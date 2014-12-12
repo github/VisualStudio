@@ -6,6 +6,12 @@ GitHub and Microsoft are developing a joint extension to Visual Studio 2015 to b
 
 Over time, we'd like to open source the extension and develop it in public, but for this initial release, we have a tight schedule and are constrained in what we can do. 
 
+## Schedule
+
+* March 16 (more or less) is when the last change to VS extensibility can happen.
+* April ?? When the last change to the extension itself can occur. We need to factor testing and stabilization time.
+* April 29 is Build
+
 ## Prerequisites
 
 Most dependencies are managed via [nuget](http://nuget.org/).
