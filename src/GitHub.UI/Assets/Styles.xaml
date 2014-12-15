@@ -1,0 +1,135 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- The blue accent color used through-out the app -->
+    <Color x:Key="GitHubAccentColor">#4ea6ea</Color>
+    <SolidColorBrush x:Key="GitHubAccentBrush" Color="{DynamicResource GitHubAccentColor}" />
+
+    <!-- Modal views display on the shell all use this as their bg color -->
+    <SolidColorBrush x:Key="GitHubModalBackgroundFill" Color="#4D000000" />
+
+    <Color x:Key="GitHubLightModalViewBackgroundColor">White</Color>
+    <SolidColorBrush x:Key="GitHubLightModalViewBackground" Color="{DynamicResource GitHubLightModalViewBackgroundColor}" />
+
+    <Color x:Key="GitHubLightModalViewTextColor">#333</Color>
+    <SolidColorBrush x:Key="GitHubLightModalViewTextBrush" Color="{DynamicResource GitHubLightModalViewTextColor}" />
+
+    <!-- Default text colors -->
+    <Color x:Key="GHTextColor">#333</Color>
+    <SolidColorBrush x:Key="GHTextBrush" Color="{DynamicResource GHTextColor}" />
+    
+    <Color x:Key="GHTextSecondaryColor">#666</Color>
+    <SolidColorBrush x:Key="GHTextSecondaryBrush" Color="{DynamicResource GHTextSecondaryColor}" />
+
+    <!-- Link Button colors -->
+    <Color x:Key="GHLinkButtonTextColor">#333</Color>
+    <SolidColorBrush x:Key="GHLinkButtonTextBrush" Color="{DynamicResource GHLinkButtonTextColor}" />
+
+    <Color x:Key="GHLinkButtonIconColor">#666</Color>
+    <SolidColorBrush x:Key="GHLinkButtonIconBrush" Color="{DynamicResource GHLinkButtonIconColor}" />
+
+    <Color x:Key="GHLinkButtonHoverColor">#222</Color>
+    <SolidColorBrush x:Key="GHLinkButtonHoverBrush" Color="{DynamicResource GHLinkButtonHoverColor}" />
+
+    <Color x:Key="GHLinkButtonHoverIconColor">#222</Color>
+    <SolidColorBrush x:Key="GHLinkButtonHoverIconBrush" Color="{DynamicResource GHLinkButtonHoverIconColor}" />
+
+    <Color x:Key="GHLinkButtonPressedColor">#121212</Color>
+    <SolidColorBrush x:Key="GHLinkButtonPressedBrush" Color="{DynamicResource GHLinkButtonPressedColor}" />
+
+    <Color x:Key="GHLinkButtonPressedIconColor">#121212</Color>
+    <SolidColorBrush x:Key="GHLinkButtonPressedIconBrush" Color="{DynamicResource GHLinkButtonPressedIconColor}" />
+
+    <!-- Blue Link Button colors -->
+    <Color x:Key="GHBlueLinkButtonTextColor">#4D89C1</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonTextBrush" Color="{DynamicResource GHBlueLinkButtonTextColor}" />
+
+    <Color x:Key="GHBlueLinkButtonDisabledTextColor">#4D89C1</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonDisabledTextBrush" Color="{DynamicResource GHBlueLinkButtonDisabledTextColor}" />
+
+    <Color x:Key="GHBlueLinkButtonIconColor">#4D89C1</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonIconBrush" Color="{DynamicResource GHBlueLinkButtonIconColor}" />
+
+    <Color x:Key="GHBlueLinkButtonHoverColor">#2061A1</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonHoverBrush" Color="{DynamicResource GHBlueLinkButtonHoverColor}" />
+
+    <Color x:Key="GHBlueLinkButtonHoverIconColor">#2061A1</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonHoverIconBrush" Color="{DynamicResource GHBlueLinkButtonHoverIconColor}" />
+
+    <Color x:Key="GHBlueLinkButtonPressedColor">#0B4680</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonPressedBrush" Color="{DynamicResource GHBlueLinkButtonPressedColor}" />
+
+    <Color x:Key="GHBlueLinkButtonPressedIconColor">#0B4680</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonPressedIconBrush" Color="{DynamicResource GHBlueLinkButtonPressedIconColor}" />
+
+    <Color x:Key="GHBlueLinkButtonDisabledColor">#6B97BF</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonDisabledBrush" Color="{DynamicResource GHBlueLinkButtonDisabledColor}" />
+
+    <Color x:Key="GHBlueLinkButtonDisabledIconColor">#6B97BF</Color>
+    <SolidColorBrush x:Key="GHBlueLinkButtonDisabledIconBrush" Color="{DynamicResource GHBlueLinkButtonDisabledIconColor}" />
+
+    <!-- Table and list colors -->
+    <Color x:Key="GHBoxDividerColor">#f1f1f1</Color>
+    <SolidColorBrush x:Key="GHBoxDividerBrush" Color="{DynamicResource GHBoxDividerColor}" />
+    
+    <Color x:Key="GHBoxHoverBackgroundColor">#f1f1f1</Color>
+    <SolidColorBrush x:Key="GHBoxHoverBackgroundBrush" Color="{DynamicResource GHBoxHoverBackgroundColor}" />
+    
+    <Color x:Key="GHBoxPressedBackgroundColor">#e7e7e7</Color>
+    <SolidColorBrush x:Key="GHBoxPressedBackgroundBrush" Color="{DynamicResource GHBoxPressedBackgroundColor}" />
+
+    <Color x:Key="GHBoxSelectedBackgroundColor">#4ea6ea</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedBackgroundBrush" Color="{DynamicResource GHBoxSelectedBackgroundColor}" />
+
+    <Color x:Key="GHBoxSelectedPressedBackgroundColor">#439bde</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedPressedBackgroundBrush" Color="{DynamicResource GHBoxSelectedPressedBackgroundColor}" />
+
+    <Color x:Key="GHBoxSelectedColor">#ffffff</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedBrush" Color="{DynamicResource GHBoxSelectedColor}" />
+
+    <Color x:Key="GHBoxSelectedSecondaryColor">#c5e6ff</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedSecondaryBrush" Color="{DynamicResource GHBoxSelectedSecondaryColor}" />
+
+    <!-- Red color used for errors -->
+    <SolidColorBrush x:Key="GitHubRed" Color="#ea2828" />
+
+    <!-- TextBox -->
+
+    <SolidColorBrush x:Key="GitHubTextBoxForegroundBrush" Color="#FF333333" />
+    <SolidColorBrush x:Key="GitHubTextBoxBorderBrush" Color="#FFCACACA" />
+    <SolidColorBrush x:Key="GitHubTextBoxMouseOverBorderBrush" Color="#FFA9A9A9" />
+    <SolidColorBrush x:Key="GitHubDarkTextBoxMouseOverBorderBrush" Color="#FF545454" />
+
+    <!-- Primary fonts -->
+    <FontFamily x:Key="GitHubFontFamilyNormal">Segoe UI</FontFamily>
+    <FontFamily x:Key="GitHubFontFamilyLight">Segoe UI Light, Segoe UI, Global User Interface</FontFamily>
+
+    <!-- Modal dialogs all leave this much of the underlying view showing -->
+    <GridLength x:Key="ModalViewLeftOffsetColumnWidth">160</GridLength>
+    
+    <QuinticEase EasingMode="EaseInOut" x:Key="GitHubDefaultEaseInOut" />
+    <QuinticEase EasingMode="EaseIn" x:Key="GitHubDefaultEaseIn" />
+    <QuinticEase EasingMode="EaseOut" x:Key="GitHubDefaultEaseOut" />
+    
+   <!-- 
+        This focus rectangle will extend 2px outside of the control boundary. 
+        Looks way nicer and happens to be the recommended practice. Not suitable for list 
+        items or elements in constrained places (close to window frame borders etc).
+    
+        "...this means that the visual feedback should appear outside the control margins, 
+         or as temporary or unobtrusive effects that will not block the hit testing on the 
+         control where the focus visual style is applied."
+    
+        http://msdn.microsoft.com/en-us/library/bb613567(v=vs.110).aspx
+    -->
+    <Style x:Key="NegativeMarginFocusVisual" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="-2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
