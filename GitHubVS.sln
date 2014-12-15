@@ -3,22 +3,45 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{1D05E67A-6D4A-4176-BFB0-D9F81BFD6E21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{11569514-5AE5-4B5B-92A2-F10B0967DE5F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{6A6B0910-ECED-4FD6-8563-359FFDC23373}"
-	ProjectSection(SolutionItems) = preProject
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
-		build\CodeAnalysisDictionary.xml = build\CodeAnalysisDictionary.xml
-		build\GitHubVS.ruleset = build\GitHubVS.ruleset
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "meta", "meta", "{880CC82E-4419-45F7-8C32-4687D0E1A175}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2FA6-4A22-8B33-69F698A18CF1}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{F8947717-5582-48D1-BDFA-3CFD5BC3C31B}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		build\Bootstrap.ps1 = build\Bootstrap.ps1
+		build.cmd = build.cmd
+		build\cibuild.ps1 = build\cibuild.ps1
+		build\SolutionInfo.cs = build\SolutionInfo.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "src\UnitTests\UnitTests.csproj", "{596595A6-2A3C-469E-9386-9E3767D863A5}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI.Reactive", "src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj", "{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Extensions", "src\GitHub.Extensions\GitHub.Extensions.csproj", "{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Extensions.Reactive", "src\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj", "{6559E128-8B40-49A5-85A8-05565ED0C7E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.App", "src\GitHub.App\GitHub.App.csproj", "{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submodules", "Submodules", "{1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rothko", "submodules\Rothko\src\Rothko.csproj", "{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1}"
+	ProjectSection(SolutionItems) = preProject
+		build\Modules\BuildUtils.psm1 = build\Modules\BuildUtils.psm1
+		build\Modules\Debugging.psm1 = build\Modules\Debugging.psm1
+		build\Modules\Vsix.psm1 = build\Modules\Vsix.psm1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,16 +49,44 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1D05E67A-6D4A-4176-BFB0-D9F81BFD6E21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D05E67A-6D4A-4176-BFB0-D9F81BFD6E21}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D05E67A-6D4A-4176-BFB0-D9F81BFD6E21}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D05E67A-6D4A-4176-BFB0-D9F81BFD6E21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{596595A6-2A3C-469E-9386-9E3767D863A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{596595A6-2A3C-469E-9386-9E3767D863A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{596595A6-2A3C-469E-9386-9E3767D863A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{596595A6-2A3C-469E-9386-9E3767D863A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{346384DD-2445-4A28-AF22-B45F3957BD89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{346384DD-2445-4A28-AF22-B45F3957BD89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{346384DD-2445-4A28-AF22-B45F3957BD89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{346384DD-2445-4A28-AF22-B45F3957BD89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6559E128-8B40-49A5-85A8-05565ED0C7E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6559E128-8B40-49A5-85A8-05565ED0C7E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6559E128-8B40-49A5-85A8-05565ED0C7E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6559E128-8B40-49A5-85A8-05565ED0C7E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
+		{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1} = {F8947717-5582-48D1-BDFA-3CFD5BC3C31B}
 	EndGlobalSection
 EndGlobal
