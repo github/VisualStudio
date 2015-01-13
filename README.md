@@ -6,6 +6,18 @@ GitHub and Microsoft are developing a joint extension to Visual Studio 2015 to b
 
 Over time, we'd like to open source the extension and develop it in public, but for this initial release, we have a tight schedule and are constrained in what we can do. 
 
+## Project Members
+Microsoft
+* PM - Anthony Cangialosi (anthc@microsoft.com)
+* PM - Cathy Sullivan (cathys@microsoft.com)
+* Dev - Art Leonard (artl@microsoft.com)
+* Dev - Praveen Sethuraman (prasethu@microsoft.com)
+* Dev - Jeff Robison (jeffro@microsoft.com)
+
+GitHub
+* Phil Haack (phil@github.com)
+* Andreia Gaita ()
+
 ## Schedule
 
 * March 16 (more or less) is when the last change to VS extensibility can happen.
