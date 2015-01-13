@@ -16,7 +16,7 @@ Microsoft
 
 GitHub
 * Phil Haack (phil@github.com)
-* Andreia Gaita ()
+* Andreia Gaita (shana@github.com)
 
 ## Schedule
 
