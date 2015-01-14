@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Dictionary>
+  <Words>
+    <Recognized>
+      <Word>param</Word>
+      <Word>git</Word>
+      <Word>github</Word>
+      <Word>bling</Word>
+      <Word>ssh</Word>
+      <Word>ssh-agent</Word>
+      <Word>unpublish</Word>
+      <Word>submodule</Word>
+      <Word>submodules</Word>
+    </Recognized>
+  </Words>
+  <Acronyms>
+    <CasingExceptions>
+      <Acronym>SSH</Acronym>
+    </CasingExceptions>
+  </Acronyms>
+</Dictionary>
