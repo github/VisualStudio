@@ -43,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{7B6C5F8D
 		script\SolutionInfo.cs = script\SolutionInfo.cs
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8A7DA2E7-262B-4581-807A-1C45CE79CDFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{596595A6-2A3C-469E-9386-9E3767D863A5} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
 	EndGlobalSection
 EndGlobal
