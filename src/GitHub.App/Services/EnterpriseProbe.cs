@@ -8,6 +8,7 @@ using GitHub.Models;
 using GitHub.Services;
 using Octokit;
 using Octokit.Internal;
+using System.Threading;
 
 namespace GitHub.Helpers
 {
@@ -38,7 +39,7 @@ namespace GitHub.Helpers
             };
             request.Headers.Add("User-Agent", productHeader.ToString());
 
-            return httpClient.Send<object>(request)
+            return httpClient.Send<object>(request, CancellationToken.None)
                 .ToObservable()
                 .Catch(Observable.Return<IResponse<object>>(null))
                 .Select(resp => resp == null
