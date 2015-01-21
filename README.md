@@ -32,6 +32,7 @@ Most dependencies are managed via [nuget](http://nuget.org/).
 __Make sure you have the following installed!__
 
 * Visual Studio 2015 preview bits
+* [Microsoft Visual Studio 2015 Preview SDK](http://www.microsoft.com/en-us/download/details.aspx?id=44932)
 
 ## Debugging
 
