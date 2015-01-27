@@ -8,12 +8,13 @@ using GitHub.Validation;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
+using GitHub.Exports;
 
 namespace GitHub.ViewModels
 {
-    [Export(typeof(TwoFactorDialogViewModel))]
+    [Export(typeof(ITwoFactorDialog))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorDialogViewModel : ReactiveValidatableObject
+    public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorDialog
     {
         bool isAuthenticationCodeSent;
         string authenticationCode;
