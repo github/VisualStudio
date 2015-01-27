@@ -1,4 +1,4 @@
-﻿using GitHub.ViewModels;
+﻿using GitHub.Exports;
 using Microsoft.VisualStudio.PlatformUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -8,7 +8,7 @@ namespace GitHub.VisualStudio.UI.Views
     /// </summary>
     public partial class LoginCommandDialog : DialogWindow
     {
-        public LoginCommandDialog(LoginControlViewModel loginControlViewModel)
+        public LoginCommandDialog(ILoginDialog loginControlViewModel)
         {
             InitializeComponent();
 

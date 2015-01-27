@@ -1,11 +1,7 @@
-﻿namespace GitHub.Authentication
+﻿using GitHub.Exports;
+
+namespace GitHub.Authentication
 {
-    public enum AuthenticationResult
-    {
-        CredentialFailure,
-        VerificationFailure,
-        Success
-    }
 
     public static class AuthenticationResultExtensions
     {

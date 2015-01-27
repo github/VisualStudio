@@ -163,6 +163,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
       <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
       <Name>GitHub.Extensions.Reactive</Name>
