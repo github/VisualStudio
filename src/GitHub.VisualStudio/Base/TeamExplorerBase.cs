@@ -1,4 +1,5 @@
-﻿using Microsoft.TeamFoundation.Client;
+﻿using GitHub.VisualStudio.Helpers;
+using Microsoft.TeamFoundation.Client;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -63,7 +64,7 @@ namespace GitHub.VisualStudio.Base
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void RaisePropertyChanged(string propertyName)
+        public void RaisePropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
@@ -91,5 +92,6 @@ namespace GitHub.VisualStudio.Base
         protected virtual void ContextChanged(object sender, ContextChangedEventArgs e)
         {
         }
+
     }
 }

@@ -187,9 +187,12 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Base\TeamExplorerBase.cs" />
+    <Compile Include="Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\ExportFactoryProvider.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Base\PackageBase.cs" />
+    <Compile Include="Helpers\INotifyPropertySource.cs" />
+    <Compile Include="Helpers\PropertyNotifierExtensions.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -200,6 +203,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="TeamExplorerHome\GitHubSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
       <DependentUpon>LoginControl.xaml</DependentUpon>
@@ -301,6 +305,7 @@
       <Name>Rothko</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
