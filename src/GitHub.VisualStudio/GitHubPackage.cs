@@ -1,27 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reactive.Concurrency;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows;
-using GitHub.Authentication;
-using GitHub.Infrastructure;
-using GitHub.ViewModels;
 using GitHub.VisualStudio.UI.Views;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using ReactiveUI;
-using Splat;
 using GitHub.Exports;
-using GitHub.VisualStudio.Services;
 
 namespace GitHub.VisualStudio
 {

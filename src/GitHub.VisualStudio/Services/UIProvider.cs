@@ -2,17 +2,14 @@
 using ReactiveUI;
 using Splat;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
-namespace GitHub.VisualStudio.Services
+namespace GitHub.VisualStudio
 {
     [Export]
     [PartCreationPolicy(CreationPolicy.Shared)]
