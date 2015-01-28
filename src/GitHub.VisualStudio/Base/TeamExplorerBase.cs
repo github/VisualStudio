@@ -1,16 +1,11 @@
-﻿using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
+﻿using Microsoft.TeamFoundation.Client;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.Base
 {
-    public abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
+    abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
     {
         bool subscribed = false;
 
