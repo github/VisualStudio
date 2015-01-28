@@ -62,6 +62,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Controls\Octicons\Octicon.cs" />
+    <Compile Include="Controls\Octicons\OcticonImage.cs" />
     <Compile Include="Controls\Octicons\OcticonPath.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs" />
     <Compile Include="Helpers\AccessKeysManagerScoping.cs" />
@@ -118,6 +119,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\Buttons\OcticonLinkButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Octicons\OcticonImage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
