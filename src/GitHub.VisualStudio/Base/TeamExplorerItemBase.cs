@@ -19,8 +19,8 @@ namespace GitHub.VisualStudio.Base
         bool isVisible;
         public bool IsVisible
         {
-            get { return IsVisible; }
-            set { IsVisible = value; this.RaisePropertyChange(); }
+            get { return isVisible; }
+            set { isVisible = value; this.RaisePropertyChange(); }
         }
 
         string text;
