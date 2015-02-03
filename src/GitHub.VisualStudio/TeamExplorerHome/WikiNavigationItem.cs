@@ -9,7 +9,9 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio
 {
-    [TeamExplorerNavigationItem(WikiNavigationItemId, 10, TargetPageId = TeamExplorerPageIds.Home)]
+    [TeamExplorerNavigationItem(WikiNavigationItemId,
+        NavigationItemPriority.Wiki,
+        TargetPageId = TeamExplorerPageIds.Home)]
     class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
@@ -22,7 +24,7 @@ namespace GitHub.VisualStudio
             IsVisible = true;
             IsEnabled = true;
 
-            Image = UI.Controls.NavigationIcon.GetImage(ServiceProvider, GitHub.UI.Octicon.book);
+            Image = Resources.book;
 
         }
     }

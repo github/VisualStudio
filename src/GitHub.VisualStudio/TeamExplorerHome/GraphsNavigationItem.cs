@@ -9,7 +9,9 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio
 {
-    [TeamExplorerNavigationItem(GraphsNavigationItemId, 10, TargetPageId = TeamExplorerPageIds.Home)]
+    [TeamExplorerNavigationItem(GraphsNavigationItemId,
+        NavigationItemPriority.Graphs,
+        TargetPageId = TeamExplorerPageIds.Home)]
     class GraphsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string GraphsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA5";
@@ -22,7 +24,7 @@ namespace GitHub.VisualStudio
             IsVisible = true;
             IsEnabled = true;
 
-            Image = UI.Controls.NavigationIcon.GetImage(ServiceProvider, GitHub.UI.Octicon.graph);
+            Image = Resources.graph;
         }
     }
 }
