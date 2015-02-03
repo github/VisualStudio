@@ -192,9 +192,8 @@
     <Compile Include="Base\TeamExplorerNavigationLinkBase.cs" />
     <Compile Include="Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\ExportFactoryProvider.cs" />
-    <Compile Include="Guids.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
-    <Compile Include="Helpers\Images.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Helpers\PropertyNotifierExtensions.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -217,7 +216,6 @@
     <Compile Include="TeamExplorerHome\IssuesNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\WikiNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PulseNavigationItem.cs" />
-    <Compile Include="UI\Controls\NavigationIcon.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
       <DependentUpon>LoginControl.xaml</DependentUpon>
@@ -260,10 +258,15 @@
     <None Include="Resources\Images.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\pulse.png" />
     <Resource Include="FodyWeavers.xml" />
     <CodeAnalysisDictionary Include="..\..\script\CodeAnalysisDictionary.xml">
       <Link>Properties\CodeAnalysisDictionary.xml</Link>
     </CodeAnalysisDictionary>
+    <None Include="Resources\book.png" />
+    <None Include="Resources\git_pull_request.png" />
+    <None Include="Resources\graph.png" />
+    <None Include="Resources\issue_opened.png" />
     <Content Include="Resources\Package.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

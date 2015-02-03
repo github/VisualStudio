@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.Controls;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace GitHub.VisualStudio
 {
-    [TeamExplorerNavigationItem(IssuesNavigationItemId, 30, TargetPageId = TeamExplorerPageIds.Home)]
+    [TeamExplorerNavigationItem(IssuesNavigationItemId,
+        NavigationItemPriority.Issues,
+        TargetPageId = TeamExplorerPageIds.Home)]
     class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
@@ -22,7 +26,7 @@ namespace GitHub.VisualStudio
             IsVisible = true;
             IsEnabled = true;
 
-            Image = UI.Controls.NavigationIcon.GetImage(ServiceProvider, GitHub.UI.Octicon.issue_closed);
+            Image = Resources.issue_opened;
         }
     }
 }

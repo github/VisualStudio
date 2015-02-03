@@ -9,7 +9,9 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio
 {
-    [TeamExplorerNavigationItem(PullRequestsNavigationItemId, 10, TargetPageId = TeamExplorerPageIds.Home)]
+    [TeamExplorerNavigationItem(PullRequestsNavigationItemId,
+        NavigationItemPriority.PullRequests,
+        TargetPageId = TeamExplorerPageIds.Home)]
     class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
@@ -22,7 +24,7 @@ namespace GitHub.VisualStudio
             IsVisible = true;
             IsEnabled = true;
 
-            Image = UI.Controls.NavigationIcon.GetImage(ServiceProvider, GitHub.UI.Octicon.git_pull_request);
+            Image = Resources.git_pull_request;
         }
     }
 }
