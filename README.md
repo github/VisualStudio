@@ -25,6 +25,11 @@ GitHub
 * April ?? When the last change to the extension itself can occur. We need to factor testing and stabilization time.
 * April 29 is Build
 
+## Documents and Assets
+https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub/_layouts/15/start.aspx#/SitePages/Home.aspx
+
+Contact cathys@microsoft.com for access to the site.
+
 ## Prerequisites
 
 Most dependencies are managed via [nuget](http://nuget.org/).
