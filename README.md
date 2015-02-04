@@ -26,7 +26,7 @@ GitHub
 * April 29 is Build
 
 ## Documents and Assets
-https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub/_layouts/15/start.aspx#/SitePages/Home.aspx
+https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub
 
 Contact cathys@microsoft.com or anthc@microsoft.com for access to the site.
 
