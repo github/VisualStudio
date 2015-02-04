@@ -28,7 +28,7 @@ GitHub
 ## Documents and Assets
 https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub/_layouts/15/start.aspx#/SitePages/Home.aspx
 
-Contact cathys@microsoft.com for access to the site.
+Contact cathys@microsoft.com or anthc@microsoft.com for access to the site.
 
 ## Prerequisites
 
