@@ -40,6 +40,5 @@ namespace GitHub.VisualStudio
             get { return image; }
             set { image = value; this.RaisePropertyChange(); }
         }
-
     }
 }
