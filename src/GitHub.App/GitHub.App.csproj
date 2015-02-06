@@ -107,7 +107,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <None Include="AkavacheSqliteLinkerOverride.cs" />
-    <Compile Include="Authentication\AuthenticationResult.cs" />
     <Compile Include="Authentication\IAccount.cs" />
     <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
     <Compile Include="Authentication\TwoFactorChallengeHandler.cs" />
@@ -130,24 +129,20 @@
     <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
     <Compile Include="Models\LocalRepositoriesAccount.cs" />
     <Compile Include="Models\LocalRepositoriesHost.cs" />
-    <Compile Include="Models\Program.cs" />
     <Compile Include="Models\RepositoryHost.cs" />
     <Compile Include="Models\RepositoryHosts.cs" />
-    <Compile Include="Primitives\HostAddress.cs" />
-    <Compile Include="Models\IProgram.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AccountFactory.cs" />
     <Compile Include="Services\ApiClient.cs" />
     <Compile Include="Services\ApiClientFactory.cs" />
-    <Compile Include="Services\Browser.cs" />
+    <None Include="Services\Browser.cs" />
     <Compile Include="Services\EnterpriseProbe.cs" />
     <Compile Include="Services\GitHubCredentialStore.cs" />
     <Compile Include="Services\IAccountFactory.cs" />
     <Compile Include="Services\IApiClient.cs" />
     <Compile Include="Services\IApiClientFactory.cs" />
-    <Compile Include="Services\IBrowser.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Services\IRepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryHostFactory.cs" />

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</ProjectGuid>
+    <ProjectGuid>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHub</RootNamespace>
-    <AssemblyName>GitHub.Exports</AssemblyName>
+    <RootNamespace>GitHub.Api</RootNamespace>
+    <AssemblyName>GitHub.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Octokit">
       <HintPath>..\..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
     </Reference>
@@ -53,25 +50,21 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
-    <Compile Include="Models\IProgram.cs" />
-    <Compile Include="Api\ISimpleApiClient.cs" />
-    <Compile Include="Api\ISimpleApiClientFactory.cs" />
-    <Compile Include="Authentication\AuthenticationResult.cs" />
-    <Compile Include="Services\IBrowser.cs" />
-    <Compile Include="UI\ICloneDialog.cs" />
-    <Compile Include="UI\ILoginDialog.cs" />
-    <Compile Include="UI\ITwoFactorDialog.cs" />
-    <Compile Include="Primitives\HostAddress.cs" />
+    <Compile Include="SimpleApiClient.cs" />
+    <Compile Include="SimpleApiClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

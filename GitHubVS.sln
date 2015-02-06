@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22310.1
+VisualStudioVersion = 14.0.22512.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{11569514-5AE5-4B5B-92A2-F10B0967DE5F}"
 EndProject
@@ -47,6 +47,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8A7DA2E7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Exports", "src\GitHub.Exports\GitHub.Exports.csproj", "{9AEA02DB-02B5-409C-B0CA-115D05331A6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.Api", "src\GitHub.Api\GitHub.Api.csproj", "{B389ADAF-62CC-486E-85B4-2D8B078DF763}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{9AEA02DB-02B5-409C-B0CA-115D05331A6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AEA02DB-02B5-409C-B0CA-115D05331A6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AEA02DB-02B5-409C-B0CA-115D05331A6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B389ADAF-62CC-486E-85B4-2D8B078DF763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B389ADAF-62CC-486E-85B4-2D8B078DF763}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B389ADAF-62CC-486E-85B4-2D8B078DF763}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B389ADAF-62CC-486E-85B4-2D8B078DF763}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

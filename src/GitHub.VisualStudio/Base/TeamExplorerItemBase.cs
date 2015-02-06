@@ -1,6 +1,7 @@
 ﻿using NullGuard;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,20 @@ namespace GitHub.VisualStudio.Base
 
         public virtual void Invalidate()
         {
+        }
+    }
+}
+
+namespace GitHub.VisualStudio.Exports
+{
+    [Export(typeof(Octokit.IGitHubClient))]
+    public class GHClient : Octokit.GitHubClient
+    {
+        [ImportingConstructor]
+        public GHClient(Models.IProgram program)
+            : base(program.ProductHeader)
+        {
+
         }
     }
 }
