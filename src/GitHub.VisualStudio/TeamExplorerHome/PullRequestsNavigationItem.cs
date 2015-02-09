@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio
 {
@@ -14,8 +15,9 @@ namespace GitHub.VisualStudio
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
 
         [ImportingConstructor]
-        public PullRequestsNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public PullRequestsNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
             Text = "Pull Requests";
             IsVisible = false;
@@ -36,10 +38,15 @@ namespace GitHub.VisualStudio
             base.Execute();
         }
 
-        async void UpdateState()
+        protected override void UpdateState()
         {
-            var solution = ServiceProvider.GetSolution();
-            IsVisible = await solution.IsHostedOnGitHub();
+            base.UpdateState();
+
+            if (IsVisible)
+            {
+
+            }
         }
+
     }
 }

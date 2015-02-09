@@ -3,6 +3,8 @@ using System.ComponentModel.Composition;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Api;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
@@ -12,11 +14,16 @@ namespace GitHub.VisualStudio
     class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
+        readonly Lazy<IBrowser> browser;
 
         [ImportingConstructor]
-        public WikiNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public WikiNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory,
+            Lazy<IBrowser> browser)
+            : base(serviceProvider, apiFactory)
         {
+            this.browser = browser;
+
             Text = "Wiki";
             IsVisible = false;
             IsEnabled = true;
@@ -31,15 +38,25 @@ namespace GitHub.VisualStudio
             base.ContextChanged(sender, e);
         }
 
-		public override void Execute()
-		{
-			base.Execute();
-		}
-
-        async void UpdateState()
+        public override async void Execute()
         {
-            var solution = ServiceProvider.GetSolution();
-            IsVisible = await solution.IsHostedOnGitHub();
+            var b = browser.Value;
+            var repo = await SimpleApiClient.GetRepository();
+            var wiki = new Uri(repo.HtmlUrl + "/wiki");
+            b.OpenUrl(wiki);
+            base.Execute();
         }
+
+        protected override async void UpdateState()
+        {
+            base.UpdateState();
+
+            if (IsVisible)
+            {
+                var repo = await SimpleApiClient.GetRepository();
+                IsEnabled = repo != null && repo.HasWiki;
+            }
+        }
+
     }
 }

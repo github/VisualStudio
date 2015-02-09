@@ -202,11 +202,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
-    <Compile Include="TeamExplorerConnect\GitHubConnectSection.cs" />
-    <Compile Include="TeamExplorerHome\GitHubHomeContent.xaml.cs">
-      <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PullRequestsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\IssuesNavigationItem.cs" />
@@ -269,11 +264,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="TeamExplorerHome\GitHubHomeContent.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>GitHub.VisualStudio.Views</CustomToolNamespace>
-    </Page>
     <Page Include="UI\Views\Controls\LoginControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -292,6 +282,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
+      <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
+      <Name>GitHub.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1a1da411-8d1f-4578-80a6-04576bea2dc5}</Project>
       <Name>GitHub.App</Name>

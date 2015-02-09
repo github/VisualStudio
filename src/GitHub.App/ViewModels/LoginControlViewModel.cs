@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GitHub.Authentication;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Models;
 using GitHub.Services;
