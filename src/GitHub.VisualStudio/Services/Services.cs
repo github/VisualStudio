@@ -27,15 +27,22 @@ namespace GitHub.VisualStudio
             string solutionDir, solutionFile, userFile;
             if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
                 return false;
+            if (solutionDir == null)
+                return false;
             var repoPath = Repository.Discover(solutionDir);
             if (repoPath == null)
                 return false;
             using (var repo = new Repository(repoPath))
             {
-                if (!repo.Network.Remotes.IsValidName("origin"))
+                var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.InvariantCulture));
+                if (remote == null)
                     return false;
                 Uri uri;
-                if (!Uri.TryCreate(repo.Network.Remotes["origin"].Url, UriKind.Absolute, out uri))
+                var url = remote.Url;
+                // fixup ssh urls
+                if (url.StartsWith("git@github.com:"))
+                    url = url.Replace("git@github.com:", "https://github.com/");
+                if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
                     return false;
 
                 if (HostAddress.IsGitHubDotComUri(uri))
