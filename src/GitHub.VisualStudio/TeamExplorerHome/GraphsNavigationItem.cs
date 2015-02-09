@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.TeamFoundation.Controls;
 using System.ComponentModel.Composition;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio
@@ -21,10 +18,28 @@ namespace GitHub.VisualStudio
             : base(serviceProvider)
         {
             Text = "Graphs";
-            IsVisible = true;
+            IsVisible = false;
             IsEnabled = true;
-
             Image = Resources.graph;
+
+            UpdateState();
+        }
+
+        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        {
+            UpdateState();
+            base.ContextChanged(sender, e);
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+        }
+
+        async void UpdateState()
+        {
+            var solution = ServiceProvider.GetSolution();
+            IsVisible = await solution.IsHostedOnGitHub();
         }
     }
 }
