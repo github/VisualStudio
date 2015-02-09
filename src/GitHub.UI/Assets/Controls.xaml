@@ -5,14 +5,12 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     mc:Ignorable="d">
 
-    
-     <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../Controls/Octicons/OcticonImage.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
     <!--
-
     Styles for standard windows controls
-
     -->
 
     <!-- TextBox -->
