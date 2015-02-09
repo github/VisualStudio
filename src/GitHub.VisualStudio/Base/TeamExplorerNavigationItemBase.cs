@@ -9,15 +9,20 @@ using NullGuard;
 using GitHub.VisualStudio.Base;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.TeamFoundation.Client;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio
 {
     class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
-        public TeamExplorerNavigationItemBase(IServiceProvider serviceProvider)
+        protected readonly ISimpleApiClientFactory apiFactory;
+        public ISimpleApiClient SimpleApiClient { get; private set;  }
+
+        public TeamExplorerNavigationItemBase(IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
             : base()
         {
             this.ServiceProvider = serviceProvider;
+            this.apiFactory = apiFactory;
 
             // temporary hack to update navigation item by tracking the solution
             SubscribeSolutionEvents();
@@ -52,6 +57,37 @@ namespace GitHub.VisualStudio
             get { return image; }
             set { image = value; this.RaisePropertyChange(); }
         }
+
+        protected virtual async void UpdateState()
+        {
+            bool visible = false;
+
+            if (SimpleApiClient == null)
+            {
+                var solution = ServiceProvider.GetSolution();
+                var uri = Services.GetRepoUrlFromSolution(solution);
+                if (uri == null)
+                {
+                    IsVisible = false;
+                    return;
+                }
+
+                if (HostAddress.IsGitHubDotComUri(uri))
+                    visible = true;
+
+                SimpleApiClient = apiFactory.Create(uri);
+
+                if (!visible)
+                {
+                    // enterprise probe
+                    var ret = await SimpleApiClient.IsEnterprise();
+                    visible = (ret == GitHub.Services.EnterpriseProbeResult.Ok);
+                }
+
+                IsVisible = visible;
+            }
+        }
+
 
 
         /* Listen to solution events so we can use the solution

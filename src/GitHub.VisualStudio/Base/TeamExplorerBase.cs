@@ -1,4 +1,5 @@
 ﻿using Microsoft.TeamFoundation.Client;
+using NullGuard;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -70,6 +71,7 @@ namespace GitHub.VisualStudio.Base
             UnsubscribeContextChanges();
         }
 
+        [return: AllowNull]
         public T GetService<T>()
         {
             Debug.Assert(this.serviceProvider != null, "GetService<T> called before service provider is set");
@@ -78,6 +80,7 @@ namespace GitHub.VisualStudio.Base
             return (T)serviceProvider.GetService(typeof(T));
         }
 
+        [return: AllowNull]
         public Ret GetService<T, Ret>() where Ret : class
         {
             return GetService<T>() as Ret;

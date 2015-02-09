@@ -138,12 +138,10 @@
     <Compile Include="Services\ApiClient.cs" />
     <Compile Include="Services\ApiClientFactory.cs" />
     <None Include="Services\Browser.cs" />
-    <Compile Include="Services\EnterpriseProbe.cs" />
     <Compile Include="Services\GitHubCredentialStore.cs" />
     <Compile Include="Services\IAccountFactory.cs" />
     <Compile Include="Services\IApiClient.cs" />
     <Compile Include="Services\IApiClientFactory.cs" />
-    <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Services\IRepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryHostFactory.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Net;
 using System.Net.Http;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using GitHub.Models;
-using GitHub.Services;
 using Octokit;
 using Octokit.Internal;
+using System.Reactive.Linq;
 using System.Threading;
+using System.Reactive.Threading.Tasks;
+using System.Net;
+using System.Threading.Tasks;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     [Export(typeof(IEnterpriseProbe))]
     [PartCreationPolicy(CreationPolicy.Shared)]
@@ -47,6 +47,11 @@ namespace GitHub.Helpers
                     : (resp.StatusCode == HttpStatusCode.OK
                         ? EnterpriseProbeResult.Ok
                         : EnterpriseProbeResult.NotFound));
+        }
+
+        public async Task<EnterpriseProbeResult> AsyncProbe(Uri enterpriseBaseUrl)
+        {
+            return await Probe(enterpriseBaseUrl).FirstAsync();
         }
     }
 
