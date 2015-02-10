@@ -58,7 +58,7 @@ namespace GitHub.VisualStudio
             set { image = value; this.RaisePropertyChange(); }
         }
 
-        protected virtual async void UpdateState()
+        protected async Task<bool> Refresh()
         {
             bool visible = false;
 
@@ -67,10 +67,7 @@ namespace GitHub.VisualStudio
                 var solution = ServiceProvider.GetSolution();
                 var uri = Services.GetRepoUrlFromSolution(solution);
                 if (uri == null)
-                {
-                    IsVisible = false;
-                    return;
-                }
+                    return visible;
 
                 if (HostAddress.IsGitHubDotComUri(uri))
                     visible = true;
@@ -83,12 +80,14 @@ namespace GitHub.VisualStudio
                     var ret = await SimpleApiClient.IsEnterprise();
                     visible = (ret == GitHub.Services.EnterpriseProbeResult.Ok);
                 }
-
-                IsVisible = visible;
             }
+            return visible;
         }
 
+        protected virtual void UpdateState()
+        {
 
+        }
 
         /* Listen to solution events so we can use the solution
         to locate the github repo it's on and update navigation
@@ -115,6 +114,7 @@ namespace GitHub.VisualStudio
 
         void SolutionOpen()
         {
+            SimpleApiClient = null;
             ContextChanged(this, new ContextChangedEventArgs(CurrentContext, CurrentContext, false, true, false));
         }
 

@@ -14,5 +14,6 @@ namespace GitHub.Api
         Uri OriginalUrl { get; }
         Task<EnterpriseProbeResult> IsEnterprise();
         Task<Repository> GetRepository();
+        Task<WikiProbeResult> HasWiki();
     }
 }

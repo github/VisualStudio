@@ -4,6 +4,8 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using GitHub.Api;
+using GitHub.Services;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.VisualStudio
 {
@@ -14,6 +16,9 @@ namespace GitHub.VisualStudio
     {
         public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
 
+        [Import(typeof(IBrowser))]
+        Lazy<IBrowser> browser;
+
         [ImportingConstructor]
         public IssuesNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory)
@@ -21,8 +26,9 @@ namespace GitHub.VisualStudio
         {
             Text = "Issues";
             IsVisible = false;
-            IsEnabled = true;
+            IsEnabled = false;
             Image = Resources.issue_opened;
+            ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
 
             UpdateState();
         }
@@ -33,20 +39,25 @@ namespace GitHub.VisualStudio
             base.ContextChanged(sender, e);
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
+            var b = browser.Value;
+            var repo = await SimpleApiClient.GetRepository();
+            var wiki = new Uri(repo.HtmlUrl + "/issues");
+            b.OpenUrl(wiki);
             base.Execute();
         }
 
         protected override async void UpdateState()
         {
-            base.UpdateState();
-
-            if (IsVisible)
+            bool visible = await Refresh();
+            if (visible)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                IsEnabled = repo != null && repo.HasIssues;
+                visible = repo != null && repo.HasIssues;
             }
+
+            IsVisible = IsEnabled = visible;
         }
     }
 }
