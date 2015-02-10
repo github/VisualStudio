@@ -4,6 +4,8 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using GitHub.Api;
+using GitHub.Services;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.VisualStudio
 {
@@ -14,6 +16,9 @@ namespace GitHub.VisualStudio
     {
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
 
+        [Import(typeof(IBrowser))]
+        Lazy<IBrowser> browser;
+
         [ImportingConstructor]
         public PullRequestsNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory)
@@ -21,8 +26,9 @@ namespace GitHub.VisualStudio
         {
             Text = "Pull Requests";
             IsVisible = false;
-            IsEnabled = true;
+            IsEnabled = false;
             Image = Resources.git_pull_request;
+            ArgbColor = Colors.RedNavigationItem.ToInt32();
 
             UpdateState();
         }
@@ -33,20 +39,18 @@ namespace GitHub.VisualStudio
             base.ContextChanged(sender, e);
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
+            var b = browser.Value;
+            var repo = await SimpleApiClient.GetRepository();
+            var wiki = new Uri(repo.HtmlUrl + "/pulls");
+            b.OpenUrl(wiki);
             base.Execute();
         }
 
-        protected override void UpdateState()
+        protected override async void UpdateState()
         {
-            base.UpdateState();
-
-            if (IsVisible)
-            {
-
-            }
+            IsVisible = IsEnabled = await Refresh();
         }
-
     }
 }

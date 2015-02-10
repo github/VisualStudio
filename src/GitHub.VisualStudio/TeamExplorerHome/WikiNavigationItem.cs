@@ -5,6 +5,7 @@ using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using GitHub.Api;
 using GitHub.Services;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.VisualStudio
 {
@@ -14,20 +15,20 @@ namespace GitHub.VisualStudio
     class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
-        readonly Lazy<IBrowser> browser;
+
+        [Import(typeof(IBrowser))]
+        Lazy<IBrowser> browser;
 
         [ImportingConstructor]
         public WikiNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory,
-            Lazy<IBrowser> browser)
+            ISimpleApiClientFactory apiFactory)
             : base(serviceProvider, apiFactory)
         {
-            this.browser = browser;
-
             Text = "Wiki";
             IsVisible = false;
-            IsEnabled = true;
+            IsEnabled = false;
             Image = Resources.book;
+            ArgbColor = Colors.BlueNavigationItem.ToInt32();
 
             UpdateState();
         }
@@ -49,14 +50,14 @@ namespace GitHub.VisualStudio
 
         protected override async void UpdateState()
         {
-            base.UpdateState();
-
-            if (IsVisible)
+            bool visible = await Refresh();
+            if (visible)
             {
-                var repo = await SimpleApiClient.GetRepository();
-                IsEnabled = repo != null && repo.HasWiki;
+                var ret = await SimpleApiClient.HasWiki();
+                visible = (ret == WikiProbeResult.Ok);
             }
+            
+            IsVisible = IsEnabled = visible;
         }
-
     }
 }

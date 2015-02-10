@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -70,6 +71,7 @@
     <Compile Include="Services\EnterpriseProbe.cs" />
     <Compile Include="Services\IBrowser.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
+    <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="UI\ICloneDialog.cs" />
     <Compile Include="UI\ILoginDialog.cs" />
     <Compile Include="UI\ITwoFactorDialog.cs" />

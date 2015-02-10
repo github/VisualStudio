@@ -185,6 +185,7 @@
     <Compile Include="Base\TeamExplorerNavigationLinkBase.cs" />
     <Compile Include="Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\Browser.cs" />
+    <Compile Include="Helpers\Colors.cs" />
     <Compile Include="Helpers\ExportFactoryProvider.cs" />
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\Services.cs" />

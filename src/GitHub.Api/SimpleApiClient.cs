@@ -15,26 +15,32 @@ namespace GitHub.Api
 
 
         readonly GitHubClient client;
-        readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
+        readonly Lazy<IEnterpriseProbe> enterpriseProbe;
+        readonly Lazy<IWikiProbe> wikiProbe;
 
         Repository repositoryCache;
+        string owner;
+        string repoName;
 
-        internal SimpleApiClient(HostAddress hostAddress, Uri repoUrl, GitHubClient githubClient, Lazy<IEnterpriseProbe> enterpriseProbe)
+        internal SimpleApiClient(HostAddress hostAddress, Uri repoUrl, GitHubClient githubClient,
+            Lazy<IEnterpriseProbe> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
-            HostAddress = hostAddress;
-            client = githubClient;
-            lazyEnterpriseProbe = enterpriseProbe;
-            OriginalUrl = repoUrl;
+            this.HostAddress = hostAddress;
+            this.client = githubClient;
+            this.enterpriseProbe = enterpriseProbe;
+            this.wikiProbe = wikiProbe;
+            this.OriginalUrl = repoUrl;
         }
 
         public async Task<Repository> GetRepository()
         {
-            if (repositoryCache == null)
+            if (owner == null)
             {
-                string owner = OriginalUrl.GetUser();
-                string name = OriginalUrl.GetRepo();
+                owner = OriginalUrl.GetUser();
+                repoName = OriginalUrl.GetRepo();
+
                 try {
-                    repositoryCache = await client.Repository.Get(owner, name);
+                    repositoryCache = await client.Repository.Get(owner, repoName);
                 } catch // TODO: if the repo is private, then it'll throw
                 {
                 }
@@ -42,11 +48,20 @@ namespace GitHub.Api
             return repositoryCache;
         }
 
+        public async Task<WikiProbeResult> HasWiki()
+        {
+            var repo = await GetRepository();
+            if (repo == null || !repo.HasWiki)
+                return WikiProbeResult.NotFound;
+
+            var probe = wikiProbe.Value;
+            return await probe.AsyncProbe(repo);
+        }
+
         public async Task<EnterpriseProbeResult> IsEnterprise()
         {
-            var enterpriseProbe = lazyEnterpriseProbe.Value;
-            return await enterpriseProbe.AsyncProbe(HostAddress.WebUri);
-
+            var probe = enterpriseProbe.Value;
+            return await probe.AsyncProbe(HostAddress.WebUri);
         }
     }
 }
