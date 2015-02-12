@@ -22,6 +22,7 @@ namespace GitHub.Exports
             this.environment = environment;
             this.serviceProvider = serviceProvider;
         }
+
         public void OpenUrl(Uri uri)
         {
             if (!uri.IsAbsoluteUri)
