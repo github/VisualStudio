@@ -1,5 +1,6 @@
 ﻿using GitHub.Services;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
 using System;
@@ -16,7 +17,8 @@ namespace GitHub.Exports
         readonly IEnvironment environment;
 
         [ImportingConstructor]
-        public Browser(IProcessStarter processManager, IEnvironment environment, IServiceProvider serviceProvider)
+        public Browser(IProcessStarter processManager, IEnvironment environment,
+            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             this.processManager = processManager;
             this.environment = environment;
