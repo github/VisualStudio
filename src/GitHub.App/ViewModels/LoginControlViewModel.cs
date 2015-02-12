@@ -105,8 +105,7 @@ namespace GitHub.ViewModels
         public string Password
         {
             [return: AllowNull]
-            get
-            { return password; }
+            get { return password; }
             set { this.RaiseAndSetIfChanged(ref password, value); }
         }
 
@@ -140,8 +139,7 @@ namespace GitHub.ViewModels
         public string UsernameOrEmail
         {
             [return: AllowNull]
-            get
-            { return usernameOrEmail; }
+            get { return usernameOrEmail; }
             set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
         }
 
