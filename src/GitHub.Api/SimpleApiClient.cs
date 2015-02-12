@@ -39,9 +39,11 @@ namespace GitHub.Api
                 owner = OriginalUrl.GetUser();
                 repoName = OriginalUrl.GetRepo();
 
-                try {
+                try
+                {
                     repositoryCache = await client.Repository.Get(owner, repoName);
-                } catch // TODO: if the repo is private, then it'll throw
+                }
+                catch // TODO: if the repo is private, then it'll throw
                 {
                 }
             }
