@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.Client;
 using GitHub.Api;
 using Microsoft.VisualStudio;
 using System.Diagnostics;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
@@ -76,12 +77,29 @@ namespace GitHub.VisualStudio
                 {
                     // enterprise probe
                     var ret = await SimpleApiClient.IsEnterprise();
-                    visible = (ret == GitHub.Services.EnterpriseProbeResult.Ok);
+                    visible = (ret == EnterpriseProbeResult.Ok);
                 }
             }
             return visible;
         }
 
+        protected async void OpenInBrowser(Lazy<IBrowser> browser, string endpoint)
+        {
+            var b = browser.Value;
+            Debug.Assert(b != null, "Could not create a browser helper instance.");
+            if (b == null)
+                return;
+
+            var repo = await SimpleApiClient.GetRepository();
+            var url = repo.HtmlUrl;
+
+            Debug.Assert(!string.IsNullOrEmpty(repo.HtmlUrl), "Could not get repository information");
+            if (string.IsNullOrEmpty(repo.HtmlUrl))
+                return;
+
+            var wiki = new Uri(repo.HtmlUrl + "/" + endpoint);
+            b.OpenUrl(wiki);
+        }
 
         protected override void Dispose(bool disposing)
         {

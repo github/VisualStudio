@@ -40,20 +40,9 @@ namespace GitHub.VisualStudio
             base.ContextChanged(sender, e);
         }
 
-        public override async void Execute()
+        public override void Execute()
         {
-            var b = browser.Value;
-            Debug.Assert(b != null, "Could not create a browser helper instance.");
-
-            var repo = await SimpleApiClient.GetRepository();
-            Debug.Assert(repo != null, "Could not load repository information.");
-
-            if (b == null || repo == null)
-                return;
-
-            var wiki = new Uri(repo.HtmlUrl + "/graphs");
-            b.OpenUrl(wiki);
-
+            OpenInBrowser(browser, "graphs");
             base.Execute();
         }
 

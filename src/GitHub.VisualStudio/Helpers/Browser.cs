@@ -71,7 +71,6 @@ namespace GitHub.Exports
             {
                 //log.Error("Really can't open the URL, even in IE", ex);
             }
-
         }
     }
 }

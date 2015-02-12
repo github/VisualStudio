@@ -3,6 +3,7 @@ using GitHub.Extensions;
 using GitHub.Services;
 using Octokit;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 
@@ -45,6 +46,7 @@ namespace GitHub.Api
                 }
                 catch // TODO: if the repo is private, then it'll throw
                 {
+                    repositoryCache = new Repository() { HtmlUrl = String.Empty };
                 }
             }
             return repositoryCache;
@@ -57,12 +59,14 @@ namespace GitHub.Api
                 return WikiProbeResult.NotFound;
 
             var probe = wikiProbe.Value;
+            Debug.Assert(probe != null, "Lazy<Wiki> probe is not set, something is wrong.");
             return await probe.AsyncProbe(repo);
         }
 
         public async Task<EnterpriseProbeResult> IsEnterprise()
         {
             var probe = enterpriseProbe.Value;
+            Debug.Assert(probe != null, "Lazy<Enterprise> probe is not set, something is wrong.");
             return await probe.AsyncProbe(HostAddress.WebUri);
         }
     }
