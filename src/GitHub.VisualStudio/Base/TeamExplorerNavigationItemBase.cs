@@ -10,13 +10,18 @@ using GitHub.VisualStudio.Base;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.TeamFoundation.Client;
 using GitHub.Api;
+using Microsoft.VisualStudio;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio
 {
-    class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
+    public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
-        protected readonly ISimpleApiClientFactory apiFactory;
-        public ISimpleApiClient SimpleApiClient { get; private set;  }
+        [AllowNull]
+        public ISimpleApiClient SimpleApiClient { get; private set; }
+
+        readonly ISimpleApiClientFactory apiFactory;
+        bool disposed = false;
 
         public TeamExplorerNavigationItemBase(IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
             : base()
@@ -26,13 +31,6 @@ namespace GitHub.VisualStudio
 
             // temporary hack to update navigation item by tracking the solution
             SubscribeSolutionEvents();
-        }
-
-        // temporary hack to update navigation item by tracking the solution
-        public override void Dispose()
-        {
-            UnsubscribeSolutionEvents();
-            base.Dispose();
         }
 
         int argbColor;
@@ -84,8 +82,18 @@ namespace GitHub.VisualStudio
             return visible;
         }
 
-        protected virtual void UpdateState()
+
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
+            if (disposed)
+                return;
+
+            if (disposing)
+                UnsubscribeSolutionEvents();
+
+            disposed = true;
 
         }
 
@@ -97,18 +105,24 @@ namespace GitHub.VisualStudio
         uint cookie = 0;
         void SubscribeSolutionEvents()
         {
+            Debug.Assert(ServiceProvider != null, "ServiceProvider must be set before subscribing to solution events");
             if (cookie > 0)
                 return;
+
             var solService = ServiceProvider.GetSolution();
-            solService.AdviseSolutionEvents(new SolutionEventListener(SolutionOpen), out cookie);
+            var ret = solService.AdviseSolutionEvents(new SolutionEventListener(SolutionOpen), out cookie);
+            Debug.Assert(ErrorHandler.Succeeded(ret), "Unable to start listening for solution events");
         }
 
         void UnsubscribeSolutionEvents()
         {
+            Debug.Assert(ServiceProvider != null, "ServiceProvider must be set before subscribing to solution events");
             if (cookie == 0)
                 return;
+
             var solService = ServiceProvider.GetSolution();
-            solService.UnadviseSolutionEvents(cookie);
+            var ret = solService.UnadviseSolutionEvents(cookie);
+            Debug.Assert(ErrorHandler.Succeeded(ret), "Unable to stop listening for solution events");
             cookie = 0;
         }
 

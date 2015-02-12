@@ -16,14 +16,13 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class WikiProbe : IWikiProbe
     {
-        static readonly Uri endPoint = new Uri("/site/sha", UriKind.Relative);
         readonly ProductHeaderValue productHeader;
         readonly IHttpClient httpClient;
 
         [ImportingConstructor]
         public WikiProbe(IProgram program, IHttpClient httpClient)
         {
-            productHeader = program.ProductHeader;
+            this.productHeader = program.ProductHeader;
             this.httpClient = httpClient;
         }
 

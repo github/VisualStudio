@@ -6,9 +6,10 @@ using System.Diagnostics;
 
 namespace GitHub.VisualStudio.Base
 {
-    abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
+    public abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
     {
         bool subscribed = false;
+        bool disposed = false;
 
         IServiceProvider serviceProvider;
         protected IServiceProvider ServiceProvider
@@ -51,6 +52,10 @@ namespace GitHub.VisualStudio.Base
 
         void UnsubscribeContextChanges()
         {
+            Debug.Assert(serviceProvider != null, "ServiceProvider must be set before subscribing to context changes");
+            if (serviceProvider == null || !subscribed)
+                return;
+
             var manager = GetService<ITeamFoundationContextManager>();
             if (manager != null)
             {
@@ -66,9 +71,26 @@ namespace GitHub.VisualStudio.Base
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
-            UnsubscribeContextChanges();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~TeamExplorerBase()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+                UnsubscribeContextChanges();
+
+            disposed = true;
         }
 
         [return: AllowNull]
@@ -80,6 +102,7 @@ namespace GitHub.VisualStudio.Base
             return (T)serviceProvider.GetService(typeof(T));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         [return: AllowNull]
         public Ret GetService<T, Ret>() where Ret : class
         {

@@ -12,18 +12,15 @@ namespace GitHub.VisualStudio
         protected IServiceProvider ServiceProvider
         {
             get { return serviceProvider; }
-            set
-            {
-                serviceProvider = value;
-            }
+            set { serviceProvider = value; }
         }
 
-        public PackageBase()
+        protected PackageBase()
         {
             ServiceProvider = this;
         }
 
-        public PackageBase(IServiceProvider serviceProvider)
+        protected PackageBase(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
         }
@@ -46,6 +43,7 @@ namespace GitHub.VisualStudio
             return (T)serviceProvider.GetService(typeof(T));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         public Ret GetService<T, Ret>() where Ret : class
         {
             return GetService<T>() as Ret;

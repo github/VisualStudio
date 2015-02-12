@@ -16,14 +16,14 @@ namespace GitHub.VisualStudio
     {
         public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
 
-        [Import(typeof(IBrowser))]
-        Lazy<IBrowser> browser;
+        readonly Lazy<IBrowser> browser;
 
         [ImportingConstructor]
         public IssuesNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory)
+            ISimpleApiClientFactory apiFactory, Lazy<IBrowser> browser)
             : base(serviceProvider, apiFactory)
         {
+            this.browser = browser;
             Text = "Issues";
             IsVisible = false;
             IsEnabled = false;
@@ -48,7 +48,7 @@ namespace GitHub.VisualStudio
             base.Execute();
         }
 
-        protected override async void UpdateState()
+        async void UpdateState()
         {
             bool visible = await Refresh();
             if (visible)

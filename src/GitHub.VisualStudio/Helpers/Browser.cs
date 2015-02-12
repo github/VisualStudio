@@ -31,8 +31,10 @@ namespace GitHub.Exports
              * CreateExternalWebBrowser method always returns E_NOTIMPL. However, it is presumably
              * safer than a Shell Execute for arbitrary URIs.
              */
-            //IVsWebBrowsingService service = serviceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
-            var service = VisualStudio.Services.WebBrowsing;
+            var service = serviceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
+            if (service == null)
+                service = VisualStudio.Services.WebBrowsing;
+
             if (service != null)
             {
                 __VSCREATEWEBBROWSER createFlags = __VSCREATEWEBBROWSER.VSCWB_AutoShow;
