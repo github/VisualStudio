@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Shell;
 using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio
 {
@@ -42,7 +43,14 @@ namespace GitHub.VisualStudio
         public override async void Execute()
         {
             var b = browser.Value;
+            Debug.Assert(b != null, "Could not create a browser helper instance.");
+
             var repo = await SimpleApiClient.GetRepository();
+            Debug.Assert(repo != null, "Could not load repository information.");
+
+            if (b == null || repo == null)
+                return;
+
             var wiki = new Uri(repo.HtmlUrl + "/pulls");
             b.OpenUrl(wiki);
             base.Execute();
