@@ -5,7 +5,7 @@ using System;
 
 namespace GitHub.VisualStudio
 {
-    class TeamExplorerSectionBase : TeamExplorerBase, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerBase, ITeamExplorerSection, INotifyPropertySource
     {
         bool isBusy;
         public bool IsBusy

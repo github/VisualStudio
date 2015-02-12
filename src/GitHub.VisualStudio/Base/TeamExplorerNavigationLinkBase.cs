@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
-    class TeamExplorerNavigationLinkBase : TeamExplorerItemBase, ITeamExplorerNavigationLink
+    public class TeamExplorerNavigationLinkBase : TeamExplorerItemBase, ITeamExplorerNavigationLink
     {
     }
 }

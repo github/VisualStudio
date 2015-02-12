@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.Base
 {
-    abstract class TeamExplorerItemBase : TeamExplorerBase, INotifyPropertySource
+    public abstract class TeamExplorerItemBase : TeamExplorerBase, INotifyPropertySource
     {
         bool isEnabled;
         public bool IsEnabled
