@@ -13,7 +13,7 @@ namespace GitHub.VisualStudio
     [TeamExplorerNavigationItem(WikiNavigationItemId,
         NavigationItemPriority.Wiki,
         TargetPageId = TeamExplorerPageIds.Home)]
-    class WikiNavigationItem : TeamExplorerNavigationItemBase
+    public class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
 

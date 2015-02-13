@@ -13,7 +13,7 @@ namespace GitHub.VisualStudio
     [TeamExplorerNavigationItem(PullRequestsNavigationItemId,
         NavigationItemPriority.PullRequests,
         TargetPageId = TeamExplorerPageIds.Home)]
-    class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
+    public class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
 

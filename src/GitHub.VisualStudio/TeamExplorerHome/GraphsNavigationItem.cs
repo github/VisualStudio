@@ -13,7 +13,7 @@ namespace GitHub.VisualStudio
     [TeamExplorerNavigationItem(GraphsNavigationItemId,
         NavigationItemPriority.Graphs,
         TargetPageId = TeamExplorerPageIds.Home)]
-    class GraphsNavigationItem : TeamExplorerNavigationItemBase
+    public class GraphsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string GraphsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA5";
 
