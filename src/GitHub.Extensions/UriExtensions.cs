@@ -40,5 +40,19 @@ namespace GitHub.Extensions
         {
             return uri == null ? "" : uri.ToString().ToUpperInvariant();
         }
+
+        public static string GetUser(this Uri uri)
+        {
+            var parts = uri.Segments;
+            var u = parts[1];
+            u = u.TrimEnd('/');
+            return u;
+        }
+
+        public static string GetRepo(this Uri uri)
+        {
+            var parts = uri.Segments;
+            return parts[2];
+        }
     }
 }
