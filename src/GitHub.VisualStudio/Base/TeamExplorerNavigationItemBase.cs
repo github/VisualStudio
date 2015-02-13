@@ -128,8 +128,9 @@ namespace GitHub.VisualStudio
                 return;
 
             var solService = ServiceProvider.GetSolution();
-            var ret = solService.AdviseSolutionEvents(new SolutionEventListener(SolutionOpen), out cookie);
-            Debug.Assert(ErrorHandler.Succeeded(ret), "Unable to start listening for solution events");
+            if (!ErrorHandler.Succeeded(solService.AdviseSolutionEvents(new SolutionEventListener(SolutionOpen), out cookie))) {
+                Debug.Assert(false, "Unable to start listening for solution events");
+            }
         }
 
         void UnsubscribeSolutionEvents()
@@ -139,8 +140,9 @@ namespace GitHub.VisualStudio
                 return;
 
             var solService = ServiceProvider.GetSolution();
-            var ret = solService.UnadviseSolutionEvents(cookie);
-            Debug.Assert(ErrorHandler.Succeeded(ret), "Unable to stop listening for solution events");
+            if (!ErrorHandler.Succeeded(solService.UnadviseSolutionEvents(cookie))) {
+                Debug.Assert(false, "Unable to stop listening for solution events");
+            }
             cookie = 0;
         }
 
