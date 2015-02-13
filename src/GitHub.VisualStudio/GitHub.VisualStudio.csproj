@@ -261,6 +261,10 @@
     <None Include="Resources\git_pull_request.png" />
     <None Include="Resources\graph.png" />
     <None Include="Resources\issue_opened.png" />
+    <Content Include="LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\Package.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

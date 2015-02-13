@@ -25,6 +25,11 @@ GitHub
 * April ?? When the last change to the extension itself can occur. We need to factor testing and stabilization time.
 * April 29 is Build
 
+## Documents and Assets
+https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub
+
+Contact cathys@microsoft.com or anthc@microsoft.com for access to the site.
+
 ## Prerequisites
 
 Most dependencies are managed via [nuget](http://nuget.org/).
@@ -32,6 +37,7 @@ Most dependencies are managed via [nuget](http://nuget.org/).
 __Make sure you have the following installed!__
 
 * Visual Studio 2015 preview bits
+* [Microsoft Visual Studio 2015 Preview SDK](http://www.microsoft.com/en-us/download/details.aspx?id=44932)
 
 ## Debugging
 
