@@ -69,7 +69,7 @@ namespace GitHub
         // since that's the same cache key for all the other github.com operations.
         public string CredentialCacheKeyHost { get; private set; }
 
-        static bool IsGitHubDotComUri(Uri hostUri)
+        public static bool IsGitHubDotComUri(Uri hostUri)
         {
             return hostUri.IsSameHost(GitHubDotComHostAddress.WebUri)
                    || hostUri.IsSameHost(GitHubDotComHostAddress.ApiUri)

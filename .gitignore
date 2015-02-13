@@ -229,3 +229,5 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+AkavacheSqliteLinkerOverride.cs

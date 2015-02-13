@@ -7,37 +7,144 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GitHub.Authentication;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Info;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
+using GitHub.Exports;
 using NullGuard;
 using ReactiveUI;
+using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    [Export(typeof(LoginControlViewModel))]
+    [Export(typeof(ILoginDialog))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LoginControlViewModel : ReactiveValidatableObject, IDisposable
+    public class LoginControlViewModel : ReactiveValidatableObject, ILoginDialog, IDisposable
     {
-        string enterpriseUrl;
-        readonly ObservableAsPropertyHelper<bool> isLoggingInToEnterprise;
-        readonly ObservableAsPropertyHelper<bool> isLoginInProgress;
-        readonly Subject<AuthenticationResult> authenticationResults;
-        readonly ObservableAsPropertyHelper<string> loginButtonText;
-        bool loginFailed;
-        string loginFailedText;
-        readonly ObservableAsPropertyHelper<LoginMode> loginMode;
-        readonly ObservableAsPropertyHelper<LoginTarget> loginTarget;
-        readonly ObservableAsPropertyHelper<VisualState> visualState;
-        string password;
-        string usernameOrEmail;
-        Uri enterpriseHostBaseUrl;
         readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
         const string notEnterpriseServerError = "Not an Enterprise server. Please enter an Enterprise URL";
+
+        public ReactiveCommand<AuthenticationResult> LoginCommand { get; private set; }
+        public ICommand LoginCmd { get { return LoginCommand; } }
+        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ICommand CancelCmd { get { return CancelCommand; } }
+        public IObservable<object> CancelEvt { get { return CancelCommand; } }
+
+        public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
+        public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
+        public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
+        public ReactiveCommand<object> SignupCommand { get; private set; }
+        public ReactiveCommand<object> LearnMoreCommand { get; private set; }
+
+        string enterpriseUrl;
+        [ValidateIf("IsLoggingInToEnterprise")]
+        [Required(ErrorMessage = "Please enter an Enterprise URL")]
+        [AllowNull]
+        public string EnterpriseUrl
+        {
+            get { return enterpriseUrl; }
+            set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
+        }
+
+        readonly ObservableAsPropertyHelper<bool> isLoggingInToEnterprise;
+        public bool IsLoggingInToEnterprise
+        {
+            get { return isLoggingInToEnterprise.Value; }
+        }
+
+        readonly ObservableAsPropertyHelper<bool> isLoginInProgress;
+        public bool IsLoginInProgress
+        {
+            get { return isLoginInProgress.Value; }
+        }
+
+        readonly ObservableAsPropertyHelper<string> loginButtonText;
+        public string LoginButtonText
+        {
+            get { return loginButtonText.Value; }
+        }
+
+        bool loginFailed;
+        public bool LoginFailed
+        {
+            get { return loginFailed; }
+            set { this.RaiseAndSetIfChanged(ref loginFailed, value); }
+        }
+
+        string loginFailedText;
+        public string LoginFailedText
+        {
+            get { return loginFailedText; }
+            private set { this.RaiseAndSetIfChanged(ref loginFailedText, value); }
+        }
+
+        readonly ObservableAsPropertyHelper<LoginMode> loginMode;
+        public LoginMode LoginMode
+        {
+            get { return loginMode.Value; }
+        }
+
+        public string LoginPrefix { get; set; }
+
+        readonly ObservableAsPropertyHelper<LoginTarget> loginTarget;
+        public LoginTarget LoginTarget
+        {
+            get { return loginTarget.Value; }
+        }
+
+        readonly ObservableAsPropertyHelper<VisualState> visualState;
+        public VisualState VisualState
+        {
+            get { return visualState.Value; }
+        }
+
+        string password;
+        [AllowNull]
+        public string Password
+        {
+            [return: AllowNull]
+            get { return password; }
+            set { this.RaiseAndSetIfChanged(ref password, value); }
+        }
+
         readonly ObservableAsPropertyHelper<Uri> forgotPasswordUrl;
+        public Uri ForgotPasswordUrl
+        {
+            get { return forgotPasswordUrl.Value; }
+        }
+
+        Uri enterpriseHostBaseUrl;
+        Uri EnterpriseHostBaseUrl
+        {
+            get { return enterpriseHostBaseUrl; }
+            set { this.RaiseAndSetIfChanged(ref enterpriseHostBaseUrl, value); }
+        }
+
+        // HACKETY HACK!
+        // Because #Bind() doesn't yet set up validation, we must use XAML bindings for username and password.
+        // But, because our SecurePasswordBox manipulates base.Text, it doesn't work with XAML binding.
+        // (It binds the password mask, not the password.)
+        // So, this property is a "black hole" to point the XAML binding to so validation works.
+        // And the actual password is bound to #Password via #Bind(). Ugly? Yep.
+        [Required(ErrorMessage = "Please enter your password")]
+        public string PasswordNoOp { get; set; }
+
+        protected IRepositoryHosts RepositoryHosts { get; private set; }
+
+        string usernameOrEmail;
+        [Required(ErrorMessage = "Please enter your username or email address")]
+        [AllowNull]
+        public string UsernameOrEmail
+        {
+            [return: AllowNull]
+            get { return usernameOrEmail; }
+            set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
+        }
+
+        readonly Subject<AuthenticationResult> authenticationResults;
+        public IObservable<AuthenticationResult> AuthenticationResults { get { return authenticationResults; } }
 
         [SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode", Justification = "It's Rx baby")]
         [ImportingConstructor]
@@ -141,113 +248,6 @@ namespace GitHub.ViewModels
             ForgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
         }
 
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-
-        [ValidateIf("IsLoggingInToEnterprise")]
-        [Required(ErrorMessage = "Please enter an Enterprise URL")]
-        [AllowNull]
-        public string EnterpriseUrl
-        {
-            get { return enterpriseUrl; }
-            set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
-        }
-
-        public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
-
-        public bool IsLoggingInToEnterprise
-        {
-            get { return isLoggingInToEnterprise.Value; }
-        }
-
-        public bool IsLoginInProgress
-        {
-            get { return isLoginInProgress.Value; }
-        }
-
-        public IObservable<AuthenticationResult> AuthenticationResults { get { return authenticationResults; } }
-
-        public string LoginButtonText
-        {
-            get { return loginButtonText.Value; }
-        }
-
-        public ReactiveCommand<AuthenticationResult> LoginCommand { get; private set; }
-
-        public bool LoginFailed
-        {
-            get { return loginFailed; }
-            set { this.RaiseAndSetIfChanged(ref loginFailed, value); }
-        }
-        
-        public string LoginFailedText
-        {
-            get { return loginFailedText; }
-            private set { this.RaiseAndSetIfChanged(ref loginFailedText, value); }
-        }
-
-        public LoginMode LoginMode
-        {
-            get { return loginMode.Value; }
-        }
-        
-        public string LoginPrefix { get; set; }
-
-        public LoginTarget LoginTarget
-        {
-            get { return loginTarget.Value; }
-        }
-
-        public VisualState VisualState
-        {
-            get { return visualState.Value; }
-        }
-
-        [AllowNull]
-        public string Password
-        {
-            [return: AllowNull]
-            get { return password; }
-            set { this.RaiseAndSetIfChanged(ref password, value); }
-        }
-
-        public Uri ForgotPasswordUrl
-        {
-            get { return forgotPasswordUrl.Value; }
-        }
-
-        Uri EnterpriseHostBaseUrl
-        {
-            get { return enterpriseHostBaseUrl; }
-            set { this.RaiseAndSetIfChanged(ref enterpriseHostBaseUrl, value); }
-        }
-
-        // HACKETY HACK!
-        // Because #Bind() doesn't yet set up validation, we must use XAML bindings for username and password.
-        // But, because our SecurePasswordBox manipulates base.Text, it doesn't work with XAML binding.
-        // (It binds the password mask, not the password.)
-        // So, this property is a "black hole" to point the XAML binding to so validation works.
-        // And the actual password is bound to #Password via #Bind(). Ugly? Yep.
-        [Required(ErrorMessage = "Please enter your password")]
-        public string PasswordNoOp { get; set; }
-
-        protected IRepositoryHosts RepositoryHosts { get; private set; }
-
-        public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
-        
-        public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
-        
-        public ReactiveCommand<object> SignupCommand { get; private set; }
-
-        public ReactiveCommand<object> LearnMoreCommand { get; private set; }
-
-        [Required(ErrorMessage = "Please enter your username or email address")]
-        [AllowNull]
-        public string UsernameOrEmail
-        {
-            [return: AllowNull]
-            get { return usernameOrEmail; }
-            set { this.RaiseAndSetIfChanged(ref usernameOrEmail, value); }
-        }
 
         public void Dispose()
         {
