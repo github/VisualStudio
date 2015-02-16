@@ -9,9 +9,13 @@ namespace GitHub.VisualStudio.Helpers
 {
     public static class Colors
     {
-        public static Color RedNavigationItem = Color.FromRgb(240, 80, 51);
-        public static Color BlueNavigationItem = Color.FromRgb(0, 121, 206);
-        public static Color LightBlueNavigationItem = Color.FromRgb(25, 140, 205);
+        public static Color RedNavigationItem = Color.FromRgb(0xF0, 0x50, 0x33);
+        public static Color BlueNavigationItem = Color.FromRgb(0, 0x79, 0xCE);
+        public static Color LightBlueNavigationItem = Color.FromRgb(0, 0x9E, 0xCE);
+        public static Color DarkPurpleNavigationItem = Color.FromRgb(0x68, 0x21, 0x7A);
+        public static Color GrayNavigationItem = Color.FromRgb(0x73, 0x82, 0x8C);
+        public static Color YellowNavigationItem = Color.FromRgb(0xF9, 0xC9, 0x00);
+        public static Color PurpleNavigationItem = Color.FromRgb(0xAE, 0x3C, 0xBA);
 
         public static int ToInt32(this Color color)
         {
