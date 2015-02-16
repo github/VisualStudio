@@ -15,10 +15,10 @@ namespace GitHub.VisualStudio
 
     static class NavigationItemPriority
     {
-        public const int PullRequests = TeamExplorerNavigationItemPriority.Settings - 5;
-        public const int Pulse = TeamExplorerNavigationItemPriority.Settings - 4;
-        public const int Graphs = TeamExplorerNavigationItemPriority.Settings - 3;
-        public const int Issues = TeamExplorerNavigationItemPriority.Settings - 2;
+        public const int PullRequests = TeamExplorerNavigationItemPriority.GitCommits - 1;
         public const int Wiki = TeamExplorerNavigationItemPriority.Settings - 1;
+        public const int Pulse = Wiki - 3;
+        public const int Graphs = Wiki- 2;
+        public const int Issues = Wiki - 1;
     }
 }
