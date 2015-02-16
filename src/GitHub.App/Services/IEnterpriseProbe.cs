@@ -1,5 +1,4 @@
-﻿using Octokit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
-    public interface IWikiProbe
+    public interface IEnterpriseProbe
     {
-        Task<WikiProbeResult> ProbeAsync(Repository repo);
+        IObservable<EnterpriseProbeResult> Probe(Uri enterpriseBaseUrl);
     }
 }

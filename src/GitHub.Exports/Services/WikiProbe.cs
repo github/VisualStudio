@@ -4,11 +4,9 @@ using System.Net.Http;
 using GitHub.Models;
 using Octokit;
 using Octokit.Internal;
-using System.Reactive.Linq;
 using System.Threading;
-using System.Reactive.Threading.Tasks;
-using System.Net;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 
 namespace GitHub.Services
 {
@@ -26,7 +24,7 @@ namespace GitHub.Services
             this.httpClient = httpClient;
         }
 
-        public IObservable<WikiProbeResult> Probe(Repository repo)
+        public async Task<WikiProbeResult> ProbeAsync(Repository repo)
         {
             var repoUri = new Uri(repo.HtmlUrl);
             var baseUri = new Uri(repo.HtmlUrl.Replace(repoUri.AbsolutePath, ""));
@@ -40,19 +38,15 @@ namespace GitHub.Services
             };
             request.Headers.Add("User-Agent", productHeader.ToString());
 
-            return httpClient.Send<object>(request, CancellationToken.None)
-                .ToObservable()
-                .Catch(Observable.Return<IResponse<object>>(null))
-                .Select(resp => resp == null
-                    ? WikiProbeResult.Failed
-                    : (resp.StatusCode == HttpStatusCode.OK
-                        ? WikiProbeResult.Ok
-                        : WikiProbeResult.NotFound));
-        }
+            var ret = await httpClient
+                .Send<object>(request, CancellationToken.None)
+                .Catch(ex => null);
 
-        public async Task<WikiProbeResult> AsyncProbe(Repository repo)
-        {
-            return await Probe(repo).FirstAsync();
+            if (ret == null)
+                return WikiProbeResult.Failed;
+            else if (ret.StatusCode == System.Net.HttpStatusCode.OK)
+                return WikiProbeResult.Ok;
+            return WikiProbeResult.NotFound;
         }
     }
 

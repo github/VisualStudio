@@ -1,20 +1,19 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Net.Http;
 using GitHub.Models;
 using Octokit;
 using Octokit.Internal;
-using System.Reactive.Linq;
-using System.Threading;
-using System.Reactive.Threading.Tasks;
-using System.Net;
 using System.Threading.Tasks;
+using System.Net.Http;
+using GitHub.Extensions;
+using System.Threading;
+using System.Net;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IEnterpriseProbe))]
+    [Export(typeof(IEnterpriseProbeTask))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class EnterpriseProbe : IEnterpriseProbe
+    public class EnterpriseProbe : IEnterpriseProbeTask
     {
         static readonly Uri endPoint = new Uri("/site/sha", UriKind.Relative);
         readonly ProductHeaderValue productHeader;
@@ -27,7 +26,7 @@ namespace GitHub.Services
             this.httpClient = httpClient;
         }
 
-        public IObservable<EnterpriseProbeResult> Probe(Uri enterpriseBaseUrl)
+        public async Task<EnterpriseProbeResult> ProbeAsync(Uri enterpriseBaseUrl)
         {
             var request = new Request
             {
@@ -39,19 +38,15 @@ namespace GitHub.Services
             };
             request.Headers.Add("User-Agent", productHeader.ToString());
 
-            return httpClient.Send<object>(request, CancellationToken.None)
-                .ToObservable()
-                .Catch(Observable.Return<IResponse<object>>(null))
-                .Select(resp => resp == null
-                    ? EnterpriseProbeResult.Failed
-                    : (resp.StatusCode == HttpStatusCode.OK
-                        ? EnterpriseProbeResult.Ok
-                        : EnterpriseProbeResult.NotFound));
-        }
+            var ret = await httpClient
+                    .Send<object>(request, CancellationToken.None)
+                    .Catch(ex => null);
 
-        public async Task<EnterpriseProbeResult> AsyncProbe(Uri enterpriseBaseUrl)
-        {
-            return await Probe(enterpriseBaseUrl).FirstAsync();
+            if (ret == null)
+                return EnterpriseProbeResult.Failed;
+            else if (ret.StatusCode == HttpStatusCode.OK)
+                return EnterpriseProbeResult.Ok;
+            return EnterpriseProbeResult.NotFound;
         }
     }
 
