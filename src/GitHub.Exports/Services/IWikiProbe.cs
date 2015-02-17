@@ -9,7 +9,6 @@ namespace GitHub.Services
 {
     public interface IWikiProbe
     {
-        IObservable<WikiProbeResult> Probe(Repository repo);
-        Task<WikiProbeResult> AsyncProbe(Repository repo);
+        Task<WikiProbeResult> ProbeAsync(Repository repo);
     }
 }
