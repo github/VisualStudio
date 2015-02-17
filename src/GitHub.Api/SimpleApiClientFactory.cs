@@ -15,11 +15,11 @@ namespace GitHub.Api
     public class SimpleApiClientFactory : ISimpleApiClientFactory
     {
         readonly ProductHeaderValue productHeader;
-        readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
+        readonly Lazy<IEnterpriseProbeTask> lazyEnterpriseProbe;
         readonly Lazy<IWikiProbe> lazyWikiProbe;
 
         [ImportingConstructor]
-        public SimpleApiClientFactory(IProgram program, Lazy<IEnterpriseProbe> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
+        public SimpleApiClientFactory(IProgram program, Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
             productHeader = program.ProductHeader;
             lazyEnterpriseProbe = enterpriseProbe;
