@@ -58,9 +58,9 @@
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
     <Compile Include="Authentication\AuthenticationResult.cs" />
-    <Compile Include="Services\EnterpriseProbe.cs" />
+    <Compile Include="Services\EnterpriseProbeTask.cs" />
     <Compile Include="Services\IBrowser.cs" />
-    <Compile Include="Services\IEnterpriseProbe.cs" />
+    <Compile Include="Services\IEnterpriseProbeTask.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="UI\ICloneDialog.cs" />
