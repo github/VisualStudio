@@ -13,14 +13,14 @@ namespace GitHub.Services
 {
     [Export(typeof(IEnterpriseProbeTask))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class EnterpriseProbe : IEnterpriseProbeTask
+    public class EnterpriseProbeTask : IEnterpriseProbeTask
     {
         static readonly Uri endPoint = new Uri("/site/sha", UriKind.Relative);
         readonly ProductHeaderValue productHeader;
         readonly IHttpClient httpClient;
 
         [ImportingConstructor]
-        public EnterpriseProbe(IProgram program, IHttpClient httpClient)
+        public EnterpriseProbeTask(IProgram program, IHttpClient httpClient)
         {
             productHeader = program.ProductHeader;
             this.httpClient = httpClient;
