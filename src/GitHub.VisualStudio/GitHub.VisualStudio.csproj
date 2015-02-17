@@ -182,6 +182,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Base\TeamExplorerBase.cs" />
+    <Compile Include="Base\TeamExplorerGitAwareItem.cs" />
     <Compile Include="Base\TeamExplorerItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationLinkBase.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PullRequestsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\IssuesNavigationItem.cs" />
@@ -216,6 +218,9 @@
     </Compile>
     <Compile Include="UI\Views\CreateIssueDialog.xaml.cs">
       <DependentUpon>CreateIssueDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GitHubHomeContent.xaml.cs">
+      <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\LoginCommandDialog.xaml.cs">
       <DependentUpon>LoginCommandDialog.xaml</DependentUpon>
@@ -278,6 +283,9 @@
     <Page Include="UI\Views\CreateIssueDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\GitHubHomeContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\LoginCommandDialog.xaml">
       <SubType>Designer</SubType>

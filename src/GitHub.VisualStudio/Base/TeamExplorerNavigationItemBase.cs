@@ -16,22 +16,19 @@ using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
-    public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
+    public class TeamExplorerNavigationItemBase : TeamExplorerGitAwareItem, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
         [AllowNull]
         public ISimpleApiClient SimpleApiClient { get; private set; }
 
         readonly ISimpleApiClientFactory apiFactory;
-        bool disposed = false;
 
         public TeamExplorerNavigationItemBase(IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
             : base()
         {
             this.ServiceProvider = serviceProvider;
             this.apiFactory = apiFactory;
-
-            // temporary hack to update navigation item by tracking the solution
-            SubscribeSolutionEvents();
+            Initialize();
         }
 
         int argbColor;
@@ -101,116 +98,11 @@ namespace GitHub.VisualStudio
             b.OpenUrl(wiki);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
 
-            if (disposed)
-                return;
-
-            if (disposing)
-                UnsubscribeSolutionEvents();
-
-            disposed = true;
-
-        }
-
-        /* Listen to solution events so we can use the solution
-        to locate the github repo it's on and update navigation
-        items accordingly. This is temporary until the
-        TFS api supports git repos. */
-
-        uint cookie = 0;
-        void SubscribeSolutionEvents()
-        {
-            Debug.Assert(ServiceProvider != null, "ServiceProvider must be set before subscribing to solution events");
-            if (cookie > 0)
-                return;
-
-            var solService = ServiceProvider.GetSolution();
-            if (!ErrorHandler.Succeeded(solService.AdviseSolutionEvents(new SolutionEventListener(SolutionOpen), out cookie))) {
-                Debug.Assert(false, "Unable to start listening for solution events");
-            }
-        }
-
-        void UnsubscribeSolutionEvents()
-        {
-            Debug.Assert(ServiceProvider != null, "ServiceProvider must be set before subscribing to solution events");
-            if (cookie == 0)
-                return;
-
-            var solService = ServiceProvider.GetSolution();
-            if (!ErrorHandler.Succeeded(solService.UnadviseSolutionEvents(cookie))) {
-                Debug.Assert(false, "Unable to stop listening for solution events");
-            }
-            cookie = 0;
-        }
-
-        void SolutionOpen()
+        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
         {
             SimpleApiClient = null;
-            ContextChanged(this, new ContextChangedEventArgs(CurrentContext, CurrentContext, false, true, false));
-        }
-
-        class SolutionEventListener : IVsSolutionEvents
-        {
-            Action callback;
-            public SolutionEventListener(Action callback)
-            {
-                this.callback = callback;
-            }
-
-            public int OnAfterCloseSolution(object pUnkReserved)
-            {
-                return 0;
-            }
-
-            public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
-            {
-                return 0;
-            }
-
-            public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
-            {
-                return 0;
-            }
-
-            public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
-            {
-                if (callback != null)
-                    callback();
-                return 0;
-            }
-
-            public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
-            {
-                return 0;
-            }
-
-            public int OnBeforeCloseSolution(object pUnkReserved)
-            {
-                return 0;
-            }
-
-            public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
-            {
-                return 0;
-            }
-
-            public int OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
-            {
-                return 0;
-            }
-
-            public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
-            {
-                return 0;
-            }
-
-            public int OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
-            {
-                return 0;
-            }
+            base.ContextChanged(sender, e);
         }
     }
 }
