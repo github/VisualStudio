@@ -2,10 +2,11 @@
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using System;
+using Microsoft.TeamFoundation.Client;
 
 namespace GitHub.VisualStudio
 {
-    public class TeamExplorerSectionBase : TeamExplorerBase, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerGitAwareItem, ITeamExplorerSection, INotifyPropertySource
     {
         bool isBusy;
         public bool IsBusy
@@ -21,12 +22,16 @@ namespace GitHub.VisualStudio
             set { isExpanded = value; this.RaisePropertyChange(); }
         }
 
+        // When this class goes back to inheriting from TeamExplorerBase,
+        // this property should be restored
+        /*
         bool isVisible;
         public bool IsVisible
         {
             get { return isVisible; }
             set { isVisible = value; this.RaisePropertyChange(); }
         }
+        */
 
         object sectionContent;
         [AllowNull]
@@ -48,6 +53,7 @@ namespace GitHub.VisualStudio
         {
         }
 
+        [return: AllowNull]
         public virtual object GetExtensibilityService(Type serviceType)
         {
             return null;
@@ -56,6 +62,7 @@ namespace GitHub.VisualStudio
         public virtual void Initialize(object sender, SectionInitializeEventArgs e)
         {
             ServiceProvider = e.ServiceProvider;
+            Initialize();
         }
 
         public virtual void Loaded(object sender, SectionLoadedEventArgs e)
@@ -68,6 +75,18 @@ namespace GitHub.VisualStudio
 
         public virtual void SaveContext(object sender, SectionSaveContextEventArgs e)
         {
+        }
+
+        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        {
+            if (e.TeamProjectChanged)
+            {
+                if (e.NewContext != null && e.NewContext.HasTeamProject)
+                    IsVisible = true;
+                else
+                    IsVisible = false;
+            }
+            base.ContextChanged(sender, e);
         }
     }
 }

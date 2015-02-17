@@ -47,19 +47,38 @@ namespace GitHub.VisualStudio
                 return null;
             using (var repo = new Repository(repoPath))
             {
-                var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
-                if (remote == null)
-                    return null;
-                Uri uri;
-                var url = remote.Url;
-                // fixup ssh urls
-                if (url.StartsWith("git@github.com:", StringComparison.Ordinal))
-                    url = url.Replace("git@github.com:", "https://github.com/");
-                if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
-                    return null;
-                return uri;
+                return GetUriFromRepository(repo);
             }
         }
 
+        [return: AllowNull]
+        public static Repository GetRepoFromSolution(IVsSolution solution)
+        {
+            string solutionDir, solutionFile, userFile;
+            if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
+                return null;
+            if (solutionDir == null)
+                return null;
+            var repoPath = Repository.Discover(solutionDir);
+            if (repoPath == null)
+                return null;
+            return new Repository(repoPath);
+        }
+
+        [return: AllowNull]
+        public static Uri GetUriFromRepository(Repository repo)
+        {
+            var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
+            if (remote == null)
+                return null;
+            Uri uri;
+            var url = remote.Url;
+            // fixup ssh urls
+            if (url.StartsWith("git@github.com:", StringComparison.Ordinal))
+                url = url.Replace("git@github.com:", "https://github.com/");
+            if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
+                return null;
+            return uri;
+        }
     }
 }
