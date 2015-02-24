@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.Composition;
+﻿using GitHub.UI;
+using System.ComponentModel.Composition;
 
-namespace GitHub.Exports
+namespace GitHub.Services
 {
     [Export]
     public class ExportFactoryProvider
@@ -13,7 +14,11 @@ namespace GitHub.Exports
         }
         
         [Import(AllowRecomposition =true)]
-        public ExportFactory<ILoginDialog> LoginViewModelFactory { get; set; }
+        public ExportFactory<ILoginViewModel> LoginViewModelFactory { get; set; }
+
+        [Import(AllowRecomposition = true)]
+        public ExportFactory<IUIController> UIControllerFactory { get; set; }
+        
         /*
         [Import(AllowRecomposition = true)]
         public ExportFactory<ITwoFactorDialog> TwoFactorViewModelFactory { get; set; }

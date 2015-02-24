@@ -11,6 +11,7 @@
     <AssemblyName>GitHub.App</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <NuGetPackageImportStamp>5547d2f4</NuGetPackageImportStamp>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
@@ -41,7 +42,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\akavache.sqlite3.4.1.0\lib\Portable-Net45+Win8+WP8+Wpa81\Akavache.Sqlite3.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -73,6 +76,9 @@
     </Reference>
     <Reference Include="SQLitePCL.raw">
       <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.1\lib\net45\SQLitePCL.raw.dll</HintPath>
+    </Reference>
+    <Reference Include="Stateless">
+      <HintPath>..\..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -107,14 +113,11 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <None Include="AkavacheSqliteLinkerOverride.cs" />
-    <Compile Include="Authentication\IAccount.cs" />
-    <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
     <Compile Include="Authentication\TwoFactorChallengeHandler.cs" />
     <Compile Include="Authentication\TwoFactorRequiredUserError.cs" />
     <Compile Include="Caches\HostCache.cs" />
     <Compile Include="Caches\HostCacheFactory.cs" />
     <Compile Include="Caches\IBlobCacheFactory.cs" />
-    <Compile Include="Caches\IHostCache.cs" />
     <Compile Include="Caches\IHostCacheFactory.cs" />
     <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
@@ -131,33 +134,48 @@
     <Compile Include="Models\LocalRepositoriesHost.cs" />
     <Compile Include="Models\RepositoryHost.cs" />
     <Compile Include="Models\RepositoryHosts.cs" />
-    <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Services\AccountFactory.cs" />
     <Compile Include="Services\ApiClient.cs" />
     <Compile Include="Services\ApiClientFactory.cs" />
     <None Include="Services\Browser.cs" />
     <Compile Include="Services\EnterpriseProbe.cs" />
+    <Compile Include="Services\ErrorMap.cs" />
+    <Compile Include="Services\ErrorMessage.cs" />
+    <Compile Include="Services\ErrorMessageTranslator.cs" />
     <Compile Include="Services\GitHubCredentialStore.cs" />
     <Compile Include="Services\IAccountFactory.cs" />
-    <Compile Include="Services\IApiClient.cs" />
     <Compile Include="Services\IApiClientFactory.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Services\IRepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryHostFactory.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />
+    <Compile Include="Controllers\UIController.cs" />
+    <Compile Include="Services\Translation.cs" />
+    <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
+    <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
+    <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
+    <Compile Include="ViewModels\CreateRepoViewModel.cs" />
+    <Compile Include="ViewModels\CloneRepoViewModel.cs" />
     <Compile Include="ViewModels\LoginControlViewModel.cs" />
     <Compile Include="ViewModels\TwoFactorDialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <Resource Include="Images\default_org_avatar.png" />
+    <Resource Include="Images\default_user_avatar.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
+      <Name>GitHub.Exports.Reactive</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
@@ -179,7 +197,6 @@
       <Name>Rothko</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

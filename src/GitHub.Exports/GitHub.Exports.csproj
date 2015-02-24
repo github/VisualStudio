@@ -42,6 +42,7 @@
     <Reference Include="Octokit">
       <HintPath>..\..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -51,22 +52,30 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Models\IProgram.cs" />
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
     <Compile Include="Authentication\AuthenticationResult.cs" />
+    <Compile Include="Models\IRepositoryModel.cs" />
+    <Compile Include="Primitives\StringEquivalent.cs" />
+    <Compile Include="Primitives\UriString.cs" />
     <Compile Include="Services\EnterpriseProbeTask.cs" />
+    <Compile Include="Services\ExportFactoryProvider.cs" />
     <Compile Include="Services\IBrowser.cs" />
     <Compile Include="Services\IEnterpriseProbeTask.cs" />
+    <Compile Include="Services\IUIProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
-    <Compile Include="UI\ICloneDialog.cs" />
-    <Compile Include="UI\ILoginDialog.cs" />
-    <Compile Include="UI\ITwoFactorDialog.cs" />
+    <Compile Include="UI\ICloneRepoViewModel.cs" />
+    <Compile Include="UI\ILoginViewModel.cs" />
+    <Compile Include="UI\ITwoFactorViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
+    <Compile Include="UI\IUIController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />

@@ -1,5 +1,4 @@
-﻿using GitHub.Exports;
-using GitHub.Extensions;
+﻿using GitHub.Extensions;
 using GitHub.Services;
 using Octokit;
 using System;

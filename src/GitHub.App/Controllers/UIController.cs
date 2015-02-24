@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.UI
             machine.Configure(UIState.Auth)
                 .OnEntry(() =>
                 {
-                    var twofa = uiProvider.GetService<ITwoFactorDialog>();
+                    var twofa = uiProvider.GetService<ITwoFactorViewModel>();
                     twofa.WhenAny(x => x.IsShowing, x => x.Value)
                         .Where(x => x)
                         .Subscribe(_ =>
@@ -55,7 +55,7 @@ namespace GitHub.VisualStudio.UI
 
                     var d = factory.LoginViewModelFactory.CreateExport();
                     disposables.Add(d);
-                    var view = uiProvider.GetService<IViewFor<ILoginDialog>>();
+                    var view = uiProvider.GetService<IViewFor<ILoginViewModel>>();
                     view.ViewModel = d.Value;
 
                     d.Value.AuthenticationResults.Subscribe(result =>
@@ -71,8 +71,8 @@ namespace GitHub.VisualStudio.UI
                 .SubstateOf(UIState.Auth)
                 .OnEntry(() =>
                 {
-                    var d = uiProvider.GetService<ITwoFactorDialog>();
-                    var view = uiProvider.GetService<IViewFor<ITwoFactorDialog>>();
+                    var d = uiProvider.GetService<ITwoFactorViewModel>();
+                    var view = uiProvider.GetService<IViewFor<ITwoFactorViewModel>>();
                     view.ViewModel = d;
                     transition.OnNext(view);
                 })
@@ -93,9 +93,9 @@ namespace GitHub.VisualStudio.UI
             machine.Configure(UIState.Clone)
                 .OnEntry(() =>
                 {
-                    var d = uiProvider.GetService<ICloneRepoDialog>();
+                    var d = uiProvider.GetService<ICloneRepoViewModel>();
                     
-                    var view = uiProvider.GetService<IViewFor<ICloneRepoDialog>>();
+                    var view = uiProvider.GetService<IViewFor<ICloneRepoViewModel>>();
                     view.ViewModel = d;
                     transition.OnNext(view);
                 })
