@@ -15,7 +15,6 @@ using NLog;
 using Octokit;
 using ReactiveUI;
 using Authorization = Octokit.Authorization;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {

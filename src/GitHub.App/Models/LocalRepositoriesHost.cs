@@ -3,7 +3,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {
