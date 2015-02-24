@@ -12,10 +12,10 @@ namespace GitHub.Authentication
     public class TwoFactorChallengeHandler : ITwoFactorChallengeHandler
     {
         //readonly IServiceProvider serviceProvider;
-        readonly Lazy<ITwoFactorDialog> lazyTwoFactorDialog;
+        readonly Lazy<ITwoFactorViewModel> lazyTwoFactorDialog;
 
         [ImportingConstructor]
-        public TwoFactorChallengeHandler(Lazy<ITwoFactorDialog> twoFactorDialog)
+        public TwoFactorChallengeHandler(Lazy<ITwoFactorViewModel> twoFactorDialog)
         {
             //this.serviceProvider = serviceProvider;
             this.lazyTwoFactorDialog = twoFactorDialog;

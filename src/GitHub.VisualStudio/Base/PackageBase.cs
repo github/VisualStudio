@@ -57,11 +57,5 @@ namespace GitHub.VisualStudio
             var exportProvider = componentModel.DefaultExportProvider;
             return exportProvider.GetExportedValue<T>();
         }
-
-        protected void EnsureUIProvider()
-        {
-            var ui = GetExportedValue<UIProvider>();
-            ui.EnsureProvider(GetService<SComponentModel, IComponentModel>().DefaultExportProvider);
-        }
     }
 }

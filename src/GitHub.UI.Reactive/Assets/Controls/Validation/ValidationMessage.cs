@@ -6,6 +6,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using GitHub.Extensions.Reactive;
 using ReactiveUI;
+using GitHub.Validation;
 
 namespace GitHub.UI
 {

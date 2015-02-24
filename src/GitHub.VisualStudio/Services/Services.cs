@@ -1,11 +1,18 @@
-﻿using GitHub.Api;
+﻿using EnvDTE;
+using EnvDTE80;
+using GitHub.Api;
+using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextManager.Interop;
 using NullGuard;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,14 +21,29 @@ namespace GitHub.VisualStudio
 {
     public static class Services
     {
+        public static IComponentModel ComponentModel
+        {
+            get { return Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel; }
+        }
+
+        public static IVsWebBrowsingService WebBrowsingService
+        {
+            get { return Package.GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService; }
+        }
+
+        public static IVsTextManager TextManager
+        {
+            get { return Package.GetGlobalService(typeof(SVsTextManager)) as IVsTextManager; }
+        }
+
+        public static IVsOutputWindow OutputWindow
+        {
+            get { return Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow; }
+        }
+
         public static IVsSolution Solution
         {
             get { return Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution; }
-        }
-
-        public static IVsSolution GetSolution(this IServiceProvider provider)
-        {
-            return provider.GetService(typeof(SVsSolution)) as IVsSolution;
         }
 
         public static IVsWebBrowsingService WebBrowsing
@@ -29,9 +51,42 @@ namespace GitHub.VisualStudio
             get { return Package.GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService; }
         }
 
+        public static IVsUIShell Shell
+        {
+            get { return Package.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell; }
+        }
+
+        public static DTE Dte
+        {
+            get { return Package.GetGlobalService(typeof(DTE)) as DTE; }
+        }
+
+        public static DTE2 Dte2
+        {
+            get { return Dte as DTE2; }
+        }
+
+        public static IVsSolution GetSolution(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(SVsSolution)) as IVsSolution;
+        }
+
         public static IVsWebBrowsingService GetWebBrowsing(this IServiceProvider provider)
         {
             return provider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
+        }
+
+        [return: AllowNull]
+        public static T GetExportedValue<T>(this IServiceProvider serviceProvider)
+        {
+            var ui = serviceProvider as IUIProvider;
+            if (ui != null)
+                return ui.GetService<T>();
+            else
+            {
+                var componentModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+                return componentModel.DefaultExportProvider.GetExportedValue<T>();
+            }
         }
 
         [return: AllowNull]

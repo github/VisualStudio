@@ -58,25 +58,18 @@
           <ButtonText>&amp;Login</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidGitHubCmdSet" id="createIssueCommand" priority="0x0101" type="Button">
+      <Button guid="guidGitHubCmdSet" id="createRepoCommand" priority="0x0101" type="Button">
         <Parent guid="guidGitHubCmdSet" id="GitHubMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>&amp;Create Issue</ButtonText>
+          <ButtonText>&amp;Create repo</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidGitHubCmdSet" id="goToIssueCommand" priority="0x0102" type="Button">
+      <Button guid="guidGitHubCmdSet" id="cloneRepoCommand" priority="0x0102" type="Button">
         <Parent guid="guidGitHubCmdSet" id="GitHubMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>&amp;Go to issue</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidGitHubCmdSet" id="viewIssuesCommand" priority="0x0103" type="Button">
-        <Parent guid="guidGitHubCmdSet" id="GitHubMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
-        <Strings>
-          <ButtonText>&amp;View Issues</ButtonText>
+          <ButtonText>&amp;Clone repo</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -94,9 +87,8 @@
 
   <KeyBindings>
     <KeyBinding guid="guidGitHubCmdSet" id="loginCommand" editor="guidVSStd97" key1="U" key2="L" mod2="CONTROL" mod1="CONTROL"/>
-    <KeyBinding guid="guidGitHubCmdSet" id="createIssueCommand" editor="guidVSStd97" key1="U" key2="C" mod2="CONTROL" mod1="CONTROL"/>
-    <KeyBinding guid="guidGitHubCmdSet" id="goToIssueCommand" editor="guidVSStd97" key1="U" key2="G" mod2="CONTROL" mod1="CONTROL"/>
-    <KeyBinding guid="guidGitHubCmdSet" id="viewIssuesCommand" editor="guidVSStd97" key1="U" key2="V" mod2="CONTROL" mod1="CONTROL"/>
+    <KeyBinding guid="guidGitHubCmdSet" id="createRepoCommand" editor="guidVSStd97" key1="U" key2="C" mod2="CONTROL" mod1="CONTROL"/>
+    <KeyBinding guid="guidGitHubCmdSet" id="cloneRepoCommand" editor="guidVSStd97" key1="U" key2="G" mod2="CONTROL" mod1="CONTROL"/>
   </KeyBindings>
   
   <Symbols>
@@ -106,10 +98,9 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidGitHubCmdSet" value="{c4c91892-8881-4588-a5d9-b41e8f540f5a}">
       <IDSymbol name="GitHubMenuGroup" value="0x1020" />
-      <IDSymbol name="loginCommand" value="0x0110" />
-      <IDSymbol name="createIssueCommand" value="0x0100" />
-      <IDSymbol name="goToIssueCommand" value="0x0101" />
-      <IDSymbol name="viewIssuesCommand" value="0x0102" />
+      <IDSymbol name="loginCommand" value="0x110" />
+      <IDSymbol name="createRepoCommand" value="0x111" />
+      <IDSymbol name="cloneRepoCommand" value="0x112" />
       <IDSymbol name="GitHubMenu" value="0x1021"/>
     </GuidSymbol>
     
