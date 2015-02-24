@@ -7,7 +7,6 @@ using Akavache;
 using GitHub.Authentication;
 using GitHub.Extensions.Reactive;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {
