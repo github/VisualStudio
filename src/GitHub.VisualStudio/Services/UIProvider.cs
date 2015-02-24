@@ -1,9 +1,14 @@
 ﻿using GitHub.Infrastructure;
+using GitHub.Services;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
+using NullGuard;
 using ReactiveUI;
 using Splat;
 using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -11,31 +16,28 @@ using System.Windows;
 
 namespace GitHub.VisualStudio
 {
-    [Export]
+    [Export(typeof(IUIProvider))]
+    [Export(typeof(IServiceProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class UIProvider
+    public class UIProvider : IServiceProvider, IUIProvider
     {
-        [Import(typeof(IServiceProvider))]
-        public MefServiceProvider ServiceProvider { get; set; }
+        [AllowNull]
+        public ExportProvider ExportProvider { get; private set; }
 
-        public UIProvider()
+        readonly IServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
+
+            var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+            Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+            ExportProvider = componentModel.DefaultExportProvider;
+
             ModeDetector.OverrideModeDetector(new AppModeDetector());
             RxApp.MainThreadScheduler = new DispatcherScheduler(Application.Current.Dispatcher);
         }
-
-        public void EnsureProvider(ExportProvider provider)
-        {
-            if (ServiceProvider.ExportProvider == null)
-                ServiceProvider.ExportProvider = provider;
-        }
-    }
-
-    [Export(typeof(IServiceProvider))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    public class MefServiceProvider : IServiceProvider
-    {
-        public ExportProvider ExportProvider { get; set; }
 
         public object GetService(Type serviceType)
         {
@@ -45,8 +47,23 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
+            instance = serviceProvider.GetService(serviceType);
+            if (instance != null)
+                return instance;
+
             throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
                 "Could not locate any instances of contract {0}.", contract));
+        }
+
+        public T GetService<T>()
+        {
+            return (T)GetService(typeof(T));
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public Ret GetService<T, Ret>() where Ret : class
+        {
+            return GetService<T>() as Ret;
         }
     }
 }
