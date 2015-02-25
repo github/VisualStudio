@@ -47,8 +47,8 @@ namespace GitHub.SampleData
         public ReactiveList<IAccount> Accounts { get; private set; }
         public IAccount SelectedAccount { get; private set; }
 
-        public ICommand OkCmd { get; }
-        public ICommand CancelCmd { get; }
+        public ICommand OkCmd { get; private set; }
+        public ICommand CancelCmd { get; private set; }
     }
 
     [ExcludeFromCodeCoverage]
