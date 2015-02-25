@@ -72,9 +72,9 @@
     <Compile Include="Services\IUIProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
-    <Compile Include="UI\ICloneRepoViewModel.cs" />
-    <Compile Include="UI\ILoginViewModel.cs" />
-    <Compile Include="UI\ITwoFactorViewModel.cs" />
+    <Compile Include="ViewModels\ICloneRepoViewModel.cs" />
+    <Compile Include="ViewModels\ILoginViewModel.cs" />
+    <Compile Include="ViewModels\ITwoFactorViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
   </ItemGroup>
