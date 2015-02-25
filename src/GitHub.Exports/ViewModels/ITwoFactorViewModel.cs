@@ -2,7 +2,7 @@
 
 namespace GitHub.UI
 {
-    public interface ITwoFactorViewModel
+    public interface ITwoFactorViewModel : IViewModel
     {
         ICommand OkCmd { get; }
         ICommand CancelCmd { get; }

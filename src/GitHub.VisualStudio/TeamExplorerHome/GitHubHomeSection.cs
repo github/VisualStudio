@@ -3,6 +3,8 @@ using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using System;
 using Microsoft.TeamFoundation.Client;
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio
 {
@@ -31,7 +33,9 @@ namespace GitHub.VisualStudio
             set { repoUrl = value; this.RaisePropertyChange(); }
         }
 
-        public GitHubHomeSection()
+        [ImportingConstructor]
+        public GitHubHomeSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+            :  base(serviceProvider)
         {
             Title = "GitHub";
             // only when the repo is hosted on github.com

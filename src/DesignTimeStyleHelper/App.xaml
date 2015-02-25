@@ -6,8 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <ResourceDictionary Source="pack://application,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <ResourceDictionary Source="/GitHub.UI;component/SharedDictionary.xaml" />
+                <ResourceDictionary Source="/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace GitHub.UI
 {
-    public interface ICloneRepoViewModel
+    public interface ICloneRepoViewModel : IViewModel
     {
         ICommand OkCmd { get; }
         ICommand CancelCmd { get; }

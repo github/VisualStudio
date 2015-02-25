@@ -13,7 +13,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// <summary>
     /// Interaction logic for LoginControl.xaml
     /// </summary>
-    [Export(typeof(IViewFor<ILoginViewModel>))]
+    [ExportView(ViewType=UIViewType.Login)]
     public partial class LoginControl : IViewFor<ILoginViewModel>
     {
         public LoginControl()

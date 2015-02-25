@@ -27,6 +27,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
         [ImportingConstructor]
         public PlaceholderGitHubSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
             this.Title = "GitHub";

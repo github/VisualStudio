@@ -1,5 +1,7 @@
-﻿using System;
+﻿using GitHub.VisualStudio.TeamExplorerConnect;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,10 @@ namespace DesignTimeStyleHelper
         public MainWindow()
         {
             InitializeComponent();
+
+            var section = (PlaceholderGitHubSection)App.ServiceProvider.GetService(typeof(PlaceholderGitHubSection));
+            container.Children.Add(section.SectionContent as UIElement);
+
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace GitHub.UI
 {
-    public interface ILoginViewModel
+    public interface ILoginViewModel : IViewModel
     {
         string UsernameOrEmail { get; set; }
         string Password { get; set; }

@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace GitHub.UI
 {
-    public interface ICreateRepoViewModel
+    public interface ICreateRepoViewModel : IViewModel
     {
         string RepositoryName { get; }
         string SafeRepositoryName { get; }
