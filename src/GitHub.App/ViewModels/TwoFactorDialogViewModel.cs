@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
-    [Export(typeof(ITwoFactorViewModel))]
+    [ExportViewModel(ViewType=UIViewType.TwoFactor)]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorViewModel
     {

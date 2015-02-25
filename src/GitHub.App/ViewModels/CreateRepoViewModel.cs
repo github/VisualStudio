@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
-    [Export(typeof(ICreateRepoViewModel))]
+    [ExportViewModel(ViewType=UIViewType.Create)]
     public class CreateRepoViewModel : ICreateRepoViewModel
     {
         public ReactiveCommand<object> CancelCommand { get; private set; }

@@ -15,11 +15,12 @@ using NullGuard;
 using ReactiveUI;
 using System.Windows.Input;
 using GitHub.UI;
+using GitHub.Exports;
 
 namespace GitHub.ViewModels
 {
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    [Export(typeof(ILoginViewModel))]
+    [ExportViewModel(ViewType=UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginControlViewModel : ReactiveValidatableObject, ILoginViewModel, IDisposable
     {

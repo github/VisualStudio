@@ -11,14 +11,13 @@ using ReactiveUI;
 using GitHub.Models;
 using GitHub.Authentication;
 using System.Diagnostics;
+using GitHub.Exports;
 
 namespace GitHub.VisualStudio.UI
 {
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-
-        enum UIState { Start, Auth, TwoFA, Create, Clone, End }
         enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous }
 
         readonly ExportFactoryProvider factory;
@@ -26,26 +25,41 @@ namespace GitHub.VisualStudio.UI
         CompositeDisposable disposables = new CompositeDisposable();
         Subject<object> transition;
         UIControllerFlow currentFlow;
-        StateMachine<UIState, Trigger> machine;
+        StateMachine<UIViewType, Trigger> machine;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, ExportFactoryProvider factory)
         {
-            factory = uiProvider.GetService<ExportFactoryProvider>();
-            
-            machine = new StateMachine<UIState, Trigger>(UIState.Start);
+            this.factory = factory;
 
-            machine.Configure(UIState.Start)
-                .Permit(Trigger.Auth, UIState.Auth)
-                .PermitIf(Trigger.Create, UIState.Create, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Create, UIState.Auth, () => !hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIState.Clone, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIState.Auth, () => !hosts.IsLoggedInToAnyHost);
+            machine = new StateMachine<UIViewType, Trigger>(UIViewType.Start);
 
-            machine.Configure(UIState.Auth)
+            machine.Configure(UIViewType.None)
+                .Permit(Trigger.Auth, UIViewType.Login)
+                .PermitIf(Trigger.Create, UIViewType.Create, () => hosts.IsLoggedInToAnyHost)
+                .PermitIf(Trigger.Create, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
+                .PermitIf(Trigger.Clone, UIViewType.Clone, () => hosts.IsLoggedInToAnyHost)
+                .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
+
+            machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
                 {
-                    var twofa = uiProvider.GetService<ITwoFactorViewModel>();
+                    var disposable = factory.GetViewModel(UIViewType.Login);
+                    disposables.Add(disposable);
+                    var viewModel = disposable.Value as ILoginViewModel;
+
+                    viewModel.AuthenticationResults.Subscribe(result =>
+                    {
+                        if (result == AuthenticationResult.Success)
+                            Fire(Trigger.Next);
+                    });
+
+                    disposable = factory.GetView(UIViewType.Login);
+                    disposables.Add(disposable);
+                    var view = disposable.Value;
+                    view.ViewModel = viewModel;
+
+                    var twofa = factory.GetViewModel(UIViewType.TwoFactor).Value;
                     twofa.WhenAny(x => x.IsShowing, x => x.Value)
                         .Where(x => x)
                         .Subscribe(_ =>
@@ -53,61 +67,59 @@ namespace GitHub.VisualStudio.UI
                             Fire(Trigger.Next);
                         });
 
-                    var d = factory.LoginViewModelFactory.CreateExport();
-                    disposables.Add(d);
-                    var view = uiProvider.GetService<IViewFor<ILoginViewModel>>();
-                    view.ViewModel = d.Value;
-
-                    d.Value.AuthenticationResults.Subscribe(result =>
-                    {
-                        if (result == AuthenticationResult.Success)
-                            Fire(Trigger.Next);
-                    });
                     transition.OnNext(view);
                 })
-                .Permit(Trigger.Next, UIState.TwoFA);
+                .Permit(Trigger.Next, UIViewType.TwoFactor);
 
-            machine.Configure(UIState.TwoFA)
-                .SubstateOf(UIState.Auth)
+            machine.Configure(UIViewType.TwoFactor)
+                .SubstateOf(UIViewType.Login)
                 .OnEntry(() =>
                 {
-                    var d = uiProvider.GetService<ITwoFactorViewModel>();
-                    var view = uiProvider.GetService<IViewFor<ITwoFactorViewModel>>();
-                    view.ViewModel = d;
+                    var view = SetupView(UIViewType.TwoFactor);
                     transition.OnNext(view);
                 })
-                .PermitIf(Trigger.Next, UIState.End, () => currentFlow == UIControllerFlow.Authentication)
-                .PermitIf(Trigger.Next, UIState.Create, () => currentFlow == UIControllerFlow.Create)
-                .PermitIf(Trigger.Next, UIState.Clone, () => currentFlow == UIControllerFlow.Clone);
+                .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
+                .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
+                .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone);
 
-            machine.Configure(UIState.Create)
+            machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
                 {
-                    var d = uiProvider.GetService<ICreateRepoViewModel>();
-                    var view = uiProvider.GetService<IViewFor<ICreateRepoViewModel>>();
-                    view.ViewModel = d;
                     transition.OnNext(view);
                 })
-                .Permit(Trigger.Next, UIState.End);
+                .Permit(Trigger.Next, UIViewType.End);
 
-            machine.Configure(UIState.Clone)
+            machine.Configure(UIViewType.Clone)
                 .OnEntry(() =>
                 {
-                    var d = uiProvider.GetService<ICloneRepoViewModel>();
-                    
-                    var view = uiProvider.GetService<IViewFor<ICloneRepoViewModel>>();
-                    view.ViewModel = d;
+                    var view = SetupView(UIViewType.Clone);
                     transition.OnNext(view);
                 })
-                .Permit(Trigger.Next, UIState.End);
+                .Permit(Trigger.Next, UIViewType.End);
 
-            machine.Configure(UIState.End)
+            machine.Configure(UIViewType.End)
                 .OnEntry(() =>
                 {
                     transition.OnCompleted();
                     transition.Dispose();
                 })
-                .Permit(Trigger.Next, UIState.Start);
+                .Permit(Trigger.Next, UIViewType.Start);
+        }
+
+        IViewFor SetupView(UIViewType viewType)
+        {
+            IViewModel disposable;
+
+            disposable = factory.GetViewModel(viewType);
+            disposables.Add(disposable);
+            var viewModel = disposable.Value;
+            
+            disposable = factory.GetView(viewType);
+            disposables.Add(disposable);
+            var view = disposable.Value;
+
+            view.ViewModel = viewModel;
+            return view;
         }
 
         void Fire(Trigger next)

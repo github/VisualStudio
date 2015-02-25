@@ -12,7 +12,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// <summary>
     /// Interaction logic for PasswordView.xaml
     /// </summary>
-    [Export(typeof(IViewFor<ITwoFactorViewModel>))]
+    [ExportView(ViewType=UIViewType.TwoFactor)]
     public partial class TwoFactorControl : IViewFor<ITwoFactorViewModel>
     {
         public TwoFactorControl()

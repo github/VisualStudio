@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
-    [Export(typeof(ICloneRepoViewModel))]
+    [ExportViewModel(ViewType=UIViewType.Clone)]
     public class CloneRepoViewModel : ICloneRepoViewModel
     {
         public ReactiveCommand<object> CancelCommand { get; private set; }
