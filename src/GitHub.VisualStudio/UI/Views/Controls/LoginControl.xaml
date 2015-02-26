@@ -175,7 +175,6 @@
                 x:Name="usernameOrEmailTextBox" 
                 PromptText="Username or Email"
                 Style="{DynamicResource RoundedPromptTextBox}" 
-                IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}"
                 Text="{Binding UsernameOrEmail, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
             <ui:SecurePasswordBox 
@@ -184,7 +183,6 @@
                 Margin="0,0,0,12" 
                 Style="{DynamicResource RoundedPromptTextBox}" 
                 VerticalAlignment="Stretch" 
-                IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}"
                 Text="{Binding PasswordNoOp, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
             <ui:PromptTextBox 
@@ -192,7 +190,6 @@
                 x:Name="enterpriseUrlTextBox" 
                 PromptText="GitHub Enterprise URL" 
                 Style="{DynamicResource RoundedPromptTextBox}" 
-                IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}"
                 Text="{Binding EnterpriseUrl, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
 
