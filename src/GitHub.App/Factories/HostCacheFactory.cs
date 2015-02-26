@@ -1,9 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using GitHub.Caches;
+using GitHub.Info;
+using GitHub.Primitives;
 using Rothko;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     [Export(typeof(IHostCacheFactory))]
     [PartCreationPolicy(CreationPolicy.Shared)]

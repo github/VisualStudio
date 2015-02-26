@@ -1,4 +1,7 @@
-﻿namespace GitHub
+﻿using GitHub.Api;
+using GitHub.Primitives;
+
+namespace GitHub.Factories
 {
     public interface IApiClientFactory
     {

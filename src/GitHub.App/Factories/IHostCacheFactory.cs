@@ -1,6 +1,7 @@
-﻿using System;
+﻿using GitHub.Caches;
+using GitHub.Primitives;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     public interface IHostCacheFactory
     {

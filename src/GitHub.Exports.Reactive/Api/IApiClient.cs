@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using GitHub.Authentication;
+using GitHub.Primitives;
 using Octokit;
 
-namespace GitHub
+namespace GitHub.Api
 {
     public interface IApiClient
     {

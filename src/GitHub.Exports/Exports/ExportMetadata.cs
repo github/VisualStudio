@@ -1,4 +1,7 @@
 using System;
+using System.ComponentModel.Composition;
+using GitHub.UI;
+using GitHub.ViewModels;
 
 namespace GitHub.Exports {
 
@@ -13,7 +16,7 @@ namespace GitHub.Exports {
 
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
-    public class ExportViewModelAttribute : ExportAttribute
+    public sealed class ExportViewModelAttribute : ExportAttribute
     {
         public ExportViewModelAttribute() : base(typeof(IViewModel))
         {
@@ -23,9 +26,9 @@ namespace GitHub.Exports {
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
-    public class ExportViewAttribute : ExportAttribute
+    public sealed class ExportViewAttribute : ExportAttribute
     {
-        public ExportViewAttribute() : base(typeof(IViewFor))
+        public ExportViewAttribute() : base(typeof(IView))
         {
         }
 
@@ -34,6 +37,6 @@ namespace GitHub.Exports {
 
     public interface IViewModelMetadata
     {
-        public IUIViewType ViewType { get; }
+        UIViewType ViewType { get; }
     }
 }
