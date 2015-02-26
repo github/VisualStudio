@@ -53,6 +53,7 @@ namespace DesignTimeStyleHelper
             var batch = new CompositionBatch();
             batch.AddExportedValue<SVsServiceProvider>(this);
             batch.AddExportedValue<SComponentModel>(this);
+            batch.AddExportedValue<ICompositionService>(DefaultCompositionService);
             batch.AddExportedValue(new PlaceholderGitHubSection(this));
             container.Compose(batch);
         }
