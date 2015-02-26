@@ -28,6 +28,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             {
                 d(this.Bind(ViewModel, vm => vm.UsernameOrEmail, v => v.usernameOrEmailTextBox.Text));
                 d(this.Bind(ViewModel, vm => vm.Password, v => v.passwordTextBox.Text));
+                d(this.OneWayBind(ViewModel, vm => vm.LoginButtonText, v => v.loginButton.Content));
+                d(this.OneWayBind(ViewModel, vm => vm.IsLoginInProgress, v => v.loginButton.IsEnabled, inProgress => !inProgress));
                 d(this.BindCommand(ViewModel, vm => vm.LoginCmd, v => v.loginButton));
             });
 

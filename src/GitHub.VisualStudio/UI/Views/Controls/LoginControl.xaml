@@ -196,9 +196,14 @@
                 Text="{Binding EnterpriseUrl, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
 
-            <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}" Margin="0,12,0,0">
-                <ui:OcticonCircleButton x:Name="loginButton" Icon="check" Content="{Binding LoginButtonText, FallbackValue=Log In}" IsDefault="True" />
-            </StackPanel>
+            <Border HorizontalAlignment="Center"  Margin="0,12,0,0">
+                <ui:OcticonCircleButton
+                    x:Name="loginButton"
+                    Icon="check"
+                    Content="Log In"
+                    IsEnabled="true"
+                    IsDefault="True" />
+            </Border>
 
             <StackPanel x:Name="gitHubSignupStackPanel">
                 <TextBlock x:Name="signUpLabel" Style="{DynamicResource GitHubH1TextBlock}" Text="Sign up" Margin="0,10,0,0" />

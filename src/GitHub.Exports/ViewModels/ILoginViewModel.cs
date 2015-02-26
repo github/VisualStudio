@@ -8,6 +8,8 @@ namespace GitHub.ViewModels
     {
         string UsernameOrEmail { get; set; }
         string Password { get; set; }
+        string LoginButtonText { get; }
+        bool IsLoginInProgress { get; }
         ICommand LoginCmd { get; }
         IObservable<AuthenticationResult> AuthenticationResults { get; }
     }
