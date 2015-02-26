@@ -8,14 +8,10 @@ namespace GitHub.VisualStudio.UI
     {
         IDisposable disposable;
 
-        public WindowController(IObservable<object> controls)
+        public WindowController(IObservable<UserControl> controls)
         {
             InitializeComponent();
-            disposable = controls.Subscribe(c =>
-            {
-                var control = c as UserControl;
-                Load(control);
-            },
+            disposable = controls.Subscribe(c => Load(c),
             Close
             );
         }

@@ -13,7 +13,6 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    [ExportViewModel(ViewType=UIViewType.TwoFactor)]
     [Export(typeof(ITwoFactorViewModel))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorViewModel

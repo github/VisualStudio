@@ -9,6 +9,6 @@
         mc:Ignorable="d"
         Title="WindowHolder" Height="655" Width="519" HasMinimizeButton="False" HasMaximizeButton="False">
     <Grid x:Name="Container">
-        <ctl:CreateRepoControl />
+        
     </Grid>
 </pfui:DialogWindow>
