@@ -14,7 +14,7 @@ namespace GitHub.Exports {
         End = 100
 	}
 
-
+    [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
     public sealed class ExportViewModelAttribute : ExportAttribute
     {
@@ -25,6 +25,7 @@ namespace GitHub.Exports {
         public UIViewType ViewType { get; set; }
     }
 
+    [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
     public sealed class ExportViewAttribute : ExportAttribute
     {
