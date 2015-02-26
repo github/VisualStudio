@@ -63,6 +63,7 @@
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
     <Compile Include="Authentication\AuthenticationResult.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
+    <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />
     <Compile Include="Primitives\UriString.cs" />
     <Compile Include="Services\EnterpriseProbeTask.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Services\IUIProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
+    <Compile Include="UI\IView.cs" />
     <Compile Include="ViewModels\ICloneRepoViewModel.cs" />
     <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorViewModel.cs" />

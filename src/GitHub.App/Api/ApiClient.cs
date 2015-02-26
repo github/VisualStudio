@@ -5,12 +5,12 @@ using System.Net;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Extensions;
+using GitHub.Primitives;
 using NLog;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
 using Authorization = Octokit.Authorization;
-using LogManager = NLog.LogManager;
 
 namespace GitHub.Api
 {

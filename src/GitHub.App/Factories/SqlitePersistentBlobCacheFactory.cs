@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.Composition;
 using Akavache;
-using Akavache.Sqlite3;
 using GitHub.Extensions;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     [Export(typeof(IBlobCacheFactory))]
     [PartCreationPolicy(CreationPolicy.Shared)]

@@ -1,15 +1,16 @@
 ﻿using GitHub.Models;
+using Octokit;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     public interface IAccountFactory
     {
         IAccount CreateAccount(
             IRepositoryHost repositoryHost,
-            Octokit.User user);
+            User user);
         
         IAccount CreateAccount(
             IRepositoryHost repositoryHost,
-            Octokit.Organization organization);
+            Organization organization);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using GitHub.Models;
+using GitHub.Primitives;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     public interface IRepositoryHostFactory
     {

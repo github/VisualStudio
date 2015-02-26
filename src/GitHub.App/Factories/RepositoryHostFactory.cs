@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.Composition;
+using GitHub.Caches;
 using GitHub.Models;
+using GitHub.Primitives;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     [Export(typeof(IRepositoryHostFactory))]
     [PartCreationPolicy(CreationPolicy.Shared)]

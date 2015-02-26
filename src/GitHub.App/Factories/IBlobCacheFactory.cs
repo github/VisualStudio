@@ -1,6 +1,6 @@
 ﻿using Akavache;
 
-namespace GitHub
+namespace GitHub.Factories
 {
     public interface IBlobCacheFactory
     {

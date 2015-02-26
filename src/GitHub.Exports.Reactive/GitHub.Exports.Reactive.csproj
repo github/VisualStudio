@@ -7,7 +7,7 @@
     <ProjectGuid>{E4ED0537-D1D9-44B6-9212-3096D7C3F7A1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHub.Exports.Reactive</RootNamespace>
+    <RootNamespace>GitHub</RootNamespace>
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -74,12 +74,15 @@
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Factories\IApiClientFactory.cs" />
+    <Compile Include="Factories\IAccountFactory.cs" />
     <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
     <Compile Include="Caches\IHostCache.cs" />
+    <Compile Include="Factories\IRepositoryHostFactory.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IApiClient.cs" />
+    <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
     <Compile Include="ViewModels\ICreateRepoViewModel.cs" />
     <Compile Include="Validation\ReactivePropertyValidator.cs" />

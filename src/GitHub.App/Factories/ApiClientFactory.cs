@@ -1,11 +1,15 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
+using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Caches;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using Octokit;
 using Octokit.Reactive;
+using ApiClient = GitHub.Api.ApiClient;
 
-namespace GitHub.Api
+namespace GitHub.Factories
 {
     [Export(typeof(IApiClientFactory))]
     [PartCreationPolicy(CreationPolicy.Shared)]
