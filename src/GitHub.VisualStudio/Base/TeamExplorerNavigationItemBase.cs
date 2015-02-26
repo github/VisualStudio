@@ -6,7 +6,6 @@ using GitHub.Api;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
-using GitHub.VisualStudio.Services;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;

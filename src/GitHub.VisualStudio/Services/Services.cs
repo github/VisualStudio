@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using NullGuard;
 
-namespace GitHub.VisualStudio.Services
+namespace GitHub.VisualStudio
 {
     public static class Services
     {

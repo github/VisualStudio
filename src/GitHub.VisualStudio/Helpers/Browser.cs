@@ -3,7 +3,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using GitHub.Info;
 using GitHub.Services;
-using GitHub.VisualStudio.Services;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;

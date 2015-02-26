@@ -14,7 +14,7 @@ using NullGuard;
 using ReactiveUI;
 using Splat;
 
-namespace GitHub.VisualStudio.Services
+namespace GitHub.VisualStudio
 {
     [Export(typeof(IUIProvider))]
     [Export(typeof(IServiceProvider))]

@@ -10,6 +10,8 @@ using GitHub.VisualStudio.TeamExplorerConnect;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Moq;
+using GitHub.Services;
+using GitHub.VisualStudio;
 
 namespace DesignTimeStyleHelper
 {
@@ -39,7 +41,7 @@ namespace DesignTimeStyleHelper
         public CustomServiceProvider()
         {
             catalog = new AggregateCatalog(
-                            new AssemblyCatalog(typeof(GitHub.VisualStudio.Services.Services).Assembly), // GitHub.VisualStudio
+                            new AssemblyCatalog(typeof(GitHub.VisualStudio.Services).Assembly), // GitHub.VisualStudio
                             new AssemblyCatalog(typeof(GitHub.Api.ApiClient).Assembly), // GitHub.App
                             new AssemblyCatalog(typeof(GitHub.Api.SimpleApiClient).Assembly), // GitHub.Api
                             new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // Rothko
