@@ -1,14 +1,11 @@
-﻿using Microsoft.TeamFoundation.Client;
+﻿using System;
+using System.Diagnostics;
+using GitHub.Extensions;
+using GitHub.VisualStudio.Services;
+using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using NullGuard;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {

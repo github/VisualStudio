@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using GitHub.ViewModels;
 using Octokit;
 using ReactiveUI;
-using GitHub.UI;
 
 namespace GitHub.Authentication
 {

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using GitHub.VisualStudio.TeamExplorerHome;
 
 namespace GitHub.VisualStudio.UI.Views
 {

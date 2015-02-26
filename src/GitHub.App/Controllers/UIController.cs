@@ -1,19 +1,19 @@
-﻿using GitHub.Services;
-using GitHub.UI;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Subjects;
-using Stateless;
-using ReactiveUI;
-using GitHub.Models;
-using GitHub.Authentication;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using GitHub.Authentication;
 using GitHub.Exports;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.ViewModels;
+using ReactiveUI;
+using Stateless;
 
-namespace GitHub.VisualStudio.UI
+namespace GitHub.Controllers
 {
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable

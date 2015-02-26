@@ -1,19 +1,14 @@
-﻿using Microsoft.VisualStudio.ComponentModelHost;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using System.ComponentModel.Composition.Primitives;
-using Microsoft.VisualStudio.Shell;
 using System.Globalization;
+using System.Linq;
+using System.Windows;
 using GitHub.VisualStudio.TeamExplorerConnect;
-using GitHub.Services;
-using GitHub.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
 using Moq;
 
 namespace DesignTimeStyleHelper
@@ -37,17 +32,17 @@ namespace DesignTimeStyleHelper
     public class CustomServiceProvider : SVsServiceProvider, IServiceProvider,
         SComponentModel, IComponentModel
     {
-        CompositionContainer container;
+        readonly CompositionContainer container;
         public CompositionContainer Container { get { return container; } }
         AggregateCatalog catalog;
 
         public CustomServiceProvider()
         {
             catalog = new AggregateCatalog(
-                            new AssemblyCatalog(typeof(GitHub.VisualStudio.Services).Assembly), // GitHub.VisualStudio
+                            new AssemblyCatalog(typeof(GitHub.VisualStudio.Services.Services).Assembly), // GitHub.VisualStudio
                             new AssemblyCatalog(typeof(GitHub.Api.ApiClient).Assembly), // GitHub.App
                             new AssemblyCatalog(typeof(GitHub.Api.SimpleApiClient).Assembly), // GitHub.Api
-                            new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // GitHub.Api
+                            new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // Rothko
                             new AssemblyCatalog(typeof(GitHub.Services.EnterpriseProbeTask).Assembly) // GitHub.Exports
                             );
             container = new CompositionContainer(catalog, CompositionOptions.IsThreadSafe | CompositionOptions.DisableSilentRejection);

@@ -5,17 +5,17 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 using GitHub.Authentication;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
 using NullGuard;
 using ReactiveUI;
-using System.Windows.Input;
-using GitHub.UI;
-using GitHub.Exports;
 
 namespace GitHub.ViewModels
 {

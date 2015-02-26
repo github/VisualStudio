@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using GitHub.Extensions;
 using Newtonsoft.Json;
 using Octokit;
-using GitHub.Extensions;
 
 namespace GitHub.Services
 {

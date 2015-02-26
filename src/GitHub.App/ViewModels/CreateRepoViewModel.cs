@@ -1,10 +1,11 @@
-﻿using GitHub.UI;
-using GitHub.Validation;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Input;
+using GitHub.Models;
+using GitHub.Validation;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {

@@ -6,8 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using GitHub.Extensions;
-using ReactiveUI;
 using GitHub.Extensions.Reactive;
+using ReactiveUI;
 
 namespace GitHub.UI
 {

@@ -2,14 +2,14 @@
 using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using GitHub.Authentication;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Validation;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
-using GitHub.UI;
-using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {

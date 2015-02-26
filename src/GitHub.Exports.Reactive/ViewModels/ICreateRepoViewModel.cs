@@ -1,10 +1,11 @@
-﻿using GitHub.Validation;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Reactive;
 using System.Windows.Input;
+using GitHub.Models;
+using GitHub.Validation;
+using ReactiveUI;
 
-namespace GitHub.UI
+namespace GitHub.ViewModels
 {
     public interface ICreateRepoViewModel : IViewModel
     {

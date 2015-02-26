@@ -1,15 +1,11 @@
-﻿using EnvDTE;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using EnvDTE;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Services
 {
     public class VSTraceListener : TraceListener
     {

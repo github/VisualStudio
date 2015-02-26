@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Reactive.Linq;
-using System.Text.RegularExpressions;
+using GitHub.Extensions;
+using GitHub.Info;
 using GitHub.Models;
 using NLog;
 using Octokit;
-using ApiClient = GitHub.Api.ApiClient;
-using LogManager = NLog.LogManager;
 using ReactiveUI;
-using GitHub.Extensions;
-using GitHub.Info;
-using GitHub.UserErrors;
+using ApiClient = GitHub.Api.ApiClient;
 
 namespace GitHub.Services
 {

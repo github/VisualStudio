@@ -1,14 +1,14 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.Api;
+using GitHub.Services;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
-using GitHub.Api;
-using GitHub.Services;
-using GitHub.VisualStudio.Helpers;
-using System.Diagnostics;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerNavigationItem(WikiNavigationItemId,
         NavigationItemPriority.Wiki,

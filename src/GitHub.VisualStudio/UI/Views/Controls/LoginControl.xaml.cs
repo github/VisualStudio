@@ -1,12 +1,10 @@
 ﻿using System.Windows;
+using GitHub.Exports;
+using GitHub.UI;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
-using GitHub.Exports;
-using System.ComponentModel.Composition;
-using GitHub.UI;
 using GitHub.UI.Helpers;
-using System.Diagnostics;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {

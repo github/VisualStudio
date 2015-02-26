@@ -1,10 +1,11 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
-using ReactiveUI;
+using GitHub.Exports;
 using GitHub.UI;
+using GitHub.ViewModels;
+using ReactiveUI;
 using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views.Controls

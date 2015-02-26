@@ -1,10 +1,8 @@
-﻿using GitHub.Services;
-using Octokit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
+using GitHub.Primitives;
+using GitHub.Services;
+using Octokit;
 
 namespace GitHub.Api
 {

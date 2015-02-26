@@ -3,20 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             xmlns:SampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App" 
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Background="White">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <ResourceDictionary Source="pack://application,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
 
     <Grid>
         <Grid.Resources>
@@ -41,11 +35,11 @@
         <Grid x:Name="repositoriesListPane" Grid.Row="1">
             <ListBox x:Name="repositoryList" HorizontalContentAlignment="Stretch" Style="{StaticResource LightListBox}">
                 <ListBox.ItemsSource>
-                    <x:Array Type="SampleData:RepositoryModelDesigner">
-                        <SampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" />
-                        <SampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" />
-                        <SampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" />
-                        <SampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" IsHosted="True" IsPrivate="True" />
+                    <x:Array Type="sampleData:RepositoryModelDesigner">
+                        <sampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" />
+                        <sampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" />
+                        <sampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" />
+                        <sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" IsHosted="True" IsPrivate="True" />
                     </x:Array>
                 </ListBox.ItemsSource>
 

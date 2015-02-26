@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reactive;
 using Akavache;
+using GitHub.Primitives;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     public interface ILoginCache : IDisposable
     {

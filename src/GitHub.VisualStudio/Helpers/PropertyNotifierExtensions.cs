@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Helpers
 {
     public static class PropertyNotifierExtensions
     {

@@ -1,6 +1,7 @@
-using ReactiveUI;
 using System;
 using System.Globalization;
+using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.UserErrors
 {
@@ -23,7 +24,7 @@ namespace GitHub.UserErrors
             var errorMessage = string.Format(CultureInfo.InvariantCulture, 
                 "You are using {0} out of {1} private repositories.", account.OwnedPrivateRepos, account.PrivateReposInPlan);
 
-            return UserError.Throw(new PrivateRepositoryQuotaExceededUserError(account, errorMessage));
+            return Throw(new PrivateRepositoryQuotaExceededUserError(account, errorMessage));
         }
     }
 }

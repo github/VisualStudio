@@ -1,11 +1,4 @@
-﻿using GitHub.Infrastructure;
-using GitHub.Services;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
-using NullGuard;
-using ReactiveUI;
-using Splat;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
@@ -13,8 +6,15 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Windows;
+using GitHub.Infrastructure;
+using GitHub.Services;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
+using NullGuard;
+using ReactiveUI;
+using Splat;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Services
 {
     [Export(typeof(IUIProvider))]
     [Export(typeof(IServiceProvider))]

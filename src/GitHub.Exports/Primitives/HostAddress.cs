@@ -2,7 +2,7 @@
 using System.Globalization;
 using GitHub.Extensions;
 
-namespace GitHub
+namespace GitHub.Primitives
 {
     public class HostAddress
     {

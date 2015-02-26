@@ -1,20 +1,17 @@
-﻿using Microsoft.TeamFoundation.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using NullGuard;
-using GitHub.VisualStudio.Base;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.TeamFoundation.Client;
-using GitHub.Api;
-using Microsoft.VisualStudio;
+﻿using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.VisualStudio.Helpers;
+using GitHub.VisualStudio.Services;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Controls;
+using NullGuard;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerNavigationItemBase : TeamExplorerGitAwareItem, ITeamExplorerNavigationItem2, INotifyPropertySource
     {

@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Base
 {
     public abstract class PackageBase : Package
     {

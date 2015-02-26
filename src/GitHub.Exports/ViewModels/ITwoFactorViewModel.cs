@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace GitHub.UI
+namespace GitHub.ViewModels
 {
     public interface ITwoFactorViewModel : IViewModel
     {

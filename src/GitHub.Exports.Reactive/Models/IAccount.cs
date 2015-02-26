@@ -1,8 +1,6 @@
-﻿using GitHub.Models;
-using Octokit;
-using ReactiveUI;
+﻿using Octokit;
 
-namespace GitHub
+namespace GitHub.Models
 {
     public interface IAccount
     {

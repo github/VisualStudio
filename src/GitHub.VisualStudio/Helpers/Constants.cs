@@ -1,4 +1,4 @@
-﻿namespace GitHub
+﻿namespace GitHub.VisualStudio.Helpers
 {
     public static class Constants
     {
