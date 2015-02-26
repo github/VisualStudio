@@ -4,11 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="541"
              d:DesignWidth="345" Background="White">
@@ -86,9 +82,6 @@
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseLearnStackPanel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
-                        </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseUrlTextBox">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
                         </ObjectAnimationUsingKeyFrames>
@@ -113,9 +106,6 @@
                 <VisualState x:Name="DotComOnly">
                     <Storyboard>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="tabs">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseLearnStackPanel">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseUrlTextBox">
@@ -212,11 +202,6 @@
                 <TextBlock x:Name="signUpLabel" Style="{DynamicResource GitHubH1TextBlock}" Text="Sign up" Margin="0,10,0,0" />
                 <TextBlock x:Name="description" Style="{DynamicResource GitHubDescriptionTextBlock}" Margin="0"><Run Text="Powerful collaboration, review, and code management for open source and private development projects." /><LineBreak /><Run Text="Build software better, together." FontWeight="Bold"/></TextBlock>
                 <ui:OcticonLinkButton x:Name="signUpLink" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Icon="link_external" Content="Sign up" ToolTip="go to github.com to sign up for an account" IsTabStop="False" />
-            </StackPanel>
-            <StackPanel x:Name="enterpriseLearnStackPanel">
-                <TextBlock x:Name="learnMoreLabel" Style="{DynamicResource GitHubH1TextBlock}" Text="Learn more" Margin="0,10,0,0" />
-                <TextBlock Style="{DynamicResource GitHubDescriptionTextBlock}" Margin="0"><Run Text="Powerful collaboration, review, and code management for private development projects." /><LineBreak /><Run Text="The best way to build and ship software, on your servers." FontWeight="Bold" /></TextBlock>
-                <ui:OcticonLinkButton x:Name="learnMoreButton" Icon="link_external" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Content="Learn more" ToolTip="go to enterprise.github.com to learn more about running github on your servers" IsTabStop="False" />
             </StackPanel>
         </StackPanel>
     </Grid>
