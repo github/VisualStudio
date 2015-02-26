@@ -6,8 +6,11 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" 
-             d:DesignHeight="541"
-             d:DesignWidth="345" Background="White">
+             d:DesignWidth="426"
+             d:DesignHeight="517"
+             MinWidth="426"
+             MinHeight="517"
+             Background="White">
     <Grid
         FocusManager.IsFocusScope="True"
         x:Name="loginStackPanel"
