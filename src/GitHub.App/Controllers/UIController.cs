@@ -51,7 +51,7 @@ namespace GitHub.Controllers
                     var dvm = factory.GetViewModel(UIViewType.Login);
                     disposables.Add(dvm);
                     var viewModel = dvm.Value as ILoginViewModel;
-
+                    Debug.Assert(viewModel != null, "The view model must implement ILoginViewModel");
                     viewModel.AuthenticationResults.Subscribe(result =>
                     {
                         if (result == AuthenticationResult.Success)
