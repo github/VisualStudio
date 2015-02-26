@@ -198,7 +198,6 @@
 
             <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}" Margin="0,12,0,0">
                 <ui:OcticonCircleButton x:Name="loginButton" Icon="check" Content="{Binding LoginButtonText, FallbackValue=Log In}" IsDefault="True" />
-                <ui:OcticonCircleButton x:Name="cancelButton" Icon="x" Margin="12,0,0,0" Content="Cancel" />
             </StackPanel>
 
             <StackPanel x:Name="gitHubSignupStackPanel">

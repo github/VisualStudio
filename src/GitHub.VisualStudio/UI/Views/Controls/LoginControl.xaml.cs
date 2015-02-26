@@ -29,7 +29,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.UsernameOrEmail, v => v.usernameOrEmailTextBox.Text));
                 d(this.Bind(ViewModel, vm => vm.Password, v => v.passwordTextBox.Text));
                 d(this.BindCommand(ViewModel, vm => vm.LoginCmd, v => v.loginButton));
-                d(this.BindCommand(ViewModel, vm => vm.CancelCmd, v => v.cancelButton));
             });
 
             VisualStateManager.GoToState(this, "DotCom", true);
