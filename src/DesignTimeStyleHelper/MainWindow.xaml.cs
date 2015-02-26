@@ -1,5 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using GitHub.VisualStudio.TeamExplorerConnect;
+using GitHub.VisualStudio;
+using GitHub.Services;
+using GitHub.UI;
+using System.ComponentModel.Composition;
 
 namespace DesignTimeStyleHelper
 {
@@ -11,10 +16,34 @@ namespace DesignTimeStyleHelper
         public MainWindow()
         {
             InitializeComponent();
+        }
 
-            var section = (PlaceholderGitHubSection)App.ServiceProvider.GetService(typeof(PlaceholderGitHubSection));
-            container.Children.Add(section.SectionContent as UIElement);
+        private void cloneLink_Click(object sender, RoutedEventArgs e)
+        {
+            var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
+
+            var factory = ui.GetService<ExportFactoryProvider>();
+            var d = factory.UIControllerFactory.CreateExport();
+            var creation = d.Value.SelectFlow(UIControllerFlow.Clone);
+            var x = new WindowController(creation);
+            creation.Subscribe(_ => { }, _ => x.Close());
+            x.Show();
+            d.Value.Start();
 
         }
+
+        private void createLink_Click(object sender, RoutedEventArgs e)
+        {
+            var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
+
+            var factory = ui.GetService<ExportFactoryProvider>();
+            var d = factory.UIControllerFactory.CreateExport();
+            var creation = d.Value.SelectFlow(UIControllerFlow.Create);
+            var x = new WindowController(creation);
+            creation.Subscribe(_ => { }, _ => x.Close());
+            x.Show();
+            d.Value.Start();
+        }
     }
+    
 }

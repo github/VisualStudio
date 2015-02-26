@@ -12,6 +12,8 @@ using Microsoft.VisualStudio.Shell;
 using Moq;
 using GitHub.Services;
 using GitHub.VisualStudio;
+using GitHub.ViewModels;
+using GitHub.Exports;
 
 namespace DesignTimeStyleHelper
 {
@@ -20,13 +22,41 @@ namespace DesignTimeStyleHelper
     /// </summary>
     public partial class App : Application
     {
-        public static CustomServiceProvider ServiceProvider { get; private set; }
+        public static Holder ExportHolder { get; set; }
+        public static CustomServiceProvider ServiceProvider { get { return (CustomServiceProvider) ExportHolder.ServiceProvider; } }
+        
 
-        static App()
+        public App()
         {
-            ServiceProvider = new CustomServiceProvider();
+            var s = new CustomServiceProvider();
+            ExportHolder = new Holder(s.DefaultCompositionService);
         }
     }
+
+
+    public class Holder
+    {
+        [Import]
+        public SVsServiceProvider ServiceProvider;
+
+        [Import]
+        SComponentModel sc;
+
+        [Import]
+        public IBrowser Browser;
+
+        [Import]
+        public ExportFactoryProvider ExportFactoryProvider;
+
+        [Import]
+        public IUIProvider UIProvider;
+        
+        public Holder(ICompositionService cc)
+        {
+            cc.SatisfyImportsOnce(this);
+        }
+    }
+
 
     [Export(typeof(SVsServiceProvider))]
     [Export(typeof(SComponentModel))]
@@ -41,22 +71,23 @@ namespace DesignTimeStyleHelper
         public CustomServiceProvider()
         {
             catalog = new AggregateCatalog(
-                            new AssemblyCatalog(typeof(GitHub.VisualStudio.Services).Assembly), // GitHub.VisualStudio
-                            new AssemblyCatalog(typeof(GitHub.Api.ApiClient).Assembly), // GitHub.App
-                            new AssemblyCatalog(typeof(GitHub.Api.SimpleApiClient).Assembly), // GitHub.Api
-                            new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // Rothko
-                            new AssemblyCatalog(typeof(GitHub.Services.EnterpriseProbeTask).Assembly) // GitHub.Exports
-                            );
+                new AssemblyCatalog(typeof(CustomServiceProvider).Assembly),
+                new AssemblyCatalog(typeof(GitHub.VisualStudio.Services).Assembly), // GitHub.VisualStudio
+                new AssemblyCatalog(typeof(GitHub.Api.ApiClient).Assembly), // GitHub.App
+                new AssemblyCatalog(typeof(GitHub.Api.SimpleApiClient).Assembly), // GitHub.Api
+                new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // Rothko
+                new AssemblyCatalog(typeof(GitHub.Services.EnterpriseProbeTask).Assembly) // GitHub.Exports
+            );
             container = new CompositionContainer(catalog, CompositionOptions.IsThreadSafe | CompositionOptions.DisableSilentRejection);
 
+            DefaultCatalog = catalog;
             DefaultExportProvider = container;
-            DefaultCompositionService = catalog.CreateCompositionService();
-
+            DefaultCompositionService = DefaultCatalog.CreateCompositionService();
+            
             var batch = new CompositionBatch();
             batch.AddExportedValue<SVsServiceProvider>(this);
             batch.AddExportedValue<SComponentModel>(this);
             batch.AddExportedValue<ICompositionService>(DefaultCompositionService);
-            batch.AddExportedValue(new PlaceholderGitHubSection(this));
             container.Compose(batch);
         }
 
@@ -68,11 +99,6 @@ namespace DesignTimeStyleHelper
 
             if (instance != null)
                 return instance;
-
-            if (serviceType == typeof(IUIProvider))
-                return new UIProvider(this);
-            if (serviceType == typeof(ExportFactoryProvider))
-                return new ExportFactoryProvider(DefaultCompositionService);
 
             instance = Create(serviceType);
 
