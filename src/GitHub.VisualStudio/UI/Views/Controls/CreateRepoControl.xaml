@@ -58,13 +58,13 @@
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                 </Style>
 
-                <Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
+                <!-- Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
                     <Setter Property="IconMargin" Value="-1,2,7,0" />
                     <Setter Property="ErrorMessageFontWeight" Value="Normal" />
                     <Setter Property="Icon" Value="alert" />
                     <Setter Property="Fill" Value="#f39c12" />
                     <Setter Property="Margin" Value="0,5,0,0"/>
-                </Style>
+                </Style -->
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -92,15 +92,15 @@
             <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Name</Label>
             <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
 
-            <StackPanel Grid.Column="1" Grid.Row="1">
+            <!-- StackPanel Grid.Column="1" Grid.Row="1">
                 <uirx:ValidationMessage x:Name="nameValidationMessage" ValidatesControl="{Binding ElementName=nameText}"/>
                 <uirx:ValidationMessage x:Name="safeRepositoryNameWarning" ValidatesControl="{Binding ElementName=nameText}" Icon="alert" Fill="#f39c12" Padding="2,0" />
-            </StackPanel>
+            </StackPanel -->
 
             <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}">Description</Label>
             <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
 
-            <!-- Custom margin for text box labels, text inside textboxes are offset -->
+            
             <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=localPathText}">Local path</Label>
             <Grid Grid.Column="1" Grid.Row="3">
 
@@ -114,7 +114,7 @@
 
             </Grid>
 
-            <uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}"/>
+            <!-- uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}"/ -->
 
             <Label Grid.Column="0" Grid.Row="5" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
             <uirx:FilteredComboBox x:Name="ignoreTemplateList" Grid.Column="1" Grid.Row="5" />
@@ -124,7 +124,7 @@
             <uirx:FilteredComboBox x:Name="licenseList" Grid.Column="1" Grid.Row="6" />
 
 
-            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" />
+            <!-- uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" / -->
 
             <ui:HorizontalShadowDivider Width="120" Grid.Row="8" Grid.ColumnSpan="2" Margin="0,12,0,12"/>
 
@@ -137,7 +137,7 @@
                     </x:Array>
                 </ComboBox.ItemsSource>
             </ui:GitHubComboBox>
-            <uirx:ValidationMessage x:Name="accountValidationMessage" Grid.Column="1" Grid.Row="10" ValidatesControl="{Binding ElementName=nameText}"/>
+            <!-- uirx:ValidationMessage x:Name="accountValidationMessage" Grid.Column="1" Grid.Row="10" ValidatesControl="{Binding ElementName=nameText}"/ -->
 
 
             <CheckBox x:Name="makePrivate" Grid.Column="1" Grid.Row="11" Content="Private Repository" Padding="10,0,0,0"/>
@@ -186,5 +186,6 @@
                 <TextBlock>Create repository</TextBlock>
             </ui:OcticonCircleButton>
         </Grid>
+    
     </StackPanel>
 </UserControl>
