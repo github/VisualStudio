@@ -12,7 +12,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Clone)]
-    public partial class CloneRepoControl : IViewFor<ICloneRepoViewModel>
+    public partial class CloneRepoControl : IViewFor<ICloneRepoViewModel>, IView
     {
         public CloneRepoControl()
         {
@@ -32,11 +32,16 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { ViewModel = (ICloneRepoViewModel)value; }
         }
 
+        object IView.ViewModel
+        {
+            get { return ViewModel; }
+            set { ViewModel = (ICloneRepoViewModel)value; }
+        }
+
         public ICloneRepoViewModel ViewModel
         {
             [return: AllowNull]
-            get
-            { return (ICloneRepoViewModel)GetValue(ViewModelProperty); }
+            get { return (ICloneRepoViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
     }

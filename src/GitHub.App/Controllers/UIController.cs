@@ -32,7 +32,7 @@ namespace GitHub.Controllers
         {
             this.factory = factory;
 
-            machine = new StateMachine<UIViewType, Trigger>(UIViewType.Start);
+            machine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
 
             machine.Configure(UIViewType.None)
                 .Permit(Trigger.Auth, UIViewType.Login)
@@ -44,9 +44,9 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
                 {
-                    var disposable = factory.GetViewModel(UIViewType.Login);
-                    disposables.Add(disposable);
-                    var viewModel = disposable.Value as ILoginViewModel;
+                    var dvm = factory.GetViewModel(UIViewType.Login);
+                    disposables.Add(dvm);
+                    var viewModel = dvm.Value as ILoginViewModel;
 
                     viewModel.AuthenticationResults.Subscribe(result =>
                     {
@@ -54,12 +54,12 @@ namespace GitHub.Controllers
                             Fire(Trigger.Next);
                     });
 
-                    disposable = factory.GetView(UIViewType.Login);
-                    disposables.Add(disposable);
-                    var view = disposable.Value;
+                    var dv = factory.GetView(UIViewType.Login);
+                    disposables.Add(dv);
+                    var view = dv.Value;
                     view.ViewModel = viewModel;
 
-                    var twofa = factory.GetViewModel(UIViewType.TwoFactor).Value;
+                    var twofa = factory.GetViewModel(UIViewType.TwoFactor).Value as ITwoFactorViewModel;
                     twofa.WhenAny(x => x.IsShowing, x => x.Value)
                         .Where(x => x)
                         .Subscribe(_ =>
@@ -85,6 +85,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
                 {
+                    var view = SetupView(UIViewType.Create);
                     transition.OnNext(view);
                 })
                 .Permit(Trigger.Next, UIViewType.End);
@@ -103,20 +104,18 @@ namespace GitHub.Controllers
                     transition.OnCompleted();
                     transition.Dispose();
                 })
-                .Permit(Trigger.Next, UIViewType.Start);
+                .Permit(Trigger.Next, UIViewType.None);
         }
 
-        IViewFor SetupView(UIViewType viewType)
+        IView SetupView(UIViewType viewType)
         {
-            IViewModel disposable;
-
-            disposable = factory.GetViewModel(viewType);
-            disposables.Add(disposable);
-            var viewModel = disposable.Value;
+            var dvm = factory.GetViewModel(viewType);
+            disposables.Add(dvm);
+            var viewModel = dvm.Value;
             
-            disposable = factory.GetView(viewType);
-            disposables.Add(disposable);
-            var view = disposable.Value;
+            var dv = factory.GetView(viewType);
+            disposables.Add(dv);
+            var view = dv.Value;
 
             view.ViewModel = viewModel;
             return view;
