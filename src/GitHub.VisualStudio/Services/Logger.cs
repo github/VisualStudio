@@ -5,7 +5,7 @@ using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace GitHub.VisualStudio.Services
+namespace GitHub.VisualStudio
 {
     public class VSTraceListener : TraceListener
     {

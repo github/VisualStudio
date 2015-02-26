@@ -3,7 +3,6 @@ using System.ComponentModel.Composition;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
-using GitHub.VisualStudio.Services;
 using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;

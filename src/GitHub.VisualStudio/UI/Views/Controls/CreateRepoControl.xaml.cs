@@ -26,6 +26,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
+            /*
             IObservable<bool> clearErrorWhenChanged = this.WhenAny(
                 x => x.ViewModel.RepositoryName,
                 x => x.ViewModel.Description,
@@ -63,6 +64,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
             });
+            */
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(

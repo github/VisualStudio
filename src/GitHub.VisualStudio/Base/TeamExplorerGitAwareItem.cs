@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using GitHub.Extensions;
-using GitHub.VisualStudio.Services;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
