@@ -14,7 +14,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
-    public partial class TwoFactorControl : IViewFor<ITwoFactorViewModel>
+    public partial class TwoFactorControl : IViewFor<ITwoFactorViewModel>, IView
     {
         public TwoFactorControl()
         {
@@ -62,6 +62,12 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 new PropertyMetadata(null));
 
         object IViewFor.ViewModel
+        {
+            get { return ViewModel; }
+            set { ViewModel = (ITwoFactorViewModel)value; }
+        }
+
+        object IView.ViewModel
         {
             get { return ViewModel; }
             set { ViewModel = (ITwoFactorViewModel)value; }

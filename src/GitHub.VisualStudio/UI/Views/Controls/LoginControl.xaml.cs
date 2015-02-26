@@ -12,7 +12,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for LoginControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Login)]
-    public partial class LoginControl : IViewFor<ILoginViewModel>
+    public partial class LoginControl : IViewFor<ILoginViewModel>, IView
     {
         public LoginControl()
         {
@@ -40,6 +40,12 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
 
         object IViewFor.ViewModel
+        {
+            get { return ViewModel; }
+            set { ViewModel = (ILoginViewModel)value; }
+        }
+
+        object IView.ViewModel
         {
             get { return ViewModel; }
             set { ViewModel = (ILoginViewModel)value; }
