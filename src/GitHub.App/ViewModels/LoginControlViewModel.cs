@@ -37,7 +37,6 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
         public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
         public ReactiveCommand<object> SignupCommand { get; private set; }
-        public ReactiveCommand<object> LearnMoreCommand { get; private set; }
 
         string enterpriseUrl;
         [ValidateIf("IsLoggingInToEnterprise")]
@@ -178,9 +177,6 @@ namespace GitHub.ViewModels
 
             SignupCommand = ReactiveCommand.Create(Observable.Return(true));
             SignupCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.Plans));
-
-            LearnMoreCommand = ReactiveCommand.Create(Observable.Return(true));
-            LearnMoreCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.GitHubEnterpriseWeb));
 
             // Whenever a host logs on or off we re-evaluate this. If there are no logged on hosts (local excluded)
             // then the user may log on to either .com or an enterprise instance. If there's already a logged on host
