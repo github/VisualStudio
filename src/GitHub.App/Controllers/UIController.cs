@@ -12,6 +12,7 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using Stateless;
+using System.Windows.Controls;
 
 namespace GitHub.Controllers
 {
@@ -21,16 +22,19 @@ namespace GitHub.Controllers
         enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous }
 
         readonly ExportFactoryProvider factory;
+        readonly IUIProvider uiProvider;
 
         CompositeDisposable disposables = new CompositeDisposable();
-        Subject<object> transition;
+        Subject<UserControl> transition;
         UIControllerFlow currentFlow;
         StateMachine<UIViewType, Trigger> machine;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, ExportFactoryProvider factory)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts,
+            ExportFactoryProvider factory)
         {
             this.factory = factory;
+            this.uiProvider = uiProvider;
 
             machine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
 
@@ -59,15 +63,14 @@ namespace GitHub.Controllers
                     var view = dv.Value;
                     view.ViewModel = viewModel;
 
-                    var twofa = factory.GetViewModel(UIViewType.TwoFactor).Value as ITwoFactorViewModel;
+                    var twofa = uiProvider.GetService<ITwoFactorViewModel>();
                     twofa.WhenAny(x => x.IsShowing, x => x.Value)
                         .Where(x => x)
                         .Subscribe(_ =>
                         {
                             Fire(Trigger.Next);
                         });
-
-                    transition.OnNext(view);
+                    LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.TwoFactor);
 
@@ -76,7 +79,7 @@ namespace GitHub.Controllers
                 .OnEntry(() =>
                 {
                     var view = SetupView(UIViewType.TwoFactor);
-                    transition.OnNext(view);
+                    LoadView(view);
                 })
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
@@ -86,7 +89,7 @@ namespace GitHub.Controllers
                 .OnEntry(() =>
                 {
                     var view = SetupView(UIViewType.Create);
-                    transition.OnNext(view);
+                    LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.End);
 
@@ -94,7 +97,7 @@ namespace GitHub.Controllers
                 .OnEntry(() =>
                 {
                     var view = SetupView(UIViewType.Clone);
-                    transition.OnNext(view);
+                    LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.End);
 
@@ -107,11 +110,22 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Next, UIViewType.None);
         }
 
+        private void LoadView(IView view)
+        {
+            transition.OnNext(view as UserControl);
+        }
+
         IView SetupView(UIViewType viewType)
         {
-            var dvm = factory.GetViewModel(viewType);
-            disposables.Add(dvm);
-            var viewModel = dvm.Value;
+            IViewModel viewModel;
+            if (viewType == UIViewType.TwoFactor)
+                viewModel = uiProvider.GetService<ITwoFactorViewModel>();
+            else
+            {
+                var dvm = factory.GetViewModel(viewType);
+                disposables.Add(dvm);
+                viewModel = dvm.Value;
+            }
             
             var dv = factory.GetView(viewType);
             disposables.Add(dv);
@@ -127,10 +141,10 @@ namespace GitHub.Controllers
             machine.Fire(next);
         }
 
-        public IObservable<object> SelectFlow(UIControllerFlow choice)
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice)
         {
             currentFlow = choice;
-            transition = new Subject<object>();
+            transition = new Subject<UserControl>();
             transition.Subscribe((o) => { }, _ => Fire(Trigger.Next));
             return transition;
         }

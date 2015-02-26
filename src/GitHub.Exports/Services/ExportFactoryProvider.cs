@@ -10,6 +10,7 @@ using GitHub.ViewModels;
 namespace GitHub.Services
 {
     [Export]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class ExportFactoryProvider
     {
         [ImportingConstructor]
