@@ -8,7 +8,7 @@ using System.Reflection;
 using Akavache;
 using ReactiveUI;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     /// <summary>
     /// A cache for data that's not host specific
@@ -108,9 +108,9 @@ namespace GitHub
             TSource source)
         {
             var member = expression.Body as MemberExpression;
-            Debug.Assert(member != null, "Expression should be a property and not method or some other shit.");
+            Debug.Assert(member != null, "Expression should be a property and not method or some other thing.");
             var property = member.Member as PropertyInfo;
-            Debug.Assert(property != null, "Expression should be a property and not field or some other shit.");
+            Debug.Assert(property != null, "Expression should be a property and not field or some other thing.");
             var propertySetterAction = new Action<TProperty>(value => property.SetValue(source, value));
             return Tuple.Create(property.Name, propertySetterAction);
         }

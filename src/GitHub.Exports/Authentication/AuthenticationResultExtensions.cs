@@ -1,6 +1,4 @@
-﻿using GitHub.Exports;
-
-namespace GitHub.Authentication
+﻿namespace GitHub.Authentication
 {
 
     public static class AuthenticationResultExtensions

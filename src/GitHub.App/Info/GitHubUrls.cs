@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using GitHub.Models;
 
 namespace GitHub.Info
 {

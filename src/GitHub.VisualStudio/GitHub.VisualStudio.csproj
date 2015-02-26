@@ -56,6 +56,12 @@
       <HintPath>..\..\packages\EditorUtils2013.1.4.1.1\lib\net40\EditorUtils2013.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="LibGit2Sharp, Version=0.17.30619.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\LibGit2Sharp.dll</HintPath>
       <Private>False</Private>
@@ -71,6 +77,7 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Data, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.UI, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -87,7 +94,6 @@
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
-    <Reference Include="Microsoft.VisualStudio.Shell.12.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0" />
@@ -140,24 +146,6 @@
     <Reference Include="System.Xaml" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="EnvDTE100">
-      <Guid>{26AD1324-4B7C-44BC-84F8-B86AED45729F}</Guid>
-      <VersionMajor>10</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="EnvDTE90">
-      <Guid>{2CE2370E-D744-4936-A090-3FFFE667B0E1}</Guid>
-      <VersionMajor>9</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="Microsoft.VisualStudio.CommandBars">
       <Guid>{1CBA492E-7263-47BB-87FE-639000619B15}</Guid>
       <VersionMajor>8</VersionMajor>
@@ -182,13 +170,15 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Base\TeamExplorerBase.cs" />
+    <Compile Include="Base\TeamExplorerGitAwareItem.cs" />
     <Compile Include="Base\TeamExplorerItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationLinkBase.cs" />
     <Compile Include="Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Helpers\Colors.cs" />
-    <Compile Include="Helpers\ExportFactoryProvider.cs" />
+    <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\Services.cs" />
     <Compile Include="Settings.cs" />
@@ -205,23 +195,34 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="TeamExplorerConnect\PlaceholderGitHubSection.cs" />
+    <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PullRequestsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\IssuesNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\WikiNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PulseNavigationItem.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
+    <Compile Include="UI\Views\Controls\CloneRepoControl.xaml.cs">
+      <DependentUpon>CloneRepoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\CreateRepoControl.xaml.cs">
+      <DependentUpon>CreateRepoControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
       <DependentUpon>LoginControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\CreateIssueDialog.xaml.cs">
-      <DependentUpon>CreateIssueDialog.xaml</DependentUpon>
+    <Compile Include="UI\Views\GitHubConnectContent.xaml.cs">
+      <DependentUpon>GitHubConnectContent.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\LoginCommandDialog.xaml.cs">
-      <DependentUpon>LoginCommandDialog.xaml</DependentUpon>
+    <Compile Include="UI\Views\GitHubHomeContent.xaml.cs">
+      <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\TwoFactorView.xaml.cs">
-      <DependentUpon>TwoFactorView.xaml</DependentUpon>
+    <Compile Include="UI\Views\Controls\TwoFactorControl.xaml.cs">
+      <DependentUpon>TwoFactorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WindowController.xaml.cs">
+      <DependentUpon>WindowController.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -271,21 +272,32 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="SharedDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\CloneRepoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\CreateRepoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Views\Controls\LoginControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\CreateIssueDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\LoginCommandDialog.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="UI\Views\GitHubConnectContent.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\TwoFactorView.xaml">
+    <Page Include="UI\Views\GitHubHomeContent.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Controls\TwoFactorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>
+      </SubType>
+    </Page>
+    <Page Include="UI\WindowController.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -296,6 +308,10 @@
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1a1da411-8d1f-4578-80a6-04576bea2dc5}</Project>
       <Name>GitHub.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
+      <Name>GitHub.Exports.Reactive</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>

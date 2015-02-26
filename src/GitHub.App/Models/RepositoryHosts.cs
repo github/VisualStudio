@@ -5,9 +5,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Authentication;
+using GitHub.Caches;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
+using GitHub.Primitives;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {

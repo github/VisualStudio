@@ -4,21 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d" 
-             d:DesignHeight="300"
-             d:DesignWidth="300">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Styles.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/GitHub.UI.Reactive;component/Assets/Controls.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
+             d:DesignHeight="541"
+             d:DesignWidth="345" Background="White">
     <Grid
         FocusManager.IsFocusScope="True"
         x:Name="loginStackPanel"

@@ -4,7 +4,7 @@ using System.Reflection;
 using GitHub.Models;
 using Octokit;
 
-namespace GitHub
+namespace GitHub.VisualStudio
 {
     // Represents the currently executing program.
     [Export(typeof(IProgram))]

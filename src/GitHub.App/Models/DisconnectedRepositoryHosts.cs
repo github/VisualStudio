@@ -1,13 +1,13 @@
 ﻿
 using System;
-using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
-using Akavache;
+using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Caches;
+using GitHub.Primitives;
 using NullGuard;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {

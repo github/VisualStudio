@@ -6,9 +6,10 @@ using System.Reactive.Linq;
 using Akavache;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Models;
 using Octokit;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     public class HostCache : IHostCache
     {

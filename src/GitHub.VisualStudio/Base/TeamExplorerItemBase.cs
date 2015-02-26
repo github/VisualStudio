@@ -1,10 +1,8 @@
-﻿using NullGuard;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.Composition;
+using GitHub.Models;
+using GitHub.VisualStudio.Helpers;
+using NullGuard;
+using Octokit;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -40,15 +38,12 @@ namespace GitHub.VisualStudio.Base
         {
         }
     }
-}
 
-namespace GitHub.VisualStudio.Exports
-{
-    [Export(typeof(Octokit.IGitHubClient))]
-    public class GHClient : Octokit.GitHubClient
+    [Export(typeof(IGitHubClient))]
+    public class GHClient : GitHubClient
     {
         [ImportingConstructor]
-        public GHClient(Models.IProgram program)
+        public GHClient(IProgram program)
             : base(program.ProductHeader)
         {
 

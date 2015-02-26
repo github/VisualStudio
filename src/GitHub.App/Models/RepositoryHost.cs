@@ -7,15 +7,18 @@ using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
+using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Factories;
+using GitHub.Primitives;
 using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
 using Authorization = Octokit.Authorization;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {
