@@ -156,8 +156,8 @@ namespace GitHub.ViewModels
 
             var canLogin = this.WhenAny(x => x.IsValid, x => x.Value);
 
-            this.WhenAny(x => x.LoginFailed, x => x.Value ? "Try again" : "Log in")
-                .ToProperty(this, x => x.LoginButtonText, out loginButtonText);
+            loginButtonText = this.WhenAny(x => x.LoginFailed, x => x.Value ? "Try again" : "Log in")
+                .ToProperty(this, x => x.LoginButtonText, initialValue: "Log In");
 
             LoginPrefix = "Log in";
             LoginFailedText = "Log in failed";
