@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(ICloneRepoViewModel), typeof(LoginControl), new PropertyMetadata(null));
+           "ViewModel", typeof(ICloneRepoViewModel), typeof(CloneRepoControl), new PropertyMetadata(null));
 
 
         object IViewFor.ViewModel
