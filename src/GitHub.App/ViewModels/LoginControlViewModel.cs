@@ -29,10 +29,7 @@ namespace GitHub.ViewModels
 
         public ReactiveCommand<AuthenticationResult> LoginCommand { get; private set; }
         public ICommand LoginCmd { get { return LoginCommand; } }
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-        public ICommand CancelCmd { get { return CancelCommand; } }
-        public IObservable<object> Cancelling { get { return CancelCommand; } }
-
+        
         public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
         public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
         public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
@@ -173,8 +170,6 @@ namespace GitHub.ViewModels
             LoginCommand.IsExecuting
                 .ToProperty(this, vm => vm.IsLoginInProgress, out isLoginInProgress);
 
-            CancelCommand = ReactiveCommand.Create(Observable.Return(true));
-
             SignupCommand = ReactiveCommand.Create(Observable.Return(true));
             SignupCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.Plans));
 
@@ -201,8 +196,7 @@ namespace GitHub.ViewModels
             Observable.Merge(
                     this.WhenAny(x => x.LoginMode, x => x.Value),
                     ShowEnterpriseLoginCommand.Select(_ => LoginMode.EnterpriseOnly),
-                    ShowDotComLoginCommand.Select(_ => LoginMode.DotComOnly),
-                    CancelCommand.Select(_ => LoginMode))
+                    ShowDotComLoginCommand.Select(_ => LoginMode.DotComOnly))
                 .Where(x =>
                     x == LoginMode.DotComOnly 
                     || x == LoginMode.EnterpriseOnly 
@@ -244,7 +238,6 @@ namespace GitHub.ViewModels
             ForgotPasswordCommand = ReactiveCommand.Create();
             ForgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
         }
-
 
         public void Dispose()
         {
