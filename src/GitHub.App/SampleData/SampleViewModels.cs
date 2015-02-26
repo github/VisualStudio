@@ -1,19 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GitHub.Helpers;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
+using GitHub.Validation;
+using GitHub.ViewModels;
 using Octokit;
 using ReactiveUI;
 using Account = Octokit.Account;
-using GitHub.Services;
-using System.Collections.Generic;
-using GitHub.Primitives;
-using NullGuard;
-using GitHub.UI;
-using System.Windows.Input;
-using GitHub.Validation;
 
 namespace GitHub.SampleData
 {

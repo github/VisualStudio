@@ -1,5 +1,4 @@
-﻿using Octokit;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace GitHub.Services

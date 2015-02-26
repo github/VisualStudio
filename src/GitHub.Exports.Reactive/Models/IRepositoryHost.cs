@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Reactive;
-using ReactiveUI;
+using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Caches;
+using GitHub.Primitives;
+using ReactiveUI;
 
 namespace GitHub.Models
 {

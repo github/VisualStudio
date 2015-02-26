@@ -1,13 +1,15 @@
-﻿using GitHub.Services;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.IO;
+using GitHub.Info;
+using GitHub.Services;
+using GitHub.VisualStudio.Services;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
-using System;
-using System.ComponentModel.Composition;
-using System.IO;
 
-namespace GitHub.Exports
+namespace GitHub.VisualStudio.Helpers
 {
     [Export(typeof(IBrowser))]
     public class Browser : IBrowser
@@ -36,7 +38,7 @@ namespace GitHub.Exports
              */
             var service = serviceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
             if (service == null)
-                service = VisualStudio.Services.WebBrowsing;
+                service = Services.WebBrowsing;
 
             if (service != null)
             {

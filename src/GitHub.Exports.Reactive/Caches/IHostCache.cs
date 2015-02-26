@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
+using GitHub.Models;
 using Octokit;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     /// <summary>
     /// Per host cache data.

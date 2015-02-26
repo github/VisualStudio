@@ -1,10 +1,10 @@
-﻿using GitHub.VisualStudio.Base;
+﻿using System;
+using GitHub.VisualStudio.Helpers;
+using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
-using System;
-using Microsoft.TeamFoundation.Client;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerSectionBase : TeamExplorerGitAwareItem, ITeamExplorerSection, INotifyPropertySource
     {

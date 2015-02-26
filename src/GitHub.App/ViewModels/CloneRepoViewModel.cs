@@ -1,9 +1,9 @@
-﻿using GitHub.Models;
-using GitHub.UI;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
+using GitHub.Exports;
+using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {

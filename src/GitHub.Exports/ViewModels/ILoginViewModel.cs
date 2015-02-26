@@ -1,8 +1,8 @@
-﻿using GitHub.Authentication;
-using System;
+﻿using System;
 using System.Windows.Input;
+using GitHub.Authentication;
 
-namespace GitHub.UI
+namespace GitHub.ViewModels
 {
     public interface ILoginViewModel : IViewModel
     {

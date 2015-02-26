@@ -1,6 +1,7 @@
-﻿using EnvDTE;
+﻿using System;
+using System.Linq;
+using EnvDTE;
 using EnvDTE80;
-using GitHub.Api;
 using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio;
@@ -9,15 +10,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using NullGuard;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Services
 {
     public static class Services
     {

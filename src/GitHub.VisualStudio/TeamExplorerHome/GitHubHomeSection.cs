@@ -1,12 +1,13 @@
-﻿using GitHub.VisualStudio.UI.Views;
-using Microsoft.TeamFoundation.Controls;
-using NullGuard;
-using System;
-using Microsoft.TeamFoundation.Client;
+﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.Helpers;
+using GitHub.VisualStudio.UI.Views;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerSection(GitHubHomeSectionId, TeamExplorerPageIds.Home, 10)]
     public class GitHubHomeSection : TeamExplorerSectionBase

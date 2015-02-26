@@ -1,13 +1,14 @@
-﻿using GitHub.Extensions.Reactive;
-using GitHub.UI;
-using GitHub.UI.Helpers;
-using GitHub.UserErrors;
-using NullGuard;
-using ReactiveUI;
-using System;
-using System.ComponentModel.Composition;
+﻿using System;
 using System.Reactive.Linq;
 using System.Windows;
+using GitHub.Exports;
+using GitHub.Extensions.Reactive;
+using GitHub.UI;
+using GitHub.UserErrors;
+using GitHub.ViewModels;
+using NullGuard;
+using ReactiveUI;
+using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {

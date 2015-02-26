@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using GitHub.VisualStudio.UI.Views;
-using Microsoft.VisualStudio.Shell;
-using GitHub.Exports;
 using GitHub.Services;
-using GitHub.Authentication;
+using GitHub.UI;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.UI;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio
 {
@@ -57,7 +56,7 @@ namespace GitHub.VisualStudio
             AddTopLevelMenuItem(PkgCmdIDList.cloneRepoCommand, OnCloneRepo);
         }
 
-        void ShowDialog(GitHub.UI.UIControllerFlow flow)
+        void ShowDialog(UIControllerFlow flow)
         {
             var ui = GetExportedValue<IUIProvider>();
             var disposable = ui.GetService<ExportFactoryProvider>().UIControllerFactory.CreateExport();
@@ -74,17 +73,17 @@ namespace GitHub.VisualStudio
 
         void OnCreateRepo(object sender, EventArgs e)
         {
-            ShowDialog(GitHub.UI.UIControllerFlow.Create);
+            ShowDialog(UIControllerFlow.Create);
         }
 
         void OnCloneRepo(object sender, EventArgs e)
         {
-            ShowDialog(GitHub.UI.UIControllerFlow.Clone);
+            ShowDialog(UIControllerFlow.Clone);
         }
 
         void OnLoginCommand(object sender, EventArgs e)
         {
-            ShowDialog(GitHub.UI.UIControllerFlow.Authentication);
+            ShowDialog(UIControllerFlow.Authentication);
         }
     }
 }

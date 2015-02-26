@@ -1,8 +1,11 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
+using GitHub.Exports;
 using GitHub.UI;
-using System.ComponentModel.Composition;
+using GitHub.ViewModels;
 
 namespace GitHub.Services
 {

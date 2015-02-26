@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using GitHub.Models;
+using GitHub.Services;
 using Octokit;
 using ReactiveUI;
-using GitHub.Services;
 
 namespace GitHub.UserErrors
 {
@@ -17,12 +18,12 @@ namespace GitHub.UserErrors
         public static IObservable<RecoveryOptionResult> Throw(Exception innerException = null)
         {
             var translation = StandardUserErrors.Translator.Value.GetUserErrorTranslation(ErrorType.RepoCreationOnGitHubFailed, innerException);
-            return UserError.Throw(new PublishRepositoryUserError(translation.ErrorMessage, translation.CauseOrResolution));
+            return Throw(new PublishRepositoryUserError(translation.ErrorMessage, translation.CauseOrResolution));
         }
 
         public static IObservable<RecoveryOptionResult> Throw(string errorMessage, string errorCauseOrResolution = null)
         {
-            return UserError.Throw(new PublishRepositoryUserError(errorMessage, errorCauseOrResolution));
+            return Throw(new PublishRepositoryUserError(errorMessage, errorCauseOrResolution));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Because no. It's only for that kind of exception")]
@@ -31,7 +32,7 @@ namespace GitHub.UserErrors
             if (account.IsOnFreePlan)
             {
                 var translation = StandardUserErrors.Translator.Value.GetUserErrorTranslation(ErrorType.RepoCreationOnGitHubFailed, exception);
-                UserError.Throw(new PrivateRepositoryOnFreeAccountUserError(translation.ErrorMessage, translation.CauseOrResolution));
+                Throw(new PrivateRepositoryOnFreeAccountUserError(translation.ErrorMessage, translation.CauseOrResolution));
             }
             else
             {

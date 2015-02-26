@@ -1,9 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive.Threading.Tasks;
 using GitHub.Models;
 using Octokit.Internal;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 
 namespace GitHub.Services
 {

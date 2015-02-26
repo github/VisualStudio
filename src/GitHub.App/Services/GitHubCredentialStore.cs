@@ -2,12 +2,13 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Akavache;
+using GitHub.Caches;
 using GitHub.Extensions.Reactive;
+using GitHub.Primitives;
 using NLog;
 using Octokit;
-using LogManager = NLog.LogManager;
 
-namespace GitHub
+namespace GitHub.Services
 {
     public class GitHubCredentialStore : ICredentialStore
     {

@@ -1,16 +1,13 @@
-﻿using GitHub.Exports;
-using GitHub.Extensions;
-using GitHub.Models;
+﻿using System;
+using System.ComponentModel.Composition;
 using GitHub.Services;
+using GitHub.UI;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.Services;
+using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
@@ -46,7 +43,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
             var factory = ui.GetService<ExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
-            var creation = d.Value.SelectFlow(GitHub.UI.UIControllerFlow.Create);
+            var creation = d.Value.SelectFlow(UIControllerFlow.Create);
             var x = new WindowController(creation);
             creation.Subscribe(_ => { }, _ => x.Close());
             x.Show();
@@ -60,7 +57,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
             var factory = ui.GetService<ExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
-            var creation = d.Value.SelectFlow(GitHub.UI.UIControllerFlow.Clone);
+            var creation = d.Value.SelectFlow(UIControllerFlow.Clone);
             creation.Subscribe(_ => { }, _ => d.Dispose());
             var x = new WindowController(creation);
             x.Show();

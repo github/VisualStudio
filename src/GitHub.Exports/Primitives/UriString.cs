@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using GitHub.Extensions;
-using GitHub.Helpers;
 
 namespace GitHub.Primitives
 {

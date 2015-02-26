@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using GitHub.Helpers;
 
 namespace GitHub.Primitives
 {

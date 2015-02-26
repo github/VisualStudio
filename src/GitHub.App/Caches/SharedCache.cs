@@ -8,7 +8,7 @@ using System.Reflection;
 using Akavache;
 using ReactiveUI;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     /// <summary>
     /// A cache for data that's not host specific

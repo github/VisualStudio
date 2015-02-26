@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using GitHub.Helpers;
 
 namespace GitHub.Services
 {
