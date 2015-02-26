@@ -46,6 +46,8 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             var x = new WindowController(creation);
             creation.Subscribe(_ => { }, _ => x.Close());
             x.Show();
+
+            d.Value.Start();
         }
 
         public void DoClone()
