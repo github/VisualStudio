@@ -11,6 +11,7 @@ namespace GitHub.ViewModels
         string LoginButtonText { get; }
         bool IsLoginInProgress { get; }
         ICommand LoginCmd { get; }
+        ICommand SignUpCommand { get; }
         IObservable<AuthenticationResult> AuthenticationResults { get; }
     }
 }

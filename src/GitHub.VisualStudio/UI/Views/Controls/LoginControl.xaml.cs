@@ -31,6 +31,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.LoginButtonText, v => v.loginButton.Content));
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoginInProgress, v => v.loginButton.IsEnabled, inProgress => !inProgress));
                 d(this.BindCommand(ViewModel, vm => vm.LoginCmd, v => v.loginButton));
+                d(this.BindCommand(ViewModel, vm => vm.SignUpCommand, v => v.signUpLink));
             });
 
             VisualStateManager.GoToState(this, "DotCom", true);

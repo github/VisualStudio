@@ -16,7 +16,7 @@
         x:Name="loginStackPanel"
         FocusVisualStyle="{x:Null}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" MinHeight="0" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <VisualStateManager.VisualStateGroups>
@@ -122,7 +122,7 @@
                 <VisualState x:Name="Design" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <StackPanel x:Name="fields" Margin="24,0,0,12" Background="{x:Null}" FocusManager.IsFocusScope="True" FocusVisualStyle="{x:Null}" helpers:AccessKeysManagerScoping.IsEnabled="True">
+        <StackPanel x:Name="fields" Margin="24,0,24,12" Background="{x:Null}" FocusManager.IsFocusScope="True" FocusVisualStyle="{x:Null}" helpers:AccessKeysManagerScoping.IsEnabled="True">
             <StackPanel
                 x:Name="loginLabel"
                 Visibility="{Binding LoginFailed, Mode=OneWay, Converter={ui:BooleanToInverseVisibilityConverter}}"
@@ -196,7 +196,7 @@
                 Text="{Binding EnterpriseUrl, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
 
-            <Border HorizontalAlignment="Center"  Margin="0,12,0,0">
+            <Border HorizontalAlignment="Center" Margin="0,12,0,12">
                 <ui:OcticonCircleButton
                     x:Name="loginButton"
                     Icon="check"
@@ -205,11 +205,21 @@
                     IsDefault="True" />
             </Border>
 
-            <StackPanel x:Name="gitHubSignupStackPanel">
-                <TextBlock x:Name="signUpLabel" Style="{DynamicResource GitHubH1TextBlock}" Text="Sign up" Margin="0,10,0,0" />
-                <TextBlock x:Name="description" Style="{DynamicResource GitHubDescriptionTextBlock}" Margin="0"><Run Text="Powerful collaboration, review, and code management for open source and private development projects." /><LineBreak /><Run Text="Build software better, together." FontWeight="Bold"/></TextBlock>
-                <ui:OcticonLinkButton x:Name="signUpLink" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Icon="link_external" Content="Sign up" ToolTip="go to github.com to sign up for an account" IsTabStop="False" />
-            </StackPanel>
+            <Border x:Name="gitHubSignupStackPanel" HorizontalAlignment="Center" Height="40">
+                <TextBlock
+                    x:Name="description"
+                    Style="{DynamicResource GitHubDescriptionTextBlock}"
+                    Margin="0">
+                    <Run Text="Don’t have an account?" />
+                    <ui:OcticonLinkButton
+                        x:Name="signUpLink"
+                        Margin="0,0,0,-3"
+                        VerticalContentAlignment="Bottom"
+                        Icon="link_external"
+                        Content="Sign up"
+                        ToolTip="go to github.com to sign up for an account" />
+                </TextBlock>
+            </Border>
         </StackPanel>
     </Grid>
 </UserControl>
