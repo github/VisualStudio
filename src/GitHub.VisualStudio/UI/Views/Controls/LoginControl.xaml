@@ -158,7 +158,7 @@
                 <TextBlock x:Name="loginFailedLabel" Margin="0" Style="{DynamicResource GitHubH1TextBlock}" Foreground="#ea2828" Text="{Binding LoginFailedText}" IsHitTestVisible="False" Visibility="{Binding LoginFailed, Converter={ui:BooleanToVisibilityConverter}}" />
                 <ui:OcticonLinkButton x:Name="forgotPasswordButton" Content="Forgot password?" Icon="link_external" Margin="6,3,0,0" IsTabStop="False" Command="{Binding ForgotPasswordCommand}" ToolTip="{Binding ForgotPasswordUrl}" />
             </StackPanel>
-            <StackPanel x:Name="tabs" Orientation="Horizontal" HorizontalAlignment="Left">
+            <StackPanel x:Name="tabs" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button
                     x:Name="dotComTabButton"
                     Content="GitHub"
