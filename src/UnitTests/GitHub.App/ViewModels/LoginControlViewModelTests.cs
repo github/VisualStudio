@@ -19,7 +19,7 @@ public class LoginControlViewModelTests
             var enterpriseProbe = LazySubstitute.For<IEnterpriseProbe>();
             var loginViewModel = new LoginControlViewModel(serviceProvider, repositoryHosts, browser, enterpriseProbe);
 
-            loginViewModel.SignupCommand.Execute(null);
+            loginViewModel.SignUpCommand.Execute(null);
 
             browser.Received().OpenUrl(GitHubUrls.Plans);
         }

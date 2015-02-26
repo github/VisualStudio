@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
@@ -27,13 +28,15 @@ namespace GitHub.ViewModels
         readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
         const string notEnterpriseServerError = "Not an Enterprise server. Please enter an Enterprise URL";
 
+        readonly ReactiveCommand<object> signUpCommand;
+
         public ReactiveCommand<AuthenticationResult> LoginCommand { get; private set; }
         public ICommand LoginCmd { get { return LoginCommand; } }
         
         public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
         public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
         public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
-        public ReactiveCommand<object> SignupCommand { get; private set; }
+        public ICommand SignUpCommand { get { return signUpCommand; } }
 
         string enterpriseUrl;
         [ValidateIf("IsLoggingInToEnterprise")]
@@ -170,8 +173,8 @@ namespace GitHub.ViewModels
             LoginCommand.IsExecuting
                 .ToProperty(this, vm => vm.IsLoginInProgress, out isLoginInProgress);
 
-            SignupCommand = ReactiveCommand.Create(Observable.Return(true));
-            SignupCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.Plans));
+            signUpCommand = ReactiveCommand.Create(Observable.Return(true));
+            signUpCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.Plans));
 
             // Whenever a host logs on or off we re-evaluate this. If there are no logged on hosts (local excluded)
             // then the user may log on to either .com or an enterprise instance. If there's already a logged on host
