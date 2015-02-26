@@ -5,9 +5,10 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Extensions;
+using GitHub.Primitives;
 using NLog;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     [Export(typeof(ILoginCache))]
     public sealed class LoginCache : ILoginCache

@@ -1,7 +1,8 @@
 ﻿using System;
 using GitHub.Authentication;
+using GitHub.Factories;
+using GitHub.Primitives;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.Models
 {

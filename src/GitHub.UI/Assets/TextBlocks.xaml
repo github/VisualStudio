@@ -47,6 +47,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style x:Key="RoundedPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#D1D1D1"/>
@@ -104,6 +105,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style x:Key="GitHubPromptRichText" TargetType="{x:Type ui:PromptRichTextBox}">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#D1D1D1"/>
@@ -183,6 +185,54 @@
     <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}" />
     <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}" />
 
+    <Style x:Key="AppendingPathTextBoxStyle" TargetType="{x:Type ui:AppendingPathTextBox}" BasedOn="{StaticResource GitHubTextBox}">
+        <Setter Property="Padding" Value="3,3,0,0" />
+        <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type ui:AppendingPathTextBox}">
+
+                    <Grid>
+                        <Border x:Name="Bd" CornerRadius="2" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <Border CornerRadius="0" BorderBrush="Black" BorderThickness="0,1,0,0" Margin="2,-2,2,0" Opacity="0.4">
+                                <Border.Effect>
+                                    <DropShadowEffect Direction="270" ShadowDepth="0" BlurRadius="4" Opacity="1" />
+                                </Border.Effect>
+                            </Border>
+                        </Border>
+
+                        <Grid  Margin="1,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Padding="3,3,0,0"  />
+                            <TextBlock Visibility="{TemplateBinding PathSeparatorVisibility}" Text="\" Grid.Column="1" Padding="0,3,0,3" Margin="-3,0,0,0"/>
+                            <TextBlock x:Name="childFolderTextBlock" Visibility="{TemplateBinding ChildFolderVisibility}" Text="{TemplateBinding Property=ChildFolderName}" Grid.Column="2" Padding="0,3,0,3" Margin="-2,0,0,0" Opacity="0.7" />
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource GitHubTextBoxMouseOverBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="PathSeparatorVisibility" Value="Visible">
+                            <Setter Property="Margin" Value="-1,0,0,0" TargetName="childFolderTextBlock" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <!-- PasswordBox -->
     <Style x:Key="GitHubPasswordBox" TargetType="{x:Type PasswordBox}">
         <Setter Property="BorderBrush" Value="{DynamicResource GitHubTextBoxBorderBrush}" />
@@ -321,37 +371,6 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
-    <ControlTemplate x:Key="ValidationAdorner">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Border BorderThickness="1" BorderBrush="{DynamicResource GitHubRed}" />
-            <AdornedElementPlaceholder />
-            <Grid Grid.Column="1" Margin="6,0,-3,0">
-                <Image Width="10" Height="20" RenderTransformOrigin="0.5,0.5">
-                    <Image.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform Angle="180" />
-                        </TransformGroup>
-                    </Image.RenderTransform>
-                    <Image.Source>
-                        <DrawingImage>
-                            <DrawingImage.Drawing>
-                                <GeometryDrawing Brush="{DynamicResource GitHubRed}" Geometry="M897.41,613.924l-10.33,10.331v-20.661L897.41,613.924z" />
-                            </DrawingImage.Drawing>
-                        </DrawingImage>
-                    </Image.Source>
-                </Image>
-            </Grid>
-            <Grid Grid.Column="2" Background="{DynamicResource GitHubRed}">
-                <TextBlock Foreground="White" FontWeight="Bold" FontSize="12" Style="{StaticResource GitHubTextBlock}" Margin="8,4,12,0" Text="{Binding Path=/ErrorContent}" />
-            </Grid>
-        </Grid>
-    </ControlTemplate>
 
     <Style x:Key="LockIconPath" TargetType="{x:Type Path}">
         <Setter Property="Data" Value="F1M2,9C2,9 2,16 2,16 2,16 9,16 9,16 9,16 9,15.891 9,15.699L9,15C9,15 3,15 3,15 3,15 3,14 3,14 3,14 9,14 9,14L9,13C9,13 3,13 3,13 3,13 3,12 3,12 3,12 9,12 9,12L9,11C9,11 3,11 3,11 3,11 3,10 3,10 3,10 9,10 9,10 9,9.438 9,9 9,9 9,9 2,9 2,9z M7,3C5.895,3 5,3.895 5,5 5,6.105 5,8 5,8 5,8 9,8 9,8 9,8 9,5.707 9,5 9,3.895 8.105,3 7,3z M7,1C9.209,1 11,2.791 11,5 11,5.298 11,5.822 11,6.441L11,8 11.57,8C11.844,8 12,8 12,8 12.552,8 13,8.448 13,9 13,9 13,16 13,16 13,16.552 12.552,17 12,17 12,17 2,17 2,17 1.448,17 1,16.552 1,16 1,16 1,9 1,9 1,8.448 1.448,8 2,8 2,8 2.156,8 2.43,8L3,8 3,6.869C3,6.203 3,5.552 3,5 3,2.791 4.791,1 7,1z" />

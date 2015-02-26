@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reactive;
 using Akavache;
 
-namespace GitHub
+namespace GitHub.Caches
 {
     /// <summary>
     /// A cache for data that's not host specific

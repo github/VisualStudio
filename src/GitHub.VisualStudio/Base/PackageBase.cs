@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Base
 {
     public abstract class PackageBase : Package
     {
@@ -56,12 +56,6 @@ namespace GitHub.VisualStudio
                 return default(T);
             var exportProvider = componentModel.DefaultExportProvider;
             return exportProvider.GetExportedValue<T>();
-        }
-
-        protected void EnsureUIProvider()
-        {
-            var ui = GetExportedValue<UIProvider>();
-            ui.EnsureProvider(GetService<SComponentModel, IComponentModel>().DefaultExportProvider);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Microsoft.TeamFoundation.Client;
-using NullGuard;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using Microsoft.TeamFoundation.Client;
+using NullGuard;
 
 namespace GitHub.VisualStudio.Base
 {

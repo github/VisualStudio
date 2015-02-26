@@ -1,11 +1,10 @@
-﻿using GitHub.Exports;
-using GitHub.Extensions;
-using GitHub.Services;
-using Octokit;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-
+using GitHub.Extensions;
+using GitHub.Primitives;
+using GitHub.Services;
+using Octokit;
 
 namespace GitHub.Api
 {

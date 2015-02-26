@@ -1,11 +1,12 @@
-﻿using GitHub.VisualStudio.Base;
+﻿using System;
+using GitHub.VisualStudio.Helpers;
+using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
-using System;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerSectionBase : TeamExplorerBase, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerGitAwareItem, ITeamExplorerSection, INotifyPropertySource
     {
         bool isBusy;
         public bool IsBusy
@@ -21,12 +22,16 @@ namespace GitHub.VisualStudio
             set { isExpanded = value; this.RaisePropertyChange(); }
         }
 
+        // When this class goes back to inheriting from TeamExplorerBase,
+        // this property should be restored
+        /*
         bool isVisible;
         public bool IsVisible
         {
             get { return isVisible; }
             set { isVisible = value; this.RaisePropertyChange(); }
         }
+        */
 
         object sectionContent;
         [AllowNull]
@@ -44,10 +49,17 @@ namespace GitHub.VisualStudio
             set { title = value; this.RaisePropertyChange(); }
         }
 
+        public TeamExplorerSectionBase(IServiceProvider serviceProvider)
+            : base()
+        {
+            this.ServiceProvider = serviceProvider;
+        }
+
         public virtual void Cancel()
         {
         }
 
+        [return: AllowNull]
         public virtual object GetExtensibilityService(Type serviceType)
         {
             return null;
@@ -56,6 +68,7 @@ namespace GitHub.VisualStudio
         public virtual void Initialize(object sender, SectionInitializeEventArgs e)
         {
             ServiceProvider = e.ServiceProvider;
+            Initialize();
         }
 
         public virtual void Loaded(object sender, SectionLoadedEventArgs e)
@@ -68,6 +81,18 @@ namespace GitHub.VisualStudio
 
         public virtual void SaveContext(object sender, SectionSaveContextEventArgs e)
         {
+        }
+
+        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        {
+            if (e.TeamProjectChanged)
+            {
+                if (e.NewContext != null && e.NewContext.HasTeamProject)
+                    IsVisible = true;
+                else
+                    IsVisible = false;
+            }
+            base.ContextChanged(sender, e);
         }
     }
 }

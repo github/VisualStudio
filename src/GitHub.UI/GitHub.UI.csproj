@@ -11,7 +11,8 @@
     <AssemblyName>GitHub.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>55d7ee16</NuGetPackageImportStamp>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <NuGetPackageImportStamp>4000dd02</NuGetPackageImportStamp>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -41,10 +42,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="NullGuard">
-      <HintPath>..\..\packages\NullGuard.Fody.1.2.0.0\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -61,10 +58,19 @@
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Controls\AppendingPathTextBox.cs" />
+    <Compile Include="Controls\ComboBoxes\GitHubComboBox.cs" />
+    <Compile Include="Controls\EmojiImage.cs" />
+    <Compile Include="Controls\FilterTextBox.cs" />
+    <Compile Include="Controls\HorizontalShadowDivider.xaml.cs">
+      <DependentUpon>HorizontalShadowDivider.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Octicons\Octicon.cs" />
     <Compile Include="Controls\Octicons\OcticonImage.cs" />
     <Compile Include="Controls\Octicons\OcticonPath.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs" />
+    <Compile Include="Controls\TrimmedTextBlock.cs" />
+    <Compile Include="Fakes\NullGuard.cs" />
     <Compile Include="Helpers\AccessKeysManagerScoping.cs" />
     <Compile Include="Controls\Buttons\OcticonButton.cs" />
     <Compile Include="Controls\Buttons\OcticonCircleButton.cs" />
@@ -95,9 +101,19 @@
     <Compile Include="Converters\VerticalOffsetToVisibilityConverter.cs" />
     <Compile Include="Helpers\BindingProxy.cs" />
     <Compile Include="Helpers\GitHubBrushes.cs" />
+    <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Assets\Controls\GitHubLinkButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Assets\Controls\LightListBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Assets\Controls\ScrollViewerWithShadow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Assets\TextBlocks.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -122,6 +138,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\HorizontalShadowDivider.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Octicons\OcticonImage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -134,9 +153,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Page Include="SharedDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml">
@@ -147,13 +166,6 @@
     <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Fody.1.26.4\build\Fody.targets" Condition="Exists('..\..\packages\Fody.1.26.4\build\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Fody.1.26.4\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.26.4\build\Fody.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

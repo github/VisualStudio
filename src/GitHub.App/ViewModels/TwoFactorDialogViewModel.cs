@@ -2,19 +2,20 @@
 using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using GitHub.Authentication;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Validation;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.ViewModels
 {
-    [Export(typeof(ITwoFactorDialog))]
+    [Export(typeof(ITwoFactorViewModel))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorDialog
+    public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorViewModel
     {
         bool isAuthenticationCodeSent;
         string authenticationCode;
@@ -105,6 +106,11 @@ namespace GitHub.ViewModels
         public ReactiveCommand<RecoveryOptionResult> CancelCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; private set; }
+
+        public ICommand OkCmd { get { return OkCommand; } }
+        public ICommand CancelCmd { get { return CancelCommand; } }
+        public ICommand ShowHelpCmd { get { return ShowHelpCommand; } }
+        public ICommand ResendCodeCmd { get { return ResendCodeCommand; } }
 
         public IObservable<RecoveryOptionResult> Show(TwoFactorRequiredUserError error)
         {

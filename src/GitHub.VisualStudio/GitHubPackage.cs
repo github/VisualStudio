@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using GitHub.VisualStudio.UI.Views;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
-using GitHub.Exports;
 
 namespace GitHub.VisualStudio
 {
@@ -43,69 +44,46 @@ namespace GitHub.VisualStudio
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFile")]
         protected override void Initialize()
         {
             Debug.WriteLine("Entering Initialize() of: {0}", ToString());
             base.Initialize();
 
-            // Set the Export Provider
-
-
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            // Login Command Menu Item
-
+            // for testing purposes only
             AddTopLevelMenuItem(PkgCmdIDList.loginCommand, OnLoginCommand);
-
-            // Create Issue Command Menu Item
-            AddTopLevelMenuItem(PkgCmdIDList.createIssueCommand, OnCreateIssueCommand);
+            AddTopLevelMenuItem(PkgCmdIDList.createRepoCommand, OnCreateRepo);
+            AddTopLevelMenuItem(PkgCmdIDList.cloneRepoCommand, OnCloneRepo);
         }
 
-        /// <summary>
-        /// This function is the callback used to execute a command when the a menu item is clicked.
-        /// See the Initialize method to see how the menu item is associated to this function using
-        /// the OleMenuCommandService service and the MenuCommand class.
-        /// </summary>
-        void OnCreateIssueCommand(object sender, EventArgs e)
+        void ShowDialog(UIControllerFlow flow)
         {
-            var createIssueDialog = new CreateIssueDialog();
-            createIssueDialog.ShowModal();
+            var ui = GetExportedValue<IUIProvider>();
+            var disposable = ui.GetService<ExportFactoryProvider>().UIControllerFactory.CreateExport();
+            var watcher = disposable.Value.SelectFlow(flow);
+            var window = new WindowController(watcher);
+            watcher.Subscribe(_ => { }, _ => {
+                window.Close();
+                disposable.Dispose();
+            });
+            //window.Owner = System.Windows.Application.Current.MainWindow;
+            //window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            window.ShowModal();
+        }
+
+        void OnCreateRepo(object sender, EventArgs e)
+        {
+            ShowDialog(UIControllerFlow.Create);
+        }
+
+        void OnCloneRepo(object sender, EventArgs e)
+        {
+            ShowDialog(UIControllerFlow.Clone);
         }
 
         void OnLoginCommand(object sender, EventArgs e)
         {
-            EnsureUIProvider();
-            /*
-            var mefServiceProvider = GetExportedValue<IServiceProvider>() as MefServiceProvider;
-            Debug.Assert(mefServiceProvider != null, "Service Provider can't be imported");
-            var componentModel = GetService<SComponentModel>() as IComponentModel;
-            if (componentModel != null)
-                mefServiceProvider.ExportProvider = componentModel.DefaultExportProvider;
-            */
-
-            //var r = GetExportedValue<ILoginDialog>();
-            var factory = GetExportedValue<ExportFactoryProvider>().LoginViewModelFactory;
-            var disposable = factory.CreateExport();
-            var loginControlViewModel = disposable.Value;
-
-            var loginIssueDialog = new LoginCommandDialog(loginControlViewModel);
-            loginIssueDialog.Closed += (o,ev) => disposable.Dispose();
-            loginControlViewModel.CancelEvt.Subscribe(x => loginIssueDialog.Close());
-
-            loginIssueDialog.Show();
-            
-            loginControlViewModel.AuthenticationResults.Subscribe(result =>
-            {
-                if (result == AuthenticationResult.Success)
-                {
-                    loginIssueDialog.Close();
-                }
-            });
-            
+            ShowDialog(UIControllerFlow.Authentication);
         }
-
     }
-    
-
-    
 }

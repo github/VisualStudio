@@ -1,1 +1,1 @@
-powershell.exe .\build\cibuild.ps1
+powershell.exe .\script\cibuild.ps1

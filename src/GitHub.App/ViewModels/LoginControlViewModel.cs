@@ -5,23 +5,24 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 using GitHub.Authentication;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
-using GitHub.Exports;
 using NullGuard;
 using ReactiveUI;
-using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    [Export(typeof(ILoginDialog))]
+    [ExportViewModel(ViewType=UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LoginControlViewModel : ReactiveValidatableObject, ILoginDialog, IDisposable
+    public class LoginControlViewModel : ReactiveValidatableObject, ILoginViewModel, IDisposable
     {
         readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
         const string notEnterpriseServerError = "Not an Enterprise server. Please enter an Enterprise URL";
@@ -30,7 +31,7 @@ namespace GitHub.ViewModels
         public ICommand LoginCmd { get { return LoginCommand; } }
         public ReactiveCommand<object> CancelCommand { get; private set; }
         public ICommand CancelCmd { get { return CancelCommand; } }
-        public IObservable<object> CancelEvt { get { return CancelCommand; } }
+        public IObservable<object> Cancelling { get { return CancelCommand; } }
 
         public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
         public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }

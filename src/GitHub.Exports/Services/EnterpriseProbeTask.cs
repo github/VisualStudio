@@ -1,13 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
 using Octokit;
 using Octokit.Internal;
-using System.Threading.Tasks;
-using System.Net.Http;
-using GitHub.Extensions;
-using System.Threading;
-using System.Net;
 
 namespace GitHub.Services
 {
