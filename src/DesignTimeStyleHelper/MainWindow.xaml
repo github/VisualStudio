@@ -7,7 +7,29 @@
         
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <StackPanel x:Name="container">
-        
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/TextBlocks.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/GitHub.UI.Reactive;component/Assets/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel>
+        <Grid>
+            <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,6">
+                <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
+                <Label Margin="6 0 6 0"></Label>
+                <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
+            </WrapPanel>
+        </Grid>
+
+        <StackPanel x:Name="container">
+
+        </StackPanel>
     </StackPanel>
 </Window>
