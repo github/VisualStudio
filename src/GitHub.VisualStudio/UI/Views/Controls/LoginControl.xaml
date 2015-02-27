@@ -4,32 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-             xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d" 
-             d:DesignHeight="541"
-             d:DesignWidth="345" Background="White">
+             d:DesignWidth="426"
+             d:DesignHeight="517"
+             MinWidth="426"
+             MinHeight="517"
+             Background="White">
     <Grid
         FocusManager.IsFocusScope="True"
         x:Name="loginStackPanel"
         FocusVisualStyle="{x:Null}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" MinHeight="0" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="Normal">
                 <VisualState x:Name="Enterprise">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="dotComOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
                         <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="dotComTabButton">
                             <DiscreteBooleanKeyFrame KeyTime="0" Value="True" />
                         </BooleanAnimationUsingKeyFrames>
@@ -60,12 +53,6 @@
                 </VisualState>
                 <VisualState x:Name="DotCom">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="dotComOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
                         <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="dotComTabButton">
                             <DiscreteBooleanKeyFrame KeyTime="0" Value="False" />
                         </BooleanAnimationUsingKeyFrames>
@@ -85,9 +72,6 @@
                                     <FontWeight>Normal</FontWeight>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseLearnStackPanel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseUrlTextBox">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
@@ -115,9 +99,6 @@
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="tabs">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
                         </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseLearnStackPanel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseUrlTextBox">
                             <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
                         </ObjectAnimationUsingKeyFrames>
@@ -129,13 +110,12 @@
                 <VisualState x:Name="Design" />
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <StackPanel x:Name="fields" Margin="24,0,0,12" Background="{x:Null}" FocusManager.IsFocusScope="True" FocusVisualStyle="{x:Null}" helpers:AccessKeysManagerScoping.IsEnabled="True">
+        <StackPanel x:Name="fields" Margin="24,0,24,12" Background="{x:Null}" FocusManager.IsFocusScope="True" FocusVisualStyle="{x:Null}" helpers:AccessKeysManagerScoping.IsEnabled="True">
             <StackPanel
                 x:Name="loginLabel"
-                Visibility="{Binding LoginFailed, Mode=OneWay, Converter={ui:BooleanToInverseVisibilityConverter}}"
                 Height="32"
                 Orientation="Horizontal"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Center"
                 Margin="40,0,0,12">
                 <TextBlock
                     x:Name="loginLabelPrefix"
@@ -143,29 +123,16 @@
                     Style="{DynamicResource GitHubH1TextBlock}"
                     IsHitTestVisible="False"
                     Text="Log in" />
-                <TextBlock
-                    x:Name="dotComOnlyLoginLabel"
-                    Margin="0"
-                    Style="{DynamicResource GitHubH1TextBlock}"
-                    IsHitTestVisible="False"
-                    Text=" to GitHub" />
-                <TextBlock 
-                    x:Name="enterpriseOnlyLoginLabel"
-                    Margin="0"
-                    Style="{DynamicResource GitHubH1TextBlock}"
-                    IsHitTestVisible="False"
-                    Text=" to GitHub Enterprise" />
             </StackPanel>
             <StackPanel
                 x:Name="loginFailed"
                 Margin="40,0,0,12"
                 Orientation="Horizontal"
-                Visibility="{Binding LoginFailed, Converter={ui:BooleanToVisibilityConverter}}"
                 Height="32">
-                <TextBlock x:Name="loginFailedLabel" Margin="0" Style="{DynamicResource GitHubH1TextBlock}" Foreground="#ea2828" Text="{Binding LoginFailedText}" IsHitTestVisible="False" Visibility="{Binding LoginFailed, Converter={ui:BooleanToVisibilityConverter}}" />
+                <TextBlock x:Name="loginFailedLabel" Margin="0" Style="{DynamicResource GitHubH1TextBlock}" Foreground="#ea2828" IsHitTestVisible="False" />
                 <ui:OcticonLinkButton x:Name="forgotPasswordButton" Content="Forgot password?" Icon="link_external" Margin="6,3,0,0" IsTabStop="False" Command="{Binding ForgotPasswordCommand}" ToolTip="{Binding ForgotPasswordUrl}" />
             </StackPanel>
-            <StackPanel x:Name="tabs" Orientation="Horizontal" HorizontalAlignment="Left">
+            <StackPanel x:Name="tabs" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button
                     x:Name="dotComTabButton"
                     Content="GitHub"
@@ -182,7 +149,6 @@
                 x:Name="usernameOrEmailTextBox" 
                 PromptText="Username or Email"
                 Style="{DynamicResource RoundedPromptTextBox}" 
-                IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}"
                 Text="{Binding UsernameOrEmail, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
             <ui:SecurePasswordBox 
@@ -191,7 +157,6 @@
                 Margin="0,0,0,12" 
                 Style="{DynamicResource RoundedPromptTextBox}" 
                 VerticalAlignment="Stretch" 
-                IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}"
                 Text="{Binding PasswordNoOp, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
             <ui:PromptTextBox 
@@ -199,25 +164,33 @@
                 x:Name="enterpriseUrlTextBox" 
                 PromptText="GitHub Enterprise URL" 
                 Style="{DynamicResource RoundedPromptTextBox}" 
-                IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}"
                 Text="{Binding EnterpriseUrl, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                 Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
 
-            <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsLoginInProgress, Converter={ui:InverseBooleanConverter}}" Margin="0,12,0,0">
-                <ui:OcticonCircleButton x:Name="loginButton" Icon="check" Content="{Binding LoginButtonText, FallbackValue=Log In}" IsDefault="True" />
-                <ui:OcticonCircleButton x:Name="cancelButton" Icon="x" Margin="12,0,0,0" Content="Cancel" />
-            </StackPanel>
+            <Border HorizontalAlignment="Center" Margin="0,12,0,12">
+                <ui:OcticonCircleButton
+                    x:Name="loginButton"
+                    Icon="check"
+                    Content="Log In"
+                    IsEnabled="true"
+                    IsDefault="True" />
+            </Border>
 
-            <StackPanel x:Name="gitHubSignupStackPanel">
-                <TextBlock x:Name="signUpLabel" Style="{DynamicResource GitHubH1TextBlock}" Text="Sign up" Margin="0,10,0,0" />
-                <TextBlock x:Name="description" Style="{DynamicResource GitHubDescriptionTextBlock}" Margin="0"><Run Text="Powerful collaboration, review, and code management for open source and private development projects." /><LineBreak /><Run Text="Build software better, together." FontWeight="Bold"/></TextBlock>
-                <ui:OcticonLinkButton x:Name="signUpLink" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Icon="link_external" Content="Sign up" ToolTip="go to github.com to sign up for an account" IsTabStop="False" />
-            </StackPanel>
-            <StackPanel x:Name="enterpriseLearnStackPanel">
-                <TextBlock x:Name="learnMoreLabel" Style="{DynamicResource GitHubH1TextBlock}" Text="Learn more" Margin="0,10,0,0" />
-                <TextBlock Style="{DynamicResource GitHubDescriptionTextBlock}" Margin="0"><Run Text="Powerful collaboration, review, and code management for private development projects." /><LineBreak /><Run Text="The best way to build and ship software, on your servers." FontWeight="Bold" /></TextBlock>
-                <ui:OcticonLinkButton x:Name="learnMoreButton" Icon="link_external" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Content="Learn more" ToolTip="go to enterprise.github.com to learn more about running github on your servers" IsTabStop="False" />
-            </StackPanel>
+            <Border x:Name="gitHubSignupStackPanel" HorizontalAlignment="Center" Height="40">
+                <TextBlock
+                    x:Name="description"
+                    Style="{DynamicResource GitHubDescriptionTextBlock}"
+                    Margin="0">
+                    <Run Text="Don’t have an account?" />
+                    <ui:OcticonLinkButton
+                        x:Name="signUpLink"
+                        Margin="0,0,0,-3"
+                        VerticalContentAlignment="Bottom"
+                        Icon="link_external"
+                        Content="Sign up"
+                        ToolTip="go to github.com to sign up for an account" />
+                </TextBlock>
+            </Border>
         </StackPanel>
     </Grid>
 </UserControl>
