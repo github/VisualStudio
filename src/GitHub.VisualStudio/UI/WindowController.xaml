@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
         xmlns:ctl="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
-        xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
+        xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
         mc:Ignorable="d"
         Title="WindowHolder" Height="655" Width="519" HasMinimizeButton="False" HasMaximizeButton="False">
     <Grid x:Name="Container">
