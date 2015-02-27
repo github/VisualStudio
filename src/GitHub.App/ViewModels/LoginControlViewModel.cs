@@ -196,7 +196,7 @@ namespace GitHub.ViewModels
 
             ShowEnterpriseLoginCommand = ReactiveCommand.Create(canSwitchTargets);
 
-            Observable.Merge(
+            loginTarget = Observable.Merge(
                     this.WhenAny(x => x.LoginMode, x => x.Value),
                     ShowEnterpriseLoginCommand.Select(_ => LoginMode.EnterpriseOnly),
                     ShowDotComLoginCommand.Select(_ => LoginMode.DotComOnly))
@@ -205,7 +205,7 @@ namespace GitHub.ViewModels
                     || x == LoginMode.EnterpriseOnly 
                     || x == LoginMode.DotComOrEnterprise)
                 .Select(x => x == LoginMode.EnterpriseOnly ? LoginTarget.Enterprise : LoginTarget.DotCom)
-                .ToProperty(this, x => x.LoginTarget, out loginTarget);
+                .ToProperty(this, x => x.LoginTarget);
 
             Observable.Merge(
                 ShowDotComLoginCommand,
@@ -230,7 +230,7 @@ namespace GitHub.ViewModels
                 .ToProperty(this, x => x.IsLoggingInToEnterprise, out isLoggingInToEnterprise);
 
             authenticationResults = new Subject<AuthenticationResult>();
-
+            
             forgotPasswordUrl = this.WhenAny(
                     x => x.EnterpriseHostBaseUrl,
                     x => x.LoginTarget,
@@ -238,8 +238,8 @@ namespace GitHub.ViewModels
                 .Select(x => GetForgotPasswordUrl(x.enterpriseBaseUrl, x.loginTarget))
                 .ToProperty(this, x => x.ForgotPasswordUrl, initialValue: GetForgotPasswordUrl(HostAddress.GitHubDotComHostAddress.WebUri, LoginTarget.DotCom));
 
-            ForgotPasswordCommand = ReactiveCommand.Create();
-            ForgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
+            forgotPasswordCommand = ReactiveCommand.Create();
+            forgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
         }
 
         public void Dispose()
