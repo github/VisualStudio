@@ -27,17 +27,16 @@ namespace GitHub.ViewModels
         readonly Lazy<IEnterpriseProbe> lazyEnterpriseProbe;
         const string notEnterpriseServerError = "Not an Enterprise server. Please enter an Enterprise URL";
 
+        readonly ReactiveCommand<object> signUpCommand;
+        readonly ReactiveCommand<object> forgotPasswordCommand;
+
         public ReactiveCommand<AuthenticationResult> LoginCommand { get; private set; }
         public ICommand LoginCmd { get { return LoginCommand; } }
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-        public ICommand CancelCmd { get { return CancelCommand; } }
-        public IObservable<object> Cancelling { get { return CancelCommand; } }
-
-        public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
+        
+        public ICommand ForgotPasswordCommand { get { return forgotPasswordCommand; } }
         public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
         public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
-        public ReactiveCommand<object> SignupCommand { get; private set; }
-        public ReactiveCommand<object> LearnMoreCommand { get; private set; }
+        public ICommand SignUpCommand { get { return signUpCommand; } }
 
         string enterpriseUrl;
         [ValidateIf("IsLoggingInToEnterprise")]
@@ -160,8 +159,8 @@ namespace GitHub.ViewModels
 
             var canLogin = this.WhenAny(x => x.IsValid, x => x.Value);
 
-            this.WhenAny(x => x.LoginFailed, x => x.Value ? "Try again" : "Log in")
-                .ToProperty(this, x => x.LoginButtonText, out loginButtonText);
+            loginButtonText = this.WhenAny(x => x.LoginFailed, x => x.Value ? "Try again" : "Log in")
+                .ToProperty(this, x => x.LoginButtonText, initialValue: "Log In");
 
             LoginPrefix = "Log in";
             LoginFailedText = "Log in failed";
@@ -174,13 +173,8 @@ namespace GitHub.ViewModels
             LoginCommand.IsExecuting
                 .ToProperty(this, vm => vm.IsLoginInProgress, out isLoginInProgress);
 
-            CancelCommand = ReactiveCommand.Create(Observable.Return(true));
-
-            SignupCommand = ReactiveCommand.Create(Observable.Return(true));
-            SignupCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.Plans));
-
-            LearnMoreCommand = ReactiveCommand.Create(Observable.Return(true));
-            LearnMoreCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.GitHubEnterpriseWeb));
+            signUpCommand = ReactiveCommand.Create(Observable.Return(true));
+            signUpCommand.Subscribe(_ => browser.OpenUrl(GitHubUrls.Plans));
 
             // Whenever a host logs on or off we re-evaluate this. If there are no logged on hosts (local excluded)
             // then the user may log on to either .com or an enterprise instance. If there's already a logged on host
@@ -202,17 +196,16 @@ namespace GitHub.ViewModels
 
             ShowEnterpriseLoginCommand = ReactiveCommand.Create(canSwitchTargets);
 
-            Observable.Merge(
+            loginTarget = Observable.Merge(
                     this.WhenAny(x => x.LoginMode, x => x.Value),
                     ShowEnterpriseLoginCommand.Select(_ => LoginMode.EnterpriseOnly),
-                    ShowDotComLoginCommand.Select(_ => LoginMode.DotComOnly),
-                    CancelCommand.Select(_ => LoginMode))
+                    ShowDotComLoginCommand.Select(_ => LoginMode.DotComOnly))
                 .Where(x =>
                     x == LoginMode.DotComOnly 
                     || x == LoginMode.EnterpriseOnly 
                     || x == LoginMode.DotComOrEnterprise)
                 .Select(x => x == LoginMode.EnterpriseOnly ? LoginTarget.Enterprise : LoginTarget.DotCom)
-                .ToProperty(this, x => x.LoginTarget, out loginTarget);
+                .ToProperty(this, x => x.LoginTarget);
 
             Observable.Merge(
                 ShowDotComLoginCommand,
@@ -237,18 +230,17 @@ namespace GitHub.ViewModels
                 .ToProperty(this, x => x.IsLoggingInToEnterprise, out isLoggingInToEnterprise);
 
             authenticationResults = new Subject<AuthenticationResult>();
-
-            this.WhenAny(
+            
+            forgotPasswordUrl = this.WhenAny(
                     x => x.EnterpriseHostBaseUrl,
                     x => x.LoginTarget,
                     (x, y) => new { enterpriseBaseUrl = x.Value, loginTarget = y.Value })
                 .Select(x => GetForgotPasswordUrl(x.enterpriseBaseUrl, x.loginTarget))
-                .ToProperty(this, x => x.ForgotPasswordUrl, out forgotPasswordUrl);
+                .ToProperty(this, x => x.ForgotPasswordUrl, initialValue: GetForgotPasswordUrl(HostAddress.GitHubDotComHostAddress.WebUri, LoginTarget.DotCom));
 
-            ForgotPasswordCommand = ReactiveCommand.Create();
-            ForgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
+            forgotPasswordCommand = ReactiveCommand.Create();
+            forgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
         }
-
 
         public void Dispose()
         {
