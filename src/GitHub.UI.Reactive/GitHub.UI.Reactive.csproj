@@ -91,6 +91,7 @@
     </Compile>
     <Compile Include="Assets\Controls\Validation\UserErrorMessages.cs" />
     <Compile Include="Assets\Controls\Validation\ValidationMessage.cs" />
+    <Compile Include="Controls\ErrorMessageDisplay.cs" />
     <Compile Include="Controls\FilteredComboBox.cs" />
     <Compile Include="Controls\GitHubTabControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
