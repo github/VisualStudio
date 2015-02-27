@@ -26,15 +26,24 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             this.WhenActivated(d =>
             {
+                // Labels
+                d(this.OneWayBind(ViewModel, vm => vm.LoginFailedText, v => v.loginFailedLabel.Text));
+                d(this.OneWayBind(ViewModel, vm => vm.LoginFailed, v => v.loginFailed.Visibility, conversionHint: BooleanToVisibilityHint.UseHidden));
+
+                // Text inputs
                 d(this.Bind(ViewModel, vm => vm.UsernameOrEmail, v => v.usernameOrEmailTextBox.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoginInProgress, v => v.usernameOrEmailTextBox.IsEnabled, inProgress => !inProgress));
                 d(this.Bind(ViewModel, vm => vm.Password, v => v.passwordTextBox.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoginInProgress, v => v.passwordTextBox.IsEnabled, inProgress => !inProgress));
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoginInProgress, v => v.enterpriseUrlTextBox.IsEnabled, inProgress => !inProgress));
+
+                // Buttons
                 d(this.OneWayBind(ViewModel, vm => vm.LoginButtonText, v => v.loginButton.Content));
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoginInProgress, v => v.loginButton.IsEnabled, inProgress => !inProgress));
                 d(this.BindCommand(ViewModel, vm => vm.LoginCmd, v => v.loginButton));
                 d(this.BindCommand(ViewModel, vm => vm.SignUpCommand, v => v.signUpLink));
+                d(this.OneWayBind(ViewModel, vm => vm.ForgotPasswordUrl, v => v.forgotPasswordButton.ToolTip));
+                d(this.BindCommand(ViewModel, vm => vm.ForgotPasswordCommand, v => v.forgotPasswordButton));
             });
 
             VisualStateManager.GoToState(this, "DotCom", true);

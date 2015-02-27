@@ -3,7 +3,6 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
@@ -29,11 +28,12 @@ namespace GitHub.ViewModels
         const string notEnterpriseServerError = "Not an Enterprise server. Please enter an Enterprise URL";
 
         readonly ReactiveCommand<object> signUpCommand;
+        readonly ReactiveCommand<object> forgotPasswordCommand;
 
         public ReactiveCommand<AuthenticationResult> LoginCommand { get; private set; }
         public ICommand LoginCmd { get { return LoginCommand; } }
         
-        public ReactiveCommand<object> ForgotPasswordCommand { get; private set; }
+        public ICommand ForgotPasswordCommand { get { return forgotPasswordCommand; } }
         public ReactiveCommand<object> ShowDotComLoginCommand { get; set; }
         public ReactiveCommand<object> ShowEnterpriseLoginCommand { get; set; }
         public ICommand SignUpCommand { get { return signUpCommand; } }
@@ -231,12 +231,12 @@ namespace GitHub.ViewModels
 
             authenticationResults = new Subject<AuthenticationResult>();
 
-            this.WhenAny(
+            forgotPasswordUrl = this.WhenAny(
                     x => x.EnterpriseHostBaseUrl,
                     x => x.LoginTarget,
                     (x, y) => new { enterpriseBaseUrl = x.Value, loginTarget = y.Value })
                 .Select(x => GetForgotPasswordUrl(x.enterpriseBaseUrl, x.loginTarget))
-                .ToProperty(this, x => x.ForgotPasswordUrl, out forgotPasswordUrl);
+                .ToProperty(this, x => x.ForgotPasswordUrl, initialValue: GetForgotPasswordUrl(HostAddress.GitHubDotComHostAddress.WebUri, LoginTarget.DotCom));
 
             ForgotPasswordCommand = ReactiveCommand.Create();
             ForgotPasswordCommand.Subscribe(_ => browser.OpenUrl(ForgotPasswordUrl));
