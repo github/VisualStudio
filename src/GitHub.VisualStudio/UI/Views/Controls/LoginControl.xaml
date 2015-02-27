@@ -23,12 +23,6 @@
             <VisualStateGroup x:Name="Normal">
                 <VisualState x:Name="Enterprise">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="dotComOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
                         <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="dotComTabButton">
                             <DiscreteBooleanKeyFrame KeyTime="0" Value="True" />
                         </BooleanAnimationUsingKeyFrames>
@@ -59,12 +53,6 @@
                 </VisualState>
                 <VisualState x:Name="DotCom">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="dotComOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
                         <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="dotComTabButton">
                             <DiscreteBooleanKeyFrame KeyTime="0" Value="False" />
                         </BooleanAnimationUsingKeyFrames>
@@ -125,10 +113,9 @@
         <StackPanel x:Name="fields" Margin="24,0,24,12" Background="{x:Null}" FocusManager.IsFocusScope="True" FocusVisualStyle="{x:Null}" helpers:AccessKeysManagerScoping.IsEnabled="True">
             <StackPanel
                 x:Name="loginLabel"
-                Visibility="{Binding LoginFailed, Mode=OneWay, Converter={ui:BooleanToInverseVisibilityConverter}}"
                 Height="32"
                 Orientation="Horizontal"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Center"
                 Margin="40,0,0,12">
                 <TextBlock
                     x:Name="loginLabelPrefix"
@@ -136,18 +123,6 @@
                     Style="{DynamicResource GitHubH1TextBlock}"
                     IsHitTestVisible="False"
                     Text="Log in" />
-                <TextBlock
-                    x:Name="dotComOnlyLoginLabel"
-                    Margin="0"
-                    Style="{DynamicResource GitHubH1TextBlock}"
-                    IsHitTestVisible="False"
-                    Text=" to GitHub" />
-                <TextBlock 
-                    x:Name="enterpriseOnlyLoginLabel"
-                    Margin="0"
-                    Style="{DynamicResource GitHubH1TextBlock}"
-                    IsHitTestVisible="False"
-                    Text=" to GitHub Enterprise" />
             </StackPanel>
             <StackPanel
                 x:Name="loginFailed"
