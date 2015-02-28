@@ -89,9 +89,12 @@
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Assets\Controls\Validation\UserErrorMessages.cs" />
-    <Compile Include="Assets\Controls\Validation\ValidationMessage.cs" />
+    <Compile Include="Controls\BindingExtensions.cs" />
+    <Compile Include="Controls\Validation\UserErrorMessages.cs" />
+    <Compile Include="Controls\Validation\ValidationMessage.cs" />
+    <Compile Include="Controls\ErrorMessageDisplay.cs" />
     <Compile Include="Controls\FilteredComboBox.cs" />
+    <Compile Include="Controls\GitHubTabControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\ReactiveValidatableObject.cs" />
     <Compile Include="Validation\ValidateIfAttribute.cs" />
@@ -101,8 +104,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Assets\Controls\GitHubTabControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Assets\Controls\Validation\UserErrorMessages.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Assets\Controls\Validation\ValidationMessage.xaml">
       <Generator>MSBuild:Compile</Generator>

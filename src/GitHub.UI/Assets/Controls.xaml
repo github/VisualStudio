@@ -7,6 +7,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Controls/GitHubLinkButton.xaml" />
+        <ResourceDictionary Source="Controls/LightModalViewTabControl.xaml" />
         <ResourceDictionary Source="Controls/ScrollViewerWithShadow.xaml" />
         <ResourceDictionary Source="Controls/LightListBox.xaml" />
         <ResourceDictionary Source="../Controls/Octicons/OcticonImage.xaml" />

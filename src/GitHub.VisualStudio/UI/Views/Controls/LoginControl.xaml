@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d" 
              d:DesignWidth="426"
@@ -11,186 +12,127 @@
              MinWidth="426"
              MinHeight="517"
              Background="White">
-    <Grid
-        FocusManager.IsFocusScope="True"
-        x:Name="loginStackPanel"
-        FocusVisualStyle="{x:Null}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="Normal">
-                <VisualState x:Name="Enterprise">
-                    <Storyboard>
-                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="dotComTabButton">
-                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True" />
-                        </BooleanAnimationUsingKeyFrames>
-                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="enterpriseTabButton">
-                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False" />
-                        </BooleanAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextElement.FontWeight)" Storyboard.TargetName="dotComTabButton">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <FontWeight>Normal</FontWeight>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextElement.FontWeight)" Storyboard.TargetName="enterpriseTabButton">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <FontWeight>Bold</FontWeight>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="gitHubSignupStackPanel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
-                        </ObjectAnimationUsingKeyFrames>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.MinHeight)" Storyboard.TargetName="fields">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="300"/>
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="DotCom">
-                    <Storyboard>
-                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="dotComTabButton">
-                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False" />
-                        </BooleanAnimationUsingKeyFrames>
-                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsEnabled)" Storyboard.TargetName="enterpriseTabButton">
-                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True" />
-                        </BooleanAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextElement.FontWeight)" Storyboard.TargetName="dotComTabButton">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <FontWeight>Bold</FontWeight>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextElement.FontWeight)" Storyboard.TargetName="enterpriseTabButton">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <FontWeight>Normal</FontWeight>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseUrlTextBox">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
-                        </ObjectAnimationUsingKeyFrames>
-                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.MinHeight)" Storyboard.TargetName="fields">
-                            <EasingDoubleKeyFrame KeyTime="0" Value="300"/>
-                        </DoubleAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="EnterpriseOnly">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="tabs">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="gitHubSignupStackPanel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="dotComOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="DotComOnly">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="tabs">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseUrlTextBox">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="enterpriseOnlyLoginLabel">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="Design" />
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-        <StackPanel x:Name="fields" Margin="24,0,24,12" Background="{x:Null}" FocusManager.IsFocusScope="True" FocusVisualStyle="{x:Null}" helpers:AccessKeysManagerScoping.IsEnabled="True">
-            <StackPanel
-                x:Name="loginLabel"
-                Height="32"
-                Orientation="Horizontal"
+    <Grid FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
+       
+        <Grid.Resources>
+            <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
+                <Setter Property="Margin" Value="0" />
+            </Style>
+
+            <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
+                <Setter Property="Margin" Value="0" />
+            </Style>
+        </Grid.Resources>
+        
+        <StackPanel
+            Margin="40,0,40,0"
+            Background="{x:Null}"
+            FocusManager.IsFocusScope="True"
+            FocusVisualStyle="{x:Null}"
+            helpers:AccessKeysManagerScoping.IsEnabled="True">
+            <ui:OcticonImage Icon="logo_github" FontSize="20" Width="200" Height="60" />
+
+            <TextBlock
+                x:Name="loginLabelPrefix"
                 HorizontalAlignment="Center"
-                Margin="40,0,0,12">
-                <TextBlock
-                    x:Name="loginLabelPrefix"
-                    Margin="0"
-                    Style="{DynamicResource GitHubH1TextBlock}"
-                    IsHitTestVisible="False"
-                    Text="Log in" />
-            </StackPanel>
-            <StackPanel
-                x:Name="loginFailed"
-                Margin="40,0,0,12"
-                Orientation="Horizontal"
-                Height="32">
-                <TextBlock x:Name="loginFailedLabel" Margin="0" Style="{DynamicResource GitHubH1TextBlock}" Foreground="#ea2828" IsHitTestVisible="False" />
-                <ui:OcticonLinkButton x:Name="forgotPasswordButton" Content="Forgot password?" Icon="link_external" Margin="6,3,0,0" IsTabStop="False" Command="{Binding ForgotPasswordCommand}" ToolTip="{Binding ForgotPasswordUrl}" />
-            </StackPanel>
-            <StackPanel x:Name="tabs" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button
-                    x:Name="dotComTabButton"
-                    Content="GitHub"
-                    IsEnabled="True"
-                    Style="{StaticResource GitHubTabButton}" />
-                <Button
-                    x:Name="enterpriseTabButton"
-                    Content="GitHub Enterprise"
-                    IsEnabled="False"
-                    Style="{StaticResource GitHubTabButton}" />
-            </StackPanel>
-            <ui:PromptTextBox 
-                Margin="0,0,0,12" 
-                x:Name="usernameOrEmailTextBox" 
-                PromptText="Username or Email"
-                Style="{DynamicResource RoundedPromptTextBox}" 
-                Text="{Binding UsernameOrEmail, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
-                Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
-            <ui:SecurePasswordBox 
-                x:Name="passwordTextBox" 
-                PromptText="Password" 
-                Margin="0,0,0,12" 
-                Style="{DynamicResource RoundedPromptTextBox}" 
-                VerticalAlignment="Stretch" 
-                Text="{Binding PasswordNoOp, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
-                Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
-            <ui:PromptTextBox 
-                Margin="0" 
-                x:Name="enterpriseUrlTextBox" 
-                PromptText="GitHub Enterprise URL" 
-                Style="{DynamicResource RoundedPromptTextBox}" 
-                Text="{Binding EnterpriseUrl, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
-                Validation.ErrorTemplate="{DynamicResource ValidationAdorner}" />
+                Margin="0,10,0,20"
+                Style="{DynamicResource GitHubH1TextBlock}"
+                IsHitTestVisible="False"
+                Text="Log in" />
+            
+            <ui:HorizontalShadowDivider Margin="0,0,0,40" />
+            
+            <TabControl x:Name="hostTabControl" Style="{StaticResource LightModalViewTabControl}">
+                <TabControl.Resources>
+                    <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LightModalViewTabItem}" />
+                    <Style TargetType="{x:Type TabPanel}">
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                    </Style>
+                </TabControl.Resources>
 
-            <Border HorizontalAlignment="Center" Margin="0,12,0,12">
-                <ui:OcticonCircleButton
-                    x:Name="loginButton"
-                    Icon="check"
-                    Content="Log In"
-                    IsEnabled="true"
-                    IsDefault="True" />
-            </Border>
+                <TabItem x:Name="dotComTab" Header="GitHub">
+                    <StackPanel Margin="0,10,0,0">
+                        <StackPanel x:Name="dotComloginControlsPanel">
+                            <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed" Margin="0,0,0,10">
+                                <TextBlock TextWrapping="Wrap">
+                                    Please make sure that you've entered your username and password
+                                    correctly, then try again (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
+                                </TextBlock>
+                            </uirx:ErrorMessageDisplay>
 
-            <Border x:Name="gitHubSignupStackPanel" HorizontalAlignment="Center" Height="40">
-                <TextBlock
-                    x:Name="description"
-                    Style="{DynamicResource GitHubDescriptionTextBlock}"
-                    Margin="0">
-                    <Run Text="Don’t have an account?" />
-                    <ui:OcticonLinkButton
-                        x:Name="signUpLink"
-                        Margin="0,0,0,-3"
-                        VerticalContentAlignment="Bottom"
-                        Icon="link_external"
-                        Content="Sign up"
-                        ToolTip="go to github.com to sign up for an account" />
-                </TextBlock>
-            </Border>
+                            <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed" Margin="0,0,0,10">
+                                <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
+                            </uirx:ErrorMessageDisplay>
+
+                            <StackPanel Margin="0,0,0,10">
+                                <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
+                                <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}"/>
+                            </StackPanel>
+                            
+                            <StackPanel Margin="0,0,0,10">
+                                <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
+                                <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}"/>
+                            </StackPanel>
+                           
+                        </StackPanel>
+
+                        <Border HorizontalAlignment="Center" Margin="0,20,0,20">
+                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                        </Border>
+
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
+                            Don’t have an account? <Hyperlink NavigateUri="https://github.com/pricing?referral_code=GitHubWindows" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise">
+                    <StackPanel Margin="0,10,0,0">
+                        <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Margin="0,0,0,10" Message="Log in failed">
+                            <TextBlock TextWrapping="Wrap">
+                                    Please make sure that you've entered your username and password 
+                                    correctly, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
+                            </TextBlock>
+                        </uirx:ErrorMessageDisplay>
+
+                        <uirx:ErrorMessageDisplay x:Name="enterpriseTwoFactorAuthFailedMessage" Margin="0,0,0,10" Message="Two factor authentication failed">
+                            <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
+                        </uirx:ErrorMessageDisplay>
+
+                        <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host" Margin="0,0,0,10">
+                            <TextBlock TextWrapping="Wrap">
+                                Failed to connect to the host or the host isn't a GitHub Enterprise server. 
+                                Please make sure that you've entered the host address correctly.
+                            </TextBlock>
+                        </uirx:ErrorMessageDisplay>
+
+                        <StackPanel x:Name="enterpriseloginControlsPanel" Margin="0,0,0,10">
+                            <StackPanel Margin="0,0,0,10">
+                                <ui:PromptTextBox x:Name="enterpriseUserNameOrEmail" PromptText="Username or email" />
+                                <uirx:ValidationMessage x:Name="enterpriseUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUserNameOrEmail}"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,10">
+                                <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="Password" />
+                                <uirx:ValidationMessage x:Name="enterprisePasswordValidationMessage" ValidatesControl="{Binding ElementName=enterprisePassword}"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,10">
+                                <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="GitHub Enterprise server address" />
+                                <uirx:ValidationMessage x:Name="enterpriseUrlValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUrl}" TextChangeThrottle="1.0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        
+                        <Border HorizontalAlignment="Center" Margin="0,10,0,10">
+                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                        </Border>
+                        
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
+                            Don’t have GitHub Enterprise? <Hyperlink x:Name="LearnMoreButton" NavigateUri="https://enterprise.github.com/" ToolTip="enterprise.github.com">Learn more</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
         </StackPanel>
     </Grid>
 </UserControl>
