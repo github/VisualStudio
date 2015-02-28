@@ -37,7 +37,7 @@
 
     <Style x:Key="LightModalViewTabItem" TargetType="{x:Type TabItem}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource GHLinkButtonTextBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource GHLinkButtonTextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,0"/>
         <Setter Property="Padding" Value="0,0,12,0"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -50,7 +50,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true">
-                            <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource GHLinkButtonHoverBrush}"/>
+                            <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{DynamicResource GHLinkButtonHoverBrush}" />
                         </DataTrigger>
 
                         <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false">
