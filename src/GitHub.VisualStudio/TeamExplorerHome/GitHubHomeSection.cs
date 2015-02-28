@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerSection(GitHubHomeSectionId, TeamExplorerPageIds.Home, 10)]
-    public class GitHubHomeSection : TeamExplorerSectionBase
+    public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 

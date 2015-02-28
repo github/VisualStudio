@@ -8,7 +8,9 @@
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300" Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
+             d:DesignHeight="60"
+             d:DesignWidth="300"
+             Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -22,10 +24,15 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-        <ui:OcticonImage x:Name="loginButton" Icon="mark_github" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
-                         Width="32" Height="32" Margin="8 0 8 0"/>
-        <StackPanel Orientation="Vertical">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
+        <ui:OcticonImage
+            x:Name="loginButton"
+            Icon="mark_github"
+            Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+            Width="32"
+            Height="32"
+            Margin="18 22 8 0"/>
+        <StackPanel Orientation="Vertical" Margin="0 22 0 0">
             <Label Content="{Binding Path=ViewModel.RepoName}" />
             <Label Content="{Binding Path=ViewModel.RepoUrl}" />
         </StackPanel>

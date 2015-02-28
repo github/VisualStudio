@@ -14,16 +14,16 @@ namespace GitHub.VisualStudio.UI.Views
             InitializeComponent();
         }
 
-        public GitHubHomeSection ViewModel
+        public IGitHubHomeSection ViewModel
         {
-            get { return (GitHubHomeSection)GetValue(ViewModelProperty); }
+            get { return (IGitHubHomeSection)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register(
                 "ViewModel",
-                typeof(GitHubHomeSection),
+                typeof(IGitHubHomeSection),
                 typeof(GitHubHomeContent));
     }
 }

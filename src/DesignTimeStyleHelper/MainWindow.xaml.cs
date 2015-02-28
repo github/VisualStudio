@@ -14,9 +14,10 @@ namespace DesignTimeStyleHelper
         public MainWindow()
         {
             InitializeComponent();
+            gitHubHomeSection.ViewModel = new DesignTimeGitHubHomeSection();
         }
 
-        private void cloneLink_Click(object sender, RoutedEventArgs e)
+        private void cloneLink_Click(object sender, RoutedEventArgs e)  
         {
             var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
 
