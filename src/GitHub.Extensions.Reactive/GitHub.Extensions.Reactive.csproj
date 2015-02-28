@@ -70,6 +70,7 @@
     </Compile>
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReactiveUIExtensions.cs" />
     <Compile Include="RecoveryCommandWithIcon.cs" />
   </ItemGroup>
   <ItemGroup>

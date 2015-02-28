@@ -111,6 +111,10 @@
     <Page Include="Assets\Controls\LightListBox.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Assets\Controls\LightModalViewTabControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Assets\Controls\ScrollViewerWithShadow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

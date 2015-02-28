@@ -1,9 +1,9 @@
-using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.ViewModels
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
-    public interface IViewModel {
-	
+    [SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
+    public interface IViewModel
+    {
 	}
 }
