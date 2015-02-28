@@ -157,7 +157,13 @@
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
     <Compile Include="ViewModels\CreateRepoViewModel.cs" />
     <Compile Include="ViewModels\CloneRepoViewModel.cs" />
+    <Compile Include="ViewModels\ILoginControlViewModel.cs" />
+    <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
+    <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
     <Compile Include="ViewModels\LoginControlViewModel.cs" />
+    <Compile Include="ViewModels\LoginTabViewModel.cs" />
+    <Compile Include="ViewModels\LoginToGitHubForEnterpriseViewModel.cs" />
+    <Compile Include="ViewModels\LoginToGitHubViewModel.cs" />
     <Compile Include="ViewModels\TwoFactorDialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

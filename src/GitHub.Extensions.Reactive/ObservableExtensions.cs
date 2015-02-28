@@ -34,6 +34,20 @@ namespace GitHub.Extensions.Reactive
         }
 
         /// <summary>
+        /// Subscribes to and produces values from the observable returned 
+        /// by <paramref name="selector"/> once the source <paramref name="observable"/> 
+        /// has completed while ignoring all elements produced from the source.
+        /// </summary>
+        /// <typeparam name="T">The type of the source observable</typeparam>
+        /// <typeparam name="TRet">The type of the resulting observable.</typeparam>
+        /// <param name="observable">The source observable.</param>
+        /// <param name="selector">The selector for producing the return observable.</param>
+        public static IObservable<TRet> ContinueAfter<T, TRet>(this IObservable<T> observable, Func<IObservable<TRet>> selector)
+        {
+            return observable.AsCompletion().SelectMany(_ => selector());
+        }
+
+        /// <summary>
         /// Helper method to transform an IObservable{T} to IObservable{Unit}.
         /// </summary>
         /// <typeparam name="T"></typeparam>
