@@ -35,10 +35,13 @@
             <TextBlock
                 x:Name="loginLabelPrefix"
                 HorizontalAlignment="Center"
-                Margin="0,10,0,10"
+                Margin="0,10,0,20"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 IsHitTestVisible="False"
                 Text="Log in" />
+            
+            <ui:HorizontalShadowDivider Margin="0,0,0,40" />
+            
             <TabControl x:Name="hostTabControl" Style="{StaticResource LightModalViewTabControl}">
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LightModalViewTabItem}" />
