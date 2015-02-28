@@ -89,8 +89,8 @@
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Assets\Controls\Validation\UserErrorMessages.cs" />
-    <Compile Include="Assets\Controls\Validation\ValidationMessage.cs" />
+    <Compile Include="Controls\Validation\UserErrorMessages.cs" />
+    <Compile Include="Controls\Validation\ValidationMessage.cs" />
     <Compile Include="Controls\ErrorMessageDisplay.cs" />
     <Compile Include="Controls\FilteredComboBox.cs" />
     <Compile Include="Controls\GitHubTabControl.cs" />
