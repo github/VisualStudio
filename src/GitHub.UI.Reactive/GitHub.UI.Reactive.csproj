@@ -89,6 +89,7 @@
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Controls\BindingExtensions.cs" />
     <Compile Include="Controls\Validation\UserErrorMessages.cs" />
     <Compile Include="Controls\Validation\ValidationMessage.cs" />
     <Compile Include="Controls\ErrorMessageDisplay.cs" />
@@ -109,6 +110,7 @@
     </Page>
     <Page Include="Assets\Controls\Validation\UserErrorMessages.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Assets\Controls\Validation\ValidationMessage.xaml">
       <Generator>MSBuild:Compile</Generator>
