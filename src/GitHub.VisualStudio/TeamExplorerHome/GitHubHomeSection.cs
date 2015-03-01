@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
@@ -23,15 +24,21 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         string repoName = String.Empty;
         public string RepoName
         {
-            get { return "Repository: " + repoName; }
+            get { return repoName; }
             set { repoName = value; this.RaisePropertyChange(); }
         }
 
         string repoUrl = String.Empty;
         public string RepoUrl
         {
-            get { return "Remote: " + repoUrl; }
+            get { return repoUrl; }
             set { repoUrl = value; this.RaisePropertyChange(); }
+        }
+
+        public Octicon Icon
+        {
+            get;
+            private set;
         }
 
         [ImportingConstructor]
@@ -53,7 +60,17 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             {
                 RepoName = e.NewContext.TeamProjectName;
                 RepoUrl = e.NewContext.TeamProjectUri.ToString();
+
+                // TODO: we'll need to ping GitHub.com to get this information. For now we stub it out.
+                Icon = GetIcon(true, true, false);
             }
+        }
+
+        static Octicon GetIcon(bool isPrivate, bool isHosted, bool isFork)
+        {
+            return !isHosted ? Octicon.device_desktop
+                : isPrivate ? Octicon.@lock
+                : isFork ? Octicon.repo_forked : Octicon.repo;
         }
     }
 }

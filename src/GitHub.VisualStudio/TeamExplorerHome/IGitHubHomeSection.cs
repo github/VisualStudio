@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     public interface IGitHubHomeSection
     {
-        string RepoName
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// The name of the repository.
+        /// </summary>
+        string RepoName { get; set; }
 
-        string RepoUrl
-        {
-            get;
-            set;
-        }
+        /// <summary>
+        /// The URL to the repository.
+        /// </summary>
+        string RepoUrl { get; set; }
+
+        /// <summary>
+        /// The icon to show next to a repository name. It indicates whether it's private, public, a fork, etc.
+        /// </summary>
+        Octicon Icon { get; }
     }
 }
