@@ -64,12 +64,12 @@
 
                             <StackPanel Margin="0,0,0,10">
                                 <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
-                                <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}"/>
+                                <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
                             </StackPanel>
                             
                             <StackPanel Margin="0,0,0,10">
                                 <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
-                                <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}"/>
+                                <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}" />
                             </StackPanel>
                            
                         </StackPanel>

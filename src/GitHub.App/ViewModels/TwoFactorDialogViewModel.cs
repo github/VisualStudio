@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.ComponentModel.DataAnnotations;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Services;
@@ -14,7 +13,7 @@ namespace GitHub.ViewModels
     [Export(typeof(ITwoFactorViewModel))]
     [Export(typeof(ITwoFactorDialogViewModel))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorDialogViewModel
+    public class TwoFactorDialogViewModel : ReactiveObject, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
         string authenticationCode;
@@ -24,10 +23,10 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isSms;
 
         [ImportingConstructor]
-        public TwoFactorDialogViewModel(IBrowser browser, IServiceProvider serviceProvider) : base(serviceProvider)
+        public TwoFactorDialogViewModel(IBrowser browser)
         {
             OkCommand = ReactiveCommand.Create(this.WhenAny(
-                x => x.IsValid,
+                x => x.AuthenticationCodeValidator.ValidationResult.IsValid,
                 x => x.AuthenticationCode,
                 (valid, y) => valid.Value && (String.IsNullOrEmpty(y.Value) || (y.Value != null && y.Value.Length == 6))));
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
@@ -60,6 +59,10 @@ namespace GitHub.ViewModels
             isSms = this.WhenAny(x => x.TwoFactorType, x => x.Value)
                 .Select(factorType => factorType == TwoFactorType.Sms)
                 .ToProperty(this, x => x.IsSms);
+
+            AuthenticationCodeValidator = ReactivePropertyValidator.For(this, x => x.AuthenticationCode)
+                .IfNullOrEmpty("Please enter your authentication code")
+                .IfNotMatch(@"^\d{6}$", "Authentication code must be exactly six digits");
         }
 
         public TwoFactorType TwoFactorType
@@ -90,8 +93,6 @@ namespace GitHub.ViewModels
             get { return description.Value; }
         }
 
-        [Required(ErrorMessage = "Please enter your authentication code")]
-        [RegularExpression(@"\d+", ErrorMessage = "Authentication code must only contain numbers")]
         [AllowNull]
         public string AuthenticationCode
         {
@@ -104,11 +105,12 @@ namespace GitHub.ViewModels
         public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; private set; }
 
+        public ReactivePropertyValidator AuthenticationCodeValidator { get; private set; }
+
         public IObservable<RecoveryOptionResult> Show(TwoFactorRequiredUserError error)
         {
             TwoFactorType = error.TwoFactorType;
             var ok = OkCommand
-                .Where(x => Validate())
                 .Select(_ => AuthenticationCode == null
                     ? RecoveryOptionResult.CancelOperation
                     : RecoveryOptionResult.RetryOperation)
