@@ -4,9 +4,9 @@ using System.Windows;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.UI;
+using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using ReactiveUI;
-using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -14,7 +14,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
-    public partial class TwoFactorControl : IViewFor<ITwoFactorViewModel>, IView
+    public partial class TwoFactorControl : IViewFor<ITwoFactorDialogViewModel>, IView
     {
         public TwoFactorControl()
         {
@@ -23,54 +23,53 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
 
             InitializeComponent();
-            DataContextChanged += (s, e) => ViewModel = (ITwoFactorViewModel)e.NewValue;
-            //IsVisibleChanged += (s, e) => authenticationCode.EnsureFocus();
+            DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
 
             this.WhenActivated(d =>
             {
-                d(this.BindCommand(ViewModel, vm => vm.OkCmd, view => view.okButton));
-                d(this.BindCommand(ViewModel, vm => vm.CancelCmd, view => view.cancelButton));
-                d(this.BindCommand(ViewModel, vm => vm.ShowHelpCmd, view => view.helpButton));
-                d(this.BindCommand(ViewModel, vm => vm.ResendCodeCmd, view => view.resendCodeButton));
+                authenticationCode.Focus();
 
-                d(this.Bind(ViewModel, vm => vm.AuthenticationCode, view => view.authenticationCode.Text));
+                d(this.BindCommand(ViewModel, vm => vm.OkCommand, view => view.okButton));
+                d(this.BindCommand(ViewModel, vm => vm.ResendCodeCommand, view => view.resendCodeButton));
+
+                d(this.Bind(ViewModel, vm => vm.AuthenticationCode, view => view.authenticationCode.Text));            
                 d(this.OneWayBind(ViewModel, vm => vm.IsAuthenticationCodeSent,
                     view => view.authenticationSentLabel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.IsSms, view => view.resendCodeButton.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.Description, view => view.description.Text));
                 d(MessageBus.Current.Listen<KeyEventArgs>()
                     .Where(x => ViewModel.IsShowing && x.Key == Key.Escape && !x.Handled)
-                    .Subscribe(async key =>
+                    .Subscribe(key =>
                     {
                         key.Handled = true;
-                        await ((ReactiveCommand<object>)ViewModel.CancelCmd).ExecuteAsync();
+                        //TODO: Hide this dialog.
                     }));
             });
         }
 
-        public ITwoFactorViewModel ViewModel
+        public ITwoFactorDialogViewModel ViewModel
         {
-            get { return (ITwoFactorViewModel)GetValue(ViewModelProperty); }
+            get { return (ITwoFactorDialogViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register(
                 "ViewModel", 
-                typeof(ITwoFactorViewModel), 
+                typeof(ITwoFactorDialogViewModel), 
                 typeof(TwoFactorControl), 
                 new PropertyMetadata(null));
 
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ITwoFactorViewModel)value; }
+            set { ViewModel = (ITwoFactorDialogViewModel)value; }
         }
 
         object IView.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ITwoFactorViewModel)value; }
+            set { ViewModel = (ITwoFactorDialogViewModel)value; }
         }
     }
 }
