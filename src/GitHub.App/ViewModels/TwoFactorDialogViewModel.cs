@@ -2,9 +2,7 @@
 using System.ComponentModel.Composition;
 using System.ComponentModel.DataAnnotations;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using GitHub.Authentication;
-using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Validation;
 using NullGuard;
@@ -14,8 +12,9 @@ using ReactiveUI;
 namespace GitHub.ViewModels
 {
     [Export(typeof(ITwoFactorViewModel))]
+    [Export(typeof(ITwoFactorDialogViewModel))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorViewModel
+    public class TwoFactorDialogViewModel : ReactiveValidatableObject, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
         string authenticationCode;
@@ -31,9 +30,8 @@ namespace GitHub.ViewModels
                 x => x.IsValid,
                 x => x.AuthenticationCode,
                 (valid, y) => valid.Value && (String.IsNullOrEmpty(y.Value) || (y.Value != null && y.Value.Length == 6))));
-            CancelCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
-            //ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
+            //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
             ResendCodeCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
 
             description = this.WhenAny(x => x.TwoFactorType, x => x.Value)
@@ -103,14 +101,8 @@ namespace GitHub.ViewModels
         }
 
         public ReactiveCommand<object> OkCommand { get; private set; }
-        public ReactiveCommand<RecoveryOptionResult> CancelCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; private set; }
-
-        public ICommand OkCmd { get { return OkCommand; } }
-        public ICommand CancelCmd { get { return CancelCommand; } }
-        public ICommand ShowHelpCmd { get { return ShowHelpCommand; } }
-        public ICommand ResendCodeCmd { get { return ResendCodeCommand; } }
 
         public IObservable<RecoveryOptionResult> Show(TwoFactorRequiredUserError error)
         {
@@ -123,11 +115,10 @@ namespace GitHub.ViewModels
                 .Do(_ => error.ChallengeResult = AuthenticationCode != null
                     ? new TwoFactorChallengeResult(AuthenticationCode)
                     : null);
-            var cancel = CancelCommand.Select(_ => RecoveryOptionResult.CancelOperation);
             var resend = ResendCodeCommand.Select(_ => RecoveryOptionResult.RetryOperation)
                 .Do(_ => error.ChallengeResult = TwoFactorChallengeResult.RequestResendCode);
 
-            return Observable.Merge(ok, cancel, resend)
+            return Observable.Merge(ok, resend)
                 .Take(1)
                 .Do(_ =>
                 {

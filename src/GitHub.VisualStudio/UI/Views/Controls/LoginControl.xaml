@@ -6,15 +6,14 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignWidth="426"
              d:DesignHeight="517"
              MinWidth="426"
              MinHeight="517"
              Background="White">
-    <Grid FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
-       
-        <Grid.Resources>
+    <Border FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
+        <Border.Resources>
             <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
@@ -22,8 +21,7 @@
             <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
-        </Grid.Resources>
-        
+        </Border.Resources>
         <StackPanel
             Margin="40,0,40,0"
             Background="{x:Null}"
@@ -134,5 +132,5 @@
                 </TabItem>
             </TabControl>
         </StackPanel>
-    </Grid>
+    </Border>
 </UserControl>

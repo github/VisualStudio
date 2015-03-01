@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
@@ -12,7 +13,6 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using Stateless;
-using System.Windows.Controls;
 
 namespace GitHub.Controllers
 {
@@ -24,14 +24,13 @@ namespace GitHub.Controllers
         readonly ExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
 
-        CompositeDisposable disposables = new CompositeDisposable();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
+        readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
-        StateMachine<UIViewType, Trigger> machine;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts,
-            ExportFactoryProvider factory)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, ExportFactoryProvider factory)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
@@ -119,7 +118,9 @@ namespace GitHub.Controllers
         {
             IViewModel viewModel;
             if (viewType == UIViewType.TwoFactor)
+            {
                 viewModel = uiProvider.GetService<ITwoFactorViewModel>();
+            }
             else
             {
                 var dvm = factory.GetViewModel(viewType);
