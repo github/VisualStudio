@@ -70,6 +70,9 @@
     <Compile Include="Controls\Octicons\OcticonPath.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs" />
     <Compile Include="Controls\TrimmedTextBlock.cs" />
+    <Compile Include="Controls\TwoFactorInput.xaml.cs">
+      <DependentUpon>TwoFactorInput.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Fakes\NullGuard.cs" />
     <Compile Include="Helpers\AccessKeysManagerScoping.cs" />
     <Compile Include="Controls\Buttons\OcticonButton.cs" />
@@ -154,6 +157,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\ToggleButtons\OcticonLinkToggleButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TwoFactorInput.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
