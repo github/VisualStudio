@@ -15,7 +15,7 @@ namespace GitHub.VisualStudio
             var executingAssembly = typeof(Program).Assembly;
             AssemblyName = executingAssembly.GetName();
             ExecutingAssemblyDirectory = Path.GetDirectoryName(executingAssembly.Location);
-            ProductHeader = new ProductHeaderValue("GitHubVS", AssemblyName.Version.ToString());
+            ProductHeader = new ProductHeaderValue("GitHubVisualStudio", AssemblyName.Version.ToString());
         }
 
         public AssemblyName AssemblyName { get; private set; }
