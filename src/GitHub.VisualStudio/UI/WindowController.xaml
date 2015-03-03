@@ -7,7 +7,8 @@
         xmlns:ctl="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
         xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
         mc:Ignorable="d"
-        Title="WindowHolder" Height="655" Width="519" HasMinimizeButton="False" HasMaximizeButton="False">
+        Title="WindowHolder" Height="655" Width="519" HasMinimizeButton="False" HasMaximizeButton="False"
+        Background="White">
     <Grid x:Name="Container">
         
     </Grid>
