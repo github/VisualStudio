@@ -32,22 +32,13 @@
                 Height="32" 
                 Width="32" 
                 VerticalAlignment="Center" 
-                Margin="18,8,8,8"
+                Margin="18,6,8,8"
                 Icon="lock" 
                 Foreground="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, FallbackValue=Gray}" />        
-            <StackPanel Orientation="Vertical" Margin="0,8,0,0">
-                <Label Content="{Binding Path=ViewModel.RepoName}" FontWeight="Bold" />
+            <StackPanel Orientation="Vertical" Margin="0">
+                <Label Content="{Binding Path=ViewModel.RepoName}" />
                 <Label Content="{Binding Path=ViewModel.RepoUrl}" />
             </StackPanel>
         </StackPanel>
-        <ui:OcticonImage
-            Height="24" 
-            Width="24"
-            HorizontalAlignment="Right"
-            Margin="8"
-            DockPanel.Dock="Right"
-            Icon="mark_github"
-            Opacity="0.3"
-            Foreground="Gray" />
     </DockPanel>
 </UserControl>
