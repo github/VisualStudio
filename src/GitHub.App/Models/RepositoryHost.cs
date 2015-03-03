@@ -288,7 +288,7 @@ namespace GitHub.Models
                     IsLoggedIn = true;
                     IsLoggingIn = false;
                     return AuthenticationResult.Success;
-                })
+                }, RxApp.MainThreadScheduler)
                 .Do(result => log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
                     user != null ? user.Login : "(null)",
                     ApiBaseUri,
