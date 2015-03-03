@@ -19,7 +19,7 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous }
+        enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous, Finish }
 
         readonly ExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
@@ -54,7 +54,7 @@ namespace GitHub.Controllers
                     viewModel.AuthenticationResults.Subscribe(result =>
                     {
                         if (result == AuthenticationResult.Success)
-                            Fire(Trigger.Next);
+                            Fire(Trigger.Finish); // Takes us to clone or create.
                     });
 
                     var dv = factory.GetView(UIViewType.Login);
@@ -71,7 +71,9 @@ namespace GitHub.Controllers
                         });
                     LoadView(view);
                 })
-                .Permit(Trigger.Next, UIViewType.TwoFactor);
+                .Permit(Trigger.Next, UIViewType.TwoFactor)
+                .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
+                .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone);
 
             machine.Configure(UIViewType.TwoFactor)
                 .SubstateOf(UIViewType.Login)
