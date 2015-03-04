@@ -1,9 +1,22 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:ui="clr-namespace:GitHub.UI">
 
-    <Style x:Key="ScrollViewerWithShadow" TargetType="{x:Type ScrollViewer}">
+    <QuinticEase
+        x:Key="GitHubDefaultEaseInOut"
+        EasingMode="EaseInOut" 
+        PresentationOptions:Freeze="true" />
+    <QuinticEase
+        x:Key="GitHubDefaultEaseIn"
+        EasingMode="EaseIn"
+        PresentationOptions:Freeze="true" />
+    <QuinticEase
+        EasingMode="EaseOut"
+        x:Key="GitHubDefaultEaseOut" 
+        PresentationOptions:Freeze="true" />
 
+    <Style x:Key="ScrollViewerWithShadow" TargetType="{x:Type ScrollViewer}">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Template">

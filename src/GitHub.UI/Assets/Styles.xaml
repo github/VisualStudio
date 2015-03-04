@@ -175,13 +175,7 @@
     <!-- Modal dialogs all leave this much of the underlying view showing -->
     <GridLength x:Key="ModalViewLeftOffsetColumnWidth">160</GridLength>
     
-    <QuinticEase EasingMode="EaseInOut" x:Key="GitHubDefaultEaseInOut" 
-                 PresentationOptions:Freeze="true" />
-    <QuinticEase EasingMode="EaseIn" x:Key="GitHubDefaultEaseIn" 
-                 PresentationOptions:Freeze="true" />
-    <QuinticEase EasingMode="EaseOut" x:Key="GitHubDefaultEaseOut" 
-                 PresentationOptions:Freeze="true" />
-    
+   
     <!-- Use this focus visual when the control is stretched vertically-->
     <Style x:Key="VerticalMarginFocusVisual" TargetType="Control">
         <Setter Property="Template">
