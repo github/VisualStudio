@@ -2,11 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="GitHubBlueLinkButton" TargetType="{x:Type ButtonBase}">
-        <Setter Property="Foreground" Value="{StaticResource GHBlueLinkButtonTextBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource GHBlueLinkButtonTextBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GHBlueLinkButtonTextBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource NegativeMarginFocusVisual}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource NegativeMarginFocusVisual}" />
         <Setter Property="ToolTipService.ShowDuration" Value="30000" />
         <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -25,10 +25,10 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource GHBlueLinkButtonHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonHoverBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource GHBlueLinkButtonPressedBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonPressedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
