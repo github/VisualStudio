@@ -5,10 +5,11 @@
                     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="..\Assets\Controls\Validation\UserErrorMessages.xaml" />
-        <ResourceDictionary Source="..\Assets\Controls\Validation\ValidationMessage.xaml" />
-        <ResourceDictionary Source="..\Assets\Controls\FilteredComboBox.xaml" />
-        <ResourceDictionary Source="..\Assets\Controls\GitHubTabControl.xaml" />
+        <ResourceDictionary Source="Controls\Validation\UserErrorMessages.xaml" />
+        <ResourceDictionary Source="Controls\Validation\ValidationMessage.xaml" />
+        <ResourceDictionary Source="Controls\GitHubTabControl.xaml" />
+        <ResourceDictionary Source="Controls\FilteredComboBox.xaml" />
+        <ResourceDictionary Source="Controls\GitHubComboBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
 </ResourceDictionary>
