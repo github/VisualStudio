@@ -109,8 +109,14 @@
                 </Grid.ColumnDefinitions>
 
                 <ui:AppendingPathTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0" />
-                <Button x:Name="browsePathButton" Grid.Column="1" Grid.Row="0" Margin="3,0,0,0">Browse</Button>
-
+                <Button
+                    x:Name="browsePathButton"
+                    Grid.Column="1"
+                    VerticalContentAlignment="Center"
+                    Grid.Row="0"
+                    Padding="0"
+                    Margin="3,0,0,0"
+                    Style="{StaticResource GitHubBlueLinkButton}">Browse</Button>
             </Grid>
 
             <!-- uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}"/ -->
