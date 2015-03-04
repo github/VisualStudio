@@ -399,7 +399,7 @@
 
     <DrawingImage x:Key="RedXMark">
         <DrawingImage.Drawing>
-            <GeometryDrawing Brush="{DynamicResource GitHubRed}" Geometry="M10.009,1.704 8.331,0.026 5.03,3.327 1.703,0 0,1.704 3.326,5.031 0.025,8.332 1.703,10.009 5.004,6.708 8.305,10.009 10.009,8.305 6.708,5.005" />
+            <GeometryDrawing Brush="{DynamicResource GitHubWarningBrush}" Geometry="M10.009,1.704 8.331,0.026 5.03,3.327 1.703,0 0,1.704 3.326,5.031 0.025,8.332 1.703,10.009 5.004,6.708 8.305,10.009 10.009,8.305 6.708,5.005" />
         </DrawingImage.Drawing>
     </DrawingImage>
 
