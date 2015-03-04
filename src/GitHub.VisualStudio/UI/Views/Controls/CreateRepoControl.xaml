@@ -29,8 +29,7 @@
             Margin="0,12,0,0"
             FocusManager.IsFocusScope="True"
             x:Name="loginStackPanel"
-            FocusVisualStyle="{x:Null}"
-            >
+            FocusVisualStyle="{x:Null}">
 
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBlock}">
@@ -45,15 +44,15 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
 
-                <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
+                <Style TargetType="{x:Type ui:PromptTextBox}">
                     <Setter Property="Margin" Value="0,5" />
                 </Style>
 
-                <Style TargetType="{x:Type ui:AppendingPathTextBox}" BasedOn="{StaticResource GitHubTextBox}">
+                <Style TargetType="{x:Type ui:AppendingPathTextBox}">
                     <Setter Property="Margin" Value="0,5" />
                 </Style>
 
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource GitHubBlueLinkButton}">
+                <Style TargetType="{x:Type Button}">
                     <Setter Property="Padding" Value="0" />
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                 </Style>
@@ -117,11 +116,11 @@
             <!-- uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}"/ -->
 
             <Label Grid.Column="0" Grid.Row="5" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
-            <uirx:FilteredComboBox x:Name="ignoreTemplateList" Grid.Column="1" Grid.Row="5" />
+            <uirx:FilteredComboBox x:Name="ignoreTemplateList" Grid.Column="1" Grid.Row="5" Style="{StaticResource GitHubFilterComboBox}" />
 
 
             <Label Grid.Column="0" Grid.Row="6" Target="{Binding ElementName=licenseList}">License</Label>
-            <uirx:FilteredComboBox x:Name="licenseList" Grid.Column="1" Grid.Row="6" />
+            <uirx:FilteredComboBox x:Name="licenseList" Grid.Column="1" Grid.Row="6" Style="{StaticResource GitHubFilterComboBox}" />
 
 
             <!-- uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" / -->

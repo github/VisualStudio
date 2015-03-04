@@ -7,6 +7,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="..\Assets\Controls\Validation\UserErrorMessages.xaml" />
         <ResourceDictionary Source="..\Assets\Controls\Validation\ValidationMessage.xaml" />
+        <ResourceDictionary Source="..\Assets\Controls\FilteredComboBox.xaml" />
         <ResourceDictionary Source="..\Assets\Controls\GitHubTabControl.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
