@@ -122,7 +122,22 @@
             <!-- uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}"/ -->
 
             <Label Grid.Column="0" Grid.Row="5" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
-            <uirx:FilteredComboBox x:Name="ignoreTemplateList" Grid.Column="1" Grid.Row="5" Style="{StaticResource GitHubFilterComboBox}" />
+            <uirx:FilteredComboBox
+                x:Name="ignoreTemplateList"
+                Grid.Column="1"
+                Grid.Row="5"
+                Style="{StaticResource GitHubFilterComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding IsRecommended, Converter={ui:BooleanToFontWeightConverter}}"/>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                                <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </uirx:FilteredComboBox>
 
 
             <Label Grid.Column="0" Grid.Row="6" Target="{Binding ElementName=licenseList}">License</Label>
