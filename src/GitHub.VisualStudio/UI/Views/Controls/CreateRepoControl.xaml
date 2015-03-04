@@ -127,7 +127,19 @@
 
             <ui:HorizontalShadowDivider Width="120" Grid.Row="8" Grid.ColumnSpan="2" Margin="0,12,0,12"/>
 
-            <ui:GitHubComboBox x:Name="accountsComboBox" Grid.Column="1" Grid.Row="9">
+            <ui:GitHubComboBox
+                x:Name="accountsComboBox"
+                Grid.Column="1"
+                Grid.Row="9"
+                Style="{StaticResource GitHubComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Avatar}" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0" />
+                            <TextBlock Text="{Binding Login}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
                 <ComboBox.ItemsSource>
                     <x:Array Type="sampleData:AccountDesigner">
                         <sampleData:AccountDesigner Login="Brendan" />
