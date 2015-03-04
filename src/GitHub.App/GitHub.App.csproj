@@ -126,8 +126,14 @@
     <Compile Include="Info\EnvironmentExtensions.cs" />
     <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Infrastructure\ExportWrappers.cs" />
+    <Compile Include="IO\GitHubDirectory.cs" />
+    <Compile Include="IO\GitHubFile.cs" />
+    <Compile Include="IO\IDirectory.cs" />
+    <Compile Include="IO\IFile.cs" />
+    <Compile Include="IO\IFileSystemInfo.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
+    <Compile Include="Models\GitIgnoreTemplate.cs" />
     <Compile Include="Models\LocalRepositoriesAccount.cs" />
     <Compile Include="Models\LocalRepositoriesHost.cs" />
     <Compile Include="Models\RepositoryHost.cs" />
