@@ -26,7 +26,7 @@
         <ui:HorizontalShadowDivider Width="120"/>
 
         <Grid
-            Margin="0,12,0,0"
+            Margin="40,12,40,0"
             FocusManager.IsFocusScope="True"
             x:Name="loginStackPanel"
             FocusVisualStyle="{x:Null}">
