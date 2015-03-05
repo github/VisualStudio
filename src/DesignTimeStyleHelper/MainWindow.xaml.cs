@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Windows;
-using GitHub.VisualStudio.TeamExplorerConnect;
-using GitHub.VisualStudio;
 using GitHub.Services;
 using GitHub.UI;
-using System.ComponentModel.Composition;
+using GitHub.VisualStudio;
 
 namespace DesignTimeStyleHelper
 {
@@ -29,7 +27,6 @@ namespace DesignTimeStyleHelper
             creation.Subscribe(_ => { }, _ => x.Close());
             x.Show();
             d.Value.Start();
-
         }
 
         private void createLink_Click(object sender, RoutedEventArgs e)
@@ -45,5 +42,4 @@ namespace DesignTimeStyleHelper
             d.Value.Start();
         }
     }
-    
 }

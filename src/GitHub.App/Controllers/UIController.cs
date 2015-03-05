@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
@@ -12,26 +13,24 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using Stateless;
-using System.Windows.Controls;
 
 namespace GitHub.Controllers
 {
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous }
+        enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous, Finish }
 
         readonly ExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
 
-        CompositeDisposable disposables = new CompositeDisposable();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
+        readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
-        StateMachine<UIViewType, Trigger> machine;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts,
-            ExportFactoryProvider factory)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, ExportFactoryProvider factory)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
@@ -55,7 +54,7 @@ namespace GitHub.Controllers
                     viewModel.AuthenticationResults.Subscribe(result =>
                     {
                         if (result == AuthenticationResult.Success)
-                            Fire(Trigger.Next);
+                            Fire(Trigger.Finish); // Takes us to clone or create.
                     });
 
                     var dv = factory.GetView(UIViewType.Login);
@@ -72,7 +71,9 @@ namespace GitHub.Controllers
                         });
                     LoadView(view);
                 })
-                .Permit(Trigger.Next, UIViewType.TwoFactor);
+                .Permit(Trigger.Next, UIViewType.TwoFactor)
+                .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
+                .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone);
 
             machine.Configure(UIViewType.TwoFactor)
                 .SubstateOf(UIViewType.Login)
@@ -119,7 +120,9 @@ namespace GitHub.Controllers
         {
             IViewModel viewModel;
             if (viewType == UIViewType.TwoFactor)
+            {
                 viewModel = uiProvider.GetService<ITwoFactorViewModel>();
+            }
             else
             {
                 var dvm = factory.GetViewModel(viewType);

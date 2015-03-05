@@ -4,19 +4,40 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Primitives;
 using ReactiveUI;
 
 namespace GitHub.Validation
 {
     public class ReactivePropertyValidationResult
     {
+        /// <summary>
+        /// Describes if the property passes validation
+        /// </summary>
         public bool IsValid { get; private set; }
+
+        /// <summary>
+        /// Describes which state we are in - Valid, Not Validated, or Invalid
+        /// </summary>
         public ValidationStatus Status { get; private set; }
+
+        /// <summary>
+        /// An error message to display
+        /// </summary>
         public string Message { get; private set; }
+
+        /// <summary>
+        /// Describes if we should show this error in the UI
+        /// We only show errors which have been marked specifically as Invalid
+        /// and we do not show errors for inputs which have not yet been validated. 
+        /// </summary>
+        public bool DisplayValidationError { get; private set; }
 
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "It is immutable")]
         public static readonly ReactivePropertyValidationResult Success = new ReactivePropertyValidationResult(ValidationStatus.Valid);
@@ -24,20 +45,19 @@ namespace GitHub.Validation
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "It is immutable")]
         public static readonly ReactivePropertyValidationResult Unvalidated = new ReactivePropertyValidationResult();
 
-        public ReactivePropertyValidationResult()
-            : this(ValidationStatus.Unvalidated, "")
+        public ReactivePropertyValidationResult() : this(ValidationStatus.Unvalidated, "")
         {
         }
 
-        public ReactivePropertyValidationResult(ValidationStatus validationStatus)
-            : this(validationStatus, "")
+        public ReactivePropertyValidationResult(ValidationStatus validationStatus) : this(validationStatus, "")
         {
         }
 
         public ReactivePropertyValidationResult(ValidationStatus validationStatus, string message)
         {
             Status = validationStatus;
-            IsValid = validationStatus != ValidationStatus.Invalid;
+            IsValid = validationStatus == ValidationStatus.Valid;
+            DisplayValidationError = validationStatus == ValidationStatus.Invalid;
             Message = message;
         }
     }
@@ -56,7 +76,12 @@ namespace GitHub.Validation
             return new ReactivePropertyValidator<TObj, TProp>(This, property);
         }
 
-        public abstract ReactivePropertyValidationResult ValidationResult { get; protected set; }
+        public static ReactivePropertyValidator<TProp> ForObservable<TProp>(IObservable<TProp> propertyObservable)
+        {
+            return new ReactivePropertyValidator<TProp>(propertyObservable);
+        }
+
+        public abstract ReactivePropertyValidationResult ValidationResult { get; }
 
         public abstract bool IsValidating { get; }
 
@@ -64,7 +89,7 @@ namespace GitHub.Validation
         {
         }
 
-        public abstract Task ExecuteAsync();
+        public abstract Task<ReactivePropertyValidationResult> ExecuteAsync();
 
         public abstract Task ResetAsync();
     }
@@ -73,38 +98,40 @@ namespace GitHub.Validation
     public class ReactivePropertyValidator<TProp> : ReactivePropertyValidator
     {
         readonly ReactiveCommand<ReactivePropertyValidationResult> validateCommand;
-        ReactivePropertyValidationResult validationResult;
+        ValidationParameter currentValidationParameter;
+        ObservableAsPropertyHelper<ReactivePropertyValidationResult> validationResult;
 
         public override ReactivePropertyValidationResult ValidationResult
         {
-            get { return validationResult; }
-            protected set { this.RaiseAndSetIfChanged(ref validationResult, value); }
+            get { return validationResult.Value; }
         }
 
-        public override Task ExecuteAsync()
+        public override Task<ReactivePropertyValidationResult> ExecuteAsync()
         {
-            return validateCommand.ExecuteAsyncTask(new ValidationParameter());
+            return validateCommand.ExecuteAsyncTask(currentValidationParameter);
         }
 
         public override Task ResetAsync()
         {
-            return validateCommand.ExecuteAsyncTask(new ValidationParameter { RequiresReset = true });
+            return validateCommand.ExecuteAsync(new ValidationParameter { RequiresReset = true })
+                .Select(_ => Unit.Default)
+                .ToTask();
         }
 
         readonly List<Func<TProp, IObservable<ReactivePropertyValidationResult>>> validators =
             new List<Func<TProp, IObservable<ReactivePropertyValidationResult>>>();
 
-        readonly ObservableAsPropertyHelper<bool> isValidating;
+        readonly ObservableAsPropertyHelper<bool> _isValidating;
         public override bool IsValidating
         {
-            get { return isValidating.Value; }
+            get { return _isValidating.Value; }
         }
 
-        public ReactivePropertyValidator(IObservable<TProp> signal)
+        public ReactivePropertyValidator(IObservable<TProp> propertyChangeSignal)
         {
             validateCommand = ReactiveCommand.CreateAsyncObservable(param =>
             {
-                var validationParams = (ValidationParameter)param;
+                var validationParams = (ValidationParameter)param ?? new ValidationParameter();
 
                 if (validationParams.RequiresReset)
                 {
@@ -134,10 +161,13 @@ namespace GitHub.Validation
                     .Select(x => x == null ? ReactivePropertyValidationResult.Success : x);
             });
 
-            isValidating = validateCommand.IsExecuting.ToProperty(this, x => x.IsValidating);
+            _isValidating = validateCommand.IsExecuting.ToProperty(this, x => x.IsValidating);
 
-            validateCommand.Subscribe(x => ValidationResult = x);
-            signal.Subscribe(x => validateCommand.Execute(new ValidationParameter { PropertyValue = x, RequiresReset = false }));
+            validationResult = validateCommand.ToProperty(this, x => x.ValidationResult);
+            propertyChangeSignal
+                .Select(x => new ValidationParameter { PropertyValue = x, RequiresReset = false })
+                .Do(validationParameter => currentValidationParameter = validationParameter)
+                .Subscribe(validationParameter => validateCommand.Execute(validationParameter));
         }
 
         public ReactivePropertyValidator<TProp> IfTrue(Func<TProp, bool> predicate, string errorMessage)
@@ -206,13 +236,13 @@ namespace GitHub.Validation
 
     public class ReactivePropertyValidator<TObj, TProp> : ReactivePropertyValidator<TProp>
     {
-        protected ReactivePropertyValidator()
-            : base(Observable.Empty<TProp>())
+        protected ReactivePropertyValidator() : base(Observable.Empty<TProp>())
         {
         }
 
         public ReactivePropertyValidator(TObj This, Expression<Func<TObj, TProp>> property)
-            : base(This.WhenAny(property, x => x.Value)) { }
+            : base(This.WhenAny(property, x => x.Value))
+        { }
     }
 
     public static class ReactivePropertyValidatorExtensions
@@ -245,14 +275,22 @@ namespace GitHub.Validation
             }, errorMessage);
         }
 
-        public static ReactivePropertyValidator<string> IfSameAsHost(this ReactivePropertyValidator<string> This, Uri compareToHost, string errorMessage)
+        public static ReactivePropertyValidator<string> IfGitHubDotComHost(
+            this ReactivePropertyValidator<string> This,
+            string errorMessage)
         {
             return This.IfTrue(s =>
             {
-                Uri uri;
-                var isUri = Uri.TryCreate(s, UriKind.Absolute, out uri);
-                return isUri && uri.IsSameHost(compareToHost);
-
+                try
+                {
+                    var hostAddress = HostAddress.Create(s);
+                    return hostAddress == HostAddress.GitHubDotComHostAddress;
+                }
+                catch (Exception)
+                {
+                    // A previous validation should probably have caught this.
+                    return false;
+                }
             }, errorMessage);
         }
 
@@ -274,6 +312,14 @@ namespace GitHub.Validation
                     // hopefully you've remembered to use `IfPathNotRooted`
                     // in your validator
                     driveLetter = Path.GetPathRoot(str);
+                }
+                catch (PathTooLongException)
+                {
+                    // when you pass in a path that is too long
+                    // you're gonna have a bad time:
+                    // - 260 characters for full path
+                    // - 248 characters for directory name
+                    return false;
                 }
                 catch (ArgumentException)
                 {
@@ -299,6 +345,11 @@ namespace GitHub.Validation
         public static ReactivePropertyValidator<string> IfPathNotRooted(this ReactivePropertyValidator<string> This, string errorMessage)
         {
             return This.IfFalse(Path.IsPathRooted, errorMessage);
+        }
+
+        public static ReactivePropertyValidator<string> DirectoryExists(this ReactivePropertyValidator<string> This, string errorMessage)
+        {
+            return This.IfFalse(Directory.Exists, errorMessage);
         }
 
         public static ReactivePropertyValidator<string> IfUncPath(this ReactivePropertyValidator<string> This, string errorMessage)

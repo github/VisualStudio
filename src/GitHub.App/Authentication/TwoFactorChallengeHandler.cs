@@ -11,25 +11,20 @@ namespace GitHub.Authentication
     public class TwoFactorChallengeHandler : ITwoFactorChallengeHandler
     {
         //readonly IServiceProvider serviceProvider;
-        readonly Lazy<ITwoFactorViewModel> lazyTwoFactorDialog;
+        readonly Lazy<ITwoFactorDialogViewModel> lazyTwoFactorDialog;
 
         [ImportingConstructor]
-        public TwoFactorChallengeHandler(Lazy<ITwoFactorViewModel> twoFactorDialog)
+        public TwoFactorChallengeHandler(Lazy<ITwoFactorDialogViewModel> twoFactorDialog)
         {
-            //this.serviceProvider = serviceProvider;
-            this.lazyTwoFactorDialog = twoFactorDialog;
+            lazyTwoFactorDialog = twoFactorDialog;
         }
 
         public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorRequiredException exception)
         {
-            var twoFactorDialog = lazyTwoFactorDialog.Value as TwoFactorDialogViewModel;
-            //var twoFactorView = (IViewFor<TwoFactorDialogViewModel>)serviceProvider.GetService(typeof(IViewFor<TwoFactorDialogViewModel>));
+            var twoFactorDialog = lazyTwoFactorDialog.Value as ITwoFactorDialogViewModel;
 
             return Observable.Start(() =>
             {
-                //twoFactorView.ViewModel = twoFactorDialog;
-                //((DialogWindow)twoFactorView).Show();
-
                 var userError = new TwoFactorRequiredUserError(exception);
                 return twoFactorDialog.Show(userError)
                     .SelectMany(x =>

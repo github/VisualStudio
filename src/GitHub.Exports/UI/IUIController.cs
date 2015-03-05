@@ -17,6 +17,4 @@ namespace GitHub.UI
         Create = 2,
         Clone = 3
     }
-
-    
 }
