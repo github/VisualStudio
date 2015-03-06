@@ -22,10 +22,7 @@
 
     <StackPanel>
         <Border Background="#F5F5F5" >
-        <gh:GitHubHomeContent
-            x:Name="gitHubHomeSection"
-            Margin="0,10,0,10"
-            d:DataContext="{d:DesignInstance local:HomeContentDesignContext, IsDesignTimeCreatable=True}" />
+        <gh:GitHubHomeContent x:Name="gitHubHomeSection" Margin="0,10,0,10" />
         </Border>
         <Grid>
             <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,6">
