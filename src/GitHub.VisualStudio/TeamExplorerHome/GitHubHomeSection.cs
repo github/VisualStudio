@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             IsVisible = false;
             IsExpanded = true;
             View = new GitHubHomeContent();
-            View.ViewModel = this;
+            View.DataContext = this;
         }
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)

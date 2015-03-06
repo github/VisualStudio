@@ -8,8 +8,10 @@ using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.UI;
 using GitHub.Validation;
 using GitHub.ViewModels;
+using GitHub.VisualStudio.TeamExplorerHome;
 using Octokit;
 using ReactiveUI;
 using Account = Octokit.Account;
@@ -189,5 +191,33 @@ namespace GitHub.SampleData
         public HashSet<string> AdditionalClones { get; private set; }
 
         public bool IsPrivate { get; set; }
+    }
+
+    public class GitHubHomeSectionDesigner : IGitHubHomeSection
+    {
+        public GitHubHomeSectionDesigner()
+        {
+            Icon = Octicon.@lock;
+            RepoName = "octokit";
+            RepoUrl = "https://github.com/octokit/octokit.net";
+        }
+
+        public Octicon Icon
+        {
+            get;
+            private set;
+        }
+
+        public string RepoName
+        {
+            get;
+            set;
+        }
+
+        public string RepoUrl
+        {
+            get;
+            set;
+        }
     }
 }

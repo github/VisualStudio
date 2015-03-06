@@ -12,6 +12,8 @@ namespace GitHub.VisualStudio.UI.Views
         public GitHubHomeContent()
         {
             InitializeComponent();
+
+            DataContextChanged += (s, e) => ViewModel = e.NewValue as IGitHubHomeSection;
         }
 
         public IGitHubHomeSection ViewModel

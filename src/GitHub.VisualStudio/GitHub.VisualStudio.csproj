@@ -198,7 +198,6 @@
     <Compile Include="TeamExplorerConnect\PlaceholderGitHubSection.cs" />
     <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
-    <Compile Include="TeamExplorerHome\IGitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\PullRequestsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\IssuesNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\WikiNavigationItem.cs" />

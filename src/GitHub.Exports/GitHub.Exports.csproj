@@ -59,6 +59,8 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="UI\Octicon.cs" />
+    <Compile Include="ViewModels\IGitHubHomeSection.cs" />
     <Compile Include="Models\IProgram.cs" />
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />

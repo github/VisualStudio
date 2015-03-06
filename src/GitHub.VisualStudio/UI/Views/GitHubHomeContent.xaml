@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
@@ -12,14 +13,22 @@
              Height="48"
              d:DesignWidth="300"
              Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
-             DataContext="{Binding RelativeSource={RelativeSource Self}}">
+             DataContext="{Binding ViewModel}">
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <sampleData:GitHubHomeSectionDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
                 <Setter Property="Padding" Value="0" />
             </Style>
         </ResourceDictionary>
@@ -33,11 +42,11 @@
                 Width="32" 
                 VerticalAlignment="Center" 
                 Margin="18,6,8,8"
-                Icon="lock" 
+                Icon="lock"
                 Foreground="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, FallbackValue=Gray}" />        
             <StackPanel Orientation="Vertical" Margin="0">
-                <Label Content="{Binding Path=ViewModel.RepoName}" />
-                <Label Content="{Binding Path=ViewModel.RepoUrl}" />
+                <Label Content="{Binding Path=RepoName}" />
+                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
             </StackPanel>
         </StackPanel>
     </DockPanel>
