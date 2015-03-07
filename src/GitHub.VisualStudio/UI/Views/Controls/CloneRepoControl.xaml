@@ -11,6 +11,13 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Background="White">
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <sampleData:CloneRepositoryViewModelDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
 
     <Grid>
         <Grid.Resources>
@@ -21,31 +28,55 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <Style x:Key="cloneRepoHeaderStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#999" />
+                <Setter Property="Margin" Value="8,6,12,6" />
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="70" />
         </Grid.RowDefinitions>
+
          <ui:FilterTextBox
             x:Name="filterText" 
             PromptText="Search repositories" 
             Margin="10" />
 
         <Grid x:Name="repositoriesListPane" Grid.Row="1">
-            <ListBox x:Name="repositoryList" HorizontalContentAlignment="Stretch" Style="{DynamicResource LightListBox}">
+            <ListBox
+                x:Name="repositoryList"
+                HorizontalContentAlignment="Stretch"
+                Style="{DynamicResource LightListBox}">
                 <ListBox.ItemsSource>
                     <x:Array Type="sampleData:RepositoryModelDesigner">
-                        <sampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" />
-                        <sampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" />
-                        <sampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" />
-                        <sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" IsHosted="True" IsPrivate="True" />
+                        <sampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" Owner="haacked" />
+                        <sampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" Owner="haacked" />
+                        <sampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" Owner="reactiveui" />
+                        <sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" IsHosted="True" IsPrivate="True" Group="other" />
                     </x:Array>
                 </ListBox.ItemsSource>
-
+                <ListBox.GroupStyle>
+                    <GroupStyle HidesIfEmpty="true">
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Path=Name}" Style="{StaticResource cloneRepoHeaderStyle}" />
+                                                <ItemsPresenter Margin="0,0,0,5" />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
                 <ListBox.ItemTemplate>
-                    <DataTemplate>
-                            
+                    <DataTemplate>                          
                         <Grid Height="30">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
