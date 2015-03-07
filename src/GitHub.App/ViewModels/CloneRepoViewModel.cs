@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
 using GitHub.Exports;
@@ -12,17 +13,28 @@ namespace GitHub.ViewModels
     {
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-        public ICommand CancelCmd { get { return CancelCommand; } }
-        public IObservable<object> Cancelling { get { return CancelCommand; } }
+        IReactiveCommand<object> cancelCommand = ReactiveCommand.Create();
+        IReactiveCommand<object> okCommand = ReactiveCommand.Create();
 
-        public ReactiveCommand<object> OkCommand { get; private set; }
-        public ICommand OkCmd { get { return OkCommand; } }
+        public ICommand CancelCommand { get { return cancelCommand; } }
+        public IObservable<object> Cancelling { get { return cancelCommand; } }
+        public ICommand OkCommand { get { return okCommand; } }
+
+        public ICollection<IRepositoryModel> Repositories
+        {
+            get;
+            private set;
+        }
 
         [ImportingConstructor]
         public CloneRepoViewModel(IRepositoryHosts hosts)
         {
-            
+            Repositories = new List<IRepositoryModel>
+            {
+                new RepositoryModel {Owner = "haacked", Name = "encourage" },
+                new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
+                new RepositoryModel {Owner = "octokit", Name = "octokit.net" },
+            };
         }
     }
 }
