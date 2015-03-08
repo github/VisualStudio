@@ -32,6 +32,13 @@
                 <Setter Property="Foreground" Value="#999" />
                 <Setter Property="Margin" Value="8,6,12,6" />
             </Style>
+            <Style x:Key="repositoryBorderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="#EAEAEA" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Margin" Value="0" />
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -66,12 +73,8 @@
                                         <ControlTemplate TargetType="{x:Type GroupItem}">
                                             <StackPanel Orientation="Vertical" Margin="0">
                                                 <Border
-                                                    BorderBrush="#EAEAEA"
-                                                    BorderThickness="0,0,0,1"
                                                     Background="#F8F8F8"
-                                                    VerticalAlignment="Center"
-                                                    Height="30"
-                                                    Margin="0">
+                                                    Style="{StaticResource repositoryBorderStyle}">
                                                     <StackPanel
                                                         Orientation="Horizontal"
                                                         VerticalAlignment="Center"
@@ -97,19 +100,14 @@
                 </ListBox.GroupStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border
-                            BorderBrush="#EAEAEA"
-                            BorderThickness="0,0,0,1"
-                            VerticalAlignment="Center"
-                            Height="30"
-                            Margin="0">
+                        <Border Style="{StaticResource repositoryBorderStyle}">
                             <StackPanel
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center"
                                 Margin="0">
                                 <ui:OcticonImage
                                     x:Name="iconPath" 
-                                    Width="16" 
+                                    Width="16"
                                     Height="16" 
                                     Margin="30,0,6,0" 
                                     VerticalAlignment="Center"
