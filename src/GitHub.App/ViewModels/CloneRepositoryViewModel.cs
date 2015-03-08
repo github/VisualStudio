@@ -9,7 +9,7 @@ using ReactiveUI;
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
-    public class CloneRepoViewModel : ICloneRepoViewModel
+    public class CloneRepositoryViewModel : ICloneRepositoryViewModel
     {
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
@@ -24,7 +24,7 @@ namespace GitHub.ViewModels
         }
 
         [ImportingConstructor]
-        public CloneRepoViewModel(IRepositoryHosts hosts)
+        public CloneRepositoryViewModel(IRepositoryHosts hosts)
         {
             // TODO: How do I know which host this dialog is associated with?
 
