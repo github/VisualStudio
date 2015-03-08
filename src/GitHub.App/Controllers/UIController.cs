@@ -40,6 +40,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.None)
                 .Permit(Trigger.Auth, UIViewType.Login)
                 .PermitIf(Trigger.Create, UIViewType.Create, () => hosts.IsLoggedInToAnyHost)
+                // TODO: This condition isn't exactly correct. We need to check that the host associated with this Create request is logged in or not.
                 .PermitIf(Trigger.Create, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
                 .PermitIf(Trigger.Clone, UIViewType.Clone, () => hosts.IsLoggedInToAnyHost)
                 .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
