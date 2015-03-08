@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:gh="clr-namespace:GitHub.VisualStudio.UI.Views;assembly=GitHub.VisualStudio"
         xmlns:local="clr-namespace:DesignTimeStyleHelper"
         xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
         mc:Ignorable="d"
@@ -20,6 +21,9 @@
     </Window.Resources>
 
     <StackPanel>
+        <Border Background="#F5F5F5" >
+        <gh:GitHubHomeContent x:Name="gitHubHomeSection" Margin="0,10,0,10" />
+        </Border>
         <Grid>
             <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,6">
                 <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
