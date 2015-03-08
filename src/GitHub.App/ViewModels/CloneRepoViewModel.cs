@@ -13,12 +13,9 @@ namespace GitHub.ViewModels
     {
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        IReactiveCommand<object> cancelCommand = ReactiveCommand.Create();
-        IReactiveCommand<object> okCommand = ReactiveCommand.Create();
+        IReactiveCommand<object> cloneCommand = ReactiveCommand.Create();
 
-        public ICommand CancelCommand { get { return cancelCommand; } }
-        public IObservable<object> Cancelling { get { return cancelCommand; } }
-        public ICommand OkCommand { get { return okCommand; } }
+        public ICommand CloneCommand { get { return cloneCommand; } }
 
         public ICollection<IRepositoryModel> Repositories
         {
@@ -29,6 +26,8 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public CloneRepoViewModel(IRepositoryHosts hosts)
         {
+            // TODO: How do I know which host this dialog is associated with?
+
             Repositories = new List<IRepositoryModel>
             {
                 new RepositoryModel {Owner = "haacked", Name = "encourage" },

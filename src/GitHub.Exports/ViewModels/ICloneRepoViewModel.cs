@@ -5,11 +5,19 @@ using GitHub.Models;
 
 namespace GitHub.ViewModels
 {
+    /// <summary>
+    /// ViewModel for the the Clone Repository dialog
+    /// </summary>
     public interface ICloneRepoViewModel : IViewModel
     {
-        ICommand OkCommand { get; }
-        ICommand CancelCommand { get; }
-        IObservable<object> Cancelling { get; }
+        /// <summary>
+        /// Command to clone the currently selected repository.
+        /// </summary>
+        ICommand CloneCommand { get; }
+
+        /// <summary>
+        /// The list of repositories the current user may clone from the specified host.
+        /// </summary>
         ICollection<IRepositoryModel> Repositories { get; }
     }
 }

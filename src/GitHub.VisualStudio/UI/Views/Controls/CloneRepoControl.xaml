@@ -140,7 +140,7 @@
         <ui:OcticonCircleButton
             Grid.Row="2"
             IsDefault="True"
-            x:Name="cloneRepositoryButton"
+            x:Name="cloneButton"
             HorizontalAlignment="Center"
             Icon="check">
             <TextBlock>Clone</TextBlock>
