@@ -29,7 +29,7 @@
                 </Style.Triggers>
             </Style>
             <Style x:Key="cloneRepoHeaderStyle" TargetType="TextBlock">
-                <Setter Property="Foreground" Value="#999" />
+                <Setter Property="Foreground" Value="#000" />
                 <Setter Property="Margin" Value="8,6,12,6" />
             </Style>
             <Style x:Key="repositoryBorderStyle" TargetType="Border">
@@ -86,7 +86,9 @@
                                                             Margin="6,0"
                                                             RenderOptions.BitmapScalingMode="HighQuality"
                                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png" />
-                                                        <TextBlock Text="{Binding Path=Name}" Style="{StaticResource cloneRepoHeaderStyle}" />
+                                                        <TextBlock
+                                                            Text="{Binding Path=Name}"
+                                                            Style="{StaticResource cloneRepoHeaderStyle}" />
                                                     </StackPanel>
                                                 </Border>
                                                 <ItemsPresenter Margin="0" />
@@ -112,11 +114,12 @@
                                     Margin="30,0,6,0" 
                                     VerticalAlignment="Center"
                                     Icon="{Binding Icon}"
-                                    Foreground="{StaticResource GHLinkButtonIconBrush}" />
+                                    Foreground="#D0D0D0" />
                             
                                 <ui:TrimmedTextBlock
                                     VerticalAlignment="Center"
                                     Text="{Binding Name}"
+                                    Foreground="#666"
                                     TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </Border>
