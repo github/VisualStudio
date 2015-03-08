@@ -32,8 +32,17 @@ namespace GitHub.ViewModels
             Repositories = new List<IRepositoryModel>
             {
                 new RepositoryModel {Owner = "haacked", Name = "encourage" },
+                new RepositoryModel {Owner = "haacked", Name = "seegit" },
+                new RepositoryModel {Owner = "haacked", Name = "routemagic" },
+                new RepositoryModel {Owner = "haacked", Name = "subtext" },
                 new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
                 new RepositoryModel {Owner = "octokit", Name = "octokit.net" },
+                new RepositoryModel {Owner = "octokit", Name = "octokit.rb" },
+                new RepositoryModel {Owner = "octokit", Name = "octokit.objc" },
+                new RepositoryModel {Owner = "github", Name = "github" },
+                new RepositoryModel {Owner = "github", Name = "windows" },
+                new RepositoryModel {Owner = "github", Name = "mac" },
+                new RepositoryModel {Owner = "github", Name = "desktop" },
             };
         }
     }
