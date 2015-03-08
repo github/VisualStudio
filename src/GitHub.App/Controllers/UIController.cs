@@ -108,6 +108,7 @@ namespace GitHub.Controllers
                 {
                     transition.OnCompleted();
                     transition.Dispose();
+                    transition = null;
                 })
                 .Permit(Trigger.Next, UIViewType.None);
         }
