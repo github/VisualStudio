@@ -224,7 +224,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICommand OkCommand
+        public ICommand CloneCommand
         {
             get;
             private set;

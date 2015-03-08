@@ -32,6 +32,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.Repositories, v => v.repositoryList.ItemsSource, CreateRepositoryListView));
+                d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
             });
         }
 
