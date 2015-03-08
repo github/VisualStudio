@@ -39,12 +39,12 @@
             <RowDefinition Height="70" />
         </Grid.RowDefinitions>
 
-         <ui:FilterTextBox
+        <ui:FilterTextBox
             x:Name="filterText" 
             PromptText="Search repositories" 
             Margin="10" />
 
-        <Grid x:Name="repositoriesListPane" Grid.Row="1">
+        <Border x:Name="repositoriesListPane" Grid.Row="1" BorderBrush="#EAEAEA" BorderThickness="0,1" Margin="0">
             <ListBox
                 x:Name="repositoryList"
                 HorizontalContentAlignment="Stretch"
@@ -64,9 +64,29 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="{x:Type GroupItem}">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Path=Name}" Style="{StaticResource cloneRepoHeaderStyle}" />
-                                                <ItemsPresenter Margin="0,0,0,5" />
+                                            <StackPanel Orientation="Vertical" Margin="0">
+                                                <Border
+                                                    BorderBrush="#EAEAEA"
+                                                    BorderThickness="0,0,0,1"
+                                                    Background="#F8F8F8"
+                                                    VerticalAlignment="Center"
+                                                    Height="30"
+                                                    Margin="0">
+                                                    <StackPanel
+                                                        Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0">
+                                                        <Image
+                                                            x:Name="avatar"
+                                                            Width="16"
+                                                            Height="16"
+                                                            Margin="6,0"
+                                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                                            Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png" />
+                                                        <TextBlock Text="{Binding Path=Name}" Style="{StaticResource cloneRepoHeaderStyle}" />
+                                                    </StackPanel>
+                                                </Border>
+                                                <ItemsPresenter Margin="0" />
                                             </StackPanel>
                                         </ControlTemplate>
                                     </Setter.Value>
@@ -76,24 +96,32 @@
                     </GroupStyle>
                 </ListBox.GroupStyle>
                 <ListBox.ItemTemplate>
-                    <DataTemplate>                          
-                        <Grid Height="30">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <ui:OcticonImage 
-                                x:Name="iconPath" 
-                                Width="16" 
-                                Height="16" 
-                                Margin="6,0,6,0" 
+                    <DataTemplate>
+                        <Border
+                            BorderBrush="#EAEAEA"
+                            BorderThickness="0,0,0,1"
+                            VerticalAlignment="Center"
+                            Height="30"
+                            Margin="0">
+                            <StackPanel
+                                Orientation="Horizontal"
                                 VerticalAlignment="Center"
-                                Icon="{Binding Icon}"
-                                Foreground="{StaticResource GHLinkButtonIconBrush}" />
+                                Margin="0">
+                                <ui:OcticonImage
+                                    x:Name="iconPath" 
+                                    Width="16" 
+                                    Height="16" 
+                                    Margin="30,0,6,0" 
+                                    VerticalAlignment="Center"
+                                    Icon="{Binding Icon}"
+                                    Foreground="{StaticResource GHLinkButtonIconBrush}" />
                             
-                            <ui:TrimmedTextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                        </Grid>
+                                <ui:TrimmedTextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Name}"
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
                         <DataTemplate.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
@@ -106,8 +134,16 @@
                             </MultiDataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
-                </ListBox.ItemTemplate>            </ListBox>
-        </Grid>
-        
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+        <ui:OcticonCircleButton
+            Grid.Row="2"
+            IsDefault="True"
+            x:Name="cloneRepositoryButton"
+            HorizontalAlignment="Center"
+            Icon="check">
+            <TextBlock>Clone</TextBlock>
+        </ui:OcticonCircleButton>
     </Grid>
 </UserControl>
