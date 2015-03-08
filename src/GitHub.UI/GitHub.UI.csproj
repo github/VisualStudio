@@ -65,7 +65,6 @@
     <Compile Include="Controls\HorizontalShadowDivider.xaml.cs">
       <DependentUpon>HorizontalShadowDivider.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Octicons\Octicon.cs" />
     <Compile Include="Controls\Octicons\OcticonImage.cs" />
     <Compile Include="Controls\Octicons\OcticonPath.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs" />
@@ -174,7 +173,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx" />
+    <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using GitHub.SampleData;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio;
@@ -14,9 +15,10 @@ namespace DesignTimeStyleHelper
         public MainWindow()
         {
             InitializeComponent();
+            gitHubHomeSection.DataContext = new GitHubHomeSectionDesigner();
         }
 
-        private void cloneLink_Click(object sender, RoutedEventArgs e)
+        private void cloneLink_Click(object sender, RoutedEventArgs e)  
         {
             var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
 
