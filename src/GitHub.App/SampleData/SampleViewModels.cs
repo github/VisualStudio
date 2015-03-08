@@ -18,7 +18,6 @@ using Account = Octokit.Account;
 
 namespace GitHub.SampleData
 {
-
     [ExcludeFromCodeCoverage]
     public class CreateRepoViewModelDesigner : ReactiveObject, ICreateRepoViewModel
     {
@@ -192,6 +191,52 @@ namespace GitHub.SampleData
         public HashSet<string> AdditionalClones { get; private set; }
 
         public bool IsPrivate { get; set; }
+
+        public string Group { get; set; }
+    }
+
+    public class CloneRepositoryViewModelDesigner : ICloneRepositoryViewModel
+    {
+        public CloneRepositoryViewModelDesigner()
+        {
+            Repositories = new List<IRepositoryModel>
+            {
+                new RepositoryModel {Owner = "haacked", Name = "encourage" },
+                new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
+                new RepositoryModel {Owner = "octokit", Name = "octokit.net" },
+                new RepositoryModel {Owner = "octokit", Name = "octokit.rb" },
+                new RepositoryModel {Owner = "octokit", Name = "octokit.objc" },
+                new RepositoryModel {Owner = "github", Name = "windows" },
+                new RepositoryModel {Owner = "github", Name = "mac" },
+                new RepositoryModel {Owner = "github", Name = "github" }
+            };
+        }
+
+        public ICommand CancelCommand
+        {
+            get;
+            private set;
+        }
+
+        public IObservable<object> Cancelling
+        {
+            get;
+            private set;
+        }
+
+        public ICommand CloneCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICollection<IRepositoryModel> Repositories
+        {
+            get;
+            private set;
+        }
+
+        public string Title { get { return "Clone a GitHub Repository"; } }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection
