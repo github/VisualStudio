@@ -21,6 +21,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginControlViewModel : ReactiveValidatableObject, ILoginControlViewModel
     {
+        public string Title { get { return "Connect to GitHub"; } } // TODO: this needs to be contextual
+
         ILoginToGitHubViewModel github;
         public ILoginToGitHubViewModel GitHubLogin
         {

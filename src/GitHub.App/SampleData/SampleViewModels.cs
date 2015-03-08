@@ -28,6 +28,7 @@ namespace GitHub.SampleData
             Accounts = new ReactiveList<IAccount> { new AccountDesigner("GitHub") };
         }
 
+        public string Title { get { return "Create a GitHub Repository"; } }
         public string RepositoryName { get; private set; }
         public string SafeRepositoryName { get; private set; }
         public bool ShowRepositoryNameWarning { get; private set; }
