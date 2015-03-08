@@ -36,7 +36,8 @@ namespace GitHub.VisualStudio
             ExportProvider = componentModel.DefaultExportProvider;
 
             ModeDetector.OverrideModeDetector(new AppModeDetector());
-            RxApp.MainThreadScheduler = new DispatcherScheduler(Application.Current.Dispatcher);
+            if (Application.Current != null)
+                RxApp.MainThreadScheduler = new DispatcherScheduler(Application.Current.Dispatcher);
         }
 
         public object GetService(Type serviceType)
