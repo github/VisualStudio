@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Input;
 using GitHub.Models;
 
@@ -8,7 +7,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// ViewModel for the the Clone Repository dialog
     /// </summary>
-    public interface ICloneRepoViewModel : IViewModel
+    public interface ICloneRepositoryViewModel : IViewModel
     {
         /// <summary>
         /// Command to clone the currently selected repository.

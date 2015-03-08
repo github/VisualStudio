@@ -203,8 +203,8 @@
     <Compile Include="TeamExplorerHome\WikiNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PulseNavigationItem.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
-    <Compile Include="UI\Views\Controls\CloneRepoControl.xaml.cs">
-      <DependentUpon>CloneRepoControl.xaml</DependentUpon>
+    <Compile Include="UI\Views\Controls\CloneRepositoryControl.xaml.cs">
+      <DependentUpon>CloneRepositoryControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\Controls\CreateRepoControl.xaml.cs">
       <DependentUpon>CreateRepoControl.xaml</DependentUpon>
@@ -277,8 +277,9 @@
     <Page Include="SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\Controls\CloneRepoControl.xaml">
+    <Page Include="UI\Views\Controls\CloneRepositoryControl.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\CreateRepoControl.xaml">
       <Generator>MSBuild:Compile</Generator>

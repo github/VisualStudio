@@ -195,7 +195,7 @@ namespace GitHub.SampleData
         public string Group { get; set; }
     }
 
-    public class CloneRepositoryViewModelDesigner : ICloneRepoViewModel
+    public class CloneRepositoryViewModelDesigner : ICloneRepositoryViewModel
     {
         public CloneRepositoryViewModelDesigner()
         {

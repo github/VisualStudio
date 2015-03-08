@@ -17,9 +17,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Clone)]
-    public partial class CloneRepoControl : IViewFor<ICloneRepoViewModel>, IView
+    public partial class CloneRepositoryControl : IViewFor<ICloneRepositoryViewModel>, IView
     {
-        public CloneRepoControl()
+        public CloneRepositoryControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
             SharedDictionaryManager.Load("GitHub.UI.Reactive");
@@ -27,7 +27,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as ICloneRepoViewModel;
+            DataContextChanged += (s, e) => ViewModel = e.NewValue as ICloneRepositoryViewModel;
 
             this.WhenActivated(d =>
             {
@@ -37,24 +37,24 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(ICloneRepoViewModel), typeof(CloneRepoControl), new PropertyMetadata(null));
+           "ViewModel", typeof(ICloneRepositoryViewModel), typeof(CloneRepositoryControl), new PropertyMetadata(null));
 
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ICloneRepoViewModel)value; }
+            set { ViewModel = (ICloneRepositoryViewModel)value; }
         }
 
         object IView.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ICloneRepoViewModel)value; }
+            set { ViewModel = (ICloneRepositoryViewModel)value; }
         }
 
-        public ICloneRepoViewModel ViewModel
+        public ICloneRepositoryViewModel ViewModel
         {
             [return: AllowNull]
-            get { return (ICloneRepoViewModel)GetValue(ViewModelProperty); }
+            get { return (ICloneRepositoryViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
