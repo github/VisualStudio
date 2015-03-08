@@ -10,6 +10,8 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType=UIViewType.Clone)]
     public class CloneRepoViewModel : ICloneRepoViewModel
     {
+        public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
+
         public ReactiveCommand<object> CancelCommand { get; private set; }
         public ICommand CancelCmd { get { return CancelCommand; } }
         public IObservable<object> Cancelling { get { return CancelCommand; } }
