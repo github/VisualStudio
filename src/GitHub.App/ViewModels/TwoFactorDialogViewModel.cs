@@ -65,6 +65,8 @@ namespace GitHub.ViewModels
                 .IfNotMatch(@"^\d{6}$", "Authentication code must be exactly six digits");
         }
 
+        public string Title { get { return "Connect to GitHub"; } } // TODO: this needs to be contextual
+
         public TwoFactorType TwoFactorType
         {
             get { return twoFactorType; }

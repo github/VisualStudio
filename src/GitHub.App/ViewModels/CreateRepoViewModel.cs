@@ -11,6 +11,8 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType=UIViewType.Create)]
     public class CreateRepoViewModel : ICreateRepoViewModel
     {
+        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+
         public ReactiveCommand<object> CancelCommand { get; private set; }
         public ICommand CancelCmd { get { return CancelCommand; } }
 
