@@ -157,7 +157,6 @@ namespace GitHub.Controllers
             Fire((Trigger)(int)currentFlow);
         }
 
-        #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -167,7 +166,8 @@ namespace GitHub.Controllers
                 if (disposing)
                 {
                     disposables.Dispose();
-                    transition.Dispose();
+                    if (transition != null)
+                        transition.Dispose();
                 }
                 disposedValue = true;
             }
@@ -178,7 +178,5 @@ namespace GitHub.Controllers
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        #endregion
-
     }
 }
