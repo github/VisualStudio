@@ -72,11 +72,11 @@ namespace DesignTimeStyleHelper
         {
             catalog = new AggregateCatalog(
                 new AssemblyCatalog(typeof(CustomServiceProvider).Assembly),
-                new AssemblyCatalog(typeof(GitHub.VisualStudio.Services).Assembly), // GitHub.VisualStudio
+                new AssemblyCatalog(typeof(Services).Assembly), // GitHub.VisualStudio
                 new AssemblyCatalog(typeof(GitHub.Api.ApiClient).Assembly), // GitHub.App
                 new AssemblyCatalog(typeof(GitHub.Api.SimpleApiClient).Assembly), // GitHub.Api
                 new AssemblyCatalog(typeof(Rothko.Environment).Assembly), // Rothko
-                new AssemblyCatalog(typeof(GitHub.Services.EnterpriseProbeTask).Assembly) // GitHub.Exports
+                new AssemblyCatalog(typeof(EnterpriseProbeTask).Assembly) // GitHub.Exports
             );
             container = new CompositionContainer(catalog, CompositionOptions.IsThreadSafe | CompositionOptions.DisableSilentRejection);
 
@@ -90,7 +90,6 @@ namespace DesignTimeStyleHelper
             batch.AddExportedValue<ICompositionService>(DefaultCompositionService);
             container.Compose(batch);
         }
-
 
         public object GetService(Type serviceType)
         {

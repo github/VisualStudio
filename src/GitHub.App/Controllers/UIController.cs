@@ -40,6 +40,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.None)
                 .Permit(Trigger.Auth, UIViewType.Login)
                 .PermitIf(Trigger.Create, UIViewType.Create, () => hosts.IsLoggedInToAnyHost)
+                // TODO: This condition isn't exactly correct. We need to check that the host associated with this Create request is logged in or not.
                 .PermitIf(Trigger.Create, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
                 .PermitIf(Trigger.Clone, UIViewType.Clone, () => hosts.IsLoggedInToAnyHost)
                 .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
@@ -107,6 +108,7 @@ namespace GitHub.Controllers
                 {
                     transition.OnCompleted();
                     transition.Dispose();
+                    transition = null;
                 })
                 .Permit(Trigger.Next, UIViewType.None);
         }
@@ -157,7 +159,6 @@ namespace GitHub.Controllers
             Fire((Trigger)(int)currentFlow);
         }
 
-        #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -167,7 +168,8 @@ namespace GitHub.Controllers
                 if (disposing)
                 {
                     disposables.Dispose();
-                    transition.Dispose();
+                    if (transition != null)
+                        transition.Dispose();
                 }
                 disposedValue = true;
             }
@@ -178,7 +180,5 @@ namespace GitHub.Controllers
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        #endregion
-
     }
 }
