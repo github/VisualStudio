@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Models;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -31,6 +32,7 @@ namespace GitHub.ViewModels
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
             hosts.GitHubHost.Cache.GetUser()
+                .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
                 .SelectMany(user => hosts.GitHubHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
                 .Select(repo => new RepositoryModel { Owner = repo.Owner.Login, Name = repo.Name })
