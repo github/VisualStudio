@@ -8,10 +8,8 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
-using NLog;
 using NullGuard;
 using ReactiveUI;
-using LogManager = NLog.LogManager;
 
 namespace GitHub.ViewModels
 {
@@ -22,7 +20,7 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IBrowser browser) : base(hosts, browser)
         {
-            EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
+            enterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
                 .IfNullOrEmpty("Please enter an Enterprise URL")
                 .IfNotUri("Please enter a valid Enterprise URL")
                 .IfGitHubDotComHost("Not an Enterprise server. Please enter an Enterprise URL");
@@ -95,11 +93,10 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
         }
 
-        ReactivePropertyValidator enterpriseUrlValidator;
+        readonly ReactivePropertyValidator enterpriseUrlValidator;
         public ReactivePropertyValidator EnterpriseUrlValidator
         {
             get { return enterpriseUrlValidator; }
-            private set { this.RaiseAndSetIfChanged(ref enterpriseUrlValidator, value); }
         }
 
         bool showConnectingToHostFailed;
