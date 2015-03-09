@@ -47,7 +47,7 @@ public class UIControllerTests
             }
         }
 
-        [Fact(Skip="Borked, CloneRepositoryViewModel requires an existing user entry in the HostCache, this fails if nobody has ever logged in before")]
+        [Fact]
         public void ShowingCloneDialogWhenLoggedInShowsCloneDialog()
         {
             var uiProvider = Substitute.For<IUIProvider>();
