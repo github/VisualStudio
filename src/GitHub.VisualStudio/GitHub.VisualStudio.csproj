@@ -96,10 +96,6 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0" />
-    <Reference Include="NullGuard">
-      <HintPath>..\..\packages\NullGuard.Fody.1.2.0.0\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Octokit, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
@@ -165,7 +161,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-	<None Include="..\..\script\Key.snk">
+    <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -308,6 +304,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\nullguard\ReferenceAssembly\NullGuard.csproj">
+      <Project>{b5aeb0e8-28f4-4955-a055-9c200f7113f0}</Project>
+      <Name>NullGuard</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>

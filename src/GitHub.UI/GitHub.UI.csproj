@@ -57,7 +57,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-	<None Include="..\..\script\Key.snk">
+    <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -173,11 +173,6 @@
     <Page Include="SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="FodyWeavers.xml">
-      <SubType>Designer</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx">
