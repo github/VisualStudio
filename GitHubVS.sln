@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignTimeStyleHelper", "sr
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "MsiInstaller", "src\MsiInstaller\MsiInstaller.wixproj", "{1ED83084-2A57-4F89-915C-8A2167C0D6BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NullGuard", "submodules\nullguard\ReferenceAssembly\NullGuard.csproj", "{B5AEB0E8-28F4-4955-A055-9C200F7113F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -221,6 +223,18 @@ Global
 		{1ED83084-2A57-4F89-915C-8A2167C0D6BC}.Release|Any CPU.ActiveCfg = Release|x86
 		{1ED83084-2A57-4F89-915C-8A2167C0D6BC}.Release|x86.ActiveCfg = Release|x86
 		{1ED83084-2A57-4F89-915C-8A2167C0D6BC}.Release|x86.Build.0 = Release|x86
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Debug|x86.Build.0 = Debug|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Publish|x86.ActiveCfg = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Publish|x86.Build.0 = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Release|x86.ActiveCfg = Release|Any CPU
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -229,5 +243,6 @@ Global
 		{596595A6-2A3C-469E-9386-9E3767D863A5} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{4A84E568-CA86-4510-8CD0-90D3EF9B65F9} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
 		{1ED83084-2A57-4F89-915C-8A2167C0D6BC} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFF}
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
 	EndGlobalSection
 EndGlobal
