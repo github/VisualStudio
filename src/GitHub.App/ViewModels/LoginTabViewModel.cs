@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -21,8 +20,6 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        // TODO: Lets fix it so we don't have to suppress this.
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IBrowser browser)
         {
             RepositoryHosts = repositoryHosts;
@@ -34,14 +31,12 @@ namespace GitHub.ViewModels
             PasswordValidator = ReactivePropertyValidator.For(this, x => x.Password)
                 .IfNullOrEmpty("Please enter your password");
 
-            CanLoginObservable = this.WhenAny(
+            canLogin = this.WhenAny(
                 x => x.UsernameOrEmailValidator.ValidationResult.IsValid,
                 x => x.PasswordValidator.ValidationResult.IsValid,
-                (x, y) => x.Value && y.Value);
+                (x, y) => x.Value && y.Value).ToProperty(this, x => x.CanLogin);
 
-            canLogin = CanLoginObservable.ToProperty(this, x => x.CanLogin);
-
-            Login = ReactiveCommand.CreateAsyncObservable(CanLoginObservable, LogIn);
+            Login = ReactiveCommand.CreateAsyncObservable(this.WhenAny(x => x.CanLogin, x => x.Value), LogIn);
 
             Login.ThrownExceptions.Subscribe(ex =>
             {
@@ -119,7 +114,7 @@ namespace GitHub.ViewModels
         }
 
         readonly ObservableAsPropertyHelper<bool> canLogin;
-        public bool CanLogin
+        public virtual bool CanLogin
         {
             get { return canLogin.Value; }
         }
