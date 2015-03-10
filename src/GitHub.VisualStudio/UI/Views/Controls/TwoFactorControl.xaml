@@ -9,7 +9,7 @@
     xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
     xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
-    xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.12.0"
+    xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
     mc:Ignorable="d"
     d:DesignWidth="426"
     d:DesignHeight="517"
