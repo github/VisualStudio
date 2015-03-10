@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+     xmlns:VSExtension="http://schemas.microsoft.com/wix/VSExtension">
+	<Product Id="*" Name="MsiInstaller" Language="1033" Version="1.0.0.0" Manufacturer="GitHub" UpgradeCode="ba510407-937d-43ab-a0d0-a23eb3efe376">
+		<Package InstallerVersion="200" Compressed="yes" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate />
+
+		<Feature Id="ProductFeature" Title="MsiInstaller" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="MsiInstaller" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<Component Id="ProductComponent">
+        <VSExtension:VsixPackage File="VsixFile" PackageId="c3d3dc68-c977-411f-b3e8-03b0dccf7dfc" Target="pro" TargetVersion="14.0" />
+        <File Id="VsixFile" Name="GitHub.VisualStudio.vsix" Source="$(var.GitHub.VisualStudio.TargetDir)\GitHub.VisualStudio.vsix"/>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
