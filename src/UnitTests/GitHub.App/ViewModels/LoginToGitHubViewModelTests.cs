@@ -18,7 +18,7 @@ public class LoginToGitHubViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.Address.Returns(HostAddress.GitHubDotComHostAddress);
             repositoryHosts.GitHubHost.Returns(gitHubHost);
-            var browser = Substitute.For<IBrowser>();
+            var browser = Substitute.For<IVisualStudioBrowser>();
             var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
 
             loginViewModel.SignUp.Execute(null);
@@ -36,7 +36,7 @@ public class LoginToGitHubViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.Address.Returns(HostAddress.GitHubDotComHostAddress);
             repositoryHosts.GitHubHost.Returns(gitHubHost);
-            var browser = Substitute.For<IBrowser>();
+            var browser = Substitute.For<IVisualStudioBrowser>();
             var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
 
             loginViewModel.ForgotPassword.Execute(null);

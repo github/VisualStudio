@@ -10,8 +10,8 @@ using Rothko;
 
 namespace GitHub.VisualStudio.Helpers
 {
-    [Export(typeof(IBrowser))]
-    public class Browser : IBrowser
+    [Export(typeof(IVisualStudioBrowser))]
+    public class Browser : IVisualStudioBrowser
     {
         readonly IServiceProvider serviceProvider;
         readonly IProcessStarter processManager;
