@@ -21,9 +21,8 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        // TODO: Lets fix it so we don't have to suppress this.
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IBrowser browser)
+        protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
         {
             RepositoryHosts = repositoryHosts;
 

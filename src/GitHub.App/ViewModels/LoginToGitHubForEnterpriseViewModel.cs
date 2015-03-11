@@ -18,7 +18,7 @@ namespace GitHub.ViewModels
     public class LoginToGitHubForEnterpriseViewModel : LoginTabViewModel, ILoginToGitHubForEnterpriseViewModel
     {
         [ImportingConstructor]
-        public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IBrowser browser) : base(hosts, browser)
+        public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IVisualStudioBrowser browser) : base(hosts, browser)
         {
             enterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
                 .IfNullOrEmpty("Please enter an Enterprise URL")

@@ -23,7 +23,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isSms;
 
         [ImportingConstructor]
-        public TwoFactorDialogViewModel(IBrowser browser)
+        public TwoFactorDialogViewModel(IVisualStudioBrowser browser)
         {
             OkCommand = ReactiveCommand.Create(this.WhenAny(
                 x => x.AuthenticationCodeValidator.ValidationResult.IsValid,
