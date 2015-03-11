@@ -4,3 +4,9 @@
 [submodule "submodules/nullguard"]
 	path = submodules/nullguard
 	url = https://github.com/shana/NullGuard.git
+[submodule "submodules/reactiveui"]
+	path = submodules/reactiveui
+	url = https://github.com/shana/ReactiveUI
+[submodule "submodules/octokit.net"]
+	path = submodules/octokit.net
+	url = https://github.com/shana/Octokit.Net
