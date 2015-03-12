@@ -21,11 +21,10 @@ GitHub
 
 ## Schedule
 
-* March 16 (more or less) is when the last change to VS extensibility can happen.
+* March 18 8:00 PM - is when the last change to VS extensibility can happen. (3 weeks of ask mode, 2 weeks of escrow after that)
 * April ?? When the last change to the extension itself can occur. We need to factor testing and stabilization time.
 * April 29 is Build
 * [Sprint Calendar](https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub/_layouts/15/WopiFrame.aspx?sourcedoc={CCE534D8-D6A7-4672-878C-C34CECB5F383}&file=GitHub%20for%20Visual%20Studio%20Timeline.xlsx&action=default) 
-
 
 ## Documents and Assets
 https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub
