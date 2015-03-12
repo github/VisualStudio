@@ -36,21 +36,14 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Octokit">
-      <HintPath>..\..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="ReactiveUI">
-      <HintPath>..\..\packages\reactiveui-core.6.3.1\lib\Net45\ReactiveUI.dll</HintPath>
-    </Reference>
-    <Reference Include="Splat">
-      <HintPath>..\..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
@@ -81,7 +74,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-	<None Include="..\..\script\Key.snk">
+    <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -106,6 +99,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
+      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
+      <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>

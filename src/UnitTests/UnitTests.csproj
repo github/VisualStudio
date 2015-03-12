@@ -67,14 +67,6 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ReactiveUI, Version=6.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\reactiveui-core.6.3.1\lib\Net45\ReactiveUI.dll</HintPath>
-    </Reference>
-    <Reference Include="Splat, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -112,6 +104,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
       <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
       <Name>Rothko</Name>
