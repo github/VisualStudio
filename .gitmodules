@@ -10,3 +10,6 @@
 [submodule "submodules/splat"]
 	path = submodules/splat
 	url = https://github.com/shana/splat.git
+[submodule "submodules/akavache"]
+	path = submodules/akavache
+	url = https://github.com/shana/Akavache
