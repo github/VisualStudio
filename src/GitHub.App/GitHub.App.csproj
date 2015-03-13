@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <NuGetPackageImportStamp>5547d2f4</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>d7ccdc0e</NuGetPackageImportStamp>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -25,6 +25,11 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,16 +37,18 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akavache, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\akavache.core.4.1.0\lib\net45\Akavache.dll</HintPath>
-    </Reference>
-    <Reference Include="Akavache.Sqlite3, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\akavache.sqlite3.4.1.0\lib\Portable-Net45+Win8+WP8+Wpa81\Akavache.Sqlite3.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
@@ -52,30 +59,15 @@
     <Reference Include="NLog">
       <HintPath>..\..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="NullGuard">
-      <HintPath>..\..\packages\NullGuard.Fody.1.2.0.0\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Octokit, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NullGuard, Version=1.4.1.0, Culture=neutral, PublicKeyToken=1958ac8092168428, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit.Reactive, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Octokit.Reactive.0.6.2\lib\net45\Octokit.Reactive.dll</HintPath>
+      <HintPath>..\..\packages\NullGuard.Fody.1.4.1\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ReactiveUI, Version=6.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SQLitePCL.raw, Version=0.7.2.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\reactiveui-core.6.3.1\lib\Net45\ReactiveUI.dll</HintPath>
-    </Reference>
-    <Reference Include="Splat, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCL.raw">
-      <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.1\lib\net45\SQLitePCL.raw.dll</HintPath>
+      <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.2-GHfVS\lib\net45\SQLitePCL.raw.dll</HintPath>
     </Reference>
     <Reference Include="Stateless">
       <HintPath>..\..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>
@@ -109,9 +101,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\script\Key.snk">
+      <Link>Key.snk</Link>
+    </None>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="AkavacheSqliteLinkerOverride.cs" />
     <Compile Include="Authentication\TwoFactorChallengeHandler.cs" />
     <Compile Include="Authentication\TwoFactorRequiredUserError.cs" />
@@ -137,7 +135,6 @@
     <Compile Include="Models\RepositoryHosts.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Models\RepositoryModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Factories\AccountFactory.cs" />
     <Compile Include="Api\ApiClient.cs" />
@@ -178,6 +175,34 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
+      <Project>{b4e665e5-6caf-4414-a6e2-8de1c3bcf203}</Project>
+      <Name>Akavache_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
+      <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
+      <Name>Octokit.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
+      <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
+      <Name>Octokit.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
+      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
+      <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
@@ -208,11 +233,11 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Fody.1.26.4\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.26.4\build\Fody.targets'))" />
-    <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.1\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.1\build\net45\SQLitePCL.raw_basic.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Fody.1.28.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.28.0\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.2-GHfVS\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.2-GHfVS\build\net45\SQLitePCL.raw_basic.targets'))" />
   </Target>
-  <Import Project="..\..\packages\Fody.1.26.4\build\Fody.targets" Condition="Exists('..\..\packages\Fody.1.26.4\build\Fody.targets')" />
-  <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.1\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.1\build\net45\SQLitePCL.raw_basic.targets')" />
+  <Import Project="..\..\packages\Fody.1.28.0\build\Fody.targets" Condition="Exists('..\..\packages\Fody.1.28.0\build\Fody.targets')" />
+  <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.2-GHfVS\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.2-GHfVS\build\net45\SQLitePCL.raw_basic.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

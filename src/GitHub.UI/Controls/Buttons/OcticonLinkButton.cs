@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using NullGuard;
 
 namespace GitHub.UI
 {
@@ -23,6 +24,7 @@ namespace GitHub.UI
 
         public Geometry Data
         {
+            [return: AllowNull]
             get { return (Geometry)GetValue(Path.DataProperty); }
             set { SetValue(Path.DataProperty, value); }
         }
