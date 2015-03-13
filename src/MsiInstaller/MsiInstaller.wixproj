@@ -34,9 +34,6 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
       <Name>GitHub.VisualStudio</Name>
       <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
@@ -46,8 +43,11 @@
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
   <PropertyGroup>
-    <WixToolPath>$(SolutionDir)packages\WiX.Toolset.2015.3.10.0.1502\tools\wix\</WixToolPath>
+    <WixToolPath>$(SolutionDir)packages\WiX.Toolset.2015.3.10.0.1503\tools\wix\</WixToolPath>
     <WixTargetsPath>$(WixToolPath)wix.targets</WixTargetsPath>
     <WixTasksPath>$(WixToolPath)WixTasks.dll</WixTasksPath>
   </PropertyGroup>
