@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
@@ -35,6 +37,13 @@ namespace GitHub.Controllers
             this.factory = factory;
             this.uiProvider = uiProvider;
 
+#if DEBUG
+            if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
+            {
+                Debug.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
+                    "The MainThreadScheduler is using the wrong dispatcher");
+            }
+#endif
             machine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
 
             machine.Configure(UIViewType.None)
