@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using NullGuard;
 
 namespace GitHub.UI
 {
@@ -16,6 +17,7 @@ namespace GitHub.UI
         [DefaultValue("Filter")]
         public string PromptText
         {
+            [return: AllowNull]
             get { return (string)GetValue(PromptTextProperty); }
             set { SetValue(PromptTextProperty, value); }
         }
