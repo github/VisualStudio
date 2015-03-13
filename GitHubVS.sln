@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{7B6C5F8D
 		script\Bootstrap.ps1 = script\Bootstrap.ps1
 		build.cmd = build.cmd
 		script\cibuild.ps1 = script\cibuild.ps1
+		nuget.config = nuget.config
 		script\SolutionInfo.cs = script\SolutionInfo.cs
 	EndProjectSection
 EndProject
