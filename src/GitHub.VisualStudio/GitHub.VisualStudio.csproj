@@ -302,6 +302,10 @@
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
       <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
       <Name>ReactiveUI_Net45</Name>
