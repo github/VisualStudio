@@ -152,7 +152,7 @@ namespace GitHub.Models
                 .PublishAsync();
         }
 
-        static readonly User unverifiedUser = new User { Id = int.MinValue };
+        static readonly User unverifiedUser = new User();
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {

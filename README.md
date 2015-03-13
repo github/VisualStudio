@@ -39,6 +39,7 @@ __Make sure you have the following installed!__
 
 * [Visual Studio 2015 CTP 6](https://www.visualstudio.com/downloads/visual-studio-2015-ctp-vs)
 * [Microsoft Visual Studio 2015 SDK CTP 6](http://go.microsoft.com/?linkid=9875738)
+* [WiX toolset v3.10.0.1502](http://static.wixtoolset.org/releases/v3.10.0.1502/wix310.exe). Don't click on the "Update Available" button, [it will downgrade the version](http://www.joyofsetup.com/2015/02/04/wix-v3-10-version-twist/)
 
 
 ## Debugging

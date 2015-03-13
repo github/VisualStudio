@@ -30,6 +30,7 @@ namespace GitHub.UI
         /// </summary>
         protected string BaseText
         {
+            [return: AllowNull]
             get { return base.Text; }
             set
             {

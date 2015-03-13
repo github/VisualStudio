@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows;
+using NullGuard;
 
 namespace GitHub.UI
 {
@@ -15,6 +16,7 @@ namespace GitHub.UI
 
         public object Data
         {
+            [return: AllowNull]
             get { return (object)GetValue(DataProperty); }
             set { SetValue(DataProperty, value); }
         }

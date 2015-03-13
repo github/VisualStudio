@@ -39,7 +39,7 @@ namespace GitHub.Services
             request.Headers.Add("User-Agent", productHeader.ToString());
 
             var ret = await httpClient
-                    .Send<object>(request, CancellationToken.None)
+                    .Send(request, CancellationToken.None)
                     .Catch(ex => null);
 
             if (ret == null)

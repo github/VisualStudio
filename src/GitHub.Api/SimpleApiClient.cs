@@ -45,7 +45,7 @@ namespace GitHub.Api
                 }
                 catch // TODO: if the repo is private, then it'll throw
                 {
-                    repositoryCache = new Repository() { HtmlUrl = String.Empty };
+                    repositoryCache = new Repository();
                 }
             }
             return repositoryCache;
