@@ -3,7 +3,7 @@
      xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
      xmlns:VSExtension="http://schemas.microsoft.com/wix/VSExtension">
 	<Product Id="9DABDBBB-3AF1-4F38-A0E0-2B99DFE5057A" Name="GitHub Extension for Visual Studio"
-           Language="1033" Version="1.0.0.0" Manufacturer="GitHub, Inc." UpgradeCode="ba510407-937d-43ab-a0d0-a23eb3efe376">
+           Language="1033" Version="1.0.0.0" Manufacturer="GitHub, Inc." UpgradeCode="BA510407-937D-43AB-A0D0-A23EB3EFE376">
 		<Package InstallerVersion="200" Compressed="yes" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes"/>
