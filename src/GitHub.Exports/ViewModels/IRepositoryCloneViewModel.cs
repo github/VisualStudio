@@ -7,7 +7,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// ViewModel for the the Clone Repository dialog
     /// </summary>
-    public interface ICloneRepositoryViewModel : IViewModel
+    public interface IRepositoryCloneViewModel : IViewModel
     {
         /// <summary>
         /// Command to clone the currently selected repository.

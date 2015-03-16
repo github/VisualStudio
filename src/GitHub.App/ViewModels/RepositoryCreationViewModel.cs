@@ -9,7 +9,7 @@ using GitHub.Exports;
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Create)]
-    public class CreateRepoViewModel : ICreateRepoViewModel
+    public class RepositoryCreationViewModel : IRepositoryCreationViewModel
     {
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 

@@ -19,7 +19,7 @@ using Account = Octokit.Account;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class CreateRepoViewModelDesigner : ReactiveObject, ICreateRepoViewModel
+    public class CreateRepoViewModelDesigner : ReactiveObject, IRepositoryCreationViewModel
     {
         public CreateRepoViewModelDesigner()
         {
@@ -195,7 +195,7 @@ namespace GitHub.SampleData
         public string Group { get; set; }
     }
 
-    public class CloneRepositoryViewModelDesigner : ICloneRepositoryViewModel
+    public class CloneRepositoryViewModelDesigner : IRepositoryCloneViewModel
     {
         public CloneRepositoryViewModelDesigner()
         {

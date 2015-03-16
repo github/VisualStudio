@@ -92,7 +92,7 @@
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
-    <Compile Include="ViewModels\ICreateRepoViewModel.cs" />
+    <Compile Include="ViewModels\IRepositoryCreationViewModel.cs" />
     <Compile Include="Validation\ReactivePropertyValidator.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface ICreateRepoViewModel : IViewModel
+    public interface IRepositoryCreationViewModel : IViewModel
     {
         string RepositoryName { get; }
         string SafeRepositoryName { get; }
