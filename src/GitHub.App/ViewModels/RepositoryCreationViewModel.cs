@@ -29,6 +29,8 @@ namespace GitHub.ViewModels
         {
             this.operatingSystem = operatingSystem;
 
+            Accounts = new ReactiveList<IAccount>();
+
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
                 .ToProperty(this, x => x.SafeRepositoryName);

@@ -72,4 +72,14 @@ public class RepositoryCreationViewModelTests
             Assert.Equal(@"c:\fake\dev", vm.BaseRepositoryPath);
         }
     }
+
+    public class TheAccountsProperty
+    {
+        [Fact]
+        public void StartsOffEmpty()
+        {
+            var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>());
+            Assert.Empty(vm.Accounts);
+        }
+    }
 }
