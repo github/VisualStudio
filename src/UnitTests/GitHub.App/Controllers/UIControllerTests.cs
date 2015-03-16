@@ -61,7 +61,7 @@ public class UIControllerTests
 
                 uiController.Start();
 
-                Assert.IsType<CloneRepositoryControl>(shownControl);
+                Assert.IsType<RepositoryCloneControl>(shownControl);
             }
         }
     }
