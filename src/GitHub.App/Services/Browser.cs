@@ -2,13 +2,13 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using GitHub.Services;
-using NLog;
 using Rothko;
+using NLog;
 
 namespace GitHub
 {
-    [Export(typeof(IBrowser))]
-    public class Browser : IBrowser
+    [Export(typeof(IVisualStudioBrowser))]
+    public class Browser : IVisualStudioBrowser
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 

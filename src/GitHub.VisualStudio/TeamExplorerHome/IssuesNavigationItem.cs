@@ -17,11 +17,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     {
         public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
 
-        readonly Lazy<IBrowser> browser;
+        readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
         public IssuesNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, Lazy<IBrowser> browser)
+            ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser)
             : base(serviceProvider, apiFactory)
         {
             this.browser = browser;

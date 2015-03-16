@@ -17,11 +17,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     {
         public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
 
-        readonly Lazy<IBrowser> browser;
+        readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
         public WikiNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, Lazy<IBrowser> browser)
+            ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser)
             : base(serviceProvider, apiFactory)
         {
             this.browser = browser;

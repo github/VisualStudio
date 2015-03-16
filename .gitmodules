@@ -1,6 +1,6 @@
 [submodule "submodules/rothko"]
 	path = submodules/rothko
-	url = https://github.com/shana/Rothko.git
+	url = https://github.com/haacked/Rothko.git
 [submodule "submodules/reactiveui"]
 	path = submodules/reactiveui
 	url = https://github.com/shana/ReactiveUI

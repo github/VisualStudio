@@ -43,7 +43,7 @@ namespace DesignTimeStyleHelper
         SComponentModel sc;
 
         [Import]
-        public IBrowser Browser;
+        public IVisualStudioBrowser Browser;
 
         [Import]
         public ExportFactoryProvider ExportFactoryProvider;

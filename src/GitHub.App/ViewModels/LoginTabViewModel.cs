@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -20,7 +20,7 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IBrowser browser)
+        protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
         {
             RepositoryHosts = repositoryHosts;
 
