@@ -24,16 +24,19 @@ namespace GitHub.ViewModels
                 .IfNullOrEmpty("Please enter an Enterprise URL")
                 .IfNotUri("Please enter a valid Enterprise URL")
                 .IfGitHubDotComHost("Not an Enterprise server. Please enter an Enterprise URL");
+
+            canLogin = this.WhenAny(
+                x => x.UsernameOrEmailValidator.ValidationResult.IsValid,
+                x => x.PasswordValidator.ValidationResult.IsValid,
+                x => x.EnterpriseUrlValidator.ValidationResult.IsValid,
+                (x, y, z) => x.Value && y.Value && z.Value)
+                .ToProperty(this, x => x.CanLogin);
         }
 
-        protected override IObservable<bool> CanLoginObservable
+        readonly ObservableAsPropertyHelper<bool> canLogin;
+        public override bool CanLogin
         {
-            get
-            {
-                return base.CanLoginObservable.CombineLatest(
-                    this.WhenAny(x => x.EnterpriseUrlValidator.ValidationResult.IsValid, x => x.Value),
-                    (x,y) => x && y);
-            }
+            get { return canLogin.Value; }
         }
 
         protected override IObservable<AuthenticationResult> LogIn(object args)

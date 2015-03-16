@@ -4,15 +4,10 @@ using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Concurrency;
-using System.Windows;
-using GitHub.Infrastructure;
 using GitHub.Services;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
-using ReactiveUI;
-using Splat;
 
 namespace GitHub.VisualStudio
 {
@@ -34,10 +29,6 @@ namespace GitHub.VisualStudio
             var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
             Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
             ExportProvider = componentModel.DefaultExportProvider;
-
-            ModeDetector.OverrideModeDetector(new AppModeDetector());
-            if (Application.Current != null)
-                RxApp.MainThreadScheduler = new DispatcherScheduler(Application.Current.Dispatcher);
         }
 
         public object GetService(Type serviceType)
