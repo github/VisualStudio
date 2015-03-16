@@ -17,9 +17,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Clone)]
-    public partial class CloneRepositoryControl : IViewFor<ICloneRepositoryViewModel>, IView
+    public partial class RepositoryCloneControl : IViewFor<IRepositoryCloneViewModel>, IView
     {
-        public CloneRepositoryControl()
+        public RepositoryCloneControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
             SharedDictionaryManager.Load("GitHub.UI.Reactive");
@@ -27,7 +27,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as ICloneRepositoryViewModel;
+            DataContextChanged += (s, e) => ViewModel = e.NewValue as IRepositoryCloneViewModel;
 
             this.WhenActivated(d =>
             {
@@ -37,24 +37,24 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(ICloneRepositoryViewModel), typeof(CloneRepositoryControl), new PropertyMetadata(null));
+           "ViewModel", typeof(IRepositoryCloneViewModel), typeof(RepositoryCloneControl), new PropertyMetadata(null));
 
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ICloneRepositoryViewModel)value; }
+            set { ViewModel = (IRepositoryCloneViewModel)value; }
         }
 
         object IView.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ICloneRepositoryViewModel)value; }
+            set { ViewModel = (IRepositoryCloneViewModel)value; }
         }
 
-        public ICloneRepositoryViewModel ViewModel
+        public IRepositoryCloneViewModel ViewModel
         {
             [return: AllowNull]
-            get { return (ICloneRepositoryViewModel)GetValue(ViewModelProperty); }
+            get { return (IRepositoryCloneViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 

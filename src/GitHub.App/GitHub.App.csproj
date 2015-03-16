@@ -152,8 +152,8 @@
     <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
-    <Compile Include="ViewModels\CreateRepoViewModel.cs" />
-    <Compile Include="ViewModels\CloneRepositoryViewModel.cs" />
+    <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
+    <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
