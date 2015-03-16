@@ -100,6 +100,7 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
     <Compile Include="GitHubPackageTests.cs" />
+    <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
