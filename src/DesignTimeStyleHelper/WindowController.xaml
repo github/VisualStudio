@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DesignTimeStyleHelper"
         mc:Ignorable="d"
-        Title="WindowController" Height="300" Width="300">
+        Title="WindowController"
+        Height="300"
+        Width="300">
     <Grid x:Name="Container">
         
     </Grid>
