@@ -16,9 +16,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
-    public partial class CreateRepoControl : IViewFor<ICreateRepoViewModel>, IView
+    public partial class RepositoryCreationControl : IViewFor<ICreateRepoViewModel>, IView
     {
-        public CreateRepoControl()
+        public RepositoryCreationControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
             SharedDictionaryManager.Load("GitHub.UI.Reactive");
@@ -68,7 +68,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(ICreateRepoViewModel), typeof(CreateRepoControl), new PropertyMetadata(null));
+           "ViewModel", typeof(ICreateRepoViewModel), typeof(RepositoryCreationControl), new PropertyMetadata(null));
 
 
         object IViewFor.ViewModel
