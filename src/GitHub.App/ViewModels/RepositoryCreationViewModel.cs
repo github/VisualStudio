@@ -4,6 +4,9 @@ using GitHub.Validation;
 using ReactiveUI;
 using GitHub.Exports;
 using System.ComponentModel.Composition;
+using NullGuard;
+using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 
 namespace GitHub.ViewModels
 {
@@ -11,6 +14,16 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCreationViewModel : ReactiveObject, IRepositoryCreationViewModel
     {
+        ObservableAsPropertyHelper<string> safeRepositoryName;
+        readonly ObservableAsPropertyHelper<string> safeRepositoryName;
+
+        public RepositoryCreationViewModel()
+        {
+            safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
+            .Select(x => x != null ? GetSafeRepositoryName(x) : null)
+            .ToProperty(this, x => x.SafeRepositoryName);
+        }
+
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         public ReactiveList<IAccount> Accounts
@@ -67,13 +80,32 @@ namespace GitHub.ViewModels
             set;
         }
 
+        string repositoryName;
+        [AllowNull]
         public string RepositoryName
         {
-            get;
-            set;
+            [return: AllowNull]
+            get
+            { return repositoryName; }
+            set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
         }
 
         public ReactivePropertyValidator<string> RepositoryNameValidator
+        {
+            get;
+            private set;
+        }
+
+        public string SafeRepositoryName
+        {
+            [return: AllowNull]
+            get
+            {
+                return safeRepositoryName.Value;
+            }
+        }
+
+        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator
         {
             get;
             private set;
@@ -86,18 +118,6 @@ namespace GitHub.ViewModels
         }
 
         public ICommand Reset
-        {
-            get;
-            private set;
-        }
-
-        public string SafeRepositoryName
-        {
-            get;
-            private set;
-        }
-
-        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator
         {
             get;
             private set;
@@ -131,6 +151,17 @@ namespace GitHub.ViewModels
         {
             get;
             private set;
+        }
+
+        // These are the characters which are permitted when creating a repository name on GitHub The Website
+        static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
+
+        /// <summary>
+        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
+        /// </summary>
+        static string GetSafeRepositoryName(string name)
+        {
+            return invalidRepositoryCharsRegex.Replace(name, "-");
         }
     }
 }
