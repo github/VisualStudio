@@ -25,10 +25,14 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public TwoFactorDialogViewModel(IBrowser browser)
         {
+            AuthenticationCodeValidator = ReactivePropertyValidator.For(this, x => x.AuthenticationCode)
+                .IfNullOrEmpty("Please enter your authentication code")
+                .IfNotMatch(@"^\d{6}$", "Authentication code must be exactly six digits");
+
             OkCommand = ReactiveCommand.Create(this.WhenAny(
                 x => x.AuthenticationCodeValidator.ValidationResult.IsValid,
                 x => x.AuthenticationCode,
-                (valid, y) => valid.Value && (String.IsNullOrEmpty(y.Value) || (y.Value != null && y.Value.Length == 6))));
+                (valid, y) => valid.Value && (string.IsNullOrEmpty(y.Value) || (y.Value != null && y.Value.Length == 6))));
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
             ResendCodeCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
@@ -59,10 +63,6 @@ namespace GitHub.ViewModels
             isSms = this.WhenAny(x => x.TwoFactorType, x => x.Value)
                 .Select(factorType => factorType == TwoFactorType.Sms)
                 .ToProperty(this, x => x.IsSms);
-
-            AuthenticationCodeValidator = ReactivePropertyValidator.For(this, x => x.AuthenticationCode)
-                .IfNullOrEmpty("Please enter your authentication code")
-                .IfNotMatch(@"^\d{6}$", "Authentication code must be exactly six digits");
         }
 
         public string Title { get { return "Connect to GitHub"; } } // TODO: this needs to be contextual
