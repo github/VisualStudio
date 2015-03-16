@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
-    public partial class RepositoryCreationControl : IViewFor<ICreateRepoViewModel>, IView
+    public partial class RepositoryCreationControl : IViewFor<IRepositoryCreationViewModel>, IView
     {
         public RepositoryCreationControl()
         {
@@ -68,26 +68,26 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(ICreateRepoViewModel), typeof(RepositoryCreationControl), new PropertyMetadata(null));
+           "ViewModel", typeof(IRepositoryCreationViewModel), typeof(RepositoryCreationControl), new PropertyMetadata(null));
 
 
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ICreateRepoViewModel)value; }
+            set { ViewModel = (IRepositoryCreationViewModel)value; }
         }
 
         object IView.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (ICreateRepoViewModel)value; }
+            set { ViewModel = (IRepositoryCreationViewModel)value; }
         }
 
-        public ICreateRepoViewModel ViewModel
+        public IRepositoryCreationViewModel ViewModel
         {
             [return: AllowNull]
             get
-            { return (ICreateRepoViewModel)GetValue(ViewModelProperty); }
+            { return (IRepositoryCreationViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
     }
