@@ -76,7 +76,7 @@ namespace GitHub.VisualStudio.Base
             return visible;
         }
 
-        protected async void OpenInBrowser(Lazy<IBrowser> browser, string endpoint)
+        protected async void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
         {
             var b = browser.Value;
             Debug.Assert(b != null, "Could not create a browser helper instance.");

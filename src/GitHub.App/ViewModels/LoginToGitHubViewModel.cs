@@ -16,7 +16,7 @@ namespace GitHub.ViewModels
         readonly Uri baseUri;
 
         [ImportingConstructor]
-        public LoginToGitHubViewModel(IRepositoryHosts repositoryHosts, IBrowser browser)
+        public LoginToGitHubViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
             : base(repositoryHosts, browser)
         {
             baseUri = repositoryHosts.GitHubHost.Address.WebUri;

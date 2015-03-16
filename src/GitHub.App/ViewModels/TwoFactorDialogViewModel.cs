@@ -23,7 +23,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isSms;
 
         [ImportingConstructor]
-        public TwoFactorDialogViewModel(IBrowser browser)
+        public TwoFactorDialogViewModel(IVisualStudioBrowser browser)
         {
             AuthenticationCodeValidator = ReactivePropertyValidator.For(this, x => x.AuthenticationCode)
                 .IfNullOrEmpty("Please enter your authentication code")

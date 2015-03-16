@@ -13,10 +13,10 @@ namespace GitHub.Factories
     public class HostCacheFactory : IHostCacheFactory
     {
         readonly Lazy<IBlobCacheFactory> blobCacheFactory;
-        readonly Lazy<IOperatingSystemFacade> operatingSystem;
+        readonly Lazy<IOperatingSystem> operatingSystem;
         
         [ImportingConstructor]
-        public HostCacheFactory(Lazy<IBlobCacheFactory> blobCacheFactory, Lazy<IOperatingSystemFacade> operatingSystem)
+        public HostCacheFactory(Lazy<IBlobCacheFactory> blobCacheFactory, Lazy<IOperatingSystem> operatingSystem)
         {
             this.blobCacheFactory = blobCacheFactory;
             this.operatingSystem = operatingSystem;
@@ -43,7 +43,7 @@ namespace GitHub.Factories
             return new HostCache(localMachineCache, userAccountCache);
         }
 
-        IOperatingSystemFacade OperatingSystem { get { return operatingSystem.Value; } }
+        IOperatingSystem OperatingSystem { get { return operatingSystem.Value; } }
         IBlobCacheFactory BlobCacheFactory { get { return blobCacheFactory.Value; } }
     }
 }
