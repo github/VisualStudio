@@ -90,7 +90,7 @@
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="UI\IView.cs" />
-    <Compile Include="ViewModels\ICloneRepoViewModel.cs" />
+    <Compile Include="ViewModels\IRepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
