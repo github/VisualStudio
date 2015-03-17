@@ -18,5 +18,7 @@ namespace GitHub.ViewModels
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
         ICollection<IRepositoryModel> Repositories { get; }
+
+        IRepositoryModel SelectedRepository { get; set; }
     }
 }
