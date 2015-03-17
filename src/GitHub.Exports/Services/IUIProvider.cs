@@ -6,6 +6,7 @@ namespace GitHub.Services
     public interface IUIProvider
     {
         ExportProvider ExportProvider { get; }
+        IServiceProvider GitServiceProvider { get; set; }
         object GetService(Type t);
         T GetService<T>();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
