@@ -127,8 +127,7 @@ namespace GitHub.ViewModels
         public string RepositoryName
         {
             [return: AllowNull]
-            get
-            { return repositoryName; }
+            get { return repositoryName; }
             set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
         }
 
@@ -141,10 +140,7 @@ namespace GitHub.ViewModels
         public string SafeRepositoryName
         {
             [return: AllowNull]
-            get
-            {
-                return safeRepositoryName.Value;
-            }
+            get { return safeRepositoryName.Value; }
         }
 
         public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator

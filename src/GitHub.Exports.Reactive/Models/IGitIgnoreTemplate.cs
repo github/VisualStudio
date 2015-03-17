@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GitHub.Exports;
 
 namespace GitHub.Models
@@ -7,7 +8,7 @@ namespace GitHub.Models
         string Name { get;  }
         string FilePath { get; }
         bool CanCopy { get; }
-        void CopyTo(string target, bool overwrite);
+        Task CopyTo(string target, bool overwrite);
         bool IsRecommended { get; }
     }
 }

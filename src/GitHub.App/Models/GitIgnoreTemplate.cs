@@ -1,29 +1,29 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using GitHub.IO;
+using System.Threading.Tasks;
+using GitHub.Extensions;
 using ReactiveUI;
+using Rothko;
 
 namespace GitHub.Models
 {
     public class GitIgnoreTemplate : ReactiveObject, IGitIgnoreTemplate
     {
         readonly bool isRecommended;
-        readonly IEnumerable<IFile> additionalFiles;
-        readonly IFile file;
+        readonly IEnumerable<IFileInfo> additionalFiles;
+        readonly IFileInfo file;
         bool isSelected;
 
-        public GitIgnoreTemplate(IFile fileInfo) : this(fileInfo, false, Enumerable.Empty<IFile>()) { }
+        public GitIgnoreTemplate(IFileInfo file) : this(file, false, Enumerable.Empty<IFileInfo>()) { }
 
-        public GitIgnoreTemplate(IFile fileInfo, bool recommended) : this(fileInfo, recommended, Enumerable.Empty<IFile>()) { }
+        public GitIgnoreTemplate(IFileInfo file, bool recommended) : this(file, recommended, Enumerable.Empty<IFileInfo>()) { }
 
-        public GitIgnoreTemplate(IFile fileInfo, bool recommended, IEnumerable<IFile> ignoresToAppend)
+        public GitIgnoreTemplate(IFileInfo file, bool recommended, IEnumerable<IFileInfo> ignoresToAppend)
         {
             isRecommended = recommended;
-            file = fileInfo;
+            this.file = file;
             additionalFiles = ignoresToAppend;
         }
 
@@ -34,34 +34,34 @@ namespace GitHub.Models
 
         public bool CanCopy { get { return file.Exists; } }
 
-        public void CopyTo(string target, bool overwrite)
+        public async Task CopyTo(string target, bool overwrite)
         {
             if (CanCopy)
             {
                 file.CopyTo(target, overwrite);
             }
 
-            var targetFile = new GitHubFile(target);
+            var targetFile = new Rothko.FileInfo(target); // TODO: We shouln't create this direcly. :(
             if (targetFile.Exists)
             {
-                AppendAnyExtraIgnoreLines(targetFile);
+                await AppendAnyExtraIgnoreLines(targetFile);
             }
         }
 
-        void AppendAnyExtraIgnoreLines(IFile targetFile)
+        async Task AppendAnyExtraIgnoreLines(IFileInfo targetFile)
         {
-            var sectionLine = string.Format(CultureInfo.InvariantCulture, "{0}# ========================={0}", Environment.NewLine);
+            var sectionLine = string.Format(CultureInfo.InvariantCulture, "{0}# ========================={0}", System.Environment.NewLine);
 
-            targetFile.AppendText(sectionLine);
-            targetFile.AppendText("# Operating System Files");
-            targetFile.AppendText(sectionLine);
+            await targetFile.AppendText(sectionLine);
+            await targetFile.AppendText("# Operating System Files");
+            await targetFile.AppendText(sectionLine);
 
             foreach (var additionalFile in additionalFiles)
             {
-                targetFile.AppendText(string.Format(CultureInfo.InvariantCulture, "{0}# {1}", Environment.NewLine, additionalFile.NameWithoutExtension));
-                targetFile.AppendText(sectionLine);
-                targetFile.AppendText(Environment.NewLine);
-                targetFile.AppendText(additionalFile.ReadAllText(Encoding.UTF8));
+                await targetFile.AppendText(string.Format(CultureInfo.InvariantCulture, "{0}# {1}", System.Environment.NewLine, Path.GetFileNameWithoutExtension(additionalFile.Name)));
+                await targetFile.AppendText(sectionLine);
+                await targetFile.AppendText(System.Environment.NewLine);
+                await targetFile.AppendText(await additionalFile.ReadAllText());
             }
         }
 
