@@ -42,9 +42,6 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             base.Initialize(sender, e);
 
             gitServiceProvider = e.ServiceProvider;
-
-            // testing grabbing the service we'll need for the cloning functionality
-            var gitExt = gitServiceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
         }
 
 
