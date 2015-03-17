@@ -40,8 +40,17 @@ namespace GitHub.Controllers
 #if DEBUG
             if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
             {
-                Debug.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
-                    "The MainThreadScheduler is using the wrong dispatcher");
+                var waitDispatcher = RxApp.MainThreadScheduler as WaitForDispatcherScheduler;
+                if (waitDispatcher != null)
+                {
+                    Debug.Assert(DispatcherScheduler.Current.Dispatcher == Application.Current.Dispatcher,
+                       "DispatcherScheduler is set correctly");
+                }
+                else
+                {
+                    Debug.Assert(((DispatcherScheduler)RxApp.MainThreadScheduler).Dispatcher == Application.Current.Dispatcher,
+                        "The MainThreadScheduler is using the wrong dispatcher");
+                }
             }
 #endif
             machine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
