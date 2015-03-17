@@ -1,0 +1,1 @@
+powershell.exe .\script\deploy.ps1 staff development "1.0.1.0" -Force -NoCampfire
