@@ -7,6 +7,7 @@ using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
@@ -14,6 +15,8 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
     public class PlaceholderGitHubSection : TeamExplorerSectionBase
     {
         public const string PlaceholderGitHubSectionId = "519B47D3-F2A9-4E19-8491-8C9FA25ABE97";
+
+        IServiceProvider gitServiceProvider;
 
         protected GitHubConnectContent View
         {
@@ -34,12 +37,23 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             View.ViewModel = this;
         }
 
+        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        {
+            base.Initialize(sender, e);
+
+            gitServiceProvider = e.ServiceProvider;
+
+            // testing grabbing the service we'll need for the cloning functionality
+            var gitExt = gitServiceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
+        }
+
+
         public void DoCreate()
         {
             // this is done here and not via the constructor so nothing gets loaded
             // until we get here
             var ui = ServiceProvider.GetExportedValue<IUIProvider>();
-
+            ui.GitServiceProvider = gitServiceProvider;
             var factory = ui.GetService<ExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
             var creation = d.Value.SelectFlow(UIControllerFlow.Create);
@@ -55,7 +69,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             // this is done here and not via the constructor so nothing gets loaded
             // until we get here
             var ui = ServiceProvider.GetExportedValue<IUIProvider>();
-
+            ui.GitServiceProvider = gitServiceProvider;
             var factory = ui.GetService<ExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
             var creation = d.Value.SelectFlow(UIControllerFlow.Clone);
