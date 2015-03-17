@@ -28,6 +28,7 @@ namespace GitHub.ViewModels
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ReactiveCommand<object> createRepositoryCommand = ReactiveCommand.Create();
 
+        [ImportingConstructor]
         public RepositoryCreationViewModel(IOperatingSystem operatingSystem)
         {
             this.operatingSystem = operatingSystem;
@@ -56,6 +57,13 @@ namespace GitHub.ViewModels
                 .IfTrue(x => x.Length > 200, "Path too long")
                 .IfContainsInvalidPathChars("Path contains invalid characters")
                 .IfPathNotRooted("Please enter a valid path");
+
+            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
+                .Add(repoName =>
+                {
+                    var parsedReference = GetSafeRepositoryName(repoName);
+                    return parsedReference != repoName ? "Will be created as " + parsedReference : null;
+                });
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual

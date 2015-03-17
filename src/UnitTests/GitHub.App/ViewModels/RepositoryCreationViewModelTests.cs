@@ -219,6 +219,32 @@ public class RepositoryCreationViewModelTests
         }
     }
 
+    public class TheSafeRepositoryNameWarningValidatorProperty
+    {
+        [Fact]
+        public void IsTrueWhenRepoNameIsSafe()
+        {
+            var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>());
+
+            vm.BaseRepositoryPath = @"c:\fake\";
+            vm.RepositoryName = "this-is-bad";
+
+            Assert.True(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
+        }
+
+        [Fact]
+        public void IsFalseWhenRepoNameIsNotSafe()
+        {
+            var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>());
+
+            vm.BaseRepositoryPath = @"c:\fake\";
+            vm.RepositoryName = "this is bad";
+
+            Assert.False(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
+            Assert.Equal("Will be created as this-is-bad", vm.SafeRepositoryNameWarningValidator.ValidationResult.Message);
+        }
+    }
+
     public class TheAccountsProperty
     {
         [Fact]
