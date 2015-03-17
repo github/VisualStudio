@@ -89,7 +89,9 @@
     <Compile Include="Caches\IHostCache.cs" />
     <Compile Include="Factories\IRepositoryHostFactory.cs" />
     <Compile Include="Models\IAccount.cs" />
+    <Compile Include="Models\IGitIgnoreTemplate.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
+    <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
     <Compile Include="ViewModels\IRepositoryCreationViewModel.cs" />
