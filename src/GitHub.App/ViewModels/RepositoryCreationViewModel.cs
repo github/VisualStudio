@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Validation;
 using NLog;
@@ -24,6 +26,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        readonly ReactiveCommand<object> createRepositoryCommand = ReactiveCommand.Create();
 
         public RepositoryCreationViewModel(IOperatingSystem operatingSystem)
         {
@@ -36,6 +39,23 @@ namespace GitHub.ViewModels
                 .ToProperty(this, x => x.SafeRepositoryName);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
+
+            var nonNullRepositoryName = this.WhenAny(
+                x => x.RepositoryName,
+                x => x.BaseRepositoryPath,
+                (x, y) => x.Value)
+                .WhereNotNull();
+
+            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
+                .IfNullOrEmpty("Please enter a repository name")
+                .IfTrue(x => x.Length > 100, "Repository name must be fewer than 100 characters")
+                .IfTrue(x => IsAlreadyRepoAtPath(GetSafeRepositoryName(x)), "Repository with same name already exists at this location");
+
+            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
+                .IfNullOrEmpty("Please enter a repository path")
+                .IfTrue(x => x.Length > 200, "Path too long")
+                .IfContainsInvalidPathChars("Path contains invalid characters")
+                .IfPathNotRooted("Please enter a valid path");
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -46,10 +66,12 @@ namespace GitHub.ViewModels
             private set;
         }
 
+        string baseRepositoryPath;
         public string BaseRepositoryPath
         {
-            get;
-            set;
+            [return: AllowNull]
+            get { return baseRepositoryPath; }
+            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
         }
 
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator
@@ -71,8 +93,7 @@ namespace GitHub.ViewModels
 
         public ICommand CreateRepository
         {
-            get;
-            private set;
+            get { return createRepositoryCommand; }
         }
 
         public string Description
@@ -206,5 +227,29 @@ namespace GitHub.ViewModels
             }, RxApp.MainThreadScheduler);
         }
 
+        bool IsAlreadyRepoAtPath(string potentialRepositoryName)
+        {
+            bool isValid = false;
+            var validationResult = BaseRepositoryPathValidator.ValidationResult;
+            if (validationResult != null && validationResult.IsValid)
+            {
+                string potentialPath = Path.Combine(BaseRepositoryPath, potentialRepositoryName);
+                isValid = IsGitRepo(potentialPath);
+            }
+            return isValid;
+        }
+
+        bool IsGitRepo(string path)
+        {
+            try
+            {
+                var head = operatingSystem.File.GetFile(Path.Combine(path, ".git", "HEAD"));
+                return head.Exists;
+            }
+            catch (PathTooLongException)
+            {
+                return false;
+            }
+        }
     }
 }
