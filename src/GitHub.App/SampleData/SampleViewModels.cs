@@ -19,9 +19,9 @@ using Account = Octokit.Account;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class CreateRepoViewModelDesigner : ReactiveObject, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : ReactiveObject, IRepositoryCreationViewModel
     {
-        public CreateRepoViewModelDesigner()
+        public RepositoryCreationViewModelDesigner()
         {
             RepositoryName = "Hello-World";
             Description = "A description";
@@ -29,27 +29,127 @@ namespace GitHub.SampleData
             Accounts = new ReactiveList<IAccount> { new AccountDesigner("GitHub") };
         }
 
-        public string Title { get { return "Create a GitHub Repository"; } }
-        public string RepositoryName { get; private set; }
-        public string SafeRepositoryName { get; private set; }
-        public bool ShowRepositoryNameWarning { get; private set; }
-        public string RepositoryNameWarningText { get; private set; }
-        public ReactivePropertyValidator<string> RepositoryNameValidator { get; private set; }
-        public string Description { get; set; }
-        public ReactivePropertyValidator<IAccount> SelectedAccountValidator { get; private set; }
-        public bool KeepPrivate { get; set; }
-        public bool CanKeepPrivate { get; private set; }
-        public bool ShowUpgradeToMicroPlanWarning { get; private set; }
-        public bool ShowUpgradePlanWarning { get; private set; }
-        public ReactiveCommand<Unit> CreateRepository { get; private set; }
-        public bool IsPublishing { get; private set; }
-        public ReactiveCommand<Object> UpgradeAccountPlan { get; private set; }
-        public ReactiveCommand<Object> Reset { get; private set; }
-        public ReactiveList<IAccount> Accounts { get; private set; }
-        public IAccount SelectedAccount { get; private set; }
+        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        public ICommand OkCmd { get; private set; }
-        public ICommand CancelCmd { get; private set; }
+        public ReactiveList<IAccount> Accounts
+        {
+            get;
+            private set;
+        }
+
+        public string BaseRepositoryPath
+        {
+            get;
+            set;
+        }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator
+        {
+            get;
+            private set;
+        }
+
+        public ICommand BrowseForDirectory
+        {
+            get;
+            private set;
+        }
+
+        public bool CanKeepPrivate
+        {
+            get;
+            private set;
+        }
+
+        public ICommand CreateRepository
+        {
+            get;
+            private set;
+        }
+
+        public string Description
+        {
+            get;
+            set;
+        }
+
+        public bool IsPublishing
+        {
+            get;
+            private set;
+        }
+
+        public bool KeepPrivate
+        {
+            get;
+            set;
+        }
+
+        public string RepositoryName
+        {
+            get;
+            set;
+        }
+
+        public ReactivePropertyValidator<string> RepositoryNameValidator
+        {
+            get;
+            private set;
+        }
+
+        public string RepositoryNameWarningText
+        {
+            get;
+            private set;
+        }
+
+        public ICommand Reset
+        {
+            get;
+            private set;
+        }
+
+        public string SafeRepositoryName
+        {
+            get;
+            private set;
+        }
+
+        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator
+        {
+            get;
+            private set;
+        }
+
+        public IAccount SelectedAccount
+        {
+            get;
+            private set;
+        }
+
+        public bool ShowRepositoryNameWarning
+        {
+            get;
+            private set;
+        }
+
+        public bool ShowUpgradePlanWarning
+        {
+            get;
+            private set;
+        }
+
+        public bool ShowUpgradeToMicroPlanWarning
+        {
+            get;
+            private set;
+        }
+
+        public ICommand UpgradeAccountPlan
+        {
+            get;
+            private set;
+        }
     }
 
     [ExcludeFromCodeCoverage]
