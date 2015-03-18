@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Models;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using NullGuard;
 using Octokit;
 using ReactiveUI;
-using NullGuard;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using System.Diagnostics;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
     public class RepositoryCloneViewModel : ReactiveObject, IRepositoryCloneViewModel
     {
-        readonly IServiceProvider serviceProvider;
-
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
         IReactiveCommand<object> cloneCommand;
@@ -42,8 +40,6 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public RepositoryCloneViewModel(IServiceProvider serviceProvider, IRepositoryHosts hosts)
         {
-            this.serviceProvider = serviceProvider;
-
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
