@@ -21,10 +21,10 @@ namespace GitHub.Api
         IObservable<IEnumerable<Repository>> GetUserRepositories(int currentUserId);
         IObservable<Repository> GetCurrentUserRepositoriesStreamed();
         IObservable<Repository> GetOrganizationRepositoriesStreamed(string login);
-        IObservable<Authorization> GetOrCreateApplicationAuthenticationCode(
+        IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander = null,
             bool useOldScopes = false);
-        IObservable<Authorization> GetOrCreateApplicationAuthenticationCode(
+        IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             string authenticationCode,
             bool useOldScopes = false);
         IObservable<IReadOnlyList<EmailAddress>> GetEmails();
