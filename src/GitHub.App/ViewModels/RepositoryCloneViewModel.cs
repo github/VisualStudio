@@ -8,11 +8,8 @@ using GitHub.Models;
 using Octokit;
 using ReactiveUI;
 using NullGuard;
-using GitHub.Primitives;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using System.Diagnostics;
-using Microsoft.VisualStudio.Shell;
-using GitHub.Services;
 
 namespace GitHub.ViewModels
 {
@@ -58,32 +55,24 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
-
-
-            cloneCommand = ReactiveCommand.CreateAsyncObservable(Observable.Return(true), _ =>
+            cloneCommand = ReactiveCommand.CreateAsyncObservable(_ =>
             {
-                return CloneRepository(SelectedRepository);
-            });
-        }
+                var repo = SelectedRepository;
+                var uri = repo.CloneUrl;
+                return Observable.Start<object>(() =>
+                {
+                    var gitExt = serviceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
+                    Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
 
-        IObservable<object> CloneRepository(IRepositoryModel repo)
-        {
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-            var ret = Observable.Create<object>(async subj =>
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-            {
-                var gitExt = serviceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
-                Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
-                var tmp = System.IO.Path.GetTempFileName();
-                System.IO.File.Delete(tmp);
-                var tmpname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(tmp), System.IO.Path.GetFileNameWithoutExtension(tmp));
-                System.IO.Directory.CreateDirectory(tmpname);
-                gitExt.Clone(repo.CloneUrl.ToString(), tmpname, CloneOptions.RecurseSubmodule);
-                subj.OnNext(repo);
-                subj.OnCompleted();
+                    // TODO: use VS default dir for projects
+                    var tmp = System.IO.Path.GetTempFileName();
+                    System.IO.File.Delete(tmp);
+                    var tmpname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(tmp), System.IO.Path.GetFileNameWithoutExtension(tmp));
+                    System.IO.Directory.CreateDirectory(tmpname);
+                    gitExt.Clone(uri.ToString(), tmpname, CloneOptions.RecurseSubmodule);
+                    return null;
+                });
             });
-
-            return ret;
         }
     }
 }
