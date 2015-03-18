@@ -64,7 +64,7 @@ namespace GitHub.ViewModels
                     var gitExt = serviceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
                     Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
 
-                    // TODO: use VS default dir for projects
+                    // TODO: use VS default dir for projects (https://github.com/github/VisualStudio/issues/96)
                     var tmp = System.IO.Path.GetTempFileName();
                     System.IO.File.Delete(tmp);
                     var tmpname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(tmp), System.IO.Path.GetFileNameWithoutExtension(tmp));
