@@ -13,7 +13,6 @@ using GitHub.Models;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
-using Octokit.Reactive;
 using ReactiveUI;
 using Rothko;
 
