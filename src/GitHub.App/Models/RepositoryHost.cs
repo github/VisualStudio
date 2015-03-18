@@ -172,7 +172,7 @@ namespace GitHub.Models
 
             // Keep the function to save the authorization token here because it's used
             // in multiple places in the chain below:
-            var saveAuthorizationToken = new Func<Authorization, IObservable<Unit>>(authorization =>
+            var saveAuthorizationToken = new Func<ApplicationAuthorization, IObservable<Unit>>(authorization =>
             {
                 if (authorization == null || String.IsNullOrWhiteSpace(authorization.Token))
                     return Observable.Return(Unit.Default);
