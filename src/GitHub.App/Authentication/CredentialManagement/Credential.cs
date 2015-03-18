@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
@@ -9,11 +8,10 @@ namespace GitHub.Authentication.CredentialManagement
 {
     public class Credential : IDisposable
     {
-
-        static object _lockObject = new object();
+        static readonly object _lockObject = new object();
         bool _disposed;
 
-        static SecurityPermission _unmanagedCodePermission;
+        static readonly SecurityPermission _unmanagedCodePermission;
 
         CredentialType _type;
         string _target;
@@ -30,6 +28,7 @@ namespace GitHub.Authentication.CredentialManagement
                 _unmanagedCodePermission = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
             }
         }
+
         public Credential()
             : this(null)
         {
@@ -126,12 +125,12 @@ namespace GitHub.Authentication.CredentialManagement
             {
                 CheckNotDisposed();
                 _unmanagedCodePermission.Demand();
-                return null == _password ? new SecureString() : _password.Copy();
+                return _password == null ? new SecureString() : _password.Copy();
             }
             set
             {
                 CheckNotDisposed();
-                if (null != _password)
+                if (_password != null)
                 {
                     _password.Clear();
                     _password.Dispose();
