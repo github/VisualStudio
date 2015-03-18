@@ -78,6 +78,7 @@
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Helpers\ExceptionHelper.cs" />
+    <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
