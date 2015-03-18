@@ -177,7 +177,7 @@ namespace GitHub.Models
                 if (authorization == null || String.IsNullOrWhiteSpace(authorization.Token))
                     return Observable.Return(Unit.Default);
 
-                return LoginCache.SaveLogin(authorization.Token, "x-oauth-basic", Address)
+                return LoginCache.SaveLogin(usernameOrEmail, authorization.Token, Address)
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
