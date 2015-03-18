@@ -294,23 +294,37 @@ public class RepositoryCreationViewModelTests
     public class TheGitIgnoreTemplatesProperty
     {
         [Fact]
-        public void IsPopulatedByTheApi()
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
         {
+            var gitIgnoreTemplates = new[]
+            {
+                "Delphi",
+                "VisualStudio",
+                "Node",
+                "Waf",
+                "WordPress"
+            };
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.ApiClient
                 .GetGitIgnoreTemplates()
-                .Returns(new[] { "VisualStudio", "Waf", "WordPress" }.ToObservable());
+                .Returns(gitIgnoreTemplates.ToObservable());
             var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>(), hosts);
 
             var result = vm.GitIgnoreTemplates;
 
-            Assert.Equal(3, result.Count);
-            Assert.Equal("VisualStudio", result[0].Name);
+            Assert.Equal(6, result.Count);
+            Assert.Equal("None", result[0].Name);
             Assert.True(result[0].Recommended);
-            Assert.Equal("Waf", result[1].Name);
-            Assert.False(result[1].Recommended);
-            Assert.Equal("WordPress", result[2].Name);
-            Assert.False(result[2].Recommended);
+            Assert.Equal("VisualStudio", result[1].Name);
+            Assert.True(result[1].Recommended);
+            Assert.Equal("Node", result[2].Name);
+            Assert.True(result[2].Recommended);
+            Assert.Equal("Delphi", result[3].Name);
+            Assert.False(result[3].Recommended);
+            Assert.Equal("Waf", result[4].Name);
+            Assert.False(result[4].Recommended);
+            Assert.Equal("WordPress", result[5].Name);
+            Assert.False(result[5].Recommended);
         }
     }
 }
