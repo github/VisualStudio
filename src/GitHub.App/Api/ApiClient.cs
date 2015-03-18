@@ -79,7 +79,7 @@ namespace GitHub.Api
             return GetOrganizations().SelectMany(org => gitHubClient.Organization.Member.GetAll(org.Login));
         }
 
-        public IObservable<Authorization> GetOrCreateApplicationAuthenticationCode(Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander = null, bool useOldScopes = false)
+        public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander = null, bool useOldScopes = false)
         {
             var newAuthorization = new NewAuthorization
             {
@@ -101,7 +101,7 @@ namespace GitHub.Api
                 dispatchedHandler);
         }
 
-        public IObservable<Authorization> GetOrCreateApplicationAuthenticationCode(
+        public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             string authenticationCode,
             bool useOldScopes = false)
         {
