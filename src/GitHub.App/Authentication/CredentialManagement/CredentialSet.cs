@@ -18,10 +18,8 @@ namespace GitHub.Authentication.CredentialManagement
         public CredentialSet(string target)
             : this()
         {
-            if (string.IsNullOrEmpty(target))
-            {
-                throw new ArgumentNullException("target");
-            }
+            Guard.ArgumentNotEmptyString(target, "target");
+
             Target = target;
         }
 
@@ -102,7 +100,5 @@ namespace GitHub.Authentication.CredentialManagement
             // Clean up memory to the Enumeration pointer
             NativeMethods.CredFree(pCredentials);
         }
-
     }
-
 }
