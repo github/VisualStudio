@@ -108,6 +108,13 @@
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Extensions\FileExtensions.cs" />
+    <Compile Include="Authentication\CredentialManagement\Credential.cs" />
+    <Compile Include="Authentication\CredentialManagement\CredentialSet.cs" />
+    <Compile Include="Authentication\CredentialManagement\CredentialType.cs" />
+    <Compile Include="Authentication\CredentialManagement\NativeMethods.cs" />
+    <Compile Include="Authentication\CredentialManagement\PersistenceType.cs" />
+    <Compile Include="Authentication\CredentialManagement\SecureStringHelper.cs" />
+    <Compile Include="Caches\CredentialCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -170,7 +177,9 @@
     <Compile Include="ViewModels\TwoFactorDialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FodyWeavers.xml" />
+    <Content Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Resource Include="Images\default_org_avatar.png" />
     <Resource Include="Images\default_user_avatar.png" />
   </ItemGroup>
