@@ -44,14 +44,16 @@ namespace GitHub.Primitives
         {
             WebUri = new Uri(enterpriseUri, new Uri("/", UriKind.Relative));
             ApiUri = new Uri(enterpriseUri, new Uri("/api/v3/", UriKind.Relative));
-            CredentialCacheKeyHost = ApiUri.Host;
+            //CredentialCacheKeyHost = ApiUri.Host;
+            CredentialCacheKeyHost = WebUri.ToString();
         }
 
         private HostAddress()
         {
             WebUri = new Uri("https://github.com");
             ApiUri = new Uri("https://api.github.com");
-            CredentialCacheKeyHost = "github.com";
+            //CredentialCacheKeyHost = "github.com";
+            CredentialCacheKeyHost = WebUri.ToString();
         }
 
         /// <summary>
