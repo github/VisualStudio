@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -68,12 +69,14 @@ namespace GitHub.ViewModels
 
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
 
-            hosts.GitHubHost.ApiClient
-                .GetGitIgnoreTemplates()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(templateName => new GitIgnoreItem(templateName))
+            Observable.Return(new GitIgnoreItem("None")).Concat(
+                hosts.GitHubHost.ApiClient
+                    .GetGitIgnoreTemplates()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(templateName => new GitIgnoreItem(templateName)))
                 .ToList()
-                .Subscribe(templates => GitIgnoreTemplates.AddRange(templates));
+                .Subscribe(templates =>
+                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended)));
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
