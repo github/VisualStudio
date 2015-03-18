@@ -23,6 +23,7 @@ namespace GitHub.Api
         public const string GitHubUrl = "https://" + GitHubDotComHostName;
         public const string GitHubDotComHostName = "github.com";
         public const string GitHubGistHostName = "gist.github.com";
+        const string ProductName = "GitHub Extension for Visual Studio";
         const string clientId = "fd5f729d309a7bfa8e1b";
         const string clientSecret = "ea0dc43463de55bb588d122cf9656109f850b6bd";
         public static readonly Uri GitHubDotComUri = new Uri(GitHubUrl);
@@ -86,7 +87,7 @@ namespace GitHub.Api
                 Scopes = useOldScopes
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
-                Note = "GitHub for Visual Studio on " + GetMachineNameSafe()
+                Note = ProductName + " on " + GetMachineNameSafe()
             };
 
             var handler =  twoFactorChallengeHander ?? TwoFactorChallengeHandler.HandleTwoFactorException;
@@ -112,7 +113,7 @@ namespace GitHub.Api
                 Scopes = useOldScopes
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
-                Note = "GitHub for Visual Studio on " + GetMachineNameSafe()
+                Note = ProductName + " on " + GetMachineNameSafe()
             };
 
             return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
