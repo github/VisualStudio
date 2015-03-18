@@ -8,6 +8,8 @@ namespace GitHub.Authentication.CredentialManagement
 {
     public class Credential : IDisposable
     {
+        const int maxPasswordLengthInBytes = NativeMethods.CREDUI_MAX_PASSWORD_LENGTH * 2;
+
         static readonly object _lockObject = new object();
         bool _disposed;
 
@@ -217,10 +219,7 @@ namespace GitHub.Authentication.CredentialManagement
             _unmanagedCodePermission.Demand();
 
             byte[] passwordBytes = Encoding.Unicode.GetBytes(Password);
-            if (passwordBytes.Length > (512))
-            {
-                throw new ArgumentOutOfRangeException("The password has exceeded 512 bytes.");
-            }
+            ValidatePasswordLength(passwordBytes);
 
             NativeMethods.CREDENTIAL credential = new NativeMethods.CREDENTIAL();
             credential.TargetName = Target;
@@ -245,10 +244,7 @@ namespace GitHub.Authentication.CredentialManagement
             CheckNotDisposed();
             _unmanagedCodePermission.Demand();
 
-            if (passwordBytes.Length > (512))
-            {
-                throw new ArgumentOutOfRangeException("The password has exceeded 512 bytes.");
-            }
+            ValidatePasswordLength(passwordBytes);
 
             NativeMethods.CREDENTIAL credential = new NativeMethods.CREDENTIAL();
             credential.TargetName = Target;
@@ -333,6 +329,14 @@ namespace GitHub.Authentication.CredentialManagement
             PersistenceType = (PersistenceType)credential.Persist;
             Description = credential.Comment;
             LastWriteTimeUtc = DateTime.FromFileTimeUtc(credential.LastWritten);
+        }
+
+        static void ValidatePasswordLength(byte[] passwordBytes)
+        {
+            if (passwordBytes.Length > maxPasswordLengthInBytes)
+            {
+                throw new ArgumentOutOfRangeException("The password has exceeded " + maxPasswordLengthInBytes + " bytes.");
+            }
         }
     }
 }

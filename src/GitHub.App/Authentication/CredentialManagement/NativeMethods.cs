@@ -7,12 +7,10 @@ namespace GitHub.Authentication.CredentialManagement
 {
     public class NativeMethods
     {
-
         public const int CREDUI_MAX_USERNAME_LENGTH = 513;
         public const int CREDUI_MAX_PASSWORD_LENGTH = 256;
         public const int CREDUI_MAX_MESSAGE_LENGTH = 32767;
         public const int CREDUI_MAX_CAPTION_LENGTH = 128;
-
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct CREDENTIAL
@@ -34,8 +32,7 @@ namespace GitHub.Authentication.CredentialManagement
             [MarshalAs(UnmanagedType.LPWStr)]
             public string UserName;
         }
-
-
+        
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct CREDUI_INFO
         {
