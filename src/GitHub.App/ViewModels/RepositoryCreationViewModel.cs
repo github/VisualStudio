@@ -76,6 +76,16 @@ namespace GitHub.ViewModels
                 .ToList()
                 .Subscribe(templates =>
                     GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended)));
+
+            Licenses = new ReactiveList<LicenseItem>();
+            Observable.Return(LicenseItem.None).Concat(
+                hosts.GitHubHost.ApiClient
+                    .GetLicenses()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(license => new LicenseItem(license)))
+                .ToList()
+                .Subscribe(licenses =>
+                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended)));
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -87,6 +97,12 @@ namespace GitHub.ViewModels
         }
 
         public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<LicenseItem> Licenses
         {
             get;
             private set;

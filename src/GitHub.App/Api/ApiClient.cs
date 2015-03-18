@@ -219,6 +219,11 @@ namespace GitHub.Api
             return gitHubClient.Miscellaneous.GetGitIgnoreTemplates();
         }
 
+        public IObservable<LicenseMetadata> GetLicenses()
+        {
+            return gitHubClient.Miscellaneous.GetLicenses();
+        }
+
         public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
 using NSubstitute;
+using Octokit;
 using Rothko;
 using Xunit;
 
@@ -325,6 +327,39 @@ public class RepositoryCreationViewModelTests
             Assert.False(result[4].Recommended);
             Assert.Equal("WordPress", result[5].Name);
             Assert.False(result[5].Recommended);
+        }
+
+        public class TheLicensesProperty
+        {
+            [Fact]
+            public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+            {
+                var licenses = new[]
+                {
+                    new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever")),
+                    new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever")),
+                    new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
+                    new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
+                };
+                var hosts = Substitute.For<IRepositoryHosts>();
+                hosts.GitHubHost.ApiClient
+                    .GetLicenses()
+                    .Returns(licenses.ToObservable());
+                var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>(), hosts);
+
+                var result = vm.Licenses;
+
+                Assert.Equal(5, result.Count);
+                Assert.Equal("", result[0].Key);
+                Assert.Equal("None", result[0].Name);
+                Assert.True(result[0].Recommended);
+                Assert.Equal("apache-2.0", result[1].Key);
+                Assert.True(result[1].Recommended);
+                Assert.Equal("mit", result[2].Key);
+                Assert.True(result[2].Recommended);
+                Assert.Equal("artistic-2.0", result[3].Key);
+                Assert.False(result[3].Recommended);
+            }
         }
     }
 }

@@ -140,8 +140,23 @@
             </uirx:FilteredComboBox>
 
             <Label Grid.Column="0" Grid.Row="6" Target="{Binding ElementName=licenseList}">License</Label>
-            <uirx:FilteredComboBox x:Name="licenseList" Grid.Column="1" Grid.Row="6" Style="{StaticResource GitHubFilterComboBox}" />
-
+            <uirx:FilteredComboBox
+                x:Name="licenseList"
+                Grid.Column="1"
+                Grid.Row="6"
+                Style="{StaticResource GitHubFilterComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                                <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </uirx:FilteredComboBox>
+            
             <!-- uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" / -->
 
             <ui:HorizontalShadowDivider Width="120" Grid.Row="8" Grid.ColumnSpan="2" Margin="0,12,0,12"/>
