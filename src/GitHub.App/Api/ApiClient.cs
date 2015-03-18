@@ -86,7 +86,7 @@ namespace GitHub.Api
                 Scopes = useOldScopes
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
-                Note = "GitHub for Windows on " + GetMachineNameSafe()
+                Note = "GitHub for Visual Studio on " + GetMachineNameSafe()
             };
 
             var handler =  twoFactorChallengeHander ?? TwoFactorChallengeHandler.HandleTwoFactorException;
@@ -112,7 +112,7 @@ namespace GitHub.Api
                 Scopes = useOldScopes
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
-                Note = "GitHub for Windows on " + GetMachineNameSafe()
+                Note = "GitHub for Visual Studio on " + GetMachineNameSafe()
             };
 
             return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
@@ -191,7 +191,7 @@ namespace GitHub.Api
                 HasIssues   = repository.HasIssues,
                 HasWiki     = repository.HasWiki,
                 HasDownloads= repository.HasDownloads
-};
+            };
         }
 
         static string GetMachineNameSafe()
