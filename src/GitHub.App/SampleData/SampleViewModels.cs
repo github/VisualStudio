@@ -27,6 +27,12 @@ namespace GitHub.SampleData
             Description = "A description";
             KeepPrivate = true;
             Accounts = new ReactiveList<IAccount> { new AccountDesigner("GitHub") };
+            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>
+            {
+                new GitIgnoreItem("VisualStudio"),
+                new GitIgnoreItem("Wap"),
+                new GitIgnoreItem("WordPress")
+            };
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -149,6 +155,11 @@ namespace GitHub.SampleData
         {
             get;
             private set;
+        }
+
+        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        {
+            get; private set;
         }
     }
 

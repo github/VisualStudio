@@ -33,6 +33,11 @@ namespace GitHub.ViewModels
         IAccount SelectedAccount { get; }
 
         /// <summary>
+        /// The list of GitIgnore templates supported by repository creation
+        /// </summary>
+        ReactiveList<GitIgnoreItem> GitIgnoreTemplates { get; }
+
+        /// <summary>
         /// Indicates whether the created repository should be private or not.
         /// </summary>
         bool KeepPrivate { get; set; }

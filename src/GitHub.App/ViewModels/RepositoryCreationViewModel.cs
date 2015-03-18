@@ -12,6 +12,7 @@ using GitHub.Models;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
+using Octokit.Reactive;
 using ReactiveUI;
 using Rothko;
 
@@ -29,7 +30,7 @@ namespace GitHub.ViewModels
         readonly ReactiveCommand<object> createRepositoryCommand = ReactiveCommand.Create();
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem)
+        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
         {
             this.operatingSystem = operatingSystem;
 
@@ -64,11 +65,26 @@ namespace GitHub.ViewModels
                     var parsedReference = GetSafeRepositoryName(repoName);
                     return parsedReference != repoName ? "Will be created as " + parsedReference : null;
                 });
+
+            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
+
+            hosts.GitHubHost.ApiClient
+                .GetGitIgnoreTemplates()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Select(templateName => new GitIgnoreItem(templateName))
+                .ToList()
+                .Subscribe(templates => GitIgnoreTemplates.AddRange(templates));
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         public ReactiveList<IAccount> Accounts
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
         {
             get;
             private set;
