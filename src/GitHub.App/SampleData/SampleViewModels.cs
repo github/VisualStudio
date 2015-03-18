@@ -33,6 +33,14 @@ namespace GitHub.SampleData
                 new GitIgnoreItem("Wap"),
                 new GitIgnoreItem("WordPress")
             };
+
+            Licenses = new ReactiveList<LicenseItem>
+            {
+                new LicenseItem(new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever"))),
+                new LicenseItem(new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever"))),
+                new LicenseItem(new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever"))),
+                new LicenseItem(new LicenseMetadata("mit", "MIT License", new Uri("https://whatever")))
+            };
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -158,6 +166,11 @@ namespace GitHub.SampleData
         }
 
         public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        {
+            get; private set;
+        }
+
+        public ReactiveList<LicenseItem> Licenses
         {
             get; private set;
         }

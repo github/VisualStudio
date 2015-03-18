@@ -30,5 +30,6 @@ namespace GitHub.Api
         IObservable<IReadOnlyList<EmailAddress>> GetEmails();
         ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; }
         IObservable<string> GetGitIgnoreTemplates();
+        IObservable<LicenseMetadata> GetLicenses();
     }
 }

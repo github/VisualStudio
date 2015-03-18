@@ -80,6 +80,7 @@
     <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Models\GitIgnoreItem.cs" />
+    <Compile Include="Models\LicenseItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
