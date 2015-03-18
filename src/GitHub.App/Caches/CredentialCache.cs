@@ -170,7 +170,7 @@ namespace GitHub.Caches
             // it appears this is how MS expects the host key
             if (!key.StartsWith("git:"))
                 key = "git:" + key;
-            if (key.EndsWith("/", StringComparison.InvariantCulture))
+            if (key.EndsWith("/", StringComparison.Ordinal))
                 key = key.Substring(0, key.Length - 1);
             return key;
         }
@@ -180,7 +180,7 @@ namespace GitHub.Caches
             key = FormatKey(key);
             if (key.StartsWith("git:"))
                 key = key.Substring("git:".Length);
-            if (!key.EndsWith("/", StringComparison.InvariantCulture))
+            if (!key.EndsWith("/", StringComparison.Ordinal))
                 key += '/';
             return key;
         }
