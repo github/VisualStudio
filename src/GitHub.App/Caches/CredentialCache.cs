@@ -1,13 +1,11 @@
-﻿using Akavache;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Subjects;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Text;
+using Akavache;
 using GitHub.Authentication.CredentialManagement;
 using GitHub.Helpers;
 
@@ -41,7 +39,7 @@ namespace GitHub.Caches
             if (disposed) return ExceptionHelper.ObservableThrowObjectDisposedException<byte[]>("CredentialCache");
 
             var keyHost = GetKeyHost(key);
-            using (Credential credential = new Credential())
+            using (var credential = new Credential())
             {
                 credential.Target = keyHost;
                 credential.Type = CredentialType.Generic;
@@ -189,7 +187,7 @@ namespace GitHub.Caches
 
         bool DeleteKey(string key)
         {
-            using (Credential credential = new Credential())
+            using (var credential = new Credential())
             {
                 credential.Target = key;
                 if (!credential.Load())
@@ -200,7 +198,7 @@ namespace GitHub.Caches
 
         bool SaveKey(string key, string user, string pwd)
         {
-            using (Credential credential = new Credential(user, pwd, key))
+            using (var credential = new Credential(user, pwd, key))
             {
                 credential.Type = CredentialType.Generic;
                 credential.PersistenceType = PersistenceType.LocalComputer;
@@ -210,7 +208,7 @@ namespace GitHub.Caches
 
         Tuple<string, string> GetKey(string key)
         {
-            using (Credential credential = new Credential())
+            using (var credential = new Credential())
             {
                 credential.Target = key;
                 credential.Type = CredentialType.Generic;

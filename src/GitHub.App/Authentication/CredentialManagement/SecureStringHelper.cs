@@ -10,8 +10,7 @@ namespace GitHub.Authentication.CredentialManagement
         // Methods
         internal static SecureString CreateSecureString(string plainString)
         {
-
-            SecureString str = new SecureString();
+            var str = new SecureString();
             if (!string.IsNullOrEmpty(plainString))
             {
                 foreach (char c in plainString)
@@ -19,21 +18,13 @@ namespace GitHub.Authentication.CredentialManagement
                     str.AppendChar(c);
                 }
             }
-            /*
-            fixed (char* str2 = plainString)
-            {
-                char* chPtr = str2;
-                str = new SecureString(chPtr, plainString.Length);
-                str.MakeReadOnly();
-            }
-            */
             return str;
         }
 
         internal static string CreateString(SecureString secureString)
         {
             string str;
-            IntPtr zero = IntPtr.Zero;
+            var zero = IntPtr.Zero;
             if ((secureString == null) || (secureString.Length == 0))
             {
                 return string.Empty;
@@ -53,6 +44,4 @@ namespace GitHub.Authentication.CredentialManagement
             return str;
         }
     }
-
-
 }

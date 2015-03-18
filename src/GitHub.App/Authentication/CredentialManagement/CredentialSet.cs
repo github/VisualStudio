@@ -64,7 +64,7 @@ namespace GitHub.Authentication.CredentialManagement
         {
             uint count;
 
-            IntPtr pCredentials = IntPtr.Zero;
+            var pCredentials = IntPtr.Zero;
             bool result = NativeMethods.CredEnumerateW(Target, 0, out count, out pCredentials);
             if (!result)
             {
@@ -73,7 +73,7 @@ namespace GitHub.Authentication.CredentialManagement
             }
 
             // Read in all of the pointers first
-            IntPtr[] ptrCredList = new IntPtr[count];
+            var ptrCredList = new IntPtr[count];
             for (int i = 0; i < count; i++)
             {
                 ptrCredList[i] = Marshal.ReadIntPtr(pCredentials, IntPtr.Size * i);
@@ -81,10 +81,10 @@ namespace GitHub.Authentication.CredentialManagement
 
             // Now let's go through all of the pointers in the list
             // and create our Credential object(s)
-            List<NativeMethods.CriticalCredentialHandle> credentialHandles =
+            var credentialHandles =
                 ptrCredList.Select(ptrCred => new NativeMethods.CriticalCredentialHandle(ptrCred)).ToList();
 
-            IEnumerable<Credential> existingCredentials = credentialHandles
+            var existingCredentials = credentialHandles
                 .Select(handle => handle.GetCredential())
                 .Select(nativeCredential =>
                 {
