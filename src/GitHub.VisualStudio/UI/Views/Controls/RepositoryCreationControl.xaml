@@ -91,15 +91,21 @@
             <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Name</Label>
             <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
 
-            <!-- StackPanel Grid.Column="1" Grid.Row="1">
-                <uirx:ValidationMessage x:Name="nameValidationMessage" ValidatesControl="{Binding ElementName=nameText}"/>
-                <uirx:ValidationMessage x:Name="safeRepositoryNameWarning" ValidatesControl="{Binding ElementName=nameText}" Icon="alert" Fill="#f39c12" Padding="2,0" />
-            </StackPanel -->
+            <StackPanel Grid.Column="1" Grid.Row="1">
+                <uirx:ValidationMessage
+                    x:Name="nameValidationMessage"
+                    ValidatesControl="{Binding ElementName=nameText}" />
+                <uirx:ValidationMessage
+                    x:Name="safeRepositoryNameWarning"
+                    ValidatesControl="{Binding ElementName=nameText}"
+                    Icon="alert"
+                    Fill="#f39c12"
+                    Padding="2,0" />
+            </StackPanel>
 
             <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}">Description</Label>
             <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
 
-            
             <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=localPathText}">Local path</Label>
             <Grid Grid.Column="1" Grid.Row="3">
 

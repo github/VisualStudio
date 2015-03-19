@@ -184,12 +184,6 @@ namespace GitHub.ViewModels
             private set;
         }
 
-        public string RepositoryNameWarningText
-        {
-            get;
-            private set;
-        }
-
         public ICommand Reset
         {
             get;
@@ -197,12 +191,6 @@ namespace GitHub.ViewModels
         }
 
         public IAccount SelectedAccount
-        {
-            get;
-            private set;
-        }
-
-        public bool ShowRepositoryNameWarning
         {
             get;
             private set;
