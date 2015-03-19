@@ -27,6 +27,7 @@ namespace GitHub.ViewModels
 
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
+        readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ReactiveCommand<Unit> createRepositoryCommand;
@@ -117,6 +118,9 @@ namespace GitHub.ViewModels
             canKeepPrivateObs
                 .Where(x => !x)
                 .Subscribe(x => KeepPrivate = false);
+
+            isPublishing = createRepositoryCommand.IsExecuting
+                .ToProperty(this, x => x.IsPublishing);
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -179,9 +183,9 @@ namespace GitHub.ViewModels
 
         public bool IsPublishing
         {
-            get;
-            private set;
+            get { return isPublishing.Value; }
         }
+
 
         bool keepPrivate;
         public bool KeepPrivate
