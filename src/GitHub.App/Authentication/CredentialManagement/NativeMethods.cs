@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
 namespace GitHub.Authentication.CredentialManagement
 {
-    public class NativeMethods
+    public static class NativeMethods
     {
         public const int CREDUI_MAX_USERNAME_LENGTH = 513;
         public const int CREDUI_MAX_PASSWORD_LENGTH = 256;
         public const int CREDUI_MAX_MESSAGE_LENGTH = 32767;
         public const int CREDUI_MAX_CAPTION_LENGTH = 128;
 
+        [SuppressMessage("Microsoft.Design", "CA1049:TypesThatOwnNativeResourcesShouldBeDisposable"
+            , Justification = "This type needs to be this way for interop")]
         [StructLayout(LayoutKind.Sequential)]
         internal struct CREDENTIAL
         {
@@ -23,6 +26,8 @@ namespace GitHub.Authentication.CredentialManagement
             public string Comment;
             public long LastWritten;
             public int CredentialBlobSize;
+            [SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources"
+                , Justification = "Need to validate that SafeHandle works properly with native interop")]
             public IntPtr CredentialBlob;
             public int Persist;
             public int AttributeCount;
@@ -32,14 +37,20 @@ namespace GitHub.Authentication.CredentialManagement
             [MarshalAs(UnmanagedType.LPWStr)]
             public string UserName;
         }
-        
+
+        [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
+            Justification = "This type is soley for native interop")]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct CREDUI_INFO
         {
             public int cbSize;
+            [SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible"
+                , Justification = "This is needed for native interop")]
             public IntPtr hwndParent;
             public string pszMessageText;
             public string pszCaptionText;
+            [SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible"
+                , Justification = "This is needed for native interop")]
             public IntPtr hbmBanner;
         }
 
@@ -135,33 +146,40 @@ namespace GitHub.Authentication.CredentialManagement
         }
 
         [DllImport("Advapi32.dll", EntryPoint = "CredReadW", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CredRead(string target, CredentialType type, int reservedFlag, out IntPtr CredentialPtr);
 
         [DllImport("Advapi32.dll", EntryPoint = "CredWriteW", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CredWrite([In] ref CREDENTIAL userCredential, [In] UInt32 flags);
 
         [DllImport("Advapi32.dll", EntryPoint = "CredFree", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CredFree([In] IntPtr cred);
 
         [DllImport("advapi32.dll", EntryPoint = "CredDeleteW", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CredDelete(StringBuilder target, CredentialType type, int flags);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CredEnumerateW(string filter, int flag, out uint count, out IntPtr pCredentials);
 
-        [DllImport("credui.dll")]
+        [DllImport("credui.dll", CharSet = CharSet.Unicode)]
         internal static extern CredUIReturnCodes CredUIPromptForCredentials(ref CREDUI_INFO creditUR, string targetName, IntPtr reserved1, int iError, StringBuilder userName, int maxUserName, StringBuilder password, int maxPassword, [MarshalAs(UnmanagedType.Bool)] ref bool pfSave, int flags);
 
         [DllImport("credui.dll", CharSet = CharSet.Unicode)]
-        internal static extern CredUIReturnCodes CredUIPromptForWindowsCredentials(ref CREDUI_INFO notUsedHere, int authError, ref uint authPackage, IntPtr InAuthBuffer, uint InAuthBufferSize, out IntPtr refOutAuthBuffer, out uint refOutAuthBufferSize, ref bool fSave, int flags);
+        internal static extern CredUIReturnCodes CredUIPromptForWindowsCredentials(ref CREDUI_INFO notUsedHere, int authError, ref uint authPackage, IntPtr InAuthBuffer, uint InAuthBufferSize, out IntPtr refOutAuthBuffer, out uint refOutAuthBufferSize, [MarshalAs(UnmanagedType.Bool)]ref bool fSave, int flags);
 
         [DllImport("ole32.dll")]
         internal static extern void CoTaskMemFree(IntPtr ptr);
 
         [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern Boolean CredPackAuthenticationBuffer(int dwFlags, StringBuilder pszUserName, StringBuilder pszPassword, IntPtr pPackedCredentials, ref int pcbPackedCredentials);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool CredPackAuthenticationBuffer(int dwFlags, StringBuilder pszUserName, StringBuilder pszPassword, IntPtr pPackedCredentials, ref int pcbPackedCredentials);
 
-        [DllImport("credui.dll", CharSet = CharSet.Auto)]
+        [DllImport("credui.dll", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool CredUnPackAuthenticationBuffer(int dwFlags, IntPtr pAuthBuffer, uint cbAuthBuffer, StringBuilder pszUserName, ref int pcchMaxUserName, StringBuilder pszDomainName, ref int pcchMaxDomainame, StringBuilder pszPassword, ref int pcchMaxPassword);
 
         internal sealed class CriticalCredentialHandle : CriticalHandleZeroOrMinusOneIsInvalid

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -68,7 +69,8 @@ namespace GitHub.Authentication.CredentialManagement
             bool result = NativeMethods.CredEnumerateW(Target, 0, out count, out pCredentials);
             if (!result)
             {
-                Trace.WriteLine(string.Format("Win32Exception: {0}", new Win32Exception(Marshal.GetLastWin32Error()).ToString()));
+                var lastError = Marshal.GetLastWin32Error();
+                Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Win32Exception: {0}", new Win32Exception(lastError).ToString()));
                 return;
             }
 
