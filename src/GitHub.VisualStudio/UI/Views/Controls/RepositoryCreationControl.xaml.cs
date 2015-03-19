@@ -55,13 +55,13 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 //d(this.Bind(ViewModel, vm => vm.SelectedAccount, v => v.accountsComboBox.SelectedItem));
 
                 d(this.BindCommand(ViewModel, vm => vm.CreateRepository, v => v.createRepositoryButton));
-                //d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.createRepositoryButton.ShowSpinner));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.createRepositoryButton.ShowSpinner));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeToMicroLink));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeAccountLink));
 
-                //d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.nameText.IsEnabled, x => x == false));
-                //d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
-                //d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.nameText.IsEnabled, x => x == false));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
             });
