@@ -36,7 +36,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.GitIgnoreTemplates, v => v.ignoreTemplateList.ItemsSource));
+                d(this.OneWayBind(ViewModel, vm => vm.SelectedGitIgnoreTemplate, v => v.ignoreTemplateList.SelectedItem));
                 d(this.OneWayBind(ViewModel, vm => vm.Licenses, v => v.licenseList.ItemsSource));
+                d(this.OneWayBind(ViewModel, vm => vm.SelectedLicense, v => v.licenseList.SelectedItem));
 
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.RepositoryNameValidator, v => v.nameValidationMessage.ReactiveValidator));
