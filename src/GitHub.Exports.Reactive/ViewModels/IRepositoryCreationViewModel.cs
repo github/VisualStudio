@@ -28,7 +28,11 @@ namespace GitHub.ViewModels
         string Description { get; set; }
 
         ReactiveList<IAccount> Accounts { get; }
-        IAccount SelectedAccount { get; }
+
+        /// <summary>
+        /// The account or organization that will be the owner of the created repository.
+        /// </summary>
+        IAccount SelectedAccount { get; set; }
 
         /// <summary>
         /// The list of GitIgnore templates supported by repository creation

@@ -8,6 +8,7 @@ using NSubstitute;
 using Octokit;
 using Rothko;
 using Xunit;
+using Xunit.Extensions;
 
 public class RepositoryCreationViewModelTests
 {
@@ -382,6 +383,31 @@ public class RepositoryCreationViewModelTests
 
                 Assert.Equal("Could not create a repository on GitHub", handlers.LastError.ErrorMessage);
             }
+        }
+    }
+
+    public class TheCanKeepPrivateProperty
+    {
+        [Theory]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, false, true, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(true, true, true, true)]
+        [InlineData(false, false, false, true)]
+        public void IsOnlyTrueWhenUserIsEntepriseOrNotOnFreeAccountThatIsNotMaxedOut(
+            bool isFreeAccount,
+            bool isEnterprise,
+            bool isMaxedOut,
+            bool expected)
+        {
+            var selectedAccount = Substitute.For<IAccount>();
+            selectedAccount.IsOnFreePlan.Returns(isFreeAccount);
+            selectedAccount.IsEnterprise.Returns(isEnterprise);
+            selectedAccount.HasMaximumPrivateRepositories.Returns(isMaxedOut);
+            var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>(), Substitute.For<IRepositoryHosts>());
+            vm.SelectedAccount = selectedAccount;
+
+            Assert.Equal(expected, vm.CanKeepPrivate);
         }
     }
 }

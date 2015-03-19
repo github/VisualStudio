@@ -132,6 +132,7 @@ namespace GitHub.SampleData
         public IAccount SelectedAccount
         {
             get;
+            set;
         }
 
         public bool ShowUpgradePlanWarning

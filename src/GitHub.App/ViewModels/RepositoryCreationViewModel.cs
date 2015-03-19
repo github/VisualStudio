@@ -26,6 +26,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
+        readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ReactiveCommand<Unit> createRepositoryCommand;
@@ -89,6 +90,13 @@ namespace GitHub.ViewModels
                 .Subscribe(licenses =>
                     Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended)));
 
+            var canKeepPrivateObs = this.WhenAny(
+                x => x.SelectedAccount.IsEnterprise,
+                x => x.SelectedAccount.IsOnFreePlan,
+                x => x.SelectedAccount.HasMaximumPrivateRepositories,
+                (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
+                    isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
+
             var canCreate = Observable.Return(true);
             createRepositoryCommand = ReactiveCommand.CreateAsyncObservable(canCreate, _ =>
                 Observable.Throw<Unit>(new InvalidOperationException("Could not create a repository on GitHub")));
@@ -101,6 +109,14 @@ namespace GitHub.ViewModels
                     UserError.Throw(new PublishRepositoryUserError(ex.Message));
                 }
             });
+
+            canKeepPrivate = canKeepPrivateObs.CombineLatest(createRepositoryCommand.IsExecuting,
+                (canKeep, publishing) => canKeep && !publishing)
+                .ToProperty(this, x => x.CanKeepPrivate);
+
+            canKeepPrivateObs
+                .Where(x => !x)
+                .Subscribe(x => KeepPrivate = false);
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -144,8 +160,7 @@ namespace GitHub.ViewModels
 
         public bool CanKeepPrivate
         {
-            get;
-            private set;
+            get { return canKeepPrivate.Value; }
         }
 
         public ICommand CreateRepository
@@ -168,10 +183,11 @@ namespace GitHub.ViewModels
             private set;
         }
 
+        bool keepPrivate;
         public bool KeepPrivate
         {
-            get;
-            set;
+            get { return keepPrivate; }
+            set { this.RaiseAndSetIfChanged(ref keepPrivate, value); }
         }
 
         string repositoryName;
@@ -207,10 +223,12 @@ namespace GitHub.ViewModels
             private set;
         }
 
+        IAccount selectedAccount;
         public IAccount SelectedAccount
         {
-            get;
-            private set;
+            [return: AllowNull]
+            get { return selectedAccount; }
+            set { this.RaiseAndSetIfChanged(ref selectedAccount, value); }
         }
 
         public bool ShowUpgradePlanWarning
