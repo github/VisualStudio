@@ -19,6 +19,16 @@ namespace GitHub.VisualStudio
         [AllowNull]
         public ExportProvider ExportProvider { get; private set; }
 
+        IServiceProvider gitServiceProvider;
+        [AllowNull]
+        public IServiceProvider GitServiceProvider {
+            get { return gitServiceProvider; }
+            set {
+                if (gitServiceProvider == null)
+                    gitServiceProvider = value;
+            }
+        }
+
         readonly IServiceProvider serviceProvider;
 
         [ImportingConstructor]
@@ -42,6 +52,13 @@ namespace GitHub.VisualStudio
             instance = serviceProvider.GetService(serviceType);
             if (instance != null)
                 return instance;
+
+            if (gitServiceProvider != null)
+            {
+                instance = gitServiceProvider.GetService(serviceType);
+                if (instance != null)
+                    return instance;
+            }
 
             throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
                 "Could not locate any instances of contract {0}.", contract));

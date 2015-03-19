@@ -84,6 +84,7 @@ namespace GitHub.Controllers
                     var twofa = uiProvider.GetService<ITwoFactorViewModel>();
                     twofa.WhenAny(x => x.IsShowing, x => x.Value)
                         .Where(x => x)
+                        .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(_ =>
                         {
                             Fire(Trigger.Next);
