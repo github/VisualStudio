@@ -10,6 +10,7 @@ using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
@@ -27,7 +28,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        readonly ReactiveCommand<object> createRepositoryCommand = ReactiveCommand.Create();
+        readonly ReactiveCommand<Unit> createRepositoryCommand;
 
         [ImportingConstructor]
         public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
@@ -87,6 +88,19 @@ namespace GitHub.ViewModels
                 .ToList()
                 .Subscribe(licenses =>
                     Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended)));
+
+            var canCreate = Observable.Return(true);
+            createRepositoryCommand = ReactiveCommand.CreateAsyncObservable(canCreate, _ =>
+                Observable.Throw<Unit>(new InvalidOperationException("Could not create a repository on GitHub")));
+            createRepositoryCommand.ThrownExceptions.Subscribe(ex =>
+            {
+                if (!ex.IsCriticalException())
+                {
+                    // TODO: Throw a proper error.
+                    log.Error("Error creating repository.", ex);
+                    UserError.Throw(new PublishRepositoryUserError(ex.Message));
+                }
+            });
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -141,6 +155,7 @@ namespace GitHub.ViewModels
 
         public string Description
         {
+            [return:  AllowNull]
             get;
             set;
         }

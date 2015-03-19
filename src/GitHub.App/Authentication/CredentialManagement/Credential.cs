@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
+using NullGuard;
 
 namespace GitHub.Authentication.CredentialManagement
 {
@@ -31,27 +32,29 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        public Credential()
-            : this(null)
+        public Credential() : this(null, null, null)
         {
         }
 
-        public Credential(string username)
-            : this(username, null)
+        public Credential([AllowNull]string username) : this(username, null, null)
         {
         }
 
-        public Credential(string username, string password)
-            : this(username, password, null)
+        public Credential([AllowNull]string username, [AllowNull]string password)
+            : this(username, password, null, CredentialType.Generic)
         {
         }
 
-        public Credential(string username, string password, string target)
+        public Credential([AllowNull]string username, [AllowNull]string password, [AllowNull]string target)
             : this(username, password, target, CredentialType.Generic)
         {
         }
 
-        public Credential(string username, string password, string target, CredentialType type)
+        public Credential(
+            [AllowNull]string username,
+            [AllowNull]string password,
+            [AllowNull]string target,
+            [AllowNull]CredentialType type)
         {
             Username = username;
             Password = password;
@@ -95,9 +98,10 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-
+        [AllowNull]
         public string Username
         {
+            [return: AllowNull]
             get
             {
                 CheckNotDisposed();
@@ -109,8 +113,11 @@ namespace GitHub.Authentication.CredentialManagement
                 _username = value;
             }
         }
+
+        [AllowNull]
         public string Password
         {
+            [return: AllowNull]
             get
             {
                 return SecureStringHelper.CreateString(SecurePassword);
@@ -121,6 +128,8 @@ namespace GitHub.Authentication.CredentialManagement
                 SecurePassword = SecureStringHelper.CreateSecureString(string.IsNullOrEmpty(value) ? string.Empty : value);
             }
         }
+
+        [AllowNull]
         public SecureString SecurePassword
         {
             get
@@ -140,8 +149,11 @@ namespace GitHub.Authentication.CredentialManagement
                 _password = null == value ? new SecureString() : value.Copy();
             }
         }
+
+        [AllowNull]
         public string Target
         {
+            [return: AllowNull]
             get
             {
                 CheckNotDisposed();
@@ -154,8 +166,10 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
+        [AllowNull]
         public string Description
         {
+            [return: AllowNull]
             get
             {
                 CheckNotDisposed();

@@ -111,12 +111,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public string RepositoryNameWarningText
-        {
-            get;
-            private set;
-        }
-
         public ICommand Reset
         {
             get;
@@ -138,13 +132,6 @@ namespace GitHub.SampleData
         public IAccount SelectedAccount
         {
             get;
-            private set;
-        }
-
-        public bool ShowRepositoryNameWarning
-        {
-            get;
-            private set;
         }
 
         public bool ShowUpgradePlanWarning
