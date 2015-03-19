@@ -81,6 +81,7 @@ namespace GitHub.ViewModels
             Observable.Return(LicenseItem.None).Concat(
                 hosts.GitHubHost.ApiClient
                     .GetLicenses()
+                    .WhereNotNull()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Select(license => new LicenseItem(license)))
                 .ToList()
