@@ -357,8 +357,10 @@ public class RepositoryCreationViewModelTests
                 Assert.True(result[1].Recommended);
                 Assert.Equal("mit", result[2].Key);
                 Assert.True(result[2].Recommended);
-                Assert.Equal("artistic-2.0", result[3].Key);
+                Assert.Equal("agpl-3.0", result[3].Key);
                 Assert.False(result[3].Recommended);
+                Assert.Equal("artistic-2.0", result[4].Key);
+                Assert.False(result[4].Recommended);
             }
         }
     }
