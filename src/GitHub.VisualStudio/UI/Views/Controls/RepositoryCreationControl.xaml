@@ -57,13 +57,13 @@
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                 </Style>
 
-                <!-- Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
+                <Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
                     <Setter Property="IconMargin" Value="-1,2,7,0" />
                     <Setter Property="ErrorMessageFontWeight" Value="Normal" />
                     <Setter Property="Icon" Value="alert" />
                     <Setter Property="Fill" Value="#f39c12" />
                     <Setter Property="Margin" Value="0,5,0,0"/>
-                </Style -->
+                </Style>
             </Grid.Resources>
 
             <Grid.ColumnDefinitions>
@@ -163,7 +163,7 @@
                 </ComboBox.ItemTemplate>
             </uirx:FilteredComboBox>
             
-            <!-- uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" / -->
+            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" />
 
             <ui:HorizontalShadowDivider Width="120" Grid.Row="8" Grid.ColumnSpan="2" Margin="0,12,0,12"/>
 

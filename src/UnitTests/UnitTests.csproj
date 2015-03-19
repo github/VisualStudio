@@ -102,6 +102,7 @@
     <Compile Include="GitHubPackageTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
+    <Compile Include="Helpers\ReactiveTestHelper.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
@@ -361,6 +362,25 @@ public class RepositoryCreationViewModelTests
                 Assert.False(result[3].Recommended);
                 Assert.Equal("artistic-2.0", result[4].Key);
                 Assert.False(result[4].Recommended);
+            }
+        }
+    }
+
+    public class TheCreateRepositoryCommand
+    {
+        [Fact]
+        public async Task DisplaysUserErrorWhenCreationFails()
+        {
+            var hosts = Substitute.For<IRepositoryHosts>();
+            var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>(), hosts);
+
+            vm.RepositoryName = "my-repo";
+
+            using (var handlers = ReactiveTestHelper.OverrideHandlersForTesting())
+            {
+                await vm.CreateRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+
+                Assert.Equal("Could not create a repository on GitHub", handlers.LastError.ErrorMessage);
             }
         }
     }
