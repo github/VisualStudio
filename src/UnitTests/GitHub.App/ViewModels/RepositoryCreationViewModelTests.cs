@@ -6,6 +6,7 @@ using GitHub.Models;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
+using ReactiveUI;
 using Rothko;
 using Xunit;
 using Xunit.Extensions;
@@ -286,12 +287,16 @@ public class RepositoryCreationViewModelTests
     public class TheAccountsProperty
     {
         [Fact]
-        public void StartsOffEmpty()
+        public void IsPopulatedByTheRepositoryHost()
         {
+            var accounts = new ReactiveList<IAccount>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(accounts);
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IRepositoryHosts>());
-            Assert.Empty(vm.Accounts);
+
+            Assert.Same(accounts, vm.Accounts);
         }
     }
 

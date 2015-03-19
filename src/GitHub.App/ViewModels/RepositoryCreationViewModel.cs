@@ -37,7 +37,7 @@ namespace GitHub.ViewModels
         {
             this.operatingSystem = operatingSystem;
 
-            Accounts = new ReactiveList<IAccount>();
+            Accounts = hosts.GitHubHost.Accounts;
 
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
