@@ -1,5 +1,9 @@
-﻿namespace GitHub.Authentication.CredentialManagement
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace GitHub.Authentication.CredentialManagement
 {
+    [SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32",
+        Justification = "This is a uint as required by the unmanaged API")]
     public enum CredentialType : uint
     {
         None = 0,

@@ -22,6 +22,7 @@ namespace GitHub.Caches
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             Scheduler = null;
             shutdown.OnNext(Unit.Default);
             shutdown.OnCompleted();
@@ -157,35 +158,35 @@ namespace GitHub.Caches
             throw new NotImplementedException();
         }
 
-        string FormatKey(string key)
+        static string FormatKey(string key)
         {
-            if (key.StartsWith("login:"))
+            if (key.StartsWith("login:", StringComparison.Ordinal))
                 key = key.Substring("login:".Length);
             return key;
         }
 
-        string GetKeyGit(string key)
+        static string GetKeyGit(string key)
         {
             key = FormatKey(key);
             // it appears this is how MS expects the host key
-            if (!key.StartsWith("git:"))
+            if (!key.StartsWith("git:", StringComparison.Ordinal))
                 key = "git:" + key;
             if (key.EndsWith("/", StringComparison.Ordinal))
                 key = key.Substring(0, key.Length - 1);
             return key;
         }
 
-        string GetKeyHost(string key)
+        static string GetKeyHost(string key)
         {
             key = FormatKey(key);
-            if (key.StartsWith("git:"))
+            if (key.StartsWith("git:", StringComparison.Ordinal))
                 key = key.Substring("git:".Length);
             if (!key.EndsWith("/", StringComparison.Ordinal))
                 key += '/';
             return key;
         }
 
-        bool DeleteKey(string key)
+        static bool DeleteKey(string key)
         {
             using (var credential = new Credential())
             {
@@ -196,7 +197,7 @@ namespace GitHub.Caches
             }
         }
 
-        bool SaveKey(string key, string user, string pwd)
+        static bool SaveKey(string key, string user, string pwd)
         {
             using (var credential = new Credential(user, pwd, key))
             {
@@ -206,7 +207,7 @@ namespace GitHub.Caches
             }
         }
 
-        Tuple<string, string> GetKey(string key)
+        static Tuple<string, string> GetKey(string key)
         {
             using (var credential = new Credential())
             {
