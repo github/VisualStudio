@@ -29,5 +29,7 @@ namespace GitHub.Api
             bool useOldScopes = false);
         IObservable<IReadOnlyList<EmailAddress>> GetEmails();
         ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; }
+        IObservable<string> GetGitIgnoreTemplates();
+        IObservable<LicenseMetadata> GetLicenses();
     }
 }

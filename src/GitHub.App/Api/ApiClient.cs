@@ -214,6 +214,16 @@ namespace GitHub.Api
             }
         }
 
+        public IObservable<string> GetGitIgnoreTemplates()
+        {
+            return gitHubClient.Miscellaneous.GetGitIgnoreTemplates();
+        }
+
+        public IObservable<LicenseMetadata> GetLicenses()
+        {
+            return gitHubClient.Miscellaneous.GetLicenses();
+        }
+
         public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
     }
 }
