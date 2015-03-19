@@ -25,7 +25,7 @@ namespace GitHub.Caches
         //{
         //}
 
-        public SharedCache() : this(new InMemoryBlobCache(), new InMemoryBlobCache(), new InMemoryBlobCache())
+        public SharedCache() : this(new InMemoryBlobCache(), new InMemoryBlobCache(), new CredentialCache())
         {
         }
 

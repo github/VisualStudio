@@ -336,6 +336,8 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public IRepositoryModel SelectedRepository { get; set; }
+
         public string Title { get { return "Clone a GitHub Repository"; } }
     }
 

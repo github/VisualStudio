@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Models;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using NullGuard;
 using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
-    public class RepositoryCloneViewModel : IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : ReactiveObject, IRepositoryCloneViewModel
     {
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        IReactiveCommand<object> cloneCommand = ReactiveCommand.Create();
+        IReactiveCommand<object> cloneCommand;
 
         public ICommand CloneCommand { get { return cloneCommand; } }
 
@@ -25,8 +28,17 @@ namespace GitHub.ViewModels
             private set;
         }
 
+        IRepositoryModel _selectedRepository;
+        [AllowNull]
+        public IRepositoryModel SelectedRepository
+        {
+            [return: AllowNull]
+            get { return _selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref _selectedRepository, value); }
+        }
+
         [ImportingConstructor]
-        public RepositoryCloneViewModel(IRepositoryHosts hosts)
+        public RepositoryCloneViewModel(IServiceProvider serviceProvider, IRepositoryHosts hosts)
         {
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
@@ -35,9 +47,28 @@ namespace GitHub.ViewModels
                 .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
                 .SelectMany(user => hosts.GitHubHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
-                .Select(repo => new RepositoryModel { Owner = repo.Owner.Login, Name = repo.Name })
+                .Select(repo => new RepositoryModel(repo))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
+
+            cloneCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+            {
+                var repo = SelectedRepository;
+                var uri = repo.CloneUrl;
+                return Observable.Start<object>(() =>
+                {
+                    var gitExt = serviceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
+                    Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
+
+                    // TODO: use VS default dir for projects (https://github.com/github/VisualStudio/issues/96)
+                    var tmp = System.IO.Path.GetTempFileName();
+                    System.IO.File.Delete(tmp);
+                    var tmpname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(tmp), System.IO.Path.GetFileNameWithoutExtension(tmp));
+                    System.IO.Directory.CreateDirectory(tmpname);
+                    gitExt.Clone(uri.ToString(), tmpname, CloneOptions.RecurseSubmodule);
+                    return null;
+                });
+            });
         }
     }
 }
