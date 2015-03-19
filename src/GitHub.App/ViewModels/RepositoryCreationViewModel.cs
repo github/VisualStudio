@@ -153,11 +153,13 @@ namespace GitHub.ViewModels
             get { return createRepositoryCommand; }
         }
 
+        string description;
+        [AllowNull]
         public string Description
         {
             [return:  AllowNull]
-            get;
-            set;
+            get { return description; }
+            set { this.RaiseAndSetIfChanged(ref description, value); }
         }
 
         public bool IsPublishing
