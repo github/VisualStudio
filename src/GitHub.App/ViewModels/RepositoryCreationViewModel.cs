@@ -253,6 +253,24 @@ namespace GitHub.ViewModels
             private set;
         }
 
+        GitIgnoreItem selectedGitIgnoreTemplate;
+        [AllowNull]
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            [return: AllowNull]
+            get { return selectedGitIgnoreTemplate; }
+            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value); }
+        }
+
+        LicenseItem selectedLicense;
+        [AllowNull]
+        public LicenseItem SelectedLicense
+        {
+            [return: AllowNull]
+            get { return selectedLicense; }
+            set { this.RaiseAndSetIfChanged(ref selectedLicense, value); }
+        }
+
         // These are the characters which are permitted when creating a repository name on GitHub The Website
         static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
 

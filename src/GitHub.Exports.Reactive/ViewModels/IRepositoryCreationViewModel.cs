@@ -34,6 +34,10 @@ namespace GitHub.ViewModels
         /// </summary>
         IAccount SelectedAccount { get; set; }
 
+        GitIgnoreItem SelectedGitIgnoreTemplate { get; set; }
+
+        LicenseItem SelectedLicense { get; set; }
+
         /// <summary>
         /// The list of GitIgnore templates supported by repository creation
         /// </summary>
