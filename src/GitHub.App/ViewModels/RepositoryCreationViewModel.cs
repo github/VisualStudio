@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -29,7 +30,7 @@ namespace GitHub.ViewModels
         readonly ReactiveCommand<object> createRepositoryCommand = ReactiveCommand.Create();
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem)
+        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
         {
             this.operatingSystem = operatingSystem;
 
@@ -64,11 +65,45 @@ namespace GitHub.ViewModels
                     var parsedReference = GetSafeRepositoryName(repoName);
                     return parsedReference != repoName ? "Will be created as " + parsedReference : null;
                 });
+
+            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
+
+            Observable.Return(new GitIgnoreItem("None")).Concat(
+                hosts.GitHubHost.ApiClient
+                    .GetGitIgnoreTemplates()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(templateName => new GitIgnoreItem(templateName)))
+                .ToList()
+                .Subscribe(templates =>
+                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended)));
+
+            Licenses = new ReactiveList<LicenseItem>();
+            Observable.Return(LicenseItem.None).Concat(
+                hosts.GitHubHost.ApiClient
+                    .GetLicenses()
+                    .WhereNotNull()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(license => new LicenseItem(license)))
+                .ToList()
+                .Subscribe(licenses =>
+                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended)));
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         public ReactiveList<IAccount> Accounts
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<LicenseItem> Licenses
         {
             get;
             private set;
