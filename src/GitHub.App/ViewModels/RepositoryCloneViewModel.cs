@@ -19,7 +19,7 @@ namespace GitHub.ViewModels
     {
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        readonly ICloneService cloneService;
+        readonly IRepositoryCloneService cloneService;
         IReactiveCommand<Unit> cloneCommand;
 
         public ICommand CloneCommand { get { return cloneCommand; } }
@@ -40,7 +40,7 @@ namespace GitHub.ViewModels
         }
 
         [ImportingConstructor]
-        public RepositoryCloneViewModel(ICloneService cloneService, IRepositoryHosts hosts)
+        public RepositoryCloneViewModel(IRepositoryCloneService cloneService, IRepositoryHosts hosts)
         {
             this.cloneService = cloneService;
 

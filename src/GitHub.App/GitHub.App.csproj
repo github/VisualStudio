@@ -107,7 +107,7 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
-    <Compile Include="Services\CloneService.cs" />
+    <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Authentication\CredentialManagement\Credential.cs" />
     <Compile Include="Authentication\CredentialManagement\CredentialSet.cs" />
