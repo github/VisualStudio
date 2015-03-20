@@ -4,11 +4,11 @@ using System.Windows;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
 using GitHub.UI;
+using GitHub.UI.Helpers;
 using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
-using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -36,16 +36,16 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.GitIgnoreTemplates, v => v.ignoreTemplateList.ItemsSource));
-                d(this.OneWayBind(ViewModel, vm => vm.SelectedGitIgnoreTemplate, v => v.ignoreTemplateList.SelectedItem));
+                d(this.Bind(ViewModel, vm => vm.SelectedGitIgnoreTemplate, v => v.ignoreTemplateList.SelectedItem));
                 d(this.OneWayBind(ViewModel, vm => vm.Licenses, v => v.licenseList.ItemsSource));
-                d(this.OneWayBind(ViewModel, vm => vm.SelectedLicense, v => v.licenseList.SelectedItem));
+                d(this.Bind(ViewModel, vm => vm.SelectedLicense, v => v.licenseList.SelectedItem));
 
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.RepositoryNameValidator, v => v.nameValidationMessage.ReactiveValidator));
                 d(this.OneWayBind(ViewModel, vm => vm.SafeRepositoryNameWarningValidator, v => v.safeRepositoryNameWarning.ReactiveValidator));
 
                 d(this.Bind(ViewModel, vm => vm.BaseRepositoryPath, v => v.localPathText.Text));
-                d(this.Bind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
+                d(this.OneWayBind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
                 d(this.Bind(ViewModel, vm => vm.KeepPrivate, v => v.makePrivate.IsChecked));
