@@ -30,16 +30,16 @@ namespace GitHub.Services
             get { return serviceProvider.Value; }
         }
 
-        public IObservable<Unit> CloneRepository(Repository repository, string repositoryPath)
+        public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
         {
             return Observable.Start(() =>
             {
-                string path = Path.Combine(repositoryPath, repository.Name);
+                string path = Path.Combine(repositoryPath, repositoryName);
 
                 var gitExt = ServiceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
                 Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
 
-                gitExt.Clone(repository.CloneUrl, path, CloneOptions.RecurseSubmodule);
+                gitExt.Clone(cloneUrl, path, CloneOptions.RecurseSubmodule);
                 return Unit.Default;
             });
         }

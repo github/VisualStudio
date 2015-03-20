@@ -11,9 +11,10 @@ namespace GitHub.Services
         /// <summary>
         /// Clones the specificed repository into the specified directory.
         /// </summary>
-        /// <param name="repository">The repository to clone.</param>
+        /// <param name="cloneUrl">The url of the repository to clone.</param>
+        /// <param name="repositoryName">The name of the repository to clone.</param>
         /// <param name="repositoryParentDirectory">The directory that will contain the repository directory.</param>
         /// <returns></returns>
-        IObservable<Unit> CloneRepository(Octokit.Repository repository, string repositoryParentDirectory);
+        IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath);
     }
 }
