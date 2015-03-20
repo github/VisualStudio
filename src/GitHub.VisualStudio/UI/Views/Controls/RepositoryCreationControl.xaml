@@ -125,7 +125,7 @@
                     Style="{StaticResource GitHubBlueLinkButton}">Browse</Button>
             </Grid>
 
-            <!-- uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}"/ -->
+            <uirx:ValidationMessage x:Name="pathValidationMessage" Grid.Column="1" Grid.Row="4" ValidatesControl="{Binding ElementName=localPathText}" />
 
             <Label Grid.Column="0" Grid.Row="5" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
             <uirx:FilteredComboBox
