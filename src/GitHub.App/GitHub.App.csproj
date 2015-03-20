@@ -107,6 +107,7 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Services\CloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Authentication\CredentialManagement\Credential.cs" />
     <Compile Include="Authentication\CredentialManagement\CredentialSet.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Services\GitHubCredentialStore.cs" />
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Factories\RepositoryHostFactory.cs" />
+    <Compile Include="Services\RepositoryCreationService.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />
     <Compile Include="Controllers\UIController.cs" />
     <Compile Include="Services\Translation.cs" />

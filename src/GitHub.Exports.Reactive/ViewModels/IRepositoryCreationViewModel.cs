@@ -13,7 +13,7 @@ namespace GitHub.ViewModels
         string RepositoryName { get; set; }
 
         /// <summary>
-        /// The path where the repository is created.
+        /// The path where the repository is created. A folder named after the repository is created in this directory.
         /// </summary>
         string BaseRepositoryPath { get; set; }
 

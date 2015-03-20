@@ -10,6 +10,7 @@ using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
@@ -31,13 +32,16 @@ namespace GitHub.ViewModels
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ReactiveCommand<Unit> createRepositoryCommand;
+        readonly IRepositoryCreationService repositoryCreationService;
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts, IRepositoryCreationService repositoryCreationService)
         {
             this.operatingSystem = operatingSystem;
+            RepositoryHost = hosts.GitHubHost;
+            this.repositoryCreationService = repositoryCreationService;
 
-            Accounts = hosts.GitHubHost.Accounts;
+            Accounts = RepositoryHost.Accounts;
 
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
@@ -72,7 +76,7 @@ namespace GitHub.ViewModels
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
 
             Observable.Return(new GitIgnoreItem("None")).Concat(
-                hosts.GitHubHost.ApiClient
+                RepositoryHost.ApiClient
                     .GetGitIgnoreTemplates()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Select(templateName => new GitIgnoreItem(templateName)))
@@ -82,7 +86,7 @@ namespace GitHub.ViewModels
 
             Licenses = new ReactiveList<LicenseItem>();
             Observable.Return(LicenseItem.None).Concat(
-                hosts.GitHubHost.ApiClient
+                RepositoryHost.ApiClient
                     .GetLicenses()
                     .WhereNotNull()
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -99,8 +103,7 @@ namespace GitHub.ViewModels
                     isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
 
             var canCreate = Observable.Return(true);
-            createRepositoryCommand = ReactiveCommand.CreateAsyncObservable(canCreate, _ =>
-                Observable.Throw<Unit>(new InvalidOperationException("Could not create a repository on GitHub")));
+            createRepositoryCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
             createRepositoryCommand.ThrownExceptions.Subscribe(ex =>
             {
                 if (!ex.IsCriticalException())
@@ -124,6 +127,12 @@ namespace GitHub.ViewModels
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+
+        public IRepositoryHost RepositoryHost
+        {
+            get;
+            private set;
+        }
 
         public ReactiveList<IAccount> Accounts
         {
@@ -334,6 +343,40 @@ namespace GitHub.ViewModels
             {
                 return false;
             }
+        }
+
+        Octokit.NewRepository GatherRepositoryInfo()
+        {
+            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
+            {
+                Description = Description,
+                Private = KeepPrivate
+            };
+
+            if (SelectedLicense != LicenseItem.None && SelectedLicense != null)
+            {
+                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
+                gitHubRepository.AutoInit = true;
+            }
+
+            if (SelectedGitIgnoreTemplate != null)
+            {
+                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
+                gitHubRepository.AutoInit = true;
+            }
+
+            return gitHubRepository;
+        }
+
+        IObservable<Unit> OnCreateRepository(object state)
+        {
+            var newRepository = GatherRepositoryInfo();
+
+            return repositoryCreationService.CreateRepository(
+                newRepository,
+                SelectedAccount,
+                BaseRepositoryPath,
+                RepositoryHost.ApiClient);
         }
     }
 }
