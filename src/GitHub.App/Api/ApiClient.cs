@@ -48,14 +48,13 @@ namespace GitHub.Api
 
         public HostAddress HostAddress { get; private set; }
 
-        public IObservable<Repository> CreateRepository(Repository repo, string login, bool isUser)
+        public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
         {
             Guard.ArgumentNotEmptyString(login, "login");
 
-            var newRepository = ToNewRepository(repo);
             var client = gitHubClient.Repository;
 
-            return (isUser ? client.Create(newRepository) : client.Create(login, newRepository));
+            return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
         public IObservable<SshKey> GetSshKeys()
@@ -179,20 +178,6 @@ namespace GitHub.Api
                 GetAllRepositoriesForCurrentUser(),
                 GetOrganizations().SelectMany(GetAllRepositoriesForOrganization)
             );
-        }
-
-        static NewRepository ToNewRepository(Repository repository)
-        {
-            return new NewRepository
-            {
-                Name        = repository.Name,
-                Description = repository.Description,
-                Homepage    = repository.Homepage,
-                Private     = repository.Private,
-                HasIssues   = repository.HasIssues,
-                HasWiki     = repository.HasWiki,
-                HasDownloads= repository.HasDownloads
-            };
         }
 
         static string GetMachineNameSafe()

@@ -10,7 +10,7 @@ namespace GitHub.Api
     {
         HostAddress HostAddress { get; }
         IObservable<SshKey> AddSshKey(SshKey newKey);
-        IObservable<Repository> CreateRepository(Repository repo, string login, bool isUser);
+        IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
         IObservable<SshKey> GetSshKeys();
         IObservable<User> GetUser();
         IObservable<User> GetAllUsersForAllOrganizations();
