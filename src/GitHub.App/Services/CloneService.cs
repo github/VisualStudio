@@ -32,7 +32,7 @@ namespace GitHub.Services
 
         public IObservable<Unit> CloneRepository(Repository repository, string repositoryPath)
         {
-            return Observable.Defer(() =>
+            return Observable.Start(() =>
             {
                 string path = Path.Combine(repositoryPath, repository.Name);
 
@@ -40,7 +40,7 @@ namespace GitHub.Services
                 Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
 
                 gitExt.Clone(repository.CloneUrl, path, CloneOptions.RecurseSubmodule);
-                return Observable.Return(Unit.Default);
+                return Unit.Default;
             });
         }
     }
