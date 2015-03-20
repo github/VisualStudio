@@ -13,10 +13,10 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryCreationService : IRepositoryCreationService
     {
-        readonly ICloneService cloneService;
+        readonly IRepositoryCloneService cloneService;
 
         [ImportingConstructor]
-        public RepositoryCreationService(ICloneService cloneService)
+        public RepositoryCreationService(IRepositoryCloneService cloneService)
         {
             this.cloneService = cloneService;
         }

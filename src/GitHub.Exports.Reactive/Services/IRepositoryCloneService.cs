@@ -6,7 +6,7 @@ namespace GitHub.Services
     /// <summary>
     /// Service used to clone GitHub repositories.
     /// </summary>
-    public interface ICloneService
+    public interface IRepositoryCloneService
     {
         /// <summary>
         /// Clones the specificed repository into the specified directory.

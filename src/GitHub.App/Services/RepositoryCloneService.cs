@@ -13,14 +13,14 @@ namespace GitHub.Services
     /// Service used to clone GitHub repositories. It wraps the <see cref="IGitRepositoriesExt"/> service provided
     /// by Team Explorer.
     /// </summary>
-    [Export(typeof(ICloneService))]
+    [Export(typeof(IRepositoryCloneService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class CloneService : ICloneService
+    public class RepositoryCloneService : IRepositoryCloneService
     {
         readonly Lazy<IServiceProvider> serviceProvider;
 
         [ImportingConstructor]
-        public CloneService(Lazy<IServiceProvider> serviceProvider)
+        public RepositoryCloneService(Lazy<IServiceProvider> serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
