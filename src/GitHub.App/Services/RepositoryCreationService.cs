@@ -28,7 +28,7 @@ namespace GitHub.Services
             IApiClient apiClient)
         {
             return apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                .Select(repository => cloneService.CloneRepository(repository, directory))
+                .Select(repository => cloneService.CloneRepository(repository.CloneUrl, repository.Name, directory))
                 .SelectUnit();
         }
     }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
+using System.IO;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Models;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using GitHub.Services;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
@@ -18,7 +19,8 @@ namespace GitHub.ViewModels
     {
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        IReactiveCommand<object> cloneCommand;
+        readonly ICloneService cloneService;
+        IReactiveCommand<Unit> cloneCommand;
 
         public ICommand CloneCommand { get { return cloneCommand; } }
 
@@ -38,8 +40,10 @@ namespace GitHub.ViewModels
         }
 
         [ImportingConstructor]
-        public RepositoryCloneViewModel(IServiceProvider serviceProvider, IRepositoryHosts hosts)
+        public RepositoryCloneViewModel(ICloneService cloneService, IRepositoryHosts hosts)
         {
+            this.cloneService = cloneService;
+
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
@@ -51,24 +55,21 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
-            cloneCommand = ReactiveCommand.CreateAsyncObservable(_ =>
-            {
-                var repo = SelectedRepository;
-                var uri = repo.CloneUrl;
-                return Observable.Start<object>(() =>
-                {
-                    var gitExt = serviceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
-                    Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
+            cloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
+        }
 
-                    // TODO: use VS default dir for projects (https://github.com/github/VisualStudio/issues/96)
-                    var tmp = System.IO.Path.GetTempFileName();
-                    System.IO.File.Delete(tmp);
-                    var tmpname = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(tmp), System.IO.Path.GetFileNameWithoutExtension(tmp));
-                    System.IO.Directory.CreateDirectory(tmpname);
-                    gitExt.Clone(uri.ToString(), tmpname, CloneOptions.RecurseSubmodule);
-                    return null;
-                });
-            });
+        IObservable<Unit> OnCloneRepository(object state)
+        {
+            return Observable.Start(() =>
+            {
+                var repository = SelectedRepository;
+
+                // TODO: Pick a better location to clone this.
+                string baseRepositoryDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
+                Directory.CreateDirectory(baseRepositoryDirectory);
+                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, baseRepositoryDirectory);
+            })
+            .SelectMany(_ => _);
         }
     }
 }
