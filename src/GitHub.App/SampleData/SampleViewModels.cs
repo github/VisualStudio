@@ -41,6 +41,9 @@ namespace GitHub.SampleData
                 new LicenseItem(new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever"))),
                 new LicenseItem(new LicenseMetadata("mit", "MIT License", new Uri("https://whatever")))
             };
+
+            SelectedLicense = LicenseItem.None;
+            SelectedGitIgnoreTemplate = null;
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -161,6 +164,18 @@ namespace GitHub.SampleData
         public ReactiveList<LicenseItem> Licenses
         {
             get; private set;
+        }
+
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            get;
+            set;
+        }
+
+        public LicenseItem SelectedLicense
+        {
+            get;
+            set;
         }
     }
 
