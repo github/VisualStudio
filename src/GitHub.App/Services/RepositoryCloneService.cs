@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Octokit;
+using Rothko;
 
 namespace GitHub.Services
 {
@@ -18,11 +19,13 @@ namespace GitHub.Services
     public class RepositoryCloneService : IRepositoryCloneService
     {
         readonly Lazy<IServiceProvider> serviceProvider;
+        readonly IOperatingSystem operatingSystem;
 
         [ImportingConstructor]
-        public RepositoryCloneService(Lazy<IServiceProvider> serviceProvider)
+        public RepositoryCloneService(Lazy<IServiceProvider> serviceProvider, IOperatingSystem operatingSystem)
         {
             this.serviceProvider = serviceProvider;
+            this.operatingSystem = operatingSystem;
         }
 
         private IServiceProvider ServiceProvider
@@ -32,9 +35,15 @@ namespace GitHub.Services
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
         {
+            Guard.ArgumentNotEmptyString(cloneUrl, "cloneUrl");
+            Guard.ArgumentNotEmptyString(repositoryName, "repositoryName");
+            Guard.ArgumentNotEmptyString(repositoryPath, "repositoryPath");
+
             return Observable.Start(() =>
             {
                 string path = Path.Combine(repositoryPath, repositoryName);
+
+                operatingSystem.Directory.CreateDirectory(path);
 
                 var gitExt = ServiceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
                 Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
