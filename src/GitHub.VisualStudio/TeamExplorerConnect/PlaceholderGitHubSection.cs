@@ -7,7 +7,6 @@ using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
@@ -44,37 +43,38 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             gitServiceProvider = e.ServiceProvider;
         }
 
-
         public void DoCreate()
         {
             // this is done here and not via the constructor so nothing gets loaded
             // until we get here
-            var ui = ServiceProvider.GetExportedValue<IUIProvider>();
-            ui.GitServiceProvider = gitServiceProvider;
-            var factory = ui.GetService<ExportFactoryProvider>();
-            var d = factory.UIControllerFactory.CreateExport();
-            var creation = d.Value.SelectFlow(UIControllerFlow.Create);
-            var x = new WindowController(creation);
-            creation.Subscribe(_ => { }, _ => x.Close());
-            x.Show();
-
-            d.Value.Start();
+            StartFlow(UIControllerFlow.Create);
         }
 
         public void DoClone()
         {
             // this is done here and not via the constructor so nothing gets loaded
             // until we get here
-            var ui = ServiceProvider.GetExportedValue<IUIProvider>();
-            ui.GitServiceProvider = gitServiceProvider;
-            var factory = ui.GetService<ExportFactoryProvider>();
-            var d = factory.UIControllerFactory.CreateExport();
-            var creation = d.Value.SelectFlow(UIControllerFlow.Clone);
-            creation.Subscribe(_ => { }, _ => d.Dispose());
-            var x = new WindowController(creation);
-            x.Show();
+            StartFlow(UIControllerFlow.Clone);
+        }
 
-            d.Value.Start();
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            uiProvider.GitServiceProvider = gitServiceProvider;
+            var factory = uiProvider.GetService<ExportFactoryProvider>();
+            var uiControllerExport = factory.UIControllerFactory.CreateExport();
+            var uiController = uiControllerExport.Value;
+            var creation = uiController.SelectFlow(controllerFlow);
+            
+            var windowController = new WindowController(creation);
+            creation.Subscribe(_ => { }, _ =>
+            {
+                windowController.Close();
+                uiControllerExport.Dispose();
+            });
+            windowController.Show();
+
+            uiController.Start();
         }
     }
 }
