@@ -424,6 +424,95 @@ public class RepositoryCreationViewModelTests
                 Assert.Equal("Could not create a repository on GitHub", handlers.LastError.ErrorMessage);
             }
         }
+
+        [Fact]
+        public void CreatesARepositoryUsingTheCreationService()
+        {
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var account = Substitute.For<IAccount>();
+            var vm = new RepositoryCreationViewModel(
+                    Substitute.For<IOperatingSystem>(),
+                    Substitute.For<IRepositoryHosts>(),
+                    creationService);
+            vm.RepositoryName = "Krieger";
+            vm.BaseRepositoryPath = @"c:\dev";
+            vm.SelectedAccount = account;
+            vm.KeepPrivate = true;
+
+            vm.CreateRepository.Execute(null);
+
+            creationService
+                .Received()
+                .CreateRepository(
+                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
+                        && r.Private == true
+                        && r.AutoInit == null
+                        && r.LicenseTemplate == null
+                        && r.GitignoreTemplate == null),
+                    account,
+                    @"c:\dev",
+                    Args.ApiClient);
+        }
+
+        [Fact]
+        public void SetsAutoInitToTrueWhenLicenseSelected()
+        {
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var account = Substitute.For<IAccount>();
+            var vm = new RepositoryCreationViewModel(
+                    Substitute.For<IOperatingSystem>(),
+                    Substitute.For<IRepositoryHosts>(),
+                    creationService);
+            vm.RepositoryName = "Krieger";
+            vm.BaseRepositoryPath = @"c:\dev";
+            vm.SelectedAccount = account;
+            vm.KeepPrivate = false;
+            vm.SelectedLicense = new LicenseItem(new LicenseMetadata("mit", "MIT", new Uri("https://whatever")));
+
+            vm.CreateRepository.Execute(null);
+
+            creationService
+                .Received()
+                .CreateRepository(
+                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
+                        && r.Private == false
+                        && r.AutoInit == true
+                        && r.LicenseTemplate == "mit"
+                        && r.GitignoreTemplate == null),
+                    account,
+                    @"c:\dev",
+                    Args.ApiClient);
+        }
+
+        [Fact]
+        public void SetsAutoInitToTrueWhenGitIgnore()
+        {
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var account = Substitute.For<IAccount>();
+            var vm = new RepositoryCreationViewModel(
+                    Substitute.For<IOperatingSystem>(),
+                    Substitute.For<IRepositoryHosts>(),
+                    creationService);
+            vm.RepositoryName = "Krieger";
+            vm.BaseRepositoryPath = @"c:\dev";
+            vm.SelectedAccount = account;
+            vm.KeepPrivate = false;
+            vm.SelectedGitIgnoreTemplate = new GitIgnoreItem("VisualStudio");
+
+            vm.CreateRepository.Execute(null);
+
+            creationService
+                .Received()
+                .CreateRepository(
+                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
+                        && r.Private == false
+                        && r.AutoInit == true
+                        && r.LicenseTemplate == null
+                        && r.GitignoreTemplate == "VisualStudio"),
+                    account,
+                    @"c:\dev",
+                    Args.ApiClient);
+        }
     }
 
     public class TheCanKeepPrivateProperty
