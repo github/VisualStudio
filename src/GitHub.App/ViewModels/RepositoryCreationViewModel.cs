@@ -110,24 +110,14 @@ namespace GitHub.ViewModels
                     Debug.Assert(Licenses.Any(), "There should be at least one license");
                 });
 
+            createRepositoryCommand = InitializeCreateRepositoryCommand();
+
             var canKeepPrivateObs = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,
                 x => x.SelectedAccount.IsOnFreePlan,
                 x => x.SelectedAccount.HasMaximumPrivateRepositories,
                 (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
                     isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
-
-            var canCreate = Observable.Return(true);
-            createRepositoryCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
-            createRepositoryCommand.ThrownExceptions.Subscribe(ex =>
-            {
-                if (!ex.IsCriticalException())
-                {
-                    // TODO: Throw a proper error.
-                    log.Error("Error creating repository.", ex);
-                    UserError.Throw(new PublishRepositoryUserError(ex.Message));
-                }
-            });
 
             canKeepPrivate = canKeepPrivateObs.CombineLatest(createRepositoryCommand.IsExecuting,
                 (canKeep, publishing) => canKeep && !publishing)
@@ -391,6 +381,26 @@ namespace GitHub.ViewModels
                 SelectedAccount,
                 BaseRepositoryPath,
                 RepositoryHost.ApiClient);
+        }
+
+        ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
+        {
+            var canCreate = this.WhenAny(
+                x => x.RepositoryNameValidator.ValidationResult.IsValid,
+                x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
+                (x, y) => x.Value && y.Value);
+            var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
+            createCommand.ThrownExceptions.Subscribe(ex =>
+            {
+                if (!ex.IsCriticalException())
+                {
+                    // TODO: Throw a proper error.
+                    log.Error("Error creating repository.", ex);
+                    UserError.Throw(new PublishRepositoryUserError(ex.Message));
+                }
+            });
+
+            return createCommand;
         }
     }
 }

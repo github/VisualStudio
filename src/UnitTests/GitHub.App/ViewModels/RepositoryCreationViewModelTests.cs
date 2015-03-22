@@ -522,6 +522,29 @@ public class RepositoryCreationViewModelTests
                     @"c:\dev",
                     Args.ApiClient);
         }
+
+        [Theory]
+        [InlineData("", "", false)]
+        [InlineData("", @"c:\dev", false)]
+        [InlineData("blah", @"c:\|dev", false)]
+        [InlineData("blah", @"c:\dev", true)]
+        public void CannotCreateWhenRepositoryNameOrBasePathIsInvalid(
+            string repositoryName,
+            string baseRepositoryPath,
+            bool expected)
+        {
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
+            vm.RepositoryName = repositoryName;
+            vm.BaseRepositoryPath = baseRepositoryPath;
+            var reactiveCommand = vm.CreateRepository as ReactiveCommand<Unit>;
+
+            bool result = reactiveCommand.CanExecute(null);
+
+            Assert.Equal(expected, result);
+        }
     }
 
     public class TheCanKeepPrivateProperty
