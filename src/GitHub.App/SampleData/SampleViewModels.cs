@@ -29,9 +29,9 @@ namespace GitHub.SampleData
             Accounts = new ReactiveList<IAccount> { new AccountDesigner("GitHub") };
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>
             {
-                new GitIgnoreItem("VisualStudio"),
-                new GitIgnoreItem("Wap"),
-                new GitIgnoreItem("WordPress")
+                GitIgnoreItem.Create("VisualStudio"),
+                GitIgnoreItem.Create("Wap"),
+                GitIgnoreItem.Create("WordPress")
             };
 
             Licenses = new ReactiveList<LicenseItem>
