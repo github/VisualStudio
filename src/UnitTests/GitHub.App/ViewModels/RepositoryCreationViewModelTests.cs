@@ -312,7 +312,7 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void IsPopulatedByTheRepositoryHost()
         {
-            var accounts = new ReactiveList<IAccount>();
+            var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>() };
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Accounts.Returns(accounts);
             var vm = new RepositoryCreationViewModel(
@@ -321,13 +321,14 @@ public class RepositoryCreationViewModelTests
                 Substitute.For<IRepositoryCreationService>());
 
             Assert.Same(accounts, vm.Accounts);
+            Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
         }
     }
 
     public class TheGitIgnoreTemplatesProperty
     {
         [Fact]
-        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirstAndSelectsFirst()
         {
             var gitIgnoreTemplates = new[]
             {
@@ -361,47 +362,49 @@ public class RepositoryCreationViewModelTests
             Assert.False(result[4].Recommended);
             Assert.Equal("WordPress", result[5].Name);
             Assert.False(result[5].Recommended);
-        }
-
-        public class TheLicensesProperty
-        {
-            [Fact]
-            public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
-            {
-                var licenses = new[]
-                {
-                    new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever")),
-                    new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever")),
-                    new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
-                    new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
-                };
-                var hosts = Substitute.For<IRepositoryHosts>();
-                hosts.GitHubHost.ApiClient
-                    .GetLicenses()
-                    .Returns(licenses.ToObservable());
-                var vm = new RepositoryCreationViewModel(
-                    Substitute.For<IOperatingSystem>(),
-                    hosts,
-                    Substitute.For<IRepositoryCreationService>());
-
-                var result = vm.Licenses;
-
-                Assert.Equal(5, result.Count);
-                Assert.Equal("", result[0].Key);
-                Assert.Equal("None", result[0].Name);
-                Assert.True(result[0].Recommended);
-                Assert.Equal("apache-2.0", result[1].Key);
-                Assert.True(result[1].Recommended);
-                Assert.Equal("mit", result[2].Key);
-                Assert.True(result[2].Recommended);
-                Assert.Equal("agpl-3.0", result[3].Key);
-                Assert.False(result[3].Recommended);
-                Assert.Equal("artistic-2.0", result[4].Key);
-                Assert.False(result[4].Recommended);
-            }
+            Assert.Equal(result[0], vm.SelectedGitIgnoreTemplate);
         }
     }
 
+    public class TheLicensesProperty
+    {
+        [Fact]
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        {
+            var licenses = new[]
+            {
+                new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever")),
+                new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever")),
+                new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
+                new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
+            };
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.ApiClient
+                .GetLicenses()
+                .Returns(licenses.ToObservable());
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts,
+                Substitute.For<IRepositoryCreationService>());
+
+            var result = vm.Licenses;
+
+            Assert.Equal(5, result.Count);
+            Assert.Equal("", result[0].Key);
+            Assert.Equal("None", result[0].Name);
+            Assert.True(result[0].Recommended);
+            Assert.Equal("apache-2.0", result[1].Key);
+            Assert.True(result[1].Recommended);
+            Assert.Equal("mit", result[2].Key);
+            Assert.True(result[2].Recommended);
+            Assert.Equal("agpl-3.0", result[3].Key);
+            Assert.False(result[3].Recommended);
+            Assert.Equal("artistic-2.0", result[4].Key);
+            Assert.False(result[4].Recommended);
+            Assert.Equal(result[0], vm.SelectedLicense);
+        }
+    }
+    
     public class TheCreateRepositoryCommand
     {
         [Fact]
@@ -428,11 +431,13 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void CreatesARepositoryUsingTheCreationService()
         {
-            var creationService = Substitute.For<IRepositoryCreationService>();
             var account = Substitute.For<IAccount>();
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
             var vm = new RepositoryCreationViewModel(
                     Substitute.For<IOperatingSystem>(),
-                    Substitute.For<IRepositoryHosts>(),
+                    hosts,
                     creationService);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
