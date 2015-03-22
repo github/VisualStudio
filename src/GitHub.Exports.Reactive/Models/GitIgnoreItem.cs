@@ -7,6 +7,8 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class GitIgnoreItem
     {
+        public static readonly GitIgnoreItem None = new GitIgnoreItem("None");
+
         readonly string[] recommendedIgnoreFiles = { "None", "VisualStudio", "Node", "Eclipse", "C++", "Windows" };
 
         public GitIgnoreItem(string name)

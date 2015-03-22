@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -41,7 +42,13 @@ namespace GitHub.ViewModels
             RepositoryHost = hosts.GitHubHost;
             this.repositoryCreationService = repositoryCreationService;
 
-            Accounts = RepositoryHost.Accounts;
+            Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
+            Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
+            var selectedAccount = Accounts.FirstOrDefault();
+            if (selectedAccount != null)
+            {
+                SelectedAccount = Accounts.FirstOrDefault();
+            }
 
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
@@ -75,14 +82,18 @@ namespace GitHub.ViewModels
 
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
 
-            Observable.Return(new GitIgnoreItem("None")).Concat(
+            Observable.Return(GitIgnoreItem.None).Concat(
                 RepositoryHost.ApiClient
                     .GetGitIgnoreTemplates()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Select(templateName => new GitIgnoreItem(templateName)))
                 .ToList()
                 .Subscribe(templates =>
-                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended)));
+                {
+                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
+                    Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
+                    SelectedGitIgnoreTemplate = GitIgnoreTemplates[0];
+                });
 
             Licenses = new ReactiveList<LicenseItem>();
             Observable.Return(LicenseItem.None).Concat(
@@ -93,7 +104,11 @@ namespace GitHub.ViewModels
                     .Select(license => new LicenseItem(license)))
                 .ToList()
                 .Subscribe(licenses =>
-                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended)));
+                {
+                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
+                    Debug.Assert(Licenses.Any(), "There should be at least one license");
+                    SelectedLicense = Licenses[0];
+                });
 
             var canKeepPrivateObs = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,
@@ -237,6 +252,7 @@ namespace GitHub.ViewModels
         }
 
         IAccount selectedAccount;
+        [AllowNull]
         public IAccount SelectedAccount
         {
             [return: AllowNull]
@@ -353,13 +369,13 @@ namespace GitHub.ViewModels
                 Private = KeepPrivate
             };
 
-            if (SelectedLicense != LicenseItem.None && SelectedLicense != null)
+            if (SelectedLicense != LicenseItem.None)
             {
                 gitHubRepository.LicenseTemplate = SelectedLicense.Key;
                 gitHubRepository.AutoInit = true;
             }
 
-            if (SelectedGitIgnoreTemplate != null)
+            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
             {
                 gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
                 gitHubRepository.AutoInit = true;
