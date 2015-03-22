@@ -1,17 +1,24 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class GitIgnoreItem
+    public sealed class GitIgnoreItem
     {
-        public static readonly GitIgnoreItem None = new GitIgnoreItem("None");
-
         readonly string[] recommendedIgnoreFiles = { "None", "VisualStudio", "Node", "Eclipse", "C++", "Windows" };
 
-        public GitIgnoreItem(string name)
+        static readonly GitIgnoreItem none = new GitIgnoreItem("None");
+        public static GitIgnoreItem None { get { return none; } }
+
+        public static GitIgnoreItem Create(string name)
+        {
+            return name.Equals("None", StringComparison.OrdinalIgnoreCase) ? none : new GitIgnoreItem(name);
+        }
+
+        GitIgnoreItem(string name)
         {
             Name = name;
             Recommended = recommendedIgnoreFiles.Any(item => item.Equals(name, System.StringComparison.OrdinalIgnoreCase));

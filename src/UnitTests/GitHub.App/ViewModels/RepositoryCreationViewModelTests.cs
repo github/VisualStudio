@@ -464,9 +464,11 @@ public class RepositoryCreationViewModelTests
         {
             var creationService = Substitute.For<IRepositoryCreationService>();
             var account = Substitute.For<IAccount>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
             var vm = new RepositoryCreationViewModel(
                     Substitute.For<IOperatingSystem>(),
-                    Substitute.For<IRepositoryHosts>(),
+                    hosts,
                     creationService);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -494,15 +496,17 @@ public class RepositoryCreationViewModelTests
         {
             var creationService = Substitute.For<IRepositoryCreationService>();
             var account = Substitute.For<IAccount>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
             var vm = new RepositoryCreationViewModel(
                     Substitute.For<IOperatingSystem>(),
-                    Substitute.For<IRepositoryHosts>(),
+                    hosts,
                     creationService);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;
             vm.KeepPrivate = false;
-            vm.SelectedGitIgnoreTemplate = new GitIgnoreItem("VisualStudio");
+            vm.SelectedGitIgnoreTemplate = GitIgnoreItem.Create("VisualStudio");
 
             vm.CreateRepository.Execute(null);
 

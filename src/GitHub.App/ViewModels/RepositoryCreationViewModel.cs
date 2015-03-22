@@ -41,7 +41,7 @@ namespace GitHub.ViewModels
             this.operatingSystem = operatingSystem;
             RepositoryHost = hosts.GitHubHost;
             this.repositoryCreationService = repositoryCreationService;
-
+            
             Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
             Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
             var selectedAccount = Accounts.FirstOrDefault();
@@ -49,6 +49,8 @@ namespace GitHub.ViewModels
             {
                 SelectedAccount = Accounts.FirstOrDefault();
             }
+            SelectedGitIgnoreTemplate = GitIgnoreItem.None;
+            SelectedLicense = LicenseItem.None;
 
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
@@ -86,13 +88,12 @@ namespace GitHub.ViewModels
                 RepositoryHost.ApiClient
                     .GetGitIgnoreTemplates()
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(templateName => new GitIgnoreItem(templateName)))
+                    .Select(GitIgnoreItem.Create))
                 .ToList()
                 .Subscribe(templates =>
                 {
                     GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
                     Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
-                    SelectedGitIgnoreTemplate = GitIgnoreTemplates[0];
                 });
 
             Licenses = new ReactiveList<LicenseItem>();
@@ -107,7 +108,6 @@ namespace GitHub.ViewModels
                 {
                     Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
                     Debug.Assert(Licenses.Any(), "There should be at least one license");
-                    SelectedLicense = Licenses[0];
                 });
 
             var canKeepPrivateObs = this.WhenAny(
@@ -282,18 +282,16 @@ namespace GitHub.ViewModels
         [AllowNull]
         public GitIgnoreItem SelectedGitIgnoreTemplate
         {
-            [return: AllowNull]
             get { return selectedGitIgnoreTemplate; }
-            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value); }
+            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
         }
 
         LicenseItem selectedLicense;
         [AllowNull]
         public LicenseItem SelectedLicense
         {
-            [return: AllowNull]
             get { return selectedLicense; }
-            set { this.RaiseAndSetIfChanged(ref selectedLicense, value); }
+            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
         }
 
         // These are the characters which are permitted when creating a repository name on GitHub The Website
