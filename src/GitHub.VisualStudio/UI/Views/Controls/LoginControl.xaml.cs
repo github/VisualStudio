@@ -8,6 +8,7 @@ using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -24,14 +25,24 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
 
             InitializeComponent();
-            
+
             DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
+            close = new Subject<object>();
 
             this.WhenActivated(d =>
             {
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
+                d(ViewModel.AuthenticationResults
+                    .Subscribe(ret =>
+                {
+                    if (ret == Authentication.AuthenticationResult.Success)
+                    {
+                        close.OnNext(null);
+                        close.OnCompleted();
+                    }
+                }));
             });
         }
         
@@ -119,5 +130,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             get { return (ILoginControlViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
+
+        readonly Subject<object> close;
+        public IObservable<object> Done { get { return close; } }
     }
 }

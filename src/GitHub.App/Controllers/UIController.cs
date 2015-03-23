@@ -66,29 +66,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
                 {
-                    var dvm = factory.GetViewModel(UIViewType.Login);
-                    disposables.Add(dvm);
-                    var viewModel = dvm.Value as ILoginViewModel;
-                    Debug.Assert(viewModel != null, "The view model must implement ILoginViewModel");
-                    viewModel.AuthenticationResults.Subscribe(result =>
-                    {
-                        if (result == AuthenticationResult.Success)
-                            Fire(Trigger.Finish); // Takes us to clone or create.
-                    });
-
-                    var dv = factory.GetView(UIViewType.Login);
-                    disposables.Add(dv);
-                    var view = dv.Value;
-                    view.ViewModel = viewModel;
-
-                    var twofa = uiProvider.GetService<ITwoFactorViewModel>();
-                    twofa.WhenAny(x => x.IsShowing, x => x.Value)
-                        .Where(x => x)
-                        .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(_ =>
-                        {
-                            Fire(Trigger.Next);
-                        });
+                    var view = SetupView(UIViewType.Login);
                     LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
@@ -156,6 +134,27 @@ namespace GitHub.Controllers
             var view = dv.Value;
 
             view.ViewModel = viewModel;
+
+            if (viewType == UIViewType.Login)
+            {
+                // we're setting up the login dialog, we need to setup the 2fa as
+                // well to continue the flow if it's needed, since the
+                // authenticationresult callback won't happen until
+                // everything is done
+                var twofa = uiProvider.GetService<ITwoFactorViewModel>();
+                twofa.WhenAny(x => x.IsShowing, x => x.Value)
+                    .Where(x => x)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(Trigger.Next));
+
+                view.Done
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(Trigger.Finish));
+            }
+            else
+                view.Done
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(Trigger.Next));
 
             return view;
         }

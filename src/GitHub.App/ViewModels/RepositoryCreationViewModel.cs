@@ -32,7 +32,6 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        readonly ReactiveCommand<Unit> createRepositoryCommand;
         readonly IRepositoryCreationService repositoryCreationService;
 
         [ImportingConstructor]
@@ -110,7 +109,7 @@ namespace GitHub.ViewModels
                     Debug.Assert(Licenses.Any(), "There should be at least one license");
                 });
 
-            createRepositoryCommand = InitializeCreateRepositoryCommand();
+            CreateRepository = InitializeCreateRepositoryCommand();
 
             var canKeepPrivateObs = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,
@@ -119,7 +118,7 @@ namespace GitHub.ViewModels
                 (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
                     isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
 
-            canKeepPrivate = canKeepPrivateObs.CombineLatest(createRepositoryCommand.IsExecuting,
+            canKeepPrivate = canKeepPrivateObs.CombineLatest(CreateRepository.IsExecuting,
                 (canKeep, publishing) => canKeep && !publishing)
                 .ToProperty(this, x => x.CanKeepPrivate);
 
@@ -127,7 +126,7 @@ namespace GitHub.ViewModels
                 .Where(x => !x)
                 .Subscribe(x => KeepPrivate = false);
 
-            isPublishing = createRepositoryCommand.IsExecuting
+            isPublishing = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsPublishing);
         }
 
@@ -181,10 +180,7 @@ namespace GitHub.ViewModels
             get { return canKeepPrivate.Value; }
         }
 
-        public ICommand CreateRepository
-        {
-            get { return createRepositoryCommand; }
-        }
+        public IReactiveCommand<Unit> CreateRepository { get; private set; }
 
         string description;
         [AllowNull]
