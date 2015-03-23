@@ -97,6 +97,7 @@ namespace GitHub.UI
         }
 
         public static readonly DependencyProperty UserErrorProperty = DependencyProperty.Register("UserError", typeof(UserError), typeof(UserErrorMessages));
+        [AllowNull]
         public UserError UserError
         {
             [return: AllowNull]
