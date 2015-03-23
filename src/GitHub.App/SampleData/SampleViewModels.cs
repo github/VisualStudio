@@ -84,12 +84,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IObservable<object> IsCreated
-        {
-            get;
-            private set;
-        }
-
         public string Description
         {
             get;
