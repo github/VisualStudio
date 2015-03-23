@@ -320,13 +320,15 @@ namespace GitHub.SampleData
         public bool IsPrivate { get; set; }
 
         public string Group { get; set; }
+
+        public bool HasLocalClone { get; private set; }
     }
 
     public class CloneRepositoryViewModelDesigner : IRepositoryCloneViewModel
     {
         public CloneRepositoryViewModelDesigner()
         {
-            Repositories = new List<IRepositoryModel>
+            Repositories = new ReactiveList<IRepositoryModel>
             {
                 new RepositoryModel {Owner = "haacked", Name = "encourage" },
                 new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
@@ -351,13 +353,26 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICollection<IRepositoryModel> Repositories
+        public IRepositoryModel SelectedRepository { get; set; }
+
+        public IReactiveList<IRepositoryModel> Repositories
+        {
+            get;
+            private set;
+        }
+        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
         {
             get;
             private set;
         }
 
-        public IRepositoryModel SelectedRepository { get; set; }
+        public bool FilterTextIsEnabled
+        {
+            get;
+            private set;
+        }
+
+        public string FilterText { get; set; }
 
         public string Title { get { return "Clone a GitHub Repository"; } }
     }
