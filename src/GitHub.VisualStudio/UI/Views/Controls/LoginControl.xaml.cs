@@ -8,6 +8,7 @@ using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -26,17 +27,21 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
-            close = ReactiveCommand.Create();
+            close = new Subject<object>();
 
             this.WhenActivated(d =>
             {
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
-                d(ViewModel.AuthenticationResults.Subscribe(ret =>
+                d(ViewModel.AuthenticationResults
+                    .Subscribe(ret =>
                 {
                     if (ret == Authentication.AuthenticationResult.Success)
-                        close.Execute(null);
+                    {
+                        close.OnNext(null);
+                        close.OnCompleted();
+                    }
                 }));
             });
         }
@@ -126,7 +131,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { SetValue(ViewModelProperty, value); }
         }
 
-        ReactiveCommand<object> close;
+        Subject<object> close;
         public IObservable<object> Done { get { return close; } }
     }
 }

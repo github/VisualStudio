@@ -145,15 +145,16 @@ namespace GitHub.Controllers
                 twofa.WhenAny(x => x.IsShowing, x => x.Value)
                     .Where(x => x)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ =>
-                    {
-                        Fire(Trigger.Next);
-                    });
+                    .Subscribe(_ => Fire(Trigger.Next));
 
-                view.Done.Subscribe(result => Fire(Trigger.Finish));
+                view.Done
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(Trigger.Finish));
             }
             else
-                view.Done.Subscribe(result => Fire(Trigger.Next));
+                view.Done
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(Trigger.Next));
 
             return view;
         }

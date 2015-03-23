@@ -78,7 +78,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICommand CreateRepository
+        public IReactiveCommand<Unit> CreateRepository
         {
             get;
             private set;
@@ -351,13 +351,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICommand CloneCommand
-        {
-            get;
-            private set;
-        }
-
-        public IObservable<object> IsCloned
+        public IReactiveCommand<Unit> CloneCommand
         {
             get;
             private set;

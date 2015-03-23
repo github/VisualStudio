@@ -3,6 +3,7 @@ using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
 using System;
+using System.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -68,8 +69,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Command that creates the repository.
         /// </summary>
-        ICommand CreateRepository { get; }
-        IObservable<object> IsCreated { get; }
+        IReactiveCommand<Unit> CreateRepository { get; }
+
         /// <summary>
         /// Command that opens a browser to a page for upgrading the user's plan.
         /// </summary>
