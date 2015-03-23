@@ -9,6 +9,7 @@ using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -26,7 +27,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
-            close = ReactiveCommand.Create();
+            close = new Subject<object>();
 
             IObservable<bool> clearErrorWhenChanged = this.WhenAny(
                 x => x.ViewModel.RepositoryName,
@@ -74,8 +75,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
 
-                d(ViewModel.IsCreated.Subscribe(_ => close.Execute(null)));
-
+                d(ViewModel.CreateRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
             });
         }
 
@@ -102,7 +102,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { SetValue(ViewModelProperty, value); }
         }
 
-        ReactiveCommand<object> close;
+        readonly Subject<object> close;
         public IObservable<object> Done { get { return close; } }
     }
 }
