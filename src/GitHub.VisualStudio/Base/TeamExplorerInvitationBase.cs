@@ -9,8 +9,30 @@ using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.Base
 {
-    class TeamExplorerInvitationBase : TeamExplorerBase, ITeamExplorerServiceInvitation, INotifyPropertySource
+    public class TeamExplorerInvitationBase : TeamExplorerBase, ITeamExplorerServiceInvitation, INotifyPropertySource
     {
+        public TeamExplorerInvitationBase()
+        {
+            canConnect = true;
+            canSignUp = true;
+        }
+
+        public virtual void Initialize(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
+        }
+
+        /// <summary>
+        /// Triggers the login flow
+        /// </summary>
+        public virtual void Connect() {}
+
+        /// <summary>
+        /// Starts the sign up process online
+        /// </summary>
+        public virtual void SignUp() {}
+
+
         bool canConnect;
         public bool CanConnect
         {
@@ -84,21 +106,6 @@ namespace GitHub.VisualStudio.Base
             [return: AllowNull]
             get { return signUpLabel; }
             set { signUpLabel = value; this.RaisePropertyChange(); }
-        }
-
-        public void Initialize(IServiceProvider serviceProvider)
-        {
-            ServiceProvider = serviceProvider;
-        }
-
-        public void Connect()
-        {
-
-        }
-
-        public void SignUp()
-        {
-
         }
     }
 }
