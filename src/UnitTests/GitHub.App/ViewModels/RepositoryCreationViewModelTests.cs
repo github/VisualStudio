@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
+using ReactiveUI;
 using Rothko;
 using Xunit;
+using Xunit.Extensions;
 
 public class RepositoryCreationViewModelTests
 {
@@ -17,7 +21,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "this-is-bad";
@@ -30,7 +35,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.RepositoryName = "this is bad";
 
@@ -42,7 +48,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
             Assert.Null(vm.SafeRepositoryName);
             vm.RepositoryName = "not-null";
             vm.RepositoryName = null;
@@ -59,7 +66,10 @@ public class RepositoryCreationViewModelTests
             var windows = Substitute.For<IOperatingSystem>();
             windows.Dialog.BrowseForDirectory(@"c:\fake\dev", Args.String)
                 .Returns(new BrowseDirectoryResult(@"c:\fake\foo"));
-            var vm = new RepositoryCreationViewModel(windows, Substitute.For<IRepositoryHosts>());
+            var vm = new RepositoryCreationViewModel(
+                windows,
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
@@ -74,7 +84,10 @@ public class RepositoryCreationViewModelTests
             var windows = Substitute.For<IOperatingSystem>();
             windows.Dialog.BrowseForDirectory(@"c:\fake\dev", Args.String)
                 .Returns(BrowseDirectoryResult.Failed);
-            var vm = new RepositoryCreationViewModel(windows, Substitute.For<IRepositoryHosts>());
+            var vm = new RepositoryCreationViewModel(
+                windows,
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
             await vm.BrowseForDirectory.ExecuteAsync();
@@ -90,7 +103,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = "";
             vm.RepositoryName = "foo";
@@ -104,7 +118,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake!!>\";
             vm.RepositoryName = "foo";
@@ -119,7 +134,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake???\sajoisfaoia\afsofsafs::::\";
             vm.RepositoryName = "foo";
@@ -134,7 +150,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake\sajoisfaoia/afsofsafs/";
             vm.RepositoryName = "foo";
@@ -147,7 +164,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = "fake";
             vm.RepositoryName = "foo";
@@ -161,7 +179,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "repo";
 
@@ -179,7 +198,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "thisisfine";
@@ -193,7 +213,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"C:\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\";
 
@@ -209,7 +230,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
             vm.BaseRepositoryPath = @"c:\fake\";
 
             vm.RepositoryName = "";
@@ -223,7 +245,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "repo";
 
@@ -242,7 +265,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.RepositoryName = "thisisfine";
 
@@ -258,7 +282,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "this-is-bad";
@@ -271,7 +296,8 @@ public class RepositoryCreationViewModelTests
         {
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
 
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "this is bad";
@@ -284,19 +310,25 @@ public class RepositoryCreationViewModelTests
     public class TheAccountsProperty
     {
         [Fact]
-        public void StartsOffEmpty()
+        public void IsPopulatedByTheRepositoryHost()
         {
+            var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>() };
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(accounts);
             var vm = new RepositoryCreationViewModel(
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryHosts>());
-            Assert.Empty(vm.Accounts);
+                hosts,
+                Substitute.For<IRepositoryCreationService>());
+
+            Assert.Same(accounts, vm.Accounts);
+            Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
         }
     }
 
     public class TheGitIgnoreTemplatesProperty
     {
         [Fact]
-        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirstAndSelectsFirst()
         {
             var gitIgnoreTemplates = new[]
             {
@@ -310,7 +342,10 @@ public class RepositoryCreationViewModelTests
             hosts.GitHubHost.ApiClient
                 .GetGitIgnoreTemplates()
                 .Returns(gitIgnoreTemplates.ToObservable());
-            var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>(), hosts);
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts,
+                Substitute.For<IRepositoryCreationService>());
 
             var result = vm.GitIgnoreTemplates;
 
@@ -327,41 +362,216 @@ public class RepositoryCreationViewModelTests
             Assert.False(result[4].Recommended);
             Assert.Equal("WordPress", result[5].Name);
             Assert.False(result[5].Recommended);
+            Assert.Equal(result[0], vm.SelectedGitIgnoreTemplate);
+        }
+    }
+
+    public class TheLicensesProperty
+    {
+        [Fact]
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        {
+            var licenses = new[]
+            {
+                new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever")),
+                new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever")),
+                new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
+                new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
+            };
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.ApiClient
+                .GetLicenses()
+                .Returns(licenses.ToObservable());
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts,
+                Substitute.For<IRepositoryCreationService>());
+
+            var result = vm.Licenses;
+
+            Assert.Equal(5, result.Count);
+            Assert.Equal("", result[0].Key);
+            Assert.Equal("None", result[0].Name);
+            Assert.True(result[0].Recommended);
+            Assert.Equal("apache-2.0", result[1].Key);
+            Assert.True(result[1].Recommended);
+            Assert.Equal("mit", result[2].Key);
+            Assert.True(result[2].Recommended);
+            Assert.Equal("agpl-3.0", result[3].Key);
+            Assert.False(result[3].Recommended);
+            Assert.Equal("artistic-2.0", result[4].Key);
+            Assert.False(result[4].Recommended);
+            Assert.Equal(result[0], vm.SelectedLicense);
+        }
+    }
+    
+    public class TheCreateRepositoryCommand
+    {
+        [Fact]
+        public async Task DisplaysUserErrorWhenCreationFails()
+        {
+            var repositoryCreationService = Substitute.For<IRepositoryCreationService>();
+            repositoryCreationService.CreateRepository(Args.NewRepository, Args.Account, Args.String, Args.ApiClient)
+                .Returns(Observable.Throw<Unit>(new InvalidOperationException("Could not create a repository on GitHub")));
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IRepositoryHosts>(),
+                repositoryCreationService);
+
+            vm.RepositoryName = "my-repo";
+
+            using (var handlers = ReactiveTestHelper.OverrideHandlersForTesting())
+            {
+                await vm.CreateRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+
+                Assert.Equal("Could not create a repository on GitHub", handlers.LastError.ErrorMessage);
+            }
         }
 
-        public class TheLicensesProperty
+        [Fact]
+        public void CreatesARepositoryUsingTheCreationService()
         {
-            [Fact]
-            public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
-            {
-                var licenses = new[]
-                {
-                    new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever")),
-                    new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever")),
-                    new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
-                    new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
-                };
-                var hosts = Substitute.For<IRepositoryHosts>();
-                hosts.GitHubHost.ApiClient
-                    .GetLicenses()
-                    .Returns(licenses.ToObservable());
-                var vm = new RepositoryCreationViewModel(Substitute.For<IOperatingSystem>(), hosts);
+            var account = Substitute.For<IAccount>();
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
+            var vm = new RepositoryCreationViewModel(
+                    Substitute.For<IOperatingSystem>(),
+                    hosts,
+                    creationService);
+            vm.RepositoryName = "Krieger";
+            vm.BaseRepositoryPath = @"c:\dev";
+            vm.SelectedAccount = account;
+            vm.KeepPrivate = true;
 
-                var result = vm.Licenses;
+            vm.CreateRepository.Execute(null);
 
-                Assert.Equal(5, result.Count);
-                Assert.Equal("", result[0].Key);
-                Assert.Equal("None", result[0].Name);
-                Assert.True(result[0].Recommended);
-                Assert.Equal("apache-2.0", result[1].Key);
-                Assert.True(result[1].Recommended);
-                Assert.Equal("mit", result[2].Key);
-                Assert.True(result[2].Recommended);
-                Assert.Equal("agpl-3.0", result[3].Key);
-                Assert.False(result[3].Recommended);
-                Assert.Equal("artistic-2.0", result[4].Key);
-                Assert.False(result[4].Recommended);
-            }
+            creationService
+                .Received()
+                .CreateRepository(
+                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
+                        && r.Private == true
+                        && r.AutoInit == null
+                        && r.LicenseTemplate == null
+                        && r.GitignoreTemplate == null),
+                    account,
+                    @"c:\dev",
+                    Args.ApiClient);
+        }
+
+        [Fact]
+        public void SetsAutoInitToTrueWhenLicenseSelected()
+        {
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var account = Substitute.For<IAccount>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
+            var vm = new RepositoryCreationViewModel(
+                    Substitute.For<IOperatingSystem>(),
+                    hosts,
+                    creationService);
+            vm.RepositoryName = "Krieger";
+            vm.BaseRepositoryPath = @"c:\dev";
+            vm.SelectedAccount = account;
+            vm.KeepPrivate = false;
+            vm.SelectedLicense = new LicenseItem(new LicenseMetadata("mit", "MIT", new Uri("https://whatever")));
+
+            vm.CreateRepository.Execute(null);
+
+            creationService
+                .Received()
+                .CreateRepository(
+                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
+                        && r.Private == false
+                        && r.AutoInit == true
+                        && r.LicenseTemplate == "mit"
+                        && r.GitignoreTemplate == null),
+                    account,
+                    @"c:\dev",
+                    Args.ApiClient);
+        }
+
+        [Fact]
+        public void SetsAutoInitToTrueWhenGitIgnore()
+        {
+            var creationService = Substitute.For<IRepositoryCreationService>();
+            var account = Substitute.For<IAccount>();
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
+            var vm = new RepositoryCreationViewModel(
+                    Substitute.For<IOperatingSystem>(),
+                    hosts,
+                    creationService);
+            vm.RepositoryName = "Krieger";
+            vm.BaseRepositoryPath = @"c:\dev";
+            vm.SelectedAccount = account;
+            vm.KeepPrivate = false;
+            vm.SelectedGitIgnoreTemplate = GitIgnoreItem.Create("VisualStudio");
+
+            vm.CreateRepository.Execute(null);
+
+            creationService
+                .Received()
+                .CreateRepository(
+                    Arg.Is<NewRepository>(r => r.Name == "Krieger"
+                        && r.Private == false
+                        && r.AutoInit == true
+                        && r.LicenseTemplate == null
+                        && r.GitignoreTemplate == "VisualStudio"),
+                    account,
+                    @"c:\dev",
+                    Args.ApiClient);
+        }
+
+        [Theory]
+        [InlineData("", "", false)]
+        [InlineData("", @"c:\dev", false)]
+        [InlineData("blah", @"c:\|dev", false)]
+        [InlineData("blah", @"c:\dev", true)]
+        public void CannotCreateWhenRepositoryNameOrBasePathIsInvalid(
+            string repositoryName,
+            string baseRepositoryPath,
+            bool expected)
+        {
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
+            vm.RepositoryName = repositoryName;
+            vm.BaseRepositoryPath = baseRepositoryPath;
+            var reactiveCommand = vm.CreateRepository as ReactiveCommand<Unit>;
+
+            bool result = reactiveCommand.CanExecute(null);
+
+            Assert.Equal(expected, result);
+        }
+    }
+
+    public class TheCanKeepPrivateProperty
+    {
+        [Theory]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, false, true, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(true, true, true, true)]
+        [InlineData(false, false, false, true)]
+        public void IsOnlyTrueWhenUserIsEntepriseOrNotOnFreeAccountThatIsNotMaxedOut(
+            bool isFreeAccount,
+            bool isEnterprise,
+            bool isMaxedOut,
+            bool expected)
+        {
+            var selectedAccount = Substitute.For<IAccount>();
+            selectedAccount.IsOnFreePlan.Returns(isFreeAccount);
+            selectedAccount.IsEnterprise.Returns(isEnterprise);
+            selectedAccount.HasMaximumPrivateRepositories.Returns(isMaxedOut);
+            var vm = new RepositoryCreationViewModel(
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
+            vm.SelectedAccount = selectedAccount;
+
+            Assert.Equal(expected, vm.CanKeepPrivate);
         }
     }
 }

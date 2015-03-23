@@ -5,7 +5,8 @@ namespace GitHub.Models
 {
     public class LicenseItem
     {
-        public static LicenseItem None = new LicenseItem();
+        static readonly LicenseItem none = new LicenseItem();
+        public static LicenseItem None { get { return none; } }
 
         public LicenseItem(LicenseMetadata license)
         {
