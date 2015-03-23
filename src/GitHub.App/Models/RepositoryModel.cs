@@ -83,6 +83,13 @@ namespace GitHub.Models
             set { this.RaiseAndSetIfChanged(ref cloneUrl, value); }
         }
 
+        bool hasLocalClone;
+        public bool HasLocalClone
+        {
+            get { return hasLocalClone; }
+            private set { this.RaiseAndSetIfChanged(ref hasLocalClone, value); }
+        }
+
         public RepositoryModel()
         {
             nameWithOwner = this.WhenAny(x => x.Name, x => x.Owner, (name, owner) => new { Name = name.Value, Owner = owner.Value })

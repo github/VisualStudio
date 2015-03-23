@@ -23,10 +23,18 @@ namespace GitHub.ViewModels
 
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        public ICollection<IRepositoryModel> Repositories
+        IReactiveList<IRepositoryModel> repositories;
+        public IReactiveList<IRepositoryModel> Repositories
         {
-            get;
-            private set;
+            get { return repositories; }
+            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
+        }
+
+        IReactiveDerivedList<IRepositoryModel> _filteredRepositories;
+        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
+        {
+            get { return _filteredRepositories; }
+            private set { this.RaiseAndSetIfChanged(ref _filteredRepositories, value); }
         }
 
         IRepositoryModel _selectedRepository;
@@ -36,6 +44,18 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return _selectedRepository; }
             set { this.RaiseAndSetIfChanged(ref _selectedRepository, value); }
+        }
+
+        readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
+        public bool FilterTextIsEnabled { get { return filterTextIsEnabled.Value; } }
+
+        string filterText;
+        [AllowNull]
+        public string FilterText
+        {
+            [return:AllowNull]
+            get { return filterText; }
+            set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
         [ImportingConstructor]
@@ -54,7 +74,39 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
+            filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
+                .ToProperty(this, x => x.FilterTextIsEnabled);
+
+            var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
+                .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
+                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler);
+
+            FilteredRepositories = Repositories.CreateDerivedCollection(
+                x => x,
+                filter: FilterRepository,
+                signalReset: filterResetSignal
+            );
+
+            var canCloneSelected = this.WhenAny(x => x.SelectedRepository, x => x.Value)
+                .Select(selected => selected == null
+                    ? Observable.Return(false)
+                    : selected.WhenAny(x => x.HasLocalClone, x => x.Value == false))
+                .Switch();
+
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(
+                canCloneSelected.StartWith(false),
+                OnCloneRepository
+            );
+
+        }
+
+        bool FilterRepository(IRepositoryModel repo)
+        {
+            if (string.IsNullOrWhiteSpace(FilterText))
+                return true;
+
+            // Not matching on NameWithOwner here since that's already been filtered on by the selected account
+            return repo.Name.IndexOf(FilterText ?? "", StringComparison.OrdinalIgnoreCase) != -1;
         }
 
         IObservable<Unit> OnCloneRepository(object state)
