@@ -87,7 +87,7 @@ namespace GitHub.Models
         public bool HasLocalClone
         {
             get { return hasLocalClone; }
-            private set { this.RaiseAndSetIfChanged(ref hasLocalClone, value); }
+            set { this.RaiseAndSetIfChanged(ref hasLocalClone, value); }
         }
 
         public RepositoryModel()

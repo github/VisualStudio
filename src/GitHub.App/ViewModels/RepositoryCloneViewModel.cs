@@ -20,6 +20,7 @@ namespace GitHub.ViewModels
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
         readonly IRepositoryCloneService cloneService;
+        readonly string clonePath;
 
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
@@ -63,6 +64,9 @@ namespace GitHub.ViewModels
         {
             this.cloneService = cloneService;
 
+            // TODO: Pick a better location to clone this.
+            this.clonePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
+
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
@@ -70,7 +74,8 @@ namespace GitHub.ViewModels
                 .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
                 .SelectMany(user => hosts.GitHubHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
-                .Select(repo => new RepositoryModel(repo))
+                // TODO: hasLocalClone is a bit hacky right now
+                .Select(repo => new RepositoryModel(repo) { HasLocalClone = Directory.Exists(Path.Combine(clonePath, repo.Name)) })
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
@@ -114,9 +119,7 @@ namespace GitHub.ViewModels
             return Observable.Start(() =>
             {
                 var repository = SelectedRepository;
-
-                // TODO: Pick a better location to clone this.
-                string baseRepositoryDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
+                string baseRepositoryDirectory = clonePath;
                 Directory.CreateDirectory(baseRepositoryDirectory);
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, baseRepositoryDirectory);
             })
