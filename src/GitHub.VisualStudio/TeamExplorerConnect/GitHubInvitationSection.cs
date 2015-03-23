@@ -2,16 +2,8 @@
 using GitHub.VisualStudio.UI;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
@@ -26,23 +18,24 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         {
             Name = "GitHub";
             Provider = "GitHub, Inc.";
+            Icon = GetDrawingForIcon(GetBrushForIcon());
 
             IsVisible = true;
-
-            var brush = Application.Current.TryFindResource(HeaderColors.DefaultTextBrushKey) as Brush;
-            if (brush == null)
-                brush = Brushes.Black;
-            Icon = GetDrawingForIcon(brush);
 
             VSColorTheme.ThemeChanged += OnThemeChanged;
         }
 
         private void OnThemeChanged(ThemeChangedEventArgs e)
         {
+            Icon = GetDrawingForIcon(GetBrushForIcon());
+        }
+
+        Brush GetBrushForIcon()
+        {
             var brush = Application.Current.TryFindResource(HeaderColors.DefaultTextBrushKey) as Brush;
             if (brush == null)
                 brush = Brushes.Black;
-            Icon = GetDrawingForIcon(brush);
+            return brush;
         }
 
         DrawingBrush GetDrawingForIcon(Brush color)
