@@ -44,5 +44,11 @@ namespace GitHub.Extensions
                 || exception is ThreadAbortException
                 || exception is AccessViolationException;
         }
+
+        public static bool CanRetry(this Exception exception)
+        {
+            return !exception.IsCriticalException()
+                && !(exception is ObjectDisposedException);
+        }
     }
 }

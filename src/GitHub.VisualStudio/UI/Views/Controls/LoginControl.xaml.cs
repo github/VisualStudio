@@ -9,6 +9,8 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using System.Reactive.Subjects;
+using GitHub.Extensions;
+using System.Windows.Input;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -44,8 +46,13 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     }
                 }));
             });
+            IsVisibleChanged += (s, e) =>
+            {
+                if (IsVisible)
+                    dotComUserNameOrEmail.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
+            };
         }
-        
+
         void SetupDotComBindings(Action<IDisposable> d)
         {
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.IsLoggingIn, x => x.dotComloginControlsPanel.IsEnabled, x => x == false));
