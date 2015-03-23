@@ -19,7 +19,10 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <Grid>
+    <Grid
+        FocusManager.IsFocusScope="True"
+        FocusVisualStyle="{x:Null}"
+        >
         <Grid.Resources>
             <Style TargetType="{x:Type ui:TrimmedTextBlock}" BasedOn="{StaticResource GitHubTextBlock}">
                 <Style.Triggers>
