@@ -97,6 +97,8 @@
     <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Services\IAvatarProvider.cs" />
+    <Compile Include="Services\IRepositoryCloneService.cs" />
+    <Compile Include="Services\IRepositoryCreationService.cs" />
     <Compile Include="ViewModels\IRepositoryCreationViewModel.cs" />
     <Compile Include="Validation\ReactivePropertyValidator.cs" />
   </ItemGroup>

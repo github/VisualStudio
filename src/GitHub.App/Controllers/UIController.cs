@@ -156,6 +156,7 @@ namespace GitHub.Controllers
             var view = dv.Value;
 
             view.ViewModel = viewModel;
+
             return view;
         }
 
@@ -169,7 +170,7 @@ namespace GitHub.Controllers
         {
             currentFlow = choice;
             transition = new Subject<UserControl>();
-            transition.Subscribe((o) => { }, _ => Fire(Trigger.Next));
+            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
             return transition;
         }
 

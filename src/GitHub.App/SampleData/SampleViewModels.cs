@@ -29,9 +29,9 @@ namespace GitHub.SampleData
             Accounts = new ReactiveList<IAccount> { new AccountDesigner("GitHub") };
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>
             {
-                new GitIgnoreItem("VisualStudio"),
-                new GitIgnoreItem("Wap"),
-                new GitIgnoreItem("WordPress")
+                GitIgnoreItem.Create("VisualStudio"),
+                GitIgnoreItem.Create("Wap"),
+                GitIgnoreItem.Create("WordPress")
             };
 
             Licenses = new ReactiveList<LicenseItem>
@@ -41,6 +41,9 @@ namespace GitHub.SampleData
                 new LicenseItem(new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever"))),
                 new LicenseItem(new LicenseMetadata("mit", "MIT License", new Uri("https://whatever")))
             };
+
+            SelectedLicense = LicenseItem.None;
+            SelectedGitIgnoreTemplate = null;
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -111,12 +114,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public string RepositoryNameWarningText
-        {
-            get;
-            private set;
-        }
-
         public ICommand Reset
         {
             get;
@@ -138,13 +135,7 @@ namespace GitHub.SampleData
         public IAccount SelectedAccount
         {
             get;
-            private set;
-        }
-
-        public bool ShowRepositoryNameWarning
-        {
-            get;
-            private set;
+            set;
         }
 
         public bool ShowUpgradePlanWarning
@@ -173,6 +164,18 @@ namespace GitHub.SampleData
         public ReactiveList<LicenseItem> Licenses
         {
             get; private set;
+        }
+
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            get;
+            set;
+        }
+
+        public LicenseItem SelectedLicense
+        {
+            get;
+            set;
         }
     }
 

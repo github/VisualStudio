@@ -13,7 +13,7 @@ namespace GitHub.ViewModels
         string RepositoryName { get; set; }
 
         /// <summary>
-        /// The path where the repository is created.
+        /// The path where the repository is created. A folder named after the repository is created in this directory.
         /// </summary>
         string BaseRepositoryPath { get; set; }
 
@@ -22,15 +22,21 @@ namespace GitHub.ViewModels
         /// dashes.
         /// </summary>
         string SafeRepositoryName { get; }
-        bool ShowRepositoryNameWarning { get; }
-        string RepositoryNameWarningText { get; }
         ReactivePropertyValidator<string> RepositoryNameValidator { get; }
         ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator { get; }
         ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
         string Description { get; set; }
 
         ReactiveList<IAccount> Accounts { get; }
-        IAccount SelectedAccount { get; }
+
+        /// <summary>
+        /// The account or organization that will be the owner of the created repository.
+        /// </summary>
+        IAccount SelectedAccount { get; set; }
+
+        GitIgnoreItem SelectedGitIgnoreTemplate { get; set; }
+
+        LicenseItem SelectedLicense { get; set; }
 
         /// <summary>
         /// The list of GitIgnore templates supported by repository creation

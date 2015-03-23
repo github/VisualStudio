@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,8 @@ using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Services;
+using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
@@ -25,16 +28,29 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
+        readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
+        readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        readonly ReactiveCommand<object> createRepositoryCommand = ReactiveCommand.Create();
+        readonly ReactiveCommand<Unit> createRepositoryCommand;
+        readonly IRepositoryCreationService repositoryCreationService;
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts, IRepositoryCreationService repositoryCreationService)
         {
             this.operatingSystem = operatingSystem;
-
-            Accounts = new ReactiveList<IAccount>();
+            RepositoryHost = hosts.GitHubHost;
+            this.repositoryCreationService = repositoryCreationService;
+            
+            Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
+            Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
+            var selectedAccount = Accounts.FirstOrDefault();
+            if (selectedAccount != null)
+            {
+                SelectedAccount = Accounts.FirstOrDefault();
+            }
+            SelectedGitIgnoreTemplate = GitIgnoreItem.None;
+            SelectedLicense = LicenseItem.None;
 
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
@@ -68,28 +84,60 @@ namespace GitHub.ViewModels
 
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
 
-            Observable.Return(new GitIgnoreItem("None")).Concat(
-                hosts.GitHubHost.ApiClient
+            Observable.Return(GitIgnoreItem.None).Concat(
+                RepositoryHost.ApiClient
                     .GetGitIgnoreTemplates()
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(templateName => new GitIgnoreItem(templateName)))
+                    .Select(GitIgnoreItem.Create))
                 .ToList()
                 .Subscribe(templates =>
-                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended)));
+                {
+                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
+                    Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
+                });
 
             Licenses = new ReactiveList<LicenseItem>();
             Observable.Return(LicenseItem.None).Concat(
-                hosts.GitHubHost.ApiClient
+                RepositoryHost.ApiClient
                     .GetLicenses()
                     .WhereNotNull()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Select(license => new LicenseItem(license)))
                 .ToList()
                 .Subscribe(licenses =>
-                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended)));
+                {
+                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
+                    Debug.Assert(Licenses.Any(), "There should be at least one license");
+                });
+
+            createRepositoryCommand = InitializeCreateRepositoryCommand();
+
+            var canKeepPrivateObs = this.WhenAny(
+                x => x.SelectedAccount.IsEnterprise,
+                x => x.SelectedAccount.IsOnFreePlan,
+                x => x.SelectedAccount.HasMaximumPrivateRepositories,
+                (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
+                    isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
+
+            canKeepPrivate = canKeepPrivateObs.CombineLatest(createRepositoryCommand.IsExecuting,
+                (canKeep, publishing) => canKeep && !publishing)
+                .ToProperty(this, x => x.CanKeepPrivate);
+
+            canKeepPrivateObs
+                .Where(x => !x)
+                .Subscribe(x => KeepPrivate = false);
+
+            isPublishing = createRepositoryCommand.IsExecuting
+                .ToProperty(this, x => x.IsPublishing);
         }
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+
+        public IRepositoryHost RepositoryHost
+        {
+            get;
+            private set;
+        }
 
         public ReactiveList<IAccount> Accounts
         {
@@ -130,8 +178,7 @@ namespace GitHub.ViewModels
 
         public bool CanKeepPrivate
         {
-            get;
-            private set;
+            get { return canKeepPrivate.Value; }
         }
 
         public ICommand CreateRepository
@@ -139,22 +186,26 @@ namespace GitHub.ViewModels
             get { return createRepositoryCommand; }
         }
 
+        string description;
+        [AllowNull]
         public string Description
         {
-            get;
-            set;
+            [return:  AllowNull]
+            get { return description; }
+            set { this.RaiseAndSetIfChanged(ref description, value); }
         }
 
         public bool IsPublishing
         {
-            get;
-            private set;
+            get { return isPublishing.Value; }
         }
 
+
+        bool keepPrivate;
         public bool KeepPrivate
         {
-            get;
-            set;
+            get { return keepPrivate; }
+            set { this.RaiseAndSetIfChanged(ref keepPrivate, value); }
         }
 
         string repositoryName;
@@ -184,28 +235,19 @@ namespace GitHub.ViewModels
             private set;
         }
 
-        public string RepositoryNameWarningText
-        {
-            get;
-            private set;
-        }
-
         public ICommand Reset
         {
             get;
             private set;
         }
 
+        IAccount selectedAccount;
+        [AllowNull]
         public IAccount SelectedAccount
         {
-            get;
-            private set;
-        }
-
-        public bool ShowRepositoryNameWarning
-        {
-            get;
-            private set;
+            [return: AllowNull]
+            get { return selectedAccount; }
+            set { this.RaiseAndSetIfChanged(ref selectedAccount, value); }
         }
 
         public bool ShowUpgradePlanWarning
@@ -224,6 +266,22 @@ namespace GitHub.ViewModels
         {
             get;
             private set;
+        }
+
+        GitIgnoreItem selectedGitIgnoreTemplate;
+        [AllowNull]
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            get { return selectedGitIgnoreTemplate; }
+            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
+        }
+
+        LicenseItem selectedLicense;
+        [AllowNull]
+        public LicenseItem SelectedLicense
+        {
+            get { return selectedLicense; }
+            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
         }
 
         // These are the characters which are permitted when creating a repository name on GitHub The Website
@@ -289,6 +347,60 @@ namespace GitHub.ViewModels
             {
                 return false;
             }
+        }
+
+        Octokit.NewRepository GatherRepositoryInfo()
+        {
+            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
+            {
+                Description = Description,
+                Private = KeepPrivate
+            };
+
+            if (SelectedLicense != LicenseItem.None)
+            {
+                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
+                gitHubRepository.AutoInit = true;
+            }
+
+            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
+            {
+                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
+                gitHubRepository.AutoInit = true;
+            }
+
+            return gitHubRepository;
+        }
+
+        IObservable<Unit> OnCreateRepository(object state)
+        {
+            var newRepository = GatherRepositoryInfo();
+
+            return repositoryCreationService.CreateRepository(
+                newRepository,
+                SelectedAccount,
+                BaseRepositoryPath,
+                RepositoryHost.ApiClient);
+        }
+
+        ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
+        {
+            var canCreate = this.WhenAny(
+                x => x.RepositoryNameValidator.ValidationResult.IsValid,
+                x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
+                (x, y) => x.Value && y.Value);
+            var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
+            createCommand.ThrownExceptions.Subscribe(ex =>
+            {
+                if (!ex.IsCriticalException())
+                {
+                    // TODO: Throw a proper error.
+                    log.Error("Error creating repository.", ex);
+                    UserError.Throw(new PublishRepositoryUserError(ex.Message));
+                }
+            });
+
+            return createCommand;
         }
     }
 }
