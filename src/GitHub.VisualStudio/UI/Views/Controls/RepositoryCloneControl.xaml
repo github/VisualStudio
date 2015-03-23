@@ -19,6 +19,9 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
+    <StackPanel>
+        <ui:OcticonImage Icon="logo_github" Width="64" Height="64"/>
+
     <Grid
         FocusManager.IsFocusScope="True"
         FocusVisualStyle="{x:Null}"
@@ -150,4 +153,6 @@
             <TextBlock>Clone</TextBlock>
         </ui:OcticonCircleButton>
     </Grid>
+
+    </StackPanel>
 </UserControl>
