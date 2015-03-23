@@ -131,7 +131,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { SetValue(ViewModelProperty, value); }
         }
 
-        Subject<object> close;
+        readonly Subject<object> close;
         public IObservable<object> Done { get { return close; } }
     }
 }
