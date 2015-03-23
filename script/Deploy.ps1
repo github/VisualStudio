@@ -108,7 +108,7 @@ function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
     }
 
     $exitCode = 0
-    if ($LastExitCode -ne 0) {
+    if (!$? -and $LastExitCode -ne 0) {
         $exitCode = $LastExitCode
     } elseif (!$?) {
         $exitCode = 1
