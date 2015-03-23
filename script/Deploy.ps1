@@ -348,11 +348,11 @@ Announce-DeployStarted
 
 	Write-Output "Ready at ${tempDirectory}"
 
-    #Upload-Symbols
-    #Upload-Vsix $tempDirectory
+    Upload-Symbols
+    Upload-Vsix $tempDirectory
 
     #Remove-Item -Recurse $tempDirectory
 
-    #Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
-    #Announce-DeployCompleted
+    Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
+    Announce-DeployCompleted
 }
