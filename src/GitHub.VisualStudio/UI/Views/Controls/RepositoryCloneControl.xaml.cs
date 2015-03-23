@@ -87,7 +87,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             }
         }
 
-        Subject<object> close;
+        readonly Subject<object> close;
         public IObservable<object> Done { get { return close; } }
     }
 }
