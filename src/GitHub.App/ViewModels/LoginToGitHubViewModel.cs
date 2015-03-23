@@ -36,7 +36,6 @@ namespace GitHub.ViewModels
             ShowTwoFactorAuthFailedError = false;
 
             return RepositoryHosts.LogInGitHubHost(UsernameOrEmail, Password)
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .SelectMany(authResult =>
                 {
                     if (authResult == AuthenticationResult.CredentialFailure)
@@ -53,8 +52,8 @@ namespace GitHub.ViewModels
                     }
                     else if (authResult == AuthenticationResult.Success)
                     {
-                        return Reset.ExecuteAsync()
-                            .ContinueAfter(() => Observable.Return(authResult));
+                        return Observable.Return(authResult);
+                        // Reset.ExecuteAsync()
                     }
 
                     return Observable.Return(authResult);

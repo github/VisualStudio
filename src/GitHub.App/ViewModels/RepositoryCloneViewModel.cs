@@ -20,9 +20,8 @@ namespace GitHub.ViewModels
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
         readonly IRepositoryCloneService cloneService;
-        IReactiveCommand<Unit> cloneCommand;
 
-        public ICommand CloneCommand { get { return cloneCommand; } }
+        public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
         public ICollection<IRepositoryModel> Repositories
         {
@@ -55,7 +54,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
-            cloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
         }
 
         IObservable<Unit> OnCloneRepository(object state)

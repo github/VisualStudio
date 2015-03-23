@@ -10,6 +10,11 @@ using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System;
+using GitHub.Extensions.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -29,11 +34,14 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IRepositoryCloneViewModel;
 
+            close = new Subject<object>();
+
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.Repositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
                 d(this.Bind(ViewModel, vm => vm.SelectedRepository, v => v.repositoryList.SelectedItem));
                 d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
+                d(ViewModel.CloneCommand.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
             });
         }
 
@@ -78,5 +86,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 return string.Equals((string)groupName, (string)itemName);
             }
         }
+
+        readonly Subject<object> close;
+        public IObservable<object> Done { get { return close; } }
     }
 }

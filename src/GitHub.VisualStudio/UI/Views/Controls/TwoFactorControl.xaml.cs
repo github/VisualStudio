@@ -7,6 +7,7 @@ using GitHub.UI;
 using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using ReactiveUI;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -24,6 +25,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
             DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
+
+            close = new Subject<object>();
 
             this.WhenActivated(d =>
             {
@@ -44,7 +47,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     .Subscribe(key =>
                     {
                         key.Handled = true;
-                        //TODO: Hide this dialog.
+                        close.OnNext(null);
+                        close.OnCompleted();
                     }));
             });
         }
@@ -73,5 +77,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             get { return ViewModel; }
             set { ViewModel = (ITwoFactorDialogViewModel)value; }
         }
+
+
+        readonly Subject<object> close;
+        public IObservable<object> Done { get { return close; } }
     }
 }
