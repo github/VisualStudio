@@ -111,6 +111,7 @@ namespace GitHub.ViewModels
                 });
 
             createRepositoryCommand = InitializeCreateRepositoryCommand();
+            IsCreated = createRepositoryCommand.Select(x => (object)x);
 
             var canKeepPrivateObs = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,
@@ -185,6 +186,8 @@ namespace GitHub.ViewModels
         {
             get { return createRepositoryCommand; }
         }
+
+        public IObservable<object> IsCreated { get; private set; }
 
         string description;
         [AllowNull]

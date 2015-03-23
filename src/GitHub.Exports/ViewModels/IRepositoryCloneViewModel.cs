@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
 using GitHub.Models;
+using System;
 
 namespace GitHub.ViewModels
 {
@@ -13,6 +14,7 @@ namespace GitHub.ViewModels
         /// Command to clone the currently selected repository.
         /// </summary>
         ICommand CloneCommand { get; }
+        IObservable<object> IsCloned { get; }
 
         /// <summary>
         /// The list of repositories the current user may clone from the specified host.
