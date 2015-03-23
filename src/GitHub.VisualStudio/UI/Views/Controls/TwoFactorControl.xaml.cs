@@ -25,6 +25,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             InitializeComponent();
             DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
 
+            close = ReactiveCommand.Create();
+
             this.WhenActivated(d =>
             {
                 authenticationCode.Focus();
@@ -44,7 +46,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     .Subscribe(key =>
                     {
                         key.Handled = true;
-                        //TODO: Hide this dialog.
+                        close.Execute(null);
                     }));
             });
         }
@@ -73,5 +75,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             get { return ViewModel; }
             set { ViewModel = (ITwoFactorDialogViewModel)value; }
         }
+
+
+        readonly ReactiveCommand<object> close;
+        public IObservable<object> Done { get { return close; } }
     }
 }

@@ -23,6 +23,7 @@ namespace GitHub.ViewModels
         IReactiveCommand<Unit> cloneCommand;
 
         public ICommand CloneCommand { get { return cloneCommand; } }
+        public IObservable<object> IsCloned { get; private set; }
 
         public ICollection<IRepositoryModel> Repositories
         {
@@ -56,6 +57,7 @@ namespace GitHub.ViewModels
                 .Subscribe(Repositories.Add);
 
             cloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
+            IsCloned = cloneCommand.Select(x => (object)x);
         }
 
         IObservable<Unit> OnCloneRepository(object state)

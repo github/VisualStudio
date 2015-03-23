@@ -26,6 +26,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
+            close = ReactiveCommand.Create();
+
             IObservable<bool> clearErrorWhenChanged = this.WhenAny(
                 x => x.ViewModel.RepositoryName,
                 x => x.ViewModel.Description,
@@ -71,6 +73,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
+
+                d(ViewModel.IsCreated.Subscribe(_ => close.Execute(null)));
+
             });
         }
 
@@ -96,5 +101,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             { return (IRepositoryCreationViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
+
+        ReactiveCommand<object> close;
+        public IObservable<object> Done { get { return close; } }
     }
 }

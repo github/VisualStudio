@@ -84,6 +84,12 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public IObservable<object> IsCreated
+        {
+            get;
+            private set;
+        }
+
         public string Description
         {
             get;
@@ -345,13 +351,13 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IObservable<object> Cancelling
+        public ICommand CloneCommand
         {
             get;
             private set;
         }
 
-        public ICommand CloneCommand
+        public IObservable<object> IsCloned
         {
             get;
             private set;

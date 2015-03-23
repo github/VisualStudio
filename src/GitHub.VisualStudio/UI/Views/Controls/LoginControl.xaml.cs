@@ -24,14 +24,20 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
 
             InitializeComponent();
-            
+
             DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
+            close = ReactiveCommand.Create();
 
             this.WhenActivated(d =>
             {
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
+                d(ViewModel.AuthenticationResults.Subscribe(ret =>
+                {
+                    if (ret == Authentication.AuthenticationResult.Success)
+                        close.Execute(null);
+                }));
             });
         }
         
@@ -119,5 +125,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             get { return (ILoginControlViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
+
+        ReactiveCommand<object> close;
+        public IObservable<object> Done { get { return close; } }
     }
 }
