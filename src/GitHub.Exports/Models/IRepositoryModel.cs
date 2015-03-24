@@ -14,5 +14,6 @@ namespace GitHub.Models
         Uri HostUri { get; }
         bool IsPrivate { get; }
         UriString CloneUrl { get; }
+        bool HasLocalClone { get; }
     }
 }

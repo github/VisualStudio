@@ -19,6 +19,9 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
+    <StackPanel>
+        <ui:OcticonImage Icon="logo_github" Width="64" Height="64"/>
+
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type ui:TrimmedTextBlock}" BasedOn="{StaticResource GitHubTextBlock}">
@@ -147,4 +150,6 @@
             <TextBlock>Clone</TextBlock>
         </ui:OcticonCircleButton>
     </Grid>
+
+    </StackPanel>
 </UserControl>
