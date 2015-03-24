@@ -19,6 +19,11 @@ namespace GitHub.Caches
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         const string staffModeKey = "__StaffOnlySettings__:IsStaffMode";
 
+        static SharedCache()
+        {
+            BlobCache.ApplicationName = "GitHub Extension for Visual Studio";
+        }
+
         public SharedCache() : this(BlobCache.UserAccount, BlobCache.LocalMachine, null)
         {
         }
