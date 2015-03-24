@@ -31,20 +31,20 @@ namespace GitHub.ViewModels
             private set { this.RaiseAndSetIfChanged(ref repositories, value); }
         }
 
-        IReactiveDerivedList<IRepositoryModel> _filteredRepositories;
+        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
         public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
         {
-            get { return _filteredRepositories; }
-            private set { this.RaiseAndSetIfChanged(ref _filteredRepositories, value); }
+            get { return filteredRepositories; }
+            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
         }
 
-        IRepositoryModel _selectedRepository;
+        IRepositoryModel selectedRepository;
         [AllowNull]
         public IRepositoryModel SelectedRepository
         {
             [return: AllowNull]
-            get { return _selectedRepository; }
-            set { this.RaiseAndSetIfChanged(ref _selectedRepository, value); }
+            get { return selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
 
         readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
@@ -65,7 +65,7 @@ namespace GitHub.ViewModels
             this.cloneService = cloneService;
 
             // TODO: Pick a better location to clone this.
-            this.clonePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
+            clonePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
 
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
