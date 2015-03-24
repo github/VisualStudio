@@ -27,7 +27,8 @@
             Background="{x:Null}"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
-            helpers:AccessKeysManagerScoping.IsEnabled="True">
+            helpers:AccessKeysManagerScoping.IsEnabled="True"
+            >
             <ui:OcticonImage Icon="logo_github" FontSize="20" Width="200" Height="60" />
 
             <TextBlock
@@ -40,7 +41,12 @@
             
             <ui:HorizontalShadowDivider Margin="0,0,0,40" />
             
-            <TabControl x:Name="hostTabControl" Style="{StaticResource LightModalViewTabControl}">
+            <TabControl 
+                x:Name="hostTabControl" Style="{StaticResource LightModalViewTabControl}"
+                FocusManager.IsFocusScope="True"
+                FocusVisualStyle="{x:Null}"
+                helpers:AccessKeysManagerScoping.IsEnabled="True"
+                >
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LightModalViewTabItem}" />
                     <Style TargetType="{x:Type TabPanel}">

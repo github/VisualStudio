@@ -10,6 +10,8 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using System.Reactive.Subjects;
+using GitHub.Extensions;
+using System.Windows.Input;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -77,6 +79,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                 d(ViewModel.CreateRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
             });
+            IsVisibleChanged += (s, e) =>
+            {
+                if (IsVisible)
+                    this.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
+            };
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
