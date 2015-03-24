@@ -15,6 +15,8 @@ using GitHub.Extensions.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Windows.Input;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -45,6 +47,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
                 d(ViewModel.CloneCommand.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
             });
+            IsVisibleChanged += (s, e) =>
+            {
+                if (IsVisible)
+                    this.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
+            };
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
