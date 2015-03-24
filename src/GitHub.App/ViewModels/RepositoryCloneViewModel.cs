@@ -20,28 +20,52 @@ namespace GitHub.ViewModels
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
         readonly IRepositoryCloneService cloneService;
+        readonly string clonePath;
 
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        public ICollection<IRepositoryModel> Repositories
+        IReactiveList<IRepositoryModel> repositories;
+        public IReactiveList<IRepositoryModel> Repositories
         {
-            get;
-            private set;
+            get { return repositories; }
+            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
         }
 
-        IRepositoryModel _selectedRepository;
+        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
+        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
+        {
+            get { return filteredRepositories; }
+            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
+        }
+
+        IRepositoryModel selectedRepository;
         [AllowNull]
         public IRepositoryModel SelectedRepository
         {
             [return: AllowNull]
-            get { return _selectedRepository; }
-            set { this.RaiseAndSetIfChanged(ref _selectedRepository, value); }
+            get { return selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
+        }
+
+        readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
+        public bool FilterTextIsEnabled { get { return filterTextIsEnabled.Value; } }
+
+        string filterText;
+        [AllowNull]
+        public string FilterText
+        {
+            [return:AllowNull]
+            get { return filterText; }
+            set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(IRepositoryCloneService cloneService, IRepositoryHosts hosts)
         {
             this.cloneService = cloneService;
+
+            // TODO: Pick a better location to clone this.
+            clonePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
 
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
@@ -50,11 +74,44 @@ namespace GitHub.ViewModels
                 .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
                 .SelectMany(user => hosts.GitHubHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
-                .Select(repo => new RepositoryModel(repo))
+                // TODO: hasLocalClone is a bit hacky right now
+                .Select(repo => new RepositoryModel(repo) { HasLocalClone = Directory.Exists(Path.Combine(clonePath, repo.Name)) })
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
+            filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
+                .ToProperty(this, x => x.FilterTextIsEnabled);
+
+            var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
+                .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
+                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler);
+
+            FilteredRepositories = Repositories.CreateDerivedCollection(
+                x => x,
+                filter: FilterRepository,
+                signalReset: filterResetSignal
+            );
+
+            var canCloneSelected = this.WhenAny(x => x.SelectedRepository, x => x.Value)
+                .Select(selected => selected == null
+                    ? Observable.Return(false)
+                    : selected.WhenAny(x => x.HasLocalClone, x => x.Value == false))
+                .Switch();
+
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(
+                canCloneSelected.StartWith(false),
+                OnCloneRepository
+            );
+
+        }
+
+        bool FilterRepository(IRepositoryModel repo)
+        {
+            if (string.IsNullOrWhiteSpace(FilterText))
+                return true;
+
+            // Not matching on NameWithOwner here since that's already been filtered on by the selected account
+            return repo.Name.IndexOf(FilterText ?? "", StringComparison.OrdinalIgnoreCase) != -1;
         }
 
         IObservable<Unit> OnCloneRepository(object state)
@@ -62,9 +119,7 @@ namespace GitHub.ViewModels
             return Observable.Start(() =>
             {
                 var repository = SelectedRepository;
-
-                // TODO: Pick a better location to clone this.
-                string baseRepositoryDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
+                string baseRepositoryDirectory = clonePath;
                 Directory.CreateDirectory(baseRepositoryDirectory);
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, baseRepositoryDirectory);
             })

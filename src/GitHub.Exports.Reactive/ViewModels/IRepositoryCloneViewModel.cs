@@ -20,8 +20,11 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
-        ICollection<IRepositoryModel> Repositories { get; }
+        IReactiveDerivedList<IRepositoryModel> FilteredRepositories { get; }
 
         IRepositoryModel SelectedRepository { get; set; }
+
+        bool FilterTextIsEnabled { get; }
+        string FilterText { get; set; }
     }
 }
