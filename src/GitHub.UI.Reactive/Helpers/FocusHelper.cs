@@ -13,19 +13,6 @@ namespace GitHub.Extensions
 {
     public static class FocusHelper
     {
-        public static void EnsureFocus(this FrameworkElement el)
-        {
-            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-            {
-                return;
-            }
-
-            Observable.Interval(TimeSpan.FromMilliseconds(10), RxApp.MainThreadScheduler)
-                .Select(x => el.Focus())
-                .TakeWhile((x, count) => !x && count < 100)
-                .Subscribe();
-        }
-
         /// <summary>
         /// Attempts to move focus to an element within the provided container waiting for the element to be loaded
         /// if necessary (waits max 1 second to protect against confusing focus shifts if the element gets loaded much
