@@ -324,11 +324,11 @@ namespace GitHub.SampleData
         public bool HasLocalClone { get; private set; }
     }
 
-    public class CloneRepositoryViewModelDesigner : IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : IRepositoryCloneViewModel
     {
-        public CloneRepositoryViewModelDesigner()
+        public RepositoryCloneViewModelDesigner()
         {
-            Repositories = new ReactiveList<IRepositoryModel>
+            var repositories = new ReactiveList<IRepositoryModel>
             {
                 new RepositoryModel {Owner = "haacked", Name = "encourage" },
                 new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
@@ -339,6 +339,10 @@ namespace GitHub.SampleData
                 new RepositoryModel {Owner = "github", Name = "mac" },
                 new RepositoryModel {Owner = "github", Name = "github" }
             };
+
+            FilteredRepositories = repositories.CreateDerivedCollection(
+                x => x
+            );
         }
 
         public ICommand CancelCommand
@@ -355,11 +359,6 @@ namespace GitHub.SampleData
 
         public IRepositoryModel SelectedRepository { get; set; }
 
-        public IReactiveList<IRepositoryModel> Repositories
-        {
-            get;
-            private set;
-        }
         public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
         {
             get;
