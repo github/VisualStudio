@@ -17,47 +17,8 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType=UIViewType.Clone)]
     public class RepositoryCloneViewModel : ReactiveObject, IRepositoryCloneViewModel
     {
-        public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
-
         readonly IRepositoryCloneService cloneService;
         readonly string clonePath;
-
-        public IReactiveCommand<Unit> CloneCommand { get; private set; }
-
-        IReactiveList<IRepositoryModel> repositories;
-        public IReactiveList<IRepositoryModel> Repositories
-        {
-            get { return repositories; }
-            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
-        }
-
-        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
-        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
-        {
-            get { return filteredRepositories; }
-            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
-        }
-
-        IRepositoryModel selectedRepository;
-        [AllowNull]
-        public IRepositoryModel SelectedRepository
-        {
-            [return: AllowNull]
-            get { return selectedRepository; }
-            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
-        }
-
-        readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
-        public bool FilterTextIsEnabled { get { return filterTextIsEnabled.Value; } }
-
-        string filterText;
-        [AllowNull]
-        public string FilterText
-        {
-            [return:AllowNull]
-            get { return filterText; }
-            set { this.RaiseAndSetIfChanged(ref filterText, value); }
-        }
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(IRepositoryCloneService cloneService, IRepositoryHosts hosts)
@@ -124,6 +85,66 @@ namespace GitHub.ViewModels
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, baseRepositoryDirectory);
             })
             .SelectMany(_ => _);
+        }
+
+        /// <summary>
+        /// Title for the dialog
+        /// </summary>
+        public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
+
+        /// <summary>
+        /// Fires off the cloning process
+        /// </summary>
+        public IReactiveCommand<Unit> CloneCommand { get; private set; }
+
+        IReactiveList<IRepositoryModel> repositories;
+        /// <summary>
+        /// List of repositories as returned by the server
+        /// </summary>
+        public IReactiveList<IRepositoryModel> Repositories
+        {
+            get { return repositories; }
+            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
+        }
+
+        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
+        /// <summary>
+        /// List of repositories as filtered by user
+        /// </summary>
+        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
+        {
+            get { return filteredRepositories; }
+            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
+        }
+
+        IRepositoryModel selectedRepository;
+        /// <summary>
+        /// Selected repository to clone
+        /// </summary>
+        [AllowNull]
+        public IRepositoryModel SelectedRepository
+        {
+            [return: AllowNull]
+            get { return selectedRepository; }
+            set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
+        }
+
+        readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
+        /// <summary>
+        /// True if there are repositories (otherwise no point in filtering)
+        /// </summary>
+        public bool FilterTextIsEnabled { get { return filterTextIsEnabled.Value; } }
+
+        string filterText;
+        /// <summary>
+        /// User text to filter the repositories list
+        /// </summary>
+        [AllowNull]
+        public string FilterText
+        {
+            [return: AllowNull]
+            get { return filterText; }
+            set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
     }
 }
