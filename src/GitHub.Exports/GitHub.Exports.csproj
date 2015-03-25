@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Services\VSExtensions.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubHomeSection.cs" />

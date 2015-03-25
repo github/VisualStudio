@@ -8,6 +8,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
+using System.Reflection;
 
 namespace GitHub.VisualStudio
 {
@@ -41,7 +42,8 @@ namespace GitHub.VisualStudio
             ExportProvider = componentModel.DefaultExportProvider;
         }
 
-        public object GetService(Type serviceType)
+        [return: AllowNull]
+        public object TryGetService(Type serviceType)
         {
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = ExportProvider.GetExportedValues<object>(contract).FirstOrDefault();
@@ -60,6 +62,16 @@ namespace GitHub.VisualStudio
                     return instance;
             }
 
+            return null;
+        }
+
+        public object GetService(Type serviceType)
+        {
+            var instance = TryGetService(serviceType);
+            if (instance != null)
+                return instance;
+
+            string contract = AttributedModelServices.GetContractName(serviceType);
             throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
                 "Could not locate any instances of contract {0}.", contract));
         }
@@ -67,6 +79,11 @@ namespace GitHub.VisualStudio
         public T GetService<T>()
         {
             return (T)GetService(typeof(T));
+        }
+
+        public T TryGetService<T>() where T : class
+        {
+            return TryGetService(typeof(T)) as T;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
