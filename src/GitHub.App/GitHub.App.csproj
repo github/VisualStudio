@@ -176,6 +176,7 @@
     <Compile Include="ViewModels\LoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\LoginToGitHubViewModel.cs" />
     <Compile Include="ViewModels\RepositoryFormViewModel.cs" />
+    <Compile Include="ViewModels\RepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\TwoFactorDialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
