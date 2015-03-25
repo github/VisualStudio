@@ -15,7 +15,7 @@ namespace GitHub.Extensions
             {
                 try
                 {
-                    return ui.GetService<T>();
+                    return serviceProvider.GetService(typeof(T)) as T;
                 }
                 catch (Exception ex)
                 {
