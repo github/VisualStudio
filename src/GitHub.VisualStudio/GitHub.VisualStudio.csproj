@@ -209,6 +209,9 @@
     <Compile Include="UI\Views\Controls\LoginControl.xaml.cs">
       <DependentUpon>LoginControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\Controls\RepositoryPublishControl.xaml.cs">
+      <DependentUpon>RepositoryPublishControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\GitHubConnectContent.xaml.cs">
       <DependentUpon>GitHubConnectContent.xaml</DependentUpon>
     </Compile>
@@ -285,6 +288,10 @@
     <Page Include="UI\Views\Controls\LoginControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\RepositoryPublishControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\GitHubConnectContent.xaml">
       <Generator>MSBuild:Compile</Generator>

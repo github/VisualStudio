@@ -74,6 +74,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\IRepositoryForm.cs" />
+    <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
