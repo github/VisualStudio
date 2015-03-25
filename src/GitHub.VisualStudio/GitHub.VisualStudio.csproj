@@ -192,6 +192,7 @@
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Helpers\Colors.cs" />
     <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\Services.cs" />
