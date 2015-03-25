@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using GitHub.Api;
+using GitHub.Authentication;
+using GitHub.Caches;
 using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -90,7 +93,7 @@ namespace GitHub.SampleData
             set;
         }
 
-        public bool IsPublishing
+        public bool IsCreating
         {
             get;
             private set;
@@ -176,6 +179,143 @@ namespace GitHub.SampleData
         {
             get;
             set;
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    public sealed class RepositoryPublishViewModelDesigner : RepositoryCreationViewModelDesigner, IRepositoryPublishViewModel
+    {
+        public RepositoryPublishViewModelDesigner()
+        {
+            RepositoryHosts = new ReactiveList<IRepositoryHost>
+            {
+                new RepositoryHostDesigner("GitHub"),
+                new RepositoryHostDesigner("ghe.io")
+            };
+        }
+
+        public bool IsPublishing
+        {
+            get;
+            private set;
+        }
+
+        public IReactiveCommand<Unit> PublishRepository
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<IRepositoryHost> RepositoryHosts
+        {
+            get;
+            private set;
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    public sealed class RepositoryHostDesigner : ReactiveObject, IRepositoryHost
+    {
+        public RepositoryHostDesigner(string title)
+        {
+            this.Title = title;
+        }
+
+        public ReactiveList<IAccount> Accounts
+        {
+            get;
+            private set;
+        }
+
+        public HostAddress Address
+        {
+            get;
+            private set;
+        }
+
+        public IApiClient ApiClient
+        {
+            get;
+            private set;
+        }
+
+        public IHostCache Cache
+        {
+            get;
+            private set;
+        }
+
+        public bool IsEnterprise
+        {
+            get;
+            private set;
+        }
+
+        public bool IsGitHub
+        {
+            get;
+            private set;
+        }
+
+        public bool IsLocal
+        {
+            get;
+            private set;
+        }
+
+        public bool IsLoggedIn
+        {
+            get;
+            private set;
+        }
+
+        public bool IsLoggingIn
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<IAccount> Organizations
+        {
+            get;
+            private set;
+        }
+
+        public string Title
+        {
+            get;
+            private set;
+        }
+
+        public IAccount User
+        {
+            get;
+            private set;
+        }
+
+        public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<AuthenticationResult> LogInFromCache()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<Unit> LogOut()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<Unit> Refresh()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc)
+        {
+            throw new NotImplementedException();
         }
     }
 
