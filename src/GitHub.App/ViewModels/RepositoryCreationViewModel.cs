@@ -38,7 +38,8 @@ namespace GitHub.ViewModels
         readonly IRepositoryCreationService repositoryCreationService;
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts, IRepositoryCreationService repositoryCreationService)
+        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts,
+            IRepositoryCreationService repositoryCreationService, IRepositoryCloneService cloneService)
         {
             this.operatingSystem = operatingSystem;
             RepositoryHost = hosts.GitHubHost;
@@ -130,6 +131,8 @@ namespace GitHub.ViewModels
 
             isPublishing = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsPublishing);
+
+            BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
         }
 
         /// <summary>

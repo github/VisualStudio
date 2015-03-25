@@ -18,15 +18,11 @@ namespace GitHub.ViewModels
     public class RepositoryCloneViewModel : ReactiveObject, IRepositoryCloneViewModel
     {
         readonly IRepositoryCloneService cloneService;
-        readonly string clonePath;
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(IRepositoryCloneService cloneService, IRepositoryHosts hosts)
         {
             this.cloneService = cloneService;
-
-            // TODO: Pick a better location to clone this.
-            clonePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GitHub");
 
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
@@ -35,8 +31,7 @@ namespace GitHub.ViewModels
                 .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
                 .SelectMany(user => hosts.GitHubHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
-                // TODO: hasLocalClone is a bit hacky right now
-                .Select(repo => new RepositoryModel(repo) { HasLocalClone = Directory.Exists(Path.Combine(clonePath, repo.Name)) })
+                .Select(repo => new RepositoryModel(repo) { HasLocalClone = LocalRepoExists(repo) })
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
@@ -64,6 +59,13 @@ namespace GitHub.ViewModels
                 OnCloneRepository
             );
 
+            BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
+        }
+
+        bool LocalRepoExists(Repository repo)
+        {
+            return Directory.Exists(Path.Combine(BaseRepositoryPath, repo.Name)) &&
+                   Directory.Exists(Path.Combine(BaseRepositoryPath, repo.Name, ".git"));
         }
 
         bool FilterRepository(IRepositoryModel repo)
@@ -80,9 +82,9 @@ namespace GitHub.ViewModels
             return Observable.Start(() =>
             {
                 var repository = SelectedRepository;
-                string baseRepositoryDirectory = clonePath;
-                Directory.CreateDirectory(baseRepositoryDirectory);
-                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, baseRepositoryDirectory);
+                if (!Directory.Exists(BaseRepositoryPath))
+                    Directory.CreateDirectory(BaseRepositoryPath);
+                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath);
             })
             .SelectMany(_ => _);
         }
@@ -91,6 +93,17 @@ namespace GitHub.ViewModels
         /// Title for the dialog
         /// </summary>
         public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
+
+        string baseRepositoryPath;
+        /// <summary>
+        /// Path to clone repositories into
+        /// </summary>
+        public string BaseRepositoryPath
+        {
+            [return: AllowNull]
+            get { return baseRepositoryPath; }
+            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
+        }
 
         /// <summary>
         /// Fires off the cloning process

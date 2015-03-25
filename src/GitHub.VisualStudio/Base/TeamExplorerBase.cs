@@ -12,8 +12,10 @@ namespace GitHub.VisualStudio.Base
         bool disposed = false;
 
         IServiceProvider serviceProvider;
+        [AllowNull]
         protected IServiceProvider ServiceProvider
         {
+            [return:  AllowNull]
             get { return serviceProvider; }
             set
             {
