@@ -19,6 +19,8 @@
                 <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
                 <Label Margin="6 0 6 0"></Label>
                 <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
+                <Label Margin="6 0 6 0"></Label>
+                <TextBlock><Hyperlink x:Name="publishLink" Click="publishLink_Click">Publish</Hyperlink></TextBlock>
             </WrapPanel>
         </Grid>
 
@@ -26,8 +28,5 @@
 
         </StackPanel>
         
-        <Border Margin="20">
-            <ui:TwoFactorInput />
-        </Border>
     </StackPanel>
 </Window>

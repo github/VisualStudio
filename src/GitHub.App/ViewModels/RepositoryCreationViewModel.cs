@@ -63,20 +63,9 @@ namespace GitHub.ViewModels
 
             CreateRepository = InitializeCreateRepositoryCommand();
 
-            var canKeepPrivateObs = this.WhenAny(
-                x => x.SelectedAccount.IsEnterprise,
-                x => x.SelectedAccount.IsOnFreePlan,
-                x => x.SelectedAccount.HasMaximumPrivateRepositories,
-                (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
-                isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
-
-            canKeepPrivate = canKeepPrivateObs.CombineLatest(CreateRepository.IsExecuting,
+            canKeepPrivate = CanKeepPrivateObservable.CombineLatest(CreateRepository.IsExecuting,
                 (canKeep, publishing) => canKeep && !publishing)
                 .ToProperty(this, x => x.CanKeepPrivate);
-
-            canKeepPrivateObs
-                .Where(x => !x)
-                .Subscribe(x => KeepPrivate = false);
 
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
@@ -167,29 +156,6 @@ namespace GitHub.ViewModels
             {
                 return false;
             }
-        }
-
-        Octokit.NewRepository GatherRepositoryInfo()
-        {
-            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
-            {
-                Description = Description,
-                Private = KeepPrivate
-            };
-
-            if (SelectedLicense != LicenseItem.None)
-            {
-                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
-                gitHubRepository.AutoInit = true;
-            }
-
-            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
-            {
-                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
-                gitHubRepository.AutoInit = true;
-            }
-
-            return gitHubRepository;
         }
 
         IObservable<Unit> OnCreateRepository(object state)

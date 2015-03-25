@@ -15,6 +15,7 @@ namespace GitHub.UI
         None = 0,
         Authentication = 1,
         Create = 2,
-        Clone = 3
+        Clone = 3,
+        Publish
     }
 }

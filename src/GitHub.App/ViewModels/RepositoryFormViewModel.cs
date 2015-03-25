@@ -22,7 +22,7 @@ namespace GitHub.ViewModels
         
         protected RepositoryFormViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
         {
-            this.OperatingSystem = operatingSystem;
+            OperatingSystem = operatingSystem;
             RepositoryHost = hosts.GitHubHost;
      
             Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
@@ -34,6 +34,17 @@ namespace GitHub.ViewModels
             }
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
+
+            CanKeepPrivateObservable = this.WhenAny(
+                x => x.SelectedAccount.IsEnterprise,
+                x => x.SelectedAccount.IsOnFreePlan,
+                x => x.SelectedAccount.HasMaximumPrivateRepositories,
+                (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
+                isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
+
+            CanKeepPrivateObservable
+                .Where(x => !x)
+                .Subscribe(x => KeepPrivate = false);
 
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
@@ -180,6 +191,8 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
         }
 
+        protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
+
         protected IOperatingSystem OperatingSystem { get; private set; }
 
         // These are the characters which are permitted when creating a repository name on GitHub The Website
@@ -191,6 +204,29 @@ namespace GitHub.ViewModels
         protected static string GetSafeRepositoryName(string name)
         {
             return invalidRepositoryCharsRegex.Replace(name, "-");
+        }
+
+        protected Octokit.NewRepository GatherRepositoryInfo()
+        {
+            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
+            {
+                Description = Description,
+                Private = KeepPrivate
+            };
+
+            if (SelectedLicense != LicenseItem.None)
+            {
+                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
+                gitHubRepository.AutoInit = true;
+            }
+
+            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
+            {
+                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
+                gitHubRepository.AutoInit = true;
+            }
+
+            return gitHubRepository;
         }
     }
 }
