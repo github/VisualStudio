@@ -208,6 +208,7 @@
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
+    <Compile Include="SimpleJson.cs" />
     <Compile Include="TeamExplorerConnect\PlaceholderGitHubSection.cs" />
     <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
