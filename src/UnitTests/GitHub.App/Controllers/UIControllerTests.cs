@@ -30,7 +30,7 @@ public class UIControllerTests
 
     public class TheStartMethod
     {
-        [Fact]
+        [STAFact]
         public void ShowingCloneDialogWithoutBeingLoggedInShowsLoginDialog()
         {
             var uiProvider = Substitute.For<IUIProvider>();
@@ -47,7 +47,7 @@ public class UIControllerTests
             }
         }
 
-        [Fact]
+        [STAFact]
         public void ShowingCloneDialogWhenLoggedInShowsCloneDialog()
         {
             var uiProvider = Substitute.For<IUIProvider>();
