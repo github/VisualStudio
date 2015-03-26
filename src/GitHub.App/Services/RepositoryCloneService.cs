@@ -8,6 +8,8 @@ using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Rothko;
 using System.Linq;
 using GitHub.Extensions;
+using GitHub.Info;
+using System.Globalization;
 
 namespace GitHub.Services
 {
@@ -29,7 +31,7 @@ namespace GitHub.Services
             this.serviceProvider = serviceProvider;
             this.operatingSystem = operatingSystem;
 
-            defaultClonePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "GitHub");
+            defaultClonePath = operatingSystem.Environment.GetUserDocumentsPathForApplication();
         }
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)

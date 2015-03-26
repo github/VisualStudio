@@ -22,5 +22,10 @@ namespace GitHub.Info
         {
             return environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
         }
+
+        public static string GetUserDocumentsPathForApplication(this Rothko.IEnvironment environment)
+        {
+            return Path.Combine(environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), applicationName);
+        }
     }
 }
