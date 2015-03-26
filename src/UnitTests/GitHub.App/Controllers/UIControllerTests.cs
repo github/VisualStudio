@@ -46,10 +46,10 @@ public class UIControllerTests
             return factory;
         }
 
-        [Fact]
+        [STAFact]
         public void ShowingCloneDialogWithoutBeingLoggedInShowsLoginDialog()
         {
-            var provider = Substitutes.ServiceProvider;
+            var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
 
@@ -68,10 +68,10 @@ public class UIControllerTests
             }
         }
 
-        [Fact]
+        [STAFact]
         public void ShowingCloneDialogWhenLoggedInShowsCloneDialog()
         {
-            var provider = Substitutes.ServiceProvider;
+            var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             hosts.IsLoggedInToAnyHost.Returns(true);
