@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
-using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Validation;
 using NullGuard;
@@ -20,17 +18,11 @@ namespace GitHub.ViewModels
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 
-        // These are the characters which are permitted when creating a repository name on GitHub The Website
-        static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
-
         protected RepositoryFormViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
             : base(connection, hosts)
         {
             OperatingSystem = operatingSystem;
      
-            SelectedGitIgnoreTemplate = GitIgnoreItem.None;
-            SelectedLicense = LicenseItem.None;
-
             CanKeepPrivateObservable = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,
                 x => x.SelectedAccount.IsOnFreePlan,
@@ -45,77 +37,7 @@ namespace GitHub.ViewModels
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
                 .ToProperty(this, x => x.SafeRepositoryName);
-
-            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
-
-            Observable.Return(GitIgnoreItem.None).Concat(
-                RepositoryHost.ApiClient
-                    .GetGitIgnoreTemplates()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(GitIgnoreItem.Create))
-                .ToList()
-                .Subscribe(templates =>
-                {
-                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
-                    Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
-                });
-
-            Licenses = new ReactiveList<LicenseItem>();
-            Observable.Return(LicenseItem.None).Concat(
-                RepositoryHost.ApiClient
-                    .GetLicenses()
-                    .WhereNotNull()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(license => new LicenseItem(license)))
-                .ToList()
-                .Subscribe(licenses =>
-                {
-                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
-                    Debug.Assert(Licenses.Any(), "There should be at least one license");
-                });
-            CancelCommand = ReactiveCommand.Create();
         }
-
-        /// <summary>
-        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
-        /// </summary>
-        protected static string GetSafeRepositoryName(string name)
-        {
-            return invalidRepositoryCharsRegex.Replace(name, "-");
-        }
-
-        protected Octokit.NewRepository GatherRepositoryInfo()
-        {
-            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
-            {
-                Description = Description,
-                Private = KeepPrivate
-            };
-
-            if (SelectedLicense != LicenseItem.None)
-            {
-                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
-                gitHubRepository.AutoInit = true;
-            }
-
-            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
-            {
-                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
-                gitHubRepository.AutoInit = true;
-            }
-
-            return gitHubRepository;
-        }
-
-        /// <summary>
-        /// List of .gitignore templates for the dropdown
-        /// </summary>
-        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates { get; private set; }
-
-        /// <summary>
-        /// List of license templates for the dropdown
-        /// </summary>
-        public ReactiveList<LicenseItem> Licenses { get; private set; }
 
         string description;
         /// <summary>
@@ -182,24 +104,28 @@ namespace GitHub.ViewModels
 
         public ICommand UpgradeAccountPlan { get; private set; }
 
-        GitIgnoreItem selectedGitIgnoreTemplate;
-        [AllowNull]
-        public GitIgnoreItem SelectedGitIgnoreTemplate
-        {
-            get { return selectedGitIgnoreTemplate; }
-            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
-        }
-
-        LicenseItem selectedLicense;
-        [AllowNull]
-        public LicenseItem SelectedLicense
-        {
-            get { return selectedLicense; }
-            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
-        }
-
         protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
 
         protected IOperatingSystem OperatingSystem { get; private set; }
+
+        // These are the characters which are permitted when creating a repository name on GitHub The Website
+        static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
+
+        /// <summary>
+        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
+        /// </summary>
+        protected static string GetSafeRepositoryName(string name)
+        {
+            return invalidRepositoryCharsRegex.Replace(name, "-");
+        }
+
+        protected virtual Octokit.NewRepository GatherRepositoryInfo()
+        {
+            return new Octokit.NewRepository(RepositoryName)
+            {
+                Description = Description,
+                Private = KeepPrivate
+            };
+        }
     }
 }

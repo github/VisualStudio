@@ -13,6 +13,7 @@
              d:DesignHeight="432"
              d:DesignWidth="414"
              Style="{DynamicResource DialogUserControl}">
+
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
@@ -70,16 +71,10 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="35" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="35" />
                 <RowDefinition Height="35" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="35" />
                 <RowDefinition Height="35" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="35" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Host</Label>
@@ -115,48 +110,12 @@
             <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}">Description</Label>
             <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
             
-            <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
-            <uirx:FilteredComboBox
-                x:Name="ignoreTemplateList"
-                Grid.Column="1"
-                Grid.Row="3"
-                Style="{StaticResource GitHubFilterComboBox}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
-                                <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </uirx:FilteredComboBox>
-
-            <Label Grid.Column="0" Grid.Row="4" Target="{Binding ElementName=licenseList}">License</Label>
-            <uirx:FilteredComboBox
-                x:Name="licenseList"
-                Grid.Column="1"
-                Grid.Row="4"
-                Style="{StaticResource GitHubFilterComboBox}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
-                                <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </uirx:FilteredComboBox>
-            
-            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" />
+            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" />
 
             <ui:GitHubComboBox
                 x:Name="accountsComboBox"
                 Grid.Column="1"
-                Grid.Row="5"
+                Grid.Row="3"
                 Style="{StaticResource GitHubComboBox}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -168,8 +127,14 @@
                 </ComboBox.ItemTemplate>
             </ui:GitHubComboBox>
 
-            <CheckBox x:Name="makePrivate" Grid.Column="1" Grid.Row="6" Content="Private Repository" Padding="10,0,0,0"/>
-            <Grid Grid.Column="1" Grid.Row="7">
+            <CheckBox
+                x:Name="makePrivate"
+                Grid.Column="1"
+                Grid.Row="4"
+                Content="Private Repository"
+                Padding="10,0,0,0"
+                Margin="0,10,0,0" />
+            <Grid Grid.Column="1" Grid.Row="5">
                 <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                         <TextBlock>Private repositories require a</TextBlock>
@@ -201,7 +166,7 @@
             </Grid>
         </Grid>
 
-        <Grid x:Name="createButtonPane" Height="70" Background="#FCFCFC">
+        <Grid x:Name="createButtonPane" Height="70">
 
             <Rectangle Height="1" VerticalAlignment="Top" Fill="{StaticResource GHBoxDividerBrush}" />
 
@@ -210,7 +175,7 @@
                     x:Name="publishRepositoryButton"
                     HorizontalAlignment="Center"
                     Icon="check">
-                <TextBlock>Publish repository</TextBlock>
+                <TextBlock>Publish</TextBlock>
             </ui:OcticonCircleButton>
         </Grid>
     
