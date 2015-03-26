@@ -235,7 +235,10 @@ namespace GitHub.Models
                     // return 422 because they haven't white-listed our client ID. In that case, we just ignore
                     // the failure, using basic authentication (with username and password) instead of trying
                     // to get an authorization token.
-                    if (IsEnterprise && (retryEx is NotFoundException || retryEx.StatusCode == (HttpStatusCode)422))
+                    // Since enterprise 2.1 and https://github.com/github/github/pull/36669 the API returns 403
+                    // instead of 404 to signal that it's not allowed. In the name of backwards compatibility we 
+                    // test for both 404 (NotFoundException) and 403 (ForbiddenException) here.
+                    if (IsEnterprise && (retryEx is NotFoundException || retryEx is ForbiddenException || retryEx.StatusCode == (HttpStatusCode)422))
                         return ApiClient.GetUser();
 
                     // Other errors are "real" so we pass them along:

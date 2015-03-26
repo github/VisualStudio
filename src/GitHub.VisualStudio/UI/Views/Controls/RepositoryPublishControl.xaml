@@ -91,17 +91,10 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Avatar}" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0" />
-                            <TextBlock Text="{Binding Login}"/>
+                            <TextBlock Text="{Binding Title}"/>
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
-                <ComboBox.ItemsSource>
-                    <x:Array Type="sampleData:AccountDesigner">
-                        <sampleData:AccountDesigner Login="GitHub.com" />
-                        <sampleData:AccountDesigner Login="ghe.io" />
-                    </x:Array>
-                </ComboBox.ItemsSource>
             </ui:GitHubComboBox>
 
             <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=nameText}">Name</Label>
