@@ -84,4 +84,167 @@ public class RepositoryPublishViewModelTests
             Assert.Same(enterpriseAccounts[0], vm.SelectedAccount);
         }
     }
+
+    public class TheSafeRepositoryNameProperty
+    {
+        [Fact]
+        public void IsTheSameAsTheRepositoryNameWhenTheInputIsSafe()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+
+            vm.RepositoryName = "this-is-bad";
+
+            Assert.Equal(vm.RepositoryName, vm.SafeRepositoryName);
+        }
+
+        [Fact]
+        public void IsConvertedWhenTheRepositoryNameIsNotSafe()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+
+            vm.RepositoryName = "this is bad";
+
+            Assert.Equal("this-is-bad", vm.SafeRepositoryName);
+        }
+
+        [Fact]
+        public void IsNullWhenRepositoryNameIsNull()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+            Assert.Null(vm.SafeRepositoryName);
+            vm.RepositoryName = "not-null";
+            vm.RepositoryName = null;
+
+            Assert.Null(vm.SafeRepositoryName);
+        }
+    }
+
+    public class TheRepositoryNameValidatorProperty
+    {
+        [Fact]
+        public void IsFalseWhenRepoNameEmpty()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+
+            vm.RepositoryName = "";
+
+            Assert.False(vm.RepositoryNameValidator.ValidationResult.IsValid);
+            Assert.Equal("Please enter a repository name", vm.RepositoryNameValidator.ValidationResult.Message);
+        }
+
+        [Fact]
+        public void IsFalseWhenAfterBeingTrue()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+            vm.RepositoryName = "repo";
+
+            Assert.True(vm.PublishRepository.CanExecute(null));
+            Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
+            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+
+            vm.RepositoryName = "";
+
+            Assert.False(vm.RepositoryNameValidator.ValidationResult.IsValid);
+            Assert.Equal("Please enter a repository name", vm.RepositoryNameValidator.ValidationResult.Message);
+        }
+
+        [Fact]
+        public void IsTrueWhenRepositoryNameIsValid()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+
+            vm.RepositoryName = "thisisfine";
+
+            Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
+            Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
+        }
+    }
+
+    public class TheSafeRepositoryNameWarningValidatorProperty
+    {
+        [Fact]
+        public void IsTrueWhenRepoNameIsSafe()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+
+            vm.RepositoryName = "this-is-bad";
+
+            Assert.True(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
+        }
+
+        [Fact]
+        public void IsFalseWhenRepoNameIsNotSafe()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vm = new RepositoryPublishViewModel(
+                Substitute.For<IOperatingSystem>(),
+                hosts);
+
+            vm.RepositoryName = "this is bad";
+
+            Assert.False(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
+            Assert.Equal("Will be created as this-is-bad", vm.SafeRepositoryNameWarningValidator.ValidationResult.Message);
+        }
+    }
 }

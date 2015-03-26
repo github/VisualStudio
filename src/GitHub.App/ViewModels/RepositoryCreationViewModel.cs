@@ -166,8 +166,7 @@ namespace GitHub.ViewModels
         {
             try
             {
-                var head = OperatingSystem.File.GetFile(Path.Combine(path, ".git", "HEAD"));
-                return head.Exists;
+                return OperatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
             }
             catch (PathTooLongException)
             {
