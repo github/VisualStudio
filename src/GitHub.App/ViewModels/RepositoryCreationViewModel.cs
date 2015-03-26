@@ -38,6 +38,15 @@ namespace GitHub.ViewModels
         {
             this.repositoryCreationService = repositoryCreationService;
 
+            Accounts = hosts.GitHubHost.Accounts;
+            Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
+            Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
+            var selectedAccount = Accounts.FirstOrDefault();
+            if (selectedAccount != null)
+            {
+                SelectedAccount = Accounts.FirstOrDefault();
+            }
+
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
@@ -66,20 +75,9 @@ namespace GitHub.ViewModels
 
             CreateRepository = InitializeCreateRepositoryCommand();
 
-            var canKeepPrivateObs = this.WhenAny(
-                x => x.SelectedAccount.IsEnterprise,
-                x => x.SelectedAccount.IsOnFreePlan,
-                x => x.SelectedAccount.HasMaximumPrivateRepositories,
-                (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
-                isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
-
-            canKeepPrivate = canKeepPrivateObs.CombineLatest(CreateRepository.IsExecuting,
+            canKeepPrivate = CanKeepPrivateObservable.CombineLatest(CreateRepository.IsExecuting,
                 (canKeep, publishing) => canKeep && !publishing)
                 .ToProperty(this, x => x.CanKeepPrivate);
-
-            canKeepPrivateObs
-                .Where(x => !x)
-                .Subscribe(x => KeepPrivate = false);
 
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
