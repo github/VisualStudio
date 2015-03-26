@@ -23,7 +23,7 @@ namespace GitHub
                 Debug.Fail(message);
             }
 #endif
-            throw new ArgumentException("String cannot be empty", name);
+            throw new ArgumentException(message, name);
         }
 
         [AttributeUsage(AttributeTargets.Parameter)]
