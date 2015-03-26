@@ -187,11 +187,13 @@ namespace GitHub.SampleData
     {
         public RepositoryPublishViewModelDesigner()
         {
+            var gitHubHost = new RepositoryHostDesigner("GitHub");
             RepositoryHosts = new ReactiveList<IRepositoryHost>
             {
-                new RepositoryHostDesigner("GitHub"),
+                gitHubHost,
                 new RepositoryHostDesigner("ghe.io")
             };
+            SelectedHost = gitHubHost;
         }
 
         public bool IsPublishing
@@ -210,6 +212,11 @@ namespace GitHub.SampleData
         {
             get;
             private set;
+        }
+
+        public IRepositoryHost SelectedHost
+        {
+            get; set;
         }
     }
 

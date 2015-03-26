@@ -25,13 +25,6 @@ namespace GitHub.ViewModels
             OperatingSystem = operatingSystem;
             RepositoryHost = hosts.GitHubHost;
      
-            Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
-            Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
-            var selectedAccount = Accounts.FirstOrDefault();
-            if (selectedAccount != null)
-            {
-                SelectedAccount = Accounts.FirstOrDefault();
-            }
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
 
@@ -80,12 +73,6 @@ namespace GitHub.ViewModels
         }
 
         public IRepositoryHost RepositoryHost
-        {
-            get;
-            private set;
-        }
-
-        public ReactiveList<IAccount> Accounts
         {
             get;
             private set;

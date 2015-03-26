@@ -18,6 +18,11 @@ namespace DesignTimeStyleHelper
             gitHubHomeSection.DataContext = new GitHubHomeSectionDesigner();
         }
 
+        private void loginLink_Click(object sender, RoutedEventArgs e)
+        {
+            ShowDialog(UIControllerFlow.Authentication);
+        }
+
         private void cloneLink_Click(object sender, RoutedEventArgs e)  
         {
             ShowDialog(UIControllerFlow.Clone);

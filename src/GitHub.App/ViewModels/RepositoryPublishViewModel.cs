@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
@@ -19,6 +20,7 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        readonly ObservableAsPropertyHelper<ReactiveList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
 
@@ -26,11 +28,23 @@ namespace GitHub.ViewModels
         public RepositoryPublishViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
             : base(operatingSystem, hosts)
         {
-            RepositoryHosts = new ReactiveList<IRepositoryHost>
+            RepositoryHosts = new ReactiveList<IRepositoryHost>(
+                new[] { hosts.GitHubHost, hosts.EnterpriseHost }.Where(h => h.IsLoggedIn));
+            if (RepositoryHosts.Any())
             {
-                // TODO: Populate this correctly.
-                hosts.GitHubHost, hosts.EnterpriseHost
-            };
+                SelectedHost = RepositoryHosts[0];
+            }
+
+            var accountsChangedObservable = this.WhenAny(x => x.SelectedHost, x => x.Value)
+                .WhereNotNull()
+                .Select(x => x.Accounts);
+
+            accounts = accountsChangedObservable
+                .ToProperty(this, x => x.Accounts, initialValue: new ReactiveList<IAccount>());
+
+            accountsChangedObservable
+                .Where(acts => acts.Any())
+                .Subscribe(acts => SelectedAccount = acts[0]);
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
@@ -84,6 +98,18 @@ namespace GitHub.ViewModels
         {
             get;
             private set;
+        }
+
+        IRepositoryHost selectedHost;
+        public IRepositoryHost SelectedHost
+        {
+            get { return selectedHost; }
+            set { this.RaiseAndSetIfChanged(ref selectedHost, value); }
+        }
+
+        public ReactiveList<IAccount> Accounts
+        {
+            get { return accounts.Value; }
         }
 
         public string Title { get { return "Publish to GitHub"; } } // TODO: this needs to be contextual

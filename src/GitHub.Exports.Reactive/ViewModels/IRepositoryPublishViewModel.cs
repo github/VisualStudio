@@ -17,5 +17,10 @@ namespace GitHub.ViewModels
         /// True when publishing is in progress.
         /// </summary>
         bool IsPublishing { get; }
+
+        /// <summary>
+        /// The selected host to publish to.
+        /// </summary>
+        IRepositoryHost SelectedHost { get; set; }
     }
 }

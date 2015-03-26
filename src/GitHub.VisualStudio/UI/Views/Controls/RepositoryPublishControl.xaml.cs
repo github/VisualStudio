@@ -40,6 +40,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             this.WhenActivated(d =>
             {
+                d(this.OneWayBind(ViewModel, vm => vm.RepositoryHosts, v => v.hostsComboBox.ItemsSource));
+                d(this.Bind(ViewModel, vm => vm.SelectedHost, v => v.hostsComboBox.SelectedItem));
+
                 d(this.OneWayBind(ViewModel, vm => vm.GitIgnoreTemplates, v => v.ignoreTemplateList.ItemsSource));
                 d(this.Bind(ViewModel, vm => vm.SelectedGitIgnoreTemplate, v => v.ignoreTemplateList.SelectedItem));
                 d(this.OneWayBind(ViewModel, vm => vm.Licenses, v => v.licenseList.ItemsSource));

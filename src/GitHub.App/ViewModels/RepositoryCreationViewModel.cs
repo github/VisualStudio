@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -34,7 +36,16 @@ namespace GitHub.ViewModels
             : base(operatingSystem, hosts)
         {
             this.repositoryCreationService = repositoryCreationService;
-            
+
+            Accounts = hosts.GitHubHost.Accounts;
+            Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
+            Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
+            var selectedAccount = Accounts.FirstOrDefault();
+            if (selectedAccount != null)
+            {
+                SelectedAccount = Accounts.FirstOrDefault();
+            }
+
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
@@ -102,6 +113,12 @@ namespace GitHub.ViewModels
         public bool CanKeepPrivate
         {
             get { return canKeepPrivate.Value; }
+        }
+
+        public ReactiveList<IAccount> Accounts
+        {
+            get;
+            private set;
         }
 
         IObservable<Unit> ShowBrowseForDirectoryDialog()
