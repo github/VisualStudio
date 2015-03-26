@@ -246,12 +246,10 @@ public class RepositoryCreationViewModelTests
         [InlineData(false, true)]
         public void IsFalseWhenRepositoryAlreadyExists(bool exists, bool expected)
         {
-            var operatingSystem = Substitute.For<IOperatingSystem>();
+            var provider = Substitutes.ServiceProvider;
+            var operatingSystem = provider.GetOperatingSystem();
             operatingSystem.File.Exists(@"c:\fake\foo\.git\HEAD").Returns(exists);
-            var vm = new RepositoryCreationViewModel(
-                operatingSystem,
-                Substitute.For<IRepositoryHosts>(),
-                Substitute.For<IRepositoryCreationService>());
+            var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\";
 
             vm.RepositoryName = "foo";

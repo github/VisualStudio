@@ -48,8 +48,33 @@ namespace UnitTests
 
         public static IRepositoryHosts RepositoryHosts { get { return Substitute.For<IRepositoryHosts>(); } }
 
+        /// <summary>
+        /// This returns a service provider with everything mocked except for 
+        /// RepositoryCloneService and RepositoryCreationService, which are real
+        /// instances.
+        /// </summary>
         public static IServiceProvider ServiceProvider { get { return GetServiceProvider();  } }
 
+        /// <summary>
+        /// This returns a service provider with mocked IRepositoryCreationService and
+        /// IRepositoryCloneService as well as all other services mocked. The regular
+        /// GetServiceProvider method (and ServiceProvider property return a IServiceProvider
+        /// with real RepositoryCloneService and RepositoryCreationService instances.
+        /// </summary>
+        /// <returns></returns>
+        public static IServiceProvider GetFullyMockedServiceProvider()
+        {
+            return GetServiceProvider(RepositoryCloneService, RepositoryCreationService);
+        }
+
+        /// <summary>
+        /// This returns a service provider with everything mocked except for 
+        /// RepositoryCloneService and RepositoryCreationService, which are real
+        /// instances.
+        /// </summary>
+        /// <param name="cloneService"></param>
+        /// <param name="creationService"></param>
+        /// <returns></returns>
         public static IServiceProvider GetServiceProvider(
             IRepositoryCloneService cloneService = null,
             IRepositoryCreationService creationService = null)
