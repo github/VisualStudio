@@ -72,6 +72,8 @@ namespace GitHub.Controllers
                     LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
+                // Added the following line to make it easy to login to both GitHub and GitHub Enterprise 
+                // in DesignTimeStyleHelper in order to test Publish.
                 .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
