@@ -76,6 +76,37 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
+        /// </summary>
+        protected static string GetSafeRepositoryName(string name)
+        {
+            return invalidRepositoryCharsRegex.Replace(name, "-");
+        }
+
+        protected Octokit.NewRepository GatherRepositoryInfo()
+        {
+            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
+            {
+                Description = Description,
+                Private = KeepPrivate
+            };
+
+            if (SelectedLicense != LicenseItem.None)
+            {
+                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
+                gitHubRepository.AutoInit = true;
+            }
+
+            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
+            {
+                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
+                gitHubRepository.AutoInit = true;
+            }
+
+            return gitHubRepository;
+        }
+
+        /// <summary>
         /// Host owning the repos
         /// </summary>
         public IRepositoryHost RepositoryHost { get; private set; }
@@ -174,36 +205,5 @@ namespace GitHub.ViewModels
         protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
 
         protected IOperatingSystem OperatingSystem { get; private set; }
-
-        /// <summary>
-        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
-        /// </summary>
-        protected static string GetSafeRepositoryName(string name)
-        {
-            return invalidRepositoryCharsRegex.Replace(name, "-");
-        }
-
-        protected Octokit.NewRepository GatherRepositoryInfo()
-        {
-            var gitHubRepository = new Octokit.NewRepository(RepositoryName)
-            {
-                Description = Description,
-                Private = KeepPrivate
-            };
-
-            if (SelectedLicense != LicenseItem.None)
-            {
-                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
-                gitHubRepository.AutoInit = true;
-            }
-
-            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
-            {
-                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
-                gitHubRepository.AutoInit = true;
-            }
-
-            return gitHubRepository;
-        }
     }
 }
