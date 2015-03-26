@@ -18,10 +18,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// <summary>
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
-    [ExportView(ViewType=UIViewType.Create)]
-    public partial class RepositoryCreationControl : IViewFor<IRepositoryCreationViewModel>, IView
+    [ExportView(ViewType=UIViewType.Publish)]
+    public partial class RepositoryPublishControl : IViewFor<IRepositoryPublishViewModel>, IView
     {
-        public RepositoryCreationControl()
+        public RepositoryPublishControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
             SharedDictionaryManager.Load("GitHub.UI.Reactive");
@@ -40,6 +40,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             this.WhenActivated(d =>
             {
+                d(this.OneWayBind(ViewModel, vm => vm.RepositoryHosts, v => v.hostsComboBox.ItemsSource));
+                d(this.Bind(ViewModel, vm => vm.SelectedHost, v => v.hostsComboBox.SelectedItem));
+
                 d(this.OneWayBind(ViewModel, vm => vm.GitIgnoreTemplates, v => v.ignoreTemplateList.ItemsSource));
                 d(this.Bind(ViewModel, vm => vm.SelectedGitIgnoreTemplate, v => v.ignoreTemplateList.SelectedItem));
                 d(this.OneWayBind(ViewModel, vm => vm.Licenses, v => v.licenseList.ItemsSource));
@@ -48,9 +51,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.RepositoryNameValidator, v => v.nameValidationMessage.ReactiveValidator));
                 d(this.OneWayBind(ViewModel, vm => vm.SafeRepositoryNameWarningValidator, v => v.safeRepositoryNameWarning.ReactiveValidator));
-
-                d(this.Bind(ViewModel, vm => vm.BaseRepositoryPath, v => v.localPathText.Text));
-                d(this.OneWayBind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
                 d(this.Bind(ViewModel, vm => vm.KeepPrivate, v => v.makePrivate.IsChecked));
@@ -64,20 +64,18 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.Accounts, v => v.accountsComboBox.ItemsSource));
                 d(this.Bind(ViewModel, vm => vm.SelectedAccount, v => v.accountsComboBox.SelectedItem));
 
-                d(this.BindCommand(ViewModel, vm => vm.CreateRepository, v => v.createRepositoryButton));
-                d(this.OneWayBind(ViewModel, vm => vm.IsCreating, v => v.createRepositoryButton.ShowSpinner));
+                d(this.BindCommand(ViewModel, vm => vm.PublishRepository, v => v.publishRepositoryButton));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.publishRepositoryButton.ShowSpinner));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeToMicroLink));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeAccountLink));
 
-                d(this.BindCommand(ViewModel, vm => vm.BrowseForDirectory, v => v.browsePathButton));
-
-                d(this.OneWayBind(ViewModel, vm => vm.IsCreating, v => v.nameText.IsEnabled, x => x == false));
-                d(this.OneWayBind(ViewModel, vm => vm.IsCreating, v => v.description.IsEnabled, x => x == false));
-                d(this.OneWayBind(ViewModel, vm => vm.IsCreating, v => v.accountsComboBox.IsEnabled, x => x == false));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.nameText.IsEnabled, x => x == false));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
 
-                d(ViewModel.CreateRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
+                d(ViewModel.PublishRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
             });
             IsVisibleChanged += (s, e) =>
             {
@@ -87,25 +85,24 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(IRepositoryCreationViewModel), typeof(RepositoryCreationControl), new PropertyMetadata(null));
+           "ViewModel", typeof(IRepositoryPublishViewModel), typeof(RepositoryPublishControl), new PropertyMetadata(null));
 
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (IRepositoryCreationViewModel)value; }
+            set { ViewModel = (IRepositoryPublishViewModel)value; }
         }
 
         object IView.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (IRepositoryCreationViewModel)value; }
+            set { ViewModel = (IRepositoryPublishViewModel)value; }
         }
 
-        public IRepositoryCreationViewModel ViewModel
+        public IRepositoryPublishViewModel ViewModel
         {
             [return: AllowNull]
-            get
-            { return (IRepositoryCreationViewModel)GetValue(ViewModelProperty); }
+            get { return (IRepositoryPublishViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 

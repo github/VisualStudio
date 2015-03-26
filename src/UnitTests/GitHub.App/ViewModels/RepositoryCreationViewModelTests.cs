@@ -273,6 +273,27 @@ public class RepositoryCreationViewModelTests
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
             Assert.Empty(vm.RepositoryNameValidator.ValidationResult.Message);
         }
+
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void IsFalseWhenRepositoryAlreadyExists(bool exists, bool expected)
+        {
+            var operatingSystem = Substitute.For<IOperatingSystem>();
+            operatingSystem.File.Exists(@"c:\fake\foo\.git\HEAD").Returns(exists);
+            var vm = new RepositoryCreationViewModel(
+                operatingSystem,
+                Substitute.For<IRepositoryHosts>(),
+                Substitute.For<IRepositoryCreationService>());
+            vm.BaseRepositoryPath = @"c:\fake\";
+
+            vm.RepositoryName = "foo";
+
+            Assert.Equal(expected, vm.RepositoryNameValidator.ValidationResult.IsValid);
+            if (!expected)
+                Assert.Equal("Repository with same name already exists at this location",
+                    vm.RepositoryNameValidator.ValidationResult.Message);
+        }
     }
 
     public class TheSafeRepositoryNameWarningValidatorProperty

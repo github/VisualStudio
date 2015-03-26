@@ -21,7 +21,7 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous, Finish }
+        enum Trigger { Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
 
         readonly ExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
@@ -61,7 +61,9 @@ namespace GitHub.Controllers
                 // TODO: This condition isn't exactly correct. We need to check that the host associated with this Create request is logged in or not.
                 .PermitIf(Trigger.Create, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
                 .PermitIf(Trigger.Clone, UIViewType.Clone, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
+                .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
+                .PermitIf(Trigger.Publish, UIViewType.Publish, () => hosts.IsLoggedInToAnyHost)
+                .PermitIf(Trigger.Publish, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
 
             machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
@@ -70,8 +72,12 @@ namespace GitHub.Controllers
                     LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
+                // Added the following line to make it easy to login to both GitHub and GitHub Enterprise 
+                // in DesignTimeStyleHelper in order to test Publish.
+                .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
-                .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone);
+                .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
+                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish);
 
             machine.Configure(UIViewType.TwoFactor)
                 .SubstateOf(UIViewType.Login)
@@ -82,7 +88,8 @@ namespace GitHub.Controllers
                 })
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
-                .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone);
+                .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
+                .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish);
 
             machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
@@ -96,6 +103,14 @@ namespace GitHub.Controllers
                 .OnEntry(() =>
                 {
                     var view = SetupView(UIViewType.Clone);
+                    LoadView(view);
+                })
+                .Permit(Trigger.Next, UIViewType.End);
+
+            machine.Configure(UIViewType.Publish)
+                .OnEntry(() =>
+                {
+                    var view = SetupView(UIViewType.Publish);
                     LoadView(view);
                 })
                 .Permit(Trigger.Next, UIViewType.End);

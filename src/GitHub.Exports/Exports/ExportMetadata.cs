@@ -11,6 +11,7 @@ namespace GitHub.Exports {
 		TwoFactor,
 		Create,
 		Clone,
+        Publish,
         End = 100
 	}
 

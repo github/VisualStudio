@@ -1,0 +1,225 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.Controls.RepositoryPublishControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
+             xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="432" d:DesignWidth="354"
+             Background="White">
+
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <sampleData:RepositoryPublishViewModelDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
+
+    <StackPanel>
+        <Grid
+            Margin="40,12,40,0"
+            FocusManager.IsFocusScope="True"
+            x:Name="loginStackPanel"
+            FocusVisualStyle="{x:Null}">
+
+            <Grid.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="0,3,0,3" />
+                </Style>
+
+                <Style TargetType="{x:Type Label}">
+                    <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                    <Setter Property="Margin" Value="0,0,10,0" />
+                    <Setter Property="Padding" Value="0" />
+                </Style>
+
+                <Style TargetType="{x:Type ui:PromptTextBox}">
+                    <Setter Property="Margin" Value="0,5" />
+                </Style>
+
+                <Style TargetType="{x:Type ui:AppendingPathTextBox}">
+                    <Setter Property="Margin" Value="0,5" />
+                </Style>
+
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                </Style>
+
+                <Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
+                    <Setter Property="IconMargin" Value="-1,2,7,0" />
+                    <Setter Property="ErrorMessageFontWeight" Value="Normal" />
+                    <Setter Property="Icon" Value="alert" />
+                    <Setter Property="Fill" Value="#f39c12" />
+                    <Setter Property="Margin" Value="0,5,0,0"/>
+                </Style>
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="35" />
+                <RowDefinition Height="35" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="35" />
+                <RowDefinition Height="35" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="35" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Host</Label>
+            <ui:GitHubComboBox
+                x:Name="hostsComboBox"
+                Grid.Column="1"
+                Grid.Row="0"
+                Style="{StaticResource GitHubComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ui:GitHubComboBox>
+
+            <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=nameText}">Name</Label>
+            <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="1" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
+
+            <StackPanel Grid.Column="1" Grid.Row="1">
+                <uirx:ValidationMessage
+                    x:Name="nameValidationMessage"
+                    ValidatesControl="{Binding ElementName=nameText}" />
+                <uirx:ValidationMessage
+                    x:Name="safeRepositoryNameWarning"
+                    ValidatesControl="{Binding ElementName=nameText}"
+                    Icon="alert"
+                    Fill="#f39c12"
+                    Padding="2,0" />
+            </StackPanel>
+
+            <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}">Description</Label>
+            <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
+            
+            <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
+            <uirx:FilteredComboBox
+                x:Name="ignoreTemplateList"
+                Grid.Column="1"
+                Grid.Row="3"
+                Style="{StaticResource GitHubFilterComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                                <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </uirx:FilteredComboBox>
+
+            <Label Grid.Column="0" Grid.Row="4" Target="{Binding ElementName=licenseList}">License</Label>
+            <uirx:FilteredComboBox
+                x:Name="licenseList"
+                Grid.Column="1"
+                Grid.Row="4"
+                Style="{StaticResource GitHubFilterComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                                <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </uirx:FilteredComboBox>
+            
+            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" />
+
+            <ui:GitHubComboBox
+                x:Name="accountsComboBox"
+                Grid.Column="1"
+                Grid.Row="5"
+                Style="{StaticResource GitHubComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Avatar}" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0" />
+                            <TextBlock Text="{Binding Login}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <ComboBox.ItemsSource>
+                    <x:Array Type="sampleData:AccountDesigner">
+                        <sampleData:AccountDesigner Login="Brendan" />
+                        <sampleData:AccountDesigner Login="Drew"/>
+                        <sampleData:AccountDesigner Login="Paul"/>
+                    </x:Array>
+                </ComboBox.ItemsSource>
+            </ui:GitHubComboBox>
+
+            <CheckBox x:Name="makePrivate" Grid.Column="1" Grid.Row="6" Content="Private Repository" Padding="10,0,0,0"/>
+            <Grid Grid.Column="1" Grid.Row="7">
+                <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <TextBlock>Private repositories require a</TextBlock>
+                        <ui:OcticonLinkButton 
+                            x:Name="upgradeToMicroLink"
+                            FontSize="12"
+                            Icon="link_external" 
+                            Content="micro plan"
+                            ToolTip="upgrade"
+                            Margin="5,0"/>
+                        <TextBlock>for $7/month</TextBlock>
+                    </StackPanel>
+                </Label>
+                <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <TextBlock>You're using 
+                                <Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/>
+                                private repositories.
+                        </TextBlock>
+                        <ui:OcticonLinkButton 
+                            x:Name="upgradeAccountLink"
+                            FontSize="12"
+                            Icon="link_external" 
+                            Content="Manage plans"
+                            ToolTip="manage plans"
+                            Margin="5,0"/>
+                    </StackPanel>
+                </Label>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="createButtonPane" Height="70" Background="#FCFCFC">
+
+            <Rectangle Height="1" VerticalAlignment="Top" Fill="{StaticResource GHBoxDividerBrush}" />
+
+            <ui:OcticonCircleButton 
+                    IsDefault="True"
+                    x:Name="publishRepositoryButton"
+                    HorizontalAlignment="Center"
+                    Icon="check">
+                <TextBlock>Publish repository</TextBlock>
+            </ui:OcticonCircleButton>
+        </Grid>
+    
+    </StackPanel>
+</UserControl>
