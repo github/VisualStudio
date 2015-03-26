@@ -18,28 +18,35 @@ namespace DesignTimeStyleHelper
             gitHubHomeSection.DataContext = new GitHubHomeSectionDesigner();
         }
 
+        private void loginLink_Click(object sender, RoutedEventArgs e)
+        {
+            ShowDialog(UIControllerFlow.Authentication);
+        }
+
         private void cloneLink_Click(object sender, RoutedEventArgs e)  
         {
-            var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
-
-            var factory = ui.GetService<ExportFactoryProvider>();
-            var d = factory.UIControllerFactory.CreateExport();
-            var creation = d.Value.SelectFlow(UIControllerFlow.Clone);
-            var x = new WindowController(creation);
-            creation.Subscribe(_ => { }, _ => x.Close());
-            x.Show();
-            d.Value.Start();
+            ShowDialog(UIControllerFlow.Clone);
         }
 
         private void createLink_Click(object sender, RoutedEventArgs e)
         {
+            ShowDialog(UIControllerFlow.Create);
+        }
+
+        private void publishLink_Click(object sender, RoutedEventArgs e)
+        {
+            ShowDialog(UIControllerFlow.Publish);
+        }
+
+        void ShowDialog(UIControllerFlow flow)
+        {
             var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
 
             var factory = ui.GetService<ExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
-            var creation = d.Value.SelectFlow(UIControllerFlow.Create);
-            var x = new WindowController(creation);
-            creation.Subscribe(_ => { }, _ => x.Close());
+            var userControlObservable = d.Value.SelectFlow(flow);
+            var x = new WindowController(userControlObservable);
+            userControlObservable.Subscribe(_ => { }, _ => x.Close());
             x.Show();
             d.Value.Start();
         }
