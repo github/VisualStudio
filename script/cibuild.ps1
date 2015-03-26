@@ -36,7 +36,7 @@ Push-Location $rootDirectory
 # Run-Command -Quiet -Fatal { .\script\Bootstrap.ps1 -ImportCertificatesOnly }
 
 $nuget = Join-Path $rootDirectory "script\nuget\nuget.exe"
-& $nuget install xunit.runners -OutputDirectory (Join-Path $rootDirectory "script") -ExcludeVersion
+& $nuget install xunit.runner.console -OutputDirectory (Join-Path $rootDirectory "script") -ExcludeVersion
 
 if ($UpdateSubmodules) {
     Update-Submodules
@@ -49,12 +49,12 @@ if ($Clean) {
 function Run-XUnit([string]$project, [int]$timeoutDuration, [string]$configuration) {
     $dll = "src\$project\bin\$configuration\$project.dll"
 
-    $xunitDirectory = Join-Path $rootDirectory script\xunit.runners\tools
-    $consoleRunner = Join-Path $xunitDirectory xunit.console.clr4.x86.exe
+    $xunitDirectory = Join-Path $rootDirectory script\xunit.runner.console\tools
+    $consoleRunner = Join-Path $xunitDirectory xunit.console.exe
     $xml = Join-Path $rootDirectory "nunit-$project.xml"
     $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $args = $dll, "/noshadow", "/nunit", $xml, "/silent"
+    $args = $dll, "-noshadow", "-xml", $xml, "-silent"
     [object[]] $output = "$consoleRunner " + ($args -join " ")
     $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
     Wait-Process -InputObject $process -Timeout $timeoutDuration -ErrorAction SilentlyContinue
