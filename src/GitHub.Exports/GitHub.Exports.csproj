@@ -43,6 +43,10 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
@@ -64,6 +68,7 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">

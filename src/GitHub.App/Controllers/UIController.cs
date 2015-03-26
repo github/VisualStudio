@@ -23,7 +23,7 @@ namespace GitHub.Controllers
     {
         enum Trigger { Auth = 1, Create = 2, Clone = 3, Next, Previous, Finish }
 
-        readonly ExportFactoryProvider factory;
+        readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
@@ -32,7 +32,7 @@ namespace GitHub.Controllers
         UIControllerFlow currentFlow;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, ExportFactoryProvider factory)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
@@ -66,8 +66,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
                 {
-                    var view = SetupView(UIViewType.Login);
-                    LoadView(view);
+                    RunView(UIViewType.Login);
                 })
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
@@ -77,8 +76,7 @@ namespace GitHub.Controllers
                 .SubstateOf(UIViewType.Login)
                 .OnEntry(() =>
                 {
-                    var view = SetupView(UIViewType.TwoFactor);
-                    LoadView(view);
+                    RunView(UIViewType.TwoFactor);
                 })
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
@@ -87,16 +85,14 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
                 {
-                    var view = SetupView(UIViewType.Create);
-                    LoadView(view);
+                    RunView(UIViewType.Create);
                 })
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.Clone)
                 .OnEntry(() =>
                 {
-                    var view = SetupView(UIViewType.Clone);
-                    LoadView(view);
+                    RunView(UIViewType.Clone);
                 })
                 .Permit(Trigger.Next, UIViewType.End);
 
@@ -110,31 +106,15 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Next, UIViewType.None);
         }
 
-        private void LoadView(IView view)
+        void RunView(UIViewType viewType)
         {
+            var view = CreateViewAndViewModel(viewType);
             transition.OnNext(view as UserControl);
+            SetupView(viewType, view);
         }
 
-        IView SetupView(UIViewType viewType)
+        void SetupView(UIViewType viewType, IView view)
         {
-            IViewModel viewModel;
-            if (viewType == UIViewType.TwoFactor)
-            {
-                viewModel = uiProvider.GetService<ITwoFactorViewModel>();
-            }
-            else
-            {
-                var dvm = factory.GetViewModel(viewType);
-                disposables.Add(dvm);
-                viewModel = dvm.Value;
-            }
-            
-            var dv = factory.GetView(viewType);
-            disposables.Add(dv);
-            var view = dv.Value;
-
-            view.ViewModel = viewModel;
-
             if (viewType == UIViewType.Login)
             {
                 // we're setting up the login dialog, we need to setup the 2fa as
@@ -155,6 +135,27 @@ namespace GitHub.Controllers
                 view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next));
+        }
+
+        IView CreateViewAndViewModel(UIViewType viewType)
+        {
+            IViewModel viewModel;
+            if (viewType == UIViewType.TwoFactor)
+            {
+                viewModel = uiProvider.GetService<ITwoFactorViewModel>();
+            }
+            else
+            {
+                var dvm = factory.GetViewModel(viewType);
+                disposables.Add(dvm);
+                viewModel = dvm.Value;
+            }
+            
+            var dv = factory.GetView(viewType);
+            disposables.Add(dv);
+            var view = dv.Value;
+
+            view.ViewModel = viewModel;
 
             return view;
         }

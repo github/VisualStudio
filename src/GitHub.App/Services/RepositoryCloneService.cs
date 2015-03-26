@@ -25,6 +25,7 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
 
+
         [ImportingConstructor]
         public RepositoryCloneService(Lazy<IServiceProvider> serviceProvider, IOperatingSystem operatingSystem)
         {
@@ -47,9 +48,7 @@ namespace GitHub.Services
                 operatingSystem.Directory.CreateDirectory(path);
 
                 // this will throw if it can't find it
-                var gitExt = ServiceProvider.GetService<IGitRepositoriesExt>();
-
-                gitExt.Clone(cloneUrl, path, CloneOptions.RecurseSubmodule);
+                VSServices.Clone(ServiceProvider, cloneUrl, path, true);
                 return Unit.Default;
             });
         }
@@ -67,6 +66,6 @@ namespace GitHub.Services
         public string DefaultClonePath { get { return defaultClonePath; } }
 
         IServiceProvider ServiceProvider { get { return serviceProvider.Value; } }
-
+        IVSServices VSServices { get { return ServiceProvider.GetService<IVSServices>(); } }
     }
 }

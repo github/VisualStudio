@@ -1,6 +1,8 @@
 ﻿using GitHub.Extensions;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -10,7 +12,15 @@ using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
-    public static class VSServices
+    public interface IVSServices
+    {
+        string GetLocalClonePathFromGitProvider(IServiceProvider provider);
+        void Clone(IServiceProvider provider, string cloneUrl, string clonePath, bool recurseSubmodules);
+    }
+    
+    [Export(typeof(IVSServices))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class VSServices : IVSServices
     {
         public static class GitCoreServices
         {
@@ -115,7 +125,7 @@ namespace GitHub.Services
         // service 'ISccSettingsService' registered in an internal service
         // 'ISccServiceHost' in an assembly with no public types that's
         // always loaded with VS if the git service provider is loaded
-        public static string GetLocalClonePathFromGitProvider(IServiceProvider provider)
+        public string GetLocalClonePathFromGitProvider(IServiceProvider provider)
         {
             try
             {
@@ -127,6 +137,14 @@ namespace GitHub.Services
                 Debug.Assert(ex == null, ex.ToString());
             }
             return string.Empty;
+        }
+
+        public void Clone(IServiceProvider provider, string cloneUrl, string clonePath, bool recurseSubmodules)
+        {
+            var gitExt = provider.GetService<IGitRepositoriesExt>();
+
+            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+            // TODO: hook up into something that alerts us when clone is done
         }
     }
 }
