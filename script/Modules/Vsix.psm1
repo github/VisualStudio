@@ -1,9 +1,9 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$scriptsDirectory = Split-Path (Split-Path (Split-Path $MyInvocation.MyCommand.Path))
+$scriptsDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
 $rootDirectory = Split-Path $scriptsDirectory
-$gitHubDirectory = Join-Path $rootDirectory GitHub
+$gitHubDirectory = Join-Path $rootDirectory src\GitHub.VisualStudio
 
 function Get-VsixManifestPath {
     Join-Path $gitHubDirectory source.extension.vsixmanifest
@@ -15,12 +15,16 @@ function Get-VsixManifestXml {
     # end up with LF line-endings, which will make Git spew a warning when we
     # try to commit the version bump.
     $xmlText = $xmlLines -join [System.Environment]::NewLine
-
+	
     [xml] $xmlText
 }
 
 function Read-CurrentVersion {
-    [System.Version] (Get-VsixManifestXml).Vsix.Identifier.Version
+    [System.Version] (Get-VsixManifestXml).PackageManifest.Metadata.Identity.Version
+}
+
+function Read-CurrentVersionVsix {
+    [System.Version] (Get-VsixManifestXml).PackageManifest.Metadata.Identity.Version
 }
 
 # Code came from http://go.microsoft.com/fwlink/?LinkId=183989
@@ -31,7 +35,7 @@ function Add-SignatureToVsix {
         $VsixPath
     )
 
-    $certificate = Get-ChildItem Cert:\CurrentUser\My | ?{ $_.Thumbprint -eq "1DFD43125FA770742AC7E01E621A737657454380" }
+    $certificate = Get-ChildItem Cert:\CurrentUser\My | ?{ $_.Thumbprint -eq "c5c87fb961a2318109a5a87561c9e90923685ed6" }
     if (!$certificate) {
         throw "Can't find GitHub certificate"
     }

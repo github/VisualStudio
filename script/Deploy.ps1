@@ -45,11 +45,19 @@ Param(
 Set-StrictMode -Version Latest
 
 $scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
-$env:PATH = "$scriptsDirectory;$env:PATH"
-$rootDirectory = Split-Path ($scriptsDirectory)
-$git = Get-Command git.cmd
+$modulesPath = (Join-Path $scriptsDirectory Modules)
+$env:PATH = "$scriptsDirectory;$modulesPath;$env:PATH"
+$env:PSModulePath = $env:PSModulePath + ";$modulesPath"
+Import-Module "$modulesPath\wix"
+Import-Module "$modulesPath\vsix"
+#Get-Command -ListImported
+Write-Output $scriptsDirectory
 
-Import-Module (Join-Path $scriptsDirectory Modules\Utilities)
+$rootDirectory = Split-Path ($scriptsDirectory)
+#$git = Get-Command git.cmd
+. $scriptsDirectory\common.ps1
+
+#Import-Module (Join-Path $scriptsDirectory Modules\Utilities)
 
 $bucketName = ""
 if ($S3Bucket -eq "production") {
@@ -65,7 +73,7 @@ if ($ReleaseChannel -ne "production") {
 
 $configuration = "Release"
 $installUrl = "http://$bucketName.s3.amazonaws.com/$keyPrefix"
-$vsixUrl = "${installUrl}GitHub.vsix"
+$vsixUrl = "${installUrl}GitHub.VisualStudio.vsix"
 
 $startTime = Get-Date
 
@@ -100,7 +108,7 @@ function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
     }
 
     $exitCode = 0
-    if ($LastExitCode -ne 0) {
+    if (!$? -and $LastExitCode -ne 0) {
         $exitCode = $LastExitCode
     } elseif (!$?) {
         $exitCode = 1
@@ -116,14 +124,10 @@ function Get-CampfireUsername {
     $email = & $git config user.email
     Pop-Location
 
-    if ($email -match "adam") {
-        "aroben"
-    } elseif ($email -match "paul") {
-        "paulbetts"
-    } elseif ($email -match "haacked") {
+    if ($email -match "haacked") {
         "Haacked"
-    } elseif ($email -match "clem") {
-        "tclem"
+    } elseif ($email -match "shana") {
+        "shana"
     } else {
         $email
     }
@@ -243,15 +247,22 @@ function Build-Vsix([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
     Run-Command -Quiet -Fatal { msbuild $solution /property:Configuration=$configuration /property:ReleaseChannel=$ReleaseChannel /property:S3Bucket=$S3Bucket /property:DeployExtension=false }
 
-    Copy-Item (Join-Path $rootDirectory GitHub\bin\$configuration\GitHub.vsix) $directory
+    Copy-Item (Join-Path $rootDirectory build\$configuration\GitHub.VisualStudio.vsix) $directory
+}
+
+function Build-Installer([string]$directory) {
+    $solution = Join-Path $rootDirectory GitHubVs.sln
+    Run-Command -Quiet -Fatal { msbuild $solution /property:Configuration=Publish }
+
+    Copy-Item (Join-Path $rootDirectory build\$configuration\ghfvs.msi) $directory
 }
 
 function Write-Manifest([string]$directory) {
-    Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.4.5.7\lib\net35\Newtonsoft.Json.dll)
+    Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll)
 
     $manifest = @{
         NewestExtension = @{
-            Version = [string](Read-CurrentVersion)
+            Version = [string](Read-CurrentVersionVsix)
             Url = $vsixUrl
         }
     }
@@ -268,7 +279,7 @@ function Write-VersionFile([string]$directory) {
 function Save-TopLevelFiles([string]$directory) {
     $files = Get-ChildItem $directory | %{ $_.FullName }
 
-    $versionSpecificDirectory = New-Item (Join-Path $directory (Read-CurrentVersion)) -Type Directory
+    $versionSpecificDirectory = New-Item (Join-Path $directory (Read-CurrentVersionVsix)) -Type Directory
 
     Copy-Item $files $versionSpecificDirectory.FullName
 }
@@ -279,7 +290,7 @@ function Upload-Symbols {
     $symbols = Create-TempDirectory
 
     $symstore = Join-Path $scriptsDirectory "Debugging Tools for Windows\symstore.exe"
-    $buildDirectory = Join-Path $rootDirectory GitHub\bin\$configuration
+    $buildDirectory = Join-Path $rootDirectory build\$configuration
     Run-Command -Quiet -Fatal { & $symstore add /r /f "$buildDirectory\*.*" /t "GitHub for Visual Studio" /s $symbols }
 
     if ($S3Bucket -eq "production") {
@@ -328,16 +339,20 @@ Announce-DeployStarted
     Clean-BuildDirectory
     $tempDirectory = Create-TempDirectory
     Build-Vsix $tempDirectory
-    Add-SignatureToVsix (Join-Path $tempDirectory GitHub.vsix)
+    Add-SignatureToVsix (Join-Path $tempDirectory GitHub.VisualStudio.vsix)
+	Build-Installer $tempDirectory
+	Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
     Write-Manifest $tempDirectory
     Write-VersionFile $tempDirectory
     Save-TopLevelFiles $tempDirectory
 
-    Upload-Symbols
-    Upload-Vsix $tempDirectory
+	Write-Output "Ready at ${tempDirectory}"
 
-    Remove-Item -Recurse $tempDirectory
+    #Upload-Symbols
+    #Upload-Vsix $tempDirectory
 
-    Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
-    Announce-DeployCompleted
+    #Remove-Item -Recurse $tempDirectory
+
+    #Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
+    #Announce-DeployCompleted
 }

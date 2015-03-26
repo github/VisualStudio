@@ -7,7 +7,9 @@ Set-PSDebug -Strict
 
 $scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
 $rootDirectory = Split-Path $scriptsDirectory
-$git = Get-Command git.cmd
+#$git = Get-Command git.cmd
+. $scriptsDirectory\common.ps1
+
 function Die([string]$message, [object[]]$output) {
     if ($output) {
         Write-Output $output
