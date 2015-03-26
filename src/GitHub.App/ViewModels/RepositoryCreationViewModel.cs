@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
+using Octokit;
 using ReactiveUI;
 using Rothko;
 
@@ -41,11 +43,11 @@ namespace GitHub.ViewModels
             IRepositoryHosts hosts,
             IRepositoryCreationService rs,
             IAvatarProvider avatarProvider)
-            : this(provider.GetService<IConnection>(), operatingSystem, hosts, rs, avatarProvider)
+            : this(provider.GetService<Models.IConnection>(), operatingSystem, hosts, rs, avatarProvider)
         {}
 
         public RepositoryCreationViewModel(
-            IConnection connection,
+            Models.IConnection connection,
             IOperatingSystem operatingSystem,
             IRepositoryHosts hosts,
             IRepositoryCreationService repositoryCreationService,
@@ -54,6 +56,8 @@ namespace GitHub.ViewModels
         {
             this.repositoryCreationService = repositoryCreationService;
             Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", RepositoryHost.Title);
+            SelectedGitIgnoreTemplate = GitIgnoreItem.None;
+            SelectedLicense = LicenseItem.None;
 
             accounts = RepositoryHost.GetAccounts(avatarProvider)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -104,6 +108,118 @@ namespace GitHub.ViewModels
 
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
+
+            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
+
+            Observable.Return(GitIgnoreItem.None).Concat(
+                RepositoryHost.ApiClient
+                    .GetGitIgnoreTemplates()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(GitIgnoreItem.Create))
+                .ToList()
+                .Subscribe(templates =>
+                {
+                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
+                    Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
+                });
+
+            Licenses = new ReactiveList<LicenseItem>();
+            Observable.Return(LicenseItem.None).Concat(
+                RepositoryHost.ApiClient
+                    .GetLicenses()
+                    .WhereNotNull()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(license => new LicenseItem(license)))
+                .ToList()
+                .Subscribe(licenses =>
+                {
+                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
+                    Debug.Assert(Licenses.Any(), "There should be at least one license");
+                });
+        }
+
+        string baseRepositoryPath;
+        /// <summary>
+        /// Path to clone repositories into
+        /// </summary>
+        public string BaseRepositoryPath
+        {
+            [return: AllowNull]
+            get { return baseRepositoryPath; }
+            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
+        }
+
+        /// <summary>
+        /// Fires up a file dialog to select the directory to clone into
+        /// </summary>
+        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
+
+        /// <summary>
+        /// Is running the creation process
+        /// </summary>
+        public bool IsCreating { get { return isCreating.Value; } }
+
+        /// <summary>
+        /// If the repo can be made private (depends on the user plan)
+        /// </summary>
+        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
+
+        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<LicenseItem> Licenses
+        {
+            get;
+            private set;
+        }
+
+        GitIgnoreItem selectedGitIgnoreTemplate;
+        [AllowNull]
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            get { return selectedGitIgnoreTemplate; }
+            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
+        }
+
+        LicenseItem selectedLicense;
+        [AllowNull]
+        public LicenseItem SelectedLicense
+        {
+            get { return selectedLicense; }
+            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
+        }
+
+        /// <summary>
+        /// List of accounts (at least one)
+        /// </summary>
+        public IReadOnlyList<IAccount> Accounts { get { return accounts.Value; } }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; private set; }
+
+        /// <summary>
+        /// Fires off the process of creating the repository remotely and then cloning it locally
+        /// </summary>
+        public IReactiveCommand<Unit> CreateRepository { get; private set; }
+
+        protected override NewRepository GatherRepositoryInfo()
+        {
+            var gitHubRepository = base.GatherRepositoryInfo();
+
+            if (SelectedLicense != LicenseItem.None)
+            {
+                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
+                gitHubRepository.AutoInit = true;
+            }
+
+            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
+            {
+                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
+                gitHubRepository.AutoInit = true;
+            }
+            return gitHubRepository;
         }
 
         IObservable<Unit> ShowBrowseForDirectoryDialog()
@@ -189,43 +305,5 @@ namespace GitHub.ViewModels
 
             return createCommand;
         }
-
-        /// <summary>
-        /// List of accounts (at least one)
-        /// </summary>
-        public IReadOnlyList<IAccount> Accounts { get { return accounts.Value; } }
-
-        string baseRepositoryPath;
-        /// <summary>
-        /// Path to clone repositories into
-        /// </summary>
-        public string BaseRepositoryPath
-        {
-            [return: AllowNull]
-            get { return baseRepositoryPath; }
-            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
-        }
-
-        public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; private set; }
-
-        /// <summary>
-        /// Fires up a file dialog to select the directory to clone into
-        /// </summary>
-        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
-
-        /// <summary>
-        /// Is running the creation process
-        /// </summary>
-        public bool IsCreating { get { return isCreating.Value; } }
-
-        /// <summary>
-        /// If the repo can be made private (depends on the user plan)
-        /// </summary>
-        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
-
-        /// <summary>
-        /// Fires off the process of creating the repository remotely and then cloning it locally
-        /// </summary>
-        public IReactiveCommand<Unit> CreateRepository { get; private set; }
-   }
+    }
 }

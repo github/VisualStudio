@@ -37,20 +37,6 @@ namespace GitHub.ViewModels
         /// </summary>
         IAccount SelectedAccount { get; set; }
 
-        GitIgnoreItem SelectedGitIgnoreTemplate { get; set; }
-
-        LicenseItem SelectedLicense { get; set; }
-
-        /// <summary>
-        /// The list of GitIgnore templates supported by repository creation
-        /// </summary>
-        ReactiveList<GitIgnoreItem> GitIgnoreTemplates { get; }
-
-        /// <summary>
-        /// The list of license templates supported by repository creation
-        /// </summary>
-        ReactiveList<LicenseItem> Licenses { get; }
-
         /// <summary>
         /// Indicates whether the created repository should be private or not.
         /// </summary>
