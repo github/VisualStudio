@@ -136,7 +136,10 @@ namespace GitHub.ViewModels
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;
 
+            // TODO: Do we need to git init here?
+
             return RepositoryHost.ApiClient.CreateRepository(newRepository, account.Login, account.IsUser)
+                .Select(gitHubRepo => /* TODO: We need to push here */ gitHubRepo)
                 .SelectUnit();
         }
     }
