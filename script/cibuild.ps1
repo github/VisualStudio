@@ -21,7 +21,7 @@ Param(
     ,
     [ValidateSet('Debug', 'Release')]
     [string]
-    $config = "Debug"
+    $config = "Release"
 )
 
 Set-StrictMode -Version Latest
