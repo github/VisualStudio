@@ -11,15 +11,18 @@ using ReactiveUI;
 using Rothko;
 using Xunit;
 using Xunit.Extensions;
+using UnitTests;
 
 public class RepositoryCreationViewModelTests
 {
-    public static IRepositoryCreationViewModel GetMeAViewModel(IOperatingSystem os = null, IRepositoryHosts hosts = null, IRepositoryCreationService creationService = null, IRepositoryCloneService cloneService = null)
+    static IRepositoryCreationViewModel GetMeAViewModel(IServiceProvider provider = null)
     {
-        os = os == null ? Substitute.For<IOperatingSystem>() : os;
-        hosts = hosts == null ? Substitute.For<IRepositoryHosts>() : hosts;
-        creationService = creationService == null ? Substitute.For<IRepositoryCreationService>() : creationService;
-        cloneService = cloneService == null ? Substitute.For<IRepositoryCloneService>() : cloneService;
+        if (provider == null)
+            provider = Substitutes.ServiceProvider;
+        var os = provider.GetOperatingSystem();
+        var hosts = provider.GetRepositoryHosts();
+        var creationService = provider.GetRepositoryCreationService();
+        var cloneService = provider.GetRepositoryCloneService();
 
         return new RepositoryCreationViewModel(os, hosts, creationService, cloneService);
     }
@@ -64,10 +67,11 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public async Task SetsTheBaseRepositoryPathWhenUserChoosesADirectory()
         {
-            var windows = Substitute.For<IOperatingSystem>();
+            var provider = Substitutes.ServiceProvider;
+            var windows = provider.GetOperatingSystem();
             windows.Dialog.BrowseForDirectory(@"c:\fake\dev", Args.String)
                 .Returns(new BrowseDirectoryResult(@"c:\fake\foo"));
-            var vm = GetMeAViewModel(windows);
+            var vm = GetMeAViewModel(provider);
 
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
@@ -79,10 +83,11 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public async Task DoesNotChangeTheBaseRepositoryPathWhenUserDoesNotChooseResult()
         {
-            var windows = Substitute.For<IOperatingSystem>();
+            var provider = Substitutes.ServiceProvider;
+            var windows = provider.GetOperatingSystem();
             windows.Dialog.BrowseForDirectory(@"c:\fake\dev", Args.String)
                 .Returns(BrowseDirectoryResult.Failed);
-            var vm = GetMeAViewModel(windows);
+            var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
             await vm.BrowseForDirectory.ExecuteAsync();
@@ -268,10 +273,11 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void IsPopulatedByTheRepositoryHost()
         {
+            var provider = Substitutes.ServiceProvider;
+            var hosts = provider.GetRepositoryHosts();
             var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>() };
-            var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Accounts.Returns(accounts);
-            var vm = GetMeAViewModel(hosts: hosts);
+            var vm = GetMeAViewModel(provider);
 
             Assert.Same(accounts, vm.Accounts);
             Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
@@ -291,11 +297,12 @@ public class RepositoryCreationViewModelTests
             "Waf",
             "WordPress"
         };
-            var hosts = Substitute.For<IRepositoryHosts>();
+            var provider = Substitutes.ServiceProvider;
+            var hosts = provider.GetRepositoryHosts();
             hosts.GitHubHost.ApiClient
                 .GetGitIgnoreTemplates()
                 .Returns(gitIgnoreTemplates.ToObservable());
-            var vm = GetMeAViewModel(hosts: hosts);
+            var vm = GetMeAViewModel(provider);
 
             var result = vm.GitIgnoreTemplates;
 
@@ -328,11 +335,12 @@ public class RepositoryCreationViewModelTests
             new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
             new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
         };
-            var hosts = Substitute.For<IRepositoryHosts>();
+            var provider = Substitutes.ServiceProvider;
+            var hosts = provider.GetRepositoryHosts();
             hosts.GitHubHost.ApiClient
                 .GetLicenses()
                 .Returns(licenses.ToObservable());
-            var vm = GetMeAViewModel(hosts: hosts);
+            var vm = GetMeAViewModel(provider);
 
             var result = vm.Licenses;
 
@@ -357,10 +365,12 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public async Task DisplaysUserErrorWhenCreationFails()
         {
-            var repositoryCreationService = Substitute.For<IRepositoryCreationService>();
-            repositoryCreationService.CreateRepository(Args.NewRepository, Args.Account, Args.String, Args.ApiClient)
+            var creationService = Substitutes.RepositoryCreationService;
+            var provider = Substitutes.GetServiceProvider(creationService: creationService);
+
+            creationService.CreateRepository(Args.NewRepository, Args.Account, Args.String, Args.ApiClient)
                 .Returns(Observable.Throw<Unit>(new InvalidOperationException("Could not create a repository on GitHub")));
-            var vm = GetMeAViewModel(creationService: repositoryCreationService);
+            var vm = GetMeAViewModel(provider);
 
             vm.RepositoryName = "my-repo";
 
@@ -375,11 +385,13 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void CreatesARepositoryUsingTheCreationService()
         {
+            var creationService = Substitutes.RepositoryCreationService;
+            var provider = Substitutes.GetServiceProvider(creationService: creationService);
+
             var account = Substitute.For<IAccount>();
-            var creationService = Substitute.For<IRepositoryCreationService>();
-            var hosts = Substitute.For<IRepositoryHosts>();
+            var hosts = provider.GetRepositoryHosts();
             hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
-            var vm = GetMeAViewModel(hosts: hosts, creationService: creationService);
+            var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;
@@ -403,11 +415,12 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void SetsAutoInitToTrueWhenLicenseSelected()
         {
-            var creationService = Substitute.For<IRepositoryCreationService>();
+            var creationService = Substitutes.RepositoryCreationService;
+            var provider = Substitutes.GetServiceProvider(creationService: creationService);
             var account = Substitute.For<IAccount>();
-            var hosts = Substitute.For<IRepositoryHosts>();
+            var hosts = provider.GetRepositoryHosts();
             hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
-            var vm = GetMeAViewModel(hosts: hosts, creationService: creationService);
+            var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;
@@ -432,11 +445,12 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void SetsAutoInitToTrueWhenGitIgnore()
         {
-            var creationService = Substitute.For<IRepositoryCreationService>();
+            var creationService = Substitutes.RepositoryCreationService;
+            var provider = Substitutes.GetServiceProvider(creationService: creationService);
             var account = Substitute.For<IAccount>();
-            var hosts = Substitute.For<IRepositoryHosts>();
+            var hosts = provider.GetRepositoryHosts();
             hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
-            var vm = GetMeAViewModel(hosts: hosts, creationService: creationService);
+            var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;

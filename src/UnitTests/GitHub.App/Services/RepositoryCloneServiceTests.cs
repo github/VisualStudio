@@ -6,6 +6,7 @@ using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using NSubstitute;
 using Rothko;
 using Xunit;
+using UnitTests;
 
 public class RepositoryCloneServiceTests
 {
@@ -14,18 +15,15 @@ public class RepositoryCloneServiceTests
         [Fact]
         public async Task ClonesToRepositoryPath()
         {
-            var gitClone = Substitute.For<IGitRepositoriesExt>();
-            var operatingSystem = Substitute.For<IOperatingSystem>();
-            var serviceProvider = Substitute.For<IServiceProvider>();
-            serviceProvider.GetService(typeof(IGitRepositoriesExt)).Returns(gitClone);
-            var cloneService = new RepositoryCloneService(
-                new Lazy<IServiceProvider>(() => serviceProvider),
-                operatingSystem);
+            var serviceProvider = Substitutes.ServiceProvider;
+            var operatingSystem = serviceProvider.GetOperatingSystem();
+            var vsservices = serviceProvider.GetVSServices();
+            var cloneService = serviceProvider.GetRepositoryCloneService();
 
             await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
 
             operatingSystem.Directory.Received().CreateDirectory(@"c:\dev\bar");
-            gitClone.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", CloneOptions.RecurseSubmodule);
+            vsservices.Received().Clone(serviceProvider, "https://github.com/foo/bar", @"c:\dev\bar", true);
         }
     }
 }

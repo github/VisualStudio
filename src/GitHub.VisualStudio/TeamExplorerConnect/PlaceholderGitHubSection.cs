@@ -7,6 +7,7 @@ using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
@@ -61,7 +62,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = gitServiceProvider;
-            var factory = uiProvider.GetService<ExportFactoryProvider>();
+            var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiControllerExport = factory.UIControllerFactory.CreateExport();
             var uiController = uiControllerExport.Value;
             var creation = uiController.SelectFlow(controllerFlow);
