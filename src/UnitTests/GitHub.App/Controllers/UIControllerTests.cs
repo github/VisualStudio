@@ -56,12 +56,15 @@ public class UIControllerTests
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory))
             {
                 var list = new List<IView>();
-                uiController.SelectFlow(UIControllerFlow.Clone).Subscribe(uc => list.Add(uc as IView));
+                uiController.SelectFlow(UIControllerFlow.Clone)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.True(list.Count > 1);
+                                    Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(list[0]);
+                                });
 
                 uiController.Start();
-
-                Assert.True(list.Count > 1);
-                Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(list[0]);
             }
         }
 
@@ -76,12 +79,14 @@ public class UIControllerTests
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory))
             {
                 var list = new List<IView>();
-                uiController.SelectFlow(UIControllerFlow.Clone).Subscribe(uc => list.Add(uc as IView));
-
+                uiController.SelectFlow(UIControllerFlow.Clone)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.Equal(1, list.Count);
+                                    Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
+                                });
                 uiController.Start();
-
-                Assert.Equal(1, list.Count);
-                Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
             }
         }
     }
