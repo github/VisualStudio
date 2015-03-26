@@ -4,13 +4,12 @@ using System.Windows;
 using System.Windows.Controls;
 using GitHub.UI;
 using Xunit;
-using Xunit.Extensions;
 
 public class TwoFactorInputTests
 {
     public class TheTextProperty
     {
-        [Fact]
+        [STAFact]
         public void SetsTextBoxesToIndividualCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -27,7 +26,7 @@ public class TwoFactorInputTests
             Assert.Equal("5", textBoxes[5].Text);
         }
 
-        [Fact]
+        [STAFact]
         public void IgnoresNonDigitCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -44,7 +43,7 @@ public class TwoFactorInputTests
             Assert.Equal("5", textBoxes[5].Text);
         }
 
-        [Fact]
+        [STAFact]
         public void HandlesNotEnoughCharacters()
         {
             var twoFactorInput = new TwoFactorInput();
@@ -61,7 +60,7 @@ public class TwoFactorInputTests
             Assert.Equal("", textBoxes[5].Text);
         }
 
-        [Theory]
+        [STATheory]
         [InlineData(null, null)]
         [InlineData("", "")]
         [InlineData("xxxx", "")]
