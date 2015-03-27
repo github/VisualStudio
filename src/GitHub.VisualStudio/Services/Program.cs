@@ -18,6 +18,19 @@ namespace GitHub.VisualStudio
             ProductHeader = new ProductHeaderValue("GitHubVisualStudio", AssemblyName.Version.ToString());
         }
 
+        const string applicationProvider = "GitHub";
+        const string applicationName = "GitHub Extension for Visual Studio";
+
+        /// <summary>
+        /// Provider of this application
+        /// </summary>
+        public string ApplicationProvider {  get { return ApplicationProvider; } }
+
+        /// <summary>
+        /// Name of this application
+        /// </summary>
+        public string ApplicationName { get { return applicationName; } }
+
         /// <summary>
         /// The currently executing assembly.
         /// </summary>

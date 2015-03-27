@@ -1,8 +1,10 @@
-﻿namespace GitHub.Models
+﻿using GitHub.Primitives;
+
+namespace GitHub.Models
 {
     public interface IConnection
     {
-        string HostAddress { get; }
+        HostAddress HostAddress { get; }
         string Username{ get; }
     }
 }
