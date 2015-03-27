@@ -46,7 +46,7 @@ public class UIControllerTests
             return factory;
         }
 
-        //[STAFact]
+        [STAFact]
         public void ShowingCloneDialogWithoutBeingLoggedInShowsLoginDialog()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
@@ -68,7 +68,7 @@ public class UIControllerTests
             }
         }
 
-        //[STAFact]
+        [STAFact]
         public void ShowingCloneDialogWhenLoggedInShowsCloneDialog()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
