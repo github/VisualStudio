@@ -69,6 +69,10 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="LibGit2Sharp">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\LibGit2Sharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -84,6 +88,7 @@
     <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
+    <Compile Include="Services\IGitClient.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
