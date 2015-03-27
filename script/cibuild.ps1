@@ -77,7 +77,7 @@ function Run-XUnit([string]$project, [int]$timeoutDuration, [string]$configurati
 
 
 function Build-Solution([string]$solution) {
-    Run-Command -Fatal { msbuild $solution /t:Build /property:Configuration=$config /verbosity:quiet /p:VisualStudioVersion=14.0 /p:DeployExtension=false }
+    Run-Command -Fatal { & "$(get-content env:windir)\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" $solution /t:Build /property:Configuration=$config /verbosity:quiet /p:VisualStudioVersion=14.0 /p:DeployExtension=false }
 }
 
 
