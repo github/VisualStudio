@@ -6,6 +6,7 @@ using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio
 {
@@ -57,7 +58,7 @@ namespace GitHub.VisualStudio
         void ShowDialog(UIControllerFlow flow)
         {
             var ui = GetExportedValue<IUIProvider>();
-            var disposable = ui.GetService<ExportFactoryProvider>().UIControllerFactory.CreateExport();
+            var disposable = ui.GetService<IExportFactoryProvider>().UIControllerFactory.CreateExport();
             var watcher = disposable.Value.SelectFlow(flow);
             var window = new WindowController(watcher);
             watcher.Subscribe(_ => { }, _ => {

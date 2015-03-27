@@ -5,8 +5,11 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Octokit;
 using Rothko;
+using System.Linq;
+using GitHub.Extensions;
+using GitHub.Info;
+using System.Globalization;
 
 namespace GitHub.Services
 {
@@ -20,17 +23,16 @@ namespace GitHub.Services
     {
         readonly Lazy<IServiceProvider> serviceProvider;
         readonly IOperatingSystem operatingSystem;
+        readonly string defaultClonePath;
+
 
         [ImportingConstructor]
         public RepositoryCloneService(Lazy<IServiceProvider> serviceProvider, IOperatingSystem operatingSystem)
         {
             this.serviceProvider = serviceProvider;
             this.operatingSystem = operatingSystem;
-        }
 
-        private IServiceProvider ServiceProvider
-        {
-            get { return serviceProvider.Value; }
+            defaultClonePath = operatingSystem.Environment.GetUserDocumentsPathForApplication();
         }
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
@@ -45,12 +47,25 @@ namespace GitHub.Services
 
                 operatingSystem.Directory.CreateDirectory(path);
 
-                var gitExt = ServiceProvider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
-                Debug.Assert(gitExt != null, "Could not get an instance of IGitRepositoriesExt");
-
-                gitExt.Clone(cloneUrl, path, CloneOptions.RecurseSubmodule);
+                // this will throw if it can't find it
+                VSServices.Clone(ServiceProvider, cloneUrl, path, true);
                 return Unit.Default;
             });
         }
+
+        public string GetLocalClonePathFromGitProvider(string fallbackPath)
+        {
+            var ret = VSServices.GetLocalClonePathFromGitProvider(ServiceProvider);
+            if (!string.IsNullOrEmpty(ret))
+                ret = operatingSystem.Environment.ExpandEnvironmentVariables(ret);
+            else
+                ret = fallbackPath;
+            return ret;
+        }
+
+        public string DefaultClonePath { get { return defaultClonePath; } }
+
+        IServiceProvider ServiceProvider { get { return serviceProvider.Value; } }
+        IVSServices VSServices { get { return ServiceProvider.GetService<IVSServices>(); } }
     }
 }

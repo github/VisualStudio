@@ -10,6 +10,10 @@ using GitHub.UI;
 using GitHub.VisualStudio.UI.Views.Controls;
 using NSubstitute;
 using Xunit;
+using UnitTests;
+using GitHub.ViewModels;
+using ReactiveUI;
+using System.Collections.Generic;
 
 public class UIControllerTests
 {
@@ -20,7 +24,7 @@ public class UIControllerTests
         {
             var uiProvider = Substitute.For<IUIProvider>();
             var hosts = Substitute.For<IRepositoryHosts>();
-            var factory = new ExportFactoryProvider(Substitute.For<ICompositionService>());
+            var factory = Substitute.For<IExportFactoryProvider>();
             var uiController = new UIController(uiProvider, hosts, factory);
 
             uiController.Dispose();
@@ -30,38 +34,59 @@ public class UIControllerTests
 
     public class TheStartMethod
     {
+        IExportFactoryProvider SetupFactory(IServiceProvider provider)
+        {
+            var factory = provider.GetExportFactoryProvider();
+            factory.GetViewModel(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ILoginControlViewModel>, UserControl>(), () => { }));
+            factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ITwoFactorDialogViewModel>, UserControl>(), () => { }));
+            factory.GetViewModel(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IRepositoryCloneViewModel>, UserControl>(), () => { }));
+            return factory;
+        }
+
         [STAFact]
         public void ShowingCloneDialogWithoutBeingLoggedInShowsLoginDialog()
         {
-            var uiProvider = Substitute.For<IUIProvider>();
-            var hosts = Substitute.For<IRepositoryHosts>();
-            var factory = (ExportFactoryProvider)new CustomServiceProvider().GetService(typeof(ExportFactoryProvider));
-            UserControl shownControl = null;
-            using (var uiController = new UIController(uiProvider, hosts, factory))
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory))
             {
-                uiController.SelectFlow(UIControllerFlow.Clone).Subscribe(uc => shownControl = uc);
+                var list = new List<IView>();
+                uiController.SelectFlow(UIControllerFlow.Clone)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.True(list.Count > 1);
+                                    Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(list[0]);
+                                });
 
                 uiController.Start();
-
-                Assert.IsType<LoginControl>(shownControl);
             }
         }
 
         [STAFact]
         public void ShowingCloneDialogWhenLoggedInShowsCloneDialog()
         {
-            var uiProvider = Substitute.For<IUIProvider>();
-            var hosts = Substitute.For<IRepositoryHosts>();
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
             hosts.IsLoggedInToAnyHost.Returns(true);
-            var factory = (ExportFactoryProvider)new CustomServiceProvider().GetService(typeof(ExportFactoryProvider));
-            UserControl shownControl = null;
-            using (var uiController = new UIController(uiProvider, hosts, factory))
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory))
             {
-                uiController.SelectFlow(UIControllerFlow.Clone).Subscribe(uc => shownControl = uc);
-
+                var list = new List<IView>();
+                uiController.SelectFlow(UIControllerFlow.Clone)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.Equal(1, list.Count);
+                                    Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
+                                });
                 uiController.Start();
-
-                Assert.IsType<RepositoryCloneControl>(shownControl);
             }
         }
     }
