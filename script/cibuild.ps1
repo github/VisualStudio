@@ -54,7 +54,7 @@ function Run-XUnit([string]$project, [int]$timeoutDuration, [string]$configurati
     $xml = Join-Path $rootDirectory "nunit-$project.xml"
     $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "none"
+    $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "all"
     [object[]] $output = "$consoleRunner " + ($args -join " ")
     $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
     Wait-Process -InputObject $process -Timeout $timeoutDuration -ErrorAction SilentlyContinue
@@ -76,20 +76,15 @@ function Run-XUnit([string]$project, [int]$timeoutDuration, [string]$configurati
 }
 
 
+function Build-Solution([string]$solution) {
+    Run-Command -Fatal { msbuild $solution /t:Build /property:Configuration=$config /verbosity:quiet /p:VisualStudioVersion=14.0 /p:DeployExtension=false }
+}
+
+
 Write-Output "Building GitHub for Visual Studio..."
 Write-Output ""
 & $nuget restore GitHubVs.sln
-$output = .\Build-Solution.ps1 Build $config -MSBuildVerbosity quiet 2>&1
-if ($LastExitCode -ne 0) {
-    $exitCode = $LastExitCode
-
-    $errors = $output | Select-String ": error"
-    if ($errors) {
-        $output = "Likely errors:", $errors, "", "Full output:", $output
-    }
-
-    Die-WithOutput $exitCode $output
-}
+Build-Solution GitHubVs.sln
 
 $exitCode = 0
 
