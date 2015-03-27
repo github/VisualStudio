@@ -11,19 +11,8 @@ Param(
     $Message
 )
 
-Set-PSDebug -Strict
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-
-$campfireAccount = "github"
-$campfireToken = "f890cb46e983068e421975cc12fb76c6ff3f4f4f"
-$campfireRoomId = "317644"
-
-function Set-BasicAuthenticationHeader([System.Net.WebRequest]$request, [string]$username, [string]$password) {
-    $credentials = "{0}:{1}" -f $username, $password
-    $credentialsBytes = [System.Text.Encoding]::Default.GetBytes($credentials)
-    $credentialsBase64 = [System.Convert]::ToBase64String($credentialsBytes)
-    $request.Headers["Authorization"] = "Basic $credentialsBase64"
-}
 
 function Create-MessageXml([string]$message) {
     $xml = New-Object Xml
@@ -46,9 +35,7 @@ function Set-PostData([System.Net.WebRequest]$request, [string]$data) {
     $stream.Close()
 }
 
-$request = [System.Net.WebRequest]::Create(("https://{0}.campfirenow.com/room/{1}/speak.xml" -f $campfireAccount, $campfireRoomId))
-# The password we provide here is ignored by the Campfire API.
-Set-BasicAuthenticationHeader $request $campfireToken "X"
+$request = New-CampfireRequest
 
 $xmlString = (Create-MessageXml $Message).OuterXml
 $request.ContentType = "application/xml"

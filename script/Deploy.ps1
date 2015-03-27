@@ -57,7 +57,7 @@ $rootDirectory = Split-Path ($scriptsDirectory)
 #$git = Get-Command git.cmd
 . $scriptsDirectory\common.ps1
 
-#Import-Module (Join-Path $scriptsDirectory Modules\Utilities)
+Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
 
 $bucketName = ""
 if ($S3Bucket -eq "production") {
