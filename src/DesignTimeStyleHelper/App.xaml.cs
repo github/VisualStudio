@@ -40,7 +40,7 @@ namespace DesignTimeStyleHelper
         public SVsServiceProvider ServiceProvider;
 
         [Import]
-        SComponentModel sc;
+        public SComponentModel sc;
 
         [Import]
         public IVisualStudioBrowser Browser;
