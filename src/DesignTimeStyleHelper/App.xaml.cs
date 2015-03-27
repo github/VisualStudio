@@ -6,14 +6,11 @@ using System.ComponentModel.Composition.Primitives;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using GitHub.VisualStudio.TeamExplorerConnect;
+using GitHub.Services;
+using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Moq;
-using GitHub.Services;
-using GitHub.VisualStudio;
-using GitHub.ViewModels;
-using GitHub.Exports;
 
 namespace DesignTimeStyleHelper
 {
@@ -33,14 +30,13 @@ namespace DesignTimeStyleHelper
         }
     }
 
-
     public class Holder
     {
         [Import]
         public SVsServiceProvider ServiceProvider;
 
         [Import]
-        SComponentModel sc;
+        public SComponentModel sc;
 
         [Import]
         public IVisualStudioBrowser Browser;
@@ -120,7 +116,6 @@ namespace DesignTimeStyleHelper
             var m = ctor.Invoke(new object[] { }) as Mock;
             return m.Object;
         }
-
 
         public ExportProvider DefaultExportProvider { get; set; }
         public ComposablePartCatalog DefaultCatalog { get; set; }
