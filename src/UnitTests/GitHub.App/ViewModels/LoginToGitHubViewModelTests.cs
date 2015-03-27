@@ -29,7 +29,7 @@ public class LoginToGitHubViewModelTests
 
     public class TheForgotPasswordCommand
     {
-        [Fact(Skip = "It's flipflopping with xunit")]
+        [Fact]
         public void LaunchesBrowserToForgotPasswordPage()
         {
             var repositoryHosts = Substitute.For<IRepositoryHosts>();
