@@ -57,7 +57,7 @@ $rootDirectory = Split-Path ($scriptsDirectory)
 #$git = Get-Command git.cmd
 . $scriptsDirectory\common.ps1
 
-#Import-Module (Join-Path $scriptsDirectory Modules\Utilities)
+Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
 
 $bucketName = ""
 if ($S3Bucket -eq "production") {
@@ -348,11 +348,11 @@ Announce-DeployStarted
 
 	Write-Output "Ready at ${tempDirectory}"
 
-    #Upload-Symbols
-    #Upload-Vsix $tempDirectory
+    Upload-Symbols
+    Upload-Vsix $tempDirectory
 
-    #Remove-Item -Recurse $tempDirectory
+    Remove-Item -Recurse $tempDirectory
 
-    #Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
-    #Announce-DeployCompleted
+    Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
+    Announce-DeployCompleted
 }
