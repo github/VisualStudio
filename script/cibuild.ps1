@@ -54,7 +54,7 @@ function Run-XUnit([string]$project, [int]$timeoutDuration, [string]$configurati
     $xml = Join-Path $rootDirectory "nunit-$project.xml"
     $outputPath = [System.IO.Path]::GetTempFileName()
 
-    $args = $dll, "-noshadow", "-xml", $xml, "-quiet", "-parallel", "all"
+    $args = $dll, "-noshadow", "-xml", $xml, "-parallel", "none"
     [object[]] $output = "$consoleRunner " + ($args -join " ")
     $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
     Wait-Process -InputObject $process -Timeout $timeoutDuration -ErrorAction SilentlyContinue
