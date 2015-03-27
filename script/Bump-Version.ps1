@@ -111,7 +111,6 @@ function Write-VersionAssemblyInfo {
             $newString = $_ -replace $regex, "`$1(`"$version`")"
         }
         $regex = "(const string Version = )`"\d+\.\d+\.\d+\.\d+`";"
-        $newString = $_
         if ($_ -match $regex) {
             $numberOfReplacements++
             $newString = $_ -replace $regex, "`$1`"$version`";"
