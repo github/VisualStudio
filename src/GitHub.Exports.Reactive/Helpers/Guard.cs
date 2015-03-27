@@ -16,8 +16,8 @@ namespace GitHub
             // We already know the value is not null because of NullGuard.Fody.
             if (!string.IsNullOrWhiteSpace(value)) return;
 
-#if DEBUG
             string message = string.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
+#if DEBUG
             if (!ModeDetector.InUnitTestRunner())
             {
                 Debug.Fail(message);
