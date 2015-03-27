@@ -32,7 +32,8 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts, IRepositoryCreationService repositoryCreationService)
+        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts,
+            IRepositoryCreationService repositoryCreationService, IRepositoryCloneService cloneService)
             : base(operatingSystem, hosts)
         {
             this.repositoryCreationService = repositoryCreationService;
@@ -80,45 +81,6 @@ namespace GitHub.ViewModels
 
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
-        }
-
-        public IReactiveCommand<Unit> CreateRepository { get; private set; }
-
-        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
-
-        string baseRepositoryPath;
-        public string BaseRepositoryPath
-        {
-            [return: AllowNull]
-            get { return baseRepositoryPath; }
-            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
-        }
-
-        public ReactivePropertyValidator<string> BaseRepositoryPathValidator
-        {
-            get;
-            private set;
-        }
-
-        public ICommand BrowseForDirectory
-        {
-            get { return browseForDirectoryCommand; }
-        }
-
-        public bool IsCreating
-        {
-            get { return isCreating.Value; }
-        }
-
-        public bool CanKeepPrivate
-        {
-            get { return canKeepPrivate.Value; }
-        }
-
-        public ReactiveList<IAccount> Accounts
-        {
-            get;
-            private set;
         }
 
         IObservable<Unit> ShowBrowseForDirectoryDialog()
@@ -204,5 +166,48 @@ namespace GitHub.ViewModels
 
             return createCommand;
         }
-    }
+
+        /// <summary>
+        /// Title for the dialog
+        /// </summary>
+        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+
+        /// <summary>
+        /// List of accounts (at least one)
+        /// </summary>
+        public ReactiveList<IAccount> Accounts { get; private set; }
+
+        string baseRepositoryPath;
+        /// <summary>
+        /// Path to clone repositories into
+        /// </summary>
+        public string BaseRepositoryPath
+        {
+            [return: AllowNull]
+            get { return baseRepositoryPath; }
+            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
+        }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; private set; }
+
+        /// <summary>
+        /// Fires up a file dialog to select the directory to clone into
+        /// </summary>
+        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
+
+        /// <summary>
+        /// Is running the creation process
+        /// </summary>
+        public bool IsCreating { get { return isCreating.Value; } }
+
+        /// <summary>
+        /// If the repo can be made private (depends on the user plan)
+        /// </summary>
+        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
+
+        /// <summary>
+        /// Fires off the process of creating the repository remotely and then cloning it locally
+        /// </summary>
+        public IReactiveCommand<Unit> CreateRepository { get; private set; }
+   }
 }

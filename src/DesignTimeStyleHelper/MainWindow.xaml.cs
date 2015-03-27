@@ -4,6 +4,7 @@ using GitHub.SampleData;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio;
+using GitHub.Models;
 
 namespace DesignTimeStyleHelper
 {
@@ -42,7 +43,7 @@ namespace DesignTimeStyleHelper
         {
             var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
 
-            var factory = ui.GetService<ExportFactoryProvider>();
+            var factory = ui.GetService<IExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
             var userControlObservable = d.Value.SelectFlow(flow);
             var x = new WindowController(userControlObservable);

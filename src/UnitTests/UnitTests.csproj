@@ -120,6 +120,7 @@
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
+    <Compile Include="Substitutes.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XUnit\ConditionalFactAttribute.cs" />

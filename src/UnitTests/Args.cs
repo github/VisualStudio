@@ -3,6 +3,7 @@ using GitHub.Models;
 using Microsoft.VisualStudio.Text;
 using NSubstitute;
 using Octokit;
+using System;
 
 internal static class Args
 {
@@ -13,4 +14,5 @@ internal static class Args
     public static NewRepository NewRepository { get { return Arg.Any<NewRepository>(); } }
     public static IAccount Account { get { return Arg.Any<IAccount>(); } }
     public static IApiClient ApiClient { get { return Arg.Any<IApiClient>(); } }
+    public static IServiceProvider ServiceProvider { get { return Arg.Any<IServiceProvider>(); } }
 }

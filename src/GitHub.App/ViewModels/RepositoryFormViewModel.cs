@@ -19,7 +19,10 @@ namespace GitHub.ViewModels
     public abstract class RepositoryFormViewModel : ReactiveObject
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
-        
+
+        // These are the characters which are permitted when creating a repository name on GitHub The Website
+        static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
+
         protected RepositoryFormViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
         {
             OperatingSystem = operatingSystem;
@@ -72,119 +75,6 @@ namespace GitHub.ViewModels
                 });
         }
 
-        public IRepositoryHost RepositoryHost
-        {
-            get;
-            private set;
-        }
-
-        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
-        {
-            get;
-            private set;
-        }
-
-        public ReactiveList<LicenseItem> Licenses
-        {
-            get;
-            private set;
-        }
-        
-        string description;
-        [AllowNull]
-        public string Description
-        {
-            [return: AllowNull]
-            get
-            { return description; }
-            set { this.RaiseAndSetIfChanged(ref description, value); }
-        }
-
-        bool keepPrivate;
-        public bool KeepPrivate
-        {
-            get { return keepPrivate; }
-            set { this.RaiseAndSetIfChanged(ref keepPrivate, value); }
-        }
-
-        string repositoryName;
-        [AllowNull]
-        public string RepositoryName
-        {
-            [return: AllowNull]
-            get { return repositoryName; }
-            set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
-        }
-
-        public ReactivePropertyValidator<string> RepositoryNameValidator
-        {
-            get;
-            protected set;
-        }
-
-        public string SafeRepositoryName
-        {
-            [return: AllowNull]
-            get { return safeRepositoryName.Value; }
-        }
-
-        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator
-        {
-            get;
-            protected set;
-        }
-
-        IAccount selectedAccount;
-        [AllowNull]
-        public IAccount SelectedAccount
-        {
-            [return: AllowNull]
-            get
-            { return selectedAccount; }
-            set { this.RaiseAndSetIfChanged(ref selectedAccount, value); }
-        }
-
-        public bool ShowUpgradePlanWarning
-        {
-            get;
-            private set;
-        }
-
-        public bool ShowUpgradeToMicroPlanWarning
-        {
-            get;
-            private set;
-        }
-
-        public ICommand UpgradeAccountPlan
-        {
-            get;
-            private set;
-        }
-
-        GitIgnoreItem selectedGitIgnoreTemplate;
-        [AllowNull]
-        public GitIgnoreItem SelectedGitIgnoreTemplate
-        {
-            get { return selectedGitIgnoreTemplate; }
-            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
-        }
-
-        LicenseItem selectedLicense;
-        [AllowNull]
-        public LicenseItem SelectedLicense
-        {
-            get { return selectedLicense; }
-            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
-        }
-
-        protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
-
-        protected IOperatingSystem OperatingSystem { get; private set; }
-
-        // These are the characters which are permitted when creating a repository name on GitHub The Website
-        static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
-
         /// <summary>
         /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
         /// </summary>
@@ -215,5 +105,105 @@ namespace GitHub.ViewModels
 
             return gitHubRepository;
         }
+
+        /// <summary>
+        /// Host owning the repos
+        /// </summary>
+        public IRepositoryHost RepositoryHost { get; private set; }
+
+        /// <summary>
+        /// List of .gitignore templates for the dropdown
+        /// </summary>
+        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates { get; private set; }
+
+        /// <summary>
+        /// List of license templates for the dropdown
+        /// </summary>
+        public ReactiveList<LicenseItem> Licenses { get; private set; }
+
+        string description;
+        /// <summary>
+        /// Description to set on the repo (optional)
+        /// </summary>
+        [AllowNull]
+        public string Description
+        {
+            [return: AllowNull]
+            get { return description; }
+            set { this.RaiseAndSetIfChanged(ref description, value); }
+        }
+
+        bool keepPrivate;
+        /// <summary>
+        /// Make the new repository private
+        /// </summary>
+        public bool KeepPrivate
+        {
+            get { return keepPrivate; }
+            set { this.RaiseAndSetIfChanged(ref keepPrivate, value); }
+        }
+
+        string repositoryName;
+        /// <summary>
+        /// Name of the repository as typed by user
+        /// </summary>
+        [AllowNull]
+        public string RepositoryName
+        {
+            [return: AllowNull]
+            get { return repositoryName; }
+            set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
+        }
+
+        public ReactivePropertyValidator<string> RepositoryNameValidator { get; protected set; }
+
+        /// <summary>
+        /// Name of the repository after fixing it to be safe (dashes instead of spaces, etc)
+        /// </summary>
+        public string SafeRepositoryName
+        {
+            [return: AllowNull]
+            get { return safeRepositoryName.Value; }
+        }
+
+        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator { get; protected set; }
+
+        IAccount selectedAccount;
+        /// <summary>
+        /// Account where the repository is going to be created on
+        /// </summary>
+        [AllowNull]
+        public IAccount SelectedAccount
+        {
+            [return: AllowNull]
+            get { return selectedAccount; }
+            set { this.RaiseAndSetIfChanged(ref selectedAccount, value); }
+        }
+
+        public bool ShowUpgradePlanWarning { get; private set; }
+
+        public bool ShowUpgradeToMicroPlanWarning { get; private set; }
+
+        public ICommand UpgradeAccountPlan { get; private set; }
+
+        GitIgnoreItem selectedGitIgnoreTemplate;
+        [AllowNull]
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            get { return selectedGitIgnoreTemplate; }
+            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
+        }
+
+        LicenseItem selectedLicense;
+        [AllowNull]
+        public LicenseItem SelectedLicense
+        {
+            get { return selectedLicense; }
+            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
+        }
+
+        protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
+
+        protected IOperatingSystem OperatingSystem { get; private set; }
     }
 }

@@ -6,12 +6,13 @@ using System.Linq;
 using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
-    [Export]
+    [Export(typeof(IExportFactoryProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class ExportFactoryProvider
+    public class ExportFactoryProvider : IExportFactoryProvider
     {
         [ImportingConstructor]
         public ExportFactoryProvider(ICompositionService cc)
