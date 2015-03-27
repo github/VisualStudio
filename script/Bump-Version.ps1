@@ -180,4 +180,4 @@ $currentVersion = Read-CurrentVersion
 $NewVersion = Bump-Version $currentVersion $NewVersion
 Write-Version $NewVersion
 Commit-VersionBump $NewVersion
-#Push-Changes
+Push-Changes
