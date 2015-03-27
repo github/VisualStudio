@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyProduct("GitHub for Visual Studio")]
+[assembly: AssemblyProduct("GitHub Extension for Visual Studio")]
 [assembly: AssemblyVersion("0.2.0.1")]
 [assembly: AssemblyFileVersion("0.2.0.1")]
 [assembly: ComVisible(false)]
