@@ -99,6 +99,10 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="LibGit2Sharp">
+      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\LibGit2Sharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -114,6 +118,7 @@
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\GravatarProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
+    <Compile Include="Services\GitClient.cs" />
     <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Authentication\CredentialManagement\Credential.cs" />
