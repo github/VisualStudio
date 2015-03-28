@@ -1,15 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Rothko;
-using System.Linq;
-using GitHub.Extensions;
 using GitHub.Info;
-using System.Globalization;
+using GitHub.Extensions;
 
 namespace GitHub.Services
 {
