@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio
         /// <summary>
         /// Provider of this application
         /// </summary>
-        public string ApplicationProvider {  get { return ApplicationProvider; } }
+        public string ApplicationProvider {  get { return applicationProvider; } }
 
         /// <summary>
         /// Name of this application
