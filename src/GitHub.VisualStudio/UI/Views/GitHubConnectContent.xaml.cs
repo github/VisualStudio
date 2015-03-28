@@ -30,16 +30,16 @@ namespace GitHub.VisualStudio.UI.Views
 
         }
 
-        public PlaceholderGitHubSection ViewModel
+        public GitHubConnectSection ViewModel
         {
-            get { return (PlaceholderGitHubSection)GetValue(ViewModelProperty); }
+            get { return (GitHubConnectSection)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register(
                 "ViewModel",
-                typeof(PlaceholderGitHubSection),
+                typeof(GitHubConnectSection),
                 typeof(GitHubConnectContent));
     }
 }
