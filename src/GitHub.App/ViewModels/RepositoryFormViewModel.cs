@@ -16,7 +16,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Base class for the Repository publish/create dialogs. It represents the details about the repository itself.
     /// </summary>
-    public abstract class RepositoryFormViewModel : ReactiveObject
+    public abstract class RepositoryFormViewModel : ConnectionViewModel
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 
@@ -24,11 +24,9 @@ namespace GitHub.ViewModels
         static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
 
         protected RepositoryFormViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+            : base(connection, hosts)
         {
-            Connection = connection;
-
             OperatingSystem = operatingSystem;
-            RepositoryHost = hosts.LookupHost(Connection.HostAddress);
      
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
@@ -107,13 +105,6 @@ namespace GitHub.ViewModels
 
             return gitHubRepository;
         }
-
-        protected IConnection Connection { get; private set; }
-
-        /// <summary>
-        /// Host owning the repos
-        /// </summary>
-        public IRepositoryHost RepositoryHost { get; private set; }
 
         /// <summary>
         /// List of .gitignore templates for the dropdown
