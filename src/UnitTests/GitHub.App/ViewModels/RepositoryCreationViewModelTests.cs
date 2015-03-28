@@ -298,8 +298,10 @@ public class RepositoryCreationViewModelTests
         {
             var provider = Substitutes.ServiceProvider;
             var hosts = provider.GetRepositoryHosts();
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
             var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>() };
-            hosts.GitHubHost.Accounts.Returns(accounts);
+            host.Accounts.Returns(accounts);
             var vm = GetMeAViewModel(provider);
 
             Assert.Same(accounts, vm.Accounts);
@@ -417,7 +419,9 @@ public class RepositoryCreationViewModelTests
 
             var account = Substitute.For<IAccount>();
             var hosts = provider.GetRepositoryHosts();
-            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
+            host.Accounts.Returns(new ReactiveList<IAccount> { account });
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -446,7 +450,9 @@ public class RepositoryCreationViewModelTests
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
             var account = Substitute.For<IAccount>();
             var hosts = provider.GetRepositoryHosts();
-            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
+            host.Accounts.Returns(new ReactiveList<IAccount> { account });
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -476,7 +482,9 @@ public class RepositoryCreationViewModelTests
             var provider = Substitutes.GetServiceProvider(creationService: creationService);
             var account = Substitute.For<IAccount>();
             var hosts = provider.GetRepositoryHosts();
-            hosts.GitHubHost.Accounts.Returns(new ReactiveList<IAccount> { account });
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
+            host.Accounts.Returns(new ReactiveList<IAccount> { account });
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
