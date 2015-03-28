@@ -6,22 +6,24 @@ using System.ComponentModel.Composition;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio
 {
     class CacheData
     {
-        public IEnumerable<IConnection> connections;
+        public IEnumerable<Connection> connections;
     }
 
-    [Export]
+    [Export(typeof(IConnectionManager))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class ConnectionManager
+    public class ConnectionManager : IConnectionManager
     {
         readonly string cachePath;
         const string cacheFile = "ghfvs.connections";
         public ObservableCollection<IConnection> Connections { get; private set; }
 
+        [ImportingConstructor]
         public ConnectionManager(IProgram program)
         {
             Connections = new ObservableCollection<IConnection>();
@@ -42,7 +44,15 @@ namespace GitHub.VisualStudio
         void LoadConnectionsFromCache()
         {
             if (!File.Exists(cacheFile))
+            {
+                // FAKE!
+                Connections.Add(new Connection()
+                {
+                    HostAddress = Primitives.HostAddress.GitHubDotComHostAddress,
+                    Username = "shana"
+                });
                 return;
+            }
             string data = File.ReadAllText(cacheFile);
 
             CacheData cacheData;
@@ -63,7 +73,7 @@ namespace GitHub.VisualStudio
         void SaveConnectionsToCache()
         {
             CacheData cache = new CacheData();
-            cache.connections = Connections.ToList();
+            cache.connections = Connections.Select(x => x as Connection);
             try
             {
                 string data = SimpleJson.SerializeObject(cache);
