@@ -169,7 +169,7 @@ namespace GitHub.ViewModels
             var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
             createCommand.ThrownExceptions.Subscribe(ex =>
             {
-                if (!ex.IsCriticalException())
+                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
                     // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);

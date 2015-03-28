@@ -125,7 +125,7 @@ namespace GitHub.ViewModels
             var publishCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
             publishCommand.ThrownExceptions.Subscribe(ex =>
             {
-                if (!ex.IsCriticalException())
+                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
                     // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);
