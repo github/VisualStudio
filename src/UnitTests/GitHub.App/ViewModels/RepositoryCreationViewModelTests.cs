@@ -15,6 +15,8 @@ using UnitTests;
 
 public class RepositoryCreationViewModelTests
 {
+    static object DefaultInstance = new object();
+
     static IRepositoryCreationViewModel GetMeAViewModel(IServiceProvider provider = null)
     {
         if (provider == null)
@@ -23,8 +25,9 @@ public class RepositoryCreationViewModelTests
         var hosts = provider.GetRepositoryHosts();
         var creationService = provider.GetRepositoryCreationService();
         var cloneService = provider.GetRepositoryCloneService();
+        var connection = provider.GetConnection();
 
-        return new RepositoryCreationViewModel(os, hosts, creationService, cloneService);
+        return new RepositoryCreationViewModel(connection, os, hosts, creationService, cloneService);
     }
 
     public class TheSafeRepositoryNameProperty
