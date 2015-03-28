@@ -14,5 +14,8 @@ namespace GitHub.Services
 
         object TryGetService(Type t);
         T TryGetService<T>() where T : class;
+
+        void AddService(Type t, object instance);
+        void RemoveService(Type t);
     }
 }
