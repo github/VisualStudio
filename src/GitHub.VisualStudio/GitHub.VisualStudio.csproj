@@ -211,7 +211,12 @@
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="SimpleJson.cs" />
-    <Compile Include="TeamExplorerConnect\PlaceholderGitHubSection.cs" />
+    <Compile Include="TeamExplorerConnect\GitHubConnectSection4.cs" />
+    <Compile Include="TeamExplorerConnect\GitHubConnectSection3.cs" />
+    <Compile Include="TeamExplorerConnect\GitHubConnectSection2.cs" />
+    <Compile Include="TeamExplorerConnect\GitHubConnectSection1.cs" />
+    <Compile Include="TeamExplorerConnect\GitHubConnectSection0.cs" />
+    <Compile Include="TeamExplorerConnect\GitHubConnectSection.cs" />
     <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PullRequestsNavigationItem.cs" />
