@@ -18,5 +18,6 @@ namespace GitHub.Models
         IObservable<AuthenticationResult> LogInGitHubHost(string usernameOrEmail, string password);
         IRepositoryHostFactory RepositoryHostFactory { get; }
         bool IsLoggedInToAnyHost { get; }
+        IRepositoryHost LookupHost(HostAddress address);
     }
 }
