@@ -12,6 +12,7 @@ using Rothko;
 using Xunit;
 using Xunit.Extensions;
 using UnitTests;
+using GitHub.Primitives;
 
 public class RepositoryCreationViewModelTests
 {
@@ -321,7 +322,9 @@ public class RepositoryCreationViewModelTests
         };
             var provider = Substitutes.ServiceProvider;
             var hosts = provider.GetRepositoryHosts();
-            hosts.GitHubHost.ApiClient
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
+            host.ApiClient
                 .GetGitIgnoreTemplates()
                 .Returns(gitIgnoreTemplates.ToObservable());
             var vm = GetMeAViewModel(provider);
@@ -359,7 +362,9 @@ public class RepositoryCreationViewModelTests
         };
             var provider = Substitutes.ServiceProvider;
             var hosts = provider.GetRepositoryHosts();
-            hosts.GitHubHost.ApiClient
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
+            host.ApiClient
                 .GetLicenses()
                 .Returns(licenses.ToObservable());
             var vm = GetMeAViewModel(provider);
