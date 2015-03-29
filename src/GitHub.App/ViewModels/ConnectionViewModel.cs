@@ -12,7 +12,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public IRepositoryHost RepositoryHost { get; private set; }
 
-
         public ConnectionViewModel(IConnection connection, IRepositoryHosts hosts)
         {
             Connection = connection;

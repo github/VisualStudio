@@ -72,7 +72,7 @@ namespace GitHub.VisualStudio
 
         void SaveConnectionsToCache()
         {
-            CacheData cache = new CacheData();
+            var cache = new CacheData();
             cache.connections = Connections.Select(x => x as Connection);
             try
             {
@@ -84,6 +84,5 @@ namespace GitHub.VisualStudio
                 Debug.Assert(false, ex.ToString());
             }
         }
-
     }
 }
