@@ -5,6 +5,7 @@
                     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Controls\ErrorMessageDisplay.xaml" />
         <ResourceDictionary Source="Controls\Validation\UserErrorMessages.xaml" />
         <ResourceDictionary Source="Controls\Validation\ValidationMessage.xaml" />
         <ResourceDictionary Source="Controls\GitHubTabControl.xaml" />
