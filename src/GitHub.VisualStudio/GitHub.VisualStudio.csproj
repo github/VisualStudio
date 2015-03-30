@@ -178,6 +178,7 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Base\TeamExplorerGitAwareItem_Solution.cs" />
     <Compile Include="Base\TeamExplorerInvitationBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
@@ -186,7 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\TeamExplorerBase.cs" />
-    <Compile Include="Base\TeamExplorerGitAwareItem.cs" />
     <Compile Include="Base\TeamExplorerItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationLinkBase.cs" />
