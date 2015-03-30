@@ -6,6 +6,7 @@ using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
+using GitHub.Primitives;
 
 namespace GitHub.ViewModels
 {
@@ -32,32 +33,7 @@ namespace GitHub.ViewModels
 
         protected override IObservable<AuthenticationResult> LogIn(object args)
         {
-            ShowLogInFailedError = false;
-            ShowTwoFactorAuthFailedError = false;
-
-            return RepositoryHosts.LogInGitHubHost(UsernameOrEmail, Password)
-                .SelectMany(authResult =>
-                {
-                    if (authResult == AuthenticationResult.CredentialFailure)
-                    {
-                        ShowLogInFailedError = true;
-
-                        Password = "";
-                        return Observable.FromAsync(PasswordValidator.ResetAsync)
-                            .Select(_ => authResult);
-                    }
-                    else if (authResult == AuthenticationResult.VerificationFailure)
-                    {
-                        ShowTwoFactorAuthFailedError = true;
-                    }
-                    else if (authResult == AuthenticationResult.Success)
-                    {
-                        return Observable.Return(authResult);
-                        // Reset.ExecuteAsync()
-                    }
-
-                    return Observable.Return(authResult);
-                });
+            return LogInToHost(HostAddress.GitHubDotComHostAddress);
         }
     }
 }
