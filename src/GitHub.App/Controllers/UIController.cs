@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Controls;
-using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,6 +14,7 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using Stateless;
+using NullGuard;
 
 namespace GitHub.Controllers
 {
@@ -25,6 +25,7 @@ namespace GitHub.Controllers
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
+        readonly IRepositoryHosts hosts;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly StateMachine<UIViewType, Trigger> machine;
@@ -36,6 +37,7 @@ namespace GitHub.Controllers
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
+            this.hosts = hosts;
 
 #if DEBUG
             if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
@@ -54,16 +56,6 @@ namespace GitHub.Controllers
             }
 #endif
             machine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
-
-            machine.Configure(UIViewType.None)
-                .Permit(Trigger.Auth, UIViewType.Login)
-                .PermitIf(Trigger.Create, UIViewType.Create, () => hosts.IsLoggedInToAnyHost)
-                // TODO: This condition isn't exactly correct. We need to check that the host associated with this Create request is logged in or not.
-                .PermitIf(Trigger.Create, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIViewType.Clone, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Publish, UIViewType.Publish, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Publish, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
 
             machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
@@ -118,6 +110,27 @@ namespace GitHub.Controllers
                     transition = null;
                 })
                 .Permit(Trigger.Next, UIViewType.None);
+        }
+
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection connection)
+        {
+            IRepositoryHost host = RepositoryHosts.DisconnectedRepositoryHost;
+            if (connection != null)
+                host = hosts.LookupHost(connection.HostAddress);
+
+            machine.Configure(UIViewType.None)
+                .Permit(Trigger.Auth, UIViewType.Login)
+                .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
+                .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
+                .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
+                .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
+                .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
+                .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+
+            currentFlow = choice;
+            transition = new Subject<UserControl>();
+            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
+            return transition;
         }
 
         void RunView(UIViewType viewType)
@@ -178,14 +191,6 @@ namespace GitHub.Controllers
         {
             Debug.WriteLine("Firing {0}", next);
             machine.Fire(next);
-        }
-
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice)
-        {
-            currentFlow = choice;
-            transition = new Subject<UserControl>();
-            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
-            return transition;
         }
 
         public void Start()

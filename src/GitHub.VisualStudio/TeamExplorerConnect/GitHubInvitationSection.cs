@@ -1,10 +1,13 @@
-﻿using GitHub.VisualStudio.Base;
+﻿using GitHub.Models;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.UI;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
+using System;
 using System.Windows;
 using System.Windows.Media;
-using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
@@ -25,7 +28,32 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             VSColorTheme.ThemeChanged += OnThemeChanged;
         }
 
-        private void OnThemeChanged(ThemeChangedEventArgs e)
+        public override void Connect()
+        {
+            StartFlow(UIControllerFlow.Authentication);
+            base.Connect();
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var factory = uiProvider.GetService<IExportFactoryProvider>();
+            var uiControllerExport = factory.UIControllerFactory.CreateExport();
+            var uiController = uiControllerExport.Value;
+            var flow = uiController.SelectFlow(controllerFlow, null);
+            var windowController = new WindowController(flow);
+            flow.Subscribe(_ => { }, _ =>
+            {
+                windowController.Close();
+                uiControllerExport.Dispose();
+            });
+            windowController.Show();
+
+            uiController.Start();
+        }
+
+
+        void OnThemeChanged(ThemeChangedEventArgs e)
         {
             Icon = GetDrawingForIcon(GetBrushForIcon());
         }
