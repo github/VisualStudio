@@ -13,6 +13,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
+using GitHub.Extensions;
 using NLog;
 using NullGuard;
 using ReactiveUI;
@@ -32,13 +33,25 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
 
         [ImportingConstructor]
-        public RepositoryCreationViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts,
-            IRepositoryCreationService repositoryCreationService, IRepositoryCloneService cloneService)
-            : base(operatingSystem, hosts)
+        RepositoryCreationViewModel(
+            IServiceProvider provider,
+            IOperatingSystem operatingSystem,
+            IRepositoryHosts hosts,
+            IRepositoryCreationService rs,
+            IRepositoryCloneService cs)
+            : this(provider.GetService<IConnection>(), operatingSystem, hosts, rs, cs)
+        {}
+
+        public RepositoryCreationViewModel(
+            IConnection connection,
+            IOperatingSystem operatingSystem,
+            IRepositoryHosts hosts,
+            IRepositoryCreationService repositoryCreationService,
+            IRepositoryCloneService cloneService)
+            : base(connection, operatingSystem, hosts)
         {
             this.repositoryCreationService = repositoryCreationService;
 
-            Accounts = hosts.GitHubHost.Accounts;
             Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
             Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
             var selectedAccount = Accounts.FirstOrDefault();
@@ -156,7 +169,7 @@ namespace GitHub.ViewModels
             var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
             createCommand.ThrownExceptions.Subscribe(ex =>
             {
-                if (!ex.IsCriticalException())
+                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
                     // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);

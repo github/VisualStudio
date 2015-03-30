@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using GitHub.Services;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
-using System.Reflection;
 
 namespace GitHub.VisualStudio
 {
@@ -31,6 +33,8 @@ namespace GitHub.VisualStudio
         }
 
         readonly IServiceProvider serviceProvider;
+        readonly CompositionContainer tempContainer;
+        readonly Dictionary<string, ComposablePart> tempParts;
 
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -40,13 +44,20 @@ namespace GitHub.VisualStudio
             var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
             Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
             ExportProvider = componentModel.DefaultExportProvider;
+
+            tempContainer = new CompositionContainer(new ComposablePartExportProvider() { SourceProvider = ExportProvider });
+            tempParts = new Dictionary<string, ComposablePart>();
         }
 
         [return: AllowNull]
         public object TryGetService(Type serviceType)
         {
             string contract = AttributedModelServices.GetContractName(serviceType);
-            var instance = ExportProvider.GetExportedValues<object>(contract).FirstOrDefault();
+            var instance = tempContainer.GetExportedValueOrDefault<object>(contract);
+            if (instance != null)
+                return instance;
+
+            instance = ExportProvider.GetExportedValues<object>(contract).FirstOrDefault();
 
             if (instance != null)
                 return instance;
@@ -86,10 +97,37 @@ namespace GitHub.VisualStudio
             return TryGetService(typeof(T)) as T;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         public Ret GetService<T, Ret>() where Ret : class
         {
             return GetService<T>() as Ret;
+        }
+
+        public void AddService(Type t, object instance)
+        {
+            var batch = new CompositionBatch();
+            string contract = AttributedModelServices.GetContractName(t);
+            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+            var part = batch.AddExportedValue(contract, instance);
+            Debug.Assert(part != null, "Adding an exported value must return a non-null part");
+            tempParts.Add(contract, part);
+            tempContainer.Compose(batch);
+        }
+
+        public void RemoveService(Type t)
+        {
+            string contract = AttributedModelServices.GetContractName(t);
+            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+
+            ComposablePart part; 
+
+            if (tempParts.TryGetValue(contract, out part))
+            {
+                tempParts.Remove(contract);
+                var batch = new CompositionBatch();
+                batch.RemovePart(part);
+                tempContainer.Compose(batch);
+            }
         }
     }
 }

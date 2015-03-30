@@ -13,20 +13,20 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginToGitHubViewModel : LoginTabViewModel, ILoginToGitHubViewModel
     {
-        readonly Uri baseUri;
+        readonly Lazy<Uri> baseUri;
 
         [ImportingConstructor]
         public LoginToGitHubViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
             : base(repositoryHosts, browser)
         {
-            baseUri = repositoryHosts.GitHubHost.Address.WebUri;
+            baseUri = new Lazy<Uri>(() => repositoryHosts.GitHubHost.Address.WebUri);
         }
 
         protected override Uri BaseUri
         {
             get
             {
-                return baseUri;
+                return baseUri.Value;
             }
         }
 

@@ -1,14 +1,11 @@
-﻿using GitHub.Extensions;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+﻿using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using GitHub.Extensions;
 
 namespace GitHub.Services
 {

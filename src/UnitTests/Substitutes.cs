@@ -47,6 +47,7 @@ namespace UnitTests
         public static IRepositoryCloneService RepositoryCloneService { get { return Substitute.For<IRepositoryCloneService>(); } }
 
         public static IRepositoryHosts RepositoryHosts { get { return Substitute.For<IRepositoryHosts>(); } }
+        public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -91,6 +92,7 @@ namespace UnitTests
                 create = new RepositoryCreationService(clone);
             var hosts = RepositoryHosts;
             var exports = ExportFactoryProvider;
+            var connection = Connection;
             ret.GetService(typeof(IGitRepositoriesExt)).Returns(git);
             ret.GetService(typeof(IVSServices)).Returns(vs);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
@@ -98,6 +100,7 @@ namespace UnitTests
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
             ret.GetService(typeof(IRepositoryHosts)).Returns(hosts);
             ret.GetService(typeof(IExportFactoryProvider)).Returns(exports);
+            ret.GetService(typeof(IConnection)).Returns(connection);
             return ret;
         }
 
@@ -134,6 +137,11 @@ namespace UnitTests
         public static IExportFactoryProvider GetExportFactoryProvider(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
+        }
+
+        public static IConnection GetConnection(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IConnection)) as IConnection;
         }
     }
 }

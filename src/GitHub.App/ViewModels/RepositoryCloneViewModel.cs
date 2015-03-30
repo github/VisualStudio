@@ -4,7 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Windows.Input;
+using GitHub.Extensions;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,21 +15,28 @@ using ReactiveUI;
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
-    public class RepositoryCloneViewModel : ReactiveObject, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : ConnectionViewModel, IRepositoryCloneViewModel
     {
         readonly IRepositoryCloneService cloneService;
 
         [ImportingConstructor]
-        public RepositoryCloneViewModel(IRepositoryCloneService cloneService, IRepositoryHosts hosts)
+        RepositoryCloneViewModel(IServiceProvider provider,
+            IRepositoryCloneService cs, IRepositoryHosts hosts)
+            : this(provider.GetService<Models.IConnection>(), cs, hosts)
+        { }
+        
+        public RepositoryCloneViewModel(Models.IConnection connection,
+            IRepositoryCloneService cloneService, IRepositoryHosts hosts)
+            : base(connection, hosts)
         {
             this.cloneService = cloneService;
 
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
-            hosts.GitHubHost.Cache.GetUser()
+            RepositoryHost.Cache.GetUser()
                 .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
-                .SelectMany(user => hosts.GitHubHost.ApiClient.GetUserRepositories(user.Id))
+                .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
                 .Select(repo => new RepositoryModel(repo) { HasLocalClone = LocalRepoExists(repo) })
                 .ObserveOn(RxApp.MainThreadScheduler)

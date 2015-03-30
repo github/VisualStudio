@@ -48,7 +48,7 @@ namespace GitHub.Primitives
             CredentialCacheKeyHost = WebUri.ToString();
         }
 
-        private HostAddress()
+        public HostAddress()
         {
             WebUri = new Uri("https://github.com");
             ApiUri = new Uri("https://api.github.com");
