@@ -14,7 +14,7 @@ namespace GitHub.VisualStudio.Base
     /// the solution open and close events. Once
     /// TFSContext is git-aware, this can be killed
     /// </summary>
-    public class TeamExplorerGitAwareItem : TeamExplorerItemBase
+    public class TeamExplorerGitAwareItemBase : TeamExplorerItemBase
     {
         bool disposed = false;
 

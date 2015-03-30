@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using NullGuard;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.VisualStudio
 {
@@ -128,6 +129,15 @@ namespace GitHub.VisualStudio
             if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
                 return null;
             return uri;
+        }
+
+        [return: AllowNull]
+        public static Repository GetRepoFromIGit(IGitRepositoryInfo repoInfo)
+        {
+            var repoPath = Repository.Discover(repoInfo.RepositoryPath);
+            if (repoPath == null)
+                return null;
+            return new Repository(repoPath);
         }
     }
 }
