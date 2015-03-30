@@ -9,6 +9,7 @@ using System.Text;
 using GitHub.Models;
 using GitHub.Services;
 using Rothko;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio
 {
@@ -48,7 +49,10 @@ namespace GitHub.VisualStudio
             Connections.CollectionChanged += RefreshConnections;
         }
 
-        public ObservableCollection<IConnection> Connections { get; private set; }
+        public IConnection CreateConnection(HostAddress address, string username)
+        {
+            return new Connection(address, username);
+        }
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -105,5 +109,7 @@ namespace GitHub.VisualStudio
                 Debug.Fail(ex.ToString());
             }
         }
+
+        public ObservableCollection<IConnection> Connections { get; private set; }
     }
 }

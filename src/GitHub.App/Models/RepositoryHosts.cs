@@ -11,6 +11,7 @@ using GitHub.Factories;
 using GitHub.Primitives;
 using ReactiveUI;
 using System.Globalization;
+using NullGuard;
 
 namespace GitHub.Models
 {
@@ -23,12 +24,16 @@ namespace GitHub.Models
         public static DisconnectedRepositoryHost DisconnectedRepositoryHost = new DisconnectedRepositoryHost();
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;
+        readonly IConnectionManager connectionManager;
 
         [ImportingConstructor]
         public RepositoryHosts(
             IRepositoryHostFactory repositoryHostFactory,
-            ISharedCache sharedCache)
+            ISharedCache sharedCache,
+            IConnectionManager connectionManager)
         {
+            this.connectionManager = connectionManager;
+
             RepositoryHostFactory = repositoryHostFactory;
 
             LocalRepositoriesHost = new LocalRepositoriesHost();
@@ -92,34 +97,6 @@ namespace GitHub.Models
             return DisconnectedRepositoryHost;
         }
 
-        IRepositoryHost githubHost;
-        public IRepositoryHost GitHubHost
-        {
-            get { return githubHost; }
-            private set {
-                var newHost = value ?? DisconnectedRepositoryHost;
-                this.RaiseAndSetIfChanged(ref githubHost, newHost);
-            }
-        }
-
-        IRepositoryHost enterpriseHost;
-        public IRepositoryHost EnterpriseHost
-        {
-            get { return enterpriseHost; }
-            set
-            {
-                var newHost = value ?? DisconnectedRepositoryHost;
-                this.RaiseAndSetIfChanged(ref enterpriseHost, newHost);
-            }
-        }
-
-        IRepositoryHost localRepositoriesHost;
-        public IRepositoryHost LocalRepositoriesHost
-        {
-            get { return localRepositoriesHost; }
-            set { this.RaiseAndSetIfChanged(ref localRepositoriesHost, value); }
-        }
-
         public IObservable<AuthenticationResult> LogIn(
             HostAddress address,
             string usernameOrEmail,
@@ -144,13 +121,11 @@ namespace GitHub.Models
                             EnterpriseHost = host;
                         else
                             GitHubHost = host;
+                        var connection = connectionManager.CreateConnection(address, usernameOrEmail);
+                        connectionManager.Connections.Add(connection);
                     }
                 });
         }
-
-        public IRepositoryHostFactory RepositoryHostFactory { get; private set; }
-
-        public bool IsLoggedInToAnyHost { get { return isLoggedInToAnyHost.Value; } }
 
         public void Dispose()
         {
@@ -165,5 +140,40 @@ namespace GitHub.Models
                 EnterpriseHost.Cache.Dispose();
             }
         }
+
+        IRepositoryHost githubHost;
+        [AllowNull]
+        public IRepositoryHost GitHubHost
+        {
+            get { return githubHost; }
+            private set
+            {
+                var newHost = value ?? DisconnectedRepositoryHost;
+                this.RaiseAndSetIfChanged(ref githubHost, newHost);
+            }
+        }
+
+        IRepositoryHost enterpriseHost;
+        [AllowNull]
+        public IRepositoryHost EnterpriseHost
+        {
+            get { return enterpriseHost; }
+            set
+            {
+                var newHost = value ?? DisconnectedRepositoryHost;
+                this.RaiseAndSetIfChanged(ref enterpriseHost, newHost);
+            }
+        }
+
+        IRepositoryHost localRepositoriesHost;
+        public IRepositoryHost LocalRepositoriesHost
+        {
+            get { return localRepositoriesHost; }
+            set { this.RaiseAndSetIfChanged(ref localRepositoriesHost, value); }
+        }
+
+        public IRepositoryHostFactory RepositoryHostFactory { get; private set; }
+
+        public bool IsLoggedInToAnyHost { get { return isLoggedInToAnyHost.Value; } }
     }
 }
