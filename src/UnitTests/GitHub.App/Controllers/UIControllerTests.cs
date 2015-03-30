@@ -14,6 +14,7 @@ using UnitTests;
 using GitHub.ViewModels;
 using ReactiveUI;
 using System.Collections.Generic;
+using GitHub.Primitives;
 
 public class UIControllerTests
 {
@@ -25,7 +26,8 @@ public class UIControllerTests
             var uiProvider = Substitute.For<IUIProvider>();
             var hosts = Substitute.For<IRepositoryHosts>();
             var factory = Substitute.For<IExportFactoryProvider>();
-            var uiController = new UIController(uiProvider, hosts, factory);
+            var cm = Substitutes.ConnectionManager;
+            var uiController = new UIController(uiProvider, hosts, factory, cm);
 
             uiController.Dispose();
             uiController.Dispose();
@@ -52,11 +54,14 @@ public class UIControllerTests
             var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
+            var cm = provider.GetConnectionManager();
+            var cons = new System.Collections.ObjectModel.ObservableCollection<IConnection>();
+            cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
                 var list = new List<IView>();
-                uiController.SelectFlow(UIControllerFlow.Clone)
+                uiController.SelectFlow(UIControllerFlow.Clone, null)
                     .Subscribe(uc => list.Add(uc as IView),
                                 () =>
                                 {
@@ -74,12 +79,16 @@ public class UIControllerTests
             var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
-            hosts.IsLoggedInToAnyHost.Returns(true);
+            var connection = provider.GetConnection();
+            var cm = provider.GetConnectionManager();
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(connection.HostAddress).Returns(host);
+            host.IsLoggedIn.Returns(true);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
                 var list = new List<IView>();
-                uiController.SelectFlow(UIControllerFlow.Clone)
+                uiController.SelectFlow(UIControllerFlow.Clone, connection)
                     .Subscribe(uc => list.Add(uc as IView),
                                 () =>
                                 {

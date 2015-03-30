@@ -15,6 +15,8 @@ using GitHub.ViewModels;
 using ReactiveUI;
 using Stateless;
 using NullGuard;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace GitHub.Controllers
 {
@@ -26,18 +28,22 @@ namespace GitHub.Controllers
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
+        readonly IConnectionManager connectionManager;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
+        IConnection connection;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
+            IConnectionManager connectionManager)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
             this.hosts = hosts;
+            this.connectionManager = connectionManager;
 
 #if DEBUG
             if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
@@ -112,11 +118,15 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Next, UIViewType.None);
         }
 
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection connection)
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection aConnection)
         {
+            connection = aConnection;
             IRepositoryHost host = RepositoryHosts.DisconnectedRepositoryHost;
             if (connection != null)
+            {
+                uiProvider.AddService(typeof(IConnection), connection);
                 host = hosts.LookupHost(connection.HostAddress);
+            }
 
             machine.Configure(UIViewType.None)
                 .Permit(Trigger.Auth, UIViewType.Login)
@@ -144,6 +154,20 @@ namespace GitHub.Controllers
         {
             if (viewType == UIViewType.Login)
             {
+                // listen for a new connection being added
+                if (connection == null)
+                {
+                    Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(connectionManager.Connections,
+                        "CollectionChanged")
+                        .Take(1)
+                        .Do(e =>
+                        {
+                            if (e.EventArgs.Action == NotifyCollectionChangedAction.Add)
+                                connection = e.EventArgs.NewItems[0] as IConnection;
+                        });
+                }
+
+
                 // we're setting up the login dialog, we need to setup the 2fa as
                 // well to continue the flow if it's needed, since the
                 // authenticationresult callback won't happen until
