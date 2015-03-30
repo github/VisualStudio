@@ -116,6 +116,7 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
+    <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
     <Compile Include="GitHubPackageTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
