@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GitHub.Primitives;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
     public interface IConnectionManager
     {
+        IConnection CreateConnection(HostAddress address, string username);
         ObservableCollection<IConnection> Connections { get; }
     }
 }
