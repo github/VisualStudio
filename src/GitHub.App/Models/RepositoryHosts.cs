@@ -12,6 +12,7 @@ using GitHub.Primitives;
 using ReactiveUI;
 using System.Globalization;
 using NullGuard;
+using System.Linq;
 
 namespace GitHub.Models
 {
@@ -121,9 +122,24 @@ namespace GitHub.Models
                             EnterpriseHost = host;
                         else
                             GitHubHost = host;
-                        var connection = connectionManager.CreateConnection(address, usernameOrEmail);
-                        connectionManager.Connections.Add(connection);
+                        connectionManager.AddConnection(address, usernameOrEmail);
                     }
+                });
+        }
+
+        public IObservable<Unit> LogOut(HostAddress address)
+        {
+            var host = LookupHost(address);
+            return LogOut(host);
+        }
+
+        public IObservable<Unit> LogOut(IRepositoryHost host)
+        {
+            var address = host.Address;
+            return host.LogOut()
+                .Do(result =>
+                {
+                    connectionManager.RemoveConnection(address);
                 });
         }
 
