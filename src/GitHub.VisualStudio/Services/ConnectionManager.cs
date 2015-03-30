@@ -45,7 +45,6 @@ namespace GitHub.VisualStudio
 
             LoadConnectionsFromCache();
 
-            // TODO: Load list of known connections from cache
             Connections.CollectionChanged += RefreshConnections;
         }
 
@@ -73,18 +72,14 @@ namespace GitHub.VisualStudio
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            // TODO: save list of known connections to cache
             SaveConnectionsToCache();
         }
 
         void LoadConnectionsFromCache()
         {
             if (!operatingSystem.File.Exists(cachePath))
-            {
-                // FAKE!
-                Connections.Add(new Connection(HostAddress.GitHubDotComHostAddress, "shana"));
                 return;
-            }
+
             string data = operatingSystem.File.ReadAllText(cachePath, Encoding.UTF8);
 
             CacheData cacheData;
