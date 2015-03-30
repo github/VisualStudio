@@ -11,6 +11,7 @@ using GitHub.Validation;
 using NLog;
 using ReactiveUI;
 using Rothko;
+using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {
@@ -25,8 +26,12 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isPublishing;
 
         [ImportingConstructor]
-        public RepositoryPublishViewModel(IOperatingSystem operatingSystem, IRepositoryHosts hosts)
-            : base(operatingSystem, hosts)
+        RepositoryPublishViewModel(IServiceProvider provider, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+            : this(provider.GetService<IConnection>(), operatingSystem, hosts)
+        {}
+
+        public RepositoryPublishViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+            : base(connection, operatingSystem, hosts)
         {
             RepositoryHosts = new ReactiveList<IRepositoryHost>(
                 new[] { hosts.GitHubHost, hosts.EnterpriseHost }.Where(h => h.IsLoggedIn));
@@ -120,7 +125,7 @@ namespace GitHub.ViewModels
             var publishCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
             publishCommand.ThrownExceptions.Subscribe(ex =>
             {
-                if (!ex.IsCriticalException())
+                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
                     // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -165,6 +166,7 @@
     <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
+    <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />

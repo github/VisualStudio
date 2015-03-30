@@ -3,6 +3,7 @@ using GitHub.ViewModels;
 using NSubstitute;
 using ReactiveUI;
 using Rothko;
+using UnitTests;
 using Xunit;
 using Xunit.Extensions;
 
@@ -28,7 +29,8 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             hosts.EnterpriseHost.Returns(enterpriseHost);
-            var vm = new RepositoryPublishViewModel(operatingSystem, hosts);
+            var connection = Substitutes.Connection;
+            var vm = new RepositoryPublishViewModel(connection, operatingSystem, hosts);
 
             var repositoryHosts = vm.RepositoryHosts;
 
@@ -48,7 +50,7 @@ public class RepositoryPublishViewModelTests
             gitHubHost.Accounts.Returns(new ReactiveList<IAccount>());
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
-            var vm = new RepositoryPublishViewModel(operatingSystem, hosts);
+            var vm = new RepositoryPublishViewModel(Substitutes.Connection, operatingSystem, hosts);
 
             Assert.Same(gitHubHost, vm.SelectedHost);
         }
@@ -73,7 +75,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             hosts.EnterpriseHost.Returns(enterpriseHost);
-            var vm = new RepositoryPublishViewModel(operatingSystem, hosts);
+            var vm = new RepositoryPublishViewModel(Substitutes.Connection, operatingSystem, hosts);
 
             Assert.Equal(2, vm.Accounts.Count);
             Assert.Same(gitHubAccounts[0], vm.SelectedAccount);
@@ -97,6 +99,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
 
@@ -115,6 +118,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
 
@@ -133,6 +137,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
             Assert.Null(vm.SafeRepositoryName);
@@ -155,6 +160,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
 
@@ -174,6 +180,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
             vm.RepositoryName = "repo";
@@ -198,6 +205,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
 
@@ -220,6 +228,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
 
@@ -238,6 +247,7 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
+                Substitutes.Connection,
                 Substitute.For<IOperatingSystem>(),
                 hosts);
 
