@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.VisualStudio;
 using NSubstitute;
 using Rothko;
@@ -30,23 +32,47 @@ public class ConnectionManagerTests
             Assert.Equal(new Uri("https://ghe.io/api/v3/"), connections[1].HostAddress.ApiUri);
         }
 
-        [Fact]
-        public void IsEmptyWhenCacheCorrupt()
+        [Theory]
+        [InlineData("|!This ain't no JSON what even is this?")]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("{}")]
+        [InlineData(@"{""connections"":null}")]
+        [InlineData(@"{""connections"":{}}")]
+        public void IsEmptyWhenCacheCorrupt(string cacheJson)
         {
-            const string cacheData = @"|!This ain't no JSON what even is this?";
             var program = Substitute.For<IProgram>();
             program.ApplicationProvider.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");
             operatingSystem.File.Exists(@"c:\fake\GHfVS\ghfvs.connections").Returns(true);
-            operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns(cacheData);
+            operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns(cacheJson);
             var manager = new ConnectionManager(program, operatingSystem);
 
             var connections = manager.Connections;
 
             Assert.Equal(0, connections.Count);
             operatingSystem.File.Received().Delete(@"c:\fake\GHfVS\ghfvs.connections");
+        }
+
+        [Fact]
+        public void IsSavedToDiskWhenConnectionAdded()
+        {
+            var program = Substitute.For<IProgram>();
+            program.ApplicationProvider.Returns("GHfVS");
+            var operatingSystem = Substitute.For<IOperatingSystem>();
+            operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
+                .Returns(@"c:\fake");
+            operatingSystem.File.Exists(@"c:\fake\GHfVS\ghfvs.connections").Returns(true);
+            operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns("");
+            var manager = new ConnectionManager(program, operatingSystem);
+
+            manager.Connections.Add(new Connection(HostAddress.GitHubDotComHostAddress, "coolio"));
+
+            Assert.Equal(1, manager.Connections.Count);
+            operatingSystem.File.Received().WriteAllText(@"c:\fake\GHfVS\ghfvs.connections",
+                @"{""connections"":[{""HostUrl"":""https://github.com/"",""UserName"":""coolio""}]}");
         }
     }
 }
