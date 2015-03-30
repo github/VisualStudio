@@ -7,46 +7,47 @@
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d"
-             d:DesignWidth="426"
-             d:DesignHeight="517"
-             MinWidth="426"
-             MinHeight="517"
+             d:DesignWidth="354"
+             d:DesignHeight="432"
+             MinWidth="354"
+             MinHeight="432"
              Background="White">
     <Border FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
         <Border.Resources>
             <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
-
+            <Style TargetType="{x:Type Border}" x:Key="LoginButtonBorder">
+                <Setter Property="Margin" Value="0,20" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
             <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
         </Border.Resources>
         <StackPanel
-            Margin="40,0,40,0"
+            Margin="30,0,30,0"
             Background="{x:Null}"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
-            helpers:AccessKeysManagerScoping.IsEnabled="True"
-            >
+            helpers:AccessKeysManagerScoping.IsEnabled="True">
             <ui:OcticonImage Icon="logo_github" FontSize="20" Width="200" Height="60" />
 
             <TextBlock
                 x:Name="loginLabelPrefix"
                 HorizontalAlignment="Center"
-                Margin="0,10,0,20"
+                Margin="0,-10,0,20"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 IsHitTestVisible="False"
                 Text="Log in" />
             
-            <ui:HorizontalShadowDivider Margin="0,0,0,40" />
+            <ui:HorizontalShadowDivider Margin="30,0,30,20" />
             
             <TabControl 
                 x:Name="hostTabControl" Style="{StaticResource LightModalViewTabControl}"
                 FocusManager.IsFocusScope="True"
                 FocusVisualStyle="{x:Null}"
-                helpers:AccessKeysManagerScoping.IsEnabled="True"
-                >
+                helpers:AccessKeysManagerScoping.IsEnabled="True">
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LightModalViewTabItem}" />
                     <Style TargetType="{x:Type TabPanel}">
@@ -55,7 +56,7 @@
                 </TabControl.Resources>
 
                 <TabItem x:Name="dotComTab" Header="GitHub">
-                    <StackPanel Margin="0,10,0,0">
+                    <StackPanel Margin="0,16,0,0">
                         <StackPanel x:Name="dotComloginControlsPanel">
                             <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed" Margin="0,0,0,10">
                                 <TextBlock TextWrapping="Wrap">
@@ -68,19 +69,21 @@
                                 <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
                             </uirx:ErrorMessageDisplay>
 
-                            <StackPanel Margin="0,0,0,10">
-                                <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
-                                <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
-                            </StackPanel>
+                            <StackPanel Margin="30,0,30,0">
+                                <StackPanel Margin="0,0,0,10">
+                                    <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
+                                    <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
+                                </StackPanel>
                             
-                            <StackPanel Margin="0,0,0,10">
-                                <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
-                                <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}" />
+                                <StackPanel Margin="0,0,0,10">
+                                    <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
+                                    <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}" />
+                                </StackPanel>
                             </StackPanel>
-                           
+
                         </StackPanel>
 
-                        <Border HorizontalAlignment="Center" Margin="0,20,0,20">
+                        <Border Style="{StaticResource LoginButtonBorder}">
                             <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
                         </Border>
 
@@ -126,8 +129,8 @@
                                 <uirx:ValidationMessage x:Name="enterpriseUrlValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUrl}" TextChangeThrottle="1.0"/>
                             </StackPanel>
                         </StackPanel>
-                        
-                        <Border HorizontalAlignment="Center" Margin="0,10,0,10">
+
+                        <Border Style="{StaticResource LoginButtonBorder}">
                             <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
                         </Border>
                         
