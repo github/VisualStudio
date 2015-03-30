@@ -10,6 +10,7 @@ using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
 using ReactiveUI;
+using System.Globalization;
 
 namespace GitHub.Models
 {
@@ -31,7 +32,7 @@ namespace GitHub.Models
             RepositoryHostFactory = repositoryHostFactory;
 
             LocalRepositoriesHost = new LocalRepositoriesHost();
-            GitHubHost = repositoryHostFactory.Create(HostAddress.GitHubDotComHostAddress);
+            GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
 
             var initialCacheLoadObs = sharedCache.UserAccount.GetObject<Uri>(EnterpriseHostApiBaseUriCacheKey)
@@ -88,14 +89,17 @@ namespace GitHub.Models
                 return GitHubHost;
             if (address == EnterpriseHost.Address)
                 return EnterpriseHost;
-            return LocalRepositoriesHost;
+            return DisconnectedRepositoryHost;
         }
 
         IRepositoryHost githubHost;
         public IRepositoryHost GitHubHost
         {
             get { return githubHost; }
-            private set { this.RaiseAndSetIfChanged(ref githubHost, value); }
+            private set {
+                var newHost = value ?? DisconnectedRepositoryHost;
+                this.RaiseAndSetIfChanged(ref githubHost, newHost);
+            }
         }
 
         IRepositoryHost enterpriseHost;
@@ -116,35 +120,32 @@ namespace GitHub.Models
             set { this.RaiseAndSetIfChanged(ref localRepositoriesHost, value); }
         }
 
-        public IObservable<AuthenticationResult> LogInEnterpriseHost(
-            HostAddress enterpriseHostAddress,
+        public IObservable<AuthenticationResult> LogIn(
+            HostAddress address,
             string usernameOrEmail,
             string password)
         {
-            var host = RepositoryHostFactory.Create(enterpriseHostAddress);
+            var isDotCom = HostAddress.GitHubDotComHostAddress == address;
+            var host = RepositoryHostFactory.Create(address);
             return host.LogIn(usernameOrEmail, password)
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
                 {
                     bool successful = result.IsSuccess();
-                    log.Info("Log in to Enterprise host '{0}' with username '{1}' {2}",
-                        enterpriseHostAddress.ApiUri,
+                    log.Info(CultureInfo.InvariantCulture, "Log in to {3} host '{0}' with username '{1}' {2}",
+                        address.ApiUri,
                         usernameOrEmail,
-                        successful ? "SUCCEEDED" : "FAILED");
+                        successful ? "SUCCEEDED" : "FAILED",
+                        isDotCom ? "GitHub.com" : "Enterprise"
+                    );
                     if (successful)
                     {
-                        EnterpriseHost = host;
+                        if (isDotCom)
+                            EnterpriseHost = host;
+                        else
+                            GitHubHost = host;
                     }
                 });
-        }
-
-        public IObservable<AuthenticationResult> LogInGitHubHost(string usernameOrEmail, string password)
-        {
-            return GitHubHost.LogIn(usernameOrEmail, password)
-                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
-                .Do(result => log.Info("Log in to GitHub.com with username '{0}' {1}",
-                    usernameOrEmail,
-                    result.IsSuccess() ? "SUCCEEDED" : "FAILED"));
         }
 
         public IRepositoryHostFactory RepositoryHostFactory { get; private set; }

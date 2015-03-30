@@ -41,50 +41,7 @@ namespace GitHub.ViewModels
 
         protected override IObservable<AuthenticationResult> LogIn(object args)
         {
-            return Observable.Defer(() =>
-            {
-                ShowLogInFailedError = false;
-                ShowTwoFactorAuthFailedError = false;
-                ShowConnectingToHostFailed = false;
-
-                var hostAddress = HostAddress.Create(EnterpriseUrl);
-                return hostAddress != null ?
-                    RepositoryHosts.LogInEnterpriseHost(hostAddress, UsernameOrEmail, Password)
-                    : Observable.Return(AuthenticationResult.CredentialFailure);
-            })
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Do(authResult => {
-                switch (authResult)
-                {
-                    case AuthenticationResult.CredentialFailure:
-                        ShowLogInFailedError = true;
-                        break;
-                    case AuthenticationResult.VerificationFailure:
-                        ShowTwoFactorAuthFailedError = true;
-                        break;
-                    case AuthenticationResult.EnterpriseServerNotFound:
-                        ShowConnectingToHostFailed = true;
-                        break;
-                }
-            })
-            .SelectMany(authResult =>
-            {
-                switch (authResult)
-                {
-                    case AuthenticationResult.CredentialFailure:
-                    case AuthenticationResult.EnterpriseServerNotFound:
-                    case AuthenticationResult.VerificationFailure:
-                        Password = "";
-                        return Observable.FromAsync(PasswordValidator.ResetAsync)
-                            .Select(_ => AuthenticationResult.CredentialFailure);
-                    case AuthenticationResult.Success:
-                        return Reset.ExecuteAsync()
-                            .ContinueAfter(() => Observable.Return(AuthenticationResult.Success));
-                    default:
-                        return Observable.Throw<AuthenticationResult>(
-                            new InvalidOperationException("Unknown EnterpriseLoginResult: " + authResult));
-                }
-            });
+            return LogInToHost(HostAddress.Create(EnterpriseUrl));
         }
 
         string enterpriseUrl;
@@ -100,13 +57,6 @@ namespace GitHub.ViewModels
         public ReactivePropertyValidator EnterpriseUrlValidator
         {
             get { return enterpriseUrlValidator; }
-        }
-
-        bool showConnectingToHostFailed;
-        public bool ShowConnectingToHostFailed
-        {
-            get { return showConnectingToHostFailed; }
-            set { this.RaiseAndSetIfChanged(ref showConnectingToHostFailed, value); }
         }
 
         protected override Uri BaseUri
