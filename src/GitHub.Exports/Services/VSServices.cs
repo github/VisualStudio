@@ -95,24 +95,23 @@ namespace GitHub.Services
                 var ret = host.TryGetService(type);
                 Debug.Assert(ret != null, string.Format(CultureInfo.InvariantCulture, "'{0}' {1} not found in assembly '{2}'. We need to check if it's been moved in this version.",
                     type, "service", assembly.GetCustomAttributeValue<AssemblyFileVersionAttribute>("Version")));
-                return new ISccSettingsService(provider);
+                return new ISccSettingsService(ret);
             }
 
 
             public class ISccSettingsService
             {
-                readonly IServiceProvider serviceProvider;
-                public ISccSettingsService(IServiceProvider provider)
+                readonly object settings;
+                public ISccSettingsService(object provider)
                 {
-                    serviceProvider = provider;
+                    settings = provider;
                 }
 
                 public string DefaultRepositoryPath
                 {
                     get
                     {
-                        var service = GetISccSettingsService(serviceProvider);
-                        return ISccSettingsServiceType.GetValueForProperty(service, "DefaultRepositoryPath") as string;
+                        return ISccSettingsServiceType.GetValueForProperty(settings, "DefaultRepositoryPath") as string;
                     }
                 }
             }
@@ -124,6 +123,8 @@ namespace GitHub.Services
         // always loaded with VS if the git service provider is loaded
         public string GetLocalClonePathFromGitProvider(IServiceProvider provider)
         {
+            provider.GetService<IGitRepositoriesExt>();
+
             try
             {
                 var service = GitCoreServices.GetISccSettingsService(provider);
