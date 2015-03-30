@@ -6,7 +6,7 @@ using NullGuard;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerSectionBase : TeamExplorerGitAwareItem, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerGitAwareItemBase, ITeamExplorerSection, INotifyPropertySource
     {
         bool isBusy;
         public bool IsBusy
@@ -21,17 +21,6 @@ namespace GitHub.VisualStudio.Base
             get { return isExpanded; }
             set { isExpanded = value; this.RaisePropertyChange(); }
         }
-
-        // When this class goes back to inheriting from TeamExplorerBase,
-        // this property should be restored
-        /*
-        bool isVisible;
-        public bool IsVisible
-        {
-            get { return isVisible; }
-            set { isVisible = value; this.RaisePropertyChange(); }
-        }
-        */
 
         object sectionContent;
         [AllowNull]

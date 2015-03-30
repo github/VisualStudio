@@ -12,7 +12,7 @@ using NullGuard;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerNavigationItemBase : TeamExplorerGitAwareItem, ITeamExplorerNavigationItem2, INotifyPropertySource
+    public class TeamExplorerNavigationItemBase : TeamExplorerGitAwareItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
         [AllowNull]
         public ISimpleApiClient SimpleApiClient { get; private set; }
