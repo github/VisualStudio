@@ -104,11 +104,12 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            foreach (var c in cacheData.connections.Where(c => c.HostUrl != null))
+            cacheData.connections.All(c =>
             {
-                var hostAddress = Primitives.HostAddress.Create(c.HostUrl);
-                Connections.Add(new Connection(hostAddress, c.UserName));
-            }
+                if (c.HostUrl != null)
+                    AddConnection(HostAddress.Create(c.HostUrl), c.UserName);
+                return true;
+            });
         }
 
         void SaveConnectionsToCache()
