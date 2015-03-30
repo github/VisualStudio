@@ -117,8 +117,6 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.AddService(typeof(IConnection), SectionConnection);
-
             uiProvider.GitServiceProvider = gitServiceProvider;
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiControllerExport = factory.UIControllerFactory.CreateExport();

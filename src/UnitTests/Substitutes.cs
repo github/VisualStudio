@@ -48,6 +48,7 @@ namespace UnitTests
 
         public static IRepositoryHosts RepositoryHosts { get { return Substitute.For<IRepositoryHosts>(); } }
         public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
+        public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -93,6 +94,7 @@ namespace UnitTests
             var hosts = RepositoryHosts;
             var exports = ExportFactoryProvider;
             var connection = Connection;
+            var connectionManager = ConnectionManager;
             ret.GetService(typeof(IGitRepositoriesExt)).Returns(git);
             ret.GetService(typeof(IVSServices)).Returns(vs);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
@@ -101,6 +103,7 @@ namespace UnitTests
             ret.GetService(typeof(IRepositoryHosts)).Returns(hosts);
             ret.GetService(typeof(IExportFactoryProvider)).Returns(exports);
             ret.GetService(typeof(IConnection)).Returns(connection);
+            ret.GetService(typeof(IConnectionManager)).Returns(connectionManager);
             return ret;
         }
 
@@ -142,6 +145,11 @@ namespace UnitTests
         public static IConnection GetConnection(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IConnection)) as IConnection;
+        }
+
+        public static IConnectionManager GetConnectionManager(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IConnectionManager)) as IConnectionManager;
         }
     }
 }
