@@ -54,6 +54,23 @@ namespace GitHub.VisualStudio
             return new Connection(address, username);
         }
 
+        public bool AddConnection(HostAddress address, string username)
+        {
+            if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
+                return false;
+            Connections.Add(new Connection(address, username));
+            return true;
+        }
+
+        public bool RemoveConnection(HostAddress address)
+        {
+            var c = Connections.FirstOrDefault(x => x.HostAddress == address);
+            if (c == null)
+                return false;
+            Connections.Remove(c);
+            return true;
+        }
+
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             // TODO: save list of known connections to cache
@@ -65,7 +82,7 @@ namespace GitHub.VisualStudio
             if (!operatingSystem.File.Exists(cachePath))
             {
                 // FAKE!
-                Connections.Add(new Connection(Primitives.HostAddress.GitHubDotComHostAddress, "shana"));
+                Connections.Add(new Connection(HostAddress.GitHubDotComHostAddress, "shana"));
                 return;
             }
             string data = operatingSystem.File.ReadAllText(cachePath, Encoding.UTF8);
