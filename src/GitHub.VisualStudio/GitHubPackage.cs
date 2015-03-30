@@ -38,51 +38,5 @@ namespace GitHub.VisualStudio
             : base(serviceProvider)
         {
         }
-
-        /// <summary>
-        /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initialization code that rely on services provided by VisualStudio.
-        /// </summary>
-        protected override void Initialize()
-        {
-            Debug.WriteLine("Entering Initialize() of: {0}", ToString());
-            base.Initialize();
-
-            // Add our command handlers for menu (commands must exist in the .vsct file)
-            // for testing purposes only
-            AddTopLevelMenuItem(PkgCmdIDList.loginCommand, OnLoginCommand);
-            AddTopLevelMenuItem(PkgCmdIDList.createRepoCommand, OnCreateRepo);
-            AddTopLevelMenuItem(PkgCmdIDList.cloneRepoCommand, OnCloneRepo);
-        }
-
-        void ShowDialog(UIControllerFlow flow)
-        {
-            var ui = GetExportedValue<IUIProvider>();
-            var disposable = ui.GetService<IExportFactoryProvider>().UIControllerFactory.CreateExport();
-            var watcher = disposable.Value.SelectFlow(flow);
-            var window = new WindowController(watcher);
-            watcher.Subscribe(_ => { }, _ => {
-                window.Close();
-                disposable.Dispose();
-            });
-            //window.Owner = System.Windows.Application.Current.MainWindow;
-            //window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-            window.ShowModal();
-        }
-
-        void OnCreateRepo(object sender, EventArgs e)
-        {
-            ShowDialog(UIControllerFlow.Create);
-        }
-
-        void OnCloneRepo(object sender, EventArgs e)
-        {
-            ShowDialog(UIControllerFlow.Clone);
-        }
-
-        void OnLoginCommand(object sender, EventArgs e)
-        {
-            ShowDialog(UIControllerFlow.Authentication);
-        }
     }
 }
