@@ -219,7 +219,6 @@
     <Compile Include="TeamExplorerConnect\GitHubConnectSection0.cs" />
     <Compile Include="TeamExplorerConnect\GitHubConnectSection.cs" />
     <Compile Include="TeamExplorerConnect\GitHubInvitationSection.cs" />
-    <Compile Include="TeamExplorerConnect\PlaceholderGitHubSection.cs" />
     <Compile Include="TeamExplorerHome\GitHubHomeSection.cs" />
     <Compile Include="TeamExplorerHome\GraphsNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PullRequestsNavigationItem.cs" />
