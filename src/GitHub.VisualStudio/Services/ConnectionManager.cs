@@ -76,7 +76,7 @@ namespace GitHub.VisualStudio
                 cacheData = null;
             }
 
-            if (cacheData == null)
+            if (cacheData == null || cacheData.connections == null)
             {
                 // cache is corrupt, remove
                 operatingSystem.File.Delete(cachePath);
@@ -102,7 +102,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                Debug.Assert(false, ex.ToString());
+                Debug.Fail(ex.ToString());
             }
         }
     }
