@@ -109,54 +109,6 @@
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource GitHubTextBox}" />
     <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}" />
     <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}" />
-
-    <Style x:Key="AppendingPathTextBoxStyle" TargetType="{x:Type ui:AppendingPathTextBox}" BasedOn="{StaticResource GitHubTextBox}">
-        <Setter Property="Padding" Value="3,3,0,0" />
-        <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="Template">
-            <Setter.Value>
-
-                <ControlTemplate TargetType="{x:Type ui:AppendingPathTextBox}">
-
-                    <Grid>
-                        <Border x:Name="Bd" CornerRadius="2" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                            <Border CornerRadius="0" BorderBrush="Black" BorderThickness="0,1,0,0" Margin="2,-2,2,0" Opacity="0.4">
-                                <Border.Effect>
-                                    <DropShadowEffect Direction="270" ShadowDepth="0" BlurRadius="4" Opacity="1" />
-                                </Border.Effect>
-                            </Border>
-                        </Border>
-
-                        <Grid  Margin="1,0,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <ScrollViewer x:Name="PART_ContentHost" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Padding="3,3,0,0"  />
-                            <TextBlock Visibility="{TemplateBinding PathSeparatorVisibility}" Text="\" Grid.Column="1" Padding="0,3,0,3" Margin="-3,0,0,0"/>
-                            <TextBlock x:Name="childFolderTextBlock" Visibility="{TemplateBinding ChildFolderVisibility}" Text="{TemplateBinding Property=ChildFolderName}" Grid.Column="2" Padding="0,3,0,3" Margin="-2,0,0,0" Opacity="0.7" />
-                        </Grid>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource GitHubTextBoxMouseOverBorderBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
-                        </Trigger>
-                        <Trigger Property="PathSeparatorVisibility" Value="Visible">
-                            <Setter Property="Margin" Value="-1,0,0,0" TargetName="childFolderTextBlock" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
     
     <!-- PasswordBox -->
     <Style x:Key="GitHubPasswordBox" TargetType="{x:Type PasswordBox}">

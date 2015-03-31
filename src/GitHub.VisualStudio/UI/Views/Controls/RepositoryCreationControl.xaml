@@ -47,11 +47,7 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
 
-                <Style TargetType="{x:Type ui:PromptTextBox}">
-                    <Setter Property="Margin" Value="0,5" />
-                </Style>
-
-                <Style TargetType="{x:Type ui:AppendingPathTextBox}">
+                <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                     <Setter Property="Margin" Value="0,5" />
                 </Style>
 
@@ -117,7 +113,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <ui:AppendingPathTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0" />
+                <ui:PromptTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0" />
                 <Button
                     x:Name="browsePathButton"
                     Grid.Column="1"
