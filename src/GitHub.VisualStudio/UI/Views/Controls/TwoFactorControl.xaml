@@ -11,18 +11,19 @@
     xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
     xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
     mc:Ignorable="d"
-    d:DesignWidth="426"
-    d:DesignHeight="517"
-    MinWidth="426"
-    MinHeight="517">
+    d:DesignWidth="354"
+    d:DesignHeight="432"
+    MinWidth="354"
+    MinHeight="432">
     <Border FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
     <StackPanel
-            Margin="40,0,40,0"
+            Margin="30,0,30,0"
             Background="{x:Null}"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
             helpers:AccessKeysManagerScoping.IsEnabled="True">
-            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,12" >
+            <ui:OcticonImage Icon="logo_github" FontSize="20" Width="200" Height="60" />
+            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12" >
                 <TextBlock 
                     Text="Two-factor authentication" 
                     Padding="0" 
@@ -37,8 +38,8 @@
                     Style="{DynamicResource GitHubH1TextBlock}" 
                     Foreground="{DynamicResource GitHubAccentBrush}" />
             </WrapPanel>
-        
-            <ui:HorizontalShadowDivider Margin="0,0,0,20" />
+
+            <ui:HorizontalShadowDivider Margin="30,0,30,20" />
 
             <TextBlock
                 Name="description"
@@ -52,7 +53,7 @@
                 Open the two-factor authentication app on your device to view your authentication code.
                 <Hyperlink NavigateUri="https://help.github.com/articles/about-two-factor-authentication" ToolTip="https://help.github.com/articles/about-two-factor-authentication">Read more</Hyperlink>
             </TextBlock>
-            <ui:TwoFactorInput
+            <uirx:TwoFactorInput
                 x:Name="authenticationCode"
                 TabIndex="1" />
             <uirx:ValidationMessage
