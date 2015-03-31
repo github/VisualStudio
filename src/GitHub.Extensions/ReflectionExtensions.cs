@@ -65,10 +65,9 @@ namespace GitHub.Extensions
             }
             catch (Exception ex)
             {
-                Debug.Assert(ex == null, string.Format(CultureInfo.InvariantCulture, "'{0}' {1} in assembly '{2}' threw an exception. {3}.",
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "'{0}' {1} in assembly '{2}' threw an exception. {3}.",
                     propName, "getter", type.Assembly.GetCustomAttributeValue<AssemblyFileVersionAttribute>("Version"), ex));
             }
-            return null;
         }
     }
 }
