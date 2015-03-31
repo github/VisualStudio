@@ -20,7 +20,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
-        public static class GitCoreServices
+        static class GitCoreServices
         {
             const string ns = "Microsoft.TeamFoundation.Git.CoreServices.";
             const string scchost = "ISccServiceHost";
@@ -99,7 +99,6 @@ namespace GitHub.Services
                 return new ISccSettingsService(ret);
             }
 
-
             public class ISccSettingsService
             {
                 readonly object settings;
@@ -132,7 +131,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                Debug.Assert(ex == null, ex.ToString());
+                Debug.Fail(ex.ToString());
             }
 
             if (!string.IsNullOrEmpty(ret))
@@ -144,7 +143,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                Debug.Assert(ex == null, ex.ToString());
+                Debug.Fail(ex.ToString());
             }
             return ret;
         }
