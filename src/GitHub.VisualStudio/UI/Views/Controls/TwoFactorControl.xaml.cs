@@ -30,8 +30,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             this.WhenActivated(d =>
             {
-                authenticationCode.Focus();
-
                 d(this.BindCommand(ViewModel, vm => vm.OkCommand, view => view.okButton));
                 d(this.BindCommand(ViewModel, vm => vm.ResendCodeCommand, view => view.resendCodeButton));
 
@@ -51,6 +49,13 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                         close.OnCompleted();
                     }));
             });
+            IsVisibleChanged += (s, e) =>
+            {
+                if (IsVisible)
+                {
+                    authenticationCode.TryFocus().Subscribe();
+                }
+            };
         }
 
         public ITwoFactorDialogViewModel ViewModel
