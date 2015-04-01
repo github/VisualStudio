@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using GitHub.Extensions;
 using NullGuard;
 
 namespace GitHub.UI
@@ -37,6 +38,11 @@ namespace GitHub.UI
             }
         }
 
+        public IObservable<bool> TryFocus()
+        {
+            return one.TryMoveFocus(FocusNavigationDirection.First);
+        }
+
         private void OnPaste(object sender, DataObjectPastingEventArgs e)
         {
             var isText = e.SourceDataObject.GetDataPresent(DataFormats.Text, true);
@@ -67,8 +73,10 @@ namespace GitHub.UI
             SetValue(TextProperty, String.Join("", digits));
         }
 
+        [AllowNull]
         public string Text
         {
+            [return: AllowNull]
             get { return (string)GetValue(TextProperty); }
             set { SetText(value); }
         }
