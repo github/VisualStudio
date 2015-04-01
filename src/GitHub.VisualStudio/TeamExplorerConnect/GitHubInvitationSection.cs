@@ -37,19 +37,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            var factory = uiProvider.GetService<IExportFactoryProvider>();
-            var uiControllerExport = factory.UIControllerFactory.CreateExport();
-            var uiController = uiControllerExport.Value;
-            var flow = uiController.SelectFlow(controllerFlow, null);
-            var windowController = new WindowController(flow);
-            flow.Subscribe(_ => { }, _ =>
-            {
-                windowController.Close();
-                uiControllerExport.Dispose();
-            });
-            windowController.Show();
-
-            uiController.Start();
+            uiProvider.RunUI(controllerFlow, null);
         }
 
 

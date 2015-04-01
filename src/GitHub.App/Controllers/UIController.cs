@@ -23,7 +23,7 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
+        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
@@ -71,6 +71,7 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
                 // Added the following line to make it easy to login to both GitHub and GitHub Enterprise 
                 // in DesignTimeStyleHelper in order to test Publish.
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
@@ -82,6 +83,7 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.TwoFactor);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
@@ -92,6 +94,7 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.Create);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.Clone)
@@ -99,6 +102,7 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.Clone);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.Publish)
@@ -106,16 +110,22 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.Publish);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.End)
                 .OnEntry(() =>
                 {
+                    uiProvider.RemoveService(typeof(IConnection));
                     transition.OnCompleted();
-                    transition.Dispose();
-                    transition = null;
                 })
-                .Permit(Trigger.Next, UIViewType.None);
+                .Permit(Trigger.Next, UIViewType.Finished);
+
+            // it might be useful later to check which triggered
+            // made us enter here (Cancel or Next) and set a final
+            // result accordingly, which is why UIViewType.End only
+            // allows a Next trigger
+            machine.Configure(UIViewType.Finished);
         }
 
         public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection aConnection)
@@ -213,13 +223,23 @@ namespace GitHub.Controllers
 
         void Fire(Trigger next)
         {
-            Debug.WriteLine("Firing {0}", next);
+            Debug.WriteLine("Firing {0} ({1})", next, GetHashCode());
             machine.Fire(next);
         }
 
         public void Start()
         {
+            Debug.WriteLine("Start ({0})", GetHashCode());
             Fire((Trigger)(int)currentFlow);
+        }
+
+        public void Stop()
+        {
+            Debug.WriteLine("Stop ({0})", GetHashCode());
+            if (machine.IsInState(UIViewType.End))
+                Fire(Trigger.Next);
+            else
+                Fire(Trigger.Cancel);
         }
 
         private bool disposedValue = false; // To detect redundant calls
@@ -230,6 +250,7 @@ namespace GitHub.Controllers
             {
                 if (disposing)
                 {
+                    Debug.WriteLine("Disposing ({0})", GetHashCode());
                     disposables.Dispose();
                     if (transition != null)
                         transition.Dispose();
@@ -243,5 +264,7 @@ namespace GitHub.Controllers
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public bool IsStopped { get { return machine.IsInState(UIViewType.Finished); } }
     }
 }

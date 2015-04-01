@@ -36,7 +36,6 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
-
             Refresh();
         }
 
@@ -118,20 +117,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = gitServiceProvider;
-            var factory = uiProvider.GetService<IExportFactoryProvider>();
-            var uiControllerExport = factory.UIControllerFactory.CreateExport();
-            var uiController = uiControllerExport.Value;
-            var creation = uiController.SelectFlow(controllerFlow, SectionConnection);
-            var windowController = new WindowController(creation);
-            creation.Subscribe(_ => { }, _ =>
-            {
-                windowController.Close();
-                uiControllerExport.Dispose();
-                uiProvider.RemoveService(typeof(IConnection));
-            });
-            windowController.Show();
-
-            uiController.Start();
+            uiProvider.RunUI(controllerFlow, SectionConnection);
         }
     }
 }

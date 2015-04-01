@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using GitHub.VisualStudio.TeamExplorerConnect;
+using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -12,6 +13,9 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public GitHubConnectContent()
         {
+            SharedDictionaryManager.Load("GitHub.UI");
+            Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
+
             InitializeComponent();
         }
 

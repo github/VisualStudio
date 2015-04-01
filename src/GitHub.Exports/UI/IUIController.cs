@@ -9,6 +9,8 @@ namespace GitHub.UI
         //IObservable<object> Transition { get; }
         IObservable<UserControl> SelectFlow(UIControllerFlow choice, IConnection connection);
         void Start();
+        void Stop();
+        bool IsStopped { get; }
     }
 
     public enum UIControllerFlow

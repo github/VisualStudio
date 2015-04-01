@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using GitHub.Services;
-using GitHub.UI;
 using GitHub.VisualStudio.Base;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.PlatformUI;
+using System.Windows.Media;
+using GitHub.VisualStudio.Helpers;
+using GitHub.UI;
+using GitHub.Services;
 using GitHub.Models;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio
 {
@@ -27,7 +29,10 @@ namespace GitHub.VisualStudio
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.guidGitHubPkgString)]
-    [ProvideBindingPath]
+    //[ProvideBindingPath]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    //[ProvideAutoLoad(UIContextGuids.NoSolution)]
+    [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
     public class GitHubPackage : PackageBase
     {
         public GitHubPackage()
@@ -37,6 +42,20 @@ namespace GitHub.VisualStudio
         public GitHubPackage(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            uiProvider.RunUI(controllerFlow, null);
         }
     }
 }
