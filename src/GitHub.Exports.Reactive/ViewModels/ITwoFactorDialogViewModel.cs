@@ -8,10 +8,11 @@ namespace GitHub.ViewModels
     public interface ITwoFactorDialogViewModel : ITwoFactorViewModel
     {
         ReactiveCommand<object> OkCommand { get; }
+        ReactiveCommand<object> CancelCommand { get; }
         ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; }
         ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; }
 
-        IObservable<RecoveryOptionResult> Show(TwoFactorRequiredUserError error);
+        IObservable<RecoveryOptionResult> Show(UserError error);
 
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }
