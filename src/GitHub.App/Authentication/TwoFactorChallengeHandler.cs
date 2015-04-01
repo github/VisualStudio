@@ -8,21 +8,18 @@ using ReactiveUI;
 namespace GitHub.Authentication
 {
     [Export(typeof(ITwoFactorChallengeHandler))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class TwoFactorChallengeHandler : ITwoFactorChallengeHandler
     {
-        //readonly IServiceProvider serviceProvider;
-        readonly Lazy<ITwoFactorDialogViewModel> lazyTwoFactorDialog;
+        ITwoFactorDialogViewModel twoFactorDialog;
 
-        [ImportingConstructor]
-        public TwoFactorChallengeHandler(Lazy<ITwoFactorDialogViewModel> twoFactorDialog)
+        public void SetViewModel(ITwoFactorDialogViewModel vm)
         {
-            lazyTwoFactorDialog = twoFactorDialog;
+            twoFactorDialog = vm;
         }
 
         public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorRequiredException exception)
         {
-            var twoFactorDialog = lazyTwoFactorDialog.Value as ITwoFactorDialogViewModel;
-
             return Observable.Start(() =>
             {
                 var userError = new TwoFactorRequiredUserError(exception);
