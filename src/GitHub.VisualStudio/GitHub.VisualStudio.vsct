@@ -25,18 +25,9 @@
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidGitHubPkg">
-    <Menus>
-      <Menu guid="guidGitHubCmdSet" id="GitHubMenu" priority="0x700" type="Menu">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
-        <Strings>
-          <ButtonText>&amp;GitHub</ButtonText>
-        </Strings>
-      </Menu>
-    </Menus>
-    
     <Groups>
-      <Group guid="guidGitHubCmdSet" id="GitHubMenuGroup" priority="0x0600">
-        <Parent guid="guidGitHubCmdSet" id="GitHubMenu" />
+      <Group guid="guidGitHubCmdSet" id="idGitHubMenuGroup" priority="0x0500">
+        <Parent guid="guidManageConnections" id="idManageConnections" />
       </Group>
     </Groups>
     
@@ -44,73 +35,54 @@
     <!--This section defines the elements the user can interact with, like a menu command or a button 
         or combo box in a toolbar. -->
     <Buttons>
-      <!--To define a menu group you have to specify its ID, the parent menu and its display priority. 
+     <!--To define a menu group you have to specify its ID, the parent menu and its display priority. 
           The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
           the CommandFlag node.
           You can add more than one CommandFlag node e.g.:
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidGitHubCmdSet" id="loginCommand" priority="0x0100" type="Button">
-        <Parent guid="guidGitHubCmdSet" id="GitHubMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
-        <Strings>
-          <ButtonText>&amp;Login</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidGitHubCmdSet" id="createRepoCommand" priority="0x0101" type="Button">
-        <Parent guid="guidGitHubCmdSet" id="GitHubMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
-        <Strings>
-          <ButtonText>&amp;Create repo</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidGitHubCmdSet" id="cloneRepoCommand" priority="0x0102" type="Button">
-        <Parent guid="guidGitHubCmdSet" id="GitHubMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
-        <Strings>
-          <ButtonText>&amp;Clone repo</ButtonText>
-        </Strings>
+
+      <Button guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100" type="Button">
+      <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup" />
+      <Icon guid="guidImages" id="logo" />
+      <Strings>
+        <ButtonText>&amp;Connect to GitHub</ButtonText>
+      </Strings>
       </Button>
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
-    <Bitmaps>
-      <!--  The bitmap id is defined in a way that is a little bit different from the others: 
+    <!--  The bitmap id is defined in a way that is a little bit different from the others: 
             the declaration starts with a guid for the bitmap strip, then there is the resource id of the 
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="logodark,logo" />
     </Bitmaps>
   </Commands>
-
-  <KeyBindings>
-    <KeyBinding guid="guidGitHubCmdSet" id="loginCommand" editor="guidVSStd97" key1="U" key2="L" mod2="CONTROL" mod1="CONTROL"/>
-    <KeyBinding guid="guidGitHubCmdSet" id="createRepoCommand" editor="guidVSStd97" key1="U" key2="C" mod2="CONTROL" mod1="CONTROL"/>
-    <KeyBinding guid="guidGitHubCmdSet" id="cloneRepoCommand" editor="guidVSStd97" key1="U" key2="G" mod2="CONTROL" mod1="CONTROL"/>
-  </KeyBindings>
   
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidGitHubPkg" value="{c3d3dc68-c977-411f-b3e8-03b0dccf7dfc}" />
-    
+
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidGitHubCmdSet" value="{c4c91892-8881-4588-a5d9-b41e8f540f5a}">
-      <IDSymbol name="GitHubMenuGroup" value="0x1020" />
-      <IDSymbol name="loginCommand" value="0x110" />
-      <IDSymbol name="createRepoCommand" value="0x111" />
-      <IDSymbol name="cloneRepoCommand" value="0x112" />
-      <IDSymbol name="GitHubMenu" value="0x1021"/>
+      <IDSymbol name="GitHubMenu" value="0x1010"/>
+      <IDSymbol name="idGitHubMenuGroup" value="0x1020"/>
+      <IDSymbol name="addConnectionCommand" value="0x110"/>
+      <IDSymbol name="addConnectionCommandDark" value="0x111"/>
+    </GuidSymbol>
+
+    <!-- This is the Manage Connections menu -->
+    <GuidSymbol name="guidManageConnections" value="{0A014553-A0AA-46DD-8D6B-B8E3178CA435}">
+      <IDSymbol name="idManageConnections" value="0x1009"/>
     </GuidSymbol>
     
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
+      <IDSymbol name="logodark" value="1" />
+      <IDSymbol name="logo" value="2" />
     </GuidSymbol>
   </Symbols>
 
