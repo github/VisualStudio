@@ -9,8 +9,11 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="432" d:DesignWidth="354"
+             mc:Ignorable="d"
+             d:DesignWidth="354"
+             d:DesignHeight="432"
+             MinWidth="354"
+             MinHeight="432"
              Background="White">
 
     <d:DesignProperties.DataContext>
@@ -44,11 +47,7 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
 
-                <Style TargetType="{x:Type ui:PromptTextBox}">
-                    <Setter Property="Margin" Value="0,5" />
-                </Style>
-
-                <Style TargetType="{x:Type ui:AppendingPathTextBox}">
+                <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                     <Setter Property="Margin" Value="0,5" />
                 </Style>
 
@@ -77,13 +76,13 @@
                 <RowDefinition Height="35" />
                 <RowDefinition Height="35" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="35" />
-                <RowDefinition Height="35" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="35" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="35" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -114,7 +113,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <ui:AppendingPathTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0" />
+                <ui:PromptTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0" />
                 <Button
                     x:Name="browsePathButton"
                     Grid.Column="1"
@@ -171,6 +170,7 @@
                 x:Name="accountsComboBox"
                 Grid.Column="1"
                 Grid.Row="9"
+                Margin="0,0,0,8"
                 Style="{StaticResource GitHubComboBox}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -189,7 +189,12 @@
                 </ComboBox.ItemsSource>
             </ui:GitHubComboBox>
 
-            <CheckBox x:Name="makePrivate" Grid.Column="1" Grid.Row="11" Content="Private Repository" Padding="10,0,0,0"/>
+            <CheckBox 
+                x:Name="makePrivate"
+                Grid.Column="1"
+                Grid.Row="11"
+                Content="Private Repository"
+                Padding="8,0,0,0" />
             <Grid Grid.Column="1" Grid.Row="12">
                 <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
@@ -220,21 +225,16 @@
                     </StackPanel>
                 </Label>
             </Grid>
-
         </Grid>
 
-        <Grid x:Name="createButtonPane" Height="70" Background="#FCFCFC">
-
-            <Rectangle Height="1" VerticalAlignment="Top" Fill="{StaticResource GHBoxDividerBrush}" />
-
-            <ui:OcticonCircleButton 
-                    IsDefault="True"
-                    x:Name="createRepositoryButton"
-                    HorizontalAlignment="Center"
-                    Icon="check">
-                <TextBlock>Create repository</TextBlock>
-            </ui:OcticonCircleButton>
-        </Grid>
+        <ui:OcticonCircleButton 
+                IsDefault="True"
+                x:Name="createRepositoryButton"
+                HorizontalAlignment="Center"
+                Margin="0,30,0,0"
+                Icon="check">
+            <TextBlock>Create</TextBlock>
+        </ui:OcticonCircleButton>
     
     </StackPanel>
 </UserControl>
