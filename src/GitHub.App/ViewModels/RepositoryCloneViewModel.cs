@@ -11,6 +11,7 @@ using GitHub.Services;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
+using System.Globalization;
 
 namespace GitHub.ViewModels
 {
@@ -30,7 +31,7 @@ namespace GitHub.ViewModels
             : base(connection, hosts)
         {
             this.cloneService = cloneService;
-
+            Title = string.Format(CultureInfo.CurrentCulture, "Clone a repository from {0}", RepositoryHost.Title);
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
@@ -95,11 +96,6 @@ namespace GitHub.ViewModels
             })
             .SelectMany(_ => _);
         }
-
-        /// <summary>
-        /// Title for the dialog
-        /// </summary>
-        public string Title { get { return "Clone a GitHub Repository"; } } // TODO: this needs to be contextual
 
         string baseRepositoryPath;
         /// <summary>

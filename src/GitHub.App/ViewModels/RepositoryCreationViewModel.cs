@@ -51,7 +51,7 @@ namespace GitHub.ViewModels
             : base(connection, operatingSystem, hosts)
         {
             this.repositoryCreationService = repositoryCreationService;
-
+            Title = string.Format(CultureInfo.CurrentCulture, "Create a repository at {0}", RepositoryHost.Title);
             Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
             Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
             var selectedAccount = Accounts.FirstOrDefault();
@@ -179,11 +179,6 @@ namespace GitHub.ViewModels
 
             return createCommand;
         }
-
-        /// <summary>
-        /// Title for the dialog
-        /// </summary>
-        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         /// <summary>
         /// List of accounts (at least one)

@@ -4,6 +4,14 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
+    public enum LoginMode
+    {
+        None = 0,
+        DotComOrEnterprise,
+        DotComOnly = 3,
+        EnterpriseOnly = 4,
+    }
+
     /// <summary>
     /// Represents a view model responsible for providing log in to
     /// either GitHub.com or a GitHub Enterprise instance.
