@@ -13,6 +13,7 @@ using ReactiveUI;
 using Rothko;
 using GitHub.Extensions;
 using System.Globalization;
+using NullGuard;
 
 namespace GitHub.ViewModels
 {
@@ -37,7 +38,7 @@ namespace GitHub.ViewModels
         {
             title = this.WhenAny(
                 x => x.SelectedHost,
-                x => x != null ?
+                x => x.Value != null ?
                     string.Format(CultureInfo.CurrentCulture, "Publish repository to {0}", x.Value.Title) :
                     "Publish repository"
             )
@@ -95,8 +96,10 @@ namespace GitHub.ViewModels
         public ReactiveList<IRepositoryHost> RepositoryHosts { get; private set; }
 
         IRepositoryHost selectedHost;
+        [AllowNull]
         public IRepositoryHost SelectedHost
         {
+            [return: AllowNull]
             get { return selectedHost; }
             set { this.RaiseAndSetIfChanged(ref selectedHost, value); }
         }
