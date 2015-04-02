@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reactive.Linq;
 using Octokit;
 using ReactiveUI;
 
@@ -17,28 +16,17 @@ namespace GitHub.Models
         string name;
         int ownedPrivateRepos;
         long privateReposInPlan;
-
-        public Account(IRepositoryHost host, User user)
-            : this(host)
+        
+        public Account(Octokit.Account apiAccount, bool isGitHub)
         {
-            Id = user.Id;
-            IsUser = true;
-
-            Update(user);
-        }
-
-        public Account(IRepositoryHost host, Organization organization)
-            : this(host)
-        {
-            Id = organization.Id;
-            IsUser = false;
-
-            Update(organization);
-        }
-
-        private Account(IRepositoryHost host)
-        {
-            Host = host;
+            Id = apiAccount.Id;
+            IsGitHub = isGitHub;
+            IsUser = (apiAccount as User) == null;
+            Email = apiAccount.Email;
+            Login = apiAccount.Login;
+            Name = apiAccount.Name ?? apiAccount.Login;
+            OwnedPrivateRepos = apiAccount.OwnedPrivateRepos;
+            PrivateReposInPlan = (apiAccount.Plan == null ? 0 : apiAccount.Plan.PrivateRepos);
 
             isOnFreePlan = this.WhenAny(x => x.PrivateReposInPlan, x => x.Value == 0)
                 .ToProperty(this, x => x.IsOnFreePlan);
@@ -60,9 +48,9 @@ namespace GitHub.Models
 
         public int Id { get; private set; }
 
-        public bool IsEnterprise { get { return Host.IsEnterprise; } }
+        public bool IsEnterprise { get { return !IsGitHub; } }
 
-        public bool IsGitHub { get { return Host.IsGitHub; } }
+        public bool IsGitHub { get; private set; }
 
         public bool IsOnFreePlan
         {
@@ -98,27 +86,6 @@ namespace GitHub.Models
         {
             get { return privateReposInPlan; }
             private set { this.RaiseAndSetIfChanged(ref privateReposInPlan, value); }
-        }
-
-        public void Update(User user)
-        {
-            UpdateAccountInfo(user);
-        }
-
-        public void Update(Organization organization)
-        {
-            UpdateAccountInfo(organization);
-        }
-
-        void UpdateAccountInfo(Octokit.Account githubAccount)
-        {
-            if (Id != githubAccount.Id) return;
-
-            Email = githubAccount.Email;
-            Login = githubAccount.Login;
-            Name = githubAccount.Name ?? githubAccount.Login;
-            OwnedPrivateRepos = githubAccount.OwnedPrivateRepos;
-            PrivateReposInPlan = (githubAccount.Plan == null ? 0 : githubAccount.Plan.PrivateRepos);
         }
 
         internal string DebuggerDisplay
