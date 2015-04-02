@@ -114,7 +114,7 @@ namespace GitHub.Models
                         address.ApiUri,
                         usernameOrEmail,
                         successful ? "SUCCEEDED" : "FAILED",
-                        isDotCom ? "GitHub.com" : "Enterprise"
+                        isDotCom ? "GitHub.com" : address.WebUri.Host
                     );
                     if (successful)
                     {
