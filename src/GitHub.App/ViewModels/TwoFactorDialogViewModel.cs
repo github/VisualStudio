@@ -12,19 +12,22 @@ namespace GitHub.ViewModels
 {
     [Export(typeof(ITwoFactorViewModel))]
     [Export(typeof(ITwoFactorDialogViewModel))]
-    public class TwoFactorDialogViewModel : ReactiveObject, ITwoFactorDialogViewModel
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
         string authenticationCode;
         TwoFactorType twoFactorType;
         readonly ObservableAsPropertyHelper<string> description;
-        readonly ObservableAsPropertyHelper<bool> isShowing;
         readonly ObservableAsPropertyHelper<bool> isSms;
+        readonly ObservableAsPropertyHelper<bool> isShowing;
 
         [ImportingConstructor]
         public TwoFactorDialogViewModel(IVisualStudioBrowser browser,
             ITwoFactorChallengeHandler twoFactorChallengeHandler)
+            : base(null)
         {
+            Title = "Two-Factor authentication required";
             twoFactorChallengeHandler.SetViewModel(this);
             AuthenticationCodeValidator = ReactivePropertyValidator.For(this, x => x.AuthenticationCode)
                 .IfNullOrEmpty("Please enter your authentication code")
@@ -99,23 +102,15 @@ namespace GitHub.ViewModels
                 });
         }
 
-        public string Title { get { return "Connect to GitHub"; } } // TODO: this needs to be contextual
-
         public TwoFactorType TwoFactorType
         {
             get { return twoFactorType; }
             private set { this.RaiseAndSetIfChanged(ref twoFactorType, value); }
         }
 
-        public bool IsShowing
-        {
-            get { return isShowing.Value; }
-        }
 
-        public bool IsSms
-        {
-            get { return isSms.Value; }
-        }
+        public bool IsSms { get { return isSms.Value; } }
+        public bool IsShowing { get { return isShowing.Value; } }
 
         public bool IsAuthenticationCodeSent
         {
@@ -138,10 +133,8 @@ namespace GitHub.ViewModels
         }
 
         public ReactiveCommand<object> OkCommand { get; private set; }
-        public ReactiveCommand<object> CancelCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; private set; }
-
         public ReactivePropertyValidator AuthenticationCodeValidator { get; private set; }
     }
 }

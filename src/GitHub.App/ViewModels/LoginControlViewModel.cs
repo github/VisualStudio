@@ -9,19 +9,49 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public enum LoginMode
-    {
-        None = 0,
-        DotComOrEnterprise,
-        DotComOnly = 3,
-        EnterpriseOnly = 4,
-    }
-
     [ExportViewModel(ViewType = UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LoginControlViewModel : ReactiveValidatableObject, ILoginControlViewModel
+    public class LoginControlViewModel : BaseViewModel, ILoginControlViewModel
     {
-        public string Title { get { return "Connect to GitHub"; } } // TODO: this needs to be contextual
+        [ImportingConstructor]
+        public LoginControlViewModel(
+            IServiceProvider serviceProvider,
+            IRepositoryHosts hosts,
+            ILoginToGitHubViewModel loginToGitHubViewModel,
+            ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
+            : base(serviceProvider)
+        {
+            Title = "Login";
+            RepositoryHosts = hosts;
+            GitHubLogin = loginToGitHubViewModel;
+            EnterpriseLogin = loginToGitHubEnterpriseViewModel;
+
+            isLoginInProgress = this.WhenAny(
+                x => x.GitHubLogin.IsLoggingIn,
+                x => x.EnterpriseLogin.IsLoggingIn,
+                (x, y) => x.Value || y.Value
+            ).ToProperty(this, vm => vm.IsLoginInProgress);
+
+            loginMode = this.WhenAny(
+                x => x.RepositoryHosts.GitHubHost.IsLoggedIn,
+                x => x.RepositoryHosts.EnterpriseHost.IsLoggedIn,
+                (x, y) => {
+
+                    var canLogInToGitHub = x.Value == false;
+                    var canLogInToEnterprise = y.Value == false;
+
+                    return canLogInToGitHub && canLogInToEnterprise ? LoginMode.DotComOrEnterprise
+                        : canLogInToGitHub ? LoginMode.DotComOnly
+                        : canLogInToEnterprise ? LoginMode.EnterpriseOnly
+                        : LoginMode.None;
+
+                }).ToProperty(this, x => x.LoginMode);
+
+            AuthenticationResults = Observable.Merge(
+                loginToGitHubViewModel.Login,
+                EnterpriseLogin.Login);
+            CancelCommand = ReactiveCommand.Create();
+        }
 
         ILoginToGitHubViewModel github;
         public ILoginToGitHubViewModel GitHubLogin
@@ -51,44 +81,6 @@ namespace GitHub.ViewModels
         public bool IsLoginInProgress { get { return isLoginInProgress.Value; } }
 
         public IObservable<AuthenticationResult> AuthenticationResults { get; private set; }
-
-        [ImportingConstructor]
-        public LoginControlViewModel(
-            IServiceProvider serviceProvider,
-            IRepositoryHosts hosts,
-            ILoginToGitHubViewModel loginToGitHubViewModel,
-            ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
-            : base(serviceProvider)
-        {
-            RepositoryHosts = hosts;
-            GitHubLogin = loginToGitHubViewModel;
-            EnterpriseLogin = loginToGitHubEnterpriseViewModel;
-
-            isLoginInProgress = this.WhenAny(
-                x => x.GitHubLogin.IsLoggingIn,
-                x => x.EnterpriseLogin.IsLoggingIn,
-                (x, y) => x.Value || y.Value
-            ).ToProperty(this, vm => vm.IsLoginInProgress);
-
-            loginMode = this.WhenAny(
-                x => x.RepositoryHosts.GitHubHost.IsLoggedIn,
-                x => x.RepositoryHosts.EnterpriseHost.IsLoggedIn,
-                (x, y) => {
-
-                    var canLogInToGitHub = x.Value == false;
-                    var canLogInToEnterprise = y.Value == false;
-
-                    return canLogInToGitHub && canLogInToEnterprise ? LoginMode.DotComOrEnterprise
-                        : canLogInToGitHub ? LoginMode.DotComOnly
-                        : canLogInToEnterprise ? LoginMode.EnterpriseOnly
-                        : LoginMode.None;
-
-                }).ToProperty(this, x => x.LoginMode);
-
-            AuthenticationResults = Observable.Merge(
-                loginToGitHubViewModel.Login,
-                EnterpriseLogin.Login);
-        }
     }
 
     public enum LoginTarget
