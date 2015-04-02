@@ -6,6 +6,7 @@ using GitHub.VisualStudio.UI;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
 using System;
+using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Media;
 
@@ -17,14 +18,16 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         public const string GitHubInvitationSectionId = "C2443FCC-6D62-4D31-B08A-C4DE70109C7F";
         public const int GitHubInvitationSectionPriority = 100;
 
-        public GitHubInvitationSection()
+        [ImportingConstructor]
+        public GitHubInvitationSection(IConnectionManager cm)
         {
             Name = "GitHub";
             Provider = "GitHub, Inc.";
             Icon = GetDrawingForIcon(GetBrushForIcon());
 
-            IsVisible = true;
+            IsVisible = cm.Connections.Count == 0;
 
+            cm.Connections.CollectionChanged += (s, e) => IsVisible = cm.Connections.Count == 0;
             VSColorTheme.ThemeChanged += OnThemeChanged;
         }
 
