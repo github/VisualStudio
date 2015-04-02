@@ -58,7 +58,7 @@
                 TabIndex="1" />
             <uirx:ValidationMessage
                 x:Name="authenticationCodeValidationMessage"
-                ValidatesControl="{Binding ElementName=authenticationCode}" />
+                ValidatesControl="{Binding ElementName=authenticationCode, Converter={uirx:TwoFactorInputToTextBox}}" />
             <StackPanel Grid.Row="4" 
                     Grid.ColumnSpan="2" 
                     Orientation="Horizontal"
