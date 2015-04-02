@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -10,15 +11,12 @@ using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
-using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
-using Authorization = Octokit.Authorization;
 
 namespace GitHub.Models
 {
@@ -26,11 +24,10 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly User unverifiedUser = new User();
 
         bool isLoggedIn;
         bool isLoggingIn;
-        bool isSelected;
-        IAccount userAccount;
         readonly IAccountFactory accountFactory;
 
         public RepositoryHost(
@@ -50,27 +47,7 @@ namespace GitHub.Models
             this.accountFactory = accountFactory;
 
             IsEnterprise = !IsGitHub;
-            Organizations = new ReactiveList<IAccount>();
             Title = MakeTitle(ApiBaseUri);
-
-            Accounts = new ReactiveList<IAccount>();
-
-            this.WhenAny(x => x.IsLoggedIn, x => x.Value)
-                 .Where(loggedIn => loggedIn)
-                 .Subscribe(_ => OnUserLoggedIn(User));
-
-            this.WhenAny(x => x.IsLoggedIn, x => x.Value)
-                .Skip(1) // so we don't log the account out on the initial evaluation of the WhenAny
-                .Where(loggedIn => !loggedIn)
-                .Subscribe(_ => OnUserLoggedOut());
-
-            this.WhenAny(x => x.Organizations.ItemsAdded, x => x.Value)
-                .SelectMany(x => x)
-                .Subscribe(OnOrgAdded);
-
-            this.WhenAny(x => x.Organizations.ItemsRemoved, x => x.Value)
-                .SelectMany(x => x)
-                .Subscribe(OnOrgRemoved);
         }
 
         Uri ApiBaseUri { get; set; }
@@ -96,23 +73,7 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggingIn, value); }
         }
 
-        public bool IsSelected
-        {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref isSelected, value); }
-        }
-
-        public ReactiveList<IAccount> Organizations { get; private set; }
-
         public string Title { get; private set; }
-
-        public IAccount User
-        {
-            get { return userAccount; }
-            private set { this.RaiseAndSetIfChanged(ref userAccount, value); }
-        }
-
-        public ReactiveList<IAccount> Accounts { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public IObservable<AuthenticationResult> LogInFromCache()
@@ -139,15 +100,8 @@ namespace GitHub.Models
                         .ObserveOn(RxApp.MainThreadScheduler);
                 })
                 .SelectMany(LoginWithApiUser)
-                .Do(result =>
-                {
-                    if (result.IsFailure()) return;
-                    AddCachedOrganizations();
-                })
                 .PublishAsync();
         }
-
-        static readonly User unverifiedUser = new User();
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
@@ -255,13 +209,6 @@ namespace GitHub.Models
                     return Observable.Throw<User>(ex);
                 })
                 .SelectMany(LoginWithApiUser)
-                .Do(result =>
-                {
-                    if (result.IsFailure()) return;
-                    RefreshOrgs().Subscribe(
-                        _ => { },
-                        ex => log.Warn("Failed to refresh orgs.", ex));
-                })
                 .PublishAsync();
         }
 
@@ -282,7 +229,6 @@ namespace GitHub.Models
                     }
 
                     Cache.InsertUser(user);
-                    User = accountFactory.CreateAccount(this, user);
                     IsLoggedIn = true;
                     IsLoggingIn = false;
                     return AuthenticationResult.Success;
@@ -298,7 +244,7 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged user {0} off of host '{1}'", User.Login, ApiBaseUri);
+            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", ApiBaseUri);
 
             return LoginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
@@ -316,199 +262,25 @@ namespace GitHub.Models
                 .Finally(() =>
                 {
                     IsLoggedIn = false;
-                    Organizations.Clear();
-                    User = null;
                 });
         }
 
-        public IObservable<Unit> Refresh()
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
-            return Refresh(h => Observable.Return(Unit.Default));
-        }
-
-        public IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc)
-        {
-            if (!IsLoggedIn) return Observable.Return(Unit.Default);
-
-            try
-            {
-                return Observable.Merge(
-                    RefreshUser(),
-                    RefreshOrgs())
-                    .AsCompletion()
-                    .SelectMany(_ => refreshTrackedRepositoriesFunc(this))
-                    .Catch<Unit, Exception>(ex =>
-                    {
-                        log.Warn("Refresh failed.", ex);
-                        return ex.ShowUserErrorMessage(ErrorType.RefreshFailed)
-                            .AsCompletion();
-                    });
-            }
-            catch (Exception ex)
-            {
-                log.Warn("Repository host refresh failed.", ex);
-                return ex.ShowUserErrorMessage(ErrorType.RefreshFailed)
-                    .AsCompletion();
-            }
+            return Cache.GetUser().Select(acct => accountFactory.CreateAccount(this, acct))
+                .Concat(Cache.GetAllOrganizations()
+                    .SelectMany(orgs => orgs.Select(org => accountFactory.CreateAccount(this, org))))
+                .ToList()
+                .Select(accts => new ReadOnlyCollection<IAccount>(accts));
         }
 
         protected ILoginCache LoginCache { get; private set; }
-
-        void AddCachedOrganizations()
-        {
-            Cache.GetAllOrganizations()
-                .Select(orgs => orgs.Where(o => o != null))
-                .Where(orgs => orgs.Any())
-                .Select(orgs => orgs.OrderBy(org => org.Login))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(
-                    AddCachedOrganizations,
-                    ex => log.Warn("Failed to get orgs from cache.", ex));
-        }
-
-        void AddCachedOrganizations(IEnumerable<Organization> ghOrgs)
-        {
-            if (ghOrgs == null) return;
-
-            var orgs = ghOrgs.Select(ghOrg => accountFactory.CreateAccount(this, ghOrg))
-                .Except(Organizations, (first, second) => first.Id == second.Id); // only add from cache if not already there
-
-            // instead of AddRange here, we need to add the
-            // items one at a time so the ItemAdded and ItemRemoved
-            // signals are raised for the account list
-            foreach (var org in orgs)
-            {
-                Organizations.Add(org);
-            }
-        }
-
-        void AddOrUpdateOrg(IAccount org)
-        {
-            if (org == null) return;
-
-            var existingOrg = Organizations.SingleOrDefault(x => x.Id == org.Id);
-            if (existingOrg == null)
-            {
-                Organizations.Add(org);
-                return;
-            }
-            Organizations[Organizations.IndexOf(existingOrg)] = org;
-        }
 
         static string MakeTitle(Uri apiBaseUri)
         {
             return apiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri) ?
                 "github" :
                 apiBaseUri.Host;
-        }
-
-        void RefreshOrgs(ICollection<IAccount> orgs)
-        {
-            orgs.ForEach(org =>
-            {
-                AddOrUpdateOrg(org);
-
-                ApiClient.GetOrganization(org.Login)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(
-                        ghOrg =>
-                        {
-                            Cache.InsertOrganization(ghOrg);
-                            UpdateOrg(ghOrg);
-                        },
-                        ex => log.Warn("Failed to get organization.", ex));
-            });
-
-            var orgsToRemove = Organizations.Except(orgs, (x, y) => x.Id == y.Id).ToArray();
-
-            orgsToRemove.ForEach(orgToRemove => Cache.InvalidateOrganization(orgToRemove));
-
-            RemoveOrgs(orgsToRemove);
-        }
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        IObservable<Unit> RefreshOrgs()
-        {
-            return ApiClient.GetOrganizations()
-                .WhereNotNull()
-                .ToArray()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(ghOrgs => ghOrgs
-                    .OrderBy(ghOrg => ghOrg.Login)
-                    .Select(org => accountFactory.CreateAccount(this, org))
-                    .ToArray())
-                .Select(ghOrgs =>
-                {
-                    RefreshOrgs(ghOrgs);
-                    return Unit.Default;
-                })
-                .PublishAsync();
-        }
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        IObservable<Unit> RefreshUser()
-        {
-            return ApiClient.GetUser()
-                .WhereNotNull()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(ghUser =>
-                {
-                    Cache.InsertUser(ghUser);
-                    if (User != null)
-                        User.Update(ghUser);
-
-                    return Unit.Default;
-                })
-                .PublishAsync();
-        }
-
-        void RemoveOrgs(IEnumerable<IAccount> orgs)
-        {
-            orgs.ForEach(org =>
-            {
-                var orgToRemove = Organizations.SingleOrDefault(o => org.Id == o.Id);
-                if (orgToRemove != null)
-                    Organizations.Remove(orgToRemove);
-            });
-        }
-
-        void UpdateOrg(Organization ghOrg)
-        {
-            if (ghOrg == null) return;
-
-            var existingOrg = Organizations.SingleOrDefault(x => x.Id == ghOrg.Id);
-            if (existingOrg != null)
-                existingOrg.Update(ghOrg);
-        }
-
-
-        void OnOrgAdded(IAccount account)
-        {
-            var accountTile = Accounts.SingleOrDefault(x => x != null && x.Id == account.Id);
-
-            if (accountTile == null)
-            {
-                Accounts.Add(account);
-            }
-        }
-
-        void OnOrgRemoved(IAccount account)
-        {
-            var accountTile = Accounts.SingleOrDefault(x => x != null && x.Id == account.Id);
-
-            if (accountTile == null) return;
-
-            Accounts.Remove(accountTile);
-        }
-
-        void OnUserLoggedIn(IAccount account)
-        {
-            Accounts.Insert(0, account);
-        }
-
-        void OnUserLoggedOut()
-        {
-            Accounts.Clear();
         }
 
         internal string DebuggerDisplay

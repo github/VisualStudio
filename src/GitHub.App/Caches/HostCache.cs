@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
-using GitHub.Extensions;
+using GitHub.Api;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using Octokit;
@@ -15,16 +15,18 @@ namespace GitHub.Caches
     {
         readonly IBlobCache localMachineCache;
         readonly IBlobCache userAccountCache;
+        readonly IApiClient apiClient;
 
-        public HostCache(IBlobCache localMachineCache, IBlobCache userAccountCache)
+        public HostCache(IBlobCache localMachineCache, IBlobCache userAccountCache, IApiClient apiClient)
         {
             this.localMachineCache = localMachineCache;
             this.userAccountCache = userAccountCache;
+            this.apiClient = apiClient;
         }
 
         public IObservable<User> GetUser()
         {
-            return userAccountCache.GetObject<User>("user");
+            return Observable.Defer(() => userAccountCache.GetAndFetchLatest("user", () => apiClient.GetUser()));
         }
 
         public IObservable<Unit> InsertUser(User user)
@@ -34,10 +36,8 @@ namespace GitHub.Caches
 
         public IObservable<IEnumerable<Organization>> GetAllOrganizations()
         {
-            // NOTE: Akavache with the SQLite storage stores the type name with the cached objects
-            //       to support the GetAllObjects method call. This is the only usage of that method
-            //       which is why we have to keep GitHubOrganization around.
-            return userAccountCache.GetAllObjects<Organization>();
+            return Observable.Defer(() =>
+                userAccountCache.GetAndFetchLatest("organizations", () => apiClient.GetOrganizations().ToList()));
         }
 
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters",

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Info;
 using GitHub.Primitives;
@@ -22,7 +23,7 @@ namespace GitHub.Factories
             this.operatingSystem = operatingSystem;
         }
 
-        public IHostCache Create(HostAddress hostAddress)
+        public IHostCache Create(HostAddress hostAddress, IApiClient apiClient)
         {
             var environment = OperatingSystem.Environment;
             // For GitHub.com, the cache file name should be "api.github.com.cache.db"
@@ -40,7 +41,7 @@ namespace GitHub.Factories
             var localMachineCache = BlobCacheFactory.CreateBlobCache(localMachinePath);
             var userAccountCache = BlobCacheFactory.CreateBlobCache(userAccountPath);
 
-            return new HostCache(localMachineCache, userAccountCache);
+            return new HostCache(localMachineCache, userAccountCache, apiClient);
         }
 
         IOperatingSystem OperatingSystem { get { return operatingSystem.Value; } }

@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
@@ -38,6 +39,11 @@ namespace GitHub.Models
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }
         public IAccount User { get; private set; }
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
+        {
+            return Observable.Empty<IReadOnlyList<IAccount>>();
+        }
+
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
             return Observable.Return(AuthenticationResult.CredentialFailure);
@@ -49,16 +55,6 @@ namespace GitHub.Models
         }
 
         public IObservable<Unit> LogOut()
-        {
-            return Observable.Return(Unit.Default);
-        }
-
-        public IObservable<Unit> Refresh()
-        {
-            return Observable.Return(Unit.Default);
-        }
-
-        public IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc)
         {
             return Observable.Return(Unit.Default);
         }
