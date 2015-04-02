@@ -63,6 +63,19 @@ function Bump-Version {
     New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, ($currentVersion.Revision + 1)
 }
 
+function Write-VersionCsproj {
+    Param(
+        [ValidateScript({ Validate-Version $_ })]
+        [System.Version]
+        $version
+    )
+
+    $document = Get-CsprojXml disk
+    $element = Get-ApplicationVersionElement $document
+    $element.InnerText = $version.ToString()
+    $document.Save((Get-CsprojPath))
+}
+
 function Write-VersionVsixManifest {
     Param(
         [ValidateScript({ Validate-Version $_ })]
@@ -132,6 +145,7 @@ function Write-Version {
         $version
     )
 
+    Write-VersionCsproj $version
     Write-VersionVsixManifest $version
 	Write-VersionInstaller $version
     Write-VersionAssemblyInfo $version

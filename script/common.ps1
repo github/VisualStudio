@@ -1,6 +1,7 @@
 $scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
 $rootDirectory = Split-Path $scriptsDirectory
 $gitHubDirectory = Join-Path $rootDirectory src\GitHub.VisualStudio
+$msbuild = "$(get-content env:windir)\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
 
 $git = (Get-Command 'git.exe').Path
 if (!$git) {
