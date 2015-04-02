@@ -344,18 +344,7 @@ namespace GitHub.SampleData
         public string Name { get; set; }
         public int OwnedPrivateRepos { get; set; }
         public long PrivateReposInPlan { get; set; }
-
-        public void Update(User ghUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Organization org)
-        {
-            throw new NotImplementedException();
-        }
     }
-
 
     [ExcludeFromCodeCoverage]
     public class AvatarProviderDesigner : IAvatarProvider
