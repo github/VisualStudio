@@ -84,11 +84,6 @@ namespace GitHub.Models
 
         public bool IsEnterprise { get; private set; }
 
-        public bool IsLocal
-        {
-            get { return false; }
-        }
-
         public bool IsLoggedIn
         {
             get { return isLoggedIn; }

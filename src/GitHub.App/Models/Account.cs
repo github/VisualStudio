@@ -78,8 +78,6 @@ namespace GitHub.Models
 
         public bool IsGitHub { get { return Host.IsGitHub; } }
 
-        public bool IsLocal { get { return false; } }
-
         public bool IsOnFreePlan
         {
             get { return isOnFreePlan.Value; }

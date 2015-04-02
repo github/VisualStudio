@@ -8,7 +8,6 @@ namespace GitHub.Models
         int Id { get; }
         bool IsEnterprise { get; }
         bool IsGitHub { get; }
-        bool IsLocal { get; }
         bool IsOnFreePlan { get; }
         bool HasMaximumPrivateRepositories { get; }
         bool IsUser { get; }

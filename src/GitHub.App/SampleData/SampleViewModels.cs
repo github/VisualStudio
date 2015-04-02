@@ -266,12 +266,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public bool IsLocal
-        {
-            get;
-            private set;
-        }
-
         public bool IsLoggedIn
         {
             get;
@@ -348,7 +342,6 @@ namespace GitHub.SampleData
         public int Id { get; set; }
         public bool IsEnterprise { get; set; }
         public bool IsGitHub { get; set; }
-        public bool IsLocal { get; set; }
         public bool IsOnFreePlan { get; set; }
         public bool HasMaximumPrivateRepositories { get; private set; }
         public bool IsSelected { get; set; }

@@ -37,7 +37,6 @@ namespace GitHub.Models
 
             RepositoryHostFactory = repositoryHostFactory;
 
-            LocalRepositoriesHost = new LocalRepositoriesHost();
             GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
 
@@ -186,13 +185,6 @@ namespace GitHub.Models
                 var newHost = value ?? DisconnectedRepositoryHost;
                 this.RaiseAndSetIfChanged(ref enterpriseHost, newHost);
             }
-        }
-
-        IRepositoryHost localRepositoriesHost;
-        public IRepositoryHost LocalRepositoriesHost
-        {
-            get { return localRepositoriesHost; }
-            set { this.RaiseAndSetIfChanged(ref localRepositoriesHost, value); }
         }
 
         public IRepositoryHostFactory RepositoryHostFactory { get; private set; }
