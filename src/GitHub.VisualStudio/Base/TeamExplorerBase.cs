@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.TeamFoundation.Client;
 using NullGuard;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -117,5 +118,13 @@ namespace GitHub.VisualStudio.Base
         {
         }
 
+        protected virtual void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, Uri uri)
+        {
+            var b = browser.Value;
+            Debug.Assert(b != null, "Could not create a browser helper instance.");
+            if (b == null)
+                return;
+            b.OpenUrl(uri);
+        }
     }
 }
