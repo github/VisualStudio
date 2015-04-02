@@ -9,22 +9,16 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class Account : ReactiveObject, IAccount
     {
-        string email;
         readonly ObservableAsPropertyHelper<bool> isOnFreePlan;
         readonly ObservableAsPropertyHelper<bool> hasMaximumPrivateRepositoriesLeft;
-        string login;
-        string name;
         int ownedPrivateRepos;
         long privateReposInPlan;
         
         public Account(Octokit.Account apiAccount, bool isGitHub)
         {
-            Id = apiAccount.Id;
             IsGitHub = isGitHub;
             IsUser = (apiAccount as User) == null;
-            Email = apiAccount.Email;
             Login = apiAccount.Login;
-            Name = apiAccount.Name ?? apiAccount.Login;
             OwnedPrivateRepos = apiAccount.OwnedPrivateRepos;
             PrivateReposInPlan = (apiAccount.Plan == null ? 0 : apiAccount.Plan.PrivateRepos);
 
@@ -37,16 +31,6 @@ namespace GitHub.Models
                 (owned, avalible) => owned.Value >= avalible.Value)
                 .ToProperty(this, x => x.HasMaximumPrivateRepositories);
         }
-
-        public string Email
-        {
-            get { return email; }
-            private set { this.RaiseAndSetIfChanged(ref email, value); }
-        }
-
-        public IRepositoryHost Host { get; private set; }
-
-        public int Id { get; private set; }
 
         public bool IsEnterprise { get { return !IsGitHub; } }
 
@@ -66,14 +50,8 @@ namespace GitHub.Models
 
         public string Login
         {
-            get { return login; }
-            private set { this.RaiseAndSetIfChanged(ref login, value); }
-        }
-
-        public string Name
-        {
-            get { return name; }
-            private set { this.RaiseAndSetIfChanged(ref name, value); }
+            get;
+            private set;
         }
 
         public int OwnedPrivateRepos
@@ -93,7 +71,7 @@ namespace GitHub.Models
             get
             {
                 return String.Format(CultureInfo.InvariantCulture,
-                    "Account: Login: {0} Name: {1}, Id: {2} Id: ", Login, Name, Id);
+                    "Account: Login: {0} IsUser: {1}", Login, IsUser);
             }
         }
 
