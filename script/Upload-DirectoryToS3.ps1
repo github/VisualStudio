@@ -44,7 +44,7 @@ Param(
     $AllowCachingUnless
 )
 
-Set-PSDebug -Strict
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 [System.IO.DirectoryInfo] $Directory = [string] (Resolve-Path $Directory)
@@ -58,6 +58,7 @@ $contentTypes = @{
     ".json" = "application/json";
     ".jsonp" = "text/javascript";
     ".vsix" = "application/vsix";
+    ".msi" = "application/msi";
 }
 $defaultContentType = "application/octet-stream"
 
@@ -66,7 +67,7 @@ $defaultContentType = "application/octet-stream"
 $checksumMetadataUploadKey = "checksum"
 $checksumMetadataDownloadKey = "x-amz-meta-{0}" -f $checksumMetadataUploadKey
 
-Add-Type -Path (Join-Path $scriptsDirectory AWSSDK.1.4.6.3\lib\AWSSDK.dll)
+Add-Type -Path (Join-Path $scriptsDirectory AWSSDK.1.5.2.0\lib\AWSSDK.dll)
 
 function Get-FileKey([System.IO.FileInfo]$file) {
     $relativePath = $file.FullName.Substring($Directory.FullName.Length + 1);
