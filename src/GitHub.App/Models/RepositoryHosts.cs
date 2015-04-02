@@ -119,9 +119,9 @@ namespace GitHub.Models
                     if (successful)
                     {
                         if (isDotCom)
-                            EnterpriseHost = host;
-                        else
                             GitHubHost = host;
+                        else
+                            EnterpriseHost = host;
                         connectionManager.AddConnection(address, usernameOrEmail);
                     }
                 });
