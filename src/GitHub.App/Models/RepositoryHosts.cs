@@ -136,9 +136,16 @@ namespace GitHub.Models
         public IObservable<Unit> LogOut(IRepositoryHost host)
         {
             var address = host.Address;
+            var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             return host.LogOut()
                 .Do(result =>
                 {
+                    // reset the logged out host property to null
+                    // it'll know what to do
+                    if (isDotCom)
+                        GitHubHost = null;
+                    else
+                        EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
                 });
         }
