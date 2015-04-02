@@ -13,12 +13,10 @@ namespace GitHub.Models
         string email;
         readonly ObservableAsPropertyHelper<bool> isOnFreePlan;
         readonly ObservableAsPropertyHelper<bool> hasMaximumPrivateRepositoriesLeft;
-        readonly ObservableAsPropertyHelper<bool> isGitHubStaff;
         string login;
         string name;
         int ownedPrivateRepos;
         long privateReposInPlan;
-        bool isSiteAdmin;
 
         public Account(IRepositoryHost host, User user)
             : this(host)
@@ -50,24 +48,12 @@ namespace GitHub.Models
                 x => x.PrivateReposInPlan,
                 (owned, avalible) => owned.Value >= avalible.Value)
                 .ToProperty(this, x => x.HasMaximumPrivateRepositories);
-
-            isGitHubStaff = this.WhenAny(x => x.IsSiteAdmin, x => x.Value)
-                .Select(admin => admin && host.IsGitHub)
-                .ToProperty(this, x => x.IsGitHubStaff);
         }
 
         public string Email
         {
             get { return email; }
             private set { this.RaiseAndSetIfChanged(ref email, value); }
-        }
-
-        /// <summary>
-        /// Returns true if the user is a member of the GitHub staff.
-        /// </summary>
-        public bool IsGitHubStaff
-        {
-            get { return isGitHubStaff.Value; }
         }
 
         public IRepositoryHost Host { get; private set; }
@@ -89,19 +75,6 @@ namespace GitHub.Models
         }
 
         public bool IsUser { get; private set; }
-
-        /// <summary>
-        /// True if the user is an admin on the host (GitHub or Enterprise).
-        /// </summary>
-        /// <remarks>
-        /// Do not confuse this with "IsStaff". This is true if the user is an admin 
-        /// on the site. IsStaff is true if that site is github.com.
-        /// </remarks>
-        public bool IsSiteAdmin
-        {
-            get { return isSiteAdmin; }
-            private set { this.RaiseAndSetIfChanged(ref isSiteAdmin, value); }
-        }
 
         public string Login
         {
@@ -129,7 +102,6 @@ namespace GitHub.Models
 
         public void Update(User user)
         {
-            IsSiteAdmin = user.SiteAdmin;
             UpdateAccountInfo(user);
         }
 

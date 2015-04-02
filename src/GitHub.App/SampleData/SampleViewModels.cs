@@ -328,8 +328,6 @@ namespace GitHub.SampleData
         {
             Name = name;
             Avatar = new AvatarProviderDesigner().DefaultOrgBitmapImage;
-            IsGitHubStaff = false;
-            IsSiteAdmin = false;
         }
 
         public object Avatar { get; set; }
@@ -341,8 +339,6 @@ namespace GitHub.SampleData
         public bool HasMaximumPrivateRepositories { get; private set; }
         public bool IsSelected { get; set; }
         public bool IsUser { get; set; }
-        public bool IsSiteAdmin { get; private set; }
-        public bool IsGitHubStaff { get; private set; }
         public IRepositoryHost Host { get; set; }
         public string Login { get; set; }
         public string Name { get; set; }
