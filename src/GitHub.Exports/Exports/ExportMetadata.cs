@@ -12,7 +12,8 @@ namespace GitHub.Exports {
 		Create,
 		Clone,
         Publish,
-        End = 100
+        End = 100,
+        Finished
 	}
 
     [MetadataAttribute]

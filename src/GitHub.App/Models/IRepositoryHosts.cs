@@ -11,11 +11,10 @@ namespace GitHub.Models
         IRepositoryHost EnterpriseHost { get; set; }
         IRepositoryHost GitHubHost { get; }
         IRepositoryHost LocalRepositoriesHost { get; }
-        IObservable<AuthenticationResult> LogInEnterpriseHost(
+        IObservable<AuthenticationResult> LogIn(
             HostAddress enterpriseHostAddress,
             string usernameOrEmail,
             string password);
-        IObservable<AuthenticationResult> LogInGitHubHost(string usernameOrEmail, string password);
         IRepositoryHostFactory RepositoryHostFactory { get; }
         bool IsLoggedInToAnyHost { get; }
         IRepositoryHost LookupHost(HostAddress address);

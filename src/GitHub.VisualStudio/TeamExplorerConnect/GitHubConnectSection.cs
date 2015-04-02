@@ -1,15 +1,12 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
-using GitHub.Models;
+using System;
 using System.Collections.Specialized;
-using NullGuard;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
@@ -30,15 +27,16 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         public GitHubConnectSection(IConnectionManager manager, int index)
         {
             Title = "GitHub";
-            IsVisible = true;
             IsEnabled = true;
-            IsExpanded = true;
+            IsVisible = false;
+            IsExpanded = false;
 
             connectionManager = manager;
             sectionIndex = index;
-            connectionManager.Connections.CollectionChanged += RefreshConnections;
 
+            connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
+            Refresh();
         }
 
         private void RefreshConnections(object sender, NotifyCollectionChangedEventArgs e)
@@ -61,13 +59,24 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             if (connection == null)
             {
                 IsVisible = false;
+                IsExpanded = false;
             }
             else if (SectionConnection != connection)
             {
                 SectionConnection = connection;
                 // TODO: set title according to type of host
                 IsVisible = true;
+                IsExpanded = true;
             }
+        }
+
+        public override void Refresh()
+        {
+            if (connectionManager.Connections.Count > sectionIndex)
+                Refresh(connectionManager.Connections[sectionIndex]);
+            else
+                Refresh(null);
+            base.Refresh();
         }
 
         public override void Initialize(object sender, SectionInitializeEventArgs e)
@@ -107,23 +116,8 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.AddService(typeof(IConnection), SectionConnection);
-
             uiProvider.GitServiceProvider = gitServiceProvider;
-            var factory = uiProvider.GetService<IExportFactoryProvider>();
-            var uiControllerExport = factory.UIControllerFactory.CreateExport();
-            var uiController = uiControllerExport.Value;
-            var creation = uiController.SelectFlow(controllerFlow);
-            var windowController = new WindowController(creation);
-            creation.Subscribe(_ => { }, _ =>
-            {
-                windowController.Close();
-                uiControllerExport.Dispose();
-                uiProvider.RemoveService(typeof(IConnection));
-            });
-            windowController.Show();
-
-            uiController.Start();
+            uiProvider.RunUI(controllerFlow, SectionConnection);
         }
     }
 }

@@ -10,6 +10,9 @@ using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
 using ReactiveUI;
+using System.Globalization;
+using NullGuard;
+using System.Linq;
 
 namespace GitHub.Models
 {
@@ -22,16 +25,20 @@ namespace GitHub.Models
         public static DisconnectedRepositoryHost DisconnectedRepositoryHost = new DisconnectedRepositoryHost();
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;
+        readonly IConnectionManager connectionManager;
 
         [ImportingConstructor]
         public RepositoryHosts(
             IRepositoryHostFactory repositoryHostFactory,
-            ISharedCache sharedCache)
+            ISharedCache sharedCache,
+            IConnectionManager connectionManager)
         {
+            this.connectionManager = connectionManager;
+
             RepositoryHostFactory = repositoryHostFactory;
 
             LocalRepositoriesHost = new LocalRepositoriesHost();
-            GitHubHost = repositoryHostFactory.Create(HostAddress.GitHubDotComHostAddress);
+            GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
 
             var initialCacheLoadObs = sharedCache.UserAccount.GetObject<Uri>(EnterpriseHostApiBaseUriCacheKey)
@@ -88,17 +95,82 @@ namespace GitHub.Models
                 return GitHubHost;
             if (address == EnterpriseHost.Address)
                 return EnterpriseHost;
-            return LocalRepositoriesHost;
+            return DisconnectedRepositoryHost;
+        }
+
+        public IObservable<AuthenticationResult> LogIn(
+            HostAddress address,
+            string usernameOrEmail,
+            string password)
+        {
+            var isDotCom = HostAddress.GitHubDotComHostAddress == address;
+            var host = RepositoryHostFactory.Create(address);
+            return host.LogIn(usernameOrEmail, password)
+                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                .Do(result =>
+                {
+                    bool successful = result.IsSuccess();
+                    log.Info(CultureInfo.InvariantCulture, "Log in to {3} host '{0}' with username '{1}' {2}",
+                        address.ApiUri,
+                        usernameOrEmail,
+                        successful ? "SUCCEEDED" : "FAILED",
+                        isDotCom ? "GitHub.com" : "Enterprise"
+                    );
+                    if (successful)
+                    {
+                        if (isDotCom)
+                            EnterpriseHost = host;
+                        else
+                            GitHubHost = host;
+                        connectionManager.AddConnection(address, usernameOrEmail);
+                    }
+                });
+        }
+
+        public IObservable<Unit> LogOut(HostAddress address)
+        {
+            var host = LookupHost(address);
+            return LogOut(host);
+        }
+
+        public IObservable<Unit> LogOut(IRepositoryHost host)
+        {
+            var address = host.Address;
+            return host.LogOut()
+                .Do(result =>
+                {
+                    connectionManager.RemoveConnection(address);
+                });
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && EnterpriseHost.Cache != null)
+            {
+                EnterpriseHost.Cache.Dispose();
+            }
         }
 
         IRepositoryHost githubHost;
+        [AllowNull]
         public IRepositoryHost GitHubHost
         {
             get { return githubHost; }
-            private set { this.RaiseAndSetIfChanged(ref githubHost, value); }
+            private set
+            {
+                var newHost = value ?? DisconnectedRepositoryHost;
+                this.RaiseAndSetIfChanged(ref githubHost, newHost);
+            }
         }
 
         IRepositoryHost enterpriseHost;
+        [AllowNull]
         public IRepositoryHost EnterpriseHost
         {
             get { return enterpriseHost; }
@@ -116,53 +188,8 @@ namespace GitHub.Models
             set { this.RaiseAndSetIfChanged(ref localRepositoriesHost, value); }
         }
 
-        public IObservable<AuthenticationResult> LogInEnterpriseHost(
-            HostAddress enterpriseHostAddress,
-            string usernameOrEmail,
-            string password)
-        {
-            var host = RepositoryHostFactory.Create(enterpriseHostAddress);
-            return host.LogIn(usernameOrEmail, password)
-                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
-                .Do(result =>
-                {
-                    bool successful = result.IsSuccess();
-                    log.Info("Log in to Enterprise host '{0}' with username '{1}' {2}",
-                        enterpriseHostAddress.ApiUri,
-                        usernameOrEmail,
-                        successful ? "SUCCEEDED" : "FAILED");
-                    if (successful)
-                    {
-                        EnterpriseHost = host;
-                    }
-                });
-        }
-
-        public IObservable<AuthenticationResult> LogInGitHubHost(string usernameOrEmail, string password)
-        {
-            return GitHubHost.LogIn(usernameOrEmail, password)
-                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
-                .Do(result => log.Info("Log in to GitHub.com with username '{0}' {1}",
-                    usernameOrEmail,
-                    result.IsSuccess() ? "SUCCEEDED" : "FAILED"));
-        }
-
         public IRepositoryHostFactory RepositoryHostFactory { get; private set; }
 
         public bool IsLoggedInToAnyHost { get { return isLoggedInToAnyHost.Value; } }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && EnterpriseHost.Cache != null)
-            {
-                EnterpriseHost.Cache.Dispose();
-            }
-        }
     }
 }
