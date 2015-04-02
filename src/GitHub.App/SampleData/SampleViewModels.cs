@@ -51,7 +51,7 @@ namespace GitHub.SampleData
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        public ReactiveList<IAccount> Accounts
+        public IReadOnlyList<IAccount> Accounts
         {
             get;
             private set;
@@ -296,6 +296,11 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
+        {
+            throw new NotImplementedException();
+        }
+
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
             throw new NotImplementedException();
@@ -307,16 +312,6 @@ namespace GitHub.SampleData
         }
 
         public IObservable<Unit> LogOut()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> Refresh()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc)
         {
             throw new NotImplementedException();
         }

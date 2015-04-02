@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Primitives;
-using ReactiveUI;
 
 namespace GitHub.Models
 {
@@ -18,12 +18,15 @@ namespace GitHub.Models
         bool IsLoggingIn { get; }
         bool IsEnterprise { get; }
         string Title { get; }
-        IAccount User { get; }
+
+        /// <summary>
+        /// Retrieves all the accounts associated with this host.
+        /// </summary>
+        /// <returns></returns>
+        IObservable<IReadOnlyList<IAccount>> GetAccounts();
 
         IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password);
         IObservable<AuthenticationResult> LogInFromCache();
         IObservable<Unit> LogOut();
-        IObservable<Unit> Refresh();
-        IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc);
     }
 }
