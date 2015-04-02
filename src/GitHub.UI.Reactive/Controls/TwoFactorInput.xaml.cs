@@ -5,9 +5,19 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using GitHub.Extensions;
 using NullGuard;
+using System.Globalization;
 
 namespace GitHub.UI
 {
+    public class TwoFactorInputToTextBox : ValueConverterMarkupExtension<TwoFactorInputToTextBox>
+    {
+        public override object Convert([AllowNull] object value, [AllowNull] Type targetType,
+            [AllowNull] object parameter, [AllowNull] CultureInfo culture)
+        {
+            return value is TwoFactorInput ? ((TwoFactorInput)value).TextBox : null;
+        }
+    }
+
     /// <summary>
     /// Interaction logic for TwoFactorInput.xaml
     /// </summary>
@@ -17,6 +27,7 @@ namespace GitHub.UI
             DependencyProperty.Register("Text", typeof(string), typeof(TwoFactorInput), new PropertyMetadata(""));
 
         TextBox[] TextBoxes;
+        public TextBox TextBox { get { return TextBoxes[0]; } }
 
         public TwoFactorInput()
         {
