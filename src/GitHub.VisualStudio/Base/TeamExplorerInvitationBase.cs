@@ -12,6 +12,7 @@ namespace GitHub.VisualStudio.Base
             CanConnect = true;
             CanSignUp = true;
             ConnectLabel = "Connect";
+            SignUpLabel = "Sign up";
         }
 
         public virtual void Initialize(IServiceProvider serviceProvider)
