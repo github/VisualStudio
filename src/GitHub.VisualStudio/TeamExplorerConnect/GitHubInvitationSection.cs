@@ -1,4 +1,5 @@
-﻿using GitHub.Models;
+﻿using GitHub.Info;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -17,10 +18,16 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
     {
         public const string GitHubInvitationSectionId = "C2443FCC-6D62-4D31-B08A-C4DE70109C7F";
         public const int GitHubInvitationSectionPriority = 100;
+        readonly Lazy<IVisualStudioBrowser> lazyBrowser;
 
         [ImportingConstructor]
-        public GitHubInvitationSection(IConnectionManager cm)
+        public GitHubInvitationSection(IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
         {
+            lazyBrowser = browser;
+            CanConnect = true;
+            CanSignUp = true;
+            ConnectLabel = "Connect";
+            SignUpLabel = "Sign up";
             Name = "GitHub";
             Provider = "GitHub, Inc.";
             Icon = GetDrawingForIcon(GetBrushForIcon());
@@ -35,6 +42,11 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         {
             StartFlow(UIControllerFlow.Authentication);
             base.Connect();
+        }
+
+        public override void SignUp()
+        {
+            OpenInBrowser(lazyBrowser, GitHubUrls.Plans);
         }
 
         void StartFlow(UIControllerFlow controllerFlow)

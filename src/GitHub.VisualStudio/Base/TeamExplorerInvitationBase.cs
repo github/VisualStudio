@@ -7,14 +7,6 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerInvitationBase : TeamExplorerBase, ITeamExplorerServiceInvitation, INotifyPropertySource
     {
-        public TeamExplorerInvitationBase()
-        {
-            CanConnect = true;
-            CanSignUp = true;
-            ConnectLabel = "Connect";
-            SignUpLabel = "Sign up";
-        }
-
         public virtual void Initialize(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
