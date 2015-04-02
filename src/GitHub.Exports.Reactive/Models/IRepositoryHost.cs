@@ -17,9 +17,6 @@ namespace GitHub.Models
         bool IsLoggedIn { get; }
         bool IsLoggingIn { get; }
         bool IsEnterprise { get; }
-        bool IsLocal { get; }
-        ReactiveList<IAccount> Organizations { get; }
-        ReactiveList<IAccount> Accounts { get; }
         string Title { get; }
         IAccount User { get; }
 
