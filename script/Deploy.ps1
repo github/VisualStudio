@@ -235,7 +235,7 @@ function Clean-BuildDirectory {
     Write-Output "Cleaning build directory..."
 
     $solution = Join-Path $rootDirectory GitHubVs.sln
-    Run-Command -Quiet -Fatal { & msbuild $solution /target:Clean /property:Configuration=$configuration }
+    Run-Command -Quiet -Fatal { & $msbuild $solution /target:Clean /property:Configuration=$configuration }
 }
 
 function Create-TempDirectory {
@@ -245,14 +245,14 @@ function Create-TempDirectory {
 
 function Build-Vsix([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
-    Run-Command -Quiet -Fatal { msbuild $solution /property:Configuration=$configuration /property:ReleaseChannel=$ReleaseChannel /property:S3Bucket=$S3Bucket /property:DeployExtension=false }
+    Run-Command -Quiet -Fatal { & $msbuild $solution /property:Configuration=$configuration /property:ReleaseChannel=$ReleaseChannel /property:S3Bucket=$S3Bucket /property:DeployExtension=false }
 
     Copy-Item (Join-Path $rootDirectory build\$configuration\GitHub.VisualStudio.vsix) $directory
 }
 
 function Build-Installer([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
-    Run-Command -Quiet -Fatal { msbuild $solution /property:Configuration=Publish }
+    Run-Command -Quiet -Fatal { & $msbuild $solution /property:Configuration=Publish }
 
     Copy-Item (Join-Path $rootDirectory build\$configuration\ghfvs.msi) $directory
 }

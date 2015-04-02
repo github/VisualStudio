@@ -5,7 +5,7 @@ $scriptsDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
 $rootDirectory = Split-Path $scriptsDirectory
 $gitHubDirectory = Join-Path $rootDirectory src\MsiInstaller
 
-function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
+function Invoke-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
     $output = ""
     if ($Quiet) {
         $output = & $Command 2>&1
@@ -57,5 +57,5 @@ function Add-SignatureToWiX {
     $signtool = Join-Path $scriptsDirectory lib\signtool.exe
     $certificate = "GitHub, inc"
 
-    Run-Command -Quiet -Fatal { & $signtool sign /n $certificate /v $WiXPath }
+    Invoke-Command -Quiet -Fatal { & $signtool sign /n $certificate /v $WiXPath }
 }
