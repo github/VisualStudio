@@ -9,6 +9,7 @@ using System.Text;
 using GitHub.Models;
 using GitHub.Services;
 using Rothko;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio
 {
@@ -44,26 +45,41 @@ namespace GitHub.VisualStudio
 
             LoadConnectionsFromCache();
 
-            // TODO: Load list of known connections from cache
             Connections.CollectionChanged += RefreshConnections;
         }
 
-        public ObservableCollection<IConnection> Connections { get; private set; }
+        public IConnection CreateConnection(HostAddress address, string username)
+        {
+            return new Connection(address, username);
+        }
+
+        public bool AddConnection(HostAddress address, string username)
+        {
+            if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
+                return false;
+            Connections.Add(new Connection(address, username));
+            return true;
+        }
+
+        public bool RemoveConnection(HostAddress address)
+        {
+            var c = Connections.FirstOrDefault(x => x.HostAddress == address);
+            if (c == null)
+                return false;
+            Connections.Remove(c);
+            return true;
+        }
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            // TODO: save list of known connections to cache
             SaveConnectionsToCache();
         }
 
         void LoadConnectionsFromCache()
         {
             if (!operatingSystem.File.Exists(cachePath))
-            {
-                // FAKE!
-                Connections.Add(new Connection(Primitives.HostAddress.GitHubDotComHostAddress, "shana"));
                 return;
-            }
+
             string data = operatingSystem.File.ReadAllText(cachePath, Encoding.UTF8);
 
             CacheData cacheData;
@@ -83,11 +99,12 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            foreach (var c in cacheData.connections.Where(c => c.HostUrl != null))
+            cacheData.connections.All(c =>
             {
-                var hostAddress = Primitives.HostAddress.Create(c.HostUrl);
-                Connections.Add(new Connection(hostAddress, c.UserName));
-            }
+                if (c.HostUrl != null)
+                    AddConnection(HostAddress.Create(c.HostUrl), c.UserName);
+                return true;
+            });
         }
 
         void SaveConnectionsToCache()
@@ -105,5 +122,7 @@ namespace GitHub.VisualStudio
                 Debug.Fail(ex.ToString());
             }
         }
+
+        public ObservableCollection<IConnection> Connections { get; private set; }
     }
 }

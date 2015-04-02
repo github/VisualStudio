@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using GitHub.VisualStudio.TeamExplorerHome;
+using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -11,6 +12,9 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public GitHubHomeContent()
         {
+            SharedDictionaryManager.Load("GitHub.UI");
+            Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
+
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IGitHubHomeSection;

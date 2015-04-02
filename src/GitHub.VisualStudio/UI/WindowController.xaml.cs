@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Controls;
 using GitHub.UI;
 using GitHub.ViewModels;
@@ -8,18 +9,10 @@ namespace GitHub.VisualStudio.UI
 {
     public partial class WindowController : DialogWindow
     {
-        IDisposable disposable;
-
         public WindowController(IObservable<UserControl> controls)
         {
             InitializeComponent();
-            disposable = controls.Subscribe(c => Load(c), Close);
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            disposable.Dispose();
-            base.OnClosed(e);
+            controls.Subscribe(c => Load(c));
         }
 
         public void Load(UserControl control)

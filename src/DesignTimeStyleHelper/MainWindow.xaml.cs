@@ -45,7 +45,7 @@ namespace DesignTimeStyleHelper
 
             var factory = ui.GetService<IExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
-            var userControlObservable = d.Value.SelectFlow(flow);
+            var userControlObservable = d.Value.SelectFlow(flow, null);
             var x = new WindowController(userControlObservable);
             userControlObservable.Subscribe(_ => { }, _ => x.Close());
             x.Show();

@@ -11,6 +11,8 @@ using GitHub.Services;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
+using GitHub.UI;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio
 {
@@ -35,6 +37,7 @@ namespace GitHub.VisualStudio
         readonly IServiceProvider serviceProvider;
         readonly CompositionContainer tempContainer;
         readonly Dictionary<string, ComposablePart> tempParts;
+        ExportLifetimeContext<IUIController> currentUIFlow;
 
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -128,6 +131,51 @@ namespace GitHub.VisualStudio
                 batch.RemovePart(part);
                 tempContainer.Compose(batch);
             }
+        }
+
+        public void RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        {
+            StopUI();
+
+            var factory = GetService<IExportFactoryProvider>();
+            currentUIFlow = factory.UIControllerFactory.CreateExport();
+            var disposable = currentUIFlow;
+            var ui = currentUIFlow.Value;
+            var creation = ui.SelectFlow(controllerFlow, connection);
+            var windowController = new UI.WindowController(creation);
+            windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
+            creation.Subscribe((c) => { }, () =>
+            {
+                windowController.Closed -= StopUIFlowWhenWindowIsClosedByUser;
+                windowController.Close();
+                if (currentUIFlow != disposable)
+                    StopUI(disposable);
+                else
+                    StopUI();
+            });
+            windowController.Show();
+            ui.Start();
+        }
+
+        public void StopUI()
+        {
+            StopUI(currentUIFlow);
+            currentUIFlow = null;
+        }
+
+        static void StopUI(ExportLifetimeContext<IUIController> disposable)
+        {
+            if (disposable != null)
+            {
+                if (!disposable.Value.IsStopped)
+                    disposable.Value.Stop();
+                disposable.Dispose();
+            }
+        }
+
+        void StopUIFlowWhenWindowIsClosedByUser(object sender, EventArgs e)
+        {
+            StopUI();
         }
     }
 }

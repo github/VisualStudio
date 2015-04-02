@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using GitHub.Services;
-using GitHub.UI;
 using GitHub.VisualStudio.Base;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.PlatformUI;
+using System.Windows.Media;
+using GitHub.VisualStudio.Helpers;
+using GitHub.UI;
+using GitHub.Services;
 using GitHub.Models;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio
 {
@@ -27,7 +29,10 @@ namespace GitHub.VisualStudio
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.guidGitHubPkgString)]
-    [ProvideBindingPath]
+    //[ProvideBindingPath]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    //[ProvideAutoLoad(UIContextGuids.NoSolution)]
+    [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
     public class GitHubPackage : PackageBase
     {
         public GitHubPackage()
@@ -37,52 +42,20 @@ namespace GitHub.VisualStudio
         public GitHubPackage(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
+
         }
 
-        /// <summary>
-        /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initialization code that rely on services provided by VisualStudio.
-        /// </summary>
         protected override void Initialize()
         {
-            Debug.WriteLine("Entering Initialize() of: {0}", ToString());
             base.Initialize();
 
-            // Add our command handlers for menu (commands must exist in the .vsct file)
-            // for testing purposes only
-            AddTopLevelMenuItem(PkgCmdIDList.loginCommand, OnLoginCommand);
-            AddTopLevelMenuItem(PkgCmdIDList.createRepoCommand, OnCreateRepo);
-            AddTopLevelMenuItem(PkgCmdIDList.cloneRepoCommand, OnCloneRepo);
+            AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
         }
 
-        void ShowDialog(UIControllerFlow flow)
+        void StartFlow(UIControllerFlow controllerFlow)
         {
-            var ui = GetExportedValue<IUIProvider>();
-            var disposable = ui.GetService<IExportFactoryProvider>().UIControllerFactory.CreateExport();
-            var watcher = disposable.Value.SelectFlow(flow);
-            var window = new WindowController(watcher);
-            watcher.Subscribe(_ => { }, _ => {
-                window.Close();
-                disposable.Dispose();
-            });
-            //window.Owner = System.Windows.Application.Current.MainWindow;
-            //window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-            window.ShowModal();
-        }
-
-        void OnCreateRepo(object sender, EventArgs e)
-        {
-            ShowDialog(UIControllerFlow.Create);
-        }
-
-        void OnCloneRepo(object sender, EventArgs e)
-        {
-            ShowDialog(UIControllerFlow.Clone);
-        }
-
-        void OnLoginCommand(object sender, EventArgs e)
-        {
-            ShowDialog(UIControllerFlow.Authentication);
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            uiProvider.RunUI(controllerFlow, null);
         }
     }
 }

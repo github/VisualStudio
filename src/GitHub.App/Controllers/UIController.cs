@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Controls;
-using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,27 +14,36 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using Stateless;
+using NullGuard;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace GitHub.Controllers
 {
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
+        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
+        readonly IRepositoryHosts hosts;
+        readonly IConnectionManager connectionManager;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
+        IConnection connection;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory)
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
+            IConnectionManager connectionManager)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
+            this.hosts = hosts;
+            this.connectionManager = connectionManager;
 
 #if DEBUG
             if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
@@ -55,16 +63,6 @@ namespace GitHub.Controllers
 #endif
             machine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
 
-            machine.Configure(UIViewType.None)
-                .Permit(Trigger.Auth, UIViewType.Login)
-                .PermitIf(Trigger.Create, UIViewType.Create, () => hosts.IsLoggedInToAnyHost)
-                // TODO: This condition isn't exactly correct. We need to check that the host associated with this Create request is logged in or not.
-                .PermitIf(Trigger.Create, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIViewType.Clone, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Clone, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Publish, UIViewType.Publish, () => hosts.IsLoggedInToAnyHost)
-                .PermitIf(Trigger.Publish, UIViewType.Login, () => !hosts.IsLoggedInToAnyHost);
-
             machine.Configure(UIViewType.Login)
                 .OnEntry(() =>
                 {
@@ -73,6 +71,7 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
                 // Added the following line to make it easy to login to both GitHub and GitHub Enterprise 
                 // in DesignTimeStyleHelper in order to test Publish.
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
@@ -84,6 +83,7 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.TwoFactor);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
@@ -94,6 +94,7 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.Create);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.Clone)
@@ -101,6 +102,7 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.Clone);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.Publish)
@@ -108,16 +110,47 @@ namespace GitHub.Controllers
                 {
                     RunView(UIViewType.Publish);
                 })
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.End)
                 .OnEntry(() =>
                 {
+                    uiProvider.RemoveService(typeof(IConnection));
                     transition.OnCompleted();
-                    transition.Dispose();
-                    transition = null;
                 })
-                .Permit(Trigger.Next, UIViewType.None);
+                .Permit(Trigger.Next, UIViewType.Finished);
+
+            // it might be useful later to check which triggered
+            // made us enter here (Cancel or Next) and set a final
+            // result accordingly, which is why UIViewType.End only
+            // allows a Next trigger
+            machine.Configure(UIViewType.Finished);
+        }
+
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection aConnection)
+        {
+            connection = aConnection;
+            IRepositoryHost host = RepositoryHosts.DisconnectedRepositoryHost;
+            if (connection != null)
+            {
+                uiProvider.AddService(typeof(IConnection), connection);
+                host = hosts.LookupHost(connection.HostAddress);
+            }
+
+            machine.Configure(UIViewType.None)
+                .Permit(Trigger.Auth, UIViewType.Login)
+                .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
+                .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
+                .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
+                .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
+                .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
+                .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+
+            currentFlow = choice;
+            transition = new Subject<UserControl>();
+            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
+            return transition;
         }
 
         void RunView(UIViewType viewType)
@@ -131,6 +164,20 @@ namespace GitHub.Controllers
         {
             if (viewType == UIViewType.Login)
             {
+                // listen for a new connection being added
+                if (connection == null)
+                {
+                    Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(connectionManager.Connections,
+                        "CollectionChanged")
+                        .Take(1)
+                        .Do(e =>
+                        {
+                            if (e.EventArgs.Action == NotifyCollectionChangedAction.Add)
+                                connection = e.EventArgs.NewItems[0] as IConnection;
+                        });
+                }
+
+
                 // we're setting up the login dialog, we need to setup the 2fa as
                 // well to continue the flow if it's needed, since the
                 // authenticationresult callback won't happen until
@@ -176,21 +223,23 @@ namespace GitHub.Controllers
 
         void Fire(Trigger next)
         {
-            Debug.WriteLine("Firing {0}", next);
+            Debug.WriteLine("Firing {0} ({1})", next, GetHashCode());
             machine.Fire(next);
-        }
-
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice)
-        {
-            currentFlow = choice;
-            transition = new Subject<UserControl>();
-            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
-            return transition;
         }
 
         public void Start()
         {
+            Debug.WriteLine("Start ({0})", GetHashCode());
             Fire((Trigger)(int)currentFlow);
+        }
+
+        public void Stop()
+        {
+            Debug.WriteLine("Stop ({0})", GetHashCode());
+            if (machine.IsInState(UIViewType.End))
+                Fire(Trigger.Next);
+            else
+                Fire(Trigger.Cancel);
         }
 
         private bool disposedValue = false; // To detect redundant calls
@@ -201,6 +250,7 @@ namespace GitHub.Controllers
             {
                 if (disposing)
                 {
+                    Debug.WriteLine("Disposing ({0})", GetHashCode());
                     disposables.Dispose();
                     if (transition != null)
                         transition.Dispose();
@@ -214,5 +264,7 @@ namespace GitHub.Controllers
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public bool IsStopped { get { return machine.IsInState(UIViewType.Finished); } }
     }
 }

@@ -4,8 +4,7 @@ namespace GitHub.VisualStudio
 {
     static class PkgCmdIDList
     {
-        public const uint loginCommand = 0x110;
-        public const uint createRepoCommand = 0x111;
-        public const uint cloneRepoCommand = 0x112;
+        public const uint addConnectionCommand = 0x110;
+        public const uint addConnectionCommandDark = 0x111;
     };
 }
