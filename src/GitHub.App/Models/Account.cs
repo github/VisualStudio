@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Media.Imaging;
 using GitHub.Caches;
+using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class Account : IAccount
+    public class Account : ReactiveObject, IAccount
     {
-        public Account(CachedAccount cachedAccount)
+        ObservableAsPropertyHelper<BitmapSource> avatar;
+
+        public Account(CachedAccount cachedAccount, IObservable<BitmapSource> bitmapSource)
         {
             IsUser = cachedAccount.IsUser;
             Login = cachedAccount.Login;
@@ -17,6 +21,8 @@ namespace GitHub.Models
             PrivateReposInPlan = cachedAccount.PrivateReposInPlan;
             IsOnFreePlan = cachedAccount.PrivateReposInPlan == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+
+            avatar = bitmapSource.ToProperty(this, a => a.Avatar);
         }
 
         public bool IsOnFreePlan { get; private set; }
@@ -33,6 +39,15 @@ namespace GitHub.Models
 
         public long PrivateReposInPlan { get; private set; }
 
+        public BitmapSource Avatar
+        {
+            [return: AllowNull]
+            get
+            {
+                return avatar.Value;
+            }
+        }
+
         internal string DebuggerDisplay
         {
             get
@@ -41,6 +56,5 @@ namespace GitHub.Models
                     "Account: Login: {0} IsUser: {1}", Login, IsUser);
             }
         }
-
     }
 }

@@ -79,22 +79,20 @@ namespace UnitTests
         /// <returns></returns>
         public static IServiceProvider GetServiceProvider(
             IRepositoryCloneService cloneService = null,
-            IRepositoryCreationService creationService = null)
+            IRepositoryCreationService creationService = null,
+            IAvatarProvider avatarProvider = null)
         {
             var ret = Substitute.For<IServiceProvider, IUIProvider>();
             var os = OperatingSystem;
             var git = IGitRepositoriesExt;
             var vs = IVSServices;
-            var clone = cloneService;
-            if (clone == null)
-                clone = new RepositoryCloneService(new Lazy<IServiceProvider>(() => ret), os);
-            var create = creationService;
-            if (create == null)
-                create = new RepositoryCreationService(clone);
+            var clone = cloneService ?? new RepositoryCloneService(new Lazy<IServiceProvider>(() => ret), os);
+            var create = creationService ?? new RepositoryCreationService(clone);
             var hosts = RepositoryHosts;
             var exports = ExportFactoryProvider;
             var connection = Connection;
             var connectionManager = ConnectionManager;
+            avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitRepositoriesExt)).Returns(git);
             ret.GetService(typeof(IVSServices)).Returns(vs);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
@@ -104,6 +102,7 @@ namespace UnitTests
             ret.GetService(typeof(IExportFactoryProvider)).Returns(exports);
             ret.GetService(typeof(IConnection)).Returns(connection);
             ret.GetService(typeof(IConnectionManager)).Returns(connectionManager);
+            ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
             return ret;
         }
 
@@ -150,6 +149,11 @@ namespace UnitTests
         public static IConnectionManager GetConnectionManager(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IConnectionManager)) as IConnectionManager;
+        }
+
+        public static IAvatarProvider GetAvatarProvider(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IAvatarProvider)) as IAvatarProvider;
         }
     }
 }

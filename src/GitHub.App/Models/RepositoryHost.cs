@@ -13,6 +13,7 @@ using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
 using GitHub.Primitives;
+using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
@@ -274,23 +275,23 @@ namespace GitHub.Models
                 });
         }
 
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
         {
             return Observable.Zip(
-                GetUser(),
-                GetOrganizations(),
+                GetUser(avatarProvider),
+                GetOrganizations(avatarProvider),
                 (user, orgs) => new ReadOnlyCollection<IAccount>(user.Concat(orgs).ToList()));
         }
 
-        IObservable<IEnumerable<IAccount>> GetOrganizations()
+        IObservable<IEnumerable<IAccount>> GetOrganizations(IAvatarProvider avatarProvider)
         {
             return Cache.GetAllOrganizations()
-                    .Select(orgs => orgs.Select(org => new Account(org)));
+                    .Select(orgs => orgs.Select(org => new Account(org, avatarProvider.GetAvatar(org))));
         }
 
-        IObservable<IEnumerable<IAccount>> GetUser()
+        IObservable<IEnumerable<IAccount>> GetUser(IAvatarProvider avatarProvider)
         {
-            return Cache.GetUser().Select(user => new[] { new Account(user) });
+            return Cache.GetUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
         }
 
         protected ILoginCache LoginCache { get; private set; }

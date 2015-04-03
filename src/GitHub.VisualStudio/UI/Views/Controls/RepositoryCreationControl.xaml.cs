@@ -31,7 +31,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             close = new Subject<object>();
 
-            IObservable<bool> clearErrorWhenChanged = this.WhenAny(
+            var clearErrorWhenChanged = this.WhenAny(
                 x => x.ViewModel.RepositoryName,
                 x => x.ViewModel.Description,
                 (x, y) => new { x, y })

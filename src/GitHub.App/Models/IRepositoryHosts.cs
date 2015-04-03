@@ -11,7 +11,7 @@ namespace GitHub.Models
         IRepositoryHost EnterpriseHost { get; set; }
         IRepositoryHost GitHubHost { get; }
         IObservable<AuthenticationResult> LogIn(
-            HostAddress enterpriseHostAddress,
+            HostAddress hostAddress,
             string usernameOrEmail,
             string password);
         IRepositoryHostFactory RepositoryHostFactory { get; }

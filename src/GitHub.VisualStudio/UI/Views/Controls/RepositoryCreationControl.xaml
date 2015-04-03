@@ -182,9 +182,9 @@
                 </ComboBox.ItemTemplate>
                 <ComboBox.ItemsSource>
                     <x:Array Type="sampleData:AccountDesigner">
-                        <sampleData:AccountDesigner Login="Brendan" />
-                        <sampleData:AccountDesigner Login="Drew"/>
-                        <sampleData:AccountDesigner Login="Paul"/>
+                        <sampleData:AccountDesigner />
+                        <sampleData:AccountDesigner />
+                        <sampleData:AccountDesigner />
                     </x:Array>
                 </ComboBox.ItemsSource>
             </ui:GitHubComboBox>

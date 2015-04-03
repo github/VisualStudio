@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Reactive;
 using System.Windows.Media.Imaging;
-using Octokit;
+using GitHub.Caches;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
-    public interface IHostAvatarProvider
-    {
-        IAvatarProvider Get(string gitHubBaseUrl);
-    }
-
     public interface IAvatarProvider
     {
         BitmapImage DefaultUserBitmapImage { get; }
         BitmapImage DefaultOrgBitmapImage { get; }
-        IObservable<BitmapSource> GetAvatar(Account apiAccount);
-        IObservable<Unit> InvalidateAvatar(Account apiAccount);
-        IObservable<BitmapSource> GetAvatar(string email);
+        IObservable<BitmapSource> GetAvatar(IAvatarContainer account);
+        IObservable<Unit> InvalidateAvatar(IAvatarContainer account);
     }
 }
