@@ -87,7 +87,7 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise">
+            <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise" Margin="10,0,-10,0">
                 <StackPanel Margin="0,10,0,0">
                     <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Margin="0,0,0,10" Message="Log in failed">
                         <TextBlock TextWrapping="Wrap">
