@@ -130,7 +130,10 @@
                 Style="{StaticResource GitHubFilterComboBox}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <TextBlock
+                            x:Name="itemName"
+                            Text="{Binding Name}"
+                            FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
                                 <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
