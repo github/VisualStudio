@@ -148,9 +148,14 @@
                 Style="{StaticResource GitHubFilterComboBox}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <TextBlock
+                            x:Name="itemName"
+                            Text="{Binding Name}"
+                            FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                            <DataTrigger
+                                Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}"
+                                Value="{x:Null}">
                                 <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
                             </DataTrigger>
                         </DataTemplate.Triggers>
@@ -171,7 +176,12 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Avatar}" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0" />
+                            <Image
+                                Source="{Binding Avatar}"
+                                Width="16"
+                                Height="16"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Margin="0,0,8,0" />
                             <TextBlock Text="{Binding Login}"/>
                         </StackPanel>
                     </DataTemplate>
