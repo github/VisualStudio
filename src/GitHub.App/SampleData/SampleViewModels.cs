@@ -180,6 +180,8 @@ namespace GitHub.SampleData
             get;
             set;
         }
+
+        public ICommand Cancel { get; set; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -492,7 +494,7 @@ namespace GitHub.SampleData
             );
         }
 
-        public ICommand CancelCommand
+        public ICommand Cancel
         {
             get;
             private set;

@@ -12,6 +12,8 @@ using NLog;
 using ReactiveUI;
 using Rothko;
 using GitHub.Extensions;
+using System.Globalization;
+using NullGuard;
 
 namespace GitHub.ViewModels
 {
@@ -24,6 +26,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<ReactiveList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
+        readonly ObservableAsPropertyHelper<string> title;
 
         [ImportingConstructor]
         RepositoryPublishViewModel(IServiceProvider provider, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
@@ -33,6 +36,14 @@ namespace GitHub.ViewModels
         public RepositoryPublishViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
             : base(connection, operatingSystem, hosts)
         {
+            title = this.WhenAny(
+                x => x.SelectedHost,
+                x => x.Value != null ?
+                    string.Format(CultureInfo.CurrentCulture, "Publish repository to {0}", x.Value.Title) :
+                    "Publish repository"
+            )
+            .ToProperty(this, x => x.Title);
+
             RepositoryHosts = new ReactiveList<IRepositoryHost>(
                 new[] { hosts.GitHubHost, hosts.EnterpriseHost }.Where(h => h.IsLoggedIn));
             if (RepositoryHosts.Any())
@@ -77,37 +88,18 @@ namespace GitHub.ViewModels
                 .ToProperty(this, x => x.IsPublishing);
         }
 
-        public bool CanKeepPrivate
-        {
-            get
-            {
-                return canKeepPrivate.Value;
-            }
-        }
+        public new string Title { get { return title.Value; } }
+        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
+        public bool IsPublishing { get { return isPublishing.Value; } }
 
-        public bool IsPublishing
-        {
-            get
-            {
-                return isPublishing.Value;
-            }
-        }
-
-        public IReactiveCommand<Unit> PublishRepository
-        {
-            get;
-            private set;
-        }
-
-        public ReactiveList<IRepositoryHost> RepositoryHosts
-        {
-            get;
-            private set;
-        }
+        public IReactiveCommand<Unit> PublishRepository { get; private set; }
+        public ReactiveList<IRepositoryHost> RepositoryHosts { get; private set; }
 
         IRepositoryHost selectedHost;
+        [AllowNull]
         public IRepositoryHost SelectedHost
         {
+            [return: AllowNull]
             get { return selectedHost; }
             set { this.RaiseAndSetIfChanged(ref selectedHost, value); }
         }
@@ -116,8 +108,6 @@ namespace GitHub.ViewModels
         {
             get { return accounts.Value; }
         }
-
-        public string Title { get { return "Publish to GitHub"; } } // TODO: this needs to be contextual
 
         ReactiveCommand<Unit> InitializePublishRepositoryCommand()
         {

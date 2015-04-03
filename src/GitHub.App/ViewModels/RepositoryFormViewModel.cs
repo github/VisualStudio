@@ -73,6 +73,7 @@ namespace GitHub.ViewModels
                     Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
                     Debug.Assert(Licenses.Any(), "There should be at least one license");
                 });
+            CancelCommand = ReactiveCommand.Create();
         }
 
         /// <summary>

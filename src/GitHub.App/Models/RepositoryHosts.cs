@@ -114,14 +114,14 @@ namespace GitHub.Models
                         address.ApiUri,
                         usernameOrEmail,
                         successful ? "SUCCEEDED" : "FAILED",
-                        isDotCom ? "GitHub.com" : "Enterprise"
+                        isDotCom ? "GitHub.com" : address.WebUri.Host
                     );
                     if (successful)
                     {
                         if (isDotCom)
-                            EnterpriseHost = host;
-                        else
                             GitHubHost = host;
+                        else
+                            EnterpriseHost = host;
                         connectionManager.AddConnection(address, usernameOrEmail);
                     }
                 });
@@ -136,9 +136,16 @@ namespace GitHub.Models
         public IObservable<Unit> LogOut(IRepositoryHost host)
         {
             var address = host.Address;
+            var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             return host.LogOut()
                 .Do(result =>
                 {
+                    // reset the logged out host property to null
+                    // it'll know what to do
+                    if (isDotCom)
+                        GitHubHost = null;
+                    else
+                        EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
                 });
         }
