@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
@@ -50,6 +51,29 @@ public class RepositoryHostTests
             var user = await userCache.GetObject<CachedAccount>("user");
             Assert.NotNull(user);
             Assert.Equal("lagavulin", user.Login);
+        }
+
+        [Fact]
+        public async Task SetsTheLoggingInBitDuringLogin()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
+                .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
+            var getUserSubject = new Subject<User>();
+            apiClient.GetUser().Returns(getUserSubject);
+            var userCache = new InMemoryBlobCache();
+            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var loginCache = new TestLoginCache();
+            var host = new RepositoryHost(apiClient, hostCache, loginCache);
+
+            var observable = host.LogIn("aUsername", "aPassword");
+
+            Assert.True(host.IsLoggingIn);
+            getUserSubject.OnNext(CreateOctokitUser("missyelliot"));
+            getUserSubject.OnCompleted();
+            await observable;
+            Assert.False(host.IsLoggingIn);
         }
 
         static User CreateOctokitUser(string login)
