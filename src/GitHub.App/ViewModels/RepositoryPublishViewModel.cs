@@ -10,6 +10,7 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
@@ -31,11 +32,19 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> title;
 
         [ImportingConstructor]
-        RepositoryPublishViewModel(IServiceProvider provider, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
-            : this(provider.GetService<IConnection>(), operatingSystem, hosts)
+        RepositoryPublishViewModel(
+            IServiceProvider provider,
+            IOperatingSystem operatingSystem,
+            IRepositoryHosts hosts,
+            IAvatarProvider avatarProvider)
+            : this(provider.GetService<IConnection>(), operatingSystem, hosts, avatarProvider)
         {}
 
-        public RepositoryPublishViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+        public RepositoryPublishViewModel(
+            IConnection connection,
+            IOperatingSystem operatingSystem,
+            IRepositoryHosts hosts,
+            IAvatarProvider avatarProvider)
             : base(connection, operatingSystem, hosts)
         {
             title = this.WhenAny(
@@ -55,7 +64,7 @@ namespace GitHub.ViewModels
 
             var accountsChangedObservable = this.WhenAny(x => x.SelectedHost, x => x.Value)
                 .WhereNotNull()
-                .SelectMany(host => host.GetAccounts());
+                .SelectMany(host => host.GetAccounts(avatarProvider));
 
             accounts = accountsChangedObservable
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.Composition;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -11,6 +12,8 @@ using Splat;
 
 namespace GitHub.Services
 {
+    [Export(typeof(IAvatarProvider))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class AvatarProvider : IAvatarProvider
     {
         readonly IImageCache imageCache;
@@ -20,11 +23,10 @@ namespace GitHub.Services
         public BitmapImage DefaultUserBitmapImage { get; private set; }
         public BitmapImage DefaultOrgBitmapImage { get; private set; }
 
-        public AvatarProvider(IBlobCache cacheToUse, IImageCache imageCache, string gitHubBaseUrl)
+        [ImportingConstructor]
+        public AvatarProvider(ISharedCache sharedCache, IImageCache imageCache)
         {
-            Guard.ArgumentNotEmptyString(gitHubBaseUrl, "gitHubBaseUrl");
-
-            cache = cacheToUse;
+            cache = sharedCache.LocalMachine;
             this.imageCache = imageCache;
 
             DefaultUserBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");

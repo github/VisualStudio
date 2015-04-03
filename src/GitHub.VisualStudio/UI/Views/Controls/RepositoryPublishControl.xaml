@@ -166,13 +166,6 @@
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
-                <ComboBox.ItemsSource>
-                    <x:Array Type="sampleData:AccountDesigner">
-                        <sampleData:AccountDesigner Login="Brendan" />
-                        <sampleData:AccountDesigner Login="Drew"/>
-                        <sampleData:AccountDesigner Login="Paul"/>
-                    </x:Array>
-                </ComboBox.ItemsSource>
             </ui:GitHubComboBox>
 
             <CheckBox x:Name="makePrivate" Grid.Column="1" Grid.Row="6" Content="Private Repository" Padding="10,0,0,0"/>

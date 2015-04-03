@@ -40,8 +40,8 @@ namespace GitHub.ViewModels
             IOperatingSystem operatingSystem,
             IRepositoryHosts hosts,
             IRepositoryCreationService rs,
-            IRepositoryCloneService cs)
-            : this(provider.GetService<IConnection>(), operatingSystem, hosts, rs, cs)
+            IAvatarProvider avatarProvider)
+            : this(provider.GetService<IConnection>(), operatingSystem, hosts, rs, avatarProvider)
         {}
 
         public RepositoryCreationViewModel(
@@ -49,21 +49,26 @@ namespace GitHub.ViewModels
             IOperatingSystem operatingSystem,
             IRepositoryHosts hosts,
             IRepositoryCreationService repositoryCreationService,
-            IRepositoryCloneService cloneService)
+            IAvatarProvider avatarProvider)
             : base(connection, operatingSystem, hosts)
         {
             this.repositoryCreationService = repositoryCreationService;
             Title = string.Format(CultureInfo.CurrentCulture, "Create a repository at {0}", RepositoryHost.Title);
 
-            accounts = RepositoryHost.GetAccounts()
+            accounts = RepositoryHost.GetAccounts(avatarProvider)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
             
-            var selectedAccount = Accounts.FirstOrDefault();
-            if (selectedAccount != null)
-            {
-                SelectedAccount = Accounts.FirstOrDefault();
-            }
+            this.WhenAny(x => x.Accounts, x => x.Value)
+                .WhereNotNull()
+                .Where(accts => accts.Any())
+                .Subscribe(accts => {
+                    var selectedAccount = accts.FirstOrDefault();
+                    if (selectedAccount != null)
+                    {
+                        SelectedAccount = accts.FirstOrDefault();
+                    }
+                });
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 
