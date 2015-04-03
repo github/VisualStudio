@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 
@@ -7,7 +8,7 @@ namespace GitHub.Caches
     /// <summary>
     /// Used to cache and restore account information.
     /// </summary>
-    public class CachedAccount
+    public class CachedAccount : IAvatarContainer
     {
         public CachedAccount()
         {
@@ -22,6 +23,10 @@ namespace GitHub.Caches
             IsUser = (account as User) != null;
             PrivateReposInPlan = account.Plan != null ? account.Plan.PrivateRepos : 0;
             OwnedPrivateRepos = account.OwnedPrivateRepos;
+            Uri avatarUrl;
+            AvatarUrl = Uri.TryCreate(account.AvatarUrl, UriKind.Absolute, out avatarUrl)
+                ? avatarUrl
+                : null;
 
             Uri url;
             IsEnterprise = (Uri.TryCreate(account.HtmlUrl, UriKind.Absolute, out url))
@@ -34,5 +39,6 @@ namespace GitHub.Caches
         public bool IsEnterprise { get; set; }
         public int OwnedPrivateRepos { get; set; }
         public long PrivateReposInPlan { get; set; }
+        public Uri AvatarUrl { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using GitHub.Api;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using NSubstitute;
 using Octokit;
@@ -16,4 +18,6 @@ internal static class Args
     public static IAccount Account { get { return Arg.Any<IAccount>(); } }
     public static IApiClient ApiClient { get { return Arg.Any<IApiClient>(); } }
     public static IServiceProvider ServiceProvider { get { return Arg.Any<IServiceProvider>(); } }
+    public static IAvatarProvider AvatarProvider { get { return Arg.Any<IAvatarProvider>(); } }
+    public static HostAddress HostAddress { get { return Arg.Any<HostAddress>(); } } 
 }

@@ -7,6 +7,7 @@ using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using UnitTests.Helpers;
@@ -98,7 +99,7 @@ public class RepositoryHostTests
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
-            var accounts = await host.GetAccounts();
+            var accounts = await host.GetAccounts(Substitute.For<IAvatarProvider>());
 
             Assert.Equal(4, accounts.Count);
             Assert.Equal("lagavulin", accounts[0].Login);
@@ -126,8 +127,8 @@ public class RepositoryHostTests
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
-            var cachedAccounts = await host.GetAccounts().FirstAsync();
-            var fetchedAccounts = await host.GetAccounts().LastAsync();
+            var cachedAccounts = await host.GetAccounts(Substitute.For<IAvatarProvider>()).FirstAsync();
+            var fetchedAccounts = await host.GetAccounts(Substitute.For<IAvatarProvider>()).LastAsync();
 
             Assert.Equal(2, cachedAccounts.Count);
             Assert.Equal("foo", cachedAccounts[0].Login);
@@ -158,7 +159,7 @@ public class RepositoryHostTests
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
-            var accounts = await host.GetAccounts();
+            var accounts = await host.GetAccounts(Substitute.For<IAvatarProvider>());
 
             Assert.Equal(4, accounts.Count);
             Assert.Equal("foo", accounts[0].Login);

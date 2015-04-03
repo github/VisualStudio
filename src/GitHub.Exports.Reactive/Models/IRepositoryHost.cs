@@ -5,6 +5,7 @@ using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -23,7 +24,7 @@ namespace GitHub.Models
         /// Retrieves all the accounts associated with this host.
         /// </summary>
         /// <returns></returns>
-        IObservable<IReadOnlyList<IAccount>> GetAccounts();
+        IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider);
 
         IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password);
         IObservable<AuthenticationResult> LogInFromCache();
