@@ -18,7 +18,7 @@ namespace GitHub.Caches
             Login = account.Login;
             OwnedPrivateRepos = account.OwnedPrivateRepos;
             PrivateReposInPlan = (account.Plan == null ? 0 : account.Plan.PrivateRepos);
-            IsUser = (account as User) == null;
+            IsUser = (account as User) != null;
             PrivateReposInPlan = account.Plan != null ? account.Plan.PrivateRepos : 0;
             OwnedPrivateRepos = account.OwnedPrivateRepos;
 

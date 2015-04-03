@@ -276,11 +276,21 @@ namespace GitHub.Models
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
-            return Cache.GetUser().Select(acct => new Account(acct))
-                .Concat(Cache.GetAllOrganizations()
-                    .SelectMany(orgs => orgs.Select(org => new Account(org))))
-                .ToList()
-                .Select(accts => new ReadOnlyCollection<Account>(accts));
+            return Observable.Zip(
+                GetUser(),
+                GetOrganizations(),
+                (user, orgs) => new ReadOnlyCollection<IAccount>(user.Concat(orgs).ToList()));
+        }
+
+        IObservable<IEnumerable<IAccount>> GetOrganizations()
+        {
+            return Cache.GetAllOrganizations()
+                    .Select(orgs => orgs.Select(org => new Account(org)));
+        }
+
+        IObservable<IEnumerable<IAccount>> GetUser()
+        {
+            return Cache.GetUser().Select(user => new[] { new Account(user) });
         }
 
         protected ILoginCache LoginCache { get; private set; }
