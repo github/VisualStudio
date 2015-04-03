@@ -11,70 +11,61 @@
     xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
     xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
     mc:Ignorable="d"
-    d:DesignWidth="354"
+    d:DesignWidth="414"
     d:DesignHeight="432"
-    MinWidth="354"
-    MinHeight="432">
-    <Border FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
+    Style="{DynamicResource DialogUserControl}">
     <StackPanel
-            Margin="30,0,30,0"
-            Background="{x:Null}"
-            FocusManager.IsFocusScope="True"
-            FocusVisualStyle="{x:Null}"
-            helpers:AccessKeysManagerScoping.IsEnabled="True">
-            <ui:OcticonImage Icon="logo_github" FontSize="20" Width="200" Height="60" />
-            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12" >
-                <TextBlock 
-                    Text="Two-factor authentication" 
-                    Padding="0" 
-                    Margin="0,0,12,0"
-                    Style="{DynamicResource GitHubH1TextBlock}"
-                    Foreground="{DynamicResource GitHubLightModalViewTextBrush}"/>
-                <TextBlock 
-                    Name="authenticationSentLabel"
-                    Text="authentication code sent!" 
-                    Padding="0" 
-                    Margin="0"
-                    Style="{DynamicResource GitHubH1TextBlock}" 
-                    Foreground="{DynamicResource GitHubAccentBrush}" />
-            </WrapPanel>
+        Style="{DynamicResource DialogContainerStackPanel}"
+        helpers:AccessKeysManagerScoping.IsEnabled="True">
+        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
+        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12" >
+            <TextBlock 
+                Text="Two-factor authentication" 
+                Padding="0" 
+                Margin="0,0,12,0"
+                Style="{DynamicResource GitHubH1TextBlock}"
+                Foreground="{DynamicResource GHTextBrush}"/>
+            <TextBlock 
+                Name="authenticationSentLabel"
+                Text="authentication code sent!" 
+                Padding="0" 
+                Margin="0"
+                Style="{DynamicResource GitHubH1TextBlock}" 
+                Foreground="{DynamicResource GitHubAccentBrush}" />
+        </WrapPanel>
 
-            <ui:HorizontalShadowDivider Margin="30,0,30,20" />
+        <ui:HorizontalShadowDivider Margin="30,0,30,20" />
 
-            <TextBlock
-                Name="description"
-                Grid.Row="1"
-                Grid.ColumnSpan="2"
-                Margin="8,0,8,16"
+        <TextBlock
+            Name="description"
+            Margin="0,0,0,16"
+            HorizontalAlignment="Center"
+            TextWrapping="Wrap"
+            Style="{DynamicResource GitHubDescriptionTextBlock}"
+            Foreground="{DynamicResource GHTextBrush}">
+            Open the two-factor authentication app on your device to view your authentication code.
+            <Hyperlink NavigateUri="https://help.github.com/articles/about-two-factor-authentication" ToolTip="https://help.github.com/articles/about-two-factor-authentication">Read more</Hyperlink>
+        </TextBlock>
+        <uirx:TwoFactorInput
+            x:Name="authenticationCode"
+            TabIndex="1" />
+        <StackPanel
+                Orientation="Horizontal"
                 HorizontalAlignment="Center"
-                TextWrapping="Wrap"
-                Style="{DynamicResource GitHubDescriptionTextBlock}"
-                Foreground="{DynamicResource GitHubLightModalViewTextBrush}">
-                Open the two-factor authentication app on your device to view your authentication code.
-                <Hyperlink NavigateUri="https://help.github.com/articles/about-two-factor-authentication" ToolTip="https://help.github.com/articles/about-two-factor-authentication">Read more</Hyperlink>
-            </TextBlock>
-            <uirx:TwoFactorInput
-                x:Name="authenticationCode"
-                TabIndex="1" />
-            <StackPanel Grid.Row="4" 
-                    Grid.ColumnSpan="2" 
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,24,24,60">
-                <ui:OcticonCircleButton 
-                    x:Name="okButton" 
-                    TabIndex="2" 
-                    Icon="check"
-                    IsDefault="True"
-                    Content="Verify" />
-                <ui:OcticonLinkButton 
-                    x:Name="resendCodeButton"
-                    ToolTip="Send the code to your registered SMS Device again"
-                    FontSize="12"
-                    Icon="sync"
-                    Margin="18,0,0,0"
-                    Content="_Resend" />
-            </StackPanel>
+                Margin="0,24,0,60">
+            <ui:OcticonCircleButton 
+                x:Name="okButton" 
+                TabIndex="2" 
+                Icon="check"
+                IsDefault="True"
+                Content="Verify" />
+            <ui:OcticonLinkButton 
+                x:Name="resendCodeButton"
+                ToolTip="Send the code to your registered SMS Device again"
+                FontSize="12"
+                Icon="sync"
+                Margin="18,0,0,0"
+                Content="_Resend" />
         </StackPanel>
-    </Border>
+    </StackPanel>
 </UserControl>
