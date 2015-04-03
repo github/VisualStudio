@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
@@ -18,7 +17,6 @@ using GitHub.ViewModels;
 using GitHub.VisualStudio.TeamExplorerHome;
 using Octokit;
 using ReactiveUI;
-using Account = Octokit.Account;
 
 namespace GitHub.SampleData
 {
