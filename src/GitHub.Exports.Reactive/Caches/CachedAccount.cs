@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Primitives;
 using Octokit;
 
 namespace GitHub.Caches
@@ -23,8 +24,8 @@ namespace GitHub.Caches
             OwnedPrivateRepos = account.OwnedPrivateRepos;
 
             Uri url;
-            IsEnterprise = (Uri.TryCreate(account.Url, UriKind.Absolute, out url))
-                && url.Host.EndsWith("github.com", StringComparison.OrdinalIgnoreCase);
+            IsEnterprise = (Uri.TryCreate(account.HtmlUrl, UriKind.Absolute, out url))
+                && HostAddress.Create(url) != HostAddress.GitHubDotComHostAddress;
         }
 
         public int Id { get; set; }
