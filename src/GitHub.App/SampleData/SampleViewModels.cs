@@ -327,7 +327,7 @@ namespace GitHub.SampleData
         public AccountDesigner(string name)
         {
             Name = name;
-            Avatar = new AvatarProviderDesigner().DefaultOrgBitmapImage;
+            Avatar = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
         }
 
         public object Avatar { get; set; }
@@ -344,34 +344,6 @@ namespace GitHub.SampleData
         public string Name { get; set; }
         public int OwnedPrivateRepos { get; set; }
         public long PrivateReposInPlan { get; set; }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public class AvatarProviderDesigner : IAvatarProvider
-    {
-        public AvatarProviderDesigner()
-        {
-            DefaultUserBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
-            DefaultOrgBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
-        }
-
-        public BitmapImage DefaultUserBitmapImage { get; private set; }
-        public BitmapImage DefaultOrgBitmapImage { get; private set; }
-
-        public IObservable<BitmapSource> GetAvatar(Account apiAccount)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> InvalidateAvatar(Account apiAccount)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<BitmapSource> GetAvatar(string email)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     [ExcludeFromCodeCoverage]

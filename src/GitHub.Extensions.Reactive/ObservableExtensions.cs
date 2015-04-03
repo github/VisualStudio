@@ -61,8 +61,8 @@ namespace GitHub.Extensions.Reactive
         }
 
         public static IObservable<TSource> CatchNonCritical<TSource>(
-    this IObservable<TSource> first,
-    Func<Exception, IObservable<TSource>> second)
+            this IObservable<TSource> first,
+            Func<Exception, IObservable<TSource>> second)
         {
             return first.Catch<TSource, Exception>(e =>
             {
@@ -129,5 +129,23 @@ namespace GitHub.Extensions.Reactive
                 : Observable.Throw<T>(t.Item3));
         }
 
+        /// <summary>
+        /// Returns an observable sequence that terminates with an exception if the source observable
+        /// doesn't produce any values. If the source observable produces values or errors those are
+        /// forwarded transparently.
+        /// </summary>
+        /// <param name="source">The source observable.</param>
+        /// <param name="exc">The exception to use if the source observable doesn't produce a value.</param>
+        public static IObservable<T> ErrorIfEmpty<T>(this IObservable<T> source, Exception exc)
+        {
+            return source
+                .Materialize()
+                .Scan(Tuple.Create<bool, Notification<T>>(false, null),
+                    (prev, cur) => Tuple.Create(prev.Item1 || cur.Kind == NotificationKind.OnNext, cur))
+                .SelectMany(x => !x.Item1 && x.Item2.Kind == NotificationKind.OnCompleted
+                    ? Observable.Throw<Notification<T>>(exc)
+                    : Observable.Return(x.Item2))
+                .Dematerialize();
+        }
     }
 }

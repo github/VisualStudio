@@ -108,6 +108,13 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Caches\ImageCache.cs" />
+    <Compile Include="Extensions\AkavacheExtensions.cs" />
+    <Compile Include="Extensions\EnvironmentExtensions.cs" />
+    <Compile Include="Services\AvatarProvider.cs" />
+    <Compile Include="Services\GravatarProvider.cs" />
+    <Compile Include="Services\HostAvatarProvider.cs" />
+    <Compile Include="Services\ImageDownloader.cs" />
     <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Authentication\CredentialManagement\Credential.cs" />
@@ -155,6 +162,7 @@
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
+    <Compile Include="Services\SerializedObjectProvider.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />
     <Compile Include="Controllers\UIController.cs" />
     <Compile Include="Services\Translation.cs" />
