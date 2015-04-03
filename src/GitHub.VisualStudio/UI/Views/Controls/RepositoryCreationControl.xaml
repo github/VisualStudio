@@ -168,7 +168,7 @@
 
             <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" />
 
-            <ui:HorizontalShadowDivider Grid.Row="8" Grid.ColumnSpan="2" Margin="0,12,0,12"/>
+            <ui:HorizontalShadowDivider Grid.Row="8" Grid.ColumnSpan="2" />
 
             <ui:GitHubComboBox
                 x:Name="accountsComboBox"
