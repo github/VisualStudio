@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using GitHub.Caches;
 using GitHub.Models;
 using Account = GitHub.Models.Account;
 
@@ -7,9 +8,9 @@ namespace GitHub.Factories
     [Export(typeof(IAccountFactory))]
     public class AccountFactory : IAccountFactory
     {
-        public IAccount CreateAccount(IRepositoryHost repositoryHost, Octokit.Account user)
+        public IAccount CreateAccount(CachedAccount account)
         {
-            return new Account(user, repositoryHost.IsGitHub);
+            return new Account(account);
         }
     }
 }

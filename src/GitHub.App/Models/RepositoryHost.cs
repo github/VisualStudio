@@ -24,7 +24,7 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly User unverifiedUser = new User();
+        static readonly CachedAccount unverifiedUser = new CachedAccount();
 
         bool isLoggedIn;
         bool isLoggingIn;
@@ -80,22 +80,22 @@ namespace GitHub.Models
         {
             IsLoggingIn = true;
 
-            return ApiClient.GetUser()
+            return GetUserFromApi()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<User, Exception>(ex =>
+                .Catch<CachedAccount, Exception>(ex =>
                 {
                     if (ex is AuthorizationException)
                     {
                         IsLoggingIn = false;
                         log.Warn("Got an authorization exception", ex);
-                        return Observable.Return<User>(null);
+                        return Observable.Return<CachedAccount>(null);
                     }
                     return Cache.GetUser()
-                        .Catch<User, Exception>(e =>
+                        .Catch<CachedAccount, Exception>(e =>
                         {
                             IsLoggingIn = false;
                             log.Warn("User does not exist in cache", e);
-                            return Observable.Return<User>(null);
+                            return Observable.Return<CachedAccount>(null);
                         })
                         .ObserveOn(RxApp.MainThreadScheduler);
                 })
@@ -139,15 +139,15 @@ namespace GitHub.Models
                 // Try to get an authorization token, save it, then get the user to log in:
                 .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
-                .SelectMany(_ => ApiClient.GetUser())
-                .Catch<User, ApiException>(firstTryEx =>
+                .SelectMany(_ => GetUserFromApi())
+                .Catch<CachedAccount, ApiException>(firstTryEx =>
                 {
                     var exception = firstTryEx as AuthorizationException;
                     if (IsEnterprise
                         && exception != null
                         && exception.Message == "Bad credentials")
                     {
-                        return Observable.Throw<User>(exception);
+                        return Observable.Throw<CachedAccount>(exception);
                     }
 
                     // If the Enterprise host doesn't support the write:public_key scope, it'll return a 422.
@@ -173,12 +173,12 @@ namespace GitHub.Models
                             })
                             // Then save the authorization token (if there is one) and get the user:
                             .SelectMany(saveAuthorizationToken)
-                            .SelectMany(_ => ApiClient.GetUser());
+                            .SelectMany(_ => GetUserFromApi());
                     }
 
-                    return Observable.Throw<User>(firstTryEx);
+                    return Observable.Throw<CachedAccount>(firstTryEx);
                 })
-                .Catch<User, ApiException>(retryEx =>
+                .Catch<CachedAccount, ApiException>(retryEx =>
                 {
                     // Older Enterprise hosts either don't have the API end-point to PUT an authorization, or they
                     // return 422 because they haven't white-listed our client ID. In that case, we just ignore
@@ -188,13 +188,13 @@ namespace GitHub.Models
                     // instead of 404 to signal that it's not allowed. In the name of backwards compatibility we 
                     // test for both 404 (NotFoundException) and 403 (ForbiddenException) here.
                     if (IsEnterprise && (retryEx is NotFoundException || retryEx is ForbiddenException || retryEx.StatusCode == (HttpStatusCode)422))
-                        return ApiClient.GetUser();
+                        return GetUserFromApi();
 
                     // Other errors are "real" so we pass them along:
-                    return Observable.Throw<User>(retryEx);
+                    return Observable.Throw<CachedAccount>(retryEx);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<User, Exception>(ex =>
+                .Catch<CachedAccount, Exception>(ex =>
                 {
                     // If we get here, we have an actual login failure:
                     IsLoggingIn = false;
@@ -204,40 +204,38 @@ namespace GitHub.Models
                     }
                     if (ex is AuthorizationException)
                     {
-                        return Observable.Return(default(User));
+                        return Observable.Return(default(CachedAccount));
                     }
-                    return Observable.Throw<User>(ex);
+                    return Observable.Throw<CachedAccount>(ex);
                 })
                 .SelectMany(LoginWithApiUser)
                 .PublishAsync();
         }
 
-        IObservable<AuthenticationResult> LoginWithApiUser(User user)
+        IObservable<AuthenticationResult> LoginWithApiUser(CachedAccount user)
         {
             return Observable.Start(() =>
             {
-                    if (user == null)
-                    {
-                        IsLoggingIn = false;
-                        return AuthenticationResult.CredentialFailure;
-                    }
-                    if (user == unverifiedUser)
-                    {
-                        IsLoggingIn = false;
-                        LoginCache.EraseLogin(Address);
-                        return AuthenticationResult.VerificationFailure;
-                    }
-
-                    Cache.InsertUser(user);
-                    IsLoggedIn = true;
+                if (user == null)
+                {
                     IsLoggingIn = false;
-                    return AuthenticationResult.Success;
-                }, RxApp.MainThreadScheduler)
-                .Do(result => log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                    user != null ? user.Login : "(null)",
-                    ApiBaseUri,
-                    result.IsSuccess() ? "SUCCEEDED" : "FAILED"))
-                .PublishAsync();
+                    return AuthenticationResult.CredentialFailure;
+                }
+                if (user == unverifiedUser)
+                {
+                    IsLoggingIn = false;
+                    LoginCache.EraseLogin(Address);
+                    return AuthenticationResult.VerificationFailure;
+                }
+
+                Cache.InsertUser(user);
+                IsLoggedIn = true;
+                IsLoggingIn = false;
+                return AuthenticationResult.Success;
+            }, RxApp.MainThreadScheduler)
+            .Do(result => log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
+                user != null ? user.Login : "(null)", ApiBaseUri, result.IsSuccess() ? "SUCCEEDED" : "FAILED"))
+            .PublishAsync();
         }
 
         public IObservable<Unit> LogOut()
@@ -267,9 +265,9 @@ namespace GitHub.Models
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
-            return Cache.GetUser().Select(acct => accountFactory.CreateAccount(this, acct))
+            return Cache.GetUser().Select(acct => accountFactory.CreateAccount(acct))
                 .Concat(Cache.GetAllOrganizations()
-                    .SelectMany(orgs => orgs.Select(org => accountFactory.CreateAccount(this, org))))
+                    .SelectMany(orgs => orgs.Select(org => accountFactory.CreateAccount(org))))
                 .ToList()
                 .Select(accts => new ReadOnlyCollection<IAccount>(accts));
         }
@@ -281,6 +279,11 @@ namespace GitHub.Models
             return apiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri) ?
                 "github" :
                 apiBaseUri.Host;
+        }
+
+        IObservable<CachedAccount> GetUserFromApi()
+        {
+            return ApiClient.GetUser().Select(u => new CachedAccount(u));
         }
 
         internal string DebuggerDisplay

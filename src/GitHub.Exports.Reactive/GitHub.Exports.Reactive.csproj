@@ -78,6 +78,7 @@
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
+    <Compile Include="Caches\CachedAccount.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />

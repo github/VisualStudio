@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive;
-using GitHub.Models;
-using Octokit;
 
 namespace GitHub.Caches
 {
@@ -11,12 +9,9 @@ namespace GitHub.Caches
     /// </summary>
     public interface IHostCache : IDisposable
     {
-        IObservable<User> GetUser();
-        IObservable<Unit> InsertUser(User user);
-        IObservable<IEnumerable<Organization>> GetAllOrganizations();
-        IObservable<Unit> InsertOrganization(Organization organization);
-        IObservable<Unit> InvalidateOrganization(Organization organization);
-        IObservable<Unit> InvalidateOrganization(IAccount organization);
+        IObservable<CachedAccount> GetUser();
+        IObservable<Unit> InsertUser(CachedAccount user);
+        IObservable<IEnumerable<CachedAccount>> GetAllOrganizations();
         IObservable<Unit> InvalidateAll();
     }
 }

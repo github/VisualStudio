@@ -3,7 +3,6 @@
     public interface IAccount
     {
         bool IsEnterprise { get; }
-        bool IsGitHub { get; }
         bool IsOnFreePlan { get; }
         bool HasMaximumPrivateRepositories { get; }
         bool IsUser { get; }
