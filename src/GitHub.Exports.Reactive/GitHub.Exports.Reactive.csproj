@@ -83,7 +83,6 @@
     <Compile Include="Caches\IImageCache.cs" />
     <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
-    <Compile Include="Services\IHostAvatarProvider.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />

@@ -7,6 +7,7 @@ using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Primitives;
+using GitHub.Services;
 using NullGuard;
 using ReactiveUI;
 
@@ -39,7 +40,7 @@ namespace GitHub.Models
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }
         public IAccount User { get; private set; }
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
         {
             return Observable.Empty<IReadOnlyList<IAccount>>();
         }

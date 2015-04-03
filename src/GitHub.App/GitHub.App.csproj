@@ -113,7 +113,6 @@
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\GravatarProvider.cs" />
-    <Compile Include="Services\HostAvatarProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
     <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />

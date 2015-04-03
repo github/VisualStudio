@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GitHub.Api;
@@ -296,7 +297,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
         {
             throw new NotImplementedException();
         }
@@ -318,32 +319,17 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public sealed class AccountDesigner : ReactiveObject, IAccount
+    public sealed class AccountDesigner : GitHub.Models.Account
     {
-        public AccountDesigner()
+        public AccountDesigner() : this("some-name")
         {
         }
 
-        public AccountDesigner(string name)
+        public AccountDesigner(string login)
+            : base(new CachedAccount { Login = login },
+                  Observable.Return(ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")))
         {
-            Name = name;
-            Avatar = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
         }
-
-        public object Avatar { get; set; }
-        public string Email { get; set; }
-        public int Id { get; set; }
-        public bool IsEnterprise { get; set; }
-        public bool IsGitHub { get; set; }
-        public bool IsOnFreePlan { get; set; }
-        public bool HasMaximumPrivateRepositories { get; private set; }
-        public bool IsSelected { get; set; }
-        public bool IsUser { get; set; }
-        public IRepositoryHost Host { get; set; }
-        public string Login { get; set; }
-        public string Name { get; set; }
-        public int OwnedPrivateRepos { get; set; }
-        public long PrivateReposInPlan { get; set; }
     }
 
     [ExcludeFromCodeCoverage]

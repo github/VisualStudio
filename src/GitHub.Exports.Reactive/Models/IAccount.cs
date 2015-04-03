@@ -1,4 +1,6 @@
-﻿namespace GitHub.Models
+﻿using System.Windows.Media.Imaging;
+
+namespace GitHub.Models
 {
     public interface IAccount
     {
@@ -9,5 +11,6 @@
         string Login { get; }
         int OwnedPrivateRepos { get; }
         long PrivateReposInPlan { get; }
+        BitmapSource Avatar { get; } 
     }
 }
