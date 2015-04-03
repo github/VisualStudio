@@ -130,8 +130,6 @@
     <Compile Include="Factories\HostCacheFactory.cs" />
     <Compile Include="Factories\IBlobCacheFactory.cs" />
     <Compile Include="Factories\IHostCacheFactory.cs" />
-    <Compile Include="Caches\ILoginCache.cs" />
-    <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Caches\LoginCache.cs" />
     <Compile Include="Caches\SharedCache.cs" />
     <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
