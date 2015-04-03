@@ -33,10 +33,8 @@ namespace GitHub.ViewModels
                 .IfNullOrEmpty("Please enter your authentication code")
                 .IfNotMatch(@"^\d{6}$", "Authentication code must be exactly six digits");
 
-            OkCommand = ReactiveCommand.Create(this.WhenAny(
-                x => x.AuthenticationCodeValidator.ValidationResult.IsValid,
-                x => x.AuthenticationCode,
-                (valid, y) => valid.Value && (string.IsNullOrEmpty(y.Value) || (y.Value != null && y.Value.Length == 6))));
+            OkCommand = ReactiveCommand.Create(this.WhenAny(x => x.AuthenticationCode,
+                code => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6));
             CancelCommand = ReactiveCommand.Create();
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
