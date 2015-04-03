@@ -190,6 +190,7 @@
                 Grid.Column="1"
                 Grid.Row="11"
                 Content="Private Repository"
+                Style="{DynamicResource BlueRoundedCheckBox}"
                 Padding="8,0,0,0" />
             <Grid Grid.Column="1" Grid.Row="12">
                 <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
