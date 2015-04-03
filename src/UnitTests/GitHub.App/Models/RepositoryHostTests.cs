@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
+using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -26,7 +27,7 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(new User()));
             var hostCache = new InMemoryBlobCache();
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
 
             await host.LogIn("aUsername", "aPassowrd");
 
@@ -43,7 +44,7 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("lagavulin")));
             var hostCache = new InMemoryBlobCache();
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
 
             await host.LogIn("aUsername", "aPassword");
 
@@ -69,7 +70,7 @@ public class RepositoryHostTests
             }.ToObservable());
             var hostCache = new InMemoryBlobCache();
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
 
             var accounts = await host.GetAccounts(Substitute.For<IAvatarProvider>());
 
@@ -96,7 +97,7 @@ public class RepositoryHostTests
             await hostCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
             await hostCache.InsertObject("organizations", new[] { new CachedAccount(CreateOctokitUser("bar")) });
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
 
             var cachedAccounts = await host.GetAccounts(Substitute.For<IAvatarProvider>()).FirstAsync();
             var fetchedAccounts = await host.GetAccounts(Substitute.For<IAvatarProvider>()).LastAsync();
@@ -127,7 +128,7 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             await hostCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
 
             var accounts = await host.GetAccounts(Substitute.For<IAvatarProvider>());
 
