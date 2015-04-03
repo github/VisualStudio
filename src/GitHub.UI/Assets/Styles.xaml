@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:ui="clr-namespace:GitHub.UI"
+                    xmlns:helpers="clr-namespace:GitHub.Helpers"
                     mc:Ignorable="PresentationOptions">
 
 
@@ -10,54 +12,21 @@
     <SolidColorBrush x:Key="GitHubAccentBrush" Color="{StaticResource GitHubAccentColor}"
                      PresentationOptions:Freeze="true" />
 
-    <!-- Modal views display on the shell all use this as their bg color -->
-    <SolidColorBrush x:Key="GitHubModalBackgroundFill" Color="#4D000000"
-                     PresentationOptions:Freeze="true" />
-
-    <Color x:Key="GitHubLightModalViewBackgroundColor">White</Color>
-    <SolidColorBrush x:Key="GitHubLightModalViewBackground" Color="{StaticResource GitHubLightModalViewBackgroundColor}"
-                     PresentationOptions:Freeze="true" />
-
-    <Color x:Key="GitHubLightModalViewTextColor">#333</Color>
-    <SolidColorBrush x:Key="GitHubLightModalViewTextBrush" Color="{StaticResource GitHubLightModalViewTextColor}"
-                     PresentationOptions:Freeze="true" />
-
     <!-- Default text colors -->
     <Color x:Key="GHTextColor">#333</Color>
-    <SolidColorBrush x:Key="GHTextBrush" Color="{StaticResource GHTextColor}"
-                     PresentationOptions:Freeze="true" />
-
-    <Color x:Key="GHBackgroundColor">White</Color>
-    <SolidColorBrush x:Key="GHBackgroundBrush" Color="{StaticResource GHBackgroundColor}"
-                     PresentationOptions:Freeze="true" />
-
-    <Color x:Key="GHTextSecondaryColor">#666</Color>
-    <SolidColorBrush x:Key="GHTextSecondaryBrush" Color="{StaticResource GHTextSecondaryColor}"
-                     PresentationOptions:Freeze="true" />
+    <SolidColorBrush x:Key="GHTextBrush" Color="{StaticResource GHTextColor}" PresentationOptions:Freeze="true" />
 
     <!-- Link Button colors -->
     <Color x:Key="GHLinkButtonTextColor">#333</Color>
     <SolidColorBrush x:Key="GHLinkButtonTextBrush" Color="{StaticResource GHLinkButtonTextColor}"
                      PresentationOptions:Freeze="true" />
 
-    <Color x:Key="GHLinkButtonIconColor">#666</Color>
-    <SolidColorBrush x:Key="GHLinkButtonIconBrush" Color="{StaticResource GHLinkButtonIconColor}"
-                     PresentationOptions:Freeze="true" />
-
     <Color x:Key="GHLinkButtonHoverColor">#222</Color>
     <SolidColorBrush x:Key="GHLinkButtonHoverBrush" Color="{StaticResource GHLinkButtonHoverColor}"
                      PresentationOptions:Freeze="true" />
 
-    <Color x:Key="GHLinkButtonHoverIconColor">#222</Color>
-    <SolidColorBrush x:Key="GHLinkButtonHoverIconBrush" Color="{StaticResource GHLinkButtonHoverIconColor}"
-                     PresentationOptions:Freeze="true" />
-
     <Color x:Key="GHLinkButtonPressedColor">#121212</Color>
     <SolidColorBrush x:Key="GHLinkButtonPressedBrush" Color="{StaticResource GHLinkButtonPressedColor}"
-                     PresentationOptions:Freeze="true" />
-
-    <Color x:Key="GHLinkButtonPressedIconColor">#121212</Color>
-    <SolidColorBrush x:Key="GHLinkButtonPressedIconBrush" Color="{StaticResource GHLinkButtonPressedIconColor}"
                      PresentationOptions:Freeze="true" />
 
     <!-- Blue Link Button colors -->
@@ -145,11 +114,7 @@
     <SolidColorBrush x:Key="GitHubErrorBrush" Color="{StaticResource GitHubErrorColor}"
                      PresentationOptions:Freeze="true" />
 
-    <!-- the background is white, yo-->
-    <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="White"/>
-
     <!-- TextBox -->
-
     <SolidColorBrush x:Key="GitHubTextBoxForegroundBrush" Color="#FF333333"
                      PresentationOptions:Freeze="true" />
     <SolidColorBrush x:Key="GitHubTextBoxBorderBrush" Color="#FFCACACA"
@@ -218,4 +183,14 @@
         </Setter>
     </Style>
 
+    <Style x:Key="DialogUserControl" TargetType="UserControl">
+        <Setter Property="Margin" Value="30" />
+    </Style>
+    
+    <Style x:Key="DialogContainerStackPanel" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusManager.IsFocusScope" Value="True" />
+        <Setter Property="helpers:AccessKeysManagerScoping.IsEnabled" Value="True" />
+    </Style>
 </ResourceDictionary>

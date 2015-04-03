@@ -10,9 +10,9 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="432" d:DesignWidth="354"
-             Background="White">
-
+             d:DesignHeight="432"
+             d:DesignWidth="414"
+             Style="{DynamicResource DialogUserControl}">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
@@ -21,7 +21,7 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <StackPanel>
+    <StackPanel Style="{DynamicResource DialogContainerStackPanel}">
         <Grid
             Margin="40,12,40,0"
             FocusManager.IsFocusScope="True"

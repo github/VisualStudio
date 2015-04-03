@@ -9,8 +9,10 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Background="White">
+             mc:Ignorable="d"
+             d:DesignWidth="414"
+             d:DesignHeight="432"
+             Background="Transparent">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
