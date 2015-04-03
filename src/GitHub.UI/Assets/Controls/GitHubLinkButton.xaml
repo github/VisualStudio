@@ -5,7 +5,7 @@
         <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonTextBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource GHBlueLinkButtonTextBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource NegativeMarginFocusVisual}" />
         <Setter Property="ToolTipService.ShowDuration" Value="30000" />
         <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
