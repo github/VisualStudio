@@ -210,28 +210,43 @@ namespace GitHub.Models
 
         IObservable<AuthenticationResult> LoginWithApiUser(CachedAccount user)
         {
-            return Observable.Start(() =>
-            {
-                if (user == null)
+            return GetAuthenticationResultForUser(user)
+                .SelectMany(result =>
                 {
-                    IsLoggingIn = false;
-                    return AuthenticationResult.CredentialFailure;
-                }
-                if (user == unverifiedUser)
-                {
-                    IsLoggingIn = false;
-                    LoginCache.EraseLogin(Address);
-                    return AuthenticationResult.VerificationFailure;
-                }
+                    if (result.IsSuccess())
+                    {
+                        return Cache.InsertUser(user).Select(_ => result);
+                    }
 
-                Cache.InsertUser(user);
-                IsLoggedIn = true;
-                IsLoggingIn = false;
-                return AuthenticationResult.Success;
-            }, RxApp.MainThreadScheduler)
-            .Do(result => log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                user != null ? user.Login : "(null)", ApiBaseUri, result.IsSuccess() ? "SUCCEEDED" : "FAILED"))
-            .PublishAsync();
+                    if (result == AuthenticationResult.VerificationFailure)
+                    {
+                        return LoginCache.EraseLogin(Address).Select(_ => result);
+                    }
+                    return Observable.Return(result);
+                })
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Do(result =>
+                 {
+                    IsLoggingIn = false;
+
+                    if (result.IsSuccess())
+                    {
+                        IsLoggedIn = true;
+                    }
+
+                    log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
+                        user != null ? user.Login : "(null)",
+                        ApiBaseUri,
+                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
+                });
+        }
+
+        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(CachedAccount account)
+        {
+            return Observable.Return(account == null ? AuthenticationResult.CredentialFailure
+                : account == unverifiedUser
+                    ? AuthenticationResult.VerificationFailure
+                    : AuthenticationResult.Success); 
         }
 
         public IObservable<Unit> LogOut()
