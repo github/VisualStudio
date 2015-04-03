@@ -34,7 +34,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.ResendCodeCommand, view => view.resendCodeButton));
 
                 d(this.Bind(ViewModel, vm => vm.AuthenticationCode, view => view.authenticationCode.Text));
-                d(this.OneWayBind(ViewModel, vm => vm.AuthenticationCodeValidator, v => v.authenticationCodeValidationMessage.ReactiveValidator));
 
                 d(this.OneWayBind(ViewModel, vm => vm.IsAuthenticationCodeSent,
                     view => view.authenticationSentLabel.Visibility));

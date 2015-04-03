@@ -78,11 +78,6 @@ namespace GitHub.VisualStudio.Base
 
         protected async void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
         {
-            var b = browser.Value;
-            Debug.Assert(b != null, "Could not create a browser helper instance.");
-            if (b == null)
-                return;
-
             var repo = await SimpleApiClient.GetRepository();
             var url = repo.HtmlUrl;
 
@@ -91,9 +86,8 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             var wiki = new Uri(repo.HtmlUrl + "/" + endpoint);
-            b.OpenUrl(wiki);
+            OpenInBrowser(browser, wiki);
         }
-
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
         {

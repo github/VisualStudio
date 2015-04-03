@@ -99,11 +99,10 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            cacheData.connections.All(c =>
+            cacheData.connections.ForEach(c =>
             {
                 if (c.HostUrl != null)
                     AddConnection(HostAddress.Create(c.HostUrl), c.UserName);
-                return true;
             });
         }
 
