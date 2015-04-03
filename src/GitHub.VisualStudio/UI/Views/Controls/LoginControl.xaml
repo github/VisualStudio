@@ -34,7 +34,7 @@
             IsHitTestVisible="False"
             Text="Log in" />
             
-        <ui:HorizontalShadowDivider Margin="30,0,30,20" />
+        <ui:HorizontalShadowDivider />
             
         <TabControl 
             x:Name="hostTabControl"

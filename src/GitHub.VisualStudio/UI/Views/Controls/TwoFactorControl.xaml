@@ -34,7 +34,7 @@
                 Foreground="{DynamicResource GitHubAccentBrush}" />
         </WrapPanel>
 
-        <ui:HorizontalShadowDivider Margin="30,0,30,20" />
+        <ui:HorizontalShadowDivider />
 
         <TextBlock
             Name="description"
