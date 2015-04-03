@@ -92,11 +92,6 @@ namespace GitHub.ViewModels
                         TwoFactorType = TwoFactorType.None;
                     }
                     IsAuthenticationCodeSent = authenticationCodeSent;
-                })
-                .Finally(() =>
-                {
-                    AuthenticationCode = null;
-                    //TODO: ResetValidation();
                 });
         }
 
