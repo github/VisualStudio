@@ -101,7 +101,6 @@
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="ViewModels\ILoginViewModel.cs" />
-    <Compile Include="ViewModels\ITwoFactorViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

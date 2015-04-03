@@ -6,7 +6,8 @@ namespace GitHub.Authentication
 {
     public interface ITwoFactorChallengeHandler
     {
-        void SetViewModel(ITwoFactorDialogViewModel vm);
+        void SetViewModel(IViewModel vm);
+        IViewModel CurrentViewModel { get; }
         IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorRequiredException exception);
     }
 }
