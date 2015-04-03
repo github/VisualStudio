@@ -25,7 +25,7 @@ namespace GitHub.Caches
         public IObservable<CachedAccount> GetUser()
         {
             return Observable.Defer(() => userAccountCache.GetAndFetchLatest("user",
-                () => apiClient.GetUser().Select(user => new CachedAccount(user))));
+                () => apiClient.GetUser().WhereNotNull().Select(user => new CachedAccount(user))));
         }
 
         public IObservable<Unit> InsertUser(CachedAccount user)
@@ -37,7 +37,7 @@ namespace GitHub.Caches
         {
             return Observable.Defer(() =>
                 userAccountCache.GetAndFetchLatest("organizations",
-                    () => apiClient.GetOrganizations().Select(org => new CachedAccount(org)).ToList()));
+                    () => apiClient.GetOrganizations().WhereNotNull().Select(org => new CachedAccount(org)).ToList()));
         }
 
         public IObservable<Unit> InvalidateAll()
