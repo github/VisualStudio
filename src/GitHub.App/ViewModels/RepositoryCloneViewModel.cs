@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using GitHub.Extensions;
+using GitHub.Caches;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
-using System.Globalization;
 
 namespace GitHub.ViewModels
 {
@@ -36,7 +37,7 @@ namespace GitHub.ViewModels
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
             RepositoryHost.Cache.GetUser()
-                .Catch<User, KeyNotFoundException>(_ => Observable.Empty<User>())
+                .Catch<CachedAccount, KeyNotFoundException>(_ => Observable.Empty<CachedAccount>())
                 .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
                 .Select(repo => new RepositoryModel(repo) { HasLocalClone = LocalRepoExists(repo) })

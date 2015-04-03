@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -10,15 +11,11 @@ using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
-using GitHub.Factories;
 using GitHub.Primitives;
-using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
-using Authorization = Octokit.Authorization;
 
 namespace GitHub.Models
 {
@@ -26,18 +23,15 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly CachedAccount unverifiedUser = new CachedAccount();
 
         bool isLoggedIn;
         bool isLoggingIn;
-        bool isSelected;
-        IAccount userAccount;
-        readonly IAccountFactory accountFactory;
 
         public RepositoryHost(
             IApiClient apiClient,
             IHostCache hostCache,
-            ILoginCache loginCache,
-            IAccountFactory accountFactory)
+            ILoginCache loginCache)
         {
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
@@ -47,30 +41,9 @@ namespace GitHub.Models
             IsGitHub = ApiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri);
             Cache = hostCache;
             LoginCache = loginCache;
-            this.accountFactory = accountFactory;
 
             IsEnterprise = !IsGitHub;
-            Organizations = new ReactiveList<IAccount>();
             Title = MakeTitle(ApiBaseUri);
-
-            Accounts = new ReactiveList<IAccount>();
-
-            this.WhenAny(x => x.IsLoggedIn, x => x.Value)
-                 .Where(loggedIn => loggedIn)
-                 .Subscribe(_ => OnUserLoggedIn(User));
-
-            this.WhenAny(x => x.IsLoggedIn, x => x.Value)
-                .Skip(1) // so we don't log the account out on the initial evaluation of the WhenAny
-                .Where(loggedIn => !loggedIn)
-                .Subscribe(_ => OnUserLoggedOut());
-
-            this.WhenAny(x => x.Organizations.ItemsAdded, x => x.Value)
-                .SelectMany(x => x)
-                .Subscribe(OnOrgAdded);
-
-            this.WhenAny(x => x.Organizations.ItemsRemoved, x => x.Value)
-                .SelectMany(x => x)
-                .Subscribe(OnOrgRemoved);
         }
 
         Uri ApiBaseUri { get; set; }
@@ -84,11 +57,6 @@ namespace GitHub.Models
 
         public bool IsEnterprise { get; private set; }
 
-        public bool IsLocal
-        {
-            get { return false; }
-        }
-
         public bool IsLoggedIn
         {
             get { return isLoggedIn; }
@@ -101,58 +69,35 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggingIn, value); }
         }
 
-        public bool IsSelected
-        {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref isSelected, value); }
-        }
-
-        public ReactiveList<IAccount> Organizations { get; private set; }
-
         public string Title { get; private set; }
-
-        public IAccount User
-        {
-            get { return userAccount; }
-            private set { this.RaiseAndSetIfChanged(ref userAccount, value); }
-        }
-
-        public ReactiveList<IAccount> Accounts { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public IObservable<AuthenticationResult> LogInFromCache()
         {
             IsLoggingIn = true;
 
-            return ApiClient.GetUser()
+            return GetUserFromApi()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<User, Exception>(ex =>
+                .Catch<CachedAccount, Exception>(ex =>
                 {
                     if (ex is AuthorizationException)
                     {
                         IsLoggingIn = false;
                         log.Warn("Got an authorization exception", ex);
-                        return Observable.Return<User>(null);
+                        return Observable.Return<CachedAccount>(null);
                     }
                     return Cache.GetUser()
-                        .Catch<User, Exception>(e =>
+                        .Catch<CachedAccount, Exception>(e =>
                         {
                             IsLoggingIn = false;
                             log.Warn("User does not exist in cache", e);
-                            return Observable.Return<User>(null);
+                            return Observable.Return<CachedAccount>(null);
                         })
                         .ObserveOn(RxApp.MainThreadScheduler);
                 })
                 .SelectMany(LoginWithApiUser)
-                .Do(result =>
-                {
-                    if (result.IsFailure()) return;
-                    AddCachedOrganizations();
-                })
                 .PublishAsync();
         }
-
-        static readonly User unverifiedUser = new User();
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
@@ -190,15 +135,15 @@ namespace GitHub.Models
                 // Try to get an authorization token, save it, then get the user to log in:
                 .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
-                .SelectMany(_ => ApiClient.GetUser())
-                .Catch<User, ApiException>(firstTryEx =>
+                .SelectMany(_ => GetUserFromApi())
+                .Catch<CachedAccount, ApiException>(firstTryEx =>
                 {
                     var exception = firstTryEx as AuthorizationException;
                     if (IsEnterprise
                         && exception != null
                         && exception.Message == "Bad credentials")
                     {
-                        return Observable.Throw<User>(exception);
+                        return Observable.Throw<CachedAccount>(exception);
                     }
 
                     // If the Enterprise host doesn't support the write:public_key scope, it'll return a 422.
@@ -224,12 +169,12 @@ namespace GitHub.Models
                             })
                             // Then save the authorization token (if there is one) and get the user:
                             .SelectMany(saveAuthorizationToken)
-                            .SelectMany(_ => ApiClient.GetUser());
+                            .SelectMany(_ => GetUserFromApi());
                     }
 
-                    return Observable.Throw<User>(firstTryEx);
+                    return Observable.Throw<CachedAccount>(firstTryEx);
                 })
-                .Catch<User, ApiException>(retryEx =>
+                .Catch<CachedAccount, ApiException>(retryEx =>
                 {
                     // Older Enterprise hosts either don't have the API end-point to PUT an authorization, or they
                     // return 422 because they haven't white-listed our client ID. In that case, we just ignore
@@ -239,13 +184,13 @@ namespace GitHub.Models
                     // instead of 404 to signal that it's not allowed. In the name of backwards compatibility we 
                     // test for both 404 (NotFoundException) and 403 (ForbiddenException) here.
                     if (IsEnterprise && (retryEx is NotFoundException || retryEx is ForbiddenException || retryEx.StatusCode == (HttpStatusCode)422))
-                        return ApiClient.GetUser();
+                        return GetUserFromApi();
 
                     // Other errors are "real" so we pass them along:
-                    return Observable.Throw<User>(retryEx);
+                    return Observable.Throw<CachedAccount>(retryEx);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<User, Exception>(ex =>
+                .Catch<CachedAccount, Exception>(ex =>
                 {
                     // If we get here, we have an actual login failure:
                     IsLoggingIn = false;
@@ -255,55 +200,60 @@ namespace GitHub.Models
                     }
                     if (ex is AuthorizationException)
                     {
-                        return Observable.Return(default(User));
+                        return Observable.Return(default(CachedAccount));
                     }
-                    return Observable.Throw<User>(ex);
+                    return Observable.Throw<CachedAccount>(ex);
                 })
                 .SelectMany(LoginWithApiUser)
-                .Do(result =>
-                {
-                    if (result.IsFailure()) return;
-                    RefreshOrgs().Subscribe(
-                        _ => { },
-                        ex => log.Warn("Failed to refresh orgs.", ex));
-                })
                 .PublishAsync();
         }
 
-        IObservable<AuthenticationResult> LoginWithApiUser(User user)
+        IObservable<AuthenticationResult> LoginWithApiUser(CachedAccount user)
         {
-            return Observable.Start(() =>
-            {
-                    if (user == null)
+            return GetAuthenticationResultForUser(user)
+                .SelectMany(result =>
+                {
+                    if (result.IsSuccess())
                     {
-                        IsLoggingIn = false;
-                        return AuthenticationResult.CredentialFailure;
-                    }
-                    if (user == unverifiedUser)
-                    {
-                        IsLoggingIn = false;
-                        LoginCache.EraseLogin(Address);
-                        return AuthenticationResult.VerificationFailure;
+                        return Cache.InsertUser(user).Select(_ => result);
                     }
 
-                    Cache.InsertUser(user);
-                    User = accountFactory.CreateAccount(this, user);
-                    IsLoggedIn = true;
+                    if (result == AuthenticationResult.VerificationFailure)
+                    {
+                        return LoginCache.EraseLogin(Address).Select(_ => result);
+                    }
+                    return Observable.Return(result);
+                })
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Do(result =>
+                 {
                     IsLoggingIn = false;
-                    return AuthenticationResult.Success;
-                }, RxApp.MainThreadScheduler)
-                .Do(result => log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                    user != null ? user.Login : "(null)",
-                    ApiBaseUri,
-                    result.IsSuccess() ? "SUCCEEDED" : "FAILED"))
-                .PublishAsync();
+
+                    if (result.IsSuccess())
+                    {
+                        IsLoggedIn = true;
+                    }
+
+                    log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
+                        user != null ? user.Login : "(null)",
+                        ApiBaseUri,
+                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
+                });
+        }
+
+        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(CachedAccount account)
+        {
+            return Observable.Return(account == null ? AuthenticationResult.CredentialFailure
+                : account == unverifiedUser
+                    ? AuthenticationResult.VerificationFailure
+                    : AuthenticationResult.Success); 
         }
 
         public IObservable<Unit> LogOut()
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged user {0} off of host '{1}'", User.Login, ApiBaseUri);
+            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", ApiBaseUri);
 
             return LoginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
@@ -321,84 +271,29 @@ namespace GitHub.Models
                 .Finally(() =>
                 {
                     IsLoggedIn = false;
-                    Organizations.Clear();
-                    User = null;
                 });
         }
 
-        public IObservable<Unit> Refresh()
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
-            return Refresh(h => Observable.Return(Unit.Default));
+            return Observable.Zip(
+                GetUser(),
+                GetOrganizations(),
+                (user, orgs) => new ReadOnlyCollection<IAccount>(user.Concat(orgs).ToList()));
         }
 
-        public IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc)
+        IObservable<IEnumerable<IAccount>> GetOrganizations()
         {
-            if (!IsLoggedIn) return Observable.Return(Unit.Default);
+            return Cache.GetAllOrganizations()
+                    .Select(orgs => orgs.Select(org => new Account(org)));
+        }
 
-            try
-            {
-                return Observable.Merge(
-                    RefreshUser(),
-                    RefreshOrgs())
-                    .AsCompletion()
-                    .SelectMany(_ => refreshTrackedRepositoriesFunc(this))
-                    .Catch<Unit, Exception>(ex =>
-                    {
-                        log.Warn("Refresh failed.", ex);
-                        return ex.ShowUserErrorMessage(ErrorType.RefreshFailed)
-                            .AsCompletion();
-                    });
-            }
-            catch (Exception ex)
-            {
-                log.Warn("Repository host refresh failed.", ex);
-                return ex.ShowUserErrorMessage(ErrorType.RefreshFailed)
-                    .AsCompletion();
-            }
+        IObservable<IEnumerable<IAccount>> GetUser()
+        {
+            return Cache.GetUser().Select(user => new[] { new Account(user) });
         }
 
         protected ILoginCache LoginCache { get; private set; }
-
-        void AddCachedOrganizations()
-        {
-            Cache.GetAllOrganizations()
-                .Select(orgs => orgs.Where(o => o != null))
-                .Where(orgs => orgs.Any())
-                .Select(orgs => orgs.OrderBy(org => org.Login))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(
-                    AddCachedOrganizations,
-                    ex => log.Warn("Failed to get orgs from cache.", ex));
-        }
-
-        void AddCachedOrganizations(IEnumerable<Organization> ghOrgs)
-        {
-            if (ghOrgs == null) return;
-
-            var orgs = ghOrgs.Select(ghOrg => accountFactory.CreateAccount(this, ghOrg))
-                .Except(Organizations, (first, second) => first.Id == second.Id); // only add from cache if not already there
-
-            // instead of AddRange here, we need to add the
-            // items one at a time so the ItemAdded and ItemRemoved
-            // signals are raised for the account list
-            foreach (var org in orgs)
-            {
-                Organizations.Add(org);
-            }
-        }
-
-        void AddOrUpdateOrg(IAccount org)
-        {
-            if (org == null) return;
-
-            var existingOrg = Organizations.SingleOrDefault(x => x.Id == org.Id);
-            if (existingOrg == null)
-            {
-                Organizations.Add(org);
-                return;
-            }
-            Organizations[Organizations.IndexOf(existingOrg)] = org;
-        }
 
         static string MakeTitle(Uri apiBaseUri)
         {
@@ -407,113 +302,9 @@ namespace GitHub.Models
                 apiBaseUri.Host;
         }
 
-        void RefreshOrgs(ICollection<IAccount> orgs)
+        IObservable<CachedAccount> GetUserFromApi()
         {
-            orgs.ForEach(org =>
-            {
-                AddOrUpdateOrg(org);
-
-                ApiClient.GetOrganization(org.Login)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(
-                        ghOrg =>
-                        {
-                            Cache.InsertOrganization(ghOrg);
-                            UpdateOrg(ghOrg);
-                        },
-                        ex => log.Warn("Failed to get organization.", ex));
-            });
-
-            var orgsToRemove = Organizations.Except(orgs, (x, y) => x.Id == y.Id).ToArray();
-
-            orgsToRemove.ForEach(orgToRemove => Cache.InvalidateOrganization(orgToRemove));
-
-            RemoveOrgs(orgsToRemove);
-        }
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        IObservable<Unit> RefreshOrgs()
-        {
-            return ApiClient.GetOrganizations()
-                .WhereNotNull()
-                .ToArray()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(ghOrgs => ghOrgs
-                    .OrderBy(ghOrg => ghOrg.Login)
-                    .Select(org => accountFactory.CreateAccount(this, org))
-                    .ToArray())
-                .Select(ghOrgs =>
-                {
-                    RefreshOrgs(ghOrgs);
-                    return Unit.Default;
-                })
-                .PublishAsync();
-        }
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        IObservable<Unit> RefreshUser()
-        {
-            return ApiClient.GetUser()
-                .WhereNotNull()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(ghUser =>
-                {
-                    Cache.InsertUser(ghUser);
-                    if (User != null)
-                        User.Update(ghUser);
-
-                    return Unit.Default;
-                })
-                .PublishAsync();
-        }
-
-        void RemoveOrgs(IEnumerable<IAccount> orgs)
-        {
-            orgs.ForEach(org =>
-            {
-                var orgToRemove = Organizations.SingleOrDefault(o => org.Id == o.Id);
-                if (orgToRemove != null)
-                    Organizations.Remove(orgToRemove);
-            });
-        }
-
-        void UpdateOrg(Organization ghOrg)
-        {
-            if (ghOrg == null) return;
-
-            var existingOrg = Organizations.SingleOrDefault(x => x.Id == ghOrg.Id);
-            if (existingOrg != null)
-                existingOrg.Update(ghOrg);
-        }
-
-
-        void OnOrgAdded(IAccount account)
-        {
-            var accountTile = Accounts.SingleOrDefault(x => x != null && x.Id == account.Id);
-
-            if (accountTile == null)
-            {
-                Accounts.Add(account);
-            }
-        }
-
-        void OnOrgRemoved(IAccount account)
-        {
-            var accountTile = Accounts.SingleOrDefault(x => x != null && x.Id == account.Id);
-
-            if (accountTile == null) return;
-
-            Accounts.Remove(accountTile);
-        }
-
-        void OnUserLoggedIn(IAccount account)
-        {
-            Accounts.Insert(0, account);
-        }
-
-        void OnUserLoggedOut()
-        {
-            Accounts.Clear();
+            return ApiClient.GetUser().Select(u => new CachedAccount(u));
         }
 
         internal string DebuggerDisplay

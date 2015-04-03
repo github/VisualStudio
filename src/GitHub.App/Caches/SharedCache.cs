@@ -17,7 +17,6 @@ namespace GitHub.Caches
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
-        const string staffModeKey = "__StaffOnlySettings__:IsStaffMode";
 
         // TODO Use this instead.
         //public SharedCache()
@@ -53,16 +52,6 @@ namespace GitHub.Caches
         public IObservable<Unit> InvalidateEnterpriseHostUri()
         {
             return UserAccount.InvalidateObject<Uri>(enterpriseHostApiBaseUriCacheKey);
-        }
-
-        public IObservable<bool> GetStaffMode()
-        {
-            return UserAccount.GetOrFetchObject(staffModeKey, () => Observable.Return(false));
-        }
-
-        public IObservable<Unit> SetStaffMode(bool staffMode)
-        {
-            return UserAccount.InsertObject(staffModeKey, staffMode);
         }
 
         public IDisposable BindPropertyToCache<TSource, TProperty>(TSource source,

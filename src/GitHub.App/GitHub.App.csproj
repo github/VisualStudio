@@ -141,14 +141,11 @@
     <Compile Include="Infrastructure\ExportWrappers.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
-    <Compile Include="Models\LocalRepositoriesAccount.cs" />
-    <Compile Include="Models\LocalRepositoriesHost.cs" />
     <Compile Include="Models\RepositoryHost.cs" />
     <Compile Include="Models\RepositoryHosts.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Models\RepositoryModel.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
-    <Compile Include="Factories\AccountFactory.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Factories\ApiClientFactory.cs" />
     <None Include="Services\Browser.cs" />
