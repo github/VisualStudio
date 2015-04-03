@@ -6,11 +6,10 @@ using ReactiveUI;
 
 namespace GitHub.Models
 {
-    public interface IRepositoryHosts : IReactiveObject
+    public interface IRepositoryHosts : IReactiveObject 
     {
         IRepositoryHost EnterpriseHost { get; set; }
         IRepositoryHost GitHubHost { get; }
-        IRepositoryHost LocalRepositoriesHost { get; }
         IObservable<AuthenticationResult> LogIn(
             HostAddress enterpriseHostAddress,
             string usernameOrEmail,

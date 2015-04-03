@@ -51,7 +51,7 @@ namespace GitHub.SampleData
 
         public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
-        public ReactiveList<IAccount> Accounts
+        public IReadOnlyList<IAccount> Accounts
         {
             get;
             private set;
@@ -266,12 +266,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public bool IsLocal
-        {
-            get;
-            private set;
-        }
-
         public bool IsLoggedIn
         {
             get;
@@ -302,6 +296,11 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts()
+        {
+            throw new NotImplementedException();
+        }
+
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
             throw new NotImplementedException();
@@ -313,16 +312,6 @@ namespace GitHub.SampleData
         }
 
         public IObservable<Unit> LogOut()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> Refresh()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<Unit> Refresh(Func<IRepositoryHost, IObservable<Unit>> refreshTrackedRepositoriesFunc)
         {
             throw new NotImplementedException();
         }
@@ -339,8 +328,6 @@ namespace GitHub.SampleData
         {
             Name = name;
             Avatar = new AvatarProviderDesigner().DefaultOrgBitmapImage;
-            IsGitHubStaff = false;
-            IsSiteAdmin = false;
         }
 
         public object Avatar { get; set; }
@@ -348,30 +335,16 @@ namespace GitHub.SampleData
         public int Id { get; set; }
         public bool IsEnterprise { get; set; }
         public bool IsGitHub { get; set; }
-        public bool IsLocal { get; set; }
         public bool IsOnFreePlan { get; set; }
         public bool HasMaximumPrivateRepositories { get; private set; }
         public bool IsSelected { get; set; }
         public bool IsUser { get; set; }
-        public bool IsSiteAdmin { get; private set; }
-        public bool IsGitHubStaff { get; private set; }
         public IRepositoryHost Host { get; set; }
         public string Login { get; set; }
         public string Name { get; set; }
         public int OwnedPrivateRepos { get; set; }
         public long PrivateReposInPlan { get; set; }
-
-        public void Update(User ghUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Organization org)
-        {
-            throw new NotImplementedException();
-        }
     }
-
 
     [ExcludeFromCodeCoverage]
     public class AvatarProviderDesigner : IAvatarProvider

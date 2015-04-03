@@ -1,12 +1,13 @@
-﻿using GitHub.Api;
+﻿using System;
+using GitHub.Api;
 using GitHub.Models;
 using Microsoft.VisualStudio.Text;
 using NSubstitute;
 using Octokit;
-using System;
 
 internal static class Args
 {
+    public static bool Boolean { get { return Arg.Any<bool>(); } }
     public static int Int32 { get { return Arg.Any<int>(); } }
     public static string String { get { return Arg.Any<string>(); } }
     public static Span Span { get { return Arg.Any<Span>(); } }

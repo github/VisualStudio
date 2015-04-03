@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
 using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
@@ -29,7 +30,7 @@ namespace GitHub.ViewModels
 
         string Description { get; set; }
 
-        ReactiveList<IAccount> Accounts { get; }
+        IReadOnlyList<IAccount> Accounts { get; }
 
         /// <summary>
         /// The account or organization that will be the owner of the created repository.

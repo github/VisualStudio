@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,12 +9,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
 using GitHub.Validation;
-using GitHub.Extensions;
 using NLog;
 using NullGuard;
 using ReactiveUI;
@@ -28,6 +29,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -52,8 +54,11 @@ namespace GitHub.ViewModels
         {
             this.repositoryCreationService = repositoryCreationService;
             Title = string.Format(CultureInfo.CurrentCulture, "Create a repository at {0}", RepositoryHost.Title);
-            Accounts = RepositoryHost.Accounts ?? new ReactiveList<IAccount>();
-            Debug.Assert(Splat.ModeDetector.InUnitTestRunner() || Accounts.Any(), "There must be at least one account");
+
+            accounts = RepositoryHost.GetAccounts()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
+            
             var selectedAccount = Accounts.FirstOrDefault();
             if (selectedAccount != null)
             {
@@ -183,7 +188,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// List of accounts (at least one)
         /// </summary>
-        public ReactiveList<IAccount> Accounts { get; private set; }
+        public IReadOnlyList<IAccount> Accounts { get { return accounts.Value; } }
 
         string baseRepositoryPath;
         /// <summary>

@@ -33,12 +33,6 @@ namespace GitHub.Caches
         IObservable<Unit> InvalidateEnterpriseHostUri();
 
         /// <summary>
-        /// Retrieves whether staff mode is enabled.
-        /// </summary>
-        /// <returns></returns>
-        IObservable<bool> GetStaffMode();
-
-        /// <summary>
         /// Helper method used to bind a property of a view model to a value in the cache.
         /// </summary>
         IDisposable BindPropertyToCache<TSource, TProperty>(TSource source,
@@ -54,12 +48,5 @@ namespace GitHub.Caches
             Func<TProperty, TCacheValue> mapToCache,
             Func<TCacheValue, TProperty> mapFromCache,
             TCacheValue defaultValue);
-
-        /// <summary>
-        /// Sets whether staff mode is enabled;
-        /// </summary>
-        /// <param name="staffMode"></param>
-        /// <returns></returns>
-        IObservable<Unit> SetStaffMode(bool staffMode);
     }
 }

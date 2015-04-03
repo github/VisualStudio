@@ -301,7 +301,7 @@ public class RepositoryCreationViewModelTests
             var host = hosts.GitHubHost;
             hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
             var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>() };
-            host.Accounts.Returns(accounts);
+            host.GetAccounts().Returns(Observable.Return(accounts));
             var vm = GetMeAViewModel(provider);
 
             Assert.Same(accounts, vm.Accounts);
@@ -421,7 +421,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
-            host.Accounts.Returns(new ReactiveList<IAccount> { account });
+            host.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -452,7 +452,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
-            host.Accounts.Returns(new ReactiveList<IAccount> { account });
+            host.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -484,7 +484,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Arg.Any<HostAddress>()).Returns(host);
-            host.Accounts.Returns(new ReactiveList<IAccount> { account });
+            host.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";

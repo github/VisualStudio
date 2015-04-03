@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
+using NullGuard;
 using ReactiveUI;
 using Rothko;
-using GitHub.Extensions;
-using System.Globalization;
-using NullGuard;
 
 namespace GitHub.ViewModels
 {
@@ -23,7 +25,7 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly ObservableAsPropertyHelper<ReactiveList<IAccount>> accounts;
+        readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly ObservableAsPropertyHelper<string> title;
@@ -53,10 +55,10 @@ namespace GitHub.ViewModels
 
             var accountsChangedObservable = this.WhenAny(x => x.SelectedHost, x => x.Value)
                 .WhereNotNull()
-                .Select(x => x.Accounts);
+                .SelectMany(host => host.GetAccounts());
 
             accounts = accountsChangedObservable
-                .ToProperty(this, x => x.Accounts, initialValue: new ReactiveList<IAccount>());
+                .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
             accountsChangedObservable
                 .Where(acts => acts.Any())
@@ -104,7 +106,7 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedHost, value); }
         }
 
-        public ReactiveList<IAccount> Accounts
+        public IReadOnlyList<IAccount> Accounts
         {
             get { return accounts.Value; }
         }
