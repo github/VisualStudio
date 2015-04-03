@@ -29,7 +29,7 @@ namespace GitHub.Authentication
                             ? Observable.Return(userError.ChallengeResult)
                             : Observable.Throw<TwoFactorChallengeResult>(exception));
             }, RxApp.MainThreadScheduler)
-            .SelectMany(x => x);
+            .Merge();
         }
     }
 }
