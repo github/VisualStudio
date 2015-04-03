@@ -7,7 +7,7 @@ using ReactiveUI;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class Account : ReactiveObject, IAccount
+    public class Account : IAccount
     {
         public Account(CachedAccount cachedAccount)
         {
