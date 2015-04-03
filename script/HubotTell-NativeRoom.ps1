@@ -16,8 +16,7 @@ $ErrorActionPreference = "Stop"
 
 Import-Module C:\psmodules\Chatterbox.psm1
 
-$Response = Send-TopicMessage "visualstudio-ci" $Message
-if ($Response.StatusCode -ne [System.Net.HttpStatusCode]::Created) {
-    Write-Error ("Expected status code 'Created' but got '{0}'" -f $Response.StatusDescription)
+$Sent = Send-TopicMessage "visualstudio-ci" $Message
+if (!$Sent) {
     exit 1
 }
