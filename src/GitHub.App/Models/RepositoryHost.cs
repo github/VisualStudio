@@ -12,7 +12,6 @@ using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
-using GitHub.Factories;
 using GitHub.Primitives;
 using NLog;
 using Octokit;
@@ -28,13 +27,11 @@ namespace GitHub.Models
 
         bool isLoggedIn;
         bool isLoggingIn;
-        readonly IAccountFactory accountFactory;
 
         public RepositoryHost(
             IApiClient apiClient,
             IHostCache hostCache,
-            ILoginCache loginCache,
-            IAccountFactory accountFactory)
+            ILoginCache loginCache)
         {
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
@@ -44,7 +41,6 @@ namespace GitHub.Models
             IsGitHub = ApiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri);
             Cache = hostCache;
             LoginCache = loginCache;
-            this.accountFactory = accountFactory;
 
             IsEnterprise = !IsGitHub;
             Title = MakeTitle(ApiBaseUri);
@@ -265,11 +261,11 @@ namespace GitHub.Models
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
-            return Cache.GetUser().Select(acct => accountFactory.CreateAccount(acct))
+            return Cache.GetUser().Select(acct => new Account(acct))
                 .Concat(Cache.GetAllOrganizations()
-                    .SelectMany(orgs => orgs.Select(org => accountFactory.CreateAccount(org))))
+                    .SelectMany(orgs => orgs.Select(org => new Account(org))))
                 .ToList()
-                .Select(accts => new ReadOnlyCollection<IAccount>(accts));
+                .Select(accts => new ReadOnlyCollection<Account>(accts));
         }
 
         protected ILoginCache LoginCache { get; private set; }

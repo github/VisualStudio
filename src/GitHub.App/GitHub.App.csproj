@@ -146,7 +146,6 @@
     <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Models\RepositoryModel.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
-    <Compile Include="Factories\AccountFactory.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Factories\ApiClientFactory.cs" />
     <None Include="Services\Browser.cs" />

@@ -96,7 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
-    <Compile Include="Factories\IAccountFactory.cs" />
     <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
     <Compile Include="Caches\IHostCache.cs" />
     <Compile Include="Factories\IRepositoryHostFactory.cs" />

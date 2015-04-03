@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
-using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
 using NSubstitute;
@@ -26,8 +25,7 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(new User()));
             var hostCache = new TestHostCache();
             var loginCache = new TestLoginCache();
-            var accountFactory = Substitute.For<IAccountFactory>();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache, accountFactory);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
             await host.LogIn("aUsername", "aPassowrd");
 
@@ -45,8 +43,7 @@ public class RepositoryHostTests
             var userCache = new InMemoryBlobCache();
             var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
             var loginCache = new TestLoginCache();
-            var accountFactory = Substitute.For<IAccountFactory>();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache, accountFactory);
+            var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
             await host.LogIn("aUsername", "aPassword");
 
