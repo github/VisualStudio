@@ -32,7 +32,7 @@ namespace GitHub.ViewModels
             : base(connection, hosts)
         {
             this.cloneService = cloneService;
-            Title = string.Format(CultureInfo.CurrentCulture, "Clone a repository from {0}", RepositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", RepositoryHost.Title);
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();

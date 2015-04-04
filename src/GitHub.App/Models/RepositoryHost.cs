@@ -299,7 +299,7 @@ namespace GitHub.Models
         static string MakeTitle(Uri apiBaseUri)
         {
             return apiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri) ?
-                "github" :
+                "GitHub" :
                 apiBaseUri.Host;
         }
 
