@@ -1,5 +1,6 @@
 ﻿using System;
 using GitHub.Primitives;
+using GitHub.UI;
 
 namespace GitHub.Models
 {
@@ -15,5 +16,6 @@ namespace GitHub.Models
         bool IsPrivate { get; }
         UriString CloneUrl { get; }
         bool HasLocalClone { get; }
+        Octicon Icon { get; }
     }
 }

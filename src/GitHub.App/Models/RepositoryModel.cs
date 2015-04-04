@@ -1,11 +1,12 @@
 ﻿using System;
-using GitHub.Primitives;
-using NullGuard;
-using ReactiveUI;
-using Octokit;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
 using System.Globalization;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using GitHub.Primitives;
+using GitHub.UI;
+using NullGuard;
+using Octokit;
+using ReactiveUI;
 
 namespace GitHub.Models
 {
@@ -19,6 +20,29 @@ namespace GitHub.Models
         string owner;
         Uri hostUri;
         UriString cloneUrl;
+
+        public RepositoryModel()
+        {
+            nameWithOwner = this.WhenAny(x => x.Name, x => x.Owner, (name, owner) => new { Name = name.Value, Owner = owner.Value })
+                .Select(x => x.Name != null && x.Owner != null ? String.Format(CultureInfo.InvariantCulture, "{0}/{1}", x.Owner, x.Name) : null)
+                .ToProperty(this, x => x.NameWithOwner, null, Scheduler.Immediate);
+        }
+
+        public RepositoryModel(Repository repo)
+        {
+            Id = repo.Id;
+            Name = repo.Name;
+            Description = repo.Description;
+            Owner = repo.Owner.Login;
+            CloneUrl = repo.CloneUrl;
+            IsPrivate = repo.Private;
+            Icon = repo.Private
+                ? Octicon.@lock
+                : repo.Fork
+                    ? Octicon.repo_forked
+                    : Octicon.repo;
+        }
+
 
         [AllowNull]
         public string Description
@@ -90,21 +114,10 @@ namespace GitHub.Models
             set { this.RaiseAndSetIfChanged(ref hasLocalClone, value); }
         }
 
-        public RepositoryModel()
+        public Octicon Icon
         {
-            nameWithOwner = this.WhenAny(x => x.Name, x => x.Owner, (name, owner) => new { Name = name.Value, Owner = owner.Value })
-                .Select(x => x.Name != null && x.Owner != null ? String.Format(CultureInfo.InvariantCulture, "{0}/{1}", x.Owner, x.Name) : null)
-                .ToProperty(this, x => x.NameWithOwner, null, Scheduler.Immediate);
-        }
-
-        public RepositoryModel(Repository repo)
-        {
-            Id = repo.Id;
-            Name = repo.Name;
-            Description = repo.Description;
-            Owner = repo.Owner.Login;
-            CloneUrl = repo.CloneUrl;
-            IsPrivate = repo.Private;
+            get;
+            private set;
         }
     }
 }
