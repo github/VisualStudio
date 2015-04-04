@@ -58,16 +58,7 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            var canCloneSelected = this.WhenAny(x => x.SelectedRepository, x => x.Value)
-                .Select(selected => selected == null
-                    ? Observable.Return(false)
-                    : selected.WhenAny(x => x.HasLocalClone, x => x.Value == false))
-                .Switch();
-
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(
-                canCloneSelected.StartWith(false),
-                OnCloneRepository
-            );
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
         }
