@@ -101,7 +101,6 @@ namespace GitHub.ViewModels
             private set { this.RaiseAndSetIfChanged(ref twoFactorType, value); }
         }
 
-
         public bool IsSms { get { return isSms.Value; } }
         public bool IsShowing { get { return isShowing.Value; } }
 
