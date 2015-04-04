@@ -344,8 +344,8 @@ namespace GitHub.SampleData
 
         public RepositoryModelDesigner(string name, string owner)
         {
-            Owner = owner;
             Name = name;
+            Owner = new AccountDesigner(owner);
             OwnerWithSlash = owner + "/";
             NameWithOwner = OwnerWithSlash + name;
             HasRemote = IsHosted = true;
@@ -373,15 +373,13 @@ namespace GitHub.SampleData
         public bool CanViewOnHost { get; private set; }
         public IRepositoryHost RepositoryHost { get; set; }
 
-        string IRepositoryModel.Owner
+        public IAccount Owner
         {
-            get { return Owner; }
-            set { Owner = value; }
+            get;
+            set;
         }
 
         public int? OwnerId { get; set; }
-
-        public string Owner { get; set; }
         public string OwnerWithSlash { get; set; }
         public string Name { get; set; }
         public string NameWithOwner { get; set; }
@@ -416,14 +414,14 @@ namespace GitHub.SampleData
         {
             var repositories = new ReactiveList<IRepositoryModel>
             {
-                new RepositoryModel {Owner = "haacked", Name = "encourage" },
-                new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
-                new RepositoryModel {Owner = "octokit", Name = "octokit.net" },
-                new RepositoryModel {Owner = "octokit", Name = "octokit.rb" },
-                new RepositoryModel {Owner = "octokit", Name = "octokit.objc" },
-                new RepositoryModel {Owner = "github", Name = "windows" },
-                new RepositoryModel {Owner = "github", Name = "mac" },
-                new RepositoryModel {Owner = "github", Name = "github" }
+                new RepositoryModel {Owner = new AccountDesigner("haacked"), Name = "encourage" },
+                new RepositoryModel {Owner = new AccountDesigner("haacked"), Name = "haacked.com" },
+                new RepositoryModel {Owner = new AccountDesigner("octokit"), Name = "octokit.net" },
+                new RepositoryModel {Owner = new AccountDesigner("octokit"), Name = "octokit.rb" },
+                new RepositoryModel {Owner = new AccountDesigner("octokit"), Name = "octokit.objc" },
+                new RepositoryModel {Owner = new AccountDesigner("github"), Name = "windows" },
+                new RepositoryModel {Owner = new AccountDesigner("github"), Name = "mac" },
+                new RepositoryModel {Owner = new AccountDesigner("github"), Name = "github" }
             };
 
             FilteredRepositories = repositories.CreateDerivedCollection(

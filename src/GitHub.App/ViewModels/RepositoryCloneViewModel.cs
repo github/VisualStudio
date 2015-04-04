@@ -23,12 +23,12 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         RepositoryCloneViewModel(IServiceProvider provider,
-            IRepositoryCloneService cs, IRepositoryHosts hosts)
-            : this(provider.GetService<Models.IConnection>(), cs, hosts)
+            IRepositoryCloneService cs, IRepositoryHosts hosts, IAvatarProvider avatarProvider)
+            : this(provider.GetService<Models.IConnection>(), cs, hosts, avatarProvider)
         { }
         
         public RepositoryCloneViewModel(Models.IConnection connection,
-            IRepositoryCloneService cloneService, IRepositoryHosts hosts)
+            IRepositoryCloneService cloneService, IRepositoryHosts hosts, IAvatarProvider avatarProvider)
             : base(connection, hosts)
         {
             this.cloneService = cloneService;
@@ -40,7 +40,7 @@ namespace GitHub.ViewModels
                 .Catch<CachedAccount, KeyNotFoundException>(_ => Observable.Empty<CachedAccount>())
                 .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
-                .Select(repo => new RepositoryModel(repo) { HasLocalClone = LocalRepoExists(repo) })
+                .Select(repo => CreateRepository(repo, avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
@@ -71,10 +71,10 @@ namespace GitHub.ViewModels
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
         }
 
-        bool LocalRepoExists(Repository repo)
+        static IRepositoryModel CreateRepository(Repository repository, IAvatarProvider avatarProvider)
         {
-            return Directory.Exists(Path.Combine(BaseRepositoryPath, repo.Name)) &&
-                   Directory.Exists(Path.Combine(BaseRepositoryPath, repo.Name, ".git"));
+            var owner = new CachedAccount(repository.Owner);
+            return new RepositoryModel(repository, new Models.Account(owner, avatarProvider.GetAvatar(owner)));
         }
 
         bool FilterRepository(IRepositoryModel repo)
