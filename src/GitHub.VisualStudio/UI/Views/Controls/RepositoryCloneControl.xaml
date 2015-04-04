@@ -53,7 +53,7 @@
                     </Style.Triggers>
                 </Style>
                 <Style x:Key="cloneRepoHeaderStyle" TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="#000" />
+                    <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
                     <Setter Property="Margin" Value="8,6,12,6" />
                 </Style>
                 <Style x:Key="repositoryBorderStyle" TargetType="Border">
