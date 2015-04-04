@@ -17,7 +17,7 @@
                 <Setter Property="Margin" Value="0" />
             </Style>
             <Style TargetType="{x:Type Border}" x:Key="LoginButtonBorder">
-                <Setter Property="Margin" Value="0,20" />
+                <Setter Property="Margin" Value="0,0,0,15" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
             <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
