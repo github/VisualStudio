@@ -9,9 +9,17 @@ namespace GitHub.Caches
     /// </summary>
     public interface IHostCache : IDisposable
     {
-        IObservable<CachedAccount> GetUser();
+        /// <summary>
+        /// Retrieves user from the cache and then makes a request to update the cache.
+        /// </summary>
+        /// <returns></returns>
+        IObservable<CachedAccount> GetAndFetchUser();
         IObservable<Unit> InsertUser(CachedAccount user);
-        IObservable<IEnumerable<CachedAccount>> GetAllOrganizations();
+        /// <summary>
+        /// Retrieves organizations from the cache and then makes a request to update the cache.
+        /// </summary>
+        /// <returns></returns>
+        IObservable<IEnumerable<CachedAccount>> GetAndFetchOrganizations();
         IObservable<Unit> InvalidateAll();
     }
 }
