@@ -129,6 +129,7 @@
 									Foreground="#D0D0D0" />
 								
 								<ui:TrimmedTextBlock
+                                    x:Name="label"
 									VerticalAlignment="Center"
 									Text="{Binding Name}"
 									Foreground="#666"
@@ -143,7 +144,8 @@
 								</MultiDataTrigger.Conditions>
 								<MultiDataTrigger.Setters>
 									<Setter Property="Foreground" Value="White" TargetName="iconPath" />
-								</MultiDataTrigger.Setters>
+                                    <Setter Property="Foreground" Value="White" TargetName="label" />
+                                </MultiDataTrigger.Setters>
 							</MultiDataTrigger>
 						</DataTemplate.Triggers>
 					</DataTemplate>
