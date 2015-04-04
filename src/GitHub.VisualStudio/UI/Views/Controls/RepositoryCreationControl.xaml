@@ -22,12 +22,13 @@
     </d:DesignProperties.DataContext>
 
     <StackPanel Style="{DynamicResource DialogContainerStackPanel}">
-        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
+        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,-20,0,-10" />
         <ui:HorizontalShadowDivider />
 
         <Grid
             FocusManager.IsFocusScope="True"
             x:Name="loginStackPanel"
+            Margin="0,0,0,20"
             FocusVisualStyle="{x:Null}">
 
             <Grid.Resources>
@@ -81,7 +82,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-
 
             <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Name</Label>
             <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
@@ -166,9 +166,8 @@
                 </ComboBox.ItemTemplate>
             </uirx:FilteredComboBox>
 
-            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" />
-
-            <ui:HorizontalShadowDivider Grid.Row="8" Grid.ColumnSpan="2" />
+            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="7" />
+            <ui:HorizontalShadowDivider Grid.Row="8" Grid.ColumnSpan="2" Margin="0,20" />
 
             <ui:GitHubComboBox
                 x:Name="accountsComboBox"
@@ -241,7 +240,6 @@
                 IsDefault="True"
                 x:Name="createRepositoryButton"
                 HorizontalAlignment="Center"
-                Margin="0,30,0,0"
                 Icon="check">
             <TextBlock>Create</TextBlock>
         </ui:OcticonCircleButton>
