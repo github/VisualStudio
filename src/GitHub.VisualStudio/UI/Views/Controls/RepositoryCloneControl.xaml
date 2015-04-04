@@ -70,9 +70,9 @@
 				Style="{DynamicResource LightListBox}">
 				<ListBox.ItemsSource>
 					<x:Array Type="sampleData:RepositoryModelDesigner">
-						<sampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" Owner="haacked" />
-						<sampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" Owner="haacked" />
-						<sampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" Owner="reactiveui" />
+						<sampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" />
+						<sampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" />
+						<sampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" />
 						<sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" IsHosted="True" IsPrivate="True" Group="other" />
 					</x:Array>
 				</ListBox.ItemsSource>
@@ -97,8 +97,8 @@
 															Height="16"
 															Margin="10,0,6,0"
 															RenderOptions.BitmapScalingMode="HighQuality"
-															Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png" />
-														<TextBlock
+															Source="{Binding Items[0].Owner.Avatar}" />
+                                                        <TextBlock
 															Text="{Binding Path=Name}"
 															Style="{StaticResource cloneRepoHeaderStyle}" />
 													</StackPanel>

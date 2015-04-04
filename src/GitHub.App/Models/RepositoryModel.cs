@@ -17,7 +17,7 @@ namespace GitHub.Models
         string description;
         bool isPrivate = true; // All repos are assumed to be private until proven otherwise.
         readonly ObservableAsPropertyHelper<string> nameWithOwner;
-        string owner;
+        IAccount owner;
         Uri hostUri;
         UriString cloneUrl;
 
@@ -28,12 +28,12 @@ namespace GitHub.Models
                 .ToProperty(this, x => x.NameWithOwner, null, Scheduler.Immediate);
         }
 
-        public RepositoryModel(Repository repo)
+        public RepositoryModel(Repository repo, IAccount ownerAccount)
         {
             Id = repo.Id;
             Name = repo.Name;
             Description = repo.Description;
-            Owner = repo.Owner.Login;
+            Owner = ownerAccount;
             CloneUrl = repo.CloneUrl;
             IsPrivate = repo.Private;
             Icon = repo.Private
@@ -92,7 +92,7 @@ namespace GitHub.Models
         }
 
         [AllowNull]
-        public string Owner
+        public IAccount Owner
         {
             [return: AllowNull]
             get { return owner; }

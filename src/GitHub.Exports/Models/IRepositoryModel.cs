@@ -8,7 +8,7 @@ namespace GitHub.Models
     {
         HostAddress HostAddress { get; }
         int? Id { get; }
-        string Owner { get; set; }
+        IAccount Owner { get; set; }
         string Name { get; }
         string NameWithOwner { get; }
         string Description { get; }

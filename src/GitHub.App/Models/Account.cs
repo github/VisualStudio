@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
 using GitHub.Caches;
 using NullGuard;
@@ -22,7 +23,8 @@ namespace GitHub.Models
             IsOnFreePlan = cachedAccount.PrivateReposInPlan == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
 
-            avatar = bitmapSource.ToProperty(this, a => a.Avatar);
+            avatar = bitmapSource.ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, a => a.Avatar);
         }
 
         public bool IsOnFreePlan { get; private set; }

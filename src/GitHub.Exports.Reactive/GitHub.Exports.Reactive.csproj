@@ -104,7 +104,6 @@
     <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
     <Compile Include="Caches\IHostCache.cs" />
     <Compile Include="Factories\IRepositoryHostFactory.cs" />
-    <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Collections\ISelectable.cs" />
     <Compile Include="Api\IApiClient.cs" />
