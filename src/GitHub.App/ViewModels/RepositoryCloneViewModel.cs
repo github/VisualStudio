@@ -36,7 +36,8 @@ namespace GitHub.ViewModels
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
-            RepositoryHost.Cache.GetUser()
+            RepositoryHost.Cache.GetAndFetchUser()
+                .FirstAsync()
                 .Catch<CachedAccount, KeyNotFoundException>(_ => Observable.Empty<CachedAccount>())
                 .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
