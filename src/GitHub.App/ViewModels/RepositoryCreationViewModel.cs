@@ -53,7 +53,7 @@ namespace GitHub.ViewModels
             : base(connection, operatingSystem, hosts)
         {
             this.repositoryCreationService = repositoryCreationService;
-            Title = string.Format(CultureInfo.CurrentCulture, "Create a repository at {0}", RepositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", RepositoryHost.Title);
 
             accounts = RepositoryHost.GetAccounts(avatarProvider)
                 .ObserveOn(RxApp.MainThreadScheduler)
