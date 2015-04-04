@@ -400,6 +400,14 @@ namespace GitHub.SampleData
         public string Group { get; set; }
 
         public bool HasLocalClone { get; private set; }
+
+        public Octicon Icon
+        {
+            get
+            {
+                return Octicon.repo;
+            }
+        }
     }
 
     public class RepositoryCloneViewModelDesigner : IRepositoryCloneViewModel
