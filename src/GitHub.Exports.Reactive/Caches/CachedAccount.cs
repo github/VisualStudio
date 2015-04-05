@@ -16,7 +16,6 @@ namespace GitHub.Caches
 
         public CachedAccount(Account account)
         {
-            Id = account.Id;
             Login = account.Login;
             OwnedPrivateRepos = account.OwnedPrivateRepos;
             PrivateReposInPlan = (account.Plan == null ? 0 : account.Plan.PrivateRepos);
@@ -33,7 +32,6 @@ namespace GitHub.Caches
                 && HostAddress.Create(url) != HostAddress.GitHubDotComHostAddress;
         }
 
-        public int Id { get; set; }
         public string Login { get; set; }
         public bool IsUser { get; set; }
         public bool IsEnterprise { get; set; }

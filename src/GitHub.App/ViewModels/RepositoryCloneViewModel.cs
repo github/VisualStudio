@@ -39,7 +39,7 @@ namespace GitHub.ViewModels
             RepositoryHost.Cache.GetAndFetchUser()
                 .FirstAsync()
                 .Catch<CachedAccount, KeyNotFoundException>(_ => Observable.Empty<CachedAccount>())
-                .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories(user.Id))
+                .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories())
                 .SelectMany(repo => repo)
                 .Select(repo => CreateRepository(repo, avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
