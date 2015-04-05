@@ -52,11 +52,6 @@ namespace GitHub.Models
             return Observable.Return(Unit.Default);
         }
 
-        public IObservable<CachedAccount> GetUser()
-        {
-            return Observable.Empty<CachedAccount>();
-        }
-
         public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
         {
             return Observable.Empty<IEnumerable<CachedAccount>>();

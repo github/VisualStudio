@@ -263,11 +263,6 @@ namespace GitHub.SampleData
             throw new NotImplementedException();
         }
 
-        public IObservable<CachedAccount> GetUser()
-        {
-            throw new NotImplementedException();
-        }
-
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
             throw new NotImplementedException();
