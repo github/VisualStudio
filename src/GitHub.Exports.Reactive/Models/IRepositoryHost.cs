@@ -15,7 +15,6 @@ namespace GitHub.Models
         IApiClient ApiClient { get; }
         IHostCache Cache { get; }
         bool IsLoggedIn { get; }
-        bool IsEnterprise { get; }
         string Title { get; }
 
         /// <summary>

@@ -253,12 +253,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public bool IsEnterprise
-        {
-            get;
-            private set;
-        }
-
         public bool IsGitHub
         {
             get;
