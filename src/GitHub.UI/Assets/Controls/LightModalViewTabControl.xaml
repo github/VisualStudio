@@ -3,7 +3,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="LightModalViewTabControl" TargetType="{x:Type TabControl}">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="2"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -31,7 +31,6 @@
                             Grid.Row="0"
                             Grid.Column="0"
                             Width="Auto"
-                            Background="Transparent"
                             HorizontalAlignment="Center"
                             Panel.ZIndex="1"
                             IsItemsHost="true"
@@ -53,7 +52,7 @@
     </Style>
 
     <Style x:Key="LightModalViewTabItem" TargetType="{x:Type TabItem}">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource GHLinkButtonTextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,0"/>
         <Setter Property="Padding" Value="0,0,12,0"/>
@@ -64,7 +63,7 @@
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid
                         x:Name="templateRoot"
-                        Margin="12,2"
+                        Margin="0,2,0,2"
                         SnapsToDevicePixels="true"
                         Background="{TemplateBinding Background}">
                         <Grid.RowDefinitions>

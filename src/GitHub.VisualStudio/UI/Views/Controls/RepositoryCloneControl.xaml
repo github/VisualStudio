@@ -9,8 +9,10 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Background="White">
+             mc:Ignorable="d"
+             d:DesignWidth="414"
+             d:DesignHeight="432"
+             Background="Transparent">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
@@ -51,8 +53,8 @@
                     </Style.Triggers>
                 </Style>
                 <Style x:Key="cloneRepoHeaderStyle" TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="#000" />
-                    <Setter Property="Margin" Value="8,6,12,6" />
+                    <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
+                    <Setter Property="Margin" Value="0,6,12,6" />
                 </Style>
                 <Style x:Key="repositoryBorderStyle" TargetType="Border">
                     <Setter Property="BorderBrush" Value="#EAEAEA" />
@@ -68,10 +70,10 @@
 				Style="{DynamicResource LightListBox}">
 				<ListBox.ItemsSource>
 					<x:Array Type="sampleData:RepositoryModelDesigner">
-						<sampleData:RepositoryModelDesigner Name="github" IsHosted="True" IsPrivate="True" Owner="haacked" />
-						<sampleData:RepositoryModelDesigner Name="windows" IsHosted="True" IsPrivate="True" Owner="haacked" />
-						<sampleData:RepositoryModelDesigner Name="ReactiveUI" IsHosted="True" Owner="reactiveui" />
-						<sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" IsHosted="True" IsPrivate="True" Group="other" />
+						<sampleData:RepositoryModelDesigner Name="github" />
+						<sampleData:RepositoryModelDesigner Name="windows" />
+						<sampleData:RepositoryModelDesigner Name="ReactiveUI" />
+						<sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" />
 					</x:Array>
 				</ListBox.ItemsSource>
 				<ListBox.GroupStyle>
@@ -93,10 +95,10 @@
 															x:Name="avatar"
 															Width="16"
 															Height="16"
-															Margin="6,0"
+															Margin="10,0,6,0"
 															RenderOptions.BitmapScalingMode="HighQuality"
-															Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png" />
-														<TextBlock
+															Source="{Binding Items[0].Owner.Avatar}" />
+                                                        <TextBlock
 															Text="{Binding Path=Name}"
 															Style="{StaticResource cloneRepoHeaderStyle}" />
 													</StackPanel>
@@ -121,12 +123,13 @@
 									x:Name="iconPath" 
 									Width="16"
 									Height="16" 
-									Margin="30,0,6,0" 
+									Margin="32,0,6,0" 
 									VerticalAlignment="Center"
 									Icon="{Binding Icon}"
 									Foreground="#D0D0D0" />
 								
 								<ui:TrimmedTextBlock
+                                    x:Name="label"
 									VerticalAlignment="Center"
 									Text="{Binding Name}"
 									Foreground="#666"
@@ -141,7 +144,8 @@
 								</MultiDataTrigger.Conditions>
 								<MultiDataTrigger.Setters>
 									<Setter Property="Foreground" Value="White" TargetName="iconPath" />
-								</MultiDataTrigger.Setters>
+                                    <Setter Property="Foreground" Value="White" TargetName="label" />
+                                </MultiDataTrigger.Setters>
 							</MultiDataTrigger>
 						</DataTemplate.Triggers>
 					</DataTemplate>

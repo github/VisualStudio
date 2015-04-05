@@ -87,7 +87,7 @@ namespace GitHub.Models
                         log.Warn("Got an authorization exception", ex);
                         return Observable.Return<CachedAccount>(null);
                     }
-                    return Cache.GetUser()
+                    return Cache.GetAndFetchUser()
                         .Catch<CachedAccount, Exception>(e =>
                         {
                             IsLoggingIn = false;
@@ -285,13 +285,13 @@ namespace GitHub.Models
 
         IObservable<IEnumerable<IAccount>> GetOrganizations(IAvatarProvider avatarProvider)
         {
-            return Cache.GetAllOrganizations()
+            return Cache.GetAndFetchOrganizations()
                     .Select(orgs => orgs.Select(org => new Account(org, avatarProvider.GetAvatar(org))));
         }
 
         IObservable<IEnumerable<IAccount>> GetUser(IAvatarProvider avatarProvider)
         {
-            return Cache.GetUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
+            return Cache.GetAndFetchUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
         }
 
         protected ILoginCache LoginCache { get; private set; }
@@ -299,7 +299,7 @@ namespace GitHub.Models
         static string MakeTitle(Uri apiBaseUri)
         {
             return apiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri) ?
-                "github" :
+                "GitHub" :
                 apiBaseUri.Host;
         }
 

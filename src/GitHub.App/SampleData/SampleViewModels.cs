@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
@@ -18,7 +17,6 @@ using GitHub.ViewModels;
 using GitHub.VisualStudio.TeamExplorerHome;
 using Octokit;
 using ReactiveUI;
-using Account = Octokit.Account;
 
 namespace GitHub.SampleData
 {
@@ -333,75 +331,30 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class RepositoryModelDesigner : ReactiveObject, IRepositoryModel
+    public class RepositoryModelDesigner : IRepositoryModel
     {
-        public RepositoryModelDesigner()
+        public RepositoryModelDesigner() : this("repo")
         {
         }
 
-        public RepositoryModelDesigner(string name)
+        public RepositoryModelDesigner(string name) : this("repo", "github")
         {
             Name = name;
         }
 
         public RepositoryModelDesigner(string name, string owner)
         {
-            Owner = owner;
             Name = name;
-            OwnerWithSlash = owner + "/";
-            NameWithOwner = OwnerWithSlash + name;
-            HasRemote = IsHosted = true;
-            AdditionalClones = new HashSet<string>();
-            ToolTip = "Repo Tooltip";
-            IsPrivate = true;
-            CanViewOnHost = true;
+            Owner = new AccountDesigner(owner);
         }
 
-        public DateTimeOffset? LastShadowBackupTime { get; set; }
-        public string LastShadowBackupSha1 { get; set; }
-        public bool IsSelected { get; set; }
-        public HostAddress HostAddress { get; private set; }
-        public int? Id { get; set; }
-        public bool IsLostOnDisk { get; set; }
-        public string LocalWorkingDirectory { get; set; }
-        public string LocalDotGitPath { get; set; }
         public UriString CloneUrl { get; set; }
-        public UriString HttpsUrl { get; set; }
-        public UriString SshUrl { get; set; }
-        public UriString UpstreamCloneUrl { get; set; }
-        public bool HasRemote { get; set; }
-        public bool IsHosted { get; set; }
-        public bool HasLocal { get; set; }
-        public bool CanViewOnHost { get; private set; }
-        public IRepositoryHost RepositoryHost { get; set; }
 
-        string IRepositoryModel.Owner
-        {
-            get { return Owner; }
-            set { Owner = value; }
-        }
+        public Octicon Icon { get; set; }
 
-        public int? OwnerId { get; set; }
-
-        public string Owner { get; set; }
-        public string OwnerWithSlash { get; set; }
         public string Name { get; set; }
-        public string NameWithOwner { get; set; }
-        public string Description { get; set; }
-        public string ToolTip { get; set; }
-        public Uri HostUri { get; set; }
-        public bool IsCollaborator { get; set; }
-        public bool IsCloning { get; set; }
-        public bool IsFork { get; private set; }
-        public bool HasDeployedGitIgnore { get; set; }
-        public string NonGitHubRemoteHost { get; set; }
-        public HashSet<string> AdditionalClones { get; private set; }
 
-        public bool IsPrivate { get; set; }
-
-        public string Group { get; set; }
-
-        public bool HasLocalClone { get; private set; }
+        public IAccount Owner { get; set; }
     }
 
     public class RepositoryCloneViewModelDesigner : IRepositoryCloneViewModel
@@ -410,14 +363,14 @@ namespace GitHub.SampleData
         {
             var repositories = new ReactiveList<IRepositoryModel>
             {
-                new RepositoryModel {Owner = "haacked", Name = "encourage" },
-                new RepositoryModel {Owner = "haacked", Name = "haacked.com" },
-                new RepositoryModel {Owner = "octokit", Name = "octokit.net" },
-                new RepositoryModel {Owner = "octokit", Name = "octokit.rb" },
-                new RepositoryModel {Owner = "octokit", Name = "octokit.objc" },
-                new RepositoryModel {Owner = "github", Name = "windows" },
-                new RepositoryModel {Owner = "github", Name = "mac" },
-                new RepositoryModel {Owner = "github", Name = "github" }
+                new RepositoryModelDesigner("encourage", "haacked"),
+                new RepositoryModelDesigner("haacked.com", "haacked"),
+                new RepositoryModelDesigner("octokit.net", "octokit"),
+                new RepositoryModelDesigner("octokit.rb", "octokit"),
+                new RepositoryModelDesigner("octokit.objc", "octokit"),
+                new RepositoryModelDesigner("windows", "github"),
+                new RepositoryModelDesigner("mac", "github"),
+                new RepositoryModelDesigner("github", "github")
             };
 
             FilteredRepositories = repositories.CreateDerivedCollection(

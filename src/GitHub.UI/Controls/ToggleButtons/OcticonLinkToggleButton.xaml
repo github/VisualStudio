@@ -29,10 +29,10 @@
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal">
                                     <Storyboard>
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonIconColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="checked" />
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonIconColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="unchecked" />
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonIconColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="indeterminate" />
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonTextColor}" Duration="0" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" Storyboard.TargetName="contentPresenter" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="checked" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="unchecked" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="indeterminate" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" Storyboard.TargetName="contentPresenter" />
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="MouseOver">
@@ -53,10 +53,10 @@
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonDisabledIconColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="checked" />
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonDisabledIconColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="unchecked" />
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonDisabledIconColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="indeterminate" />
-                                        <ColorAnimation To="{DynamicResource GHBlueLinkButtonDisabledColor}" Duration="0" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" Storyboard.TargetName="contentPresenter" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="checked" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="unchecked" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" Storyboard.TargetName="indeterminate" />
+                                        <ColorAnimation To="{DynamicResource GHTextColor}" Duration="0" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)" Storyboard.TargetName="contentPresenter" />
 
                                         <DoubleAnimation To="0.3" Duration="0" Storyboard.TargetProperty="Opacity" />
                                     </Storyboard>

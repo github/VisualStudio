@@ -10,12 +10,9 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
-             d:DesignWidth="354"
+             d:DesignWidth="414"
              d:DesignHeight="432"
-             MinWidth="354"
-             MinHeight="432"
-             Background="White">
-
+             Style="{DynamicResource DialogUserControl}">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
@@ -24,14 +21,14 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <StackPanel>
-        <ui:OcticonImage Icon="logo_github" Width="64" Height="64"/>
-        <ui:HorizontalShadowDivider Width="120"/>
+    <StackPanel Style="{DynamicResource DialogContainerStackPanel}">
+        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,-20,0,-10" />
+        <ui:HorizontalShadowDivider />
 
         <Grid
-            Margin="40,12,40,0"
             FocusManager.IsFocusScope="True"
             x:Name="loginStackPanel"
+            Margin="0,0,0,20"
             FocusVisualStyle="{x:Null}">
 
             <Grid.Resources>
@@ -86,7 +83,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-
             <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Name</Label>
             <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
 
@@ -134,7 +130,10 @@
                 Style="{StaticResource GitHubFilterComboBox}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <TextBlock
+                            x:Name="itemName"
+                            Text="{Binding Name}"
+                            FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
                                 <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
@@ -152,19 +151,23 @@
                 Style="{StaticResource GitHubFilterComboBox}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock x:Name="itemName" Text="{Binding Name}" FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
+                        <TextBlock
+                            x:Name="itemName"
+                            Text="{Binding Name}"
+                            FontWeight="{Binding Recommended, Converter={ui:BooleanToFontWeightConverter}}" />
                         <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                            <DataTrigger
+                                Binding="{Binding  RelativeSource={RelativeSource Mode=FindAncestor,  AncestorType=ComboBoxItem}}"
+                                Value="{x:Null}">
                                 <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </uirx:FilteredComboBox>
-            
-            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2"  Grid.Row="7" />
 
-            <ui:HorizontalShadowDivider Width="120" Grid.Row="8" Grid.ColumnSpan="2" Margin="0,12,0,12"/>
+            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="7" />
+            <ui:HorizontalShadowDivider Grid.Row="8" Grid.ColumnSpan="2" Margin="0,20" />
 
             <ui:GitHubComboBox
                 x:Name="accountsComboBox"
@@ -175,7 +178,12 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Avatar}" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0" />
+                            <Image
+                                Source="{Binding Avatar}"
+                                Width="16"
+                                Height="16"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Margin="0,0,8,0" />
                             <TextBlock Text="{Binding Login}"/>
                         </StackPanel>
                     </DataTemplate>
@@ -194,6 +202,7 @@
                 Grid.Column="1"
                 Grid.Row="11"
                 Content="Private Repository"
+                Style="{DynamicResource BlueRoundedCheckBox}"
                 Padding="8,0,0,0" />
             <Grid Grid.Column="1" Grid.Row="12">
                 <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
@@ -231,10 +240,9 @@
                 IsDefault="True"
                 x:Name="createRepositoryButton"
                 HorizontalAlignment="Center"
-                Margin="0,30,0,0"
                 Icon="check">
             <TextBlock>Create</TextBlock>
         </ui:OcticonCircleButton>
-    
+
     </StackPanel>
 </UserControl>

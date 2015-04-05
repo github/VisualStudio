@@ -21,7 +21,7 @@ namespace GitHub.ViewModels
             ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
             : base(serviceProvider)
         {
-            Title = "Login";
+            Title = "Connect To GitHub";
             RepositoryHosts = hosts;
             GitHubLogin = loginToGitHubViewModel;
             EnterpriseLogin = loginToGitHubEnterpriseViewModel;
