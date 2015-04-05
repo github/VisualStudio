@@ -24,6 +24,7 @@
                 <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink x:Name="publishLink" Click="publishLink_Click">Publish</Hyperlink></TextBlock>
+                <TextBlock><Hyperlink x:Name="twoFactorTester" Click="twoFactorTester_Click">Two Factor</Hyperlink></TextBlock>
             </WrapPanel>
         </Grid>
 

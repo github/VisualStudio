@@ -39,6 +39,12 @@ namespace DesignTimeStyleHelper
             ShowDialog(UIControllerFlow.Publish);
         }
 
+        private void twoFactorTester_Click(object sender, RoutedEventArgs e)
+        {
+            var twoFactorTester = new TwoFactorInputTester();
+            twoFactorTester.ShowDialog();
+        }
+
         void ShowDialog(UIControllerFlow flow)
         {
             var ui = App.ServiceProvider.GetExportedValue<IUIProvider>();
