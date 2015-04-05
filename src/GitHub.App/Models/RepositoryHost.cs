@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
+using Akavache;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
@@ -27,11 +28,11 @@ namespace GitHub.Models
         static readonly CachedAccount unverifiedUser = new CachedAccount();
 
         readonly Uri apiBaseUri;
-        readonly IHostCache hostCache;
+        readonly IBlobCache hostCache;
         bool isLoggedIn;
         bool isEnterprise;
 
-        public RepositoryHost(IApiClient apiClient, IHostCache hostCache, ILoginCache loginCache)
+        public RepositoryHost(IApiClient apiClient, IBlobCache hostCache, ILoginCache loginCache)
         {
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
@@ -69,7 +70,7 @@ namespace GitHub.Models
                         log.Warn("Got an authorization exception", ex);
                         return Observable.Return<CachedAccount>(null);
                     }
-                    return hostCache.GetAndFetchUser()
+                    return GetUser()
                         .Catch<CachedAccount, Exception>(e =>
                         {
                             log.Warn("User does not exist in cache", e);
@@ -195,7 +196,7 @@ namespace GitHub.Models
                 {
                     if (result.IsSuccess())
                     {
-                        return hostCache.InsertUser(user).Select(_ => result);
+                        return InsertUser(user).Select(_ => result);
                     }
 
                     if (result == AuthenticationResult.VerificationFailure)
@@ -262,13 +263,13 @@ namespace GitHub.Models
 
         IObservable<IEnumerable<IAccount>> GetOrganizations(IAvatarProvider avatarProvider)
         {
-            return hostCache.GetAndFetchOrganizations()
+            return GetAllOrganizations()
                     .Select(orgs => orgs.Select(org => new Account(org, avatarProvider.GetAvatar(org))));
         }
 
         IObservable<IEnumerable<IAccount>> GetUser(IAvatarProvider avatarProvider)
         {
-            return hostCache.GetAndFetchUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
+            return GetUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
         }
 
         protected ILoginCache LoginCache { get; private set; }
@@ -283,6 +284,24 @@ namespace GitHub.Models
         IObservable<CachedAccount> GetUserFromApi()
         {
             return ApiClient.GetUser().Select(u => new CachedAccount(u));
+        }
+
+        public IObservable<CachedAccount> GetUser()
+        {
+            return Observable.Defer(() => hostCache.GetAndFetchLatest("user",
+                () => ApiClient.GetUser().WhereNotNull().Select(user => new CachedAccount(user))));
+        }
+
+        IObservable<Unit> InsertUser(CachedAccount user)
+        {
+            return hostCache.InsertObject("user", user);
+        }
+
+        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
+        {
+            return Observable.Defer(() =>
+                hostCache.GetAndFetchLatest("organizations",
+                    () => ApiClient.GetOrganizations().WhereNotNull().Select(org => new CachedAccount(org)).ToList()));
         }
 
         internal string DebuggerDisplay

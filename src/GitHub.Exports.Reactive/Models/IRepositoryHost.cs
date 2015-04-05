@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Caches;
 using GitHub.Primitives;
 using GitHub.Services;
 
@@ -24,5 +25,7 @@ namespace GitHub.Models
         IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password);
         IObservable<AuthenticationResult> LogInFromCache();
         IObservable<Unit> LogOut();
+        IObservable<CachedAccount> GetUser();
+        IObservable<IEnumerable<CachedAccount>> GetAllOrganizations();
     }
 }
