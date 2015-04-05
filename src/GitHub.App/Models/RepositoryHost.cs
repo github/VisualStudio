@@ -26,23 +26,22 @@ namespace GitHub.Models
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         static readonly CachedAccount unverifiedUser = new CachedAccount();
 
+        readonly Uri apiBaseUri;
         bool isLoggedIn;
 
         public RepositoryHost(IApiClient apiClient, IHostCache hostCache, ILoginCache loginCache)
         {
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
-            ApiBaseUri = apiClient.HostAddress.ApiUri;
+            apiBaseUri = apiClient.HostAddress.ApiUri;
             ApiClient = apiClient;
-            Debug.Assert(ApiBaseUri != null, "Mistakes were made. ApiClient must have non-null ApiBaseUri");
+            Debug.Assert(apiBaseUri != null, "Mistakes were made. ApiClient must have non-null ApiBaseUri");
             Cache = hostCache;
             LoginCache = loginCache;
 
-            IsEnterprise = !HostAddress.IsGitHubDotComUri(ApiBaseUri);
-            Title = MakeTitle(ApiBaseUri);
+            IsEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
+            Title = MakeTitle(apiBaseUri);
         }
-
-        Uri ApiBaseUri { get; set; }
 
         public HostAddress Address { get; private set; }
         public IApiClient ApiClient { get; private set; }
@@ -216,7 +215,7 @@ namespace GitHub.Models
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
                         user != null ? user.Login : "(null)",
-                        ApiBaseUri,
+                        apiBaseUri,
                         result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
         }
@@ -233,7 +232,7 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", ApiBaseUri);
+            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", apiBaseUri);
 
             return LoginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
@@ -291,7 +290,7 @@ namespace GitHub.Models
         {
             get
             {
-                return String.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, ApiBaseUri);
+                return String.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, apiBaseUri);
             }
         }
     }
