@@ -7,139 +7,137 @@
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              mc:Ignorable="d"
-             d:DesignWidth="354"
+             d:DesignWidth="414"
              d:DesignHeight="432"
-             MinWidth="354"
-             MinHeight="432"
-             Background="White">
-    <Border FocusManager.IsFocusScope="True" x:Name="LoginStackPanel" FocusVisualStyle="{x:Null}">
-        <Border.Resources>
+             Style="{DynamicResource DialogUserControl}">
+
+    <StackPanel Style="{DynamicResource DialogContainerStackPanel}">
+        <StackPanel.Resources>
             <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
             <Style TargetType="{x:Type Border}" x:Key="LoginButtonBorder">
-                <Setter Property="Margin" Value="0,20" />
+                <Setter Property="Margin" Value="0,0,0,15" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
             <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
-        </Border.Resources>
-        <StackPanel
-            Margin="30,0,30,0"
-            Background="{x:Null}"
+        </StackPanel.Resources>
+        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
+
+        <TextBlock
+            x:Name="loginLabelPrefix"
+            HorizontalAlignment="Center"
+            Margin="0,0,0,10"
+            Style="{DynamicResource GitHubH1TextBlock}"
+            IsHitTestVisible="False"
+            Text="Log in" />
+            
+        <ui:HorizontalShadowDivider />
+            
+        <TabControl 
+            x:Name="hostTabControl"
+            Style="{StaticResource LightModalViewTabControl}"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
             helpers:AccessKeysManagerScoping.IsEnabled="True">
-            <ui:OcticonImage Icon="logo_github" FontSize="20" Width="200" Height="60" />
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LightModalViewTabItem}" />
+                <Style TargetType="{x:Type TabPanel}">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
+                <Style x:Key="TabStackPanel" TargetType="{x:Type StackPanel}">
+                    <Setter Property="Margin" Value="0,20,0,0" />
+                </Style>
+                <Style x:Key="FormFieldStackPanel" TargetType="{x:Type StackPanel}">
+                    <Setter Property="Margin" Value="0,0,0,20" />
+                </Style>
+            </TabControl.Resources>
 
-            <TextBlock
-                x:Name="loginLabelPrefix"
-                HorizontalAlignment="Center"
-                Margin="0,-10,0,20"
-                Style="{DynamicResource GitHubH1TextBlock}"
-                IsHitTestVisible="False"
-                Text="Log in" />
-            
-            <ui:HorizontalShadowDivider Margin="30,0,30,20" />
-            
-            <TabControl 
-                x:Name="hostTabControl" Style="{StaticResource LightModalViewTabControl}"
-                FocusManager.IsFocusScope="True"
-                FocusVisualStyle="{x:Null}"
-                helpers:AccessKeysManagerScoping.IsEnabled="True">
-                <TabControl.Resources>
-                    <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource LightModalViewTabItem}" />
-                    <Style TargetType="{x:Type TabPanel}">
-                        <Setter Property="HorizontalAlignment" Value="Center" />
-                    </Style>
-                </TabControl.Resources>
-
-                <TabItem x:Name="dotComTab" Header="GitHub">
-                    <StackPanel Margin="0,16,0,0">
-                        <StackPanel x:Name="dotComloginControlsPanel">
-                            <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed" Margin="0,0,0,10">
-                                <TextBlock TextWrapping="Wrap">
-                                    Please make sure that you've entered your username and password
-                                    correctly, then try again (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
-                                </TextBlock>
-                            </uirx:ErrorMessageDisplay>
-
-                            <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed" Margin="0,0,0,10">
-                                <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
-                            </uirx:ErrorMessageDisplay>
-
-                            <StackPanel Margin="30,0,30,0">
-                                <StackPanel Margin="0,0,0,10">
-                                    <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
-                                    <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
-                                </StackPanel>
-                            
-                                <StackPanel Margin="0,0,0,10">
-                                    <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
-                                    <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}" />
-                                </StackPanel>
-                            </StackPanel>
-
-                        </StackPanel>
-
-                        <Border Style="{StaticResource LoginButtonBorder}">
-                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
-                        </Border>
-
-                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                            Don’t have an account? <Hyperlink NavigateUri="https://github.com/pricing?referral_code=GitHubWindows" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
-                        </TextBlock>
-                    </StackPanel>
-                </TabItem>
-
-                <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise">
-                    <StackPanel Margin="0,10,0,0">
-                        <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Margin="0,0,0,10" Message="Log in failed">
+            <TabItem x:Name="dotComTab" Header="GitHub">
+                <StackPanel Style="{StaticResource TabStackPanel}">
+                    <StackPanel x:Name="dotComloginControlsPanel">
+                        <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed" Margin="0,0,0,10">
                             <TextBlock TextWrapping="Wrap">
-                                    Please make sure that you've entered your username and password 
-                                    correctly, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
+                                Please make sure that you've entered your username and password
+                                correctly, then try again (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
-                        <uirx:ErrorMessageDisplay x:Name="enterpriseTwoFactorAuthFailedMessage" Margin="0,0,0,10" Message="Two factor authentication failed">
+                        <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed" Margin="0,0,0,10">
                             <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
                         </uirx:ErrorMessageDisplay>
 
-                        <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host" Margin="0,0,0,10">
-                            <TextBlock TextWrapping="Wrap">
-                                Failed to connect to the host or the host isn't a GitHub Enterprise server. 
-                                Please make sure that you've entered the host address correctly.
-                            </TextBlock>
-                        </uirx:ErrorMessageDisplay>
-
-                        <StackPanel x:Name="enterpriseloginControlsPanel" Margin="0,0,0,10">
+                        <StackPanel Style="{StaticResource FormFieldStackPanel}">
                             <StackPanel Margin="0,0,0,10">
-                                <ui:PromptTextBox x:Name="enterpriseUserNameOrEmail" PromptText="Username or email" />
-                                <uirx:ValidationMessage x:Name="enterpriseUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUserNameOrEmail}"/>
+                                <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
+                                <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
                             </StackPanel>
-
-                            <StackPanel Margin="0,0,0,10">
-                                <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="Password" />
-                                <uirx:ValidationMessage x:Name="enterprisePasswordValidationMessage" ValidatesControl="{Binding ElementName=enterprisePassword}"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,0,0,10">
-                                <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="GitHub Enterprise server address" />
-                                <uirx:ValidationMessage x:Name="enterpriseUrlValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUrl}" TextChangeThrottle="1.0"/>
+                            
+                            <StackPanel>
+                                <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
+                                <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}" />
                             </StackPanel>
                         </StackPanel>
-
-                        <Border Style="{StaticResource LoginButtonBorder}">
-                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
-                        </Border>
-                        
-                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                            Don’t have GitHub Enterprise? <Hyperlink x:Name="LearnMoreButton" NavigateUri="https://enterprise.github.com/" ToolTip="enterprise.github.com">Learn more</Hyperlink>
-                        </TextBlock>
                     </StackPanel>
-                </TabItem>
-            </TabControl>
-        </StackPanel>
-    </Border>
+
+                    <Border Style="{StaticResource LoginButtonBorder}">
+                        <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                    </Border>
+
+                    <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
+                        Don’t have an account? <Hyperlink NavigateUri="https://github.com/pricing?referral_code=GitHubWindows" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise" Margin="10,0,-10,0">
+                <StackPanel Style="{StaticResource TabStackPanel}">
+                    <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Margin="0,0,0,10" Message="Log in failed">
+                        <TextBlock TextWrapping="Wrap">
+                                Please make sure that you've entered your username and password 
+                                correctly, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
+                        </TextBlock>
+                    </uirx:ErrorMessageDisplay>
+
+                    <uirx:ErrorMessageDisplay x:Name="enterpriseTwoFactorAuthFailedMessage" Margin="0,0,0,10" Message="Two factor authentication failed">
+                        <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
+                    </uirx:ErrorMessageDisplay>
+
+                    <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host" Margin="0,0,0,10">
+                        <TextBlock TextWrapping="Wrap">
+                            Failed to connect to the host or the host isn't a GitHub Enterprise server. 
+                            Please make sure that you've entered the host address correctly.
+                        </TextBlock>
+                    </uirx:ErrorMessageDisplay>
+
+                    <StackPanel x:Name="enterpriseloginControlsPanel" Style="{StaticResource FormFieldStackPanel}">
+                        <StackPanel Margin="0,0,0,10">
+                            <ui:PromptTextBox x:Name="enterpriseUserNameOrEmail" PromptText="Username or email" />
+                            <uirx:ValidationMessage x:Name="enterpriseUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUserNameOrEmail}"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,10">
+                            <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="Password" />
+                            <uirx:ValidationMessage x:Name="enterprisePasswordValidationMessage" ValidatesControl="{Binding ElementName=enterprisePassword}"/>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="GitHub Enterprise server address" />
+                            <uirx:ValidationMessage x:Name="enterpriseUrlValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUrl}" TextChangeThrottle="1.0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Border Style="{StaticResource LoginButtonBorder}">
+                        <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                    </Border>
+                        
+                    <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
+                        Don’t have GitHub Enterprise? <Hyperlink x:Name="LearnMoreButton" NavigateUri="https://enterprise.github.com/" ToolTip="enterprise.github.com">Learn more</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </StackPanel>
 </UserControl>

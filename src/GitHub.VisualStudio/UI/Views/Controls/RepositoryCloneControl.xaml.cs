@@ -87,7 +87,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
-                return ((IRepositoryModel)item).Owner;
+                return ((IRepositoryModel)item).Owner.Login;
             }
 
             public override bool NamesMatch(object groupName, object itemName)

@@ -23,24 +23,25 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         RepositoryCloneViewModel(IServiceProvider provider,
-            IRepositoryCloneService cs, IRepositoryHosts hosts)
-            : this(provider.GetService<Models.IConnection>(), cs, hosts)
+            IRepositoryCloneService cs, IRepositoryHosts hosts, IAvatarProvider avatarProvider)
+            : this(provider.GetService<Models.IConnection>(), cs, hosts, avatarProvider)
         { }
         
         public RepositoryCloneViewModel(Models.IConnection connection,
-            IRepositoryCloneService cloneService, IRepositoryHosts hosts)
+            IRepositoryCloneService cloneService, IRepositoryHosts hosts, IAvatarProvider avatarProvider)
             : base(connection, hosts)
         {
             this.cloneService = cloneService;
-            Title = string.Format(CultureInfo.CurrentCulture, "Clone a repository from {0}", RepositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", RepositoryHost.Title);
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
-            RepositoryHost.Cache.GetUser()
+            RepositoryHost.Cache.GetAndFetchUser()
+                .FirstAsync()
                 .Catch<CachedAccount, KeyNotFoundException>(_ => Observable.Empty<CachedAccount>())
                 .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories(user.Id))
                 .SelectMany(repo => repo)
-                .Select(repo => new RepositoryModel(repo) { HasLocalClone = LocalRepoExists(repo) })
+                .Select(repo => CreateRepository(repo, avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);
 
@@ -57,24 +58,15 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            var canCloneSelected = this.WhenAny(x => x.SelectedRepository, x => x.Value)
-                .Select(selected => selected == null
-                    ? Observable.Return(false)
-                    : selected.WhenAny(x => x.HasLocalClone, x => x.Value == false))
-                .Switch();
-
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(
-                canCloneSelected.StartWith(false),
-                OnCloneRepository
-            );
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(OnCloneRepository);
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
         }
 
-        bool LocalRepoExists(Repository repo)
+        static IRepositoryModel CreateRepository(Repository repository, IAvatarProvider avatarProvider)
         {
-            return Directory.Exists(Path.Combine(BaseRepositoryPath, repo.Name)) &&
-                   Directory.Exists(Path.Combine(BaseRepositoryPath, repo.Name, ".git"));
+            var owner = new CachedAccount(repository.Owner);
+            return new RepositoryModel(repository, new Models.Account(owner, avatarProvider.GetAvatar(owner)));
         }
 
         bool FilterRepository(IRepositoryModel repo)
