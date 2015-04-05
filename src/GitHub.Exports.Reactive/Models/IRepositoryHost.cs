@@ -25,7 +25,6 @@ namespace GitHub.Models
         IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password);
         IObservable<AuthenticationResult> LogInFromCache();
         IObservable<Unit> LogOut();
-        IObservable<CachedAccount> GetUser();
         IObservable<IEnumerable<CachedAccount>> GetAllOrganizations();
     }
 }
