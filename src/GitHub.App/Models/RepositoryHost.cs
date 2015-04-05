@@ -39,7 +39,7 @@ namespace GitHub.Models
             ApiBaseUri = apiClient.HostAddress.ApiUri;
             ApiClient = apiClient;
             Debug.Assert(ApiBaseUri != null, "Mistakes were made. ApiClient must have non-null ApiBaseUri");
-            IsGitHub = ApiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri);
+            IsGitHub = HostAddress.IsGitHubDotComUri(ApiBaseUri);
             Cache = hostCache;
             LoginCache = loginCache;
 
@@ -298,9 +298,9 @@ namespace GitHub.Models
 
         static string MakeTitle(Uri apiBaseUri)
         {
-            return apiBaseUri.Equals(Api.ApiClient.GitHubDotComApiBaseUri) ?
-                "GitHub" :
-                apiBaseUri.Host;
+            return HostAddress.IsGitHubDotComUri(apiBaseUri)
+                ? "GitHub"
+                : apiBaseUri.Host;
         }
 
         IObservable<CachedAccount> GetUserFromApi()
