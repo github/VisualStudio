@@ -27,7 +27,6 @@ namespace GitHub.Models
         static readonly CachedAccount unverifiedUser = new CachedAccount();
 
         bool isLoggedIn;
-        bool isLoggingIn;
 
         public RepositoryHost(IApiClient apiClient, IHostCache hostCache, ILoginCache loginCache)
         {
@@ -58,33 +57,23 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggedIn, value); }
         }
 
-        public bool IsLoggingIn
-        {
-            get { return isLoggingIn; }
-            private set { this.RaiseAndSetIfChanged(ref isLoggingIn, value); }
-        }
-
         public string Title { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public IObservable<AuthenticationResult> LogInFromCache()
         {
-            IsLoggingIn = true;
-
             return GetUserFromApi()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<CachedAccount, Exception>(ex =>
                 {
                     if (ex is AuthorizationException)
                     {
-                        IsLoggingIn = false;
                         log.Warn("Got an authorization exception", ex);
                         return Observable.Return<CachedAccount>(null);
                     }
                     return Cache.GetAndFetchUser()
                         .Catch<CachedAccount, Exception>(e =>
                         {
-                            IsLoggingIn = false;
                             log.Warn("User does not exist in cache", e);
                             return Observable.Return<CachedAccount>(null);
                         })
@@ -125,7 +114,6 @@ namespace GitHub.Models
             // that don't support authorization tokens, and for the API client to use until an authorization
             // token has been created and acquired:
             return LoginCache.SaveLogin(usernameOrEmail, password, Address)
-                .Do(_ => IsLoggingIn = true)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 // Try to get an authorization token, save it, then get the user to log in:
                 .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
@@ -188,7 +176,6 @@ namespace GitHub.Models
                 .Catch<CachedAccount, Exception>(ex =>
                 {
                     // If we get here, we have an actual login failure:
-                    IsLoggingIn = false;
                     if (ex is TwoFactorChallengeFailedException)
                     {
                         return Observable.Return(unverifiedUser);
@@ -222,8 +209,6 @@ namespace GitHub.Models
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Do(result =>
                  {
-                    IsLoggingIn = false;
-
                     if (result.IsSuccess())
                     {
                         IsLoggedIn = true;
