@@ -109,7 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Args.cs" />
-    <Compile Include="GitHub.App\Caches\HostCacheTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
@@ -125,7 +124,6 @@
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />
-    <Compile Include="Helpers\TestHostCache.cs" />
     <Compile Include="Helpers\TestLoginCache.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
     <Compile Include="Substitutes.cs" />

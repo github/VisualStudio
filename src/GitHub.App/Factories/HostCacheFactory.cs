@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
-using GitHub.Api;
-using GitHub.Caches;
+using Akavache;
 using GitHub.Info;
 using GitHub.Primitives;
 using Rothko;
@@ -23,7 +22,7 @@ namespace GitHub.Factories
             this.operatingSystem = operatingSystem;
         }
 
-        public IHostCache Create(HostAddress hostAddress, IApiClient apiClient)
+        public IBlobCache Create(HostAddress hostAddress)
         {
             var environment = OperatingSystem.Environment;
             // For GitHub.com, the cache file name should be "api.github.com.cache.db"
@@ -31,16 +30,11 @@ namespace GitHub.Factories
             string host = hostAddress.ApiUri.Host;
             string cacheFileName = host + ".cache.db";
 
-            var localMachinePath = Path.Combine(environment.GetLocalGitHubApplicationDataPath(), cacheFileName);
             var userAccountPath = Path.Combine(environment.GetApplicationDataPath(), cacheFileName);
 
             // CreateDirectory is a noop if the directory already exists.
-            new[] { localMachinePath, userAccountPath }
-                .ForEach(x => OperatingSystem.Directory.CreateDirectory(Path.GetDirectoryName(x)));
-
-            var userAccountCache = BlobCacheFactory.CreateBlobCache(userAccountPath);
-
-            return new HostCache(userAccountCache, apiClient);
+            OperatingSystem.Directory.CreateDirectory(Path.GetDirectoryName(userAccountPath));
+            return BlobCacheFactory.CreateBlobCache(userAccountPath);
         }
 
         IOperatingSystem OperatingSystem { get { return operatingSystem.Value; } }

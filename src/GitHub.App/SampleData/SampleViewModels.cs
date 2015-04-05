@@ -241,12 +241,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IHostCache Cache
-        {
-            get;
-            private set;
-        }
-        
         public bool IsLoggedIn
         {
             get;
@@ -260,6 +254,16 @@ namespace GitHub.SampleData
         }
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<CachedAccount> GetUser()
         {
             throw new NotImplementedException();
         }

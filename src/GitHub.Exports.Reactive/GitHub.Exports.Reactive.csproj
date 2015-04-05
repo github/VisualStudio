@@ -102,7 +102,6 @@
   <ItemGroup>
     <Compile Include="Factories\IApiClientFactory.cs" />
     <Compile Include="Authentication\ITwoFactorChallengeHandler.cs" />
-    <Compile Include="Caches\IHostCache.cs" />
     <Compile Include="Factories\IRepositoryHostFactory.cs" />
     <Compile Include="Models\IRepositoryHost.cs" />
     <Compile Include="Collections\ISelectable.cs" />
