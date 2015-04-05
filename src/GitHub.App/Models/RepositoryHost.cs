@@ -28,6 +28,7 @@ namespace GitHub.Models
 
         readonly Uri apiBaseUri;
         bool isLoggedIn;
+        bool isEnterprise;
 
         public RepositoryHost(IApiClient apiClient, IHostCache hostCache, ILoginCache loginCache)
         {
@@ -39,16 +40,15 @@ namespace GitHub.Models
             Cache = hostCache;
             LoginCache = loginCache;
 
-            IsEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
+            isEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
             Title = MakeTitle(apiBaseUri);
         }
 
         public HostAddress Address { get; private set; }
+
         public IApiClient ApiClient { get; private set; }
 
         public IHostCache Cache { get; private set; }
-
-        public bool IsEnterprise { get; private set; }
 
         public bool IsLoggedIn
         {
@@ -121,7 +121,7 @@ namespace GitHub.Models
                 .Catch<CachedAccount, ApiException>(firstTryEx =>
                 {
                     var exception = firstTryEx as AuthorizationException;
-                    if (IsEnterprise
+                    if (isEnterprise
                         && exception != null
                         && exception.Message == "Bad credentials")
                     {
@@ -132,7 +132,7 @@ namespace GitHub.Models
                     // EXCEPT, there's a bug where it doesn't, and instead creates a bad token, and in 
                     // that case we'd get a 401 here from the GetUser invocation. So to be safe (and consistent
                     // with the Mac app), we'll just retry after any API error for Enterprise hosts:
-                    if (IsEnterprise && !(firstTryEx is TwoFactorChallengeFailedException))
+                    if (isEnterprise && !(firstTryEx is TwoFactorChallengeFailedException))
                     {
                         // Because we potentially have a bad authorization token due to the Enterprise bug,
                         // we need to reset to using username and password authentication:
@@ -165,7 +165,7 @@ namespace GitHub.Models
                     // Since enterprise 2.1 and https://github.com/github/github/pull/36669 the API returns 403
                     // instead of 404 to signal that it's not allowed. In the name of backwards compatibility we 
                     // test for both 404 (NotFoundException) and 403 (ForbiddenException) here.
-                    if (IsEnterprise && (retryEx is NotFoundException || retryEx is ForbiddenException || retryEx.StatusCode == (HttpStatusCode)422))
+                    if (isEnterprise && (retryEx is NotFoundException || retryEx is ForbiddenException || retryEx.StatusCode == (HttpStatusCode)422))
                         return GetUserFromApi();
 
                     // Other errors are "real" so we pass them along:
