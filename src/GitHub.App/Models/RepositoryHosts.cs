@@ -18,7 +18,7 @@ namespace GitHub.Models
 {
     [Export(typeof(IRepositoryHosts))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class RepositoryHosts : ReactiveObject, IRepositoryHosts, IDisposable
+    public class RepositoryHosts : ReactiveObject, IRepositoryHosts
     {
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
@@ -147,20 +147,6 @@ namespace GitHub.Models
                         EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
                 });
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && EnterpriseHost.Cache != null)
-            {
-                EnterpriseHost.Cache.Dispose();
-            }
         }
 
         IRepositoryHost githubHost;
