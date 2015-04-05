@@ -8,7 +8,7 @@ namespace UnitTests.Helpers
 {
     public class TestHostCache : HostCache
     {
-        public TestHostCache() : base(new InMemoryBlobCache(), new InMemoryBlobCache(), CreateFakeApiClient())
+        public TestHostCache() : base(new InMemoryBlobCache(), CreateFakeApiClient())
         {
         }
 

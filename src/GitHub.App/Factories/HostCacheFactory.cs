@@ -38,10 +38,9 @@ namespace GitHub.Factories
             new[] { localMachinePath, userAccountPath }
                 .ForEach(x => OperatingSystem.Directory.CreateDirectory(Path.GetDirectoryName(x)));
 
-            var localMachineCache = BlobCacheFactory.CreateBlobCache(localMachinePath);
             var userAccountCache = BlobCacheFactory.CreateBlobCache(userAccountPath);
 
-            return new HostCache(localMachineCache, userAccountCache, apiClient);
+            return new HostCache(userAccountCache, apiClient);
         }
 
         IOperatingSystem OperatingSystem { get { return operatingSystem.Value; } }

@@ -18,7 +18,7 @@ public class HostCacheTests
             var userAccountCache = new InMemoryBlobCache();
             await userAccountCache.InsertObject("user", new CachedAccount { Login = "hongkongfuey" });
             var apiClient = Substitute.For<IApiClient>();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userAccountCache, apiClient);
+            var hostCache = new HostCache(userAccountCache, apiClient);
 
             var user = await hostCache.GetAndFetchUser();
 
@@ -32,7 +32,7 @@ public class HostCacheTests
             await userAccountCache.InsertObject("user", new CachedAccount { Login = "hongkongfuey" });
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("snoopy")));
-            var hostCache = new HostCache(new InMemoryBlobCache(), userAccountCache, apiClient);
+            var hostCache = new HostCache(userAccountCache, apiClient);
 
             var cachedUser = await hostCache.GetAndFetchUser().FirstAsync();
             var fetchedUser = await hostCache.GetAndFetchUser().LastAsync();
