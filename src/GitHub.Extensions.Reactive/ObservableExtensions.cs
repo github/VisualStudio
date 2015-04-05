@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Collections.Generic;
 
 namespace GitHub.Extensions.Reactive
 {
@@ -146,6 +147,21 @@ namespace GitHub.Extensions.Reactive
                     ? Observable.Throw<Notification<T>>(exc)
                     : Observable.Return(x.Item2))
                 .Dematerialize();
+        }
+
+        /// <summary>
+        /// Flattens an observable of enumerables into a stream of individual signals.
+        /// </summary>
+        /// <remarks>
+        /// I end up doing this a lot and it looks cleaner. Note that this could produce bad results if you expect
+        /// the observable to return a single collection and it returns multiple collections.
+        /// </remarks>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IObservable<T> Flatten<T>(this IObservable<IEnumerable<T>> source)
+        {
+            return source.SelectMany(items => items);
         }
     }
 }
