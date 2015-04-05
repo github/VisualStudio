@@ -43,7 +43,7 @@ public class RepositoryHostTests
                 .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("lagavulin")));
             var userCache = new InMemoryBlobCache();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new HostCache(userCache, apiClient);
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -64,7 +64,7 @@ public class RepositoryHostTests
             var getUserSubject = new Subject<User>();
             apiClient.GetUser().Returns(getUserSubject);
             var userCache = new InMemoryBlobCache();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new HostCache(userCache, apiClient);
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -95,7 +95,7 @@ public class RepositoryHostTests
                 CreateOctokitOrganization("github")
             }.ToObservable());
             var userCache = new InMemoryBlobCache();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new HostCache(userCache, apiClient);
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -123,7 +123,7 @@ public class RepositoryHostTests
             var userCache = new InMemoryBlobCache();
             await userCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
             await userCache.InsertObject("organizations", new[] { new CachedAccount(CreateOctokitUser("bar")) });
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new HostCache(userCache, apiClient);
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -155,7 +155,7 @@ public class RepositoryHostTests
             }.ToObservable());
             var userCache = new InMemoryBlobCache();
             await userCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new HostCache(userCache, apiClient);
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 

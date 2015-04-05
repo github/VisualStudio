@@ -5,19 +5,16 @@ using System.Reactive.Linq;
 using Akavache;
 using GitHub.Api;
 using GitHub.Extensions.Reactive;
-using Octokit;
 
 namespace GitHub.Caches
 {
     public class HostCache : IHostCache
     {
-        readonly IBlobCache localMachineCache;
         readonly IBlobCache userAccountCache;
         readonly IApiClient apiClient;
 
-        public HostCache(IBlobCache localMachineCache, IBlobCache userAccountCache, IApiClient apiClient)
+        public HostCache(IBlobCache userAccountCache, IApiClient apiClient)
         {
-            this.localMachineCache = localMachineCache;
             this.userAccountCache = userAccountCache;
             this.apiClient = apiClient;
         }
@@ -44,7 +41,6 @@ namespace GitHub.Caches
         {
             return Observable.Merge
             (
-                localMachineCache.InvalidateAll(),
                 userAccountCache.InvalidateAll(),
                 Invalidate()
             ).AsCompletion();
@@ -65,8 +61,6 @@ namespace GitHub.Caches
         {
             if (disposing)
             {
-                localMachineCache.Dispose();
-                localMachineCache.Shutdown.Wait();
                 userAccountCache.Dispose();
                 userAccountCache.Shutdown.Wait();
             }
