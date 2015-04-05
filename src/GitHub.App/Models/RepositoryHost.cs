@@ -27,6 +27,7 @@ namespace GitHub.Models
         static readonly CachedAccount unverifiedUser = new CachedAccount();
 
         readonly Uri apiBaseUri;
+        readonly IHostCache hostCache;
         bool isLoggedIn;
         bool isEnterprise;
 
@@ -37,7 +38,7 @@ namespace GitHub.Models
             apiBaseUri = apiClient.HostAddress.ApiUri;
             ApiClient = apiClient;
             Debug.Assert(apiBaseUri != null, "Mistakes were made. ApiClient must have non-null ApiBaseUri");
-            Cache = hostCache;
+            this.hostCache = hostCache;
             LoginCache = loginCache;
 
             isEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
@@ -47,8 +48,6 @@ namespace GitHub.Models
         public HostAddress Address { get; private set; }
 
         public IApiClient ApiClient { get; private set; }
-
-        public IHostCache Cache { get; private set; }
 
         public bool IsLoggedIn
         {
@@ -70,7 +69,7 @@ namespace GitHub.Models
                         log.Warn("Got an authorization exception", ex);
                         return Observable.Return<CachedAccount>(null);
                     }
-                    return Cache.GetAndFetchUser()
+                    return hostCache.GetAndFetchUser()
                         .Catch<CachedAccount, Exception>(e =>
                         {
                             log.Warn("User does not exist in cache", e);
@@ -196,7 +195,7 @@ namespace GitHub.Models
                 {
                     if (result.IsSuccess())
                     {
-                        return Cache.InsertUser(user).Select(_ => result);
+                        return hostCache.InsertUser(user).Select(_ => result);
                     }
 
                     if (result == AuthenticationResult.VerificationFailure)
@@ -240,7 +239,7 @@ namespace GitHub.Models
                     log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);
                     return Observable.Return(Unit.Default);
                 })
-                .SelectMany(_ => Cache.InvalidateAll())
+                .SelectMany(_ => hostCache.InvalidateAll())
                 .Catch<Unit, Exception>(e =>
                 {
                     log.Warn("ASSERT! Failed to invaldiate caches", e);
@@ -263,13 +262,13 @@ namespace GitHub.Models
 
         IObservable<IEnumerable<IAccount>> GetOrganizations(IAvatarProvider avatarProvider)
         {
-            return Cache.GetAndFetchOrganizations()
+            return hostCache.GetAndFetchOrganizations()
                     .Select(orgs => orgs.Select(org => new Account(org, avatarProvider.GetAvatar(org))));
         }
 
         IObservable<IEnumerable<IAccount>> GetUser(IAvatarProvider avatarProvider)
         {
-            return Cache.GetAndFetchUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
+            return hostCache.GetAndFetchUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
         }
 
         protected ILoginCache LoginCache { get; private set; }

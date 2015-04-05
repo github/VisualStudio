@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using GitHub.Caches;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using NullGuard;
@@ -36,11 +37,9 @@ namespace GitHub.ViewModels
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
-            RepositoryHost.Cache.GetAndFetchUser()
+            RepositoryHost.ApiClient.GetUserRepositories()
                 .FirstAsync()
-                .Catch<CachedAccount, KeyNotFoundException>(_ => Observable.Empty<CachedAccount>())
-                .SelectMany(user => RepositoryHost.ApiClient.GetUserRepositories())
-                .SelectMany(repo => repo)
+                .Flatten()
                 .Select(repo => CreateRepository(repo, avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.Add);

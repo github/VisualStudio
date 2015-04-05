@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive;
 using GitHub.Api;
 using GitHub.Authentication;
-using GitHub.Caches;
 using GitHub.Primitives;
 using GitHub.Services;
 
@@ -13,7 +12,6 @@ namespace GitHub.Models
     {
         HostAddress Address { get; }
         IApiClient ApiClient { get; }
-        IHostCache Cache { get; }
         bool IsLoggedIn { get; }
         string Title { get; }
 
