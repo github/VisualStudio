@@ -100,6 +100,16 @@ namespace GitHub.UI
 
             textBox.PreviewKeyDown += (sender, args) =>
             {
+                // Handle navigation.
+                if (args.Key == Key.Left || args.Key == Key.Right || args.Key == Key.Back)
+                {
+                    args.Handled = args.Key == Key.Right ? MoveNext() : MovePrevious();
+                    if (args.Key == Key.Back)
+                    {
+                        textBox.Text = "";
+                    }
+                }
+
                 if (args.Key != Key.D0
                     && args.Key != Key.D1
                     && args.Key != Key.D2
@@ -112,6 +122,7 @@ namespace GitHub.UI
                     && args.Key != Key.D9
                     && args.Key != Key.Tab
                     && args.Key != Key.Escape
+                    && args.Key != Key.Delete
                     && (!(args.Key == Key.V && args.KeyboardDevice.Modifiers == ModifierKeys.Control))
                     && (!(args.Key == Key.Insert && args.KeyboardDevice.Modifiers == ModifierKeys.Shift)))
                 {
@@ -128,19 +139,35 @@ namespace GitHub.UI
                     textBox.SelectAll();
                 }
             };
-
+            
             textBox.TextChanged += (sender, args) =>
             {
-                var tRequest = new TraversalRequest(FocusNavigationDirection.Next);
-                var keyboardFocus = Keyboard.FocusedElement as UIElement;
-
                 SetValue(TextProperty, String.Join("", GetTwoFactorCode()));
-
-                if (keyboardFocus != null)
-                {
-                    keyboardFocus.MoveFocus(tRequest);
-                }
+                var change = args.Changes.FirstOrDefault();
+                args.Handled = (change != null && change.AddedLength > 0) && MoveNext();
             };
+        }
+
+        bool MoveNext()
+        {
+            return MoveFocus(FocusNavigationDirection.Next);
+        }
+
+        bool MovePrevious()
+        {
+            return MoveFocus(FocusNavigationDirection.Previous);
+        }
+
+        bool MoveFocus(FocusNavigationDirection navigationDirection)
+        {
+            var traversalRequest = new TraversalRequest(navigationDirection);
+            var keyboardFocus = Keyboard.FocusedElement as UIElement;
+            if (keyboardFocus != null)
+            {
+                keyboardFocus.MoveFocus(traversalRequest);
+                return true;
+            }
+            return false;
         }
 
         private static string GetTextBoxValue(TextBox textBox)
