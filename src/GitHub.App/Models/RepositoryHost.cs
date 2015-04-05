@@ -29,21 +29,17 @@ namespace GitHub.Models
         bool isLoggedIn;
         bool isLoggingIn;
 
-        public RepositoryHost(
-            IApiClient apiClient,
-            IHostCache hostCache,
-            ILoginCache loginCache)
+        public RepositoryHost(IApiClient apiClient, IHostCache hostCache, ILoginCache loginCache)
         {
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
             ApiBaseUri = apiClient.HostAddress.ApiUri;
             ApiClient = apiClient;
             Debug.Assert(ApiBaseUri != null, "Mistakes were made. ApiClient must have non-null ApiBaseUri");
-            IsGitHub = HostAddress.IsGitHubDotComUri(ApiBaseUri);
             Cache = hostCache;
             LoginCache = loginCache;
 
-            IsEnterprise = !IsGitHub;
+            IsEnterprise = !HostAddress.IsGitHubDotComUri(ApiBaseUri);
             Title = MakeTitle(ApiBaseUri);
         }
 
@@ -53,8 +49,6 @@ namespace GitHub.Models
         public IApiClient ApiClient { get; private set; }
 
         public IHostCache Cache { get; private set; }
-
-        public bool IsGitHub { get; private set; }
 
         public bool IsEnterprise { get; private set; }
 

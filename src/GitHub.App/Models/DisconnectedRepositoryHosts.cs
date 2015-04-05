@@ -32,7 +32,6 @@ namespace GitHub.Models
             get;
             private set;
         }
-        public bool IsGitHub { get; private set; }
         public bool IsLoggedIn { get; private set; }
         public bool IsLoggingIn { get; private set; }
         public bool IsEnterprise { get; private set; }

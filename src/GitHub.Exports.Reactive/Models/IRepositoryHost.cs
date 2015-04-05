@@ -14,7 +14,6 @@ namespace GitHub.Models
         HostAddress Address { get; }
         IApiClient ApiClient { get; }
         IHostCache Cache { get; }
-        bool IsGitHub { get; }
         bool IsLoggedIn { get; }
         bool IsLoggingIn { get; }
         bool IsEnterprise { get; }
