@@ -229,12 +229,6 @@ namespace GitHub.SampleData
             this.Title = title;
         }
 
-        public ReactiveList<IAccount> Accounts
-        {
-            get;
-            private set;
-        }
-
         public HostAddress Address
         {
             get;
@@ -252,38 +246,14 @@ namespace GitHub.SampleData
             get;
             private set;
         }
-
-        public bool IsGitHub
-        {
-            get;
-            private set;
-        }
-
+        
         public bool IsLoggedIn
         {
             get;
             private set;
         }
 
-        public bool IsLoggingIn
-        {
-            get;
-            private set;
-        }
-
-        public ReactiveList<IAccount> Organizations
-        {
-            get;
-            private set;
-        }
-
         public string Title
-        {
-            get;
-            private set;
-        }
-
-        public IAccount User
         {
             get;
             private set;
