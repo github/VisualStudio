@@ -27,6 +27,7 @@ namespace GitHub.Models
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         static readonly CachedAccount unverifiedUser = new CachedAccount();
 
+        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly Uri apiBaseUri;
         readonly IBlobCache hostCache;
         readonly ILoginCache loginCache;
@@ -34,16 +35,20 @@ namespace GitHub.Models
         bool isLoggedIn;
         bool isEnterprise;
 
-        public RepositoryHost(IApiClient apiClient, IBlobCache hostCache, ILoginCache loginCache)
+        public RepositoryHost(
+            IApiClient apiClient,
+            IBlobCache hostCache,
+            ILoginCache loginCache,
+            ITwoFactorChallengeHandler twoFactorChallengeHandler)
         {
+            ApiClient = apiClient;
+            this.hostCache = hostCache;
+            this.loginCache = loginCache;
+            this.twoFactorChallengeHandler = twoFactorChallengeHandler;
+
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
             apiBaseUri = apiClient.HostAddress.ApiUri;
-            ApiClient = apiClient;
-            Debug.Assert(apiBaseUri != null, "Mistakes were made. ApiClient must have non-null ApiBaseUri");
-            this.hostCache = hostCache;
-            this.loginCache = loginCache;
-
             isEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
             Title = MakeTitle(apiBaseUri);
         }
@@ -96,7 +101,7 @@ namespace GitHub.Models
             // We need to intercept the 2FA handler to get the token:
             var interceptingTwoFactorChallengeHandler =
                 new Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>(ex =>
-                    ApiClient.TwoFactorChallengeHandler.HandleTwoFactorException(ex)
+                    twoFactorChallengeHandler.HandleTwoFactorException(ex)
                     .Do(twoFactorChallengeResult =>
                         authenticationCode = twoFactorChallengeResult.AuthenticationCode));
 
@@ -149,7 +154,9 @@ namespace GitHub.Models
                                         true);
 
                                 // Otherwise, we use the default handler:
-                                return ApiClient.GetOrCreateApplicationAuthenticationCode(useOldScopes: true);
+                                return ApiClient.GetOrCreateApplicationAuthenticationCode(
+                                    interceptingTwoFactorChallengeHandler,
+                                    useOldScopes: true);
                             })
                             // Then save the authorization token (if there is one) and get the user:
                             .SelectMany(saveAuthorizationToken)

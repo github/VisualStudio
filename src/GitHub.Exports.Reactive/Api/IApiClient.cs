@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GitHub.Authentication;
 using GitHub.Primitives;
 using Octokit;
 
@@ -18,12 +17,11 @@ namespace GitHub.Api
         /// <returns></returns>
         IObservable<IEnumerable<Repository>> GetUserRepositories();
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander = null,
+            Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             bool useOldScopes = false);
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             string authenticationCode,
             bool useOldScopes = false);
-        ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; }
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
     }

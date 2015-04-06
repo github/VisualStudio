@@ -23,14 +23,10 @@ namespace GitHub.Api
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
         readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
 
-        public ApiClient(
-            HostAddress hostAddress,
-            IObservableGitHubClient gitHubClient,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler)
+        public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
             HostAddress = hostAddress;
             this.gitHubClient = gitHubClient;
-            TwoFactorChallengeHandler = twoFactorChallengeHandler;
         }
 
         public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
@@ -47,7 +43,14 @@ namespace GitHub.Api
             return gitHubClient.User.Current();
         }
 
-        public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander = null, bool useOldScopes = false)
+        public IObservable<User> GetAllUsersForAllOrganizations()
+        {
+            return GetOrganizations().SelectMany(org => gitHubClient.Organization.Member.GetAll(org.Login));
+        }
+
+        public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
+            Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
+            bool useOldScopes = false)
         {
             var newAuthorization = new NewAuthorization
             {
@@ -57,10 +60,8 @@ namespace GitHub.Api
                 Note = ProductName + " on " + GetMachineNameSafe()
             };
 
-            var handler =  twoFactorChallengeHander ?? TwoFactorChallengeHandler.HandleTwoFactorException;
-
             Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
-                ex => Observable.Start(() => handler(ex), RxApp.MainThreadScheduler).Merge();
+                ex => Observable.Start(() => twoFactorChallengeHander(ex), RxApp.MainThreadScheduler).Merge();
 
             return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
                 clientId,
