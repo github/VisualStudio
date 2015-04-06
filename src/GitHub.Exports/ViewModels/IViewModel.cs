@@ -6,5 +6,6 @@ namespace GitHub.ViewModels
     {
         string Title { get; }
         ICommand Cancel { get; }
+        bool IsShowing { get; }
 	}
 }

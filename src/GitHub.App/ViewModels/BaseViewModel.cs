@@ -8,6 +8,8 @@ namespace GitHub.ViewModels
 {
     public class BaseViewModel : ReactiveValidatableObject, IViewModel
     {
+        protected ObservableAsPropertyHelper<bool> isShowing;
+
         public BaseViewModel([AllowNull] IServiceProvider serviceProvider) : base(serviceProvider)
         { }
 
@@ -15,5 +17,6 @@ namespace GitHub.ViewModels
         public ICommand Cancel { get { return CancelCommand; } }
 
         public string Title { get; protected set; }
+        public bool IsShowing { get { return isShowing.Value; } }
     }
 }

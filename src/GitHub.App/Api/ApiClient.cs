@@ -92,7 +92,7 @@ namespace GitHub.Api
             var handler =  twoFactorChallengeHander ?? TwoFactorChallengeHandler.HandleTwoFactorException;
 
             Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
-                ex => Observable.Start(() => handler(ex), RxApp.MainThreadScheduler).SelectMany(result => result);
+                ex => Observable.Start(() => handler(ex), RxApp.MainThreadScheduler).Merge();
 
             return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
                 clientId,

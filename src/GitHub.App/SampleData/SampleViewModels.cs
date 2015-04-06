@@ -21,7 +21,15 @@ using ReactiveUI;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : ReactiveObject, IRepositoryCreationViewModel
+    public class BaseViewModelDesigner : ReactiveObject, IViewModel
+    {
+        public ICommand Cancel { get; set; }
+        public bool IsShowing { get; set; }
+        public string Title { get; set; }
+    }
+
+    [ExcludeFromCodeCoverage]
+    public class RepositoryCreationViewModelDesigner : BaseViewModelDesigner, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -48,7 +56,7 @@ namespace GitHub.SampleData
             SelectedGitIgnoreTemplate = null;
         }
 
-        public string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
+        public new string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
 
         public IReadOnlyList<IAccount> Accounts
         {
@@ -179,8 +187,6 @@ namespace GitHub.SampleData
             get;
             set;
         }
-
-        public ICommand Cancel { get; set; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -357,7 +363,7 @@ namespace GitHub.SampleData
         public IAccount Owner { get; set; }
     }
 
-    public class RepositoryCloneViewModelDesigner : IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : BaseViewModelDesigner, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
@@ -376,12 +382,6 @@ namespace GitHub.SampleData
             FilteredRepositories = repositories.CreateDerivedCollection(
                 x => x
             );
-        }
-
-        public ICommand Cancel
-        {
-            get;
-            private set;
         }
 
         public IReactiveCommand<Unit> CloneCommand
@@ -406,7 +406,7 @@ namespace GitHub.SampleData
 
         public string FilterText { get; set; }
 
-        public string Title { get { return "Clone a GitHub Repository"; } }
+        public new string Title { get { return "Clone a GitHub Repository"; } }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection

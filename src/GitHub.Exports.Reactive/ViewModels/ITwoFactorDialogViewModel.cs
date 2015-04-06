@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface ITwoFactorDialogViewModel : ITwoFactorViewModel
+    public interface ITwoFactorDialogViewModel : IViewModel
     {
         ReactiveCommand<object> OkCommand { get; }
         ReactiveCommand<object> CancelCommand { get; }
@@ -20,7 +20,7 @@ namespace GitHub.ViewModels
         string AuthenticationCode { get; set; }
 
         /// <summary>
-        /// Gets the validator instance used for validating the 
+        /// Gets the validator instance used for validating the
         /// <see cref="AuthenticationCode"/> property
         /// </summary>
         ReactivePropertyValidator AuthenticationCodeValidator { get; }

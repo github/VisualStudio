@@ -1,4 +1,5 @@
-﻿using GitHub.Models;
+﻿using GitHub.Authentication;
+using GitHub.Models;
 using GitHub.Services;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using NSubstitute;
@@ -49,6 +50,7 @@ namespace UnitTests
         public static IRepositoryHosts RepositoryHosts { get { return Substitute.For<IRepositoryHosts>(); } }
         public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
+        public static ITwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<ITwoFactorChallengeHandler>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -92,6 +94,7 @@ namespace UnitTests
             var exports = ExportFactoryProvider;
             var connection = Connection;
             var connectionManager = ConnectionManager;
+            var twoFactorChallengeHandler = TwoFactorChallengeHandler;
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitRepositoriesExt)).Returns(git);
             ret.GetService(typeof(IVSServices)).Returns(vs);
@@ -103,6 +106,7 @@ namespace UnitTests
             ret.GetService(typeof(IConnection)).Returns(connection);
             ret.GetService(typeof(IConnectionManager)).Returns(connectionManager);
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
+            ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(twoFactorChallengeHandler);
             return ret;
         }
 
@@ -154,6 +158,11 @@ namespace UnitTests
         public static IAvatarProvider GetAvatarProvider(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IAvatarProvider)) as IAvatarProvider;
+        }
+
+        public static ITwoFactorChallengeHandler GetTwoFactorChallengeHandler(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(ITwoFactorChallengeHandler)) as ITwoFactorChallengeHandler;
         }
     }
 }

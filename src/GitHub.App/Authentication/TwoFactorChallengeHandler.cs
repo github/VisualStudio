@@ -4,32 +4,37 @@ using System.Reactive.Linq;
 using GitHub.ViewModels;
 using Octokit;
 using ReactiveUI;
+using NullGuard;
 
 namespace GitHub.Authentication
 {
     [Export(typeof(ITwoFactorChallengeHandler))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TwoFactorChallengeHandler : ITwoFactorChallengeHandler
+    public class TwoFactorChallengeHandler : ReactiveObject, ITwoFactorChallengeHandler
     {
         ITwoFactorDialogViewModel twoFactorDialog;
-
-        public void SetViewModel(ITwoFactorDialogViewModel vm)
+        [AllowNull]
+        public IViewModel CurrentViewModel
         {
-            twoFactorDialog = vm;
+            [return:AllowNull]
+            get { return twoFactorDialog; }
+            private set { this.RaiseAndSetIfChanged(ref twoFactorDialog, (ITwoFactorDialogViewModel)value); }
+        }
+
+        public void SetViewModel([AllowNull]IViewModel vm)
+        {
+            CurrentViewModel = vm;
         }
 
         public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorRequiredException exception)
         {
-            return Observable.Start(() =>
-            {
-                var userError = new TwoFactorRequiredUserError(exception);
-                return twoFactorDialog.Show(userError)
-                    .SelectMany(x =>
-                        x == RecoveryOptionResult.RetryOperation
-                            ? Observable.Return(userError.ChallengeResult)
-                            : Observable.Throw<TwoFactorChallengeResult>(exception));
-            }, RxApp.MainThreadScheduler)
-            .SelectMany(x => x);
+            var userError = new TwoFactorRequiredUserError(exception);
+            return twoFactorDialog.Show(userError)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .SelectMany(x =>
+                    x == RecoveryOptionResult.RetryOperation
+                        ? Observable.Return(userError.ChallengeResult)
+                        : Observable.Throw<TwoFactorChallengeResult>(exception));
         }
     }
 }

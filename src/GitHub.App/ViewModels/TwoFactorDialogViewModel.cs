@@ -7,11 +7,11 @@ using GitHub.Validation;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
+using GitHub.Exports;
 
 namespace GitHub.ViewModels
 {
-    [Export(typeof(ITwoFactorViewModel))]
-    [Export(typeof(ITwoFactorDialogViewModel))]
+    [ExportViewModel(ViewType = UIViewType.TwoFactor)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
     {
@@ -20,7 +20,6 @@ namespace GitHub.ViewModels
         TwoFactorType twoFactorType;
         readonly ObservableAsPropertyHelper<string> description;
         readonly ObservableAsPropertyHelper<bool> isSms;
-        readonly ObservableAsPropertyHelper<bool> isShowing;
 
         [ImportingConstructor]
         public TwoFactorDialogViewModel(IVisualStudioBrowser browser,
@@ -29,9 +28,6 @@ namespace GitHub.ViewModels
         {
             Title = "Two-Factor authentication required";
             twoFactorChallengeHandler.SetViewModel(this);
-            AuthenticationCodeValidator = ReactivePropertyValidator.For(this, x => x.AuthenticationCode)
-                .IfNullOrEmpty("Please enter your authentication code")
-                .IfNotMatch(@"^\d{6}$", "Authentication code must be exactly six digits");
 
             OkCommand = ReactiveCommand.Create(this.WhenAny(x => x.AuthenticationCode,
                 code => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6));
@@ -102,7 +98,6 @@ namespace GitHub.ViewModels
         }
 
         public bool IsSms { get { return isSms.Value; } }
-        public bool IsShowing { get { return isShowing.Value; } }
 
         public bool IsAuthenticationCodeSent
         {
