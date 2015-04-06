@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
-using GitHub.Validation;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -47,7 +46,7 @@ namespace GitHub.ViewModels
 
                 }).ToProperty(this, x => x.LoginMode);
 
-            AuthenticationResults = Observable.Merge(
+            AuthenticationResults = Observable.Amb(
                 loginToGitHubViewModel.Login,
                 EnterpriseLogin.Login);
             CancelCommand = ReactiveCommand.Create();
