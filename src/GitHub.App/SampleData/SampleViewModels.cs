@@ -235,12 +235,6 @@ namespace GitHub.SampleData
             this.Title = title;
         }
 
-        public ReactiveList<IAccount> Accounts
-        {
-            get;
-            private set;
-        }
-
         public HostAddress Address
         {
             get;
@@ -253,37 +247,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IHostCache Cache
-        {
-            get;
-            private set;
-        }
-
-        public bool IsEnterprise
-        {
-            get;
-            private set;
-        }
-
-        public bool IsGitHub
-        {
-            get;
-            private set;
-        }
-
         public bool IsLoggedIn
-        {
-            get;
-            private set;
-        }
-
-        public bool IsLoggingIn
-        {
-            get;
-            private set;
-        }
-
-        public ReactiveList<IAccount> Organizations
         {
             get;
             private set;
@@ -295,13 +259,12 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IAccount User
+        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
         {
-            get;
-            private set;
+            throw new NotImplementedException();
         }
 
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
+        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
         {
             throw new NotImplementedException();
         }

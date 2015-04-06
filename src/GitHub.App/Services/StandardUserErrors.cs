@@ -8,6 +8,7 @@ using System.Net.Http;
 using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Models;
+using GitHub.Primitives;
 using NLog;
 using Octokit;
 using ReactiveUI;
@@ -100,7 +101,7 @@ namespace GitHub.Services
                         "Please make sure the repository exists and that you have permissions to change it."),
                     new Translation(@".*?\(deletion of the current branch prohibited\).*",
                         "Cannot delete the default branch",
-                        "To delete this branch, log in to " + ApiClient.GitHubDotComHostName + " and change " +
+                        "To delete this branch, log in to " + HostAddress.GitHubDotComHostAddress.WebUri.Host + " and change " +
                         "the repository’s default branch to another branch first."))
             },
             {
@@ -116,7 +117,7 @@ namespace GitHub.Services
                         "Please make sure the repository exists and that you have permissions to change it."),
                     new Translation(@".*?\(deletion of the current branch prohibited\).*",
                         "Cannot unpublish the default branch",
-                        "To unpublish this branch, log in to " + ApiClient.GitHubDotComHostName + " and change " +
+                        "To unpublish this branch, log in to " + HostAddress.GitHubDotComHostAddress.WebUri.Host + " and change " +
                         "the repository’s default branch to another branch first."))
             },
             { ErrorType.ClipboardFailed, Map(Defaults("Failed to copy text to the clipboard.")) },

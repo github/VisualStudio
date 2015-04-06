@@ -9,25 +9,20 @@ namespace GitHub.Api
     public interface IApiClient
     {
         HostAddress HostAddress { get; }
-        IObservable<SshKey> AddSshKey(SshKey newKey);
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
-        IObservable<SshKey> GetSshKeys();
         IObservable<User> GetUser();
-        IObservable<User> GetAllUsersForAllOrganizations();
-        IObservable<Organization> GetOrganization(string login);
         IObservable<Organization> GetOrganizations();
-        IObservable<User> GetMembersOfOrganization(string organizationName);
-        IObservable<Repository> GetRepository(string owner, string name);
-        IObservable<IEnumerable<Repository>> GetUserRepositories(int currentUserId);
-        IObservable<Repository> GetCurrentUserRepositoriesStreamed();
-        IObservable<Repository> GetOrganizationRepositoriesStreamed(string login);
+        /// <summary>
+        /// Retrieves all repositories that belong to this user or to any organizations this user is a member of.
+        /// </summary>
+        /// <returns></returns>
+        IObservable<IEnumerable<Repository>> GetUserRepositories();
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander = null,
             bool useOldScopes = false);
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             string authenticationCode,
             bool useOldScopes = false);
-        IObservable<IReadOnlyList<EmailAddress>> GetEmails();
         ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; }
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
