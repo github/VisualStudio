@@ -27,7 +27,7 @@ namespace GitHub.Factories
         public IRepositoryHost Create(HostAddress hostAddress)
         {
             var apiClient = apiClientFactory.Create(hostAddress);
-            var hostCache = hostCacheFactory.Create(hostAddress, apiClient);
+            var hostCache = hostCacheFactory.Create(hostAddress);
 
             return new RepositoryHost(apiClient, hostCache, loginCache);
         }

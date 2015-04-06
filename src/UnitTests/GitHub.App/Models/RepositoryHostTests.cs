@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
@@ -25,7 +24,7 @@ public class RepositoryHostTests
             apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
                 .Returns(Observable.Return(new ApplicationAuthorization("1234")));
             apiClient.GetUser().Returns(Observable.Return(new User()));
-            var hostCache = new TestHostCache();
+            var hostCache = new InMemoryBlobCache();
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -42,42 +41,16 @@ public class RepositoryHostTests
             apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
                 .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("lagavulin")));
-            var userCache = new InMemoryBlobCache();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new InMemoryBlobCache();
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
             await host.LogIn("aUsername", "aPassword");
 
-            var user = await userCache.GetObject<CachedAccount>("user");
+            var user = await hostCache.GetObject<CachedAccount>("user");
             Assert.NotNull(user);
             Assert.Equal("lagavulin", user.Login);
         }
-
-        [Fact]
-        public async Task SetsTheLoggingInBitDuringLogin()
-        {
-            var apiClient = Substitute.For<IApiClient>();
-            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
-            apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
-                .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
-            var getUserSubject = new Subject<User>();
-            apiClient.GetUser().Returns(getUserSubject);
-            var userCache = new InMemoryBlobCache();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
-            var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, hostCache, loginCache);
-
-            var observable = host.LogIn("aUsername", "aPassword");
-
-            Assert.True(host.IsLoggingIn);
-            getUserSubject.OnNext(CreateOctokitUser("missyelliot"));
-            getUserSubject.OnCompleted();
-            await observable;
-            Assert.False(host.IsLoggingIn);
-        }
-
-        
     }
 
     public class TheGetAccountsMethod
@@ -94,8 +67,7 @@ public class RepositoryHostTests
                 CreateOctokitOrganization("islay"),
                 CreateOctokitOrganization("github")
             }.ToObservable());
-            var userCache = new InMemoryBlobCache();
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new InMemoryBlobCache();
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -120,10 +92,9 @@ public class RepositoryHostTests
                 CreateOctokitOrganization("islay"),
                 CreateOctokitOrganization("github")
             }.ToObservable());
-            var userCache = new InMemoryBlobCache();
-            await userCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
-            await userCache.InsertObject("organizations", new[] { new CachedAccount(CreateOctokitUser("bar")) });
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new InMemoryBlobCache();
+            await hostCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
+            await hostCache.InsertObject("organizations", new[] { new CachedAccount(CreateOctokitUser("bar")) });
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 
@@ -153,9 +124,8 @@ public class RepositoryHostTests
                 CreateOctokitOrganization("islay"),
                 CreateOctokitOrganization("github")
             }.ToObservable());
-            var userCache = new InMemoryBlobCache();
-            await userCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
-            var hostCache = new HostCache(new InMemoryBlobCache(), userCache, apiClient);
+            var hostCache = new InMemoryBlobCache();
+            await hostCache.InsertObject("user", new CachedAccount(CreateOctokitUser("foo")));
             var loginCache = new TestLoginCache();
             var host = new RepositoryHost(apiClient, hostCache, loginCache);
 

@@ -132,7 +132,6 @@
     <None Include="AkavacheSqliteLinkerOverride.cs" />
     <Compile Include="Authentication\TwoFactorChallengeHandler.cs" />
     <Compile Include="Authentication\TwoFactorRequiredUserError.cs" />
-    <Compile Include="Caches\HostCache.cs" />
     <Compile Include="Factories\HostCacheFactory.cs" />
     <Compile Include="Factories\IBlobCacheFactory.cs" />
     <Compile Include="Factories\IHostCacheFactory.cs" />

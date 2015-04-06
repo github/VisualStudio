@@ -26,16 +26,8 @@ namespace GitHub.Models
         public IApiClient ApiClient { get; private set; }
 
         [AllowNull]
-        public IHostCache Cache
-        {
-            [return: AllowNull]
-            get;
-            private set;
-        }
-        public bool IsGitHub { get; private set; }
         public bool IsLoggedIn { get; private set; }
         public bool IsLoggingIn { get; private set; }
-        public bool IsEnterprise { get; private set; }
         public ReactiveList<IAccount> Organizations { get; private set; }
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }
@@ -58,6 +50,11 @@ namespace GitHub.Models
         public IObservable<Unit> LogOut()
         {
             return Observable.Return(Unit.Default);
+        }
+
+        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
+        {
+            return Observable.Empty<IEnumerable<CachedAccount>>();
         }
     }
 }
