@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -32,20 +31,10 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> title;
 
         [ImportingConstructor]
-        RepositoryPublishViewModel(
-            IServiceProvider provider,
-            IRepositoryHosts hosts,
-            IAvatarProvider avatarProvider,
-            IRepositoryPublishService repositoryPublishService)
-            : this(provider.GetService<IConnection>(), hosts, avatarProvider, repositoryPublishService)
-        {}
-
         public RepositoryPublishViewModel(
-            IConnection connection,
             IRepositoryHosts hosts,
             IAvatarProvider avatarProvider,
             IRepositoryPublishService repositoryPublishService)
-            : base(connection, hosts)
         {
             title = this.WhenAny(
                 x => x.SelectedHost,

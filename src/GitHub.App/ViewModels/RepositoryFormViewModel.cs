@@ -13,11 +13,11 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Base class for the Repository publish/create dialogs. It represents the details about the repository itself.
     /// </summary>
-    public abstract class RepositoryFormViewModel : ConnectionViewModel
+    public abstract class RepositoryFormViewModel : BaseViewModel
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 
-        protected RepositoryFormViewModel(IConnection connection, IRepositoryHosts hosts) : base(connection, hosts)
+        protected RepositoryFormViewModel()
         {
             CanKeepPrivateObservable = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,

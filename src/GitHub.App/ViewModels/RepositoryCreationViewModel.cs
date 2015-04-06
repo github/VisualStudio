@@ -10,7 +10,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -32,6 +31,7 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
+        readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -39,29 +39,27 @@ namespace GitHub.ViewModels
 
         [ImportingConstructor]
         RepositoryCreationViewModel(
-            IServiceProvider provider,
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IOperatingSystem operatingSystem,
-            IRepositoryHosts hosts,
-            IRepositoryCreationService rs,
+            IRepositoryCreationService repositoryCreationService,
             IAvatarProvider avatarProvider)
-            : this(provider.GetService<Models.IConnection>(), operatingSystem, hosts, rs, avatarProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, avatarProvider)
         {}
 
         public RepositoryCreationViewModel(
-            Models.IConnection connection,
+            IRepositoryHost repositoryHost,
             IOperatingSystem operatingSystem,
-            IRepositoryHosts hosts,
             IRepositoryCreationService repositoryCreationService,
             IAvatarProvider avatarProvider)
-            : base(connection, hosts)
         {
+            this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
-            Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", RepositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", repositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
 
-            accounts = RepositoryHost.GetAccounts(avatarProvider)
+            accounts = repositoryHost.GetAccounts(avatarProvider)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
             
@@ -114,7 +112,7 @@ namespace GitHub.ViewModels
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
 
             Observable.Return(GitIgnoreItem.None).Concat(
-                RepositoryHost.ApiClient
+                repositoryHost.ApiClient
                     .GetGitIgnoreTemplates()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Select(GitIgnoreItem.Create))
@@ -127,7 +125,7 @@ namespace GitHub.ViewModels
 
             Licenses = new ReactiveList<LicenseItem>();
             Observable.Return(LicenseItem.None).Concat(
-                RepositoryHost.ApiClient
+                repositoryHost.ApiClient
                     .GetLicenses()
                     .WhereNotNull()
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -285,7 +283,7 @@ namespace GitHub.ViewModels
                 newRepository,
                 SelectedAccount,
                 BaseRepositoryPath,
-                RepositoryHost.ApiClient);
+                repositoryHost.ApiClient);
         }
 
         ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
