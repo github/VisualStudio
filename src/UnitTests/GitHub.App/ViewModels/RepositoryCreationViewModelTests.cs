@@ -9,10 +9,8 @@ using NSubstitute;
 using Octokit;
 using ReactiveUI;
 using Rothko;
-using Xunit;
-using Xunit.Extensions;
 using UnitTests;
-using GitHub.Primitives;
+using Xunit;
 
 public class RepositoryCreationViewModelTests
 {
@@ -22,13 +20,13 @@ public class RepositoryCreationViewModelTests
     {
         if (provider == null)
             provider = Substitutes.ServiceProvider;
+        var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
         var os = provider.GetOperatingSystem();
-        var hosts = provider.GetRepositoryHosts();
         var creationService = provider.GetRepositoryCreationService();
         var avatarProvider = provider.GetAvatarProvider();
         var connection = provider.GetConnection();
 
-        return new RepositoryCreationViewModel(connection, os, hosts, creationService, avatarProvider);
+        return new RepositoryCreationViewModel(repositoryHost, os, creationService, avatarProvider);
     }
 
     public class TheSafeRepositoryNameProperty
@@ -297,15 +295,11 @@ public class RepositoryCreationViewModelTests
         public void IsPopulatedByTheRepositoryHost()
         {
             var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
-            var host = Substitute.For<IRepositoryHost>();
-            host.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(accounts));
-            var hosts = Substitute.For<IRepositoryHosts>();
-            hosts.GitHubHost.Returns(host);
-            hosts.LookupHost(Args.HostAddress).Returns(host);
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(accounts));
             var vm = new RepositoryCreationViewModel(
-                Substitute.For<GitHub.Models.IConnection>(),
+                repositoryHost,
                 Substitute.For<IOperatingSystem>(),
-                hosts,
                 Substitute.For<IRepositoryCreationService>(),
                 Substitute.For<IAvatarProvider>());
 
