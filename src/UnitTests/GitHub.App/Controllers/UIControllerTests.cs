@@ -2,19 +2,17 @@
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Windows.Controls;
-using DesignTimeStyleHelper;
 using GitHub.Controllers;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using GitHub.VisualStudio.UI.Views.Controls;
 using NSubstitute;
 using Xunit;
 using UnitTests;
 using GitHub.ViewModels;
 using ReactiveUI;
 using System.Collections.Generic;
-using GitHub.Primitives;
+using GitHub.Authentication;
 
 public class UIControllerTests
 {
@@ -27,7 +25,7 @@ public class UIControllerTests
             var hosts = Substitute.For<IRepositoryHosts>();
             var factory = Substitute.For<IExportFactoryProvider>();
             var cm = Substitutes.ConnectionManager;
-            var uiController = new UIController(uiProvider, hosts, factory, cm);
+            var uiController = new UIController(uiProvider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>());
 
             uiController.Dispose();
             uiController.Dispose();
@@ -58,7 +56,7 @@ public class UIControllerTests
             var cons = new System.Collections.ObjectModel.ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
             {
                 var list = new List<IView>();
                 uiController.SelectFlow(UIControllerFlow.Clone, null)
@@ -85,7 +83,7 @@ public class UIControllerTests
             hosts.LookupHost(connection.HostAddress).Returns(host);
             host.IsLoggedIn.Returns(true);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
             {
                 var list = new List<IView>();
                 uiController.SelectFlow(UIControllerFlow.Clone, connection)

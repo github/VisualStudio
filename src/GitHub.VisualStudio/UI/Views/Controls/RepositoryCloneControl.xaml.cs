@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
                 d(this.OneWayBind(ViewModel, vm => vm.FilterTextIsEnabled, v => v.filterText.IsEnabled));
                 d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
-                d(ViewModel.CloneCommand.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); }));
+                ViewModel.CloneCommand.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
             });
             IsVisibleChanged += (s, e) =>
             {

@@ -17,6 +17,7 @@ using Stateless;
 using NullGuard;
 using System.Collections.Specialized;
 using System.Linq;
+using GitHub.Authentication;
 
 namespace GitHub.Controllers
 {
@@ -29,6 +30,7 @@ namespace GitHub.Controllers
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
+        readonly Lazy<ITwoFactorChallengeHandler> lazyTwoFactorChallengeHandler;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly StateMachine<UIViewType, Trigger> machine;
@@ -38,12 +40,13 @@ namespace GitHub.Controllers
 
         [ImportingConstructor]
         public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
-            IConnectionManager connectionManager)
+            IConnectionManager connectionManager, Lazy<ITwoFactorChallengeHandler> lazyTwoFactorChallengeHandler)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
             this.hosts = hosts;
             this.connectionManager = connectionManager;
+            this.lazyTwoFactorChallengeHandler = lazyTwoFactorChallengeHandler;
 
 #if DEBUG
             if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
@@ -182,7 +185,9 @@ namespace GitHub.Controllers
                 // well to continue the flow if it's needed, since the
                 // authenticationresult callback won't happen until
                 // everything is done
-                var twofa = uiProvider.GetService<ITwoFactorViewModel>();
+                var dvm = factory.GetViewModel(UIViewType.TwoFactor);
+                disposables.Add(dvm);
+                var twofa = dvm.Value;
                 twofa.WhenAny(x => x.IsShowing, x => x.Value)
                     .Where(x => x)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -192,10 +197,12 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Finish));
             }
-            else
+            else if (viewType != UIViewType.TwoFactor)
+            {
                 view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next));
+            }
         }
 
         IView CreateViewAndViewModel(UIViewType viewType)
@@ -203,7 +210,7 @@ namespace GitHub.Controllers
             IViewModel viewModel;
             if (viewType == UIViewType.TwoFactor)
             {
-                viewModel = uiProvider.GetService<ITwoFactorViewModel>();
+                viewModel = lazyTwoFactorChallengeHandler.Value.CurrentViewModel;
             }
             else
             {

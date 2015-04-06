@@ -36,7 +36,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
-                d(ViewModel.AuthenticationResults
+                ViewModel.AuthenticationResults
                     .Subscribe(ret =>
                 {
                     if (ret == Authentication.AuthenticationResult.Success)
@@ -44,7 +44,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                         close.OnNext(null);
                         close.OnCompleted();
                     }
-                }));
+                });
             });
             IsVisibleChanged += (s, e) =>
             {
