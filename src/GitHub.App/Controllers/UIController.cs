@@ -197,10 +197,12 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Finish));
             }
-            else
+            else if (viewType != UIViewType.TwoFactor)
+            {
                 view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next));
+            }
         }
 
         IView CreateViewAndViewModel(UIViewType viewType)
