@@ -16,7 +16,6 @@ using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
-using Rothko;
 
 namespace GitHub.ViewModels
 {
@@ -27,6 +26,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
+        readonly IRepositoryPublishService repositoryPublishService;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly ObservableAsPropertyHelper<string> title;
@@ -34,18 +34,18 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         RepositoryPublishViewModel(
             IServiceProvider provider,
-            IOperatingSystem operatingSystem,
             IRepositoryHosts hosts,
-            IAvatarProvider avatarProvider)
-            : this(provider.GetService<IConnection>(), operatingSystem, hosts, avatarProvider)
+            IAvatarProvider avatarProvider,
+            IRepositoryPublishService repositoryPublishService)
+            : this(provider.GetService<IConnection>(), hosts, avatarProvider, repositoryPublishService)
         {}
 
         public RepositoryPublishViewModel(
             IConnection connection,
-            IOperatingSystem operatingSystem,
             IRepositoryHosts hosts,
-            IAvatarProvider avatarProvider)
-            : base(connection, operatingSystem, hosts)
+            IAvatarProvider avatarProvider,
+            IRepositoryPublishService repositoryPublishService)
+            : base(connection, hosts)
         {
             title = this.WhenAny(
                 x => x.SelectedHost,
@@ -57,6 +57,8 @@ namespace GitHub.ViewModels
 
             RepositoryHosts = new ReactiveList<IRepositoryHost>(
                 new[] { hosts.GitHubHost, hosts.EnterpriseHost }.Where(h => h.IsLoggedIn));
+            this.repositoryPublishService = repositoryPublishService;
+
             if (RepositoryHosts.Any())
             {
                 SelectedHost = RepositoryHosts[0];
@@ -142,10 +144,7 @@ namespace GitHub.ViewModels
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;
 
-            // TODO: Do we need to git init here?
-
-            return RepositoryHost.ApiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                .Select(gitHubRepo => /* TODO: We need to push here */ gitHubRepo)
+            return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
                 .SelectUnit();
         }
     }

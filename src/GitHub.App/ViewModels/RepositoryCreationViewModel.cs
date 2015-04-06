@@ -35,6 +35,7 @@ namespace GitHub.ViewModels
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
+        readonly IOperatingSystem operatingSystem;
 
         [ImportingConstructor]
         RepositoryCreationViewModel(
@@ -52,8 +53,9 @@ namespace GitHub.ViewModels
             IRepositoryHosts hosts,
             IRepositoryCreationService repositoryCreationService,
             IAvatarProvider avatarProvider)
-            : base(connection, operatingSystem, hosts)
+            : base(connection, hosts)
         {
+            this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
             Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", RepositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
@@ -229,7 +231,7 @@ namespace GitHub.ViewModels
                 // We store this in a local variable to prevent it changing underneath us while the
                 // folder dialog is open.
                 var localBaseRepositoryPath = BaseRepositoryPath;
-                var browseResult = OperatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
                     "Select a containing folder for your new repository.");
 
                 if (!browseResult.Success)
@@ -267,7 +269,7 @@ namespace GitHub.ViewModels
         {
             try
             {
-                return OperatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
+                return operatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
             }
             catch (PathTooLongException)
             {

@@ -89,6 +89,7 @@
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
     <Compile Include="Services\IGitClient.cs" />
+    <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />

@@ -7,7 +7,6 @@ using GitHub.Models;
 using GitHub.Validation;
 using NullGuard;
 using ReactiveUI;
-using Rothko;
 
 namespace GitHub.ViewModels
 {
@@ -18,11 +17,8 @@ namespace GitHub.ViewModels
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 
-        protected RepositoryFormViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
-            : base(connection, hosts)
+        protected RepositoryFormViewModel(IConnection connection, IRepositoryHosts hosts) : base(connection, hosts)
         {
-            OperatingSystem = operatingSystem;
-     
             CanKeepPrivateObservable = this.WhenAny(
                 x => x.SelectedAccount.IsEnterprise,
                 x => x.SelectedAccount.IsOnFreePlan,
@@ -105,8 +101,6 @@ namespace GitHub.ViewModels
         public ICommand UpgradeAccountPlan { get; private set; }
 
         protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
-
-        protected IOperatingSystem OperatingSystem { get; private set; }
 
         // These are the characters which are permitted when creating a repository name on GitHub The Website
         static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
