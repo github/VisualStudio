@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Composition;
 using GitHub.Api;
-using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -15,17 +14,12 @@ namespace GitHub.Factories
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ApiClientFactory : IApiClientFactory
     {
-        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly ProductHeaderValue productHeader;
 
         [ImportingConstructor]
-        public ApiClientFactory(
-            ILoginCache loginCache,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler,
-            IProgram program)
+        public ApiClientFactory(ILoginCache loginCache, IProgram program)
         {
             LoginCache = loginCache;
-            this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             productHeader = program.ProductHeader;
         }
 
@@ -35,9 +29,7 @@ namespace GitHub.Factories
 
             return new ApiClient(
                 hostAddress,
-                new ObservableGitHubClient(
-                    new GitHubClient(productHeader, new GitHubCredentialStore(hostAddress, LoginCache), apiBaseUri)),
-                twoFactorChallengeHandler);
+                new ObservableGitHubClient(new GitHubClient(productHeader, new GitHubCredentialStore(hostAddress, LoginCache), apiBaseUri)));
         }
 
         protected ILoginCache LoginCache { get; private set; }
