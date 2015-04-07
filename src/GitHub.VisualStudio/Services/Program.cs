@@ -12,14 +12,19 @@ namespace GitHub.VisualStudio
     {
         public Program()
         {
+            applicationName = Info.ApplicationInfo.ApplicationName;
+            applicationProvider = Info.ApplicationInfo.ApplicationProvider;
+            applicationDescription = Info.ApplicationInfo.ApplicationDescription;
+
             var executingAssembly = typeof(Program).Assembly;
             AssemblyName = executingAssembly.GetName();
             ExecutingAssemblyDirectory = Path.GetDirectoryName(executingAssembly.Location);
-            ProductHeader = new ProductHeaderValue("GitHubVisualStudio", AssemblyName.Version.ToString());
+            ProductHeader = new ProductHeaderValue(applicationName, AssemblyName.Version.ToString());
         }
 
-        const string applicationProvider = "GitHub";
-        const string applicationName = "GitHub Extension for Visual Studio";
+        readonly string applicationName;
+        readonly string applicationProvider;
+        readonly string applicationDescription;
 
         /// <summary>
         /// Provider of this application
@@ -30,6 +35,11 @@ namespace GitHub.VisualStudio
         /// Name of this application
         /// </summary>
         public string ApplicationName { get { return applicationName; } }
+
+        /// <summary>
+        /// Name of this application
+        /// </summary>
+        public string ApplicationDescription { get { return applicationDescription; } }
 
         /// <summary>
         /// The currently executing assembly.

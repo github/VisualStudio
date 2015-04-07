@@ -40,7 +40,7 @@ namespace GitHub.VisualStudio
             Connections = new ObservableCollection<IConnection>();
             cachePath = Path.Combine(
                 operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationProvider,
+                program.ApplicationName,
                 cacheFile);
 
             LoadConnectionsFromCache();

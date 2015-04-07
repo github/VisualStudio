@@ -17,7 +17,7 @@ public class ConnectionManagerTests
         {
             const string cacheData = @"{""connections"":[{""HostUrl"":""https://github.com"", ""UserName"":""shana""},{""HostUrl"":""https://ghe.io"", ""UserName"":""haacked""}]}";
             var program = Substitute.For<IProgram>();
-            program.ApplicationProvider.Returns("GHfVS");
+            program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");
@@ -42,7 +42,7 @@ public class ConnectionManagerTests
         public void IsEmptyWhenCacheCorrupt(string cacheJson)
         {
             var program = Substitute.For<IProgram>();
-            program.ApplicationProvider.Returns("GHfVS");
+            program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");
@@ -60,7 +60,7 @@ public class ConnectionManagerTests
         public void IsSavedToDiskWhenConnectionAdded()
         {
             var program = Substitute.For<IProgram>();
-            program.ApplicationProvider.Returns("GHfVS");
+            program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");

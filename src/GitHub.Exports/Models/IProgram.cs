@@ -8,6 +8,7 @@ namespace GitHub.Models
     {
         string ApplicationProvider { get; }
         string ApplicationName { get; }
+        string ApplicationDescription { get; }
         AssemblyName AssemblyName { get; }
         string ExecutingAssemblyDirectory { get; }
         ProductHeaderValue ProductHeader { get; }
