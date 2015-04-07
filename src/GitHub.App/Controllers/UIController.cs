@@ -133,15 +133,9 @@ namespace GitHub.Controllers
 
         public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection aConnection)
         {
-            connection = aConnection;
-            IRepositoryHost host = RepositoryHosts.DisconnectedRepositoryHost;
-            if (connection != null)
+            Func<IRepositoryHost, Subject<UserControl>> run = (host) =>
             {
-                uiProvider.AddService(typeof(IConnection), connection);
-                host = hosts.LookupHost(connection.HostAddress);
-            }
-
-            machine.Configure(UIViewType.None)
+                machine.Configure(UIViewType.None)
                 .Permit(Trigger.Auth, UIViewType.Login)
                 .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
                 .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
@@ -150,10 +144,26 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
                 .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
 
-            currentFlow = choice;
-            transition = new Subject<UserControl>();
-            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
-            return transition;
+                currentFlow = choice;
+                transition = new Subject<UserControl>();
+                transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
+                return transition;
+            };
+
+            connection = aConnection;
+
+            if (connection != null)
+            {
+                uiProvider.AddService(typeof(IConnection), connection);
+                return connection.Login()
+                    .Select(c =>
+                    {
+                        var host = hosts.LookupHost(connection.HostAddress);
+                        return run(host);
+                    }).Wait();
+            }
+
+            return run(new DisconnectedRepositoryHost());
         }
 
         void RunView(UIViewType viewType)

@@ -10,6 +10,7 @@ using GitHub.Models;
 using GitHub.Services;
 using Rothko;
 using GitHub.Primitives;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
@@ -32,6 +33,9 @@ namespace GitHub.VisualStudio
         readonly IOperatingSystem operatingSystem;
         const string cacheFile = "ghfvs.connections";
 
+        public event Action<IConnection> RequiresLogin;
+        public IObservable<IConnection> LoginComplete { get; set; }
+
         [ImportingConstructor]
         public ConnectionManager(IProgram program, IOperatingSystem operatingSystem)
         {
@@ -50,14 +54,14 @@ namespace GitHub.VisualStudio
 
         public IConnection CreateConnection(HostAddress address, string username)
         {
-            return new Connection(address, username);
+            return new Connection(this, address, username);
         }
 
         public bool AddConnection(HostAddress address, string username)
         {
             if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
                 return false;
-            Connections.Add(new Connection(address, username));
+            Connections.Add(new Connection(this, address, username));
             return true;
         }
 
@@ -68,6 +72,17 @@ namespace GitHub.VisualStudio
                 return false;
             Connections.Remove(c);
             return true;
+        }
+
+        public IObservable<IConnection> RequestLogin(IConnection connection)
+        {
+            if (LoginComplete == null)
+                return null;
+            var handler = RequiresLogin;
+            if (handler == null)
+                return null;
+            handler(connection);
+            return LoginComplete;
         }
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

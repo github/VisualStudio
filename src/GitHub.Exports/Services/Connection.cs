@@ -1,17 +1,26 @@
-﻿using GitHub.Models;
+﻿using System;
+using GitHub.Models;
 using GitHub.Primitives;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
     public class Connection : IConnection
     {
-        public Connection(HostAddress hostAddress, string userName)
+        readonly IConnectionManager manager;
+        public Connection(IConnectionManager cm, HostAddress hostAddress, string userName)
         {
+            manager = cm;
             HostAddress = hostAddress;
             Username = userName;
         }
 
         public HostAddress HostAddress { get; private set; }
         public string Username { get; private set; }
+
+        public IObservable<IConnection> Login()
+        {
+            return manager.RequestLogin(this);
+        }
     }
 }

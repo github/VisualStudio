@@ -14,7 +14,7 @@ namespace GitHub.VisualStudio.Base
         IGitExt gitService;
         bool disposed;
 
-        protected void Initialize()
+        protected virtual void Initialize()
         {
             var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
             if (gitProviderUIContext.IsActive)
