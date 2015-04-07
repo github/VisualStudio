@@ -20,12 +20,6 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         readonly IConnectionManager connectionManager;
 
-        public Octicon Icon
-        {
-            get;
-            private set;
-        }
-
         [ImportingConstructor]
         public GitHubPublishSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IConnectionManager cm)
             :  base(serviceProvider)
@@ -36,18 +30,16 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             IsExpanded = true;
         }
 
-        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        protected override void Initialize()
         {
-            base.Initialize(sender, e);
+            base.Initialize();
+            Refresh();
         }
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
         {
             base.ContextChanged(sender, e);
-            if (e.NewContext != null && e.NewContext.HasTeamProject)
-            {
-                Refresh();
-            }
+            Refresh();
         }
 
         public override void Refresh()
@@ -60,14 +52,15 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                 var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
                 if (remote == null)
                 {
+                    IsVisible = true;
                     if (connectionManager.Connections.Count > 0)
-                    {
                         ShowPublish();
-                    }
                     else
-                    {
                         ShowInvitation();
-                    }
+                }
+                else
+                {
+                    IsVisible = false;
                 }
             }
         }

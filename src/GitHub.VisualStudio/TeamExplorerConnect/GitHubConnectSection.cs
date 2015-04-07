@@ -90,7 +90,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
                 Refresh(connectionManager.Connections[sectionIndex]);
         }
 
-        private void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
             {
