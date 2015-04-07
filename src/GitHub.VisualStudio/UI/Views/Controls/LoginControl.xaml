@@ -38,6 +38,7 @@
             
         <TabControl 
             x:Name="hostTabControl"
+            Margin="30,0"
             Style="{StaticResource LightModalViewTabControl}"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
