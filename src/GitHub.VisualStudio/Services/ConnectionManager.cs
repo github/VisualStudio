@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using GitHub.Models;
@@ -33,12 +32,46 @@ namespace GitHub.VisualStudio
         public event Action<IConnection> RequiresLogin;
         public IObservable<IConnection> LoginComplete { get; set; }
 
+        Func<string, bool> fileExists;
+        Func<string, Encoding, string> readAllText;
+        Action<string, string> writeAllText;
+        Action<string> fileDelete;
+        Func<string, bool> dirExists;
+        Action<string> dirCreate;
+
         [ImportingConstructor]
         public ConnectionManager(IProgram program)
         {
+            fileExists = (path) => System.IO.File.Exists(path);
+            readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
+            writeAllText = (path, content) => System.IO.File.WriteAllText(path, content);
+            fileDelete = (path) => System.IO.File.Delete(path);
+            dirExists = (path) => System.IO.Directory.Exists(path);
+            dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
+
             Connections = new ObservableCollection<IConnection>();
-            cachePath = Path.Combine(
+            cachePath = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                program.ApplicationName,
+                cacheFile);
+
+            LoadConnectionsFromCache();
+
+            Connections.CollectionChanged += RefreshConnections;
+        }
+
+        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os)
+        {
+            fileExists = (path) => os.File.Exists(path);
+            readAllText = (path, encoding) => os.File.ReadAllText(path, encoding);
+            writeAllText = (path, content) => os.File.WriteAllText(path, content);
+            fileDelete = (path) => os.File.Delete(path);
+            dirExists = (path) => os.Directory.Exists(path);
+            dirCreate = (path) => os.Directory.CreateDirectory(path);
+
+            Connections = new ObservableCollection<IConnection>();
+            cachePath = System.IO.Path.Combine(
+                os.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 program.ApplicationName,
                 cacheFile);
 
@@ -89,10 +122,10 @@ namespace GitHub.VisualStudio
         {
             EnsureCachePath();
 
-            if (!File.Exists(cachePath))
+            if (!fileExists(cachePath))
                 return;
 
-            string data = File.ReadAllText(cachePath, Encoding.UTF8);
+            string data = readAllText(cachePath, Encoding.UTF8);
 
             CacheData cacheData;
             try
@@ -107,7 +140,7 @@ namespace GitHub.VisualStudio
             if (cacheData == null || cacheData.connections == null)
             {
                 // cache is corrupt, remove
-                File.Delete(cachePath);
+                fileDelete(cachePath);
                 return;
             }
 
@@ -128,7 +161,7 @@ namespace GitHub.VisualStudio
             try
             {
                 string data = SimpleJson.SerializeObject(cache);
-                File.WriteAllText(cachePath, data);
+                writeAllText(cachePath, data);
             }
             catch (Exception ex)
             {
@@ -138,11 +171,11 @@ namespace GitHub.VisualStudio
 
         void EnsureCachePath()
         {
-            if (File.Exists(cachePath))
+            if (fileExists(cachePath))
                 return;
-            var di = Path.GetDirectoryName(cachePath);
-            if (!Directory.Exists(di))
-                Directory.CreateDirectory(di);
+            var di = System.IO.Path.GetDirectoryName(cachePath);
+            if (!dirExists(di))
+                dirCreate(di);
         }
 
         public ObservableCollection<IConnection> Connections { get; private set; }
