@@ -13,6 +13,7 @@ using ReactiveUI;
 using System.Globalization;
 using NullGuard;
 using System.Linq;
+using System.Reactive.Subjects;
 
 namespace GitHub.Models
 {
@@ -83,8 +84,28 @@ namespace GitHub.Models
                 (githubLoggedIn, enterpriseLoggedIn) => githubLoggedIn.Value || enterpriseLoggedIn.Value)
                 .ToProperty(this, x => x.IsLoggedInToAnyHost);
 
+            // This part is strictly to support having the IConnectionManager request that a connection
+            // be logged in. It doesn't know about hosts or load anything reactive, so it gets
+            // informed of logins via the LoginComplete observable, and requests logins via
+            // the RequiresLogin event.
+            var connectionLogin = new ReplaySubject<IConnection>();
+            connectionManager.LoginComplete = connectionLogin;
+            Observable.FromEvent<IConnection>(
+                h => connectionManager.RequiresLogin += h,
+                h => connectionManager.RequiresLogin -= h
+            ).Do(c =>
+            {
+                var address = c.HostAddress;
+                var host = LookupHost(address);
+                if (host == DisconnectedRepositoryHost)
+                {
+                    LogInFromCache(address)
+                        .Do(x => connectionLogin.OnNext(c));
+                }
+            });
+
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
-            // start tracking changes to the EntepriseHost property and persist every change to the db
+            // start tracking changes to the EnterpriseHost property and persist every change to the db
             Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe();
         }
 
@@ -122,6 +143,25 @@ namespace GitHub.Models
                         else
                             EnterpriseHost = host;
                         connectionManager.AddConnection(address, usernameOrEmail);
+                    }
+                });
+        }
+
+        public IObservable<AuthenticationResult> LogInFromCache(HostAddress address)
+        {
+            var isDotCom = HostAddress.GitHubDotComHostAddress == address;
+            var host = RepositoryHostFactory.Create(address);
+            return host.LogInFromCache()
+                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                .Do(result =>
+                {
+                    bool successful = result.IsSuccess();
+                    if (successful)
+                    {
+                        if (isDotCom)
+                            GitHubHost = host;
+                        else
+                            EnterpriseHost = host;
                     }
                 });
         }

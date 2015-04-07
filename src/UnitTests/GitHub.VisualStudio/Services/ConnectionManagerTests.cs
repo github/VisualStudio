@@ -68,7 +68,7 @@ public class ConnectionManagerTests
             operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns("");
             var manager = new ConnectionManager(program, operatingSystem);
 
-            manager.Connections.Add(new Connection(HostAddress.GitHubDotComHostAddress, "coolio"));
+            manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));
 
             Assert.Equal(1, manager.Connections.Count);
             operatingSystem.File.Received().WriteAllText(@"c:\fake\GHfVS\ghfvs.connections",

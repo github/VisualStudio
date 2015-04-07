@@ -1,4 +1,6 @@
 ﻿using GitHub.Primitives;
+using System;
+using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
@@ -6,5 +8,7 @@ namespace GitHub.Models
     {
         HostAddress HostAddress { get; }
         string Username { get; }
+
+        IObservable<IConnection> Login();
     }
 }

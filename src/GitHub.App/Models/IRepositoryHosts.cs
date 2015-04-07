@@ -14,6 +14,7 @@ namespace GitHub.Models
             HostAddress hostAddress,
             string usernameOrEmail,
             string password);
+        IObservable<AuthenticationResult> LogInFromCache(HostAddress hostAddress);
         IRepositoryHostFactory RepositoryHostFactory { get; }
         bool IsLoggedInToAnyHost { get; }
         IRepositoryHost LookupHost(HostAddress address);
