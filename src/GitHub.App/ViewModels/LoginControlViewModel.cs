@@ -18,7 +18,6 @@ namespace GitHub.ViewModels
             IRepositoryHosts hosts,
             ILoginToGitHubViewModel loginToGitHubViewModel,
             ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
-            : base(serviceProvider)
         {
             Title = "Connect To GitHub";
             RepositoryHosts = hosts;

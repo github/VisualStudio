@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\IAvatarContainer.cs" />
+    <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
@@ -88,6 +89,8 @@
     <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />
     <Compile Include="Services\IImageDownloader.cs" />
+    <Compile Include="Services\IGitClient.cs" />
+    <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
