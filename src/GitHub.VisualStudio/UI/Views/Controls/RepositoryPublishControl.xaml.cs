@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows;
+using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.UI.Helpers;
@@ -9,9 +12,6 @@ using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
-using System.Reactive.Subjects;
-using GitHub.Extensions;
-using System.Windows.Input;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -42,11 +42,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             {
                 d(this.OneWayBind(ViewModel, vm => vm.RepositoryHosts, v => v.hostsComboBox.ItemsSource));
                 d(this.Bind(ViewModel, vm => vm.SelectedHost, v => v.hostsComboBox.SelectedItem));
-
-                d(this.OneWayBind(ViewModel, vm => vm.GitIgnoreTemplates, v => v.ignoreTemplateList.ItemsSource));
-                d(this.Bind(ViewModel, vm => vm.SelectedGitIgnoreTemplate, v => v.ignoreTemplateList.SelectedItem));
-                d(this.OneWayBind(ViewModel, vm => vm.Licenses, v => v.licenseList.ItemsSource));
-                d(this.Bind(ViewModel, vm => vm.SelectedLicense, v => v.licenseList.SelectedItem));
 
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.RepositoryNameValidator, v => v.nameValidationMessage.ReactiveValidator));

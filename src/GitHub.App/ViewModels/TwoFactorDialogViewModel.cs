@@ -2,12 +2,12 @@
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using GitHub.Authentication;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Validation;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
-using GitHub.Exports;
 
 namespace GitHub.ViewModels
 {
@@ -24,7 +24,6 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public TwoFactorDialogViewModel(IVisualStudioBrowser browser,
             ITwoFactorChallengeHandler twoFactorChallengeHandler)
-            : base(null)
         {
             Title = "Two-Factor authentication required";
             twoFactorChallengeHandler.SetViewModel(this);
