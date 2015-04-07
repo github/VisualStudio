@@ -31,9 +31,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         }
 
         [ImportingConstructor]
-        public GitHubPublishSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
-            :  base(serviceProvider)
+        public GitHubPublishSection(IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
         {
             connectionManager = cm;
             lazyBrowser = browser;
@@ -41,6 +39,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             IsVisible = false;
             IsExpanded = true;
             Description = "Powerful collaboration, code review, and code management for open source and private projects.";
+
+            cm.Connections.CollectionChanged += (s,e) => Refresh();
         }
 
         protected override void Initialize()
@@ -97,15 +97,27 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         void ShowInvitation()
         {
             var view = new GitHubInvitationContent();
-            view.DataContext = this;
             SectionContent = view;
+            view.DataContext = this;
         }
 
         void ShowPublish()
         {
-            var view = new RepositoryPublishControl();
-            view.DataContext = this;
-            SectionContent = view;
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var factory = uiProvider.GetService<IExportFactoryProvider>();
+            var uiflow = factory.UIControllerFactory.CreateExport();
+            var disposable = uiflow;
+            var ui = uiflow.Value;
+            var creation = ui.SelectFlow(UIControllerFlow.Publish, null);
+            creation.Subscribe((c) =>
+            {
+                SectionContent = c;
+                c.DataContext = this;
+            },
+            () =>
+            {
+            });
+            ui.Start();
         }
     }
 }

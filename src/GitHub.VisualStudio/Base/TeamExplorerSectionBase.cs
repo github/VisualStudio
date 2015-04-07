@@ -43,7 +43,7 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerSectionBase(IServiceProvider serviceProvider)
             : base()
         {
-            this.ServiceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
         }
 
         public virtual void Cancel()
