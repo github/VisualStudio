@@ -37,7 +37,7 @@
         <ui:HorizontalShadowDivider />
 
         <TextBlock
-            Margin="0,0,0,16"
+            Margin="30,0,30,16"
             HorizontalAlignment="Center"
             TextWrapping="Wrap"
             Style="{DynamicResource GitHubDescriptionTextBlock}">
