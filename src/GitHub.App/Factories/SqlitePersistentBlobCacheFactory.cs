@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Akavache;
+using Akavache.Sqlite3;
 
 namespace GitHub.Factories
 {
@@ -11,8 +12,8 @@ namespace GitHub.Factories
         {
             Guard.ArgumentNotEmptyString(path, "path");
 
-            return new InMemoryBlobCache();
-            //return new SQLitePersistentBlobCache(path);
+            //return new InMemoryBlobCache();
+            return new SQLitePersistentBlobCache(path);
         }
     }
 }
