@@ -8,9 +8,7 @@ using System.Linq;
 using System.Text;
 using GitHub.Models;
 using GitHub.Services;
-using Rothko;
 using GitHub.Primitives;
-using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
@@ -30,20 +28,17 @@ namespace GitHub.VisualStudio
     public class ConnectionManager : IConnectionManager
     {
         readonly string cachePath;
-        readonly IOperatingSystem operatingSystem;
         const string cacheFile = "ghfvs.connections";
 
         public event Action<IConnection> RequiresLogin;
         public IObservable<IConnection> LoginComplete { get; set; }
 
         [ImportingConstructor]
-        public ConnectionManager(IProgram program, IOperatingSystem operatingSystem)
+        public ConnectionManager(IProgram program)
         {
-            this.operatingSystem = operatingSystem;
-
             Connections = new ObservableCollection<IConnection>();
             cachePath = Path.Combine(
-                operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 program.ApplicationName,
                 cacheFile);
 
@@ -92,10 +87,12 @@ namespace GitHub.VisualStudio
 
         void LoadConnectionsFromCache()
         {
-            if (!operatingSystem.File.Exists(cachePath))
+            EnsureCachePath();
+
+            if (!File.Exists(cachePath))
                 return;
 
-            string data = operatingSystem.File.ReadAllText(cachePath, Encoding.UTF8);
+            string data = File.ReadAllText(cachePath, Encoding.UTF8);
 
             CacheData cacheData;
             try
@@ -110,7 +107,7 @@ namespace GitHub.VisualStudio
             if (cacheData == null || cacheData.connections == null)
             {
                 // cache is corrupt, remove
-                operatingSystem.File.Delete(cachePath);
+                File.Delete(cachePath);
                 return;
             }
 
@@ -123,18 +120,29 @@ namespace GitHub.VisualStudio
 
         void SaveConnectionsToCache()
         {
+            EnsureCachePath();
+
             var cache = new CacheData();
             cache.connections = Connections.Select(conn =>
                 new ConnectionCacheItem { HostUrl = conn.HostAddress.WebUri, UserName = conn.Username });
             try
             {
                 string data = SimpleJson.SerializeObject(cache);
-                operatingSystem.File.WriteAllText(cachePath, data);
+                File.WriteAllText(cachePath, data);
             }
             catch (Exception ex)
             {
                 Debug.Fail(ex.ToString());
             }
+        }
+
+        void EnsureCachePath()
+        {
+            if (File.Exists(cachePath))
+                return;
+            var di = Path.GetDirectoryName(cachePath);
+            if (!Directory.Exists(di))
+                Directory.CreateDirectory(di);
         }
 
         public ObservableCollection<IConnection> Connections { get; private set; }
