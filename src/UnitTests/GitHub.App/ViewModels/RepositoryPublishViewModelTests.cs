@@ -1,11 +1,9 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using ReactiveUI;
-using Rothko;
-using UnitTests;
 using Xunit;
 
 public class RepositoryPublishViewModelTests
@@ -18,7 +16,6 @@ public class RepositoryPublishViewModelTests
         [InlineData(false, true, 1)]
         public void IncludesLoggedInRepositories(bool gitHubLoggedIn, bool enterpriseLoggedIn, int expectedCount)
         {
-            var operatingSystem = Substitute.For<IOperatingSystem>();
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(gitHubLoggedIn);
             gitHubHost.Title.Returns("GitHub");
@@ -30,8 +27,10 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             hosts.EnterpriseHost.Returns(enterpriseHost);
-            var connection = Substitutes.Connection;
-            var vm = new RepositoryPublishViewModel(connection, operatingSystem, hosts, Substitute.For<IAvatarProvider>());
+            var vm = new RepositoryPublishViewModel(
+                hosts,
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             var repositoryHosts = vm.RepositoryHosts;
 
@@ -44,14 +43,16 @@ public class RepositoryPublishViewModelTests
         [Fact]
         public void DefaultsToGitHub()
         {
-            var operatingSystem = Substitute.For<IOperatingSystem>();
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
             gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
-            var vm = new RepositoryPublishViewModel(Substitutes.Connection, operatingSystem, hosts, Substitute.For<IAvatarProvider>());
+            var vm = new RepositoryPublishViewModel(
+                hosts,
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             Assert.Same(gitHubHost, vm.SelectedHost);
         }
@@ -62,7 +63,6 @@ public class RepositoryPublishViewModelTests
         [Fact]
         public void IsPopulatedByTheAccountsForTheSelectedHost()
         {
-            var operatingSystem = Substitute.For<IOperatingSystem>();
             var gitHubAccounts = new ReactiveList<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
             var enterpriseAccounts = new ReactiveList<IAccount> { Substitute.For<IAccount>() };
             var gitHubHost = Substitute.For<IRepositoryHost>();
@@ -76,7 +76,10 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             hosts.EnterpriseHost.Returns(enterpriseHost);
-            var vm = new RepositoryPublishViewModel(Substitutes.Connection, operatingSystem, hosts, Substitute.For<IAvatarProvider>());
+            var vm = new RepositoryPublishViewModel(
+                hosts,
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             Assert.Equal(2, vm.Accounts.Count);
             Assert.Same(gitHubAccounts[0], vm.SelectedAccount);
@@ -100,10 +103,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             vm.RepositoryName = "this-is-bad";
 
@@ -120,10 +122,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             vm.RepositoryName = "this is bad";
 
@@ -140,10 +141,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
             Assert.Null(vm.SafeRepositoryName);
             vm.RepositoryName = "not-null";
             vm.RepositoryName = null;
@@ -164,10 +164,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             vm.RepositoryName = "";
 
@@ -185,10 +184,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
             vm.RepositoryName = "repo";
 
             Assert.True(vm.PublishRepository.CanExecute(null));
@@ -211,10 +209,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             vm.RepositoryName = "thisisfine";
 
@@ -235,10 +232,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             vm.RepositoryName = "this-is-bad";
 
@@ -255,10 +251,9 @@ public class RepositoryPublishViewModelTests
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = new RepositoryPublishViewModel(
-                Substitutes.Connection,
-                Substitute.For<IOperatingSystem>(),
                 hosts,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IAvatarProvider>(),
+                Substitute.For<IRepositoryPublishService>());
 
             vm.RepositoryName = "this is bad";
 

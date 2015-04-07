@@ -16,7 +16,7 @@ namespace GitHub.ViewModels
     /// Represents a view model responsible for providing log in to
     /// either GitHub.com or a GitHub Enterprise instance.
     /// </summary>
-    public interface ILoginControlViewModel : IReactiveObject, IDataErrorInfo, ILoginViewModel
+    public interface ILoginControlViewModel : IReactiveObject, ILoginViewModel
     {
         /// <summary>
         /// Gets a value indicating the currently available login modes 

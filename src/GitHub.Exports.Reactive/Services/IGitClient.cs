@@ -1,0 +1,27 @@
+﻿using System;
+using System.Reactive;
+using LibGit2Sharp;
+
+namespace GitHub.Services
+{
+    public interface IGitClient
+    {
+        /// <summary>
+        /// Pushes the specified branch to the remote.
+        /// </summary>
+        /// <param name="repository">The repository to pull</param>
+        /// <param name="remoteName">The name of the remote</param>
+        /// <param name="branchName">the branch to pull</param>
+        /// <returns></returns>
+        IObservable<Unit> Push(IRepository repository, string branchName, string remoteName);
+
+        /// <summary>
+        /// Sets the specified remote to the specified URL.
+        /// </summary>
+        /// <param name="repository">The repository to set</param>
+        /// <param name="remoteName">The name of the remote</param>
+        /// <param name="url">The URL to set as the remote</param>
+        /// <returns></returns>
+        IObservable<Unit> SetRemote(IRepository repository, string remoteName, Uri url);
+    }
+}
