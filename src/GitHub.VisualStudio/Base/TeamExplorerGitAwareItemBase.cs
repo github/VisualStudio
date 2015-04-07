@@ -10,7 +10,7 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerGitAwareItemBase : TeamExplorerItemBase
     {
-        IGitRepositoryInfo activeRepo;
+        protected IGitRepositoryInfo activeRepo;
         IGitExt gitService;
         bool disposed;
 

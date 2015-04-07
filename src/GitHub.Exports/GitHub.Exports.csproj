@@ -85,6 +85,7 @@
     <Compile Include="Services\VSExtensions.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
+    <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
     <Compile Include="ViewModels\IGitHubHomeSection.cs" />
     <Compile Include="Models\IProgram.cs" />
     <Compile Include="Api\ISimpleApiClient.cs" />
