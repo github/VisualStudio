@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Windows.Input;
+using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -31,5 +32,19 @@ namespace GitHub.ViewModels
         /// True when creation is in progress.
         /// </summary>
         bool IsCreating { get; }
+
+        GitIgnoreItem SelectedGitIgnoreTemplate { get; set; }
+
+        LicenseItem SelectedLicense { get; set; }
+
+        /// <summary>
+        /// The list of GitIgnore templates supported by repository creation
+        /// </summary>
+        ReactiveList<GitIgnoreItem> GitIgnoreTemplates { get; }
+
+        /// <summary>
+        /// The list of license templates supported by repository creation
+        /// </summary>
+        ReactiveList<LicenseItem> Licenses { get; }
     }
 }

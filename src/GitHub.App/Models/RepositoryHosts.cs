@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
@@ -9,11 +11,9 @@ using GitHub.Caches;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
-using ReactiveUI;
-using System.Globalization;
 using NullGuard;
-using System.Linq;
 using System.Reactive.Subjects;
+using ReactiveUI;
 
 namespace GitHub.Models
 {

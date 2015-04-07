@@ -1,41 +1,35 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using ReactiveUI;
-using Rothko;
-using UnitTests;
 using Xunit;
+using UnitTests;
 
 public class RepositoryPublishViewModelTests
 {
     public static class Helpers
     {
-        public static RepositoryPublishViewModel GetViewModel(IAvatarProvider ap = null)
+        public static IRepositoryPublishViewModel GetViewModel(IAvatarProvider ap)
         {
-            return GetViewModel(null, null, ap);
+            return GetViewModel(null, ap, null);
         }
 
-        public static RepositoryPublishViewModel GetViewModel(IRepositoryHosts hosts = null, IAvatarProvider ap = null)
+        public static IRepositoryPublishViewModel GetViewModel(IRepositoryPublishService service = null)
         {
-            return GetViewModel(null, hosts, ap);
+            return GetViewModel(null, null, service);
         }
 
-        public static RepositoryPublishViewModel GetViewModel(IRepositoryHosts hosts = null)
+        public static IRepositoryPublishViewModel GetViewModel(IRepositoryHosts hosts = null, IAvatarProvider ap = null, IRepositoryPublishService service = null)
         {
-            return GetViewModel(null, hosts, null);
-        }
-
-        public static RepositoryPublishViewModel GetViewModel(IOperatingSystem os = null, IRepositoryHosts hosts = null, IAvatarProvider ap = null)
-        {
-            if (os == null)
-                os = Substitutes.OperatingSystem;
             if (hosts == null)
                 hosts = Substitutes.RepositoryHosts;
             if (ap == null)
                 ap = Substitute.For<IAvatarProvider>();
-            return new RepositoryPublishViewModel(os, hosts, ap);
+            if (service == null)
+                service = Substitute.For<IRepositoryPublishService>();
+            return new RepositoryPublishViewModel(hosts, ap, service);
         }
     }
 

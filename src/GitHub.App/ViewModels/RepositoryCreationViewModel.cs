@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -9,7 +10,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -17,6 +17,7 @@ using GitHub.UserErrors;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
+using Octokit;
 using ReactiveUI;
 using Rothko;
 
@@ -30,32 +31,35 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
+        readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
+        readonly IOperatingSystem operatingSystem;
 
         [ImportingConstructor]
         RepositoryCreationViewModel(
-            IServiceProvider provider,
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IOperatingSystem operatingSystem,
-            IRepositoryHosts hosts,
-            IRepositoryCreationService rs,
+            IRepositoryCreationService repositoryCreationService,
             IAvatarProvider avatarProvider)
-            : this(provider.GetService<IConnection>(), operatingSystem, hosts, rs, avatarProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, avatarProvider)
         {}
 
         public RepositoryCreationViewModel(
-            IConnection connection,
+            IRepositoryHost repositoryHost,
             IOperatingSystem operatingSystem,
-            IRepositoryHosts hosts,
             IRepositoryCreationService repositoryCreationService,
             IAvatarProvider avatarProvider)
-            : base(connection, operatingSystem, hosts)
         {
+            this.repositoryHost = repositoryHost;
+            this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
-            Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", RepositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", repositoryHost.Title);
+            SelectedGitIgnoreTemplate = GitIgnoreItem.None;
+            SelectedLicense = LicenseItem.None;
 
-            accounts = RepositoryHost.GetAccounts(avatarProvider)
+            accounts = repositoryHost.GetAccounts(avatarProvider)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
             
@@ -104,6 +108,118 @@ namespace GitHub.ViewModels
 
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
+
+            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
+
+            Observable.Return(GitIgnoreItem.None).Concat(
+                repositoryHost.ApiClient
+                    .GetGitIgnoreTemplates()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(GitIgnoreItem.Create))
+                .ToList()
+                .Subscribe(templates =>
+                {
+                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
+                    Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
+                });
+
+            Licenses = new ReactiveList<LicenseItem>();
+            Observable.Return(LicenseItem.None).Concat(
+                repositoryHost.ApiClient
+                    .GetLicenses()
+                    .WhereNotNull()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Select(license => new LicenseItem(license)))
+                .ToList()
+                .Subscribe(licenses =>
+                {
+                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
+                    Debug.Assert(Licenses.Any(), "There should be at least one license");
+                });
+        }
+
+        string baseRepositoryPath;
+        /// <summary>
+        /// Path to clone repositories into
+        /// </summary>
+        public string BaseRepositoryPath
+        {
+            [return: AllowNull]
+            get { return baseRepositoryPath; }
+            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
+        }
+
+        /// <summary>
+        /// Fires up a file dialog to select the directory to clone into
+        /// </summary>
+        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
+
+        /// <summary>
+        /// Is running the creation process
+        /// </summary>
+        public bool IsCreating { get { return isCreating.Value; } }
+
+        /// <summary>
+        /// If the repo can be made private (depends on the user plan)
+        /// </summary>
+        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
+
+        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        {
+            get;
+            private set;
+        }
+
+        public ReactiveList<LicenseItem> Licenses
+        {
+            get;
+            private set;
+        }
+
+        GitIgnoreItem selectedGitIgnoreTemplate;
+        [AllowNull]
+        public GitIgnoreItem SelectedGitIgnoreTemplate
+        {
+            get { return selectedGitIgnoreTemplate; }
+            set { this.RaiseAndSetIfChanged(ref selectedGitIgnoreTemplate, value ?? GitIgnoreItem.None); }
+        }
+
+        LicenseItem selectedLicense;
+        [AllowNull]
+        public LicenseItem SelectedLicense
+        {
+            get { return selectedLicense; }
+            set { this.RaiseAndSetIfChanged(ref selectedLicense, value ?? LicenseItem.None); }
+        }
+
+        /// <summary>
+        /// List of accounts (at least one)
+        /// </summary>
+        public IReadOnlyList<IAccount> Accounts { get { return accounts.Value; } }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; private set; }
+
+        /// <summary>
+        /// Fires off the process of creating the repository remotely and then cloning it locally
+        /// </summary>
+        public IReactiveCommand<Unit> CreateRepository { get; private set; }
+
+        protected override NewRepository GatherRepositoryInfo()
+        {
+            var gitHubRepository = base.GatherRepositoryInfo();
+
+            if (SelectedLicense != LicenseItem.None)
+            {
+                gitHubRepository.LicenseTemplate = SelectedLicense.Key;
+                gitHubRepository.AutoInit = true;
+            }
+
+            if (SelectedGitIgnoreTemplate != GitIgnoreItem.None)
+            {
+                gitHubRepository.GitignoreTemplate = SelectedGitIgnoreTemplate.Name;
+                gitHubRepository.AutoInit = true;
+            }
+            return gitHubRepository;
         }
 
         IObservable<Unit> ShowBrowseForDirectoryDialog()
@@ -113,7 +229,7 @@ namespace GitHub.ViewModels
                 // We store this in a local variable to prevent it changing underneath us while the
                 // folder dialog is open.
                 var localBaseRepositoryPath = BaseRepositoryPath;
-                var browseResult = OperatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
                     "Select a containing folder for your new repository.");
 
                 if (!browseResult.Success)
@@ -151,7 +267,7 @@ namespace GitHub.ViewModels
         {
             try
             {
-                return OperatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
+                return operatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
             }
             catch (PathTooLongException)
             {
@@ -167,7 +283,7 @@ namespace GitHub.ViewModels
                 newRepository,
                 SelectedAccount,
                 BaseRepositoryPath,
-                RepositoryHost.ApiClient);
+                repositoryHost.ApiClient);
         }
 
         ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
@@ -189,43 +305,5 @@ namespace GitHub.ViewModels
 
             return createCommand;
         }
-
-        /// <summary>
-        /// List of accounts (at least one)
-        /// </summary>
-        public IReadOnlyList<IAccount> Accounts { get { return accounts.Value; } }
-
-        string baseRepositoryPath;
-        /// <summary>
-        /// Path to clone repositories into
-        /// </summary>
-        public string BaseRepositoryPath
-        {
-            [return: AllowNull]
-            get { return baseRepositoryPath; }
-            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
-        }
-
-        public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; private set; }
-
-        /// <summary>
-        /// Fires up a file dialog to select the directory to clone into
-        /// </summary>
-        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
-
-        /// <summary>
-        /// Is running the creation process
-        /// </summary>
-        public bool IsCreating { get { return isCreating.Value; } }
-
-        /// <summary>
-        /// If the repo can be made private (depends on the user plan)
-        /// </summary>
-        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
-
-        /// <summary>
-        /// Fires off the process of creating the repository remotely and then cloning it locally
-        /// </summary>
-        public IReactiveCommand<Unit> CreateRepository { get; private set; }
-   }
+    }
 }

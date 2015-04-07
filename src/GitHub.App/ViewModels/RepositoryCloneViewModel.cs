@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
@@ -7,7 +6,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Caches;
 using GitHub.Exports;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -18,26 +16,29 @@ using ReactiveUI;
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
-    public class RepositoryCloneViewModel : ConnectionViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
         readonly IRepositoryCloneService cloneService;
 
         [ImportingConstructor]
-        RepositoryCloneViewModel(IServiceProvider provider,
-            IRepositoryCloneService cs, IRepositoryHosts hosts, IAvatarProvider avatarProvider)
-            : this(provider.GetService<Models.IConnection>(), cs, hosts, avatarProvider)
+        RepositoryCloneViewModel(
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            IRepositoryCloneService repositoryCloneService,
+            IAvatarProvider avatarProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, avatarProvider)
         { }
         
-        public RepositoryCloneViewModel(Models.IConnection connection,
-            IRepositoryCloneService cloneService, IRepositoryHosts hosts, IAvatarProvider avatarProvider)
-            : base(connection, hosts)
+        public RepositoryCloneViewModel(
+            IRepositoryHost repositoryHost,
+            IRepositoryCloneService cloneService,
+            IAvatarProvider avatarProvider)
         {
             this.cloneService = cloneService;
-            Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", RepositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             // TODO: How do I know which host this dialog is associated with?
             // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
-            RepositoryHost.ApiClient.GetUserRepositories()
+            repositoryHost.ApiClient.GetUserRepositories()
                 .FirstAsync()
                 .Flatten()
                 .Select(repo => CreateRepository(repo, avatarProvider))
