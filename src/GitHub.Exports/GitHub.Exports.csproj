@@ -68,6 +68,7 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
