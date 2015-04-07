@@ -3,18 +3,6 @@ using System;
 
 namespace GitHub.Info
 {
-    public static class ApplicationInfo
-    {
-#if DEBUG
-        public const string ApplicationName = "GìtHūbForVisualStudio";
-        public const string ApplicationProvider = "GìtHūb";
-#else
-        public const string ApplicationName = "GitHubForVisualStudio";
-        public const string ApplicationProvider = "GitHub";
-#endif
-        public const string ApplicationDescription = "GitHub Extension for Visual Studio";
-    }
-
     public static class EnvironmentExtensions
     {
         public static string GetLocalGitHubApplicationDataPath(this Rothko.IEnvironment environment)
