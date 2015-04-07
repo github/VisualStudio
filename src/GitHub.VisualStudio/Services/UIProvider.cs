@@ -141,7 +141,7 @@ namespace GitHub.VisualStudio
             currentUIFlow = factory.UIControllerFactory.CreateExport();
             var disposable = currentUIFlow;
             var ui = currentUIFlow.Value;
-            var creation = ui.SelectFlow(controllerFlow, connection);
+            var creation = ui.SelectFlow(controllerFlow);
             var windowController = new UI.WindowController(creation);
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
             creation.Subscribe((c) => { }, () =>
@@ -154,7 +154,7 @@ namespace GitHub.VisualStudio
                     StopUI();
             });
             windowController.Show();
-            ui.Start();
+            ui.Start(connection);
         }
 
         public void StopUI()

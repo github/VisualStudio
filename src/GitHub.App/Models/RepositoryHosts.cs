@@ -88,20 +88,38 @@ namespace GitHub.Models
             // be logged in. It doesn't know about hosts or load anything reactive, so it gets
             // informed of logins via the LoginComplete observable, and requests logins via
             // the RequiresLogin event.
-            var connectionLogin = new ReplaySubject<IConnection>();
-            connectionManager.LoginComplete = connectionLogin;
+            connectionManager.LoginComplete = new ReplaySubject<IConnection>();
             Observable.FromEvent<IConnection>(
                 h => connectionManager.RequiresLogin += h,
                 h => connectionManager.RequiresLogin -= h
             ).Do(c =>
             {
-                var address = c.HostAddress;
-                var host = LookupHost(address);
-                if (host == DisconnectedRepositoryHost)
+                IObservable<AuthenticationResult> list = Observable.Return(AuthenticationResult.Success);
+                var connectionLogin = (ReplaySubject<IConnection>)connectionManager.LoginComplete;
+                foreach (var connection in connectionManager.Connections)
                 {
-                    LogInFromCache(address)
-                        .Do(x => connectionLogin.OnNext(c));
+                    if (connection == c)
+                    {
+                        var address = c.HostAddress;
+                        var host = LookupHost(address);
+                        if (host == DisconnectedRepositoryHost)
+                            list = LogInFromCache(address)
+                            .Select(x => {
+                                connectionLogin.OnNext(c);
+                                return x;
+                            })
+                            .Concat(list);
+                        else
+                            connectionLogin.OnNext(c);
+                    }
+                    else
+                        connectionLogin.OnNext(c);
                 }
+                list.Subscribe(_ => { }, () =>
+                {
+                    connectionLogin.OnCompleted();
+                    connectionManager.LoginComplete = new ReplaySubject<IConnection>();
+                });
             }).Subscribe();
 
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then

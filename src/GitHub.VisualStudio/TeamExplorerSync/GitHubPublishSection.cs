@@ -12,6 +12,8 @@ using GitHub.Models;
 using GitHub.VisualStudio.UI.Views.Controls;
 using GitHub.Services;
 using GitHub.Info;
+using ReactiveUI;
+using System.Reactive.Linq;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -108,8 +110,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             var uiflow = factory.UIControllerFactory.CreateExport();
             var disposable = uiflow;
             var ui = uiflow.Value;
-            var creation = ui.SelectFlow(UIControllerFlow.Publish, null);
-            creation.Subscribe((c) =>
+            var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            creation
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe((c) =>
             {
                 SectionContent = c;
                 c.DataContext = this;
@@ -117,7 +121,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             () =>
             {
             });
-            ui.Start();
+            ui.Start(null);
         }
     }
 }

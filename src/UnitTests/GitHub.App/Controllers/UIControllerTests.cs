@@ -59,7 +59,7 @@ public class UIControllerTests
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
             {
                 var list = new List<IView>();
-                uiController.SelectFlow(UIControllerFlow.Clone, null)
+                uiController.SelectFlow(UIControllerFlow.Clone)
                     .Subscribe(uc => list.Add(uc as IView),
                                 () =>
                                 {
@@ -67,7 +67,7 @@ public class UIControllerTests
                                     Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(list[0]);
                                 });
 
-                uiController.Start();
+                uiController.Start(null);
             }
         }
 
@@ -87,14 +87,14 @@ public class UIControllerTests
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
             {
                 var list = new List<IView>();
-                uiController.SelectFlow(UIControllerFlow.Clone, connection)
+                uiController.SelectFlow(UIControllerFlow.Clone)
                     .Subscribe(uc => list.Add(uc as IView),
                                 () =>
                                 {
                                     Assert.Equal(1, list.Count);
                                     Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
                                 });
-                uiController.Start();
+                uiController.Start(connection);
             }
         }
     }
