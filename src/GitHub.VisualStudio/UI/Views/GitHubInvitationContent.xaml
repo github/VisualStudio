@@ -23,20 +23,21 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DockPanel>
+    <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
             <ui:OcticonImage
-                x:Name="logo" 
-                Height="32" 
-                Width="32" 
+                Height="16" 
+                Width="16" 
                 VerticalAlignment="Center" 
-                Margin="18,6,8,8"
+                Margin="8"
                 Icon="logo_github"
-                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
-            <StackPanel Orientation="Vertical" Margin="0">
-                <Label Content="{Binding Path=RepoName}" />
-                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
-            </StackPanel>
+                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}" />
+            <Label Content="{Binding Path=Description}" />
         </StackPanel>
-    </DockPanel>
+
+        <DockPanel Margin="8">
+            <TextBlock DockPanel.Dock="Left" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect</Hyperlink></TextBlock>
+            <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right"><Hyperlink x:Name="signup" Click="signup_Click">Sign up</Hyperlink></TextBlock>
+        </DockPanel>
+    </StackPanel>
 </UserControl>

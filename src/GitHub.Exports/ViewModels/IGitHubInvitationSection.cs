@@ -2,8 +2,10 @@
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
     public interface IGitHubInvitationSection
     {
+        string Description { get; set; }
+        void Connect();
+        void SignUp();
     }
 }

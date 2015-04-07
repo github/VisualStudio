@@ -30,6 +30,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             SignUpLabel = "Sign up";
             Name = "GitHub";
             Provider = "GitHub, Inc.";
+            Description = "Powerful collaboration, code review, and code management for open source and private projects.";
             Icon = GetDrawingForIcon(GetBrushForIcon());
 
             IsVisible = cm.Connections.Count == 0;
@@ -54,7 +55,6 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.RunUI(controllerFlow, null);
         }
-
 
         void OnThemeChanged(ThemeChangedEventArgs e)
         {
