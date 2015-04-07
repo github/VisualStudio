@@ -78,6 +78,7 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var connection = provider.GetConnection();
+            connection.Login().Returns(Observable.Return(connection));
             var cm = provider.GetConnectionManager();
             var host = hosts.GitHubHost;
             hosts.LookupHost(connection.HostAddress).Returns(host);

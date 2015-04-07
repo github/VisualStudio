@@ -18,6 +18,7 @@ using NullGuard;
 using System.Collections.Specialized;
 using System.Linq;
 using GitHub.Authentication;
+using System.Threading.Tasks;
 
 namespace GitHub.Controllers
 {
@@ -29,6 +30,7 @@ namespace GitHub.Controllers
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IConnectionManager connectionManager;
         readonly Lazy<ITwoFactorChallengeHandler> lazyTwoFactorChallengeHandler;
 
@@ -36,7 +38,6 @@ namespace GitHub.Controllers
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
-        IConnection connection;
 
         [ImportingConstructor]
         public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
@@ -131,7 +132,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Finished);
         }
 
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection aConnection)
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection connection)
         {
             Func<IRepositoryHost, Subject<UserControl>> run = (host) =>
             {
@@ -150,20 +151,24 @@ namespace GitHub.Controllers
                 return transition;
             };
 
-            connection = aConnection;
-
             if (connection != null)
             {
                 uiProvider.AddService(typeof(IConnection), connection);
-                return connection.Login()
-                    .Select(c =>
-                    {
-                        var host = hosts.LookupHost(connection.HostAddress);
-                        return run(host);
-                    }).Wait();
+                var host = DoLogin(connection).Result;
+                return run(host);
+            }
+            else if (choice != UIControllerFlow.Authentication)
+            {
             }
 
             return run(new DisconnectedRepositoryHost());
+        }
+
+        async Task<IRepositoryHost> DoLogin(IConnection connection)
+        {
+            return await connection.Login()
+                .FirstAsync(c => c == connection)
+                .Select(c => hosts.LookupHost(connection.HostAddress));
         }
 
         void RunView(UIViewType viewType)
@@ -177,20 +182,6 @@ namespace GitHub.Controllers
         {
             if (viewType == UIViewType.Login)
             {
-                // listen for a new connection being added
-                if (connection == null)
-                {
-                    Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(connectionManager.Connections,
-                        "CollectionChanged")
-                        .Take(1)
-                        .Do(e =>
-                        {
-                            if (e.EventArgs.Action == NotifyCollectionChangedAction.Add)
-                                connection = e.EventArgs.NewItems[0] as IConnection;
-                        });
-                }
-
-
                 // we're setting up the login dialog, we need to setup the 2fa as
                 // well to continue the flow if it's needed, since the
                 // authenticationresult callback won't happen until

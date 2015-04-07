@@ -102,7 +102,7 @@ namespace GitHub.Models
                     LogInFromCache(address)
                         .Do(x => connectionLogin.OnNext(c));
                 }
-            });
+            }).Subscribe();
 
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
             // start tracking changes to the EnterpriseHost property and persist every change to the db
