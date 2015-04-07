@@ -32,20 +32,11 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> title;
 
         [ImportingConstructor]
-        RepositoryPublishViewModel(
-            IServiceProvider provider,
-            IOperatingSystem operatingSystem,
-            IRepositoryHosts hosts,
-            IAvatarProvider avatarProvider)
-            : this(provider.GetService<IConnection>(), operatingSystem, hosts, avatarProvider)
-        {}
-
         public RepositoryPublishViewModel(
-            IConnection connection,
             IOperatingSystem operatingSystem,
             IRepositoryHosts hosts,
             IAvatarProvider avatarProvider)
-            : base(connection, operatingSystem, hosts)
+            : base(null, operatingSystem, hosts)
         {
             title = this.WhenAny(
                 x => x.SelectedHost,
@@ -126,7 +117,7 @@ namespace GitHub.ViewModels
             var publishCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
             publishCommand.ThrownExceptions.Subscribe(ex =>
             {
-                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
+                if (!ex.IsCriticalException())
                 {
                     // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);

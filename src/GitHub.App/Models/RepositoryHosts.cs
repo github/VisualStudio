@@ -88,7 +88,7 @@ namespace GitHub.Models
             Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe();
         }
 
-        public IRepositoryHost LookupHost(HostAddress address)
+        public IRepositoryHost LookupHost([AllowNull] HostAddress address)
         {
             if (address == GitHubHost.Address)
                 return GitHubHost;

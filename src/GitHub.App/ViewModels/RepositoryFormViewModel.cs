@@ -23,7 +23,7 @@ namespace GitHub.ViewModels
         // These are the characters which are permitted when creating a repository name on GitHub The Website
         static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);
 
-        protected RepositoryFormViewModel(IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
+        protected RepositoryFormViewModel([AllowNull]IConnection connection, IOperatingSystem operatingSystem, IRepositoryHosts hosts)
             : base(connection, hosts)
         {
             OperatingSystem = operatingSystem;
