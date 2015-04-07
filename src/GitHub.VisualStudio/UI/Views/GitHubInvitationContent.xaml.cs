@@ -34,5 +34,15 @@ namespace GitHub.VisualStudio.UI.Views
                 "ViewModel",
                 typeof(IGitHubInvitationSection),
                 typeof(GitHubInvitationContent));
+
+        void connect_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Connect();
+        }
+
+        void signup_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.SignUp();
+        }
     }
 }

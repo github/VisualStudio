@@ -29,11 +29,6 @@ namespace GitHub.VisualStudio.UI.Views
             ViewModel.DoCreate();
         }
 
-        private void m_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         public GitHubConnectSection ViewModel
         {
             get { return (GitHubConnectSection)GetValue(ViewModelProperty); }

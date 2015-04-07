@@ -10,24 +10,37 @@ using Microsoft.VisualStudio.Shell;
 using System.Linq;
 using GitHub.Models;
 using GitHub.VisualStudio.UI.Views.Controls;
+using GitHub.Services;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerSection(GitHubPublishSectionId, TeamExplorerPageIds.GitCommits, 10)]
-    public class GitHubPublishSection : TeamExplorerSectionBase
+    public class GitHubPublishSection : TeamExplorerSectionBase, IGitHubInvitationSection
     {
         public const string GitHubPublishSectionId = "92655B52-360D-4BF5-95C5-D9E9E596AC76";
 
         readonly IConnectionManager connectionManager;
+        readonly Lazy<IVisualStudioBrowser> lazyBrowser;
+
+        string description = String.Empty;
+        public string Description
+        {
+            get { return description; }
+            set { description = value; this.RaisePropertyChange(); }
+        }
 
         [ImportingConstructor]
-        public GitHubPublishSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IConnectionManager cm)
+        public GitHubPublishSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+            IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
             :  base(serviceProvider)
         {
-            this.connectionManager = cm;
+            connectionManager = cm;
+            lazyBrowser = browser;
             Title = "GitHub";
             IsVisible = false;
             IsExpanded = true;
+            Description = "Powerful collaboration, code review, and code management for open source and private projects.";
         }
 
         protected override void Initialize()
@@ -63,6 +76,22 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                     IsVisible = false;
                 }
             }
+        }
+
+        public void Connect()
+        {
+            StartFlow(UIControllerFlow.Authentication);
+        }
+
+        public void SignUp()
+        {
+            OpenInBrowser(lazyBrowser, GitHubUrls.Plans);
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            uiProvider.RunUI(controllerFlow, null);
         }
 
         void ShowInvitation()
