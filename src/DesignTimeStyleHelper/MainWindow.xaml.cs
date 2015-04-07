@@ -51,11 +51,11 @@ namespace DesignTimeStyleHelper
 
             var factory = ui.GetService<IExportFactoryProvider>();
             var d = factory.UIControllerFactory.CreateExport();
-            var userControlObservable = d.Value.SelectFlow(flow, null);
+            var userControlObservable = d.Value.SelectFlow(flow);
             var x = new WindowController(userControlObservable);
             userControlObservable.Subscribe(_ => { }, _ => x.Close());
             x.Show();
-            d.Value.Start();
+            d.Value.Start(null);
         }
     }
 }

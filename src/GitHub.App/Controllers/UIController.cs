@@ -19,6 +19,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using GitHub.Authentication;
 using System.Threading.Tasks;
+using GitHub.Extensions.Reactive;
+using System.Reactive;
 
 namespace GitHub.Controllers
 {
@@ -132,43 +134,14 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Finished);
         }
 
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection connection)
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice)
         {
-            Func<IRepositoryHost, Subject<UserControl>> run = (host) =>
-            {
-                machine.Configure(UIViewType.None)
-                .Permit(Trigger.Auth, UIViewType.Login)
-                .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
-                .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
-                .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
-                .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
-                .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
-                .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+            currentFlow = choice;
 
-                currentFlow = choice;
-                transition = new Subject<UserControl>();
-                transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
-                return transition;
-            };
-
-            if (connection != null)
-            {
-                uiProvider.AddService(typeof(IConnection), connection);
-                var host = DoLogin(connection).Result;
-                return run(host);
-            }
-            else if (choice != UIControllerFlow.Authentication)
-            {
-            }
-
-            return run(new DisconnectedRepositoryHost());
-        }
-
-        async Task<IRepositoryHost> DoLogin(IConnection connection)
-        {
-            return await connection.Login()
-                .FirstAsync(c => c == connection)
-                .Select(c => hosts.LookupHost(connection.HostAddress));
+            transition = new Subject<UserControl>();
+            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
+        
+            return transition;
         }
 
         void RunView(UIViewType viewType)
@@ -235,10 +208,57 @@ namespace GitHub.Controllers
             machine.Fire(next);
         }
 
-        public void Start()
+        public void Start([AllowNull] IConnection connection)
         {
-            Debug.WriteLine("Start ({0})", GetHashCode());
-            Fire((Trigger)(int)currentFlow);
+            if (connection != null)
+            {
+                uiProvider.AddService(typeof(IConnection), connection);
+                connection.Login()
+                    .Where(c => c == connection)
+                    .Select(c => hosts.LookupHost(connection.HostAddress))
+                    .Do(host =>
+                    {
+                        machine.Configure(UIViewType.None)
+                            .Permit(Trigger.Auth, UIViewType.Login)
+                            .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
+                            .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
+                            .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+                    })
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire((Trigger)(int)currentFlow);
+                    });
+            }
+            else
+            {
+                var list = Observable.Return<IConnection>(null);
+                foreach (var conn in connectionManager.Connections)
+                {
+                    list = conn.Login().Concat(list);
+                }
+
+                list
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe( _ => { }, () =>
+                {
+                    var loggedin = !list.Select(c => hosts.LookupHost(c.HostAddress)).Where(h => h.IsLoggedIn).IsEmpty().Wait();
+                    machine.Configure(UIViewType.None)
+                        .Permit(Trigger.Auth, UIViewType.Login)
+                        .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
+                        .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin)
+                        .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
+                        .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
+                        .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
+                        .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
+                    Debug.WriteLine("Start ({0})", GetHashCode());
+                    Fire((Trigger)(int)currentFlow);
+                });
+            }
         }
 
         public void Stop()
