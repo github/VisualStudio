@@ -83,7 +83,7 @@ function Build-Solution([string]$solution) {
 
 Write-Output "Building GitHub for Visual Studio..."
 Write-Output ""
-& $nuget restore GitHubVs.sln -NonInteractive -Verbosity quiet
+& $nuget restore GitHubVs.sln -NonInteractive -Verbosity detailed
 Build-Solution GitHubVs.sln
 
 $exitCode = 0
