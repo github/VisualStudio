@@ -20,7 +20,7 @@ namespace GitHub.Caches
 
         static SharedCache()
         {
-            BlobCache.ApplicationName = "GitHub Extension for Visual Studio";
+            BlobCache.ApplicationName = Info.ApplicationInfo.ApplicationDescription;
         }
 
         public SharedCache() : this(BlobCache.UserAccount, BlobCache.LocalMachine, null)
