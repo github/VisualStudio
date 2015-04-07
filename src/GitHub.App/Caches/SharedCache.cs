@@ -18,18 +18,22 @@ namespace GitHub.Caches
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
 
-        // TODO Use this instead.
-        //public SharedCache()
-        //    : this(BlobCache.UserAccount, BlobCache.LocalMachine, BlobCache.Secure)
-        //{
-        //}
+        static SharedCache()
+        {
+            BlobCache.ApplicationName = "GitHub Extension for Visual Studio";
+        }
 
-        public SharedCache() : this(new InMemoryBlobCache(), new InMemoryBlobCache(), new CredentialCache())
+        public SharedCache() : this(BlobCache.UserAccount, BlobCache.LocalMachine, null)
         {
         }
 
         protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache, ISecureBlobCache secureCache)
         {
+            if (secureCache == null)
+            {
+                BlobCache.Secure = new CredentialCache();
+                secureCache = BlobCache.Secure;
+            }
             UserAccount = userAccountCache;
             LocalMachine = localMachineCache;
             Secure = secureCache;
