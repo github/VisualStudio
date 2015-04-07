@@ -24,9 +24,6 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Controls.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Label">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
                 <Setter Property="Padding" Value="0" />
