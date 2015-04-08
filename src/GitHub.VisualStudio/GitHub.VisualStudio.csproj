@@ -85,7 +85,7 @@
     </Reference>
     <Reference Include="LibGit2Sharp">
       <HintPath>..\..\lib\LibGit2Sharp.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.TeamFoundation.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
