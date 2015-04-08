@@ -50,6 +50,7 @@ namespace GitHub.Models
                 })
                 .WhereNotNull()
                 .Select(HostAddress.Create)
+                .Where(x => connectionManager.Connections.Any(c => c.HostAddress == x))
                 .Select(repositoryHostFactory.Create)
                 .Do(x => EnterpriseHost = x)
                 .SelectUnit();
