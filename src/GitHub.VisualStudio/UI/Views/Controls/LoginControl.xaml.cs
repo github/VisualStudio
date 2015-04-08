@@ -70,6 +70,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowLogInFailedError, v => v.dotComLoginFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowTwoFactorAuthFailedError, v => v.dotComTwoFactorAuthFailedMessage.Visibility));
+            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowConnectingToHostFailed, v => v.dotComConnectionFailedMessage.Visibility));
         }
 
         void SetupEnterpriseBindings(Action<IDisposable> d)
