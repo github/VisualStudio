@@ -7,19 +7,96 @@ using System.Linq;
 using System.Reflection;
 using GitHub.Extensions;
 using Microsoft.Win32;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.VisualStudio;
 
 namespace GitHub.Services
 {
     public interface IVSServices
     {
-        string GetLocalClonePathFromGitProvider(IServiceProvider provider);
-        void Clone(IServiceProvider provider, string cloneUrl, string clonePath, bool recurseSubmodules);
+        string GetLocalClonePathFromGitProvider();
+        void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
+        string GetActiveRepoPath();
+        LibGit2Sharp.Repository GetActiveRepo();
     }
 
     [Export(typeof(IVSServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
+        readonly IServiceProvider serviceProvider;
+
+        [ImportingConstructor]
+        public VSServices(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
+        // The Default Repository Path that VS uses is hidden in an internal
+        // service 'ISccSettingsService' registered in an internal service
+        // 'ISccServiceHost' in an assembly with no public types that's
+        // always loaded with VS if the git service provider is loaded
+        public string GetLocalClonePathFromGitProvider()
+        {
+            string ret = string.Empty;
+            try
+            {
+                var service = GitCoreServices.GetISccSettingsService(serviceProvider);
+                ret = service.DefaultRepositoryPath;
+            }
+            catch (Exception ex)
+            {
+                Debug.Fail(ex.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(ret))
+                return ret;
+
+            try
+            {
+                ret = PokeTheRegistryForLocalClonePath();
+            }
+            catch (Exception ex)
+            {
+                Debug.Fail(ex.ToString());
+            }
+            return ret;
+        }
+
+        public void Clone(string cloneUrl, string clonePath, bool recurseSubmodules)
+        {
+            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
+            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+        }
+
+        public LibGit2Sharp.Repository GetActiveRepo()
+        {
+            var gitExt = serviceProvider.GetService<IGitExt>();
+            if (gitExt.ActiveRepositories.Count > 0)
+                return gitExt.ActiveRepositories.First().GetRepoFromIGit();
+            return serviceProvider.GetSolution().GetRepoFromSolution();
+        }
+
+        public string GetActiveRepoPath()
+        {
+            var gitExt = serviceProvider.GetService<IGitExt>();
+            if (gitExt.ActiveRepositories.Count > 0)
+                return gitExt.ActiveRepositories.First().RepositoryPath;
+            else
+            {
+                var repo = serviceProvider.GetSolution().GetRepoFromSolution();
+                if (repo != null)
+                    return repo.Info.Path;
+            }
+            return string.Empty;
+        }
+
+        static string PokeTheRegistryForLocalClonePath()
+        {
+            var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl\General");
+            return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+        }
+
         static class GitCoreServices
         {
             const string ns = "Microsoft.TeamFoundation.Git.CoreServices.";
@@ -115,49 +192,6 @@ namespace GitHub.Services
                     }
                 }
             }
-        }
-
-        // The Default Repository Path that VS uses is hidden in an internal
-        // service 'ISccSettingsService' registered in an internal service
-        // 'ISccServiceHost' in an assembly with no public types that's
-        // always loaded with VS if the git service provider is loaded
-        public string GetLocalClonePathFromGitProvider(IServiceProvider provider)
-        {
-            string ret = string.Empty;
-            try
-            {
-                var service = GitCoreServices.GetISccSettingsService(provider);
-                ret = service.DefaultRepositoryPath;
-            }
-            catch (Exception ex)
-            {
-                Debug.Fail(ex.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(ret))
-                return ret;
-
-            try
-            {
-                ret = PokeTheRegistryForLocalClonePath();
-            }
-            catch (Exception ex)
-            {
-                Debug.Fail(ex.ToString());
-            }
-            return ret;
-        }
-
-        public void Clone(IServiceProvider provider, string cloneUrl, string clonePath, bool recurseSubmodules)
-        {
-            var gitExt = provider.GetService<IGitRepositoriesExt>();
-            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
-        }
-
-        static string PokeTheRegistryForLocalClonePath()
-        {
-            var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl\General");
-            return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
         }
     }
 }

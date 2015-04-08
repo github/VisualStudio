@@ -23,7 +23,7 @@ public class RepositoryCloneServiceTests
             await cloneService.CloneRepository("https://github.com/foo/bar", "bar", @"c:\dev");
 
             operatingSystem.Directory.Received().CreateDirectory(@"c:\dev\bar");
-            vsservices.Received().Clone(serviceProvider, "https://github.com/foo/bar", @"c:\dev\bar", true);
+            vsservices.Received().Clone("https://github.com/foo/bar", @"c:\dev\bar", true);
         }
     }
 }

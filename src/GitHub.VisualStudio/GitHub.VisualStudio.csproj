@@ -208,8 +208,6 @@
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Program.cs" />
-    <Compile Include="Services\RepositoryPublishService.cs" />
-    <Compile Include="Services\Services.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
