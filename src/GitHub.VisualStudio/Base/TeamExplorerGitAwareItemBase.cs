@@ -52,7 +52,7 @@ namespace GitHub.VisualStudio.Base
                     tc.HasTeamProject = true;
                 }
             }
-            ContextChanged(this, new ContextChangedEventArgs(CurrentContext, tc, false, true, false));
+            ContextChanged(this, new ContextChangedEventArgs(CurrentContext, tc, false, true, false, false));
         }
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
