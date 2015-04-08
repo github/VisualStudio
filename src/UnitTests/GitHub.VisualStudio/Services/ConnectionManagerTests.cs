@@ -17,7 +17,7 @@ public class ConnectionManagerTests
         {
             const string cacheData = @"{""connections"":[{""HostUrl"":""https://github.com"", ""UserName"":""shana""},{""HostUrl"":""https://ghe.io"", ""UserName"":""haacked""}]}";
             var program = Substitute.For<IProgram>();
-            program.ApplicationProvider.Returns("GHfVS");
+            program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");
@@ -42,7 +42,7 @@ public class ConnectionManagerTests
         public void IsEmptyWhenCacheCorrupt(string cacheJson)
         {
             var program = Substitute.For<IProgram>();
-            program.ApplicationProvider.Returns("GHfVS");
+            program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");
@@ -60,7 +60,7 @@ public class ConnectionManagerTests
         public void IsSavedToDiskWhenConnectionAdded()
         {
             var program = Substitute.For<IProgram>();
-            program.ApplicationProvider.Returns("GHfVS");
+            program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)
                 .Returns(@"c:\fake");
@@ -68,7 +68,7 @@ public class ConnectionManagerTests
             operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns("");
             var manager = new ConnectionManager(program, operatingSystem);
 
-            manager.Connections.Add(new Connection(HostAddress.GitHubDotComHostAddress, "coolio"));
+            manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));
 
             Assert.Equal(1, manager.Connections.Count);
             operatingSystem.File.Received().WriteAllText(@"c:\fake\GHfVS\ghfvs.connections",

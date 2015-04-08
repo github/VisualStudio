@@ -30,6 +30,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             SignUpLabel = "Sign up";
             Name = "GitHub";
             Provider = "GitHub, Inc.";
+            Description = "Powerful collaboration, code review, and code management for open source and private projects.";
             Icon = GetDrawingForIcon(GetBrushForIcon());
 
             IsVisible = cm.Connections.Count == 0;
@@ -55,13 +56,12 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             uiProvider.RunUI(controllerFlow, null);
         }
 
-
         void OnThemeChanged(ThemeChangedEventArgs e)
         {
             Icon = GetDrawingForIcon(GetBrushForIcon());
         }
 
-        Brush GetBrushForIcon()
+        static Brush GetBrushForIcon()
         {
             var brush = Application.Current.TryFindResource(HeaderColors.DefaultTextBrushKey) as Brush;
             if (brush == null)
@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             return brush;
         }
 
-        DrawingBrush GetDrawingForIcon(Brush color)
+        static DrawingBrush GetDrawingForIcon(Brush color)
         {
             Octicon icon = Octicon.mark_github;
             return new DrawingBrush() {

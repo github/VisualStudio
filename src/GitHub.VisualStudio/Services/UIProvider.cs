@@ -19,7 +19,7 @@ namespace GitHub.VisualStudio
     [Export(typeof(IUIProvider))]
     [Export(typeof(IServiceProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class UIProvider : IServiceProvider, IUIProvider
+    public class UIProvider : IServiceProvider, IUIProvider, IDisposable
     {
         [AllowNull]
         public ExportProvider ExportProvider { get; private set; }
@@ -141,7 +141,7 @@ namespace GitHub.VisualStudio
             currentUIFlow = factory.UIControllerFactory.CreateExport();
             var disposable = currentUIFlow;
             var ui = currentUIFlow.Value;
-            var creation = ui.SelectFlow(controllerFlow, connection);
+            var creation = ui.SelectFlow(controllerFlow);
             var windowController = new UI.WindowController(creation);
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
             creation.Subscribe((c) => { }, () =>
@@ -154,7 +154,7 @@ namespace GitHub.VisualStudio
                     StopUI();
             });
             windowController.Show();
-            ui.Start();
+            ui.Start(connection);
         }
 
         public void StopUI()
@@ -176,6 +176,29 @@ namespace GitHub.VisualStudio
         void StopUIFlowWhenWindowIsClosedByUser(object sender, EventArgs e)
         {
             StopUI();
+        }
+
+        bool disposed = false;
+        protected void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    StopUI();
+                    if (tempContainer != null)
+                    {
+                        tempContainer.Dispose();
+                    }
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

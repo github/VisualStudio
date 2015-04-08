@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using GitHub.Models;
 using GitHub.Services;
-using Rothko;
 using GitHub.Primitives;
 
 namespace GitHub.VisualStudio
@@ -29,18 +27,51 @@ namespace GitHub.VisualStudio
     public class ConnectionManager : IConnectionManager
     {
         readonly string cachePath;
-        readonly IOperatingSystem operatingSystem;
         const string cacheFile = "ghfvs.connections";
 
+        public event Func<IConnection, IObservable<IConnection>> DoLogin;
+
+        Func<string, bool> fileExists;
+        Func<string, Encoding, string> readAllText;
+        Action<string, string> writeAllText;
+        Action<string> fileDelete;
+        Func<string, bool> dirExists;
+        Action<string> dirCreate;
+
         [ImportingConstructor]
-        public ConnectionManager(IProgram program, IOperatingSystem operatingSystem)
+        public ConnectionManager(IProgram program)
         {
-            this.operatingSystem = operatingSystem;
+            fileExists = (path) => System.IO.File.Exists(path);
+            readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
+            writeAllText = (path, content) => System.IO.File.WriteAllText(path, content);
+            fileDelete = (path) => System.IO.File.Delete(path);
+            dirExists = (path) => System.IO.Directory.Exists(path);
+            dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
             Connections = new ObservableCollection<IConnection>();
-            cachePath = Path.Combine(
-                operatingSystem.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationProvider,
+            cachePath = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                program.ApplicationName,
+                cacheFile);
+
+            LoadConnectionsFromCache();
+
+            Connections.CollectionChanged += RefreshConnections;
+        }
+
+        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os)
+        {
+            fileExists = (path) => os.File.Exists(path);
+            readAllText = (path, encoding) => os.File.ReadAllText(path, encoding);
+            writeAllText = (path, content) => os.File.WriteAllText(path, content);
+            fileDelete = (path) => os.File.Delete(path);
+            dirExists = (path) => os.Directory.Exists(path);
+            dirCreate = (path) => os.Directory.CreateDirectory(path);
+
+            Connections = new ObservableCollection<IConnection>();
+            cachePath = System.IO.Path.Combine(
+                os.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                program.ApplicationName,
                 cacheFile);
 
             LoadConnectionsFromCache();
@@ -50,14 +81,14 @@ namespace GitHub.VisualStudio
 
         public IConnection CreateConnection(HostAddress address, string username)
         {
-            return new Connection(address, username);
+            return new Connection(this, address, username);
         }
 
         public bool AddConnection(HostAddress address, string username)
         {
             if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
                 return false;
-            Connections.Add(new Connection(address, username));
+            Connections.Add(new Connection(this, address, username));
             return true;
         }
 
@@ -70,6 +101,19 @@ namespace GitHub.VisualStudio
             return true;
         }
 
+        public IObservable<IConnection> RequestLogin(IConnection connection)
+        {
+            var handler = DoLogin;
+            if (handler == null)
+                return null;
+            return handler(connection);
+        }
+
+        public void RequestLogout(IConnection connection)
+        {
+            Connections.Remove(connection);
+        }
+
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             SaveConnectionsToCache();
@@ -77,10 +121,12 @@ namespace GitHub.VisualStudio
 
         void LoadConnectionsFromCache()
         {
-            if (!operatingSystem.File.Exists(cachePath))
+            EnsureCachePath();
+
+            if (!fileExists(cachePath))
                 return;
 
-            string data = operatingSystem.File.ReadAllText(cachePath, Encoding.UTF8);
+            string data = readAllText(cachePath, Encoding.UTF8);
 
             CacheData cacheData;
             try
@@ -95,7 +141,7 @@ namespace GitHub.VisualStudio
             if (cacheData == null || cacheData.connections == null)
             {
                 // cache is corrupt, remove
-                operatingSystem.File.Delete(cachePath);
+                fileDelete(cachePath);
                 return;
             }
 
@@ -108,18 +154,29 @@ namespace GitHub.VisualStudio
 
         void SaveConnectionsToCache()
         {
+            EnsureCachePath();
+
             var cache = new CacheData();
             cache.connections = Connections.Select(conn =>
                 new ConnectionCacheItem { HostUrl = conn.HostAddress.WebUri, UserName = conn.Username });
             try
             {
                 string data = SimpleJson.SerializeObject(cache);
-                operatingSystem.File.WriteAllText(cachePath, data);
+                writeAllText(cachePath, data);
             }
             catch (Exception ex)
             {
                 Debug.Fail(ex.ToString());
             }
+        }
+
+        void EnsureCachePath()
+        {
+            if (fileExists(cachePath))
+                return;
+            var di = System.IO.Path.GetDirectoryName(cachePath);
+            if (!dirExists(di))
+                dirCreate(di);
         }
 
         public ObservableCollection<IConnection> Connections { get; private set; }

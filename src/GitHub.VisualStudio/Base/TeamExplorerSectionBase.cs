@@ -43,7 +43,7 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerSectionBase(IServiceProvider serviceProvider)
             : base()
         {
-            this.ServiceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
         }
 
         public virtual void Cancel()
@@ -76,6 +76,7 @@ namespace GitHub.VisualStudio.Base
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
         {
+            /*
             if (e.TeamProjectChanged)
             {
                 if (e.NewContext != null && e.NewContext.HasTeamProject)
@@ -83,6 +84,7 @@ namespace GitHub.VisualStudio.Base
                 else
                     IsVisible = false;
             }
+            */
             base.ContextChanged(sender, e);
         }
     }
