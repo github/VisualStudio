@@ -59,10 +59,12 @@ namespace GitHub.ViewModels
                 .SelectMany(host => host.GetAccounts(avatarProvider));
 
             accounts = accountsChangedObservable
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
             accountsChangedObservable
                 .Where(acts => acts.Any())
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(acts => SelectedAccount = acts[0]);
 
             var nonNullRepositoryName = this.WhenAny(
