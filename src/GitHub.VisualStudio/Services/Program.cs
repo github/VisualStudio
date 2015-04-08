@@ -13,7 +13,6 @@ namespace GitHub.VisualStudio
         public Program()
         {
             applicationName = Info.ApplicationInfo.ApplicationName;
-            applicationProvider = Info.ApplicationInfo.ApplicationProvider;
             applicationDescription = Info.ApplicationInfo.ApplicationDescription;
 
             var executingAssembly = typeof(Program).Assembly;
@@ -23,13 +22,7 @@ namespace GitHub.VisualStudio
         }
 
         readonly string applicationName;
-        readonly string applicationProvider;
         readonly string applicationDescription;
-
-        /// <summary>
-        /// Provider of this application
-        /// </summary>
-        public string ApplicationProvider {  get { return applicationProvider; } }
 
         /// <summary>
         /// Name of this application
