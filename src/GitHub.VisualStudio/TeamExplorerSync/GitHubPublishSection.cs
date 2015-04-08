@@ -6,18 +6,18 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
 using System.Linq;
 using GitHub.Models;
-using GitHub.VisualStudio.UI.Views.Controls;
 using GitHub.Services;
 using GitHub.Info;
 using ReactiveUI;
 using System.Reactive.Linq;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerSection(GitHubPublishSectionId, TeamExplorerPageIds.GitCommits, 10)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPublishSection : TeamExplorerSectionBase, IGitHubInvitationSection
     {
         public const string GitHubPublishSectionId = "92655B52-360D-4BF5-95C5-D9E9E596AC76";
@@ -136,6 +136,9 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             },
             () =>
             {
+                var notificationManager = ServiceProvider.TryGetService<ITeamExplorerNotificationManager>();
+                if (notificationManager != null)
+                    notificationManager.ShowNotification("Repository published.", NotificationType.Information, NotificationFlags.None, null, default(Guid));
             });
             ui.Start(null);
         }

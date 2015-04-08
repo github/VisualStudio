@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
-using NullGuard;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.VisualStudio
@@ -71,7 +70,6 @@ namespace GitHub.VisualStudio
             return provider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
         }
 
-        [return: AllowNull]
         public static T GetExportedValue<T>(this IServiceProvider serviceProvider)
         {
             var ui = serviceProvider as IUIProvider;
@@ -84,7 +82,6 @@ namespace GitHub.VisualStudio
             }
         }
 
-        [return: AllowNull]
         public static Uri GetRepoUrlFromSolution(IVsSolution solution)
         {
             string solutionDir, solutionFile, userFile;
@@ -101,8 +98,7 @@ namespace GitHub.VisualStudio
             }
         }
 
-        [return: AllowNull]
-        public static Repository GetRepoFromSolution(IVsSolution solution)
+        public static Repository GetRepoFromSolution(this IVsSolution solution)
         {
             string solutionDir, solutionFile, userFile;
             if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
@@ -115,7 +111,6 @@ namespace GitHub.VisualStudio
             return new Repository(repoPath);
         }
 
-        [return: AllowNull]
         public static Uri GetUriFromRepository(Repository repo)
         {
             var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
@@ -131,8 +126,7 @@ namespace GitHub.VisualStudio
             return uri;
         }
 
-        [return: AllowNull]
-        public static Repository GetRepoFromIGit(IGitRepositoryInfo repoInfo)
+        public static Repository GetRepoFromIGit(this IGitRepositoryInfo repoInfo)
         {
             var repoPath = Repository.Discover(repoInfo.RepositoryPath);
             if (repoPath == null)
