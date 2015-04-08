@@ -18,6 +18,9 @@ using NullGuard;
 using System.Collections.Specialized;
 using System.Linq;
 using GitHub.Authentication;
+using System.Threading.Tasks;
+using GitHub.Extensions.Reactive;
+using System.Reactive;
 
 namespace GitHub.Controllers
 {
@@ -29,6 +32,7 @@ namespace GitHub.Controllers
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IConnectionManager connectionManager;
         readonly Lazy<ITwoFactorChallengeHandler> lazyTwoFactorChallengeHandler;
 
@@ -36,7 +40,6 @@ namespace GitHub.Controllers
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
-        IConnection connection;
 
         [ImportingConstructor]
         public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
@@ -131,28 +134,13 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Finished);
         }
 
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice, [AllowNull] IConnection aConnection)
+        public IObservable<UserControl> SelectFlow(UIControllerFlow choice)
         {
-            connection = aConnection;
-            IRepositoryHost host = RepositoryHosts.DisconnectedRepositoryHost;
-            if (connection != null)
-            {
-                uiProvider.AddService(typeof(IConnection), connection);
-                host = hosts.LookupHost(connection.HostAddress);
-            }
-
-            machine.Configure(UIViewType.None)
-                .Permit(Trigger.Auth, UIViewType.Login)
-                .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
-                .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
-                .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
-                .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
-                .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
-                .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
-
             currentFlow = choice;
+
             transition = new Subject<UserControl>();
             transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
+        
             return transition;
         }
 
@@ -167,20 +155,6 @@ namespace GitHub.Controllers
         {
             if (viewType == UIViewType.Login)
             {
-                // listen for a new connection being added
-                if (connection == null)
-                {
-                    Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(connectionManager.Connections,
-                        "CollectionChanged")
-                        .Take(1)
-                        .Do(e =>
-                        {
-                            if (e.EventArgs.Action == NotifyCollectionChangedAction.Add)
-                                connection = e.EventArgs.NewItems[0] as IConnection;
-                        });
-                }
-
-
                 // we're setting up the login dialog, we need to setup the 2fa as
                 // well to continue the flow if it's needed, since the
                 // authenticationresult callback won't happen until
@@ -234,10 +208,55 @@ namespace GitHub.Controllers
             machine.Fire(next);
         }
 
-        public void Start()
+        public void Start([AllowNull] IConnection connection)
         {
-            Debug.WriteLine("Start ({0})", GetHashCode());
-            Fire((Trigger)(int)currentFlow);
+            if (connection != null)
+            {
+                uiProvider.AddService(typeof(IConnection), connection);
+                connection.Login()
+                    .Select(c => hosts.LookupHost(connection.HostAddress))
+                    .Do(host =>
+                    {
+                        machine.Configure(UIViewType.None)
+                            .Permit(Trigger.Auth, UIViewType.Login)
+                            .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
+                            .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
+                            .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+                    })
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire((Trigger)(int)currentFlow);
+                    });
+            }
+            else
+            {
+                var list = connectionManager.Connections.ToObservable()
+                        .SelectMany(c => c.Login());
+
+                list.Select(c => hosts.LookupHost(c.HostAddress)).Any(h => h.IsLoggedIn)
+                    .Do(loggedin =>
+                    {
+                        machine.Configure(UIViewType.None)
+                            .Permit(Trigger.Auth, UIViewType.Login)
+                            .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
+                            .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin)
+                            .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
+                            .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
+                            .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
+                    })
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire((Trigger)(int)currentFlow);
+                    });
+            }
         }
 
         public void Stop()
@@ -249,11 +268,10 @@ namespace GitHub.Controllers
                 Fire(Trigger.Cancel);
         }
 
-        private bool disposedValue = false; // To detect redundant calls
-
+        bool disposed = false; // To detect redundant calls
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!disposed)
             {
                 if (disposing)
                 {
@@ -262,7 +280,7 @@ namespace GitHub.Controllers
                     if (transition != null)
                         transition.Dispose();
                 }
-                disposedValue = true;
+                disposed = true;
             }
         }
 

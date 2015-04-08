@@ -22,6 +22,8 @@
             <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
             <Label Margin="6 0 6 0">|</Label>
             <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
+            <Label Margin="6 0 6 0">|</Label>
+            <TextBlock Grid.Row="1"><Hyperlink x:Name="signOut" Click="signOut_Click">Sign out</Hyperlink></TextBlock>
         </WrapPanel>
-    </Grid>
+      </Grid>
 </UserControl>

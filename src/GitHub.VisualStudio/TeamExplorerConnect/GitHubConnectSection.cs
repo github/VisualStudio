@@ -36,7 +36,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
-            Refresh();
+            UpdateConnection();
         }
 
         private void RefreshConnections(object sender, NotifyCollectionChangedEventArgs e)
@@ -72,10 +72,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
         public override void Refresh()
         {
-            if (connectionManager.Connections.Count > sectionIndex)
-                Refresh(connectionManager.Connections[sectionIndex]);
-            else
-                Refresh(null);
+            UpdateConnection();
             base.Refresh();
         }
 
@@ -90,7 +87,15 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
                 Refresh(connectionManager.Connections[sectionIndex]);
         }
 
-        private void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void UpdateConnection()
+        {
+            if (connectionManager.Connections.Count > sectionIndex)
+                Refresh(connectionManager.Connections[sectionIndex]);
+            else
+                Refresh(null);
+        }
+
+        void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
             {
@@ -111,6 +116,11 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             // this is done here and not via the constructor so nothing gets loaded
             // until we get here
             StartFlow(UIControllerFlow.Clone);
+        }
+
+        public void SignOut()
+        {
+            SectionConnection.Logout();
         }
 
         void StartFlow(UIControllerFlow controllerFlow)

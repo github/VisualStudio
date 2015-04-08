@@ -18,8 +18,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for LoginControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Login)]
-    public partial class LoginControl : IViewFor<ILoginControlViewModel>, IView
+    public partial class LoginControl : IViewFor<ILoginControlViewModel>, IView, IDisposable
     {
+        readonly Subject<object> close;
+
         public LoginControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
@@ -28,8 +30,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
             close = new Subject<object>();
+
+            DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
 
             this.WhenActivated(d =>
             {
@@ -139,7 +142,25 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { SetValue(ViewModelProperty, value); }
         }
 
-        readonly Subject<object> close;
         public IObservable<object> Done { get { return close; } }
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    close.Dispose();
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

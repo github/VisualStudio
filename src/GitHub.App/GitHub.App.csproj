@@ -69,9 +69,8 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="SQLitePCL.raw">
+    <Reference Include="SQLitePCL.raw, Version=0.7.2.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.2.1-GHfVS\lib\net45\SQLitePCL.raw.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Stateless">
       <HintPath>..\..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>

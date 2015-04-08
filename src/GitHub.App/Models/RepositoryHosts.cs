@@ -12,13 +12,15 @@ using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
 using NullGuard;
+using System.Reactive.Subjects;
 using ReactiveUI;
+using System.Reactive.Disposables;
 
 namespace GitHub.Models
 {
     [Export(typeof(IRepositoryHosts))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class RepositoryHosts : ReactiveObject, IRepositoryHosts
+    public class RepositoryHosts : ReactiveObject, IRepositoryHosts, IDisposable
     {
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
@@ -26,6 +28,7 @@ namespace GitHub.Models
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;
         readonly IConnectionManager connectionManager;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
 
         [ImportingConstructor]
         public RepositoryHosts(
@@ -49,6 +52,7 @@ namespace GitHub.Models
                 })
                 .WhereNotNull()
                 .Select(HostAddress.Create)
+                .Where(x => connectionManager.Connections.Any(c => c.HostAddress == x))
                 .Select(repositoryHostFactory.Create)
                 .Do(x => EnterpriseHost = x)
                 .SelectUnit();
@@ -83,12 +87,48 @@ namespace GitHub.Models
                 (githubLoggedIn, enterpriseLoggedIn) => githubLoggedIn.Value || enterpriseLoggedIn.Value)
                 .ToProperty(this, x => x.IsLoggedInToAnyHost);
 
+            // This part is strictly to support having the IConnectionManager request that a connection
+            // be logged in. It doesn't know about hosts or load anything reactive, so it gets
+            // informed of logins by an observable returned by the event
+            connectionManager.DoLogin += RunLoginHandler;
+
+            // monitor the list of connections so we can log out hosts when connections are removed
+            disposables.Add(
+                connectionManager.Connections.CreateDerivedCollection(x => x)
+                .ItemsRemoved
+                .Select(x =>
+                {
+                    var host = LookupHost(x.HostAddress);
+                    if (host.Address != x.HostAddress)
+                        host = RepositoryHostFactory.Create(x.HostAddress);
+                    return host;
+                })
+                .Select(h => LogOut(h))
+                .Merge().ToList().Select(_ => Unit.Default).Subscribe());
+
+
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
-            // start tracking changes to the EntepriseHost property and persist every change to the db
-            Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe();
+            // start tracking changes to the EnterpriseHost property and persist every change to the db
+            disposables.Add(Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe());
         }
 
-        public IRepositoryHost LookupHost(HostAddress address)
+        IObservable<IConnection> RunLoginHandler(IConnection connection)
+        {
+            var handler = new ReplaySubject<IConnection>();
+            var address = connection.HostAddress;
+            var host = LookupHost(address);
+            if (host == DisconnectedRepositoryHost)
+                LogInFromCache(address)
+                    .Subscribe((c) => handler.OnNext(connection), () => handler.OnCompleted());
+            else
+            {
+                handler.OnNext(connection);
+                handler.OnCompleted();
+            }
+            return handler;
+        }
+
+        public IRepositoryHost LookupHost([AllowNull] HostAddress address)
         {
             if (address == GitHubHost.Address)
                 return GitHubHost;
@@ -126,6 +166,31 @@ namespace GitHub.Models
                 });
         }
 
+        /// <summary>
+        /// This is only called by the connection manager when logging in connections
+        /// that already exist so we don't have to add the connection.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public IObservable<AuthenticationResult> LogInFromCache(HostAddress address)
+        {
+            var isDotCom = HostAddress.GitHubDotComHostAddress == address;
+            var host = RepositoryHostFactory.Create(address);
+            return host.LogInFromCache()
+                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                .Do(result =>
+                {
+                    bool successful = result.IsSuccess();
+                    if (successful)
+                    {
+                        if (isDotCom)
+                            GitHubHost = host;
+                        else
+                            EnterpriseHost = host;
+                    }
+                });
+        }
+
         public IObservable<Unit> LogOut(HostAddress address)
         {
             var host = LookupHost(address);
@@ -147,6 +212,27 @@ namespace GitHub.Models
                         EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
                 });
+        }
+
+        bool disposed = false;
+        protected void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    connectionManager.DoLogin -= RunLoginHandler;
+                    disposables.Dispose();
+
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         IRepositoryHost githubHost;

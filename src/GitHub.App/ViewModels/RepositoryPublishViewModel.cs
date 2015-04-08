@@ -15,6 +15,7 @@ using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
+using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {
@@ -58,10 +59,12 @@ namespace GitHub.ViewModels
                 .SelectMany(host => host.GetAccounts(avatarProvider));
 
             accounts = accountsChangedObservable
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
             accountsChangedObservable
                 .Where(acts => acts.Any())
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(acts => SelectedAccount = acts[0]);
 
             var nonNullRepositoryName = this.WhenAny(
@@ -117,7 +120,7 @@ namespace GitHub.ViewModels
             var publishCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
             publishCommand.ThrownExceptions.Subscribe(ex =>
             {
-                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
+                if (!ex.IsCriticalException())
                 {
                     // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);

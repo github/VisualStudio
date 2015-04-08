@@ -32,7 +32,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
@@ -237,6 +237,7 @@
     <Compile Include="TeamExplorerHome\IssuesNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\WikiNavigationItem.cs" />
     <Compile Include="TeamExplorerHome\PulseNavigationItem.cs" />
+    <Compile Include="TeamExplorerSync\GitHubPublishSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
@@ -252,6 +253,9 @@
     </Compile>
     <Compile Include="UI\Views\GitHubConnectContent.xaml.cs">
       <DependentUpon>GitHubConnectContent.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\GitHubInvitationContent.xaml.cs">
+      <DependentUpon>GitHubInvitationContent.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\GitHubHomeContent.xaml.cs">
       <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
@@ -333,6 +337,10 @@
     </Page>
     <Page Include="UI\Views\GitHubConnectContent.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\GitHubInvitationContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\GitHubHomeContent.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -19,19 +19,19 @@ namespace GitHub.VisualStudio.UI.Views
             InitializeComponent();
         }
 
-        private void cloneLink_Click(object sender, RoutedEventArgs e)
+        void cloneLink_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.DoClone();
         }
 
-        private void createLink_Click(object sender, RoutedEventArgs e)
+        void createLink_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.DoCreate();
         }
 
-        private void m_Click(object sender, RoutedEventArgs e)
+        void signOut_Click(object sender, RoutedEventArgs e)
         {
-
+            ViewModel.SignOut();
         }
 
         public GitHubConnectSection ViewModel

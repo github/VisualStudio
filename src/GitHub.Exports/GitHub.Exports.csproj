@@ -68,6 +68,7 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Services\VSExtensions.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
+    <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
     <Compile Include="ViewModels\IGitHubHomeSection.cs" />
     <Compile Include="Models\IProgram.cs" />
     <Compile Include="Api\ISimpleApiClient.cs" />

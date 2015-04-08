@@ -19,8 +19,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
-    public partial class RepositoryCreationControl : IViewFor<IRepositoryCreationViewModel>, IView
+    public partial class RepositoryCreationControl : IViewFor<IRepositoryCreationViewModel>, IView, IDisposable
     {
+        readonly Subject<object> close;
+
         public RepositoryCreationControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
@@ -109,7 +111,25 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { SetValue(ViewModelProperty, value); }
         }
 
-        readonly Subject<object> close;
         public IObservable<object> Done { get { return close; } }
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    close.Dispose();
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubHomeContent"
+﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubInvitationContent"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,14 +14,6 @@
              d:DesignWidth="300"
              Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
              DataContext="{Binding ViewModel}">
-    <d:DesignProperties.DataContext>
-        <Binding>
-            <Binding.Source>
-                <sampleData:GitHubHomeSectionDesigner />
-            </Binding.Source>
-        </Binding>
-    </d:DesignProperties.DataContext>
-
     <UserControl.Resources>
         <ResourceDictionary>
             <Style TargetType="Label">
@@ -31,20 +23,21 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DockPanel>
+    <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
             <ui:OcticonImage
-                x:Name="repositoryIcon" 
-                Height="32" 
-                Width="32" 
+                Height="16" 
+                Width="16" 
                 VerticalAlignment="Center" 
-                Margin="18,6,8,8"
-                Icon="lock"
-                Foreground="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, FallbackValue=Gray}" />        
-            <StackPanel Orientation="Vertical" Margin="0">
-                <Label Content="{Binding Path=RepoName}" />
-                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
-            </StackPanel>
+                Margin="8"
+                Icon="logo_github"
+                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}" />
+            <Label Content="{Binding Path=Description}" />
         </StackPanel>
-    </DockPanel>
+
+        <DockPanel Margin="8">
+            <TextBlock DockPanel.Dock="Left" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect</Hyperlink></TextBlock>
+            <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right"><Hyperlink x:Name="signup" Click="signup_Click">Sign up</Hyperlink></TextBlock>
+        </DockPanel>
+    </StackPanel>
 </UserControl>
