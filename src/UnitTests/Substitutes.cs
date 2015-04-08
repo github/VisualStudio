@@ -28,7 +28,7 @@ namespace UnitTests
             get
             {
                 var ret = Substitute.For<IVSServices>();
-                ret.GetLocalClonePathFromGitProvider(Args.ServiceProvider).Returns(@"c:\foo\bar");
+                ret.GetLocalClonePathFromGitProvider().Returns(@"c:\foo\bar");
                 return ret;
             }
         }
