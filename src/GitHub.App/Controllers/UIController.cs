@@ -246,7 +246,7 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe( _ => { }, () =>
                 {
-                    var loggedin = !list.Select(c => hosts.LookupHost(c.HostAddress)).Where(h => h.IsLoggedIn).IsEmpty().Wait();
+                    var loggedin = !list.WhereNotNull().Select(c => hosts.LookupHost(c.HostAddress)).Where(h => h.IsLoggedIn).IsEmpty().Wait();
                     machine.Configure(UIViewType.None)
                         .Permit(Trigger.Auth, UIViewType.Login)
                         .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
