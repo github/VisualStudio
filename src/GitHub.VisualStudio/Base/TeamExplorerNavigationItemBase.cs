@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio.Base
         {
             this.ServiceProvider = serviceProvider;
             this.apiFactory = apiFactory;
-            Initialize();
+            GetGitActiveRepo();
         }
 
         int argbColor;

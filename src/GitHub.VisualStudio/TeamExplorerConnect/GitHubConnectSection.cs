@@ -36,7 +36,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
-            Refresh();
+            UpdateConnection();
         }
 
         private void RefreshConnections(object sender, NotifyCollectionChangedEventArgs e)
@@ -72,10 +72,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
         public override void Refresh()
         {
-            if (connectionManager.Connections.Count > sectionIndex)
-                Refresh(connectionManager.Connections[sectionIndex]);
-            else
-                Refresh(null);
+            UpdateConnection();
             base.Refresh();
         }
 
@@ -88,6 +85,14 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             // when we start up the connection list is loaded before we can get notifications so refresh manually
             if (SectionConnection == null && connectionManager.Connections.Count > sectionIndex)
                 Refresh(connectionManager.Connections[sectionIndex]);
+        }
+
+        void UpdateConnection()
+        {
+            if (connectionManager.Connections.Count > sectionIndex)
+                Refresh(connectionManager.Connections[sectionIndex]);
+            else
+                Refresh(null);
         }
 
         void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)

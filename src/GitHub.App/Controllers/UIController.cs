@@ -268,11 +268,10 @@ namespace GitHub.Controllers
                 Fire(Trigger.Cancel);
         }
 
-        private bool disposedValue = false; // To detect redundant calls
-
+        bool disposed = false; // To detect redundant calls
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!disposed)
             {
                 if (disposing)
                 {
@@ -281,7 +280,7 @@ namespace GitHub.Controllers
                     if (transition != null)
                         transition.Dispose();
                 }
-                disposedValue = true;
+                disposed = true;
             }
         }
 
