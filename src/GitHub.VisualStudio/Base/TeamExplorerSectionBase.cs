@@ -38,14 +38,6 @@ namespace GitHub.VisualStudio.Base
             set { title = value; this.RaisePropertyChange(); }
         }
 
-        public TeamExplorerSectionBase() { }
-
-        public TeamExplorerSectionBase(IServiceProvider serviceProvider)
-            : base()
-        {
-            ServiceProvider = serviceProvider;
-        }
-
         public virtual void Cancel()
         {
         }

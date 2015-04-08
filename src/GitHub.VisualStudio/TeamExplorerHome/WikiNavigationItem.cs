@@ -48,10 +48,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         async void UpdateState()
         {
-            bool visible = await Refresh();
+            bool visible = await Refresh().ConfigureAwait(true);
             if (visible)
             {
-                var ret = await SimpleApiClient.HasWiki();
+                var ret = await SimpleApiClient.HasWiki().ConfigureAwait(true);
                 visible = (ret == WikiProbeResult.Ok);
             }
             

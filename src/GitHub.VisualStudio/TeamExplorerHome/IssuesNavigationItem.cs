@@ -48,10 +48,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         async void UpdateState()
         {
-            bool visible = await Refresh();
+            bool visible = await Refresh().ConfigureAwait(true);
             if (visible)
             {
-                var repo = await SimpleApiClient.GetRepository();
+                var repo = await SimpleApiClient.GetRepository().ConfigureAwait(true);
                 visible = repo != null && repo.HasIssues;
             }
 
