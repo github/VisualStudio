@@ -54,20 +54,22 @@
                 <Style x:Key="FormFieldStackPanel" TargetType="{x:Type StackPanel}">
                     <Setter Property="Margin" Value="0,0,0,20" />
                 </Style>
+                <Style TargetType="{x:Type uirx:ErrorMessageDisplay}" BasedOn="{StaticResource ErrorMessageCenteredNoIcon}">
+                    <Setter Property="Margin" Value="0,-20,0,10" />
+                </Style>
             </TabControl.Resources>
 
             <TabItem x:Name="dotComTab" Header="GitHub">
                 <StackPanel Style="{StaticResource TabStackPanel}">
                     <StackPanel x:Name="dotComloginControlsPanel">
-                        <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed" Margin="0,0,0,10">
-                            <TextBlock TextWrapping="Wrap">
-                                Please make sure that you've entered your username and password
-                                correctly, then try again (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
+                        <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                Check your username and password, then try again (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
-                        <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed" Margin="0,0,0,10">
-                            <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
+                        <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">Authentication codes are only valid for a short period of time</TextBlock>
                         </uirx:ErrorMessageDisplay>
 
                         <StackPanel Style="{StaticResource FormFieldStackPanel}">
@@ -95,19 +97,18 @@
 
             <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise" Margin="10,0,-10,0">
                 <StackPanel Style="{StaticResource TabStackPanel}">
-                    <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Margin="0,0,0,10" Message="Log in failed">
-                        <TextBlock TextWrapping="Wrap">
-                                Please make sure that you've entered your username and password 
-                                correctly, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
+                    <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Message="Log in failed">
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                            Check your username and password, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
                         </TextBlock>
                     </uirx:ErrorMessageDisplay>
 
-                    <uirx:ErrorMessageDisplay x:Name="enterpriseTwoFactorAuthFailedMessage" Margin="0,0,0,10" Message="Two factor authentication failed">
-                        <TextBlock TextWrapping="Wrap">Authentication codes are only valid for a short period of time</TextBlock>
+                    <uirx:ErrorMessageDisplay x:Name="enterpriseTwoFactorAuthFailedMessage" Message="Two factor authentication failed">
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Center">Authentication codes are only valid for a short period of time</TextBlock>
                     </uirx:ErrorMessageDisplay>
 
-                    <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host" Margin="0,0,0,10">
-                        <TextBlock TextWrapping="Wrap">
+                    <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host">
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                             Failed to connect to the host or the host isn't a GitHub Enterprise server. 
                             Please make sure that you've entered the host address correctly.
                         </TextBlock>
