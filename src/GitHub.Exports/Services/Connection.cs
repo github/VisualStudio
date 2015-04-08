@@ -22,5 +22,10 @@ namespace GitHub.Services
         {
             return manager.RequestLogin(this);
         }
+
+        public void Logout()
+        {
+            manager.RequestLogout(this);
+        }
     }
 }
