@@ -81,5 +81,11 @@ namespace GitHub.ViewModels
         /// a GitHub.com lost password flow.
         /// </summary>
         IReactiveCommand<Unit> ForgotPassword { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether to show an error message
+        /// due to being unable to connect to the host.
+        /// </summary>
+        bool ShowConnectingToHostFailed { get; }
     }
 }

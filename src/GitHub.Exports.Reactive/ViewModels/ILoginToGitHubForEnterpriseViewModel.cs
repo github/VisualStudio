@@ -18,11 +18,5 @@ namespace GitHub.ViewModels
         /// <see cref="EnterpriseUrl"/> property
         /// </summary>
         ReactivePropertyValidator EnterpriseUrlValidator { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to show an error message
-        /// due to being unable to connect to the host.
-        /// </summary>
-        bool ShowConnectingToHostFailed { get; }
     }
 }

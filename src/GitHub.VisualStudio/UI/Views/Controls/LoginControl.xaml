@@ -68,6 +68,12 @@
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
+                        <uirx:ErrorMessageDisplay x:Name="dotComConnectionFailedMessage" Message="Could not connect to github.com">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                Please check your internet connection and try again.
+                            </TextBlock>
+                        </uirx:ErrorMessageDisplay>
+
                         <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed">
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">Authentication codes are only valid for a short period of time</TextBlock>
                         </uirx:ErrorMessageDisplay>
@@ -109,8 +115,7 @@
 
                     <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host">
                         <TextBlock TextWrapping="Wrap" TextAlignment="Center">
-                            Failed to connect to the host or the host isn't a GitHub Enterprise server. 
-                            Please make sure that you've entered the host address correctly.
+                            The host isn't available or is not a GitHub Enterprise server. Check the address and try again.
                         </TextBlock>
                     </uirx:ErrorMessageDisplay>
 

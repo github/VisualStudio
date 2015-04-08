@@ -1,9 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Authentication;
-using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
