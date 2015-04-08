@@ -33,8 +33,8 @@ namespace GitHub.ViewModels
             loginMode = this.WhenAny(
                 x => x.RepositoryHosts.GitHubHost.IsLoggedIn,
                 x => x.RepositoryHosts.EnterpriseHost.IsLoggedIn,
-                (x, y) => {
-
+                (x, y) =>
+                {
                     var canLogInToGitHub = x.Value == false;
                     var canLogInToEnterprise = y.Value == false;
 

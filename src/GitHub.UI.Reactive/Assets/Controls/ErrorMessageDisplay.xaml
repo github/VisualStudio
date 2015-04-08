@@ -2,54 +2,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                     xmlns:uirx="clr-namespace:GitHub.UI">
-    <Style TargetType="{x:Type uirx:ErrorMessageDisplay}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type uirx:ErrorMessageDisplay}">
-                    <Grid Margin="{TemplateBinding Padding}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <ui:OcticonImage 
-                            Icon="{TemplateBinding Icon}" 
-                            VerticalAlignment="Top" 
-                            Margin="0,5,10,0" 
-                            Foreground="{DynamicResource GitHubErrorBrush}" />
-
-                        <TextBlock 
-                            Grid.Column="1" 
-                            Foreground="{DynamicResource GitHubErrorBrush}" 
-                            FontSize="16" 
-                            FontFamily="{DynamicResource GitHubFontFamilyLight}" 
-                            Text="{TemplateBinding Message}" />
-
-                        <ContentPresenter 
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                            Grid.Column="1"
-                            Grid.Row="2"
-                            Content="{TemplateBinding Content}" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <Style x:Key="ErrorMessageCenteredNoIcon" TargetType="{x:Type uirx:ErrorMessageDisplay}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type uirx:ErrorMessageDisplay}">
                     <StackPanel TextBlock.TextAlignment="Center">
-                        <TextBlock 
+                        <TextBlock
                             HorizontalAlignment="Center"
                             Foreground="{DynamicResource GitHubErrorBrush}" 
-                            FontSize="16" 
+                            FontSize="14" 
                             FontFamily="{DynamicResource GitHubFontFamilyLight}" 
                             Text="{TemplateBinding Message}" />
 
@@ -62,4 +24,6 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type uirx:ErrorMessageDisplay}" BasedOn="{StaticResource ErrorMessageCenteredNoIcon}" />
 </ResourceDictionary>
