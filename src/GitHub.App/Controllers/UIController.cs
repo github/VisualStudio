@@ -214,7 +214,6 @@ namespace GitHub.Controllers
             {
                 uiProvider.AddService(typeof(IConnection), connection);
                 connection.Login()
-                    .Where(c => c == connection)
                     .Select(c => hosts.LookupHost(connection.HostAddress))
                     .Do(host =>
                     {
@@ -236,28 +235,27 @@ namespace GitHub.Controllers
             }
             else
             {
-                var list = Observable.Return<IConnection>(null);
-                foreach (var conn in connectionManager.Connections)
-                {
-                    list = conn.Login().Concat(list);
-                }
+                var list = connectionManager.Connections.ToObservable()
+                        .SelectMany(c => c.Login());
 
-                list
+                list.Select(c => hosts.LookupHost(c.HostAddress)).Any(h => h.IsLoggedIn)
+                    .Do(loggedin =>
+                    {
+                        machine.Configure(UIViewType.None)
+                            .Permit(Trigger.Auth, UIViewType.Login)
+                            .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
+                            .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin)
+                            .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
+                            .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
+                            .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
+                    })
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe( _ => { }, () =>
-                {
-                    var loggedin = !list.WhereNotNull().Select(c => hosts.LookupHost(c.HostAddress)).Where(h => h.IsLoggedIn).IsEmpty().Wait();
-                    machine.Configure(UIViewType.None)
-                        .Permit(Trigger.Auth, UIViewType.Login)
-                        .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
-                        .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin)
-                        .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
-                        .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
-                        .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
-                        .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
-                    Debug.WriteLine("Start ({0})", GetHashCode());
-                    Fire((Trigger)(int)currentFlow);
-                });
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire((Trigger)(int)currentFlow);
+                    });
             }
         }
 

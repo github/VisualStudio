@@ -87,45 +87,42 @@ namespace GitHub.Models
 
             // This part is strictly to support having the IConnectionManager request that a connection
             // be logged in. It doesn't know about hosts or load anything reactive, so it gets
-            // informed of logins via the LoginComplete observable, and requests logins via
-            // the RequiresLogin event.
-            connectionManager.LoginComplete = new ReplaySubject<IConnection>();
-            Observable.FromEvent<IConnection>(
-                h => connectionManager.RequiresLogin += h,
-                h => connectionManager.RequiresLogin -= h
-            ).Do(c =>
-            {
-                IObservable<AuthenticationResult> list = Observable.Return(AuthenticationResult.Success);
-                var connectionLogin = (ReplaySubject<IConnection>)connectionManager.LoginComplete;
-                foreach (var connection in connectionManager.Connections)
+            // informed of logins by an observable returned by the event
+            connectionManager.DoLogin += RunLoginHandler;
+
+            // monitor the list of connections so we can log out hosts when connections are removed
+            connectionManager.Connections.CreateDerivedCollection(x => x)
+                .ItemsRemoved
+                .Select(x =>
                 {
-                    if (connection == c)
-                    {
-                        var address = c.HostAddress;
-                        var host = LookupHost(address);
-                        if (host == DisconnectedRepositoryHost)
-                            list = LogInFromCache(address)
-                            .Select(x => {
-                                connectionLogin.OnNext(c);
-                                return x;
-                            })
-                            .Concat(list);
-                        else
-                            connectionLogin.OnNext(c);
-                    }
-                    else
-                        connectionLogin.OnNext(c);
-                }
-                list.Subscribe(_ => { }, () =>
-                {
-                    connectionLogin.OnCompleted();
-                    connectionManager.LoginComplete = new ReplaySubject<IConnection>();
-                });
-            }).Subscribe();
+                    var host = LookupHost(x.HostAddress);
+                    if (host.Address != x.HostAddress)
+                        host = RepositoryHostFactory.Create(x.HostAddress);
+                    return host;
+                })
+                .Select(h => LogOut(h))
+                .Merge().ToList().Select(_ => Unit.Default).Subscribe();
+
 
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
             // start tracking changes to the EnterpriseHost property and persist every change to the db
             Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe();
+        }
+
+        IObservable<IConnection> RunLoginHandler(IConnection connection)
+        {
+            var handler = new ReplaySubject<IConnection>();
+            var address = connection.HostAddress;
+            var host = LookupHost(address);
+            if (host == DisconnectedRepositoryHost)
+                LogInFromCache(address)
+                    .Subscribe((c) => handler.OnNext(connection), () => handler.OnCompleted());
+            else
+            {
+                handler.OnNext(connection);
+                handler.OnCompleted();
+            }
+            return handler;
         }
 
         public IRepositoryHost LookupHost([AllowNull] HostAddress address)
@@ -166,6 +163,12 @@ namespace GitHub.Models
                 });
         }
 
+        /// <summary>
+        /// This is only called by the connection manager when logging in connections
+        /// that already exist so we don't have to add the connection.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public IObservable<AuthenticationResult> LogInFromCache(HostAddress address)
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
