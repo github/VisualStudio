@@ -45,8 +45,7 @@ namespace GitHub.ViewModels
                 if (!ex.IsCriticalException())
                 {
                     log.Error(String.Format(CultureInfo.InvariantCulture, "Error logging into GitHub.com the website'{0}'", UsernameOrEmail), ex);
-                    // TODO: Handle this error properly
-                    MessageBox.Show(ex.Message);
+                    ShowConnectingToHostFailed = true;
                 }
             });
 

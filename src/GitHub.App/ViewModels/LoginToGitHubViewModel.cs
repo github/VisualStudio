@@ -1,12 +1,9 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 using GitHub.Authentication;
-using GitHub.Extensions.Reactive;
 using GitHub.Models;
-using GitHub.Services;
-using ReactiveUI;
 using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.ViewModels
 {
