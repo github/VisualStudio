@@ -61,7 +61,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             Icon = GetDrawingForIcon(GetBrushForIcon());
         }
 
-        Brush GetBrushForIcon()
+        static Brush GetBrushForIcon()
         {
             var brush = Application.Current.TryFindResource(HeaderColors.DefaultTextBrushKey) as Brush;
             if (brush == null)
@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             return brush;
         }
 
-        DrawingBrush GetDrawingForIcon(Brush color)
+        static DrawingBrush GetDrawingForIcon(Brush color)
         {
             Octicon icon = Octicon.mark_github;
             return new DrawingBrush() {

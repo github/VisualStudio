@@ -14,12 +14,13 @@ using GitHub.Primitives;
 using NullGuard;
 using System.Reactive.Subjects;
 using ReactiveUI;
+using System.Reactive.Disposables;
 
 namespace GitHub.Models
 {
     [Export(typeof(IRepositoryHosts))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class RepositoryHosts : ReactiveObject, IRepositoryHosts
+    public class RepositoryHosts : ReactiveObject, IRepositoryHosts, IDisposable
     {
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
@@ -27,6 +28,7 @@ namespace GitHub.Models
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;
         readonly IConnectionManager connectionManager;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
 
         [ImportingConstructor]
         public RepositoryHosts(
@@ -91,7 +93,8 @@ namespace GitHub.Models
             connectionManager.DoLogin += RunLoginHandler;
 
             // monitor the list of connections so we can log out hosts when connections are removed
-            connectionManager.Connections.CreateDerivedCollection(x => x)
+            disposables.Add(
+                connectionManager.Connections.CreateDerivedCollection(x => x)
                 .ItemsRemoved
                 .Select(x =>
                 {
@@ -101,12 +104,12 @@ namespace GitHub.Models
                     return host;
                 })
                 .Select(h => LogOut(h))
-                .Merge().ToList().Select(_ => Unit.Default).Subscribe();
+                .Merge().ToList().Select(_ => Unit.Default).Subscribe());
 
 
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
             // start tracking changes to the EnterpriseHost property and persist every change to the db
-            Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe();
+            disposables.Add(Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe());
         }
 
         IObservable<IConnection> RunLoginHandler(IConnection connection)
@@ -209,6 +212,27 @@ namespace GitHub.Models
                         EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
                 });
+        }
+
+        bool disposed = false;
+        protected void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    connectionManager.DoLogin -= RunLoginHandler;
+                    disposables.Dispose();
+
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         IRepositoryHost githubHost;

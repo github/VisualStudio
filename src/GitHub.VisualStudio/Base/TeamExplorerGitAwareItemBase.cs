@@ -16,6 +16,11 @@ namespace GitHub.VisualStudio.Base
 
         protected virtual void Initialize()
         {
+            GetGitActiveRepo();
+        }
+
+        protected void GetGitActiveRepo()
+        {
             var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
             if (gitProviderUIContext.IsActive)
             {
@@ -54,13 +59,7 @@ namespace GitHub.VisualStudio.Base
         {
             if (gitService == null)
             {
-                var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
-                if (gitProviderUIContext.IsActive)
-                {
-                    gitService = ServiceProvider.GetService<IGitExt>();
-                    activeRepo = gitService.ActiveRepositories.FirstOrDefault();
-                    gitService.PropertyChanged += CheckAndUpdate;
-                }
+                GetGitActiveRepo();
             }
             base.ContextChanged(sender, e);
         }

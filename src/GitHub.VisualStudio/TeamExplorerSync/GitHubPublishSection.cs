@@ -24,6 +24,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         readonly IConnectionManager connectionManager;
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
+        IDisposable disposable;
 
         string description = String.Empty;
         public string Description
@@ -80,6 +81,21 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             }
         }
 
+        bool disposed = false;
+        protected override void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    if (disposable != null)
+                        disposable.Dispose();
+                }
+                disposed = true;
+            }
+            base.Dispose(disposing);
+        }
+
         public void Connect()
         {
             StartFlow(UIControllerFlow.Authentication);
@@ -108,7 +124,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
-            var disposable = uiflow;
+            disposable = uiflow;
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
             creation

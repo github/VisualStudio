@@ -15,8 +15,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
-    public partial class TwoFactorControl : IViewFor<ITwoFactorDialogViewModel>, IView
+    public partial class TwoFactorControl : IViewFor<ITwoFactorDialogViewModel>, IView, IDisposable
     {
+        readonly Subject<object> close;
+
         public TwoFactorControl()
         {
             SharedDictionaryManager.Load("GitHub.UI");
@@ -24,9 +26,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
 
             InitializeComponent();
-            DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
 
             close = new Subject<object>();
+
+            DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
 
             this.WhenActivated(d =>
             {
@@ -82,8 +85,25 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             set { ViewModel = (ITwoFactorDialogViewModel)value; }
         }
 
-
-        readonly Subject<object> close;
         public IObservable<object> Done { get { return close; } }
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    close.Dispose();
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
