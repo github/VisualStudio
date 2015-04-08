@@ -28,7 +28,7 @@
         <Grid
             FocusManager.IsFocusScope="True"
             x:Name="loginStackPanel"
-            Margin="0,0,0,20"
+            Margin="30,0,30,20"
             FocusVisualStyle="{x:Null}">
 
             <Grid.Resources>
