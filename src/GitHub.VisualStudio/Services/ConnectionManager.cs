@@ -29,8 +29,7 @@ namespace GitHub.VisualStudio
         readonly string cachePath;
         const string cacheFile = "ghfvs.connections";
 
-        public event Action<IConnection> RequiresLogin;
-        public IObservable<IConnection> LoginComplete { get; set; }
+        public event Func<IConnection, IObservable<IConnection>> DoLogin;
 
         Func<string, bool> fileExists;
         Func<string, Encoding, string> readAllText;
@@ -104,13 +103,15 @@ namespace GitHub.VisualStudio
 
         public IObservable<IConnection> RequestLogin(IConnection connection)
         {
-            if (LoginComplete == null)
-                return null;
-            var handler = RequiresLogin;
+            var handler = DoLogin;
             if (handler == null)
                 return null;
-            handler(connection);
-            return LoginComplete;
+            return handler(connection);
+        }
+
+        public void RequestLogout(IConnection connection)
+        {
+            Connections.Remove(connection);
         }
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

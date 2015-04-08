@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -13,11 +14,9 @@ namespace GitHub.Models
         ObservableCollection<IConnection> Connections { get; }
 
         IObservable<IConnection> RequestLogin(IConnection connection);
+        void RequestLogout(IConnection connection);
 
         // for telling IRepositoryHosts that we need to login from cache
-        event Action<IConnection> RequiresLogin;
-
-        // registered by IRepositoryHosts to return an observable
-        IObservable<IConnection> LoginComplete { get; set; }
+        event Func<IConnection, IObservable<IConnection>> DoLogin;
     }
 }
