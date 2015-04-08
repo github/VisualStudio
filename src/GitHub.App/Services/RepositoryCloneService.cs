@@ -44,14 +44,14 @@ namespace GitHub.Services
                 operatingSystem.Directory.CreateDirectory(path);
 
                 // this will throw if it can't find it
-                VSServices.Clone(ServiceProvider, cloneUrl, path, true);
+                VSServices.Clone(cloneUrl, path, true);
                 return Unit.Default;
             });
         }
 
         public string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
-            var ret = VSServices.GetLocalClonePathFromGitProvider(ServiceProvider);
+            var ret = VSServices.GetLocalClonePathFromGitProvider();
             if (!string.IsNullOrEmpty(ret))
                 ret = operatingSystem.Environment.ExpandEnvironmentVariables(ret);
             else

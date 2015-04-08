@@ -13,12 +13,12 @@ public class VSServicesTests
         [InlineData(false, CloneOptions.None)]
         public void CallsCloneOnVsProvidedCloneService(bool recurseSubmodules, CloneOptions expectedCloneOptions)
         {
-            var vsServices = new VSServices();
-            var gitRepositoriesExt = Substitute.For<IGitRepositoriesExt>();
             var provider = Substitute.For<IServiceProvider>();
+            var gitRepositoriesExt = Substitute.For<IGitRepositoriesExt>();
             provider.GetService(typeof(IGitRepositoriesExt)).Returns(gitRepositoriesExt);
+            var vsServices = new VSServices(provider);
 
-            vsServices.Clone(provider, "https://github.com/github/visualstudio", @"c:\fake\ghfvs", recurseSubmodules);
+            vsServices.Clone("https://github.com/github/visualstudio", @"c:\fake\ghfvs", recurseSubmodules);
 
             gitRepositoriesExt.Received()
                 .Clone("https://github.com/github/visualstudio", @"c:\fake\ghfvs", expectedCloneOptions);
