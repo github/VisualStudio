@@ -12,7 +12,7 @@ namespace GitHub.Api
 {
     public class ApiClient : IApiClient
     {
-        const string ProductName = "GitHub Extension for Visual Studio";
+        const string ProductName = Info.ApplicationInfo.ApplicationDescription;
         const string clientId = "fd5f729d309a7bfa8e1b";
         const string clientSecret = "ea0dc43463de55bb588d122cf9656109f850b6bd";
 
