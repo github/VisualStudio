@@ -8,7 +8,7 @@ namespace GitHub.Models
     {
         HostAddress HostAddress { get; }
         string Username { get; }
-
         IObservable<IConnection> Login();
+        void Logout();
     }
 }

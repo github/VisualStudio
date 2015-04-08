@@ -113,6 +113,11 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             StartFlow(UIControllerFlow.Clone);
         }
 
+        public void SignOut()
+        {
+            SectionConnection.Logout();
+        }
+
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
