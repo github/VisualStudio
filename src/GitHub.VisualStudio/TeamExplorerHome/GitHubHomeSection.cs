@@ -41,9 +41,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             private set;
         }
 
-        [ImportingConstructor]
-        public GitHubHomeSection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            :  base(serviceProvider)
+        public GitHubHomeSection()
         {
             Title = "GitHub";
             // only when the repo is hosted on github.com
