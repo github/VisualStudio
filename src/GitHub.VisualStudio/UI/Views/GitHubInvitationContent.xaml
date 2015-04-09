@@ -46,7 +46,7 @@
                 <ColumnDefinition ColumnDefinition.Width="Auto" />
                 <ColumnDefinition ColumnDefinition.Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" KeyboardNavigation.TabIndex="0" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect</Hyperlink></TextBlock>
+            <TextBlock Grid.Column="0" KeyboardNavigation.TabIndex="0" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect…</Hyperlink></TextBlock>
             <TextBlock Grid.Column="1" KeyboardNavigation.TabIndex="1" HorizontalAlignment="Right"><Hyperlink x:Name="signup" Click="signup_Click">Sign up</Hyperlink></TextBlock>
         </Grid>
 
