@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,8 +16,6 @@ using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
-using GitHub.Extensions;
-using System.Reactive.Threading.Tasks;
 
 namespace GitHub.ViewModels
 {
