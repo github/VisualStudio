@@ -54,18 +54,22 @@ namespace GitHub.ViewModels
                 SelectedHost = RepositoryHosts[0];
             }
 
-            var accountsChangedObservable = this.WhenAny(x => x.SelectedHost, x => x.Value)
+            accounts = this.WhenAny(x => x.SelectedHost, x => x.Value)
                 .WhereNotNull()
-                .SelectMany(host => host.GetAccounts(avatarProvider));
-
-            accounts = accountsChangedObservable
+                .SelectMany(host => host.GetAccounts(avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
-            accountsChangedObservable
-                .Where(acts => acts.Any())
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(acts => SelectedAccount = acts[0]);
+            this.WhenAny(x => x.Accounts, x => x.Value)
+                .WhereNotNull()
+                .Where(accts => accts.Any())
+                .Subscribe(accts => {
+                    var selectedAccount = accts.FirstOrDefault();
+                    if (selectedAccount != null)
+                    {
+                        SelectedAccount = accts.FirstOrDefault();
+                    }
+                });
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
