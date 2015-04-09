@@ -16,6 +16,7 @@ using NLog;
 using NullGuard;
 using ReactiveUI;
 using GitHub.Extensions;
+using System.Reactive.Threading.Tasks;
 
 namespace GitHub.ViewModels
 {
@@ -101,8 +102,15 @@ namespace GitHub.ViewModels
 
             isPublishing = PublishRepository.IsExecuting
                 .ToProperty(this, x => x.IsPublishing);
+
+            var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
+            if (!string.IsNullOrEmpty(defaultRepositoryName))
+            {
+                DefaultRepositoryName    = defaultRepositoryName;
+            }
         }
 
+        public string DefaultRepositoryName { get; private set; }
         public new string Title { get { return title.Value; } }
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
         public bool IsPublishing { get { return isPublishing.Value; } }

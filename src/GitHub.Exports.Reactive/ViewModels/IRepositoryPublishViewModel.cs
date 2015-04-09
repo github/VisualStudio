@@ -27,5 +27,10 @@ namespace GitHub.ViewModels
         /// The selected host to publish to.
         /// </summary>
         IRepositoryHost SelectedHost { get; set; }
+
+        /// <summary>
+        /// Sets the default repository name when prepopulating the form.
+        /// </summary>
+        string DefaultRepositoryName { get; }
     }
 }

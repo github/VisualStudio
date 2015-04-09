@@ -79,6 +79,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
 
                 ViewModel.PublishRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
+
+                nameText.Text = ViewModel.DefaultRepositoryName;
             });
             IsVisibleChanged += (s, e) =>
             {
