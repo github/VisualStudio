@@ -38,7 +38,7 @@
         </Style>
     </UserControl.Resources>
 
-    <StackPanel Margin="8,12,18,0" Orientation="Vertical" Style="{DynamicResource DialogContainerStackPanel}">
+    <StackPanel Margin="8,6,18,0" Orientation="Vertical" Style="{DynamicResource DialogContainerStackPanel}">
         <StackPanel.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
@@ -47,20 +47,25 @@
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
         </StackPanel.Resources>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
+        <DockPanel VerticalAlignment="Top" Margin="0,0,0,13">
             <ui:OcticonImage
                 x:Name="octokit"
+                DockPanel.Dock="Left"
                 Height="32"
                 Width="32"
                 VerticalAlignment="Center"
-                Margin="0,6,8,8"
+                Margin="0,6,8,0"
                 Icon="mark_github"
                 Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
-            <StackPanel Orientation="Vertical">
-                <Label Content="GitHub" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.CaptionTextKey }}" />
-                <Label Content="GitHub, Inc." Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" Margin="0,-10,0,0" />
-            </StackPanel>
-        </StackPanel>
+            <Border Height="32" Margin="0,6,0,0" DockPanel.Dock="Right">
+                <TextBlock
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="This repository does not have a remote. Fill out the form to publish it to GitHub."
+                    Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+            </Border>
+        </DockPanel>
 
         <ComboBox x:Name="hostsComboBox">
             <ComboBox.ItemTemplate>
