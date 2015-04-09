@@ -203,6 +203,22 @@ namespace GitHub.SampleData
             SelectedHost = gitHubHost;
         }
 
+        public string DefaultRepositoryName
+        {
+            get
+            {
+                return "whatever";
+            }
+        }
+
+        public bool IsHostComboBoxVisible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public bool IsPublishing
         {
             get;

@@ -17,5 +17,10 @@ namespace GitHub.Services
             Octokit.NewRepository newRepository,
             IAccount account,
             IApiClient apiClient);
+
+        /// <summary>
+        /// Retrieves the repository name.
+        /// </summary>
+        string LocalRepositoryName { get; }
     }
 }

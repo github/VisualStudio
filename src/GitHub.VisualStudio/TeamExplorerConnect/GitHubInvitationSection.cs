@@ -26,7 +26,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             lazyBrowser = browser;
             CanConnect = true;
             CanSignUp = true;
-            ConnectLabel = "Connect";
+            ConnectLabel = "Connect…";
             SignUpLabel = "Sign up";
             Name = "GitHub";
             Provider = "GitHub, Inc.";

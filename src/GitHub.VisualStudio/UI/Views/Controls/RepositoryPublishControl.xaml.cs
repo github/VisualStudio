@@ -31,6 +31,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
+            // This is a hack because we can't seem to style the TextBox child control of LabeledTextBox properly.
+            nameText.TextBoxControl.Height = 23;
+            description.TextBoxControl.Height = 52;
+            // TODO: description.TextBoxControl.Foreground = Application.Current.FindResource("SubduedTextBrushKey") as Brush;
+
             close = new Subject<object>();
 
             IObservable<bool> clearErrorWhenChanged = this.WhenAny(
@@ -43,6 +48,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.RepositoryHosts, v => v.hostsComboBox.ItemsSource));
+                d(this.OneWayBind(ViewModel, vm => vm.IsHostComboBoxVisible, v => v.hostsComboBox.Visibility));
                 d(this.Bind(ViewModel, vm => vm.SelectedHost, v => v.hostsComboBox.SelectedItem));
 
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
@@ -51,7 +57,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
                 d(this.Bind(ViewModel, vm => vm.KeepPrivate, v => v.makePrivate.IsChecked));
-                d(this.OneWayBind(ViewModel, vm => vm.CanKeepPrivate, v => v.makePrivate.IsEnabled));
+                //d(this.OneWayBind(ViewModel, vm => vm.CanKeepPrivate, v => v.makePrivate.IsEnabled));
 
                 //d(this.OneWayBind(ViewModel, vm => vm.ShowUpgradeToMicroPlanWarning, v => v.upgradeToMicroPlanWarning.Visibility));
                 //d(this.OneWayBind(ViewModel, vm => vm.ShowUpgradePlanWarning, v => v.upgradePlanWarning.Visibility));
@@ -62,7 +68,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.SelectedAccount, v => v.accountsComboBox.SelectedItem));
 
                 d(this.BindCommand(ViewModel, vm => vm.PublishRepository, v => v.publishRepositoryButton));
-                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.publishRepositoryButton.ShowSpinner));
+                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.publishingSpinner.Visibility));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeToMicroLink));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeAccountLink));
 
@@ -73,6 +79,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
 
                 ViewModel.PublishRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
+
+                nameText.Text = ViewModel.DefaultRepositoryName;
             });
             IsVisibleChanged += (s, e) =>
             {

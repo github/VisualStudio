@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Models;
-using GitHub.VisualStudio;
 
 namespace GitHub.Services
 {
@@ -19,6 +19,19 @@ namespace GitHub.Services
         {
             this.gitClient = gitClient;
             this.services = services;
+        }
+
+        public string LocalRepositoryName
+        {
+            get
+            {
+                var repo = services.GetActiveRepo();
+                if (repo != null && repo.Info != null && !string.IsNullOrEmpty(repo.Info.WorkingDirectory))
+                {
+                    return new DirectoryInfo(repo.Info.WorkingDirectory).Name ?? "";
+                }
+                return string.Empty;
+            }
         }
 
         public IObservable<Octokit.Repository> PublishRepository(

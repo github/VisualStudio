@@ -8,11 +8,16 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
+             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+             xmlns:tfcrd="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
+             xmlns:tl="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer;assembly=Microsoft.TeamFoundation.Controls"
+             xmlns:ttvc="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.Converters;assembly=Microsoft.TeamFoundation.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="432"
              d:DesignWidth="414"
-             Style="{DynamicResource DialogUserControl}">
+             Margin="0"
+             Background="Transparent">
 
     <d:DesignProperties.DataContext>
         <Binding>
@@ -22,162 +27,149 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <StackPanel Style="{DynamicResource DialogContainerStackPanel}">
-        <Grid
-            Margin="40,12,40,0"
-            FocusManager.IsFocusScope="True"
-            x:Name="loginStackPanel"
-            FocusVisualStyle="{x:Null}">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ComboBoxStyleKey}}">
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="23" />
+        </Style>
+        <Style TargetType="{x:Type tfcrd:LabeledTextBox}">
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+    </UserControl.Resources>
 
-            <Grid.Resources>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Margin" Value="0,3,0,3" />
-                </Style>
+    <StackPanel Margin="8,6,18,0" Orientation="Vertical" Style="{DynamicResource DialogContainerStackPanel}">
+        <StackPanel.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <tfcrd:TFCachedResourceDictionary
+                        Source="pack://application:,,,/Microsoft.TeamFoundation.Controls;component/WPF/SharedResources.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary>
+        </StackPanel.Resources>
+        <DockPanel VerticalAlignment="Top" Margin="0,0,0,13">
+            <ui:OcticonImage
+                x:Name="octokit"
+                DockPanel.Dock="Left"
+                Height="32"
+                Width="32"
+                VerticalAlignment="Center"
+                Margin="0,6,8,0"
+                Icon="mark_github"
+                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+            <Border Height="32" Margin="0,6,0,0" DockPanel.Dock="Right">
+                <TextBlock
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    Text="This repository does not have a remote. Fill out the form to publish it to GitHub."
+                    Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+            </Border>
+        </DockPanel>
 
-                <Style TargetType="{x:Type Label}">
-                    <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                    <Setter Property="Margin" Value="0,0,10,0" />
-                    <Setter Property="Padding" Value="0" />
-                </Style>
+        <ComboBox x:Name="hostsComboBox">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Title}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
-                <Style TargetType="{x:Type ui:PromptTextBox}">
-                    <Setter Property="Margin" Value="0,5" />
-                </Style>
+        <ComboBox x:Name="accountsComboBox">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image
+                            Source="{Binding Avatar}"
+                            Width="15"
+                            Height="15"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Margin="0,0,8,0" />
+                        <TextBlock Text="{Binding Login}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+            <ComboBox.ItemsSource>
+                <x:Array Type="sampleData:AccountDesigner">
+                    <sampleData:AccountDesigner />
+                    <sampleData:AccountDesigner />
+                    <sampleData:AccountDesigner />
+                </x:Array>
+            </ComboBox.ItemsSource>
+        </ComboBox>
 
-                <Style TargetType="{x:Type ui:AppendingPathTextBox}">
-                    <Setter Property="Margin" Value="0,5" />
-                </Style>
+        <tfcrd:LabeledTextBox 
+            x:Name="nameText"
+            HintText="Repository Name"
+            MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
 
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                </Style>
+        <StackPanel>
+            <uirx:ValidationMessage
+                x:Name="nameValidationMessage"
+                ValidatesControl="{Binding ElementName=nameText}" />
+            <uirx:ValidationMessage
+                x:Name="safeRepositoryNameWarning"
+                ValidatesControl="{Binding ElementName=nameText}"
+                Icon="alert"
+                Fill="#f39c12"
+                Padding="2,0" />
+        </StackPanel>
 
-                <Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
-                    <Setter Property="IconMargin" Value="-1,2,7,0" />
-                    <Setter Property="ErrorMessageFontWeight" Value="Normal" />
-                    <Setter Property="Icon" Value="alert" />
-                    <Setter Property="Fill" Value="#f39c12" />
-                    <Setter Property="Margin" Value="0,5,0,0"/>
-                </Style>
-            </Grid.Resources>
+        <tfcrd:LabeledTextBox
+            x:Name="description"
+            Height="52"
+            HintText="Description (optional)"
+            AcceptsReturn="True" />
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="35" />
-                <RowDefinition Height="35" />
-                <RowDefinition Height="35" />
-                <RowDefinition Height="35" />
-                <RowDefinition Height="35" />
-            </Grid.RowDefinitions>
-
-            <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Host</Label>
-            <ui:GitHubComboBox
-                x:Name="hostsComboBox"
-                Grid.Column="1"
-                Grid.Row="0"
-                Style="{StaticResource GitHubComboBox}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Title}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ui:GitHubComboBox>
-
-            <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=nameText}">Name</Label>
-            <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="1" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
-
-            <StackPanel Grid.Column="1" Grid.Row="1">
-                <uirx:ValidationMessage
-                    x:Name="nameValidationMessage"
-                    ValidatesControl="{Binding ElementName=nameText}" />
-                <uirx:ValidationMessage
-                    x:Name="safeRepositoryNameWarning"
-                    ValidatesControl="{Binding ElementName=nameText}"
-                    Icon="alert"
-                    Fill="#f39c12"
-                    Padding="2,0" />
+        <CheckBox x:Name="makePrivate" Margin="0,3,0,6" Background="{StaticResource ToolWindowBackgroundBrushKey}" BorderBrush="{StaticResource SubduedBorderBrushKey}">
+            <TextBlock TextWrapping="Wrap">
+                <TextBlock.Inlines>
+                    <Run>Private Repository</Run>
+                </TextBlock.Inlines>
+            </TextBlock>
+        </CheckBox>
+        
+        <Label x:Name="upgradeToMicroPlanWarning" HorizontalAlignment="Left" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <TextBlock>Private repositories require a</TextBlock>
+                <ui:OcticonLinkButton
+                    x:Name="upgradeToMicroLink"
+                    FontSize="12"
+                    Icon="link_external" 
+                    Content="micro plan"
+                    ToolTip="upgrade"
+                    Margin="5,0"/>
+                <TextBlock>for $7/month</TextBlock>
             </StackPanel>
+        </Label>
+        <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <TextBlock>You're using 
+                        <Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/>
+                        private repositories.
+                </TextBlock>
+                <ui:OcticonLinkButton 
+                    x:Name="upgradeAccountLink"
+                    FontSize="12"
+                    Icon="link_external" 
+                    Content="Manage plans"
+                    ToolTip="manage plans"
+                    Margin="5,0"/>
+            </StackPanel>
+        </Label>
 
-            <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}">Description</Label>
-            <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
-            
-            <uirx:UserErrorMessages x:Name="userErrorMessages" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" />
+        <uirx:UserErrorMessages x:Name="userErrorMessages" />
+        
+        <Button
+            IsDefault="True"
+            x:Name="publishRepositoryButton"
+            HorizontalAlignment="Left">
+            <TextBlock>Publish</TextBlock>
+        </Button>
 
-            <ui:GitHubComboBox
-                x:Name="accountsComboBox"
-                Grid.Column="1"
-                Grid.Row="3"
-                Style="{StaticResource GitHubComboBox}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Avatar}" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,10,0" />
-                            <TextBlock Text="{Binding Login}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ui:GitHubComboBox>
+        <tfcrd:BusySpinner x:Name="publishingSpinner" />
 
-            <CheckBox
-                x:Name="makePrivate"
-                Grid.Column="1"
-                Grid.Row="4"
-                Content="Private Repository"
-                Padding="10,0,0,0"
-                Margin="0,10,0,0" />
-            <Grid Grid.Column="1" Grid.Row="5">
-                <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                        <TextBlock>Private repositories require a</TextBlock>
-                        <ui:OcticonLinkButton 
-                            x:Name="upgradeToMicroLink"
-                            FontSize="12"
-                            Icon="link_external" 
-                            Content="micro plan"
-                            ToolTip="upgrade"
-                            Margin="5,0"/>
-                        <TextBlock>for $7/month</TextBlock>
-                    </StackPanel>
-                </Label>
-                <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                        <TextBlock>You're using 
-                                <Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/>
-                                private repositories.
-                        </TextBlock>
-                        <ui:OcticonLinkButton 
-                            x:Name="upgradeAccountLink"
-                            FontSize="12"
-                            Icon="link_external" 
-                            Content="Manage plans"
-                            ToolTip="manage plans"
-                            Margin="5,0"/>
-                    </StackPanel>
-                </Label>
-            </Grid>
-        </Grid>
-
-        <Grid x:Name="createButtonPane" Height="70">
-
-            <Rectangle Height="1" VerticalAlignment="Top" Fill="{StaticResource GHBoxDividerBrush}" />
-
-            <ui:OcticonCircleButton 
-                    IsDefault="True"
-                    x:Name="publishRepositoryButton"
-                    HorizontalAlignment="Center"
-                    Icon="check">
-                <TextBlock>Publish</TextBlock>
-            </ui:OcticonCircleButton>
-        </Grid>
-    
     </StackPanel>
 </UserControl>
