@@ -44,7 +44,11 @@ namespace GitHub.Extensions
         public static string GetUser(this Uri uri)
         {
             var parts = uri.Segments;
+            if (parts.Length < 2)
+                return null;
             var u = parts[1];
+            if (u == null)
+                return null;
             u = u.TrimEnd('/');
             return u;
         }
@@ -52,7 +56,14 @@ namespace GitHub.Extensions
         public static string GetRepo(this Uri uri)
         {
             var parts = uri.Segments;
-            return parts[2];
+            if (parts.Length < 3)
+                return null;
+            var name = parts[2];
+            if (name == null)
+                return null;
+            if (name.EndsWith(".git", StringComparison.Ordinal))
+                name = name.Remove(name.Length - 4);
+            return name;
         }
     }
 }

@@ -46,25 +46,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             cm.Connections.CollectionChanged += (s,e) => Refresh();
         }
 
-        protected override void Initialize()
+        protected override void RepoChanged()
         {
-            base.Initialize();
-            Refresh();
-        }
-
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            base.ContextChanged(sender, e);
-            Refresh();
-        }
-
-        public override void Refresh()
-        {
-            base.Refresh();
-
-            if (activeRepo != null)
+            if (ActiveRepo != null)
             {
-                var repo = Services.GetRepoFromIGit(activeRepo);
+                var repo = Services.GetRepoFromIGit(ActiveRepo);
                 var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
                 if (remote == null)
                 {
@@ -79,6 +65,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                     IsVisible = false;
                 }
             }
+            base.RepoChanged();
         }
 
         bool disposed = false;
