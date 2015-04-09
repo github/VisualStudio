@@ -31,6 +31,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             InitializeComponent();
 
+            // This is a hack because we can't seem to style the TextBox child control of LabeledTextBox properly.
+            nameText.TextBoxControl.Height = 23;
+            description.TextBoxControl.Height = 52;
+            // TODO: description.TextBoxControl.Foreground = Application.Current.FindResource("SubduedTextBrushKey") as Brush;
+
             close = new Subject<object>();
 
             IObservable<bool> clearErrorWhenChanged = this.WhenAny(

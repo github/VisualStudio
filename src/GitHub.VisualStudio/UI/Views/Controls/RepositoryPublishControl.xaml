@@ -42,8 +42,8 @@
         <StackPanel.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
-                    <tfcrd:TFCachedResourceDictionary Source="pack://application:,,,/Microsoft.TeamFoundation.Controls;component/WPF/SharedResources.xaml" />
-                    
+                    <tfcrd:TFCachedResourceDictionary
+                        Source="pack://application:,,,/Microsoft.TeamFoundation.Controls;component/WPF/SharedResources.xaml" />
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
         </StackPanel.Resources>
@@ -55,7 +55,7 @@
                 VerticalAlignment="Center"
                 Margin="0,6,8,8"
                 Icon="mark_github"
-                Foreground="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, FallbackValue=Gray}" />
+                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
             <StackPanel Orientation="Vertical">
                 <Label Content="GitHub" />
                 <Label Content="GitHub, Inc." Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" Margin="0,-8,0,0" />
@@ -112,7 +112,11 @@
                 Padding="2,0" />
         </StackPanel>
 
-        <tfcrd:LabeledTextBox x:Name="description" Height="52" HintText="Description (optional)" AcceptsReturn="True" />
+        <tfcrd:LabeledTextBox
+            x:Name="description"
+            Height="52"
+            HintText="Description (optional)"
+            AcceptsReturn="True" />
 
         <CheckBox x:Name="makePrivate" Margin="0,3,0,6" Background="{StaticResource ToolWindowBackgroundBrushKey}" BorderBrush="{StaticResource SubduedBorderBrushKey}">
             <TextBlock TextWrapping="Wrap">
