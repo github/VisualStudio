@@ -9,35 +9,46 @@
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d"
-             d:DesignHeight="48"
-             Height="48"
-             d:DesignWidth="300"
-             Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
-             DataContext="{Binding ViewModel}">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
-                <Setter Property="Padding" Value="0" />
-            </Style>
-        </ResourceDictionary>
-    </UserControl.Resources>
+             DataContext="{Binding ViewModel}" d:DesignWidth="230" d:DesignHeight="120">
 
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
+    <StackPanel Margin="8,0">
+        <StackPanel.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.MergedDictionaries>
+                    <tfcrd:TFCachedResourceDictionary Source="pack://application:,,,/Microsoft.TeamFoundation.Controls;component/WPF/SharedResources.xaml" xmlns:tfcrd="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls" />
+                </ResourceDictionary.MergedDictionaries>
+                <Style TargetType="Label">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                    <Setter Property="Padding" Value="0" />
+                </Style>
+            </ResourceDictionary>
+        </StackPanel.Resources>
+
+        <Grid Margin="0,6,-4,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition ColumnDefinition.Width="Auto" />
+                <ColumnDefinition ColumnDefinition.Width="*" />
+            </Grid.ColumnDefinitions>
+
             <ui:OcticonImage
-                Height="16" 
-                Width="16" 
+                x:Name="octokit"
+                Height="32"
+                Width="32"
                 VerticalAlignment="Center" 
-                Margin="8"
-                Icon="logo_github"
-                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}" />
-            <Label Content="{Binding Path=Description}" />
-        </StackPanel>
+                Margin="0,6,8,8"
+                Icon="mark_github"
+                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
 
-        <DockPanel Margin="8">
-            <TextBlock DockPanel.Dock="Left" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect</Hyperlink></TextBlock>
-            <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right"><Hyperlink x:Name="signup" Click="signup_Click">Sign up</Hyperlink></TextBlock>
-        </DockPanel>
+            <TextBlock Grid.Column="1" Margin="0,6,8,8" Foreground="{StaticResource SubduedTextBrushKey}" TextWrapping="Wrap" Text="{Binding Description}" />
+        </Grid>
+        <Grid FrameworkElement.Margin="0,0,0,6" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.TabIndex="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition ColumnDefinition.Width="Auto" />
+                <ColumnDefinition ColumnDefinition.Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" KeyboardNavigation.TabIndex="0" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect</Hyperlink></TextBlock>
+            <TextBlock Grid.Column="1" KeyboardNavigation.TabIndex="1" HorizontalAlignment="Right"><Hyperlink x:Name="signup" Click="signup_Click">Sign up</Hyperlink></TextBlock>
+        </Grid>
+
     </StackPanel>
 </UserControl>
