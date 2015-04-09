@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:VSExtension="http://schemas.microsoft.com/wix/VSExtension">
-  <Product Id="9DABDBBB-3AF1-4F38-A0E0-2B99DFE5057A" Name="GitHub Extension for Visual Studio" Language="1033" Version="0.3.2.0" Manufacturer="GitHub, Inc." UpgradeCode="BA510407-937D-43AB-A0D0-A23EB3EFE376">
+  <Product Id="9DABDBBB-3AF1-4F38-A0E0-2B99DFE5057A" Name="GitHub Extension for Visual Studio" Language="1033" Version="1.0.0.0" Manufacturer="GitHub, Inc." UpgradeCode="BA510407-937D-43AB-A0D0-A23EB3EFE376">
     <Package Id="*" InstallerVersion="200" Compressed="yes" />
     <Upgrade Id="BA510407-937D-43AB-A0D0-A23EB3EFE376">
-      <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND" Minimum="0.3.2.0" IncludeMinimum="yes" Maximum="0.3.2.0" IncludeMaximum="yes" />
+      <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND" Minimum="1.0.0.0" IncludeMinimum="yes" Maximum="1.0.0.0" IncludeMaximum="yes" />
       <UpgradeVersion OnlyDetect="yes" Property="NEWERFOUND" Minimum="0.1.0" IncludeMinimum="no" />
     </Upgrade>
     <CustomAction Id="AlreadyUpdated" Error="[ProductName] is already installed." />
