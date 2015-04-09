@@ -26,12 +26,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             this.browser = browser;
             Text = "Graphs";
-            IsVisible = false;
-            IsEnabled = false;
             Image = Resources.graph;
             ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
-
-            UpdateState();
         }
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
@@ -40,15 +36,21 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.ContextChanged(sender, e);
         }
 
+        protected override void RepoChanged()
+        {
+            UpdateState();
+            base.RepoChanged();
+        }
+
+        protected async override void UpdateState()
+        {
+            IsVisible = IsEnabled = await Refresh().ConfigureAwait(true);
+        }
+
         public override void Execute()
         {
             OpenInBrowser(browser, "graphs");
             base.Execute();
-        }
-
-        async void UpdateState()
-        {
-            IsVisible = IsEnabled = await Refresh().ConfigureAwait(true);
         }
     }
 }

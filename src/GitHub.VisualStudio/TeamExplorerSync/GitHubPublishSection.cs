@@ -46,39 +46,22 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             cm.Connections.CollectionChanged += (s,e) => Refresh();
         }
 
-        protected override void Initialize()
+        protected override void RepoChanged()
         {
-            base.Initialize();
-            Refresh();
-        }
-
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            base.ContextChanged(sender, e);
-            Refresh();
-        }
-
-        public override void Refresh()
-        {
-            base.Refresh();
-
-            if (activeRepo != null)
+            if (ActiveRepo != null && ActiveRepoUri == null)
             {
-                var repo = Services.GetRepoFromIGit(activeRepo);
-                var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
-                if (remote == null)
-                {
-                    IsVisible = true;
-                    if (connectionManager.Connections.Count > 0)
-                        ShowPublish();
-                    else
-                        ShowInvitation();
-                }
+                // not published yet
+                IsVisible = true;
+                if (connectionManager.Connections.Count > 0)
+                    ShowPublish();
                 else
-                {
-                    IsVisible = false;
-                }
+                    ShowInvitation();
             }
+            else
+            {
+                IsVisible = false;
+            }
+            base.RepoChanged();
         }
 
         bool disposed = false;

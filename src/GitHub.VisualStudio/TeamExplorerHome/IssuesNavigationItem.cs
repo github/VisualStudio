@@ -26,18 +26,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             this.browser = browser;
             Text = "Issues";
-            IsVisible = false;
-            IsEnabled = false;
             Image = Resources.issue_opened;
             ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
-
-            UpdateState();
-        }
-
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            UpdateState();
-            base.ContextChanged(sender, e);
         }
 
         public override void Execute()
@@ -46,7 +36,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.Execute();
         }
 
-        async void UpdateState()
+        protected override async void UpdateState()
         {
             bool visible = await Refresh().ConfigureAwait(true);
             if (visible)
