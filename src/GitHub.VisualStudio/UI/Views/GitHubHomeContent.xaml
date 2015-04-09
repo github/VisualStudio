@@ -35,7 +35,7 @@
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
             <ui:OcticonImage
-                x:Name="lock"
+                x:Name="repositoryIcon"
                 Height="32"
                 Width="32"
                 VerticalAlignment="Center" 
