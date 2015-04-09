@@ -35,10 +35,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             set { repoUrl = value; this.RaisePropertyChange(); }
         }
 
+        Octicon icon;
         public Octicon Icon
         {
-            get;
-            private set;
+            get { return icon; }
+            set { icon = value; this.RaisePropertyChange(); }
         }
 
         public GitHubHomeSection()
@@ -51,17 +52,16 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             View.DataContext = this;
         }
 
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        protected override void RepoChanged()
         {
-            base.ContextChanged(sender, e);
-            if (e.NewContext != null && e.NewContext.HasTeamProject)
+            IsVisible = ActiveRepoUri != null;
+            if (ActiveRepoUri != null)
             {
-                RepoName = e.NewContext.TeamProjectName;
-                RepoUrl = e.NewContext.TeamProjectUri.ToString();
-
-                // TODO: we'll need to ping GitHub.com to get this information. For now we stub it out.
-                Icon = GetIcon(true, true, false);
+                RepoName = ActiveRepoName;
+                RepoUrl = ActiveRepoUri.ToString();
+                Icon = GetIcon(true, true, true);
             }
+            base.RepoChanged();
         }
 
         static Octicon GetIcon(bool isPrivate, bool isHosted, bool isFork)

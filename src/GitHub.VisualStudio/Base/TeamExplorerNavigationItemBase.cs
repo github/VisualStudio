@@ -24,7 +24,10 @@ namespace GitHub.VisualStudio.Base
         {
             this.ServiceProvider = serviceProvider;
             this.apiFactory = apiFactory;
-            GetGitActiveRepo();
+            IsVisible = true;
+            IsEnabled = true;
+
+            Initialize();
         }
 
         int argbColor;
@@ -50,14 +53,19 @@ namespace GitHub.VisualStudio.Base
             set { image = value; this.RaisePropertyChange(); }
         }
 
+        protected virtual async void UpdateState()
+        {
+            var visible = await Refresh().ConfigureAwait(true);
+            IsVisible = IsEnabled = visible;
+        }
+
         protected async Task<bool> Refresh()
         {
             bool visible = false;
 
             if (SimpleApiClient == null)
             {
-                var solution = ServiceProvider.GetSolution();
-                var uri = Services.GetRepoUrlFromSolution(solution);
+                var uri = ActiveRepoUri;
                 if (uri == null)
                     return visible;
 
@@ -89,10 +97,11 @@ namespace GitHub.VisualStudio.Base
             OpenInBrowser(browser, wiki);
         }
 
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        protected override void RepoChanged()
         {
             SimpleApiClient = null;
-            base.ContextChanged(sender, e);
+            UpdateState();
+            base.RepoChanged();
         }
     }
 }

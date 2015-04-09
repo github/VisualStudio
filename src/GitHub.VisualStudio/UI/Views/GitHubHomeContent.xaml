@@ -32,15 +32,16 @@
     </UserControl.Resources>
 
     <DockPanel>
+
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
             <ui:OcticonImage
-                x:Name="repositoryIcon" 
-                Height="32" 
-                Width="32" 
+                x:Name="repositoryIcon"
+                Height="32"
+                Width="32"
                 VerticalAlignment="Center" 
-                Margin="18,6,8,8"
-                Icon="lock"
-                Foreground="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, FallbackValue=Gray}" />        
+                Margin="0,0,8,0"
+                Icon="{Binding Path=Icon}"
+                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
             <StackPanel Orientation="Vertical" Margin="0">
                 <Label Content="{Binding Path=RepoName}" />
                 <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
