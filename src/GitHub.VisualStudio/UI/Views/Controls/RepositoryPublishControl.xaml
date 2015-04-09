@@ -28,8 +28,9 @@
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>
-        <Style TargetType="{x:Type ComboBox}">
+        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ComboBoxStyleKey}}">
             <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
         <Style TargetType="{x:Type tfcrd:LabeledTextBox}">
             <Setter Property="Margin" Value="0,0,0,6" />
