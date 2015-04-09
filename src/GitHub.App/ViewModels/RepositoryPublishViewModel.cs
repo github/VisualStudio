@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,7 +16,6 @@ using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
-using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {
@@ -26,6 +26,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
+        readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
@@ -54,18 +55,27 @@ namespace GitHub.ViewModels
                 SelectedHost = RepositoryHosts[0];
             }
 
-            var accountsChangedObservable = this.WhenAny(x => x.SelectedHost, x => x.Value)
+            accounts = this.WhenAny(x => x.SelectedHost, x => x.Value)
                 .WhereNotNull()
-                .SelectMany(host => host.GetAccounts(avatarProvider));
-
-            accounts = accountsChangedObservable
+                .SelectMany(host => host.GetAccounts(avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 
-            accountsChangedObservable
-                .Where(acts => acts.Any())
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(acts => SelectedAccount = acts[0]);
+            this.WhenAny(x => x.Accounts, x => x.Value)
+                .WhereNotNull()
+                .Where(accts => accts.Any())
+                .Subscribe(accts => {
+                    var selectedAccount = accts.FirstOrDefault();
+                    if (selectedAccount != null)
+                    {
+                        SelectedAccount = accts.FirstOrDefault();
+                    }
+                });
+
+            isHostComboBoxVisible = this.WhenAny(x => x.RepositoryHosts, x => x.Value)
+                .WhereNotNull()
+                .Select(h => h.Count > 1)
+                .ToProperty(this, x => x.IsHostComboBoxVisible, initialValue: false);
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
@@ -91,8 +101,15 @@ namespace GitHub.ViewModels
 
             isPublishing = PublishRepository.IsExecuting
                 .ToProperty(this, x => x.IsPublishing);
+
+            var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
+            if (!string.IsNullOrEmpty(defaultRepositoryName))
+            {
+                DefaultRepositoryName    = defaultRepositoryName;
+            }
         }
 
+        public string DefaultRepositoryName { get; private set; }
         public new string Title { get { return title.Value; } }
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
         public bool IsPublishing { get { return isPublishing.Value; } }
@@ -112,6 +129,11 @@ namespace GitHub.ViewModels
         public IReadOnlyList<IAccount> Accounts
         {
             get { return accounts.Value; }
+        }
+
+        public bool IsHostComboBoxVisible
+        {
+            get { return isHostComboBoxVisible.Value; }
         }
 
         ReactiveCommand<Unit> InitializePublishRepositoryCommand()
