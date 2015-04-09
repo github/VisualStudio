@@ -41,7 +41,7 @@
 
             <TextBlock Grid.Column="1" Margin="0,6,8,8" Foreground="{StaticResource SubduedTextBrushKey}" TextWrapping="Wrap" Text="{Binding Description}" />
         </Grid>
-        <Grid FrameworkElement.Margin="0,0,0,6" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.TabIndex="1">
+        <Grid Margin="0,0,0,6" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.TabIndex="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition ColumnDefinition.Width="Auto" />
                 <ColumnDefinition ColumnDefinition.Width="*" />
