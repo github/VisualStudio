@@ -26,6 +26,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
+        readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
@@ -70,6 +71,11 @@ namespace GitHub.ViewModels
                         SelectedAccount = accts.FirstOrDefault();
                     }
                 });
+
+            isHostComboBoxVisible = this.WhenAny(x => x.RepositoryHosts, x => x.Value)
+                .WhereNotNull()
+                .Select(h => h.Count > 1)
+                .ToProperty(this, x => x.IsHostComboBoxVisible, initialValue: false);
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
@@ -116,6 +122,11 @@ namespace GitHub.ViewModels
         public IReadOnlyList<IAccount> Accounts
         {
             get { return accounts.Value; }
+        }
+
+        public bool IsHostComboBoxVisible
+        {
+            get { return isHostComboBoxVisible.Value; }
         }
 
         ReactiveCommand<Unit> InitializePublishRepositoryCommand()
