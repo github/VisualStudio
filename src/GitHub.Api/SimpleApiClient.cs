@@ -18,9 +18,9 @@ namespace GitHub.Api
         readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
 
-        Repository repositoryCache;
-        string owner;
-        string repoName;
+        Repository repositoryCache = new Repository();
+        string owner = null;
+        string repoName = null;
 
         internal SimpleApiClient(HostAddress hostAddress, Uri repoUrl, GitHubClient githubClient,
             Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
@@ -39,13 +39,15 @@ namespace GitHub.Api
                 owner = OriginalUrl.GetUser();
                 repoName = OriginalUrl.GetRepo();
 
-                try
+                if (owner != null && repoName != null)
                 {
-                    repositoryCache = await client.Repository.Get(owner, repoName);
-                }
-                catch // TODO: if the repo is private, then it'll throw
-                {
-                    repositoryCache = new Repository();
+                    try
+                    {
+                        repositoryCache = await client.Repository.Get(owner, repoName);
+                    }
+                    catch // TODO: if the repo is private, then it'll throw
+                    {
+                    }
                 }
             }
             return repositoryCache;

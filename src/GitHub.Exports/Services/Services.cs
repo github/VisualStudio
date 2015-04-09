@@ -113,6 +113,8 @@ namespace GitHub.VisualStudio
 
         public static Uri GetUriFromRepository(Repository repo)
         {
+            if (repo == null)
+                return null;
             var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
             if (remote == null)
                 return null;

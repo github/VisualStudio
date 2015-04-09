@@ -68,15 +68,6 @@ namespace GitHub.VisualStudio.Base
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
         {
-            /*
-            if (e.TeamProjectChanged)
-            {
-                if (e.NewContext != null && e.NewContext.HasTeamProject)
-                    IsVisible = true;
-                else
-                    IsVisible = false;
-            }
-            */
             base.ContextChanged(sender, e);
         }
     }

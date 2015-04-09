@@ -5,63 +5,85 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Microsoft.TeamFoundation.Client;
 using NullGuard;
 using System.Linq;
+using GitHub.VisualStudio.Helpers;
+using System.Threading;
 
 namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerGitAwareItemBase : TeamExplorerItemBase
     {
-        protected IGitRepositoryInfo activeRepo;
+        IGitRepositoryInfo activeRepo;
         IGitExt gitService;
         bool disposed;
+        Uri activeRepoUri;
+        string activeRepoName = string.Empty;
+        SynchronizationContext syncContext;
 
-        protected virtual void Initialize()
+        public TeamExplorerGitAwareItemBase()
         {
-            GetGitActiveRepo();
+                syncContext = SynchronizationContext.Current;
         }
 
-        protected void GetGitActiveRepo()
+        protected virtual void RepoChanged()
         {
-            var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
-            if (gitProviderUIContext.IsActive)
-            {
-                gitService = ServiceProvider.GetService<IGitExt>();
-                activeRepo = gitService.ActiveRepositories.FirstOrDefault();
-                gitService.PropertyChanged += CheckAndUpdate;
-            }
+        }
+
+        protected void Initialize()
+        {
+            UpdateRepo();
+        }
+
+        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        {
+            base.ContextChanged(sender, e);
+            UpdateRepo();
         }
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ActiveRepositories")
             {
-                UpdateRepo(gitService.ActiveRepositories.FirstOrDefault());
+                syncContext.Post((o) => UpdateRepo(o as IGitRepositoryInfo), gitService.ActiveRepositories.FirstOrDefault());
             }
+        }
+
+        void UpdateRepo()
+        {
+            if (gitService == null)
+            {
+                var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                if (gitProviderUIContext.IsActive)
+                {
+                    gitService = ServiceProvider.GetService<IGitExt>();
+                    gitService.PropertyChanged += CheckAndUpdate;
+                }
+            }
+
+            if (gitService != null)
+                UpdateRepo(gitService.ActiveRepositories.FirstOrDefault());
+            else
+                UpdateRepo(null);
         }
 
         void UpdateRepo([AllowNull]IGitRepositoryInfo repo)
         {
-            activeRepo = repo;
-            var tc = new TeamContext();
-            if (activeRepo != null)
-            {
-                var gitRepo = Services.GetRepoFromIGit(activeRepo);
-                tc.TeamProjectUri = Services.GetUriFromRepository(gitRepo);
-                if (tc.TeamProjectUri != null)
-                {
-                    tc.TeamProjectName = tc.TeamProjectUri.GetUser() + "/" + tc.TeamProjectUri.GetRepo();
-                    tc.HasTeamProject = true;
-                }
-            }
-            ContextChanged(this, new ContextChangedEventArgs(CurrentContext, tc, false, true, false, false));
-        }
+            if (ActiveRepo == repo)
+                return;
 
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            if (gitService == null)
+            if (repo != null)
             {
-                GetGitActiveRepo();
+                var gitRepo = Services.GetRepoFromIGit(repo);
+                var uri  = Services.GetUriFromRepository(gitRepo);
+                if (uri != null)
+                {
+                    ActiveRepo = repo;
+                    ActiveRepoUri = uri;
+                    ActiveRepoName = activeRepoUri.GetUser() + "/" + activeRepoUri.GetRepo();
+                }
+                else
+                    ActiveRepo = null;
             }
-            base.ContextChanged(sender, e);
+            RepoChanged();
         }
 
         protected override void Dispose(bool disposing)
@@ -78,20 +100,33 @@ namespace GitHub.VisualStudio.Base
             }
             disposed = true;
         }
-    }
 
-    class TeamContext : ITeamFoundationContext
-    {
-        public bool HasCollection { get; set; }
-        public bool HasTeam { get; set; }
-        public bool HasTeamProject { get; set; }
-        public Guid TeamId { get; set; }
-        public string TeamName { get; set; }
-        public TfsTeamProjectCollection TeamProjectCollection { get; set; }
         [AllowNull]
-        public string TeamProjectName { get; set; }
-        [AllowNull]
-        public Uri TeamProjectUri { get; set; }
-    }
+        protected IGitRepositoryInfo ActiveRepo
+        {
+            [return: AllowNull]
+            get { return activeRepo; }
+            private set
+            {
+                activeRepoName = string.Empty;
+                activeRepoUri = null;
+                activeRepo = value;
+            }
+        }
 
+        [AllowNull]
+        protected Uri ActiveRepoUri
+        {
+            [return: AllowNull]
+            get
+            { return activeRepoUri; }
+            private set { activeRepoUri = value; }
+        }
+
+        protected string ActiveRepoName
+        {
+            get { return activeRepoName; }
+            private set { activeRepoName = value; }
+        }
+    }
 }
