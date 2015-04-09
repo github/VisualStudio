@@ -38,7 +38,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             connectionManager = cm;
             lazyBrowser = browser;
-            Title = "GitHub";
+            Title = "Publish to GitHub";
             IsVisible = false;
             IsExpanded = true;
             Description = "Powerful collaboration, code review, and code management for open source and private projects.";
