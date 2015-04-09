@@ -54,13 +54,13 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected override void RepoChanged()
         {
-            IsVisible = ActiveRepo != null;
-            if (ActiveRepo == null)
-                return;
-            RepoName = ActiveRepoName;
-            RepoUrl = ActiveRepoUri.ToString();
-            Icon = GetIcon(true, true, true);
-                
+            IsVisible = ActiveRepoUri != null;
+            if (ActiveRepoUri != null)
+            {
+                RepoName = ActiveRepoName;
+                RepoUrl = ActiveRepoUri.ToString();
+                Icon = GetIcon(true, true, true);
+            }
             base.RepoChanged();
         }
 
