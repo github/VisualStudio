@@ -48,22 +48,18 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected override void RepoChanged()
         {
-            if (ActiveRepo != null)
+            if (ActiveRepo != null && ActiveRepoUri == null)
             {
-                var repo = Services.GetRepoFromIGit(ActiveRepo);
-                var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
-                if (remote == null)
-                {
-                    IsVisible = true;
-                    if (connectionManager.Connections.Count > 0)
-                        ShowPublish();
-                    else
-                        ShowInvitation();
-                }
+                // not published yet
+                IsVisible = true;
+                if (connectionManager.Connections.Count > 0)
+                    ShowPublish();
                 else
-                {
-                    IsVisible = false;
-                }
+                    ShowInvitation();
+            }
+            else
+            {
+                IsVisible = false;
             }
             base.RepoChanged();
         }
