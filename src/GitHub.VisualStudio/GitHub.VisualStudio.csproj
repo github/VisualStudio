@@ -23,7 +23,7 @@
     <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ApplicationVersion>0.3.2.0</ApplicationVersion>
+    <ApplicationVersion>0.4.0.2</ApplicationVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -98,9 +98,11 @@
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\lib\\Microsoft.TeamFoundation.Controls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Provider, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
@@ -132,8 +134,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NullGuard.Fody.1.4.1\Lib\portable-net4+sl4+wp7+win8+MonoAndroid16+MonoTouch40\NullGuard.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCL.raw, Version=0.7.2.0, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.2.1-GHfVS\lib\net45\SQLitePCL.raw.dll</HintPath>
+    <Reference Include="SQLitePCL.raw, Version=0.7.2.3, Culture=neutral, PublicKeyToken=d89a3d1cc066b805, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.2.3-vs2012\lib\net45\SQLitePCL.raw.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -361,6 +363,10 @@
       <Project>{241c47df-ca8e-4296-aa03-2c48bb646abd}</Project>
       <Name>Akavache.Sqlite3</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
+      <Project>{b4e665e5-6caf-4414-a6e2-8de1c3bcf203}</Project>
+      <Name>Akavache_Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
@@ -437,10 +443,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Fody.1.28.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.28.0\build\Fody.targets'))" />
-    <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.2.1-GHfVS\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.2.1-GHfVS\build\net45\SQLitePCL.raw_basic.targets'))" />
+    <Error Condition="!Exists('..\..\packages\SQLitePCL.raw_basic.0.7.2.3-vs2012\build\net45\SQLitePCL.raw_basic.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SQLitePCL.raw_basic.0.7.2.3-vs2012\build\net45\SQLitePCL.raw_basic.targets'))" />
   </Target>
   <Import Project="..\..\packages\Fody.1.28.0\build\Fody.targets" Condition="Exists('..\..\packages\Fody.1.28.0\build\Fody.targets')" />
-  <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.2.1-GHfVS\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.2.1-GHfVS\build\net45\SQLitePCL.raw_basic.targets')" />
+  <Import Project="..\..\packages\SQLitePCL.raw_basic.0.7.2.3-vs2012\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\..\packages\SQLitePCL.raw_basic.0.7.2.3-vs2012\build\net45\SQLitePCL.raw_basic.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
