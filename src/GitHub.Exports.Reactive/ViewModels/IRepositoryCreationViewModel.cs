@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System.Collections.Generic;
+using System.Reactive;
 using System.Windows.Input;
 using GitHub.Models;
 using GitHub.Validation;
@@ -40,11 +41,11 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The list of GitIgnore templates supported by repository creation
         /// </summary>
-        ReactiveList<GitIgnoreItem> GitIgnoreTemplates { get; }
+        IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates { get; }
 
         /// <summary>
         /// The list of license templates supported by repository creation
         /// </summary>
-        ReactiveList<LicenseItem> Licenses { get; }
+        IReadOnlyList<LicenseItem> Licenses { get; }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -62,7 +63,11 @@ namespace GitHub.Services
         {
             var ret = new AsyncSubject<BitmapSource>();
 
-            imageCache.GetImage(account.AvatarUrl)
+            Uri avatarUrl;
+            Uri.TryCreate(account.AvatarUrl, UriKind.Absolute, out avatarUrl);
+            Debug.Assert(avatarUrl != null, "Cannot have a null avatar url");
+
+            imageCache.GetImage(avatarUrl)
                 .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(account)))
                 .Multicast(ret).Connect();
 
