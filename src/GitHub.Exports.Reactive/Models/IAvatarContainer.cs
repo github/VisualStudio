@@ -15,7 +15,7 @@ namespace GitHub.Models
         /// <summary>
         /// URL to the avatar.
         /// </summary>
-        Uri AvatarUrl { get; }
+        string AvatarUrl { get; }
 
         /// <summary>
         /// Helps determine the default image. Yeah, this interface isn't perfect.

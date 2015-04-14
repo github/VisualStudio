@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Api;
 using GitHub.Authentication;
-using GitHub.Caches;
 using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -15,7 +14,6 @@ using GitHub.UI;
 using GitHub.Validation;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.TeamExplorerHome;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.SampleData
@@ -46,10 +44,10 @@ namespace GitHub.SampleData
 
             Licenses = new ReactiveList<LicenseItem>
             {
-                new LicenseItem(new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever"))),
-                new LicenseItem(new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever"))),
-                new LicenseItem(new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever"))),
-                new LicenseItem(new LicenseMetadata("mit", "MIT License", new Uri("https://whatever")))
+                new LicenseItem("agpl-3.0", "GNU Affero GPL v3.0"),
+                new LicenseItem("apache-2.0", "Apache License 2.0"),
+                new LicenseItem("artistic-2.0", "Artistic License 2.0"),
+                new LicenseItem("mit", "MIT License")
             };
 
             SelectedLicense = LicenseItem.None;
@@ -166,12 +164,12 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates
         {
             get; private set;
         }
 
-        public ReactiveList<LicenseItem> Licenses
+        public IReadOnlyList<LicenseItem> Licenses
         {
             get; private set;
         }
@@ -269,20 +267,16 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public string Title
+        public IModelService ModelService
         {
             get;
             private set;
         }
 
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
+        public string Title
         {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
-        {
-            throw new NotImplementedException();
+            get;
+            private set;
         }
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
@@ -302,15 +296,14 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public sealed class AccountDesigner : GitHub.Models.Account
+    public sealed class AccountDesigner : Account
     {
         public AccountDesigner() : this("some-name")
         {
         }
 
         public AccountDesigner(string login)
-            : base(new CachedAccount { Login = login },
-                  Observable.Return(ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")))
+            : base(login, true, false, 0, 0, Observable.Return(ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")))
         {
         }
     }
