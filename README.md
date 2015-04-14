@@ -31,16 +31,27 @@ https://microsoft.sharepoint.com/teams/DD_VSIDE_GitHub
 
 Contact cathys@microsoft.com or anthc@microsoft.com for access to the site.
 
-## Prerequisites
+## Prerequisites for running the extension
+
+* Visual Studio 2015 RC (ping The Desktop Room)
+
+## Prerequisites for building
 
 Most dependencies are managed via [nuget](http://nuget.org/).
 
 __Make sure you have the following installed!__
 
-* [Visual Studio 2015 CTP 6](https://www.visualstudio.com/downloads/visual-studio-2015-ctp-vs)
-* [Microsoft Visual Studio 2015 SDK CTP 6](http://go.microsoft.com/?linkid=9875738)
-* [WiX toolset v3.10.0.1502](http://static.wixtoolset.org/releases/v3.10.0.1502/wix310.exe). Don't click on the "Update Available" button, [it will downgrade the version](http://www.joyofsetup.com/2015/02/04/wix-v3-10-version-twist/)
+* Visual Studio 2015 RC (githubbers, ping The Desktop Room)
+* Microsoft Visual Studio 2015 SDK (githubbers, ping The Desktop Room)
+* Optional for building the msi installer (not needed for the vsix, if you're not deploying to production you don't need this): [WiX toolset v3.10.0.1519](http://static.wixtoolset.org/releases/v3.10.0.1519/wix310.exe).
+  * If you don't install this the MsiInstaller project will not load. This is fine.
 
+## Building
+
+* The only solution you should be opening is the GitHubVS.sln solution at the top.
+* Either build the whole solution or build the GitHub.VisualStudio project, which will grab and build all dependencies
+* If the build fails the first time, try again
+  * If it still fails try building the Akavache projects individually (in Submodules/Akavache) and then the GitHub.VisualStudio project or the whole solution
 
 ## Debugging
 
