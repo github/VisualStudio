@@ -96,6 +96,7 @@
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Services\Connection.cs" />
+    <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\Services.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Models\IConnection.cs" />

@@ -12,7 +12,6 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase
     {
-        IServiceProvider gitServiceProvider;
         readonly IConnectionManager connectionManager;
         readonly int sectionIndex;
 
@@ -80,8 +79,6 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         {
             base.Initialize(sender, e);
 
-            gitServiceProvider = e.ServiceProvider;
-
             // when we start up the connection list is loaded before we can get notifications so refresh manually
             if (SectionConnection == null && connectionManager.Connections.Count > sectionIndex)
                 Refresh(connectionManager.Connections[sectionIndex]);
@@ -126,7 +123,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.GitServiceProvider = gitServiceProvider;
+            uiProvider.GitServiceProvider = ServiceProvider;
             uiProvider.RunUI(controllerFlow, SectionConnection);
         }
     }
