@@ -123,12 +123,6 @@
     <Compile Include="Services\GitClient.cs" />
     <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
-    <Compile Include="Authentication\CredentialManagement\Credential.cs" />
-    <Compile Include="Authentication\CredentialManagement\CredentialSet.cs" />
-    <Compile Include="Authentication\CredentialManagement\CredentialType.cs" />
-    <Compile Include="Authentication\CredentialManagement\NativeMethods.cs" />
-    <Compile Include="Authentication\CredentialManagement\PersistenceType.cs" />
-    <Compile Include="Authentication\CredentialManagement\SecureStringHelper.cs" />
     <Compile Include="Caches\CredentialCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
@@ -224,6 +218,10 @@
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
+      <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
+      <Name>CredentialManagement</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>

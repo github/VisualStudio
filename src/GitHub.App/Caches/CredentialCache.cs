@@ -6,8 +6,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using Akavache;
-using GitHub.Authentication.CredentialManagement;
 using GitHub.Helpers;
+using GitHub.Authentication.CredentialManagement;
 
 namespace GitHub.Caches
 {
