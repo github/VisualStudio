@@ -30,6 +30,7 @@ namespace GitHub.Api
             this.enterpriseProbe = enterpriseProbe;
             this.wikiProbe = wikiProbe;
             this.OriginalUrl = repoUrl;
+            
         }
 
         public async Task<Repository> GetRepository()
