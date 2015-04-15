@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     [TeamExplorerNavigationItem(PullRequestsNavigationItemId,
         NavigationItemPriority.PullRequests,
         TargetPageId = TeamExplorerPageIds.Home)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
@@ -20,9 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public PullRequestsNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser)
-            : base(serviceProvider, apiFactory)
+        public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
+                                    ITeamExplorerServiceHolder holder)
+            : base(apiFactory, holder)
         {
             this.browser = browser;
             Text = "Pull Requests";

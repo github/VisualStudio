@@ -90,7 +90,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.TeamFoundation.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Common.dll\Microsoft.TeamFoundation.Common.dll</HintPath>
+      <HintPath>..\..\lib\Microsoft.TeamFoundation.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -210,6 +210,7 @@
     <Compile Include="Base\TeamExplorerGitAwareItemBase.cs" />
     <None Include="Base\TeamExplorerGitAwareItem_Solution.cs" />
     <Compile Include="Base\TeamExplorerInvitationBase.cs" />
+    <Compile Include="Base\TeamExplorerServiceHolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
@@ -241,9 +242,6 @@
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="SimpleJson.cs" />
-    <Compile Include="TeamExplorerConnect\GitHubConnectSection4.cs" />
-    <Compile Include="TeamExplorerConnect\GitHubConnectSection3.cs" />
-    <Compile Include="TeamExplorerConnect\GitHubConnectSection2.cs" />
     <Compile Include="TeamExplorerConnect\GitHubConnectSection1.cs" />
     <Compile Include="TeamExplorerConnect\GitHubConnectSection0.cs" />
     <Compile Include="TeamExplorerConnect\GitHubConnectSection.cs" />
