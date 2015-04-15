@@ -23,6 +23,7 @@ namespace GitHub.VisualStudio.Base
         Dictionary<object, Action<IServiceProvider>> handlers = new Dictionary<object, Action<IServiceProvider>>();
 
         IServiceProvider serviceProvider;
+        bool notified = false;
 
         [AllowNull]
         public IServiceProvider ServiceProvider
@@ -36,7 +37,7 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             serviceProvider = provider;
-            Notify();
+            notified = false;
         }
 
         public void ClearServiceProvider([AllowNull] IServiceProvider provider)
@@ -49,8 +50,9 @@ namespace GitHub.VisualStudio.Base
 
         }
 
-        void Notify()
+        public void Notify()
         {
+            notified = true;
             foreach (var handler in handlers.Values)
                 handler(serviceProvider);
         }
@@ -67,7 +69,7 @@ namespace GitHub.VisualStudio.Base
             else
                 handlers[who] = handler;
 
-            if (provider != null)
+            if (provider != null && notified)
                 handler(provider);
         }
 
