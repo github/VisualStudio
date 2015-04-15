@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     [TeamExplorerNavigationItem(PulseNavigationItemId,
         NavigationItemPriority.Pulse,
         TargetPageId = TeamExplorerPageIds.Home)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PulseNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PulseNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA2";

@@ -11,14 +11,15 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerSection(GitHubHomeSectionId, TeamExplorerPageIds.Home, 10)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 
         protected GitHubHomeContent View
         {
-            get { return this.SectionContent as GitHubHomeContent; }
-            set { this.SectionContent = value; }
+            get { return SectionContent as GitHubHomeContent; }
+            set { SectionContent = value; }
         }
 
         string repoName = String.Empty;

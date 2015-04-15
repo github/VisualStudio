@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     [TeamExplorerNavigationItem(IssuesNavigationItemId,
         NavigationItemPriority.Issues,
         TargetPageId = TeamExplorerPageIds.Home)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
