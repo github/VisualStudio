@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using NullGuard;
@@ -32,14 +33,14 @@ namespace GitHub.Services
         public IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndFetchLatest("gitignores", GetOrderedGitIgnoreTemplatesFromApi)
+                hostCache.GetAndRefreshObject("gitignores", GetOrderedGitIgnoreTemplatesFromApi, TimeSpan.FromDays(1), TimeSpan.FromDays(7))
                 .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None));
         }
 
         public IObservable<IReadOnlyList<LicenseItem>> GetLicenses()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndFetchLatest("licenses", GetOrderedLicensesFromApi)
+                hostCache.GetAndRefreshObject("licenses", GetOrderedLicensesFromApi, TimeSpan.FromDays(1), TimeSpan.FromDays(7))
                 .ToReadOnlyList(Create, LicenseItem.None));
         }
 
@@ -71,22 +72,24 @@ namespace GitHub.Services
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
         {
-            return hostCache.GetAndFetchLatest("user", () => apiClient.GetUser().Select(AccountCacheItem.Create))
+            return hostCache.GetAndRefreshObject("user",
+                () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
                 .ToList();
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUserOrganizations()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndFetchLatest("orgs",
-                    () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList()));
+                hostCache.GetAndRefreshObject("orgs",
+                    () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
+                    TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)));
         }
 
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndFetchLatest("repos",
-                    () => apiClient.GetUserRepositories().Select(RepositoryCacheItem.Create).ToList())
+                hostCache.GetAndRefreshObject("repos",
+                    () => apiClient.GetUserRepositories().Select(RepositoryCacheItem.Create).ToList(), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
                 .ToReadOnlyList(Create));
         }
 
