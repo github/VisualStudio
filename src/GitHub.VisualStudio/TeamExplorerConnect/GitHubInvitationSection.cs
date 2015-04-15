@@ -14,6 +14,7 @@ using System.Windows.Media;
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
     [TeamExplorerServiceInvitation(GitHubInvitationSectionId, GitHubInvitationSectionPriority)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubInvitationSection : TeamExplorerInvitationBase
     {
         public const string GitHubInvitationSectionId = "C2443FCC-6D62-4D31-B08A-C4DE70109C7F";
