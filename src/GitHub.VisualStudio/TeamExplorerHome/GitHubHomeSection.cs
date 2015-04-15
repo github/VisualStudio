@@ -51,6 +51,12 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             holder.SetServiceProvider(e.ServiceProvider);
         }
 
+        public override void Loaded(object sender, SectionLoadedEventArgs e)
+        {
+            base.Loaded(sender, e);
+            holder.Notify();
+        }
+
         bool disposed;
         protected override void Dispose(bool disposing)
         {

@@ -31,13 +31,14 @@ namespace GitHub.VisualStudio.Base
 
         protected void Initialize()
         {
-            UpdateRepo();
+            if (ServiceProvider != null)
+                UpdateRepo();
         }
 
         protected override void ContextChanged(object sender, ContextChangedEventArgs e)
         {
             base.ContextChanged(sender, e);
-            UpdateRepo();
+            Initialize();
         }
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
