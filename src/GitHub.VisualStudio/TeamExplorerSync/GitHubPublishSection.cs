@@ -92,7 +92,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
+            var ret = uiProvider.RunUI(controllerFlow, null);
+            ret.Subscribe((c) => { }, () =>
+            {
+                Initialize();
+            });
         }
 
         void ShowInvitation()
