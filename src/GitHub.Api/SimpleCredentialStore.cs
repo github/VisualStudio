@@ -4,7 +4,7 @@ using Octokit;
 using System;
 using GitHub.Authentication.CredentialManagement;
 
-namespace GitHub.Services
+namespace GitHub.Api
 {
     public class SimpleCredentialStore : ICredentialStore
     {
@@ -26,6 +26,30 @@ namespace GitHub.Services
                     return Task.FromResult(new Credentials(credential.Username, credential.Password));
             }
             return Task.FromResult(Credentials.Anonymous);
+        }
+
+        public static Task<bool> RemoveCredentials(string key)
+        {
+            var keyGit = GetKeyGit(key);
+            if (!DeleteKey(keyGit))
+                return Task.FromResult(false);
+
+            var keyHost = GetKeyHost(key);
+            if (!DeleteKey(keyHost))
+                return Task.FromResult(false);
+
+            return Task.FromResult(true);
+        }
+
+        static bool DeleteKey(string key)
+        {
+            using (var credential = new Credential())
+            {
+                credential.Target = key;
+                if (!credential.Load())
+                    return false;
+                return credential.Delete();
+            }
         }
 
         static string GetKeyHost(string key)
