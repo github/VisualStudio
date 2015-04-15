@@ -13,5 +13,6 @@ namespace GitHub.Services
         void ClearServiceProvider(IServiceProvider provider);
         void Subscribe(object who, Action<IServiceProvider> handler);
         void Unsubscribe(object who);
+        void Notify();
     }
 }
