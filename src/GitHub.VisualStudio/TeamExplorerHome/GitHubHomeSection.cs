@@ -18,43 +18,12 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         readonly ITeamExplorerServiceHolder holder;
 
+        [ImportingConstructor]
         public GitHubHomeSection(ITeamExplorerServiceHolder holder)
             : base()
         {
             this.holder = holder;
-        }
-
-        protected GitHubHomeContent View
-        {
-            get { return SectionContent as GitHubHomeContent; }
-            set { SectionContent = value; }
-        }
-
-        string repoName = String.Empty;
-        public string RepoName
-        {
-            get { return repoName; }
-            set { repoName = value; this.RaisePropertyChange(); }
-        }
-
-        string repoUrl = String.Empty;
-        public string RepoUrl
-        {
-            get { return repoUrl; }
-            set { repoUrl = value; this.RaisePropertyChange(); }
-        }
-
-        Octicon icon;
-        public Octicon Icon
-        {
-            get { return icon; }
-            set { icon = value; this.RaisePropertyChange(); }
-        }
-
-        public GitHubHomeSection()
-        {
             Title = "GitHub";
-            // only when the repo is hosted on github.com
             IsVisible = false;
             IsExpanded = true;
             View = new GitHubHomeContent();
@@ -93,12 +62,38 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.Dispose(disposing);
         }
 
-
         static Octicon GetIcon(bool isPrivate, bool isHosted, bool isFork)
         {
             return !isHosted ? Octicon.device_desktop
                 : isPrivate ? Octicon.@lock
                 : isFork ? Octicon.repo_forked : Octicon.repo;
+        }
+
+        protected GitHubHomeContent View
+        {
+            get { return SectionContent as GitHubHomeContent; }
+            set { SectionContent = value; }
+        }
+
+        string repoName = String.Empty;
+        public string RepoName
+        {
+            get { return repoName; }
+            set { repoName = value; this.RaisePropertyChange(); }
+        }
+
+        string repoUrl = String.Empty;
+        public string RepoUrl
+        {
+            get { return repoUrl; }
+            set { repoUrl = value; this.RaisePropertyChange(); }
+        }
+
+        Octicon icon;
+        public Octicon Icon
+        {
+            get { return icon; }
+            set { icon = value; this.RaisePropertyChange(); }
         }
     }
 }
