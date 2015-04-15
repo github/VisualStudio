@@ -20,6 +20,6 @@ namespace GitHub.Services
         void AddService(Type t, object instance);
         void RemoveService(Type t);
 
-        void RunUI(UIControllerFlow controllerFlow, IConnection connection);
+        IObservable<object> RunUI(UIControllerFlow controllerFlow, IConnection connection);
     }
 }
