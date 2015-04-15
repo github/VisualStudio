@@ -7,6 +7,9 @@ using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using System.Diagnostics;
 using GitHub.Services;
+using GitHub.Api;
+using GitHub.Primitives;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -16,12 +19,15 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 
+        readonly ISimpleApiClientFactory apiFactory;
         readonly ITeamExplorerServiceHolder holder;
+        ISimpleApiClient simpleApiClient;
 
         [ImportingConstructor]
-        public GitHubHomeSection(ITeamExplorerServiceHolder holder)
+        public GitHubHomeSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
             : base()
         {
+            this.apiFactory = apiFactory;
             this.holder = holder;
             Title = "GitHub";
             IsVisible = false;
@@ -30,15 +36,20 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             View.DataContext = this;
         }
 
-        protected override void RepoChanged()
+        protected async override void RepoChanged()
         {
-            IsVisible = ActiveRepoUri != null;
-            if (ActiveRepoUri != null)
+            var visible = await UpdateState().ConfigureAwait(true);
+
+            if (visible)
             {
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
-                Icon = GetIcon(true, true, true);
+                IsVisible = IsEnabled = visible;
+                Icon = GetIcon(false, true, false);
+                var repo = await simpleApiClient.GetRepository();
+                Icon = GetIcon(repo.Private, true, repo.Fork);
             }
+
             base.RepoChanged();
         }
 
@@ -49,6 +60,32 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             if (holder == null)
                 return;
             holder.SetServiceProvider(e.ServiceProvider);
+        }
+
+        async Task<bool> UpdateState()
+        {
+            bool visible = false;
+
+            if (simpleApiClient == null)
+            {
+                var uri = ActiveRepoUri;
+                if (uri == null)
+                    return false;
+
+                simpleApiClient = apiFactory.Create(uri);
+
+                if (HostAddress.IsGitHubDotComUri(uri))
+                    visible = true;
+
+                if (!visible)
+                {
+                    // enterprise probe
+                    var ret = await simpleApiClient.IsEnterprise().ConfigureAwait(true);
+                    visible = (ret == EnterpriseProbeResult.Ok);
+                }
+            }
+
+            return visible;
         }
 
         public override void Loaded(object sender, SectionLoadedEventArgs e)
