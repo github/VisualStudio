@@ -162,9 +162,9 @@ function Commit-VersionBump {
 
     Push-Location $rootDirectory
 
-    $output = & $git commit --all --message "Bump version to $version" 2>&1
-    if (!$? -or ($LastExitCode -ne 0)) {
-        Die "Error committing version bump" $output
+    $output = Start-Process $git "commit --all --message ""Bump version to $version""" -wait -NoNewWindow -ErrorAction Continue -PassThru
+    if ($output.ExitCode -ne 0) {
+        Die "Error committing version bump"
     }
 
     Pop-Location
