@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
 using GitHub.Helpers;
 using GitHub.Models;
+using NullGuard;
 using Splat;
 
 namespace GitHub.Services
@@ -23,6 +25,17 @@ namespace GitHub.Services
 
         public BitmapImage DefaultUserBitmapImage { get; private set; }
         public BitmapImage DefaultOrgBitmapImage { get; private set; }
+
+        static AvatarProvider()
+        {
+            // NB: If this isn't explicitly set, WPF will try to guess it via
+            // GetEntryAssembly, which in a unit test runner will be null
+            // This is needed for the pack:// URL format to be understood.
+            if (Application.ResourceAssembly == null)
+            {
+                Application.ResourceAssembly = typeof(AvatarProvider).Assembly;
+            }
+        }
 
         [ImportingConstructor]
         public AvatarProvider(ISharedCache sharedCache, IImageCache imageCache)
@@ -52,7 +65,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<Unit> InvalidateAvatar(IAvatarContainer apiAccount)
+        public IObservable<Unit> InvalidateAvatar([AllowNull] IAvatarContainer apiAccount)
         {
             return apiAccount == null || String.IsNullOrWhiteSpace(apiAccount.Login)
                 ? Observable.Return(Unit.Default)

@@ -113,6 +113,7 @@
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
+    <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
     <Compile Include="GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Substitutes.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\TestImageCache.cs" />
     <Compile Include="XUnit\ConditionalFactAttribute.cs" />
     <Compile Include="XUnit\DelayedMessageBus.cs" />
     <Compile Include="XUnit\RetryFactAttribute.cs" />
