@@ -20,7 +20,7 @@ namespace GitHub.Caches
 
         static SharedCache()
         {
-            BlobCache.ApplicationName = Info.ApplicationInfo.ApplicationDescription;
+            BlobCache.ApplicationName = Info.ApplicationInfo.ApplicationName;
         }
 
         public SharedCache() : this(BlobCache.UserAccount, BlobCache.LocalMachine, null)
