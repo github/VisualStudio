@@ -21,9 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public PullRequestsNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser)
-            : base(serviceProvider, apiFactory)
+        public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
+                                    ITeamExplorerServiceHolder holder)
+            : base(apiFactory, holder)
         {
             this.browser = browser;
             Text = "Pull Requests";

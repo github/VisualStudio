@@ -4,9 +4,9 @@ using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
+using System.Diagnostics;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -15,6 +15,14 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
+
+        readonly ITeamExplorerServiceHolder holder;
+
+        public GitHubHomeSection(ITeamExplorerServiceHolder holder)
+            : base()
+        {
+            this.holder = holder;
+        }
 
         protected GitHubHomeContent View
         {
@@ -64,6 +72,27 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             }
             base.RepoChanged();
         }
+
+        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        {
+            base.Initialize(sender, e);
+            Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
+            if (holder == null)
+                return;
+            holder.SetServiceProvider(e.ServiceProvider);
+        }
+
+        bool disposed;
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && !disposed)
+            {
+                holder.ClearServiceProvider(ServiceProvider);
+                disposed = true;
+            }
+            base.Dispose(disposing);
+        }
+
 
         static Octicon GetIcon(bool isPrivate, bool isHosted, bool isFork)
         {
