@@ -59,10 +59,6 @@ namespace GitHub.VisualStudio.Base
 
         public void Subscribe(object who, Action<IServiceProvider> handler)
         {
-            Debug.Assert(who != null, "Section Subscribe: subscriber cannot be null");
-            Debug.Assert(handler != null, "Section Subscribe: Handler cannot be null");
-            if (handler == null || who == null)
-                return;
             var provider = ServiceProvider;
             if (!handlers.ContainsKey(who))
                 handlers.Add(who, handler);
@@ -75,8 +71,6 @@ namespace GitHub.VisualStudio.Base
 
         public void Unsubscribe(object who)
         {
-            if (who == null)
-                return;
             if (handlers.ContainsKey(who))
                 handlers.Remove(who);
         }
