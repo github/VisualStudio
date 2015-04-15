@@ -14,8 +14,6 @@ namespace GitHub.VisualStudio.UI.Views
         public GitHubConnectContent()
         {
             SharedDictionaryManager.Load("GitHub.UI");
-            Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
-
             InitializeComponent();
         }
 

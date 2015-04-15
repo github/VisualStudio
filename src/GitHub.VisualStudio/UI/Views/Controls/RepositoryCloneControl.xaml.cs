@@ -32,7 +32,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             SharedDictionaryManager.Load("GitHub.UI");
             SharedDictionaryManager.Load("GitHub.UI.Reactive");
-            Resources.MergedDictionaries.Add(SharedDictionaryManager.SharedDictionary);
 
             InitializeComponent();
 
