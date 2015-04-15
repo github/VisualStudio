@@ -133,7 +133,7 @@ namespace GitHub.VisualStudio
             }
         }
 
-        public IObservable<Object> RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        public IObservable<object> RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             StopUI();
 
