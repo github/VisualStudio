@@ -7,6 +7,7 @@ using NullGuard;
 using System.Linq;
 using GitHub.VisualStudio.Helpers;
 using System.Threading;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -21,7 +22,7 @@ namespace GitHub.VisualStudio.Base
 
         public TeamExplorerGitAwareItemBase()
         {
-                syncContext = SynchronizationContext.Current;
+            syncContext = SynchronizationContext.Current;
         }
 
         protected virtual void RepoChanged()
@@ -54,6 +55,7 @@ namespace GitHub.VisualStudio.Base
                 var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
                 if (gitProviderUIContext.IsActive)
                 {
+                    Debug.Assert(ServiceProvider != null, "ServiceProvider must be set before subscribing to git changes");
                     gitService = ServiceProvider.GetService<IGitExt>();
                     gitService.PropertyChanged += CheckAndUpdate;
                 }
