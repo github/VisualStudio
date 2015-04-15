@@ -43,13 +43,20 @@ namespace GitHub.Services
             cache = sharedCache.LocalMachine;
             this.imageCache = imageCache;
 
-            DefaultUserBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
-            DefaultOrgBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
+            DefaultUserBitmapImage = CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
+            DefaultOrgBitmapImage = CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
 
             // NB: We pick 32 here to be roughly the same size as the list of items
             // in the commit list, to the nearest round number
             userAvatarCache = new MemoizingMRUCache<IAvatarContainer, AsyncSubject<BitmapSource>>(
                 (account, _) => GetAvatarForAccount(account), 32);
+        }
+
+        public static BitmapImage CreateBitmapImage(string packUrl)
+        {
+            var bitmap = new BitmapImage(new Uri(packUrl));
+            bitmap.Freeze();
+            return bitmap;
         }
 
         public IObservable<BitmapSource> GetAvatar(IAvatarContainer apiAccount)
