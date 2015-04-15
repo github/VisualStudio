@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     [TeamExplorerNavigationItem(PulseNavigationItemId,
         NavigationItemPriority.Pulse,
         TargetPageId = TeamExplorerPageIds.Home)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PulseNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PulseNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA2";
@@ -20,9 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public PulseNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser)
-            : base(serviceProvider, apiFactory)
+        public PulseNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
+                                    ITeamExplorerServiceHolder holder)
+            : base(apiFactory, holder)
         {
             this.browser = browser;
             Text = "Pulse";

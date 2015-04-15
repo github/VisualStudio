@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     [TeamExplorerNavigationItem(IssuesNavigationItemId,
         NavigationItemPriority.Issues,
         TargetPageId = TeamExplorerPageIds.Home)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
@@ -20,9 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public IssuesNavigationItem([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser)
-            : base(serviceProvider, apiFactory)
+        public IssuesNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
+                                    ITeamExplorerServiceHolder holder)
+            : base(apiFactory, holder)
         {
             this.browser = browser;
             Text = "Issues";

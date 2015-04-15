@@ -6,7 +6,6 @@ using GitHub.Api;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 
@@ -18,16 +17,16 @@ namespace GitHub.VisualStudio.Base
         public ISimpleApiClient SimpleApiClient { get; private set; }
 
         readonly ISimpleApiClientFactory apiFactory;
+        readonly ITeamExplorerServiceHolder holder;
 
-        public TeamExplorerNavigationItemBase(IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+        public TeamExplorerNavigationItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
             : base()
         {
-            this.ServiceProvider = serviceProvider;
             this.apiFactory = apiFactory;
-            IsVisible = true;
+            this.holder = holder;
+            IsVisible = false;
             IsEnabled = true;
-
-            Initialize();
+            SubscribeToSectionProvider();
         }
 
         int argbColor;
@@ -102,6 +101,34 @@ namespace GitHub.VisualStudio.Base
             SimpleApiClient = null;
             UpdateState();
             base.RepoChanged();
+        }
+
+        void SubscribeToSectionProvider()
+        {
+            holder.Subscribe(this, (provider) =>
+            {
+                ServiceProvider = provider;
+                Initialize();
+            });
+        }
+
+        void UnsubscribeToSectionProvider()
+        {
+            holder.Unsubscribe(this);
+        }
+
+        bool disposed;
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!disposed)
+                {
+                    disposed = true;
+                    UnsubscribeToSectionProvider();
+                }
+            }
+            base.Dispose(disposing);
         }
     }
 }

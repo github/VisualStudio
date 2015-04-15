@@ -51,24 +51,20 @@ namespace GitHub.VisualStudio.Base
         public virtual void Initialize(object sender, SectionInitializeEventArgs e)
         {
             ServiceProvider = e.ServiceProvider;
-            Initialize();
         }
 
         public virtual void Loaded(object sender, SectionLoadedEventArgs e)
         {
+            Initialize();
         }
 
         public virtual void Refresh()
         {
+            Initialize();
         }
 
         public virtual void SaveContext(object sender, SectionSaveContextEventArgs e)
         {
-        }
-
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            base.ContextChanged(sender, e);
         }
     }
 }
