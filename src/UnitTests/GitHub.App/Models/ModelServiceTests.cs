@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Akavache;
@@ -101,7 +102,7 @@ public class ModelServiceTests
     public class TheGetAccountsMethod
     {
         [Fact]
-        public async Task CanRetrieveAndCacheAccounts()
+        public async Task CanRetrieveAndCacheUserAndAccounts()
         {
             var orgs = new[]
             {
@@ -126,6 +127,34 @@ public class ModelServiceTests
             Assert.Equal("fake", cachedOrgs[1].Login);
             var cachedUser = await cache.GetObject<AccountCacheItem>("user");
             Assert.Equal("snoopy", cachedUser.Login);
+        }
+
+        [Fact]
+        public async Task CanRetrieveUserFromCacheAndAccountsFromApi()
+        {
+            var orgs = new[]
+            {
+                CreateOctokitOrganization("github"),
+                CreateOctokitOrganization("fake")
+            };
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetOrganizations().Returns(orgs.ToObservable());
+            var cache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
+
+            var fetched = await modelService.GetAccounts();
+
+            Assert.Equal(3, fetched.Count);
+            Assert.Equal("octocat", fetched[0].Login);
+            Assert.Equal("github", fetched[1].Login);
+            Assert.Equal("fake", fetched[2].Login);
+            var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("orgs");
+            Assert.Equal(2, cachedOrgs.Count);
+            Assert.Equal("github", cachedOrgs[0].Login);
+            Assert.Equal("fake", cachedOrgs[1].Login);
+            var cachedUser = await cache.GetObject<AccountCacheItem>("user");
+            Assert.Equal("octocat", cachedUser.Login);
         }
     }
 
@@ -159,6 +188,23 @@ public class ModelServiceTests
             Assert.Equal("reactiveui", cachedRepositories[1].Owner.Login);
             Assert.Equal("splat", cachedRepositories[2].Name);
             Assert.Equal("paulcbetts", cachedRepositories[2].Owner.Login);
+        }
+    }
+
+    public class TheInvalidateAllMethod
+    {
+        [Fact]
+        public async Task InvalidatesTheCache()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var cache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = await modelService.InsertUser(new AccountCacheItem(CreateOctokitUser("octocat")));
+            Assert.Equal(1, (await cache.GetAllObjects<AccountCacheItem>()).Count());
+
+            await modelService.InvalidateAll();
+
+            Assert.Equal(0, (await cache.GetAllObjects<AccountCacheItem>()).Count());
         }
     }
 
