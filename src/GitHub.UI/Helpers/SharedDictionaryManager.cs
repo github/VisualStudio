@@ -38,8 +38,9 @@ namespace GitHub.UI.Helpers
                 //if (System.Reflection.Assembly.GetCallingAssembly().GetName().Name == assemblyname)
                 //    loc = new Uri("/SharedDictionary.xaml", UriKind.Relative);
                 //else
-                    loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.Relative);
+                    loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.RelativeOrAbsolute);
                 var dic = (ResourceDictionary)Application.LoadComponent(loc);
+                Application.Current.Resources.MergedDictionaries.Add(dic);
                 mergedDictionaries.MergedDictionaries.Add(dic);
             }
             return mergedDictionaries;
