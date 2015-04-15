@@ -31,10 +31,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DockPanel>
+    <StackPanel Margin="8,0">
+        <Grid Margin="0,6,-4,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition ColumnDefinition.Width="Auto" />
+                <ColumnDefinition ColumnDefinition.Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0">
-            <ui:OcticonImage
+        <ui:OcticonImage
                 x:Name="repositoryIcon"
                 Height="32"
                 Width="32"
@@ -42,10 +46,11 @@
                 Margin="0,0,8,0"
                 Icon="{Binding Path=Icon}"
                 Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
-            <StackPanel Orientation="Vertical" Margin="0">
+
+            <StackPanel Orientation="Vertical" Margin="0" Grid.Column="1">
                 <Label Content="{Binding Path=RepoName}" />
                 <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
             </StackPanel>
-        </StackPanel>
-    </DockPanel>
+        </Grid>
+    </StackPanel>
 </UserControl>
