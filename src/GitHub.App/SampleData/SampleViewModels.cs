@@ -303,7 +303,7 @@ namespace GitHub.SampleData
         }
 
         public AccountDesigner(string login)
-            : base(login, true, false, 0, 0, Observable.Return(ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")))
+            : base(login, true, false, 0, 0, Observable.Return(AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")))
         {
         }
     }

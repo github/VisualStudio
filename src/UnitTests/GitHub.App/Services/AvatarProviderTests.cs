@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
-using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
@@ -70,7 +69,7 @@ public class AvatarProviderTests
         [STAFact]
         public async Task GetsAvatarFromCache()
         {
-            var expectedImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
+            var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
             var avatarUrl = new Uri("https://avatars.githubusercontent.com/u/e?email=me@test.com&s=140");
             var blobCache = new InMemoryBlobCache();
             var sharedCache = Substitute.For<ISharedCache>();
@@ -89,7 +88,7 @@ public class AvatarProviderTests
         [STAFact]
         public async Task RetrievesGitHubAvatar()
         {
-            var expectedImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
+            var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
             var avatarUrl = new Uri("https://avatars.githubusercontent.com/u/e?email=me@test.com&s=140");
             var blobCache = new InMemoryBlobCache();
             var sharedCache = Substitute.For<ISharedCache>();
@@ -145,7 +144,7 @@ public class AvatarProviderTests
         [Fact]
         public void GetsBytesFromImage()
         {
-            var image = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
+            var image = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
 
             byte[] bytes;
             var encoder = new PngBitmapEncoder();
