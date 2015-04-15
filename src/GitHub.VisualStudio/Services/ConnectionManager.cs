@@ -116,6 +116,13 @@ namespace GitHub.VisualStudio
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach(IConnection c in e.OldItems)
+                {
+                    Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
+                }
+            }
             SaveConnectionsToCache();
         }
 

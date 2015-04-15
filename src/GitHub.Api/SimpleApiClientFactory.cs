@@ -27,7 +27,7 @@ namespace GitHub.Api
         {
             var hostAddress = HostAddress.Create(repoUrl);
             var apiBaseUri = hostAddress.ApiUri;
-            return new SimpleApiClient(hostAddress, repoUrl, new GitHubClient(productHeader, apiBaseUri), lazyEnterpriseProbe, lazyWikiProbe);
+            return new SimpleApiClient(hostAddress, repoUrl, new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), apiBaseUri), lazyEnterpriseProbe, lazyWikiProbe);
         }
     }
 }
