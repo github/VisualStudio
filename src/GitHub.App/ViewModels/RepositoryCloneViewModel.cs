@@ -21,14 +21,14 @@ namespace GitHub.ViewModels
         RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
-            IAvatarProvider avatarProvider)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, avatarProvider)
+            IVSServices vsServices)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, vsServices)
         { }
         
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
-            IAvatarProvider avatarProvider)
+            IVSServices vsServices)
         {
             this.cloneService = cloneService;
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
@@ -53,8 +53,9 @@ namespace GitHub.ViewModels
 
             var canClone = this.WhenAny(x => x.SelectedRepository, x => x.Value)
                 .Select(repo => repo != null);
-
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
+            CloneCommand.ThrownExceptions.Subscribe(e =>
+                vsServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed)));
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
         }
