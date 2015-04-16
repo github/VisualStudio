@@ -59,7 +59,8 @@ namespace GitHub.Services
                 .WhereNotNull()
                 .Select(LicenseCacheItem.Create)
                 .ToList()
-                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)));
+                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)))
+                .Catch<IEnumerable<LicenseCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<LicenseCacheItem>()));
         }
 
         IObservable<IEnumerable<string>> GetOrderedGitIgnoreTemplatesFromApi()
@@ -67,7 +68,8 @@ namespace GitHub.Services
             return apiClient.GetGitIgnoreTemplates()
                 .WhereNotNull()
                 .ToList()
-                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
+                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended))
+                .Catch<IEnumerable<string>, Exception>(_ => Observable.Return(Enumerable.Empty<string>()));
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
