@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Akavache;
@@ -69,6 +70,23 @@ public class ModelServiceTests
             Assert.Equal("peanuts", cached[1]);
             Assert.Equal("bloomcounty", cached[2]);
         }
+
+        [Fact]
+        public async Task ReturnsEmptyCollectionWhenGitIgnoreEndpointNotFound()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetGitIgnoreTemplates()
+                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
+            var cache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetGitIgnoreTemplates();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("None", fetched[0].Name);
+            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("gitignores");
+            Assert.Equal(0, cached.Count);
+        }
     }
 
     public class TheGetLicensesMethod
@@ -96,6 +114,23 @@ public class ModelServiceTests
             Assert.Equal(2, cached.Count);
             Assert.Equal("mit", cached[0].Key);
             Assert.Equal("apache", cached[1].Key);
+        }
+
+        [Fact]
+        public async Task ReturnsEmptyCollectionWhenLicenseApiNotFound()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetLicenses()
+                .Returns(Observable.Throw<LicenseMetadata>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
+            var cache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetLicenses();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("None", fetched[0].Name);
+            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("licenses");
+            Assert.Equal(0, cached.Count);
         }
     }
 
