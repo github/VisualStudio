@@ -1,26 +1,22 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Controls;
+using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
+using NullGuard;
 using ReactiveUI;
 using Stateless;
-using NullGuard;
-using System.Collections.Specialized;
-using System.Linq;
-using GitHub.Authentication;
-using System.Threading.Tasks;
-using GitHub.Extensions.Reactive;
-using System.Reactive;
 
 namespace GitHub.Controllers
 {
