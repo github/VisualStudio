@@ -1,11 +1,13 @@
-﻿using ReactiveUI;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Collections.Generic;
+using ReactiveUI;
 
 namespace GitHub.Extensions.Reactive
 {
@@ -162,6 +164,39 @@ namespace GitHub.Extensions.Reactive
         public static IObservable<T> Flatten<T>(this IObservable<IEnumerable<T>> source)
         {
             return source.SelectMany(items => items);
+        }
+
+        /// <summary>
+        /// Aggregates the items in the observable sequence into a readonly list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IObservable<IReadOnlyList<T>> ToReadOnlyList<T>(this IObservable<T> source)
+        {
+            return source.ToList().Select(list => new ReadOnlyCollection<T>(list));
+        }
+
+        /// <summary>
+        /// Aggregates the items in the observable sequence into a readonly list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IObservable<IReadOnlyList<TResult>> ToReadOnlyList<T, TResult>(this IObservable<IEnumerable<T>> source, Func<T, TResult> map)
+        {
+            return source.Select(items => new ReadOnlyCollection<TResult>(items.Select(map).ToList()));
+        }
+
+        /// <summary>
+        /// Aggregates the items in the observable sequence into a readonly list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IObservable<IReadOnlyList<TResult>> ToReadOnlyList<T, TResult>(this IObservable<IEnumerable<T>> source, Func<T, TResult> map, TResult firstItem)
+        {
+            return source.Select(items => new ReadOnlyCollection<TResult>(new[] { firstItem }.Concat(items.Select(map)).ToList()));
         }
     }
 }

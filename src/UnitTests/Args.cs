@@ -20,4 +20,5 @@ internal static class Args
     public static IServiceProvider ServiceProvider { get { return Arg.Any<IServiceProvider>(); } }
     public static IAvatarProvider AvatarProvider { get { return Arg.Any<IAvatarProvider>(); } }
     public static HostAddress HostAddress { get { return Arg.Any<HostAddress>(); } } 
+    public static Uri Uri { get { return Arg.Any<Uri>(); } }
 }

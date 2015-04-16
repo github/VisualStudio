@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -31,6 +30,8 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
+        readonly ObservableAsPropertyHelper<IReadOnlyList<LicenseItem>> licenses;
+        readonly ObservableAsPropertyHelper<IReadOnlyList<GitIgnoreItem>> gitIgnoreTemplates;
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
@@ -59,7 +60,7 @@ namespace GitHub.ViewModels
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
 
-            accounts = repositoryHost.GetAccounts(avatarProvider)
+            accounts = repositoryHost.ModelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
             
@@ -109,33 +110,13 @@ namespace GitHub.ViewModels
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
 
-            GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>();
-
-            Observable.Return(GitIgnoreItem.None).Concat(
-                repositoryHost.ApiClient
-                    .GetGitIgnoreTemplates()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(GitIgnoreItem.Create))
-                .ToList()
-                .Subscribe(templates =>
-                {
-                    GitIgnoreTemplates.AddRange(templates.OrderByDescending(template => template.Recommended));
-                    Debug.Assert(GitIgnoreTemplates.Any(), "There should be at least one GitIgnoreTemplate");
-                });
-
-            Licenses = new ReactiveList<LicenseItem>();
-            Observable.Return(LicenseItem.None).Concat(
-                repositoryHost.ApiClient
-                    .GetLicenses()
-                    .WhereNotNull()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Select(license => new LicenseItem(license)))
-                .ToList()
-                .Subscribe(licenses =>
-                {
-                    Licenses.AddRange(licenses.OrderByDescending(lic => lic.Recommended));
-                    Debug.Assert(Licenses.Any(), "There should be at least one license");
-                });
+            gitIgnoreTemplates = repositoryHost.ModelService.GetGitIgnoreTemplates()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, x => x.GitIgnoreTemplates, initialValue: new GitIgnoreItem[] { });
+            
+            licenses = repositoryHost.ModelService.GetLicenses()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
         }
 
         string baseRepositoryPath;
@@ -164,16 +145,14 @@ namespace GitHub.ViewModels
         /// </summary>
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
-        public ReactiveList<GitIgnoreItem> GitIgnoreTemplates
+        public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates
         {
-            get;
-            private set;
+            get { return gitIgnoreTemplates.Value; }
         }
 
-        public ReactiveList<LicenseItem> Licenses
+        public IReadOnlyList<LicenseItem> Licenses
         {
-            get;
-            private set;
+            get { return licenses.Value; }
         }
 
         GitIgnoreItem selectedGitIgnoreTemplate;

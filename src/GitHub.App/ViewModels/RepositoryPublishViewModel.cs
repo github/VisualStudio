@@ -33,10 +33,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> title;
 
         [ImportingConstructor]
-        public RepositoryPublishViewModel(
-            IRepositoryHosts hosts,
-            IAvatarProvider avatarProvider,
-            IRepositoryPublishService repositoryPublishService)
+        public RepositoryPublishViewModel(IRepositoryHosts hosts, IRepositoryPublishService repositoryPublishService)
         {
             title = this.WhenAny(
                 x => x.SelectedHost,
@@ -57,7 +54,7 @@ namespace GitHub.ViewModels
 
             accounts = this.WhenAny(x => x.SelectedHost, x => x.Value)
                 .WhereNotNull()
-                .SelectMany(host => host.GetAccounts(avatarProvider))
+                .SelectMany(host => host.ModelService.GetAccounts())
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
 

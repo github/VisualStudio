@@ -110,15 +110,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Args.cs" />
+    <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
+    <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
+    <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCreationServiceTests.cs" />
     <Compile Include="GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
-    <Compile Include="GitHub.Exports.Reactive\Caches\CachedAccountTests.cs" />
     <Compile Include="GitHub.Exports\VSServicesTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
@@ -132,6 +134,7 @@
     <Compile Include="Substitutes.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\TestImageCache.cs" />
     <Compile Include="XUnit\ConditionalFactAttribute.cs" />
     <Compile Include="XUnit\DelayedMessageBus.cs" />
     <Compile Include="XUnit\RetryFactAttribute.cs" />
@@ -214,6 +217,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GitHub.Exports.Reactive\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
