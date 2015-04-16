@@ -38,6 +38,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected async override void RepoChanged()
         {
+            simpleApiClient = null;
             var visible = await UpdateState().ConfigureAwait(true);
 
             if (visible)
