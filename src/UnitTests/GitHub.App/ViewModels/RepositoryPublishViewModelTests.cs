@@ -6,28 +6,27 @@ using NSubstitute;
 using ReactiveUI;
 using Xunit;
 using UnitTests;
+using Microsoft.Reactive.Testing;
+using ReactiveUI.Testing;
 
 public class RepositoryPublishViewModelTests
 {
     public static class Helpers
     {
-        public static IRepositoryPublishViewModel GetViewModel(IAvatarProvider ap)
-        {
-            return GetViewModel(null, ap, null);
-        }
-
         public static IRepositoryPublishViewModel GetViewModel(IRepositoryPublishService service = null)
         {
-            return GetViewModel(null, null, service);
+            return GetViewModel(null, service, null);
         }
 
-        public static IRepositoryPublishViewModel GetViewModel(IRepositoryHosts hosts = null, IAvatarProvider ap = null, IRepositoryPublishService service = null)
+        public static IRepositoryPublishViewModel GetViewModel(
+            IRepositoryHosts hosts = null,
+            IRepositoryPublishService service = null,
+            IVSServices vsServices = null)
         {
-            if (hosts == null)
-                hosts = Substitutes.RepositoryHosts;
-            if (service == null)
-                service = Substitute.For<IRepositoryPublishService>();
-            return new RepositoryPublishViewModel(hosts, service);
+            hosts = hosts ?? Substitutes.RepositoryHosts;
+            service = service ?? Substitute.For<IRepositoryPublishService>();
+            vsServices = vsServices ?? Substitute.For<IVSServices>();
+            return new RepositoryPublishViewModel(hosts, service, vsServices);
         }
     }
 
@@ -249,6 +248,30 @@ public class RepositoryPublishViewModelTests
 
             Assert.False(vm.SafeRepositoryNameWarningValidator.ValidationResult.IsValid);
             Assert.Equal("Will be created as this-is-bad", vm.SafeRepositoryNameWarningValidator.ValidationResult.Message);
+        }
+
+        [Fact]
+        public void DisplaysWarningWhenRepoNameNotSafeAndClearsItWhenSafeAgain()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vsServices = Substitute.For<IVSServices>();
+            var vm = Helpers.GetViewModel(hosts, vsServices: vsServices);
+            vsServices.DidNotReceive().ShowWarning(Args.String);
+
+            vm.RepositoryName = "this is bad";
+            Assert.Equal("this-is-bad", vm.SafeRepositoryName);
+
+            vsServices.Received().ShowWarning("Will be created as this-is-bad");
+            vsServices.DidNotReceive().ClearNotifications();
+
+            vm.RepositoryName = "this";
+
+            vsServices.Received().ClearNotifications();
         }
     }
 }
