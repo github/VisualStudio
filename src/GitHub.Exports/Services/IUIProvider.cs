@@ -1,7 +1,7 @@
-﻿using GitHub.Models;
-using GitHub.UI;
-using System;
+﻿using System;
 using System.ComponentModel.Composition.Hosting;
+using GitHub.Models;
+using GitHub.UI;
 
 namespace GitHub.Services
 {

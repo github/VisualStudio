@@ -7,12 +7,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using GitHub.Models;
 using GitHub.Services;
+using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
-using GitHub.UI;
-using GitHub.Models;
 
 namespace GitHub.VisualStudio
 {
@@ -167,7 +167,7 @@ namespace GitHub.VisualStudio
             windowController.ShowModal();
         }
 
-        public void RunUI(UIControllerFlow controllerFlow, IConnection connection)
+        public void RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             SetupUI(controllerFlow, connection);
             windowController.ShowModal();
