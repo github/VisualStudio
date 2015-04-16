@@ -121,7 +121,7 @@ namespace GitHub.Services
             },
             { ErrorType.ClipboardFailed, Map(Defaults("Failed to copy text to the clipboard.")) },
             {
-                ErrorType.ClonedFailed, Map(Defaults("Failed to clone the repository '{0}'", "Please check your log file for more details, or email support if you are still having problems."),
+                ErrorType.ClonedFailed, Map(Defaults("Failed to clone the repository '{0}'", "Email support@github.com if you continue to have problems."),
                     new[]
                     {
                         new Translation(@"fatal: bad config file line (\d+) in (.+)", "Failed to clone the repository '{0}'", @"The config file '$2' is corrupted at line $1. You may need to open the file and try to fix any errors."),
@@ -154,7 +154,7 @@ namespace GitHub.Services
 
         public static string GetUserFriendlyErrorMessage(this Exception exception, ErrorType errorType, params object[] messageArgs)
         {
-            var translation = exception.GetUserFriendlyError(errorType, exception, messageArgs);
+            var translation = exception.GetUserFriendlyError(errorType, messageArgs);
             if (translation == null) return exception.Message;
             return translation.ErrorMessage + Environment.NewLine + translation.ErrorCauseOrResolution;
         }
@@ -215,7 +215,7 @@ namespace GitHub.Services
             return userError.Throw();
         }
 
-        public static UserError GetUserFriendlyError(this Exception exception, ErrorType errorType, params object[] messageArgs)
+        static UserError GetUserFriendlyError(this Exception exception, ErrorType errorType, params object[] messageArgs)
         {
             return Translator.Value.GetUserError(errorType, exception, messageArgs);
         }
