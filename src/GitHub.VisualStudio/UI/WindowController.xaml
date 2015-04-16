@@ -10,6 +10,8 @@
         Title="GitHub"
         Height="432"
         Width="414"
+        MinHeight="432"
+        MinWidth="414"
         HasMinimizeButton="False"
         HasMaximizeButton="False"
         Background="White">
