@@ -123,7 +123,7 @@
             HintText="Description (optional)"
             AcceptsReturn="True" />
 
-        <CheckBox x:Name="makePrivate" Margin="0,3,0,6" Background="{StaticResource ToolWindowBackgroundBrushKey}" BorderBrush="{StaticResource SubduedBorderBrushKey}">
+        <CheckBox x:Name="makePrivate" Margin="0,3,0,6" Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}">
             <TextBlock TextWrapping="Wrap">
                 <TextBlock.Inlines>
                     <Run>Private Repository</Run>
