@@ -7,12 +7,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using GitHub.Models;
 using GitHub.Services;
+using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
-using GitHub.UI;
-using GitHub.Models;
 
 namespace GitHub.VisualStudio
 {
@@ -133,7 +133,8 @@ namespace GitHub.VisualStudio
             }
         }
 
-        public IObservable<object> RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        UI.WindowController windowController;
+        public IObservable<object> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             StopUI();
 
@@ -142,9 +143,10 @@ namespace GitHub.VisualStudio
             var disposable = currentUIFlow;
             var ui = currentUIFlow.Value;
             var creation = ui.SelectFlow(controllerFlow);
-            var windowController = new UI.WindowController(creation);
+            windowController = new UI.WindowController(creation);
+            windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
-            creation.Subscribe((c) => { }, () =>
+            creation.Subscribe((c) => {}, () =>
             {
                 windowController.Closed -= StopUIFlowWhenWindowIsClosedByUser;
                 windowController.Close();
@@ -153,9 +155,22 @@ namespace GitHub.VisualStudio
                 else
                     StopUI();
             });
-            windowController.Show();
             ui.Start(connection);
             return creation;
+        }
+
+        public void RunUI()
+        {
+            Debug.Assert(windowController != null, "WindowController is null, did you forget to call SetupUI?");
+            if (windowController == null)
+                return;
+            windowController.ShowModal();
+        }
+
+        public void RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        {
+            SetupUI(controllerFlow, connection);
+            windowController.ShowModal();
         }
 
         public void StopUI()
