@@ -10,7 +10,6 @@ using System.Text;
 using System.Windows.Media.Imaging;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
-using GitHub.Helpers;
 using GitHub.Models;
 
 namespace GitHub.Services
@@ -24,8 +23,8 @@ namespace GitHub.Services
         {
             this.imageCache = imageCache;
 
-            DefaultUserBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
-            DefaultOrgBitmapImage = ImageHelper.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
+            DefaultUserBitmapImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
+            DefaultOrgBitmapImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
         }
 
         public BitmapImage DefaultUserBitmapImage { get; private set; }

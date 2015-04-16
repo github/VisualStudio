@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -25,11 +23,10 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly CachedAccount unverifiedUser = new CachedAccount();
+        static readonly AccountCacheItem unverifiedUser = new AccountCacheItem();
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly Uri apiBaseUri;
-        readonly IBlobCache hostCache;
         readonly ILoginCache loginCache;
 
         bool isLoggedIn;
@@ -37,12 +34,12 @@ namespace GitHub.Models
 
         public RepositoryHost(
             IApiClient apiClient,
-            IBlobCache hostCache,
+            IModelService modelService,
             ILoginCache loginCache,
             ITwoFactorChallengeHandler twoFactorChallengeHandler)
         {
             ApiClient = apiClient;
-            this.hostCache = hostCache;
+            ModelService = modelService;
             this.loginCache = loginCache;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
 
@@ -70,18 +67,18 @@ namespace GitHub.Models
         {
             return GetUserFromApi()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<CachedAccount, Exception>(ex =>
+                .Catch<AccountCacheItem, Exception>(ex =>
                 {
                     if (ex is AuthorizationException)
                     {
                         log.Warn("Got an authorization exception", ex);
-                        return Observable.Return<CachedAccount>(null);
+                        return Observable.Return<AccountCacheItem>(null);
                     }
-                    return GetUser()
-                        .Catch<CachedAccount, Exception>(e =>
+                    return ModelService.GetUserFromCache()
+                        .Catch<AccountCacheItem, Exception>(e =>
                         {
                             log.Warn("User does not exist in cache", e);
-                            return Observable.Return<CachedAccount>(null);
+                            return Observable.Return<AccountCacheItem>(null);
                         })
                         .ObserveOn(RxApp.MainThreadScheduler);
                 })
@@ -125,14 +122,14 @@ namespace GitHub.Models
                 .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
                 .SelectMany(_ => GetUserFromApi())
-                .Catch<CachedAccount, ApiException>(firstTryEx =>
+                .Catch<AccountCacheItem, ApiException>(firstTryEx =>
                 {
                     var exception = firstTryEx as AuthorizationException;
                     if (isEnterprise
                         && exception != null
                         && exception.Message == "Bad credentials")
                     {
-                        return Observable.Throw<CachedAccount>(exception);
+                        return Observable.Throw<AccountCacheItem>(exception);
                     }
 
                     // If the Enterprise host doesn't support the write:public_key scope, it'll return a 422.
@@ -163,9 +160,9 @@ namespace GitHub.Models
                             .SelectMany(_ => GetUserFromApi());
                     }
 
-                    return Observable.Throw<CachedAccount>(firstTryEx);
+                    return Observable.Throw<AccountCacheItem>(firstTryEx);
                 })
-                .Catch<CachedAccount, ApiException>(retryEx =>
+                .Catch<AccountCacheItem, ApiException>(retryEx =>
                 {
                     // Older Enterprise hosts either don't have the API end-point to PUT an authorization, or they
                     // return 422 because they haven't white-listed our client ID. In that case, we just ignore
@@ -178,10 +175,10 @@ namespace GitHub.Models
                         return GetUserFromApi();
 
                     // Other errors are "real" so we pass them along:
-                    return Observable.Throw<CachedAccount>(retryEx);
+                    return Observable.Throw<AccountCacheItem>(retryEx);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<CachedAccount, Exception>(ex =>
+                .Catch<AccountCacheItem, Exception>(ex =>
                 {
                     // If we get here, we have an actual login failure:
                     if (ex is TwoFactorChallengeFailedException)
@@ -190,9 +187,9 @@ namespace GitHub.Models
                     }
                     if (ex is AuthorizationException)
                     {
-                        return Observable.Return(default(CachedAccount));
+                        return Observable.Return(default(AccountCacheItem));
                     }
-                    return Observable.Throw<CachedAccount>(ex);
+                    return Observable.Throw<AccountCacheItem>(ex);
                 })
                 .SelectMany(LoginWithApiUser)
                 .PublishAsync();
@@ -210,7 +207,7 @@ namespace GitHub.Models
                     log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);
                     return Observable.Return(Unit.Default);
                 })
-                .SelectMany(_ => hostCache.InvalidateAll())
+                .SelectMany(_ => ModelService.InvalidateAll())
                 .Catch<Unit, Exception>(e =>
                 {
                     log.Warn("ASSERT! Failed to invaldiate caches", e);
@@ -223,21 +220,6 @@ namespace GitHub.Models
                 });
         }
 
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
-        {
-            return Observable.Zip(
-                GetUser(avatarProvider),
-                GetOrganizations(avatarProvider),
-                (user, orgs) => new ReadOnlyCollection<IAccount>(user.Concat(orgs).ToList()));
-        }
-
-        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
-        {
-            return Observable.Defer(() =>
-                hostCache.GetAndFetchLatest("organizations",
-                    () => ApiClient.GetOrganizations().WhereNotNull().Select(org => new CachedAccount(org)).ToList()));
-        }
-
         static string MakeTitle(Uri apiBaseUri)
         {
             return HostAddress.IsGitHubDotComUri(apiBaseUri)
@@ -245,7 +227,7 @@ namespace GitHub.Models
                 : apiBaseUri.Host;
         }
 
-        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(CachedAccount account)
+        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(AccountCacheItem account)
         {
             return Observable.Return(account == null ? AuthenticationResult.CredentialFailure
                 : account == unverifiedUser
@@ -253,14 +235,14 @@ namespace GitHub.Models
                     : AuthenticationResult.Success);
         }
 
-        IObservable<AuthenticationResult> LoginWithApiUser(CachedAccount user)
+        IObservable<AuthenticationResult> LoginWithApiUser(AccountCacheItem user)
         {
             return GetAuthenticationResultForUser(user)
                 .SelectMany(result =>
                 {
                     if (result.IsSuccess())
                     {
-                        return InsertUser(user).Select(_ => result);
+                        return ModelService.InsertUser(user).Select(_ => result);
                     }
 
                     if (result == AuthenticationResult.VerificationFailure)
@@ -284,31 +266,10 @@ namespace GitHub.Models
                 });
         }
 
-        IObservable<IEnumerable<IAccount>> GetOrganizations(IAvatarProvider avatarProvider)
+        IObservable<AccountCacheItem> GetUserFromApi()
         {
-            return GetAllOrganizations()
-                    .Select(orgs => orgs.Select(org => new Account(org, avatarProvider.GetAvatar(org))));
-        }
-
-        IObservable<IEnumerable<IAccount>> GetUser(IAvatarProvider avatarProvider)
-        {
-            return GetUser().Select(user => new[] { new Account(user, avatarProvider.GetAvatar(user)) });
-        }
-
-        IObservable<CachedAccount> GetUserFromApi()
-        {
-            return ApiClient.GetUser().Select(u => new CachedAccount(u));
-        }
-
-        IObservable<CachedAccount> GetUser()
-        {
-            return Observable.Defer(() => hostCache.GetAndFetchLatest("user",
-                () => ApiClient.GetUser().WhereNotNull().Select(user => new CachedAccount(user))));
-        }
-
-        IObservable<Unit> InsertUser(CachedAccount user)
-        {
-            return hostCache.InsertObject("user", user);
+            return Observable.Defer(() => ApiClient.GetUser().WhereNotNull()
+                .Select(user => new AccountCacheItem(user)));
         }
 
         internal string DebuggerDisplay
@@ -317,6 +278,12 @@ namespace GitHub.Models
             {
                 return String.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, apiBaseUri);
             }
+        }
+
+        public IModelService ModelService
+        {
+            get;
+            private set;
         }
     }
 }

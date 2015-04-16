@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Reactive.Linq;
 using GitHub.Authentication;
@@ -96,7 +95,7 @@ namespace GitHub.Api
             return gitHubClient.Organization.GetAllForCurrent();
         }
 
-        public IObservable<IEnumerable<Repository>> GetUserRepositories()
+        public IObservable<Repository> GetUserRepositories()
         {
             return Observable.Merge(
                 GetAllRepositoriesForCurrentUser(),
@@ -118,16 +117,14 @@ namespace GitHub.Api
 
         public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
 
-        IObservable<IEnumerable<Repository>> GetAllRepositoriesForOrganization(Organization org)
+        IObservable<Repository> GetAllRepositoriesForOrganization(Organization org)
         {
-            return gitHubClient.Repository.GetAllForOrg(org.Login)
-                .ToList();
+            return gitHubClient.Repository.GetAllForOrg(org.Login);
         }
 
-        IObservable<IEnumerable<Repository>> GetAllRepositoriesForCurrentUser()
+        IObservable<Repository> GetAllRepositoriesForCurrentUser()
         {
-            return gitHubClient.Repository.GetAllForCurrent()
-                .ToList();
+            return gitHubClient.Repository.GetAllForCurrent();
         }
 
         static string GetMachineNameSafe()

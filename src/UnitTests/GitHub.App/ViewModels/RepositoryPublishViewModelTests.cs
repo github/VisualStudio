@@ -25,11 +25,9 @@ public class RepositoryPublishViewModelTests
         {
             if (hosts == null)
                 hosts = Substitutes.RepositoryHosts;
-            if (ap == null)
-                ap = Substitute.For<IAvatarProvider>();
             if (service == null)
                 service = Substitute.For<IRepositoryPublishService>();
-            return new RepositoryPublishViewModel(hosts, ap, service);
+            return new RepositoryPublishViewModel(hosts, service);
         }
     }
 
@@ -44,10 +42,10 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(gitHubLoggedIn);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var enterpriseHost = Substitute.For<IRepositoryHost>();
             enterpriseHost.IsLoggedIn.Returns(enterpriseLoggedIn);
-            enterpriseHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            enterpriseHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             enterpriseHost.Title.Returns("ghe.io");
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
@@ -68,7 +66,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -87,10 +85,10 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.Title.Returns("GitHub");
             gitHubHost.IsLoggedIn.Returns(true);
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(gitHubAccounts));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(gitHubAccounts));
             var enterpriseHost = Substitute.For<IRepositoryHost>();
             enterpriseHost.IsLoggedIn.Returns(true);
-            enterpriseHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(enterpriseAccounts));
+            enterpriseHost.ModelService.GetAccounts().Returns(Observable.Return(enterpriseAccounts));
             enterpriseHost.Title.Returns("ghe.io");
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
@@ -115,7 +113,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -131,7 +129,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -147,7 +145,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -167,7 +165,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -184,7 +182,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -206,7 +204,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -226,7 +224,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);
@@ -242,7 +240,7 @@ public class RepositoryPublishViewModelTests
             var gitHubHost = Substitute.For<IRepositoryHost>();
             gitHubHost.IsLoggedIn.Returns(true);
             gitHubHost.Title.Returns("GitHub");
-            gitHubHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount>()));
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             var hosts = Substitute.For<IRepositoryHosts>();
             hosts.GitHubHost.Returns(gitHubHost);
             var vm = Helpers.GetViewModel(hosts);

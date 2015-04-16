@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Extensions.Reactive;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
@@ -11,6 +12,7 @@ using ReactiveUI;
 using Rothko;
 using UnitTests;
 using Xunit;
+using System.Linq;
 
 public class RepositoryCreationViewModelTests
 {
@@ -296,7 +298,7 @@ public class RepositoryCreationViewModelTests
         {
             var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
             var repositoryHost = Substitute.For<IRepositoryHost>();
-            repositoryHost.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(accounts));
+            repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
             var vm = new RepositoryCreationViewModel(
                 repositoryHost,
                 Substitute.For<IOperatingSystem>(),
@@ -314,37 +316,35 @@ public class RepositoryCreationViewModelTests
         public void IsPopulatedByTheApiAndSortedWithRecommendedFirstAndSelectsFirst()
         {
             var gitIgnoreTemplates = new[]
-        {
-            "Delphi",
-            "VisualStudio",
-            "Node",
-            "Waf",
-            "WordPress"
-        };
+            {
+                "None",
+                "VisualStudio",
+                "Node",
+                "Waf",
+                "WordPress"
+            }.Select(GitIgnoreItem.Create);
             var provider = Substitutes.ServiceProvider;
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ApiClient
+            host.ModelService
                 .GetGitIgnoreTemplates()
-                .Returns(gitIgnoreTemplates.ToObservable());
+                .Returns(gitIgnoreTemplates.ToObservable().ToReadOnlyList());
             var vm = GetMeAViewModel(provider);
 
             var result = vm.GitIgnoreTemplates;
 
-            Assert.Equal(6, result.Count);
+            Assert.Equal(5, result.Count);
             Assert.Equal("None", result[0].Name);
             Assert.True(result[0].Recommended);
             Assert.Equal("VisualStudio", result[1].Name);
             Assert.True(result[1].Recommended);
             Assert.Equal("Node", result[2].Name);
             Assert.True(result[2].Recommended);
-            Assert.Equal("Delphi", result[3].Name);
+            Assert.Equal("Waf", result[3].Name);
             Assert.False(result[3].Recommended);
-            Assert.Equal("Waf", result[4].Name);
+            Assert.Equal("WordPress", result[4].Name);
             Assert.False(result[4].Recommended);
-            Assert.Equal("WordPress", result[5].Name);
-            Assert.False(result[5].Recommended);
             Assert.Equal(result[0], vm.SelectedGitIgnoreTemplate);
         }
     }
@@ -352,22 +352,23 @@ public class RepositoryCreationViewModelTests
     public class TheLicensesProperty
     {
         [Fact]
-        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        public void IsPopulatedByTheModelService()
         {
             var licenses = new[]
-        {
-            new LicenseMetadata("agpl-3.0", "GNU Affero GPL v3.0", new Uri("https://whatever")),
-            new LicenseMetadata("apache-2.0", "Apache License 2.0", new Uri("https://whatever")),
-            new LicenseMetadata("artistic-2.0", "Artistic License 2.0", new Uri("https://whatever")),
-            new LicenseMetadata("mit", "MIT License", new Uri("https://whatever"))
-        };
+            {
+                LicenseItem.None,
+                new LicenseItem("apache-2.0", "Apache License 2.0"),
+                new LicenseItem("mit", "MIT License"),
+                new LicenseItem("agpl-3.0", "GNU Affero GPL v3.0"),
+                new LicenseItem("artistic-2.0", "Artistic License 2.0")
+            };
             var provider = Substitutes.ServiceProvider;
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ApiClient
+            host.ModelService
                 .GetLicenses()
-                .Returns(licenses.ToObservable());
+                .Returns(licenses.ToObservable().ToReadOnlyList());
             var vm = GetMeAViewModel(provider);
 
             var result = vm.Licenses;
@@ -420,7 +421,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -451,13 +452,13 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.GetAccounts(Args.AvatarProvider).Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
             vm.SelectedAccount = account;
             vm.KeepPrivate = false;
-            vm.SelectedLicense = new LicenseItem(new LicenseMetadata("mit", "MIT", new Uri("https://whatever")));
+            vm.SelectedLicense = new LicenseItem("mit", "MIT");
 
             vm.CreateRepository.Execute(null);
 
@@ -483,7 +484,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.GetAccounts(Substitute.For<IAvatarProvider>()).Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";

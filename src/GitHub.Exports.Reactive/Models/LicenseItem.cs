@@ -8,11 +8,11 @@ namespace GitHub.Models
         static readonly LicenseItem none = new LicenseItem();
         public static LicenseItem None { get { return none; } }
 
-        public LicenseItem(LicenseMetadata license)
+        public LicenseItem(string key, string name)
         {
-            Key = license.Key;
-            Name = license.Name;
-            Recommended = license.Key == "mit" || license.Key == "gpl-2.0" || license.Key == "apache-2.0";
+            Key = key;
+            Name = name;
+            Recommended = IsRecommended(key);
         }
 
         LicenseItem()
@@ -20,6 +20,11 @@ namespace GitHub.Models
             Key = "";
             Name = "None";
             Recommended = true;
+        }
+
+        public static bool IsRecommended(string licenseKey)
+        {
+            return licenseKey == "mit" || licenseKey == "gpl-2.0" || licenseKey == "apache-2.0";
         }
 
         public string Key { get; private set; }
