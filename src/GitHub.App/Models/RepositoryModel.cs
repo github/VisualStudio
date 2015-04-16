@@ -6,14 +6,14 @@ namespace GitHub.Models
 {
     public class RepositoryModel : IRepositoryModel
     {
-        public RepositoryModel(Repository apiRepository, IAccount ownerAccount)
+        public RepositoryModel(string name, string cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
         {
-            Name = apiRepository.Name;
+            Name = name;
             Owner = ownerAccount;
-            CloneUrl = apiRepository.CloneUrl;
-            Icon = apiRepository.Private
+            CloneUrl = cloneUrl;
+            Icon = isPrivate
                 ? Octicon.@lock
-                : apiRepository.Fork
+                : isFork
                     ? Octicon.repo_forked
                     : Octicon.repo;
         }

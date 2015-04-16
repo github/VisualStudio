@@ -1,11 +1,9 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Authentication;
-using GitHub.Caches;
 using GitHub.Primitives;
 using GitHub.Services;
 using NullGuard;
@@ -32,10 +30,7 @@ namespace GitHub.Models
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }
         public IAccount User { get; private set; }
-        public IObservable<IReadOnlyList<IAccount>> GetAccounts(IAvatarProvider avatarProvider)
-        {
-            return Observable.Empty<IReadOnlyList<IAccount>>();
-        }
+        public IModelService ModelService { get; private set; }
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
@@ -50,11 +45,6 @@ namespace GitHub.Models
         public IObservable<Unit> LogOut()
         {
             return Observable.Return(Unit.Default);
-        }
-
-        public IObservable<IEnumerable<CachedAccount>> GetAllOrganizations()
-        {
-            return Observable.Empty<IEnumerable<CachedAccount>>();
         }
     }
 }

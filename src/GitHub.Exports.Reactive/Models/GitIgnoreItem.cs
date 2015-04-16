@@ -8,7 +8,7 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public sealed class GitIgnoreItem
     {
-        readonly string[] recommendedIgnoreFiles = { "None", "VisualStudio", "Node", "Eclipse", "C++", "Windows" };
+        static readonly string[] recommendedIgnoreFiles = { "None", "VisualStudio", "Node", "Eclipse", "C++", "Windows" };
 
         static readonly GitIgnoreItem none = new GitIgnoreItem("None");
         public static GitIgnoreItem None { get { return none; } }
@@ -21,12 +21,17 @@ namespace GitHub.Models
         GitIgnoreItem(string name)
         {
             Name = name;
-            Recommended = recommendedIgnoreFiles.Any(item => item.Equals(name, System.StringComparison.OrdinalIgnoreCase));
+            Recommended = IsRecommended(name);
         }
 
         public string Name { get; private set; }
 
         public bool Recommended { get; private set; }
+
+        public static bool IsRecommended(string name)
+        {
+            return recommendedIgnoreFiles.Any(item => item.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
 
         internal string DebuggerDisplay
         {

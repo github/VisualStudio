@@ -4,7 +4,7 @@ using GitHub.Caches;
 using Octokit;
 using Xunit;
 
-public class CachedAccountTests
+public class AccountCacheItemTests
 {
     public class TheConstructor
     {
@@ -17,7 +17,7 @@ public class CachedAccountTests
         public void SetsIsEnterpriseCorrectly(string htmlUrl, bool expected)
         {
             var apiAccount = CreateOctokitUser(htmlUrl);
-            var cachedAccount = new CachedAccount(apiAccount);
+            var cachedAccount = new AccountCacheItem(apiAccount);
 
             Assert.Equal(expected, cachedAccount.IsEnterprise);
         }

@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
-using GitHub.Caches;
 using NullGuard;
 using ReactiveUI;
 
@@ -14,13 +13,20 @@ namespace GitHub.Models
     {
         ObservableAsPropertyHelper<BitmapSource> avatar;
 
-        public Account(CachedAccount cachedAccount, IObservable<BitmapSource> bitmapSource)
+        public Account(
+            string login,
+            bool isUser,
+            bool isEnterprise,
+            int ownedPrivateRepositoryCount,
+            long privateRepositoryInPlanCount,
+            IObservable<BitmapSource> bitmapSource)
         {
-            IsUser = cachedAccount.IsUser;
-            Login = cachedAccount.Login;
-            OwnedPrivateRepos = cachedAccount.OwnedPrivateRepos;
-            PrivateReposInPlan = cachedAccount.PrivateReposInPlan;
-            IsOnFreePlan = cachedAccount.PrivateReposInPlan == 0;
+            Login = login;
+            IsUser = isUser;
+            IsEnterprise = isEnterprise;
+            OwnedPrivateRepos = ownedPrivateRepositoryCount;
+            PrivateReposInPlan = privateRepositoryInPlanCount;
+            IsOnFreePlan = privateRepositoryInPlanCount == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
 
             avatar = bitmapSource.ObserveOn(RxApp.MainThreadScheduler)

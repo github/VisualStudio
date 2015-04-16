@@ -15,7 +15,7 @@ namespace GitHub.Api
         /// Retrieves all repositories that belong to this user or to any organizations this user is a member of.
         /// </summary>
         /// <returns></returns>
-        IObservable<IEnumerable<Repository>> GetUserRepositories();
+        IObservable<Repository> GetUserRepositories();
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             bool useOldScopes = false);

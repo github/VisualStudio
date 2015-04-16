@@ -79,12 +79,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caches\AccountCacheItem.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
+    <Compile Include="Services\IModelService.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
-    <Compile Include="Caches\CachedAccount.cs" />
     <Compile Include="Caches\IImageCache.cs" />
     <Compile Include="Caches\ILoginCache.cs" />
     <Compile Include="Caches\ISharedCache.cs" />

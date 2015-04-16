@@ -1,22 +1,21 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
 using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
-using System;
-using GitHub.Extensions.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Subjects;
-using System.Windows.Input;
-using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -46,6 +45,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
                 d(this.OneWayBind(ViewModel, vm => vm.FilterTextIsEnabled, v => v.filterText.IsEnabled));
                 d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
+                d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
                 ViewModel.CloneCommand.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
             });
             IsVisibleChanged += (s, e) =>
