@@ -96,6 +96,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splat-Portable", "submodule
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CredentialManagement", "src\CredentialManagement\CredentialManagement.csproj", "{41A47C5B-C606-45B4-B83C-22B9239E4DA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Testing_Net45", "submodules\reactiveui\ReactiveUI.Testing\ReactiveUI.Testing_Net45.csproj", "{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -371,6 +373,18 @@ Global
 		{41A47C5B-C606-45B4-B83C-22B9239E4DA0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{41A47C5B-C606-45B4-B83C-22B9239E4DA0}.Release|x86.ActiveCfg = Release|Any CPU
 		{41A47C5B-C606-45B4-B83C-22B9239E4DA0}.Release|x86.Build.0 = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Debug|x86.Build.0 = Debug|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Publish|x86.ActiveCfg = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Publish|x86.Build.0 = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Release|x86.ActiveCfg = Release|Any CPU
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -394,5 +408,6 @@ Global
 		{1E7F7253-A6AF-43C4-A955-37BEDDA01AF9} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
 		{252CE1C2-027A-4445-A3C2-E4D6C80A935A} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AF9}
 		{0EC8DBA1-D745-4EE5-993A-6026440EC3BF} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AF9}
+		{DD99FD0F-82F6-4C30-930E-4A1D0DF01D65} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB9}
 	EndGlobalSection
 EndGlobal
