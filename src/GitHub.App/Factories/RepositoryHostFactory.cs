@@ -3,6 +3,7 @@ using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.Factories
 {
@@ -13,6 +14,7 @@ namespace GitHub.Factories
         readonly IApiClientFactory apiClientFactory;
         readonly IHostCacheFactory hostCacheFactory;
         readonly ILoginCache loginCache;
+        readonly IAvatarProvider avatarProvider;
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
 
         [ImportingConstructor]
@@ -20,11 +22,13 @@ namespace GitHub.Factories
             IApiClientFactory apiClientFactory,
             IHostCacheFactory hostCacheFactory,
             ILoginCache loginCache,
+            IAvatarProvider avatarProvider,
             ITwoFactorChallengeHandler twoFactorChallengeHandler)
         {
             this.apiClientFactory = apiClientFactory;
             this.hostCacheFactory = hostCacheFactory;
             this.loginCache = loginCache;
+            this.avatarProvider = avatarProvider;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
         }
 
@@ -32,8 +36,9 @@ namespace GitHub.Factories
         {
             var apiClient = apiClientFactory.Create(hostAddress);
             var hostCache = hostCacheFactory.Create(hostAddress);
+            var modelService = new ModelService(apiClient, hostCache, avatarProvider);
 
-            return new RepositoryHost(apiClient, hostCache, loginCache, twoFactorChallengeHandler);
+            return new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler);
         }
     }
 }

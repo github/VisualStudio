@@ -4,13 +4,10 @@ using System.Globalization;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using GitHub.Caches;
 using GitHub.Exports;
-using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using NullGuard;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -35,15 +32,11 @@ namespace GitHub.ViewModels
         {
             this.cloneService = cloneService;
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
-            // TODO: How do I know which host this dialog is associated with?
-            // For now, I'll assume GitHub Host.
             Repositories = new ReactiveList<IRepositoryModel>();
-            repositoryHost.ApiClient.GetUserRepositories()
+            repositoryHost.ModelService.GetRepositories()
                 .FirstAsync()
-                .Flatten()
-                .Select(repo => CreateRepository(repo, avatarProvider))
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(Repositories.Add);
+                .Subscribe(Repositories.AddRange);
 
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
@@ -64,12 +57,6 @@ namespace GitHub.ViewModels
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
-        }
-
-        static IRepositoryModel CreateRepository(Repository repository, IAvatarProvider avatarProvider)
-        {
-            var owner = new CachedAccount(repository.Owner);
-            return new RepositoryModel(repository, new Models.Account(owner, avatarProvider.GetAvatar(owner)));
         }
 
         bool FilterRepository(IRepositoryModel repo)
