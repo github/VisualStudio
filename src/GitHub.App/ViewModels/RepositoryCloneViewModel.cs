@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reactive;
@@ -9,6 +10,7 @@ using GitHub.Models;
 using GitHub.Services;
 using NullGuard;
 using ReactiveUI;
+using Rothko;
 
 namespace GitHub.ViewModels
 {
@@ -16,21 +18,28 @@ namespace GitHub.ViewModels
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
         readonly IRepositoryCloneService cloneService;
+        readonly IOperatingSystem operatingSystem;
+        readonly IVSServices vsServices;
 
         [ImportingConstructor]
         RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
-            IAvatarProvider avatarProvider)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, avatarProvider)
+            IOperatingSystem operatingSystem,
+            IVSServices vsServices)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, vsServices)
         { }
         
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
-            IAvatarProvider avatarProvider)
+            IOperatingSystem operatingSystem,
+            IVSServices vsServices)
         {
             this.cloneService = cloneService;
+            this.operatingSystem = operatingSystem;
+            this.vsServices = vsServices;
+
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
             repositoryHost.ModelService.GetRepositories()
@@ -53,7 +62,6 @@ namespace GitHub.ViewModels
 
             var canClone = this.WhenAny(x => x.SelectedRepository, x => x.Value)
                 .Select(repo => repo != null);
-
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
@@ -73,11 +81,19 @@ namespace GitHub.ViewModels
             return Observable.Start(() =>
             {
                 var repository = SelectedRepository;
-                if (!Directory.Exists(BaseRepositoryPath))
-                    Directory.CreateDirectory(BaseRepositoryPath);
+                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
+                // The following is a noop if the directory already exists.
+                operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath);
             })
-            .SelectMany(_ => _);
+            .SelectMany(_ => _)
+            .Catch<Unit, Exception>(e =>
+            {
+                var repository = SelectedRepository;
+                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
+                vsServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, SelectedRepository.Name));
+                return Observable.Return(Unit.Default);
+            });
         }
 
         string baseRepositoryPath;
