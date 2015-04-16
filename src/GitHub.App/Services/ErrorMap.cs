@@ -1,28 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.Services
 {
     public class ErrorMap
     {
-        public ErrorMap(ErrorMessage defaultMessage) : this(defaultMessage, null, null)
-        {
-        }
+        readonly ErrorMessage defaultMessage;
+        readonly IEnumerable<Translation> translations;
 
-        public ErrorMap(ErrorMessage defaultMessage, IEnumerable<Translation> translations, IEnumerable<IRecoveryCommand> recoveryCommands)
+        public ErrorMap(
+            [AllowNull] ErrorMessage defaultMessage,
+            [AllowNull] IEnumerable<Translation> translations,
+            [AllowNull] IEnumerable<IRecoveryCommand> recoveryCommands)
         {
             this.defaultMessage = defaultMessage;
             this.translations = translations;
             RecoveryCommands = recoveryCommands;
         }
 
-        readonly ErrorMessage defaultMessage;
-        readonly IEnumerable<Translation> translations;
-        public IEnumerable<IRecoveryCommand> RecoveryCommands { get; private set; }
+        [AllowNull]
+        public IEnumerable<IRecoveryCommand> RecoveryCommands
+        {
+            [return: AllowNull]
+            get;
+            private set;
+        }
 
-        public ErrorMessage GetErrorInfo(Exception exception)
+        [return: AllowNull]
+        public ErrorMessage GetErrorInfo([AllowNull] Exception exception)
         {
             if (exception != null && translations != null)
             {
