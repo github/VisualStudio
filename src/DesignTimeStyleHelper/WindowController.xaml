@@ -7,7 +7,9 @@
         mc:Ignorable="d"
         Title="WindowController"
         Height="432"
-        Width="414">
+        Width="414"
+        MinWidth="414"
+        MinHeight="432">
     <Grid x:Name="Container">
         
     </Grid>
