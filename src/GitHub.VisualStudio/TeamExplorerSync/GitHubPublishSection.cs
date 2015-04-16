@@ -123,9 +123,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             },
             () =>
             {
-                var notificationManager = ServiceProvider.TryGetService<ITeamExplorerNotificationManager>();
-                if (notificationManager != null)
-                    notificationManager.ShowNotification("Repository published.", NotificationType.Information, NotificationFlags.None, null, default(Guid));
+                ServiceProvider.GetExportedValue<IVSServices>().ShowMessage("Repository published successfully.");
             });
             ui.Start(null);
         }
