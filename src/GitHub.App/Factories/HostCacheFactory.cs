@@ -2,9 +2,9 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using Akavache;
-using GitHub.Info;
 using GitHub.Primitives;
 using Rothko;
+using GitHub.Extensions;
 
 namespace GitHub.Factories
 {
