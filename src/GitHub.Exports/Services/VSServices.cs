@@ -9,6 +9,7 @@ using GitHub.Extensions;
 using Microsoft.Win32;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.VisualStudio;
+using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.Services
 {
@@ -18,6 +19,10 @@ namespace GitHub.Services
         void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
         string GetActiveRepoPath();
         LibGit2Sharp.Repository GetActiveRepo();
+
+        void ShowMessage(string message);
+        void ShowWarning(string message);
+        void ShowError(string message);
     }
 
     [Export(typeof(IVSServices))]
@@ -95,6 +100,27 @@ namespace GitHub.Services
         {
             var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl\General");
             return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+        }
+
+        public void ShowMessage(string message)
+        {
+            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            if (manager != null)
+                manager.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
+        }
+
+        public void ShowWarning(string message)
+        {
+            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            if (manager != null)
+                manager.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
+        }
+
+        public void ShowError(string message)
+        {
+            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            if (manager != null)
+                manager.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
         }
 
         static class GitCoreServices
