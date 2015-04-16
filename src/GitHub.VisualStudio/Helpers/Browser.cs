@@ -7,6 +7,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Helpers
 {
