@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.Services
@@ -15,7 +16,7 @@ namespace GitHub.Services
             userErrorMappings = userErrors;
         }
 
-        public UserError GetUserError(ErrorType errorType, Exception exception, params object[] context)
+        public UserError GetUserError(ErrorType errorType, [AllowNull] Exception exception, params object[] context)
         {
             var translation = GetUserErrorTranslation(errorType, exception, context);
             return new UserError(translation.ErrorMessage, translation.CauseOrResolution, translation.RecoveryCommands, null, exception)
@@ -24,7 +25,10 @@ namespace GitHub.Services
             };
         }
 
-        public UserErrorTranslation GetUserErrorTranslation(ErrorType errorType, Exception exception, params object[] context)
+        public UserErrorTranslation GetUserErrorTranslation(
+            ErrorType errorType,
+            [AllowNull] Exception exception,
+            params object[] context)
         {
             ErrorMessage errorMessage = null;
             ErrorMap errorMap;
@@ -53,17 +57,39 @@ namespace GitHub.Services
 
         public class UserErrorTranslation
         {
-            public UserErrorTranslation(string errorMessage, string causeOrResolution, IEnumerable<IRecoveryCommand> recoveryCommands)
+            public UserErrorTranslation(
+                [AllowNull] string errorMessage,
+                [AllowNull] string causeOrResolution,
+                [AllowNull] IEnumerable<IRecoveryCommand> recoveryCommands)
             {
                 ErrorMessage = errorMessage;
                 CauseOrResolution = causeOrResolution;
                 RecoveryCommands = recoveryCommands;
             }
 
-            public string ErrorMessage { get; private set; }
-            public string CauseOrResolution { get; private set; }
-            public IEnumerable<IRecoveryCommand> RecoveryCommands { get; private set; }
-        }
+            [AllowNull]
+            public string ErrorMessage
+            {
+                [return: AllowNull]
+                get;
+                private set;
+            }
 
+            [AllowNull]
+            public string CauseOrResolution
+            {
+                [return: AllowNull]
+                get;
+                private set;
+            }
+
+            [AllowNull]
+            public IEnumerable<IRecoveryCommand> RecoveryCommands
+            {
+                [return: AllowNull]
+                get;
+                private set;
+            }
+        }
     }
 }
