@@ -30,5 +30,11 @@ namespace GitHub.Services
             IAccount account,
             string directory,
             IApiClient apiClient);
+
+        /// <summary>
+        /// Default path to clone things to, used as fallback if we can't find the correct path
+        /// from VS.
+        /// </summary>
+        string DefaultClonePath { get; }
     }
 }

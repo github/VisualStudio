@@ -21,6 +21,11 @@ namespace GitHub.Services
             this.cloneService = cloneService;
         }
 
+        public string DefaultClonePath
+        {
+            get { return cloneService.DefaultClonePath; }
+        }
+
         public IObservable<Unit> CreateRepository(
             NewRepository newRepository,
             IAccount account,
