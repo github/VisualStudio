@@ -232,7 +232,7 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string potentialRepositoryName)
         {
-            bool IsAlreadyRepoAtPath = false;
+            bool isAlreadyRepoAtPath = false;
             var validationResult = BaseRepositoryPathValidator.ValidationResult;
             string safeRepositoryName = GetSafeRepositoryName(potentialRepositoryName);
             if (validationResult != null && validationResult.IsValid)
@@ -240,9 +240,9 @@ namespace GitHub.ViewModels
                 if (Path.GetInvalidPathChars().Any(chr => BaseRepositoryPath.Contains(chr)))
                     return false;
                 string potentialPath = Path.Combine(BaseRepositoryPath, safeRepositoryName);
-                IsAlreadyRepoAtPath = IsGitRepo(potentialPath);
+                isAlreadyRepoAtPath = IsGitRepo(potentialPath);
             }
-            return IsAlreadyRepoAtPath;
+            return isAlreadyRepoAtPath;
         }
 
         bool IsGitRepo(string path)
