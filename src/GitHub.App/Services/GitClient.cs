@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using LibGit2Sharp;
@@ -17,9 +18,14 @@ namespace GitHub.Services
 
             return Observable.Defer(() =>
             {
-                // TODO: Need to handle error conditions.
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName);
+                if (repository.Head != null
+                    && repository.Head != null
+                    && repository.Head.Commits != null
+                    && repository.Head.Commits.Any())
+                {
+                    var remote = repository.Network.Remotes[remoteName];
+                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName);
+                }
                 return Observable.Return(Unit.Default);
             });
         }

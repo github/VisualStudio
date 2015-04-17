@@ -33,7 +33,10 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<string> title;
 
         [ImportingConstructor]
-        public RepositoryPublishViewModel(IRepositoryHosts hosts, IRepositoryPublishService repositoryPublishService)
+        public RepositoryPublishViewModel(
+            IRepositoryHosts hosts,
+            IRepositoryPublishService repositoryPublishService,
+            IVSServices vsServices)
         {
             title = this.WhenAny(
                 x => x.SelectedHost,
@@ -74,21 +77,7 @@ namespace GitHub.ViewModels
                 .Select(h => h.Count > 1)
                 .ToProperty(this, x => x.IsHostComboBoxVisible, initialValue: false);
 
-            var nonNullRepositoryName = this.WhenAny(
-                x => x.RepositoryName,
-                x => x.Value)
-                .WhereNotNull();
-
-            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .IfNullOrEmpty("Please enter a repository name")
-                .IfTrue(x => x.Length > 100, "Repository name must be fewer than 100 characters");
-
-            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .Add(repoName =>
-                {
-                    var parsedReference = GetSafeRepositoryName(repoName);
-                    return parsedReference != repoName ? "Will be created as " + parsedReference : null;
-                });
+            InitializeValidation(vsServices);
 
             PublishRepository = InitializePublishRepositoryCommand();
 
@@ -157,6 +146,40 @@ namespace GitHub.ViewModels
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
                 .SelectUnit();
+        }
+
+        void InitializeValidation(IVSServices vsServices)
+        {
+            var nonNullRepositoryName = this.WhenAny(
+                x => x.RepositoryName,
+                x => x.Value)
+                .WhereNotNull();
+
+            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
+                .IfNullOrEmpty("Please enter a repository name")
+                .IfTrue(x => x.Length > 100, "Repository name must be fewer than 100 characters");
+
+            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
+                .Add(repoName =>
+                {
+                    var parsedReference = GetSafeRepositoryName(repoName);
+                    return parsedReference != repoName ? "Will be created as " + parsedReference : null;
+                });
+
+            this.WhenAny(x => x.SafeRepositoryNameWarningValidator.ValidationResult, x => x.Value)
+                .WhereNotNull() // When this is instantiated, it sends a null result.
+                .Select(result => result == null ? null : result.Message)
+                .Subscribe(message =>
+                {
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        vsServices.ShowWarning(message);
+                    }
+                    else
+                    {
+                        vsServices.ClearNotifications();
+                    }
+                });
         }
     }
 }

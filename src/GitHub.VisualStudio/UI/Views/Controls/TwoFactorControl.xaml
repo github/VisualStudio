@@ -59,6 +59,7 @@
                 Content="Verify" />
             <ui:OcticonLinkButton 
                 x:Name="resendCodeButton"
+                TabIndex="3"
                 ToolTip="Send the code to your registered SMS Device again"
                 FontSize="12"
                 Icon="sync"
