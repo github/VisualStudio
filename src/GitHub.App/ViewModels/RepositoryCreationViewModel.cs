@@ -56,6 +56,8 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
+
+            BaseRepositoryPath = repositoryCreationService.DefaultClonePath;
             Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", repositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;

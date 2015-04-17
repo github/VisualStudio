@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Models;
 using GitHub.Extensions.Reactive;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
@@ -12,19 +13,20 @@ using ReactiveUI;
 using Rothko;
 using UnitTests;
 using Xunit;
-using System.Linq;
 
 public class RepositoryCreationViewModelTests
 {
     static object DefaultInstance = new object();
 
-    static IRepositoryCreationViewModel GetMeAViewModel(IServiceProvider provider = null)
+    static IRepositoryCreationViewModel GetMeAViewModel(
+        IServiceProvider provider = null,
+        IRepositoryCreationService creationService = null)
     {
         if (provider == null)
             provider = Substitutes.ServiceProvider;
         var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
         var os = provider.GetOperatingSystem();
-        var creationService = provider.GetRepositoryCreationService();
+        creationService = creationService ?? provider.GetRepositoryCreationService();
         var avatarProvider = provider.GetAvatarProvider();
         var connection = provider.GetConnection();
 
@@ -97,6 +99,20 @@ public class RepositoryCreationViewModelTests
             await vm.BrowseForDirectory.ExecuteAsync();
 
             Assert.Equal(@"c:\fake\dev", vm.BaseRepositoryPath);
+        }
+    }
+
+    public class TheBaseRepositoryPathProperty
+    {
+        [Fact]
+        public void IsSetFromTheRepositoryCreationService()
+        {
+            var repositoryCreationService = Substitute.For<IRepositoryCreationService>();
+            repositoryCreationService.DefaultClonePath.Returns(@"c:\fake\default");
+
+            var vm = GetMeAViewModel(creationService: repositoryCreationService);
+
+            Assert.Equal(@"c:\fake\default", vm.BaseRepositoryPath);
         }
     }
 
