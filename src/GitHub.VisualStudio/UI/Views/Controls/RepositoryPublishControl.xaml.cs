@@ -5,10 +5,8 @@ using System.Windows;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions;
-using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.UI.Helpers;
-using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
@@ -36,13 +34,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             // TODO: description.TextBoxControl.Foreground = Application.Current.FindResource("SubduedTextBrushKey") as Brush;
 
             close = new Subject<object>();
-
-            IObservable<bool> clearErrorWhenChanged = this.WhenAny(
-                x => x.ViewModel.RepositoryName,
-                x => x.ViewModel.Description,
-                (x, y) => new { x, y })
-                .WhereNotNull()
-                .Select(x => true);
 
             this.WhenActivated(d =>
             {
@@ -72,8 +63,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.nameText.IsEnabled, x => x == false));
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
-
-                d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
 
                 ViewModel.PublishRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
 

@@ -118,14 +118,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             creation
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe((c) =>
-            {
-                SectionContent = c;
-                c.DataContext = this;
-            },
-            () =>
-            {
-                ServiceProvider.GetExportedValue<IVSServices>().ShowMessage("Repository published successfully.");
-            });
+                {
+                    SectionContent = c;
+                    c.DataContext = this;
+                });
             ui.Start(null);
         }
     }
