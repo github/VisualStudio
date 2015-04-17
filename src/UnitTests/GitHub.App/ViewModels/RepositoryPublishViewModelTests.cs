@@ -8,6 +8,9 @@ using Xunit;
 using UnitTests;
 using Microsoft.Reactive.Testing;
 using ReactiveUI.Testing;
+using System.Reactive;
+using System.Threading.Tasks;
+using System;
 
 public class RepositoryPublishViewModelTests
 {
@@ -272,6 +275,53 @@ public class RepositoryPublishViewModelTests
             vm.RepositoryName = "this";
 
             vsServices.Received().ClearNotifications();
+        }
+    }
+
+    public class ThePublishRepositoryCommand
+    {
+        [Fact]
+        public async Task DisplaysSuccessMessageWhenCompletedWithoutError()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vsServices = Substitute.For<IVSServices>();
+            var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
+            repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
+                .Returns(Observable.Return(new Octokit.Repository()));
+            var vm = Helpers.GetViewModel(hosts, service: repositoryPublishService, vsServices: vsServices);
+            vm.RepositoryName = "repo-name";
+
+            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+
+            vsServices.Received().ShowMessage("Repository published successfully.");
+            vsServices.DidNotReceive().ShowError(Args.String);
+        }
+
+        [Fact]
+        public async Task DisplaysRepositoryExistsErrorWithVisualStudioNotifications()
+        {
+            var gitHubHost = Substitute.For<IRepositoryHost>();
+            gitHubHost.IsLoggedIn.Returns(true);
+            gitHubHost.Title.Returns("GitHub");
+            gitHubHost.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+            var hosts = Substitute.For<IRepositoryHosts>();
+            hosts.GitHubHost.Returns(gitHubHost);
+            var vsServices = Substitute.For<IVSServices>();
+            var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
+            repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
+                .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
+            var vm = Helpers.GetViewModel(hosts, service: repositoryPublishService, vsServices: vsServices);
+            vm.RepositoryName = "repo-name";
+
+            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+
+            vsServices.DidNotReceive().ShowMessage(Args.String);
+            vsServices.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
         }
     }
 }
