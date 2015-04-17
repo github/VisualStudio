@@ -149,6 +149,7 @@ public class ModelServiceTests
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            await modelService.InsertUser(new AccountCacheItem { Login = "snoopy" });
 
             var fetched = await modelService.GetAccounts();
 
@@ -156,7 +157,7 @@ public class ModelServiceTests
             Assert.Equal("snoopy", fetched[0].Login);
             Assert.Equal("github", fetched[1].Login);
             Assert.Equal("fake", fetched[2].Login);
-            var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("orgs");
+            var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("snoopy|orgs");
             Assert.Equal(2, cachedOrgs.Count);
             Assert.Equal("github", cachedOrgs[0].Login);
             Assert.Equal("fake", cachedOrgs[1].Login);
@@ -184,7 +185,7 @@ public class ModelServiceTests
             Assert.Equal("octocat", fetched[0].Login);
             Assert.Equal("github", fetched[1].Login);
             Assert.Equal("fake", fetched[2].Login);
-            var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("orgs");
+            var cachedOrgs = await cache.GetObject<IReadOnlyList<AccountCacheItem>>("octocat|orgs");
             Assert.Equal(2, cachedOrgs.Count);
             Assert.Equal("github", cachedOrgs[0].Login);
             Assert.Equal("fake", cachedOrgs[1].Login);
@@ -208,6 +209,7 @@ public class ModelServiceTests
             apiClient.GetUserRepositories().Returns(repos.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            await modelService.InsertUser(new AccountCacheItem { Login = "opus" });
 
             var fetched = await modelService.GetRepositories();
 
@@ -215,7 +217,7 @@ public class ModelServiceTests
             Assert.Equal("octokit.net", fetched[0].Name);
             Assert.Equal("reactiveui", fetched[1].Name);
             Assert.Equal("splat", fetched[2].Name);
-            var cachedRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("repos");
+            var cachedRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|repos");
             Assert.Equal(3, cachedRepositories.Count);
             Assert.Equal("octokit.net", cachedRepositories[0].Name);
             Assert.Equal("octokit", cachedRepositories[0].Owner.Login);
