@@ -1,5 +1,6 @@
 ﻿using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Services;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -7,6 +8,7 @@ using Rothko;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,17 +25,38 @@ namespace GitHub.Infrastructure
     public class LoggingConfiguration : ILoggingConfiguration
     {
         [ImportingConstructor]
-        public LoggingConfiguration(IProgram program, IOperatingSystem os)
+        public LoggingConfiguration(IProgram program, IOperatingSystem os, IVSServices vsservice)
         {
+            NLog.Config.LoggingConfiguration conf = null;
             string assemblyFolder = program.ExecutingAssemblyDirectory;
-            var conf = new XmlLoggingConfiguration(System.IO.Path.Combine(assemblyFolder, "NLog.config"), true);
-            var fileTarget = new FileTarget();
-            conf.AddTarget("file", fileTarget);
+            try
+            {
+                conf = new XmlLoggingConfiguration(Path.Combine(assemblyFolder, "NLog.config"), true);
+            }
+            catch (Exception ex)
+            {
+                vsservice.ActivityLogError(string.Format(CultureInfo.InvariantCulture, "Error loading nlog.config. {0}", ex));
+                conf = new NLog.Config.LoggingConfiguration();
+            }
+
+            var fileTarget = conf.FindTargetByName("file") as FileTarget;
+            if (fileTarget == null)
+            {
+                fileTarget = new FileTarget();
+                conf.AddTarget(Path.GetRandomFileName(), fileTarget);
+                conf.LoggingRules.Add(new LoggingRule("*", LogLevel.Fatal, fileTarget));
+            }
             fileTarget.FileName = Path.Combine(os.Environment.GetLocalGitHubApplicationDataPath(), "extension.log");
             fileTarget.Layout = "${message}";
-            var rule = new LoggingRule("*", LogLevel.Debug, fileTarget);
-            conf.LoggingRules.Add(rule);
-            NLog.LogManager.Configuration = conf;
+
+            try
+            {
+                LogManager.Configuration = conf;
+            }
+            catch (Exception ex)
+            {
+                vsservice.ActivityLogError(string.Format(CultureInfo.InvariantCulture, "Error configuring the log. {0}", ex));
+            }
         }
 
         public void Configure()
