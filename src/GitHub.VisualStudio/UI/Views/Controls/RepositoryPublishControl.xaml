@@ -63,7 +63,9 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Stretch"
                     Text="This repository does not have a remote. Fill out the form to publish it to GitHub."
-                    Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+                    Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}"
+                    TextTrimming="CharacterEllipsis"
+                    ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
             </Border>
         </DockPanel>
 
