@@ -92,7 +92,7 @@ namespace GitHub.ViewModels
             RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
                 .IfNullOrEmpty("Please enter a repository name")
                 .IfTrue(x => x.Length > 100, "Repository name must be fewer than 100 characters")
-                .IfTrue(x => IsAlreadyRepoAtPath(GetSafeRepositoryName(x)), "Repository with same name already exists at this location");
+                .IfTrue(IsAlreadyRepoAtPath, "Repository with same name already exists at this location");
 
             SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
                 .Add(repoName =>
@@ -232,14 +232,17 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string potentialRepositoryName)
         {
-            bool isValid = false;
+            bool IsAlreadyRepoAtPath = false;
             var validationResult = BaseRepositoryPathValidator.ValidationResult;
+            string safeRepositoryName = GetSafeRepositoryName(potentialRepositoryName);
             if (validationResult != null && validationResult.IsValid)
             {
-                string potentialPath = Path.Combine(BaseRepositoryPath, potentialRepositoryName);
-                isValid = IsGitRepo(potentialPath);
+                if (Path.GetInvalidPathChars().Any(chr => BaseRepositoryPath.Contains(chr)))
+                    return false;
+                string potentialPath = Path.Combine(BaseRepositoryPath, safeRepositoryName);
+                IsAlreadyRepoAtPath = IsGitRepo(potentialPath);
             }
-            return isValid;
+            return IsAlreadyRepoAtPath;
         }
 
         bool IsGitRepo(string path)
