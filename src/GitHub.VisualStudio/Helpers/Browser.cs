@@ -38,6 +38,7 @@ namespace GitHub.VisualStudio.Helpers
             var service = serviceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
             if (service == null)
                 service = Services.WebBrowsing;
+            var service = serviceProvider.GetWebBrowsingService();
 
             if (service != null)
             {
