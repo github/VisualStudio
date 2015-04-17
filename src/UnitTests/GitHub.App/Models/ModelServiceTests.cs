@@ -197,34 +197,91 @@ public class ModelServiceTests
     public class TheGetRepositoriesMethod
     {
         [Fact]
-        public async Task CanRetrieveAndCacheRepositories()
+        public async Task CanRetrieveAndCacheRepositoriesForUserAndOrganizations()
         {
-            var repos = new[]
+            var orgs = new[]
+            {
+                CreateOctokitOrganization("github"),
+                CreateOctokitOrganization("octokit")
+            };
+            var ownedRepos = new[]
+            {
+                CreateRepository("haacked", "seegit"),
+                CreateRepository("haacked", "codehaacks")
+            };
+            var memberRepos = new[]
+            {
+                CreateRepository("mojombo", "semver"),
+                CreateRepository("ninject", "ninject"),
+                CreateRepository("jabbr", "jabbr"),
+                CreateRepository("fody", "nullguard")
+            };
+            var githubRepos = new[]
+            {
+                CreateRepository("github", "visualstudio")
+            };
+            var octokitRepos = new[]
             {
                 CreateRepository("octokit", "octokit.net"),
-                CreateRepository("reactiveui", "reactiveui"),
-                CreateRepository("paulcbetts", "splat")
+                CreateRepository("octokit", "octokit.rb"),
+                CreateRepository("octokit", "octokit.objc")
             };
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetUserRepositories().Returns(repos.ToObservable());
+            apiClient.GetOrganizations().Returns(orgs.ToObservable());
+            apiClient.GetUserRepositories(RepositoryType.Owner).Returns(ownedRepos.ToObservable());
+            apiClient.GetUserRepositories(RepositoryType.Member).Returns(memberRepos.ToObservable());
+            apiClient.GetRepositoriesForOrganization("github").Returns(githubRepos.ToObservable());
+            apiClient.GetRepositoriesForOrganization("octokit").Returns(octokitRepos.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             await modelService.InsertUser(new AccountCacheItem { Login = "opus" });
 
-            var fetched = await modelService.GetRepositories();
+            var fetched = await modelService.GetRepositories().ToList();
 
-            Assert.Equal(3, fetched.Count);
-            Assert.Equal("octokit.net", fetched[0].Name);
-            Assert.Equal("reactiveui", fetched[1].Name);
-            Assert.Equal("splat", fetched[2].Name);
-            var cachedRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|repos");
-            Assert.Equal(3, cachedRepositories.Count);
-            Assert.Equal("octokit.net", cachedRepositories[0].Name);
-            Assert.Equal("octokit", cachedRepositories[0].Owner.Login);
-            Assert.Equal("reactiveui", cachedRepositories[1].Name);
-            Assert.Equal("reactiveui", cachedRepositories[1].Owner.Login);
-            Assert.Equal("splat", cachedRepositories[2].Name);
-            Assert.Equal("paulcbetts", cachedRepositories[2].Owner.Login);
+            Assert.Equal(4, fetched.Count);
+            Assert.Equal(2, fetched[0].Count);
+            Assert.Equal(4, fetched[1].Count);
+            Assert.Equal(1, fetched[2].Count);
+            Assert.Equal(3, fetched[3].Count);
+            Assert.Equal("seegit", fetched[0][0].Name);
+            Assert.Equal("codehaacks", fetched[0][1].Name);
+            Assert.Equal("semver", fetched[1][0].Name);
+            Assert.Equal("ninject", fetched[1][1].Name);
+            Assert.Equal("jabbr", fetched[1][2].Name);
+            Assert.Equal("nullguard", fetched[1][3].Name);
+            Assert.Equal("visualstudio", fetched[2][0].Name);
+            Assert.Equal("octokit.net", fetched[3][0].Name);
+            Assert.Equal("octokit.rb", fetched[3][1].Name);
+            Assert.Equal("octokit.objc", fetched[3][2].Name);
+            var cachedOwnerRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|Owner:repos");
+            Assert.Equal(2, cachedOwnerRepositories.Count);
+            Assert.Equal("seegit", cachedOwnerRepositories[0].Name);
+            Assert.Equal("haacked", cachedOwnerRepositories[0].Owner.Login);
+            Assert.Equal("codehaacks", cachedOwnerRepositories[1].Name);
+            Assert.Equal("haacked", cachedOwnerRepositories[1].Owner.Login);
+            var cachedMemberRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|Member:repos");
+            Assert.Equal(4, cachedMemberRepositories.Count);
+            Assert.Equal("semver", cachedMemberRepositories[0].Name);
+            Assert.Equal("mojombo", cachedMemberRepositories[0].Owner.Login);
+            Assert.Equal("ninject", cachedMemberRepositories[1].Name);
+            Assert.Equal("ninject", cachedMemberRepositories[1].Owner.Login);
+            Assert.Equal("jabbr", cachedMemberRepositories[2].Name);
+            Assert.Equal("jabbr", cachedMemberRepositories[2].Owner.Login);
+            Assert.Equal("nullguard", cachedMemberRepositories[3].Name);
+            Assert.Equal("fody", cachedMemberRepositories[3].Owner.Login);
+            var cachedGitHubRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|github|repos");
+            Assert.Equal(1, cachedGitHubRepositories.Count);
+            Assert.Equal("seegit", cachedOwnerRepositories[0].Name);
+            Assert.Equal("haacked", cachedOwnerRepositories[0].Owner.Login);
+            Assert.Equal("codehaacks", cachedOwnerRepositories[1].Name);
+            Assert.Equal("haacked", cachedOwnerRepositories[1].Owner.Login);
+            var cachedOctokitRepositories = await cache.GetObject<IReadOnlyList<ModelService.RepositoryCacheItem>>("opus|octokit|repos");
+            Assert.Equal("octokit.net", cachedOctokitRepositories[0].Name);
+            Assert.Equal("octokit", cachedOctokitRepositories[0].Owner.Login);
+            Assert.Equal("octokit.rb", cachedOctokitRepositories[1].Name);
+            Assert.Equal("octokit", cachedOctokitRepositories[1].Owner.Login);
+            Assert.Equal("octokit.objc", cachedOctokitRepositories[2].Name);
+            Assert.Equal("octokit", cachedOctokitRepositories[2].Owner.Login);
         }
     }
 
