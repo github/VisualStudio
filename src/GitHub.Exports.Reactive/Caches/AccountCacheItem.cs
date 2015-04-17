@@ -7,7 +7,7 @@ namespace GitHub.Caches
 {
     public class AccountCacheItem : IAvatarContainer
     {
-        public static AccountCacheItem Create(Octokit.Account apiAccount)
+        public static AccountCacheItem Create(Account apiAccount)
         {
             return new AccountCacheItem(apiAccount);
         }

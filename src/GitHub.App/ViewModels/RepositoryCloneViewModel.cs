@@ -43,7 +43,6 @@ namespace GitHub.ViewModels
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
             repositoryHost.ModelService.GetRepositories()
-                .FirstAsync()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(Repositories.AddRange);
 
