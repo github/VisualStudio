@@ -13,12 +13,12 @@ namespace GitHub.VisualStudio.Converters
     /// </summary>
     public class CountToVisibilityConverter : IValueConverter
     {
-        public object Convert([AllowNull] object value, [AllowNull] Type targetType, [AllowNull] object parameter, [AllowNull] CultureInfo culture)
+        public object Convert(object value, Type targetType, [AllowNull] object parameter, [AllowNull] CultureInfo culture)
         {
             return ((int)value == 0) ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public object ConvertBack([AllowNull] object value, [AllowNull] Type targetType, [AllowNull] object parameter, [AllowNull] CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, [AllowNull] object parameter, [AllowNull] CultureInfo culture)
         {
             return null;
         }
