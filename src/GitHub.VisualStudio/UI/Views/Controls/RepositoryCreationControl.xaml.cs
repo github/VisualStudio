@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows;
+using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.UI.Helpers;
@@ -9,9 +12,6 @@ using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
-using System.Reactive.Subjects;
-using GitHub.Extensions;
-using System.Windows.Input;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -35,7 +35,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             var clearErrorWhenChanged = this.WhenAny(
                 x => x.ViewModel.RepositoryName,
                 x => x.ViewModel.Description,
-                (x, y) => new { x, y })
+                x => x.ViewModel.BaseRepositoryPath,
+                (x, y, z) => new { x, y, z })
                 .WhereNotNull()
                 .Select(x => true);
 

@@ -139,10 +139,10 @@ namespace GitHub.Services
             { ErrorType.LoginFailed, Map(Defaults("login failed", "Unable to retrieve your user info from the server. A proxy server might be interfering with the request.")) },
             { ErrorType.RepoCreationAsPrivateNotAvailableForFreePlan, Map(Defaults("Failed to create private repository", "You are currently on a free plan and unable to create private repositories. Either make the repository public or upgrade your account on the website to a plan that allows for private repositories.")) },
             { ErrorType.RepoCreationFailed, Map(Defaults("Failed to create repository", "An error occurred while creating the repository. You might need to open a shell and debug the state of this repo.")) },
-            { ErrorType.RepoExistsOnDisk, Map(Defaults("Failed to create repository", "There is already a repository named '{0}' in the directory\n'{1}'.")) },
+            { ErrorType.RepoExistsOnDisk, Map(Defaults("Failed to create repository", "A repository named '{0}' exists in the directory\n'{1}'.")) },
             { ErrorType.RepositoryNotFoundOnDisk, Map(Defaults("Repository not found", "Could not find the repository '{0}' in the location '{1}'.\nDid you move it somewhere else on your filesystem?")) },
-            { ErrorType.RepoExistsForUser, Map(Defaults("Failed to create repository", "There is already a repository named '{0}' in your GitHub account.")) },
-            { ErrorType.RepoExistsInOrganization, Map(Defaults("Failed to create repository", "There is already a repository named '{0}' in the organization '{1}'.")) },
+            { ErrorType.RepoExistsForUser, Map(Defaults("Failed to create repository", "A repository named '{0}' already exists in your GitHub account.")) },
+            { ErrorType.RepoExistsInOrganization, Map(Defaults("Failed to create repository", "A repository named '{0}' exists in the organization '{1}'.")) },
             { ErrorType.LoadingWorkingDirectoryFailed, Map(Defaults("Failed to refresh the working directory", "You might need to open a shell and debug the state of this repo.")) },
             {
                 ErrorType.RefreshFailed, Map(Defaults("Refresh failed", "Refresh failed unexpectedly. Please email support@github.com if this error persists."),
