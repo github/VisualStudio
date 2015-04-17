@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Services;
 using LibGit2Sharp;
@@ -29,12 +30,29 @@ public class GitClientTests
         public async Task DoesNotPushEmptyRepository()
         {
             var repository = Substitute.For<IRepository>();
-
             var gitClient = new GitClient();
+
             await gitClient.Push(repository, "master", "origin");
 
             repository.Network.DidNotReceive()
                 .Push(Args.Remote, Args.String, Args.String, Arg.Any<PushOptions>(), Arg.Any<Signature>(), Args.String);
+        }
+    }
+
+    public class TheSetRemoteMethod
+    {
+        [Fact]
+        public async Task SetsTheConfigToTheRemoteBranch()
+        {
+            var config = Substitute.For<Configuration>();
+            var repository = Substitute.For<IRepository>();
+            repository.Config.Returns(config);
+            var gitClient = new GitClient();
+
+            await gitClient.SetRemote(repository, "origin", new Uri("https://github.com/foo/bar"));
+
+            config.Received().Set<string>("remote.origin.url", "https://github.com/foo/bar");
+            config.Received().Set<string>("remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*");
         }
     }
 }
