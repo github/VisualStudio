@@ -192,6 +192,18 @@ public class RepositoryCreationViewModelTests
         }
 
         [Fact]
+        public void IsTrueWhenSetToValidQuotedPath()
+        {
+            var vm = GetMeAViewModel();
+
+            vm.RepositoryName = "thisisfine";
+            vm.BaseRepositoryPath = @"""c:\fake""";
+
+            Assert.True(vm.BaseRepositoryPathValidator.ValidationResult.IsValid);
+            Assert.Equal(@"c:\fake", vm.BaseRepositoryPath);
+        }
+
+        [Fact]
         public void ReturnsCorrectMessageWhenPathTooLong()
         {
             var vm = GetMeAViewModel();
