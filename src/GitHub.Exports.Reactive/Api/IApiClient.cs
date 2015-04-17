@@ -12,10 +12,15 @@ namespace GitHub.Api
         IObservable<User> GetUser();
         IObservable<Organization> GetOrganizations();
         /// <summary>
-        /// Retrieves all repositories that belong to this user or to any organizations this user is a member of.
+        /// Retrieves all repositories that belong to this user.
         /// </summary>
         /// <returns></returns>
-        IObservable<Repository> GetUserRepositories();
+        IObservable<Repository> GetUserRepositories(RepositoryType repositoryType);
+        /// <summary>
+        /// Retrieves the repository for this org.
+        /// </summary>
+        /// <returns></returns>
+        IObservable<Repository> GetRepositoriesForOrganization(string organization);
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             bool useOldScopes = false);
