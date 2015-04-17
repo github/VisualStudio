@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -97,10 +98,10 @@ namespace GitHub.Services
 
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
         {
-            return GetUserFromCache().SelectMany(user =>
-                hostCache.GetAndRefreshObject(user.Login + "|repos",
-                    () => apiClient.GetUserRepositories().Select(RepositoryCacheItem.Create).ToList(), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
-                .ToReadOnlyList(Create));
+            return GetUserRepositories(RepositoryType.Owner)
+                .Take(1)
+                .Concat(GetUserRepositories(RepositoryType.Member).Take(1))
+                .Concat(GetAllRepositoriesForAllOrganizations());
         }
 
         public IObservable<AccountCacheItem> GetUserFromCache()
@@ -111,6 +112,43 @@ namespace GitHub.Services
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll();
+        }
+
+        IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
+        {
+            return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
+                hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
+                    () => GetUserRepositoriesFromApi(repositoryType),
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(7)))
+                .ToReadOnlyList(Create));
+        }
+
+        IObservable<IEnumerable<RepositoryCacheItem>> GetUserRepositoriesFromApi(RepositoryType repositoryType)
+        {
+            return apiClient.GetUserRepositories(repositoryType)
+                .WhereNotNull()
+                .Select(RepositoryCacheItem.Create)
+                .ToList()
+                .Catch<IEnumerable<RepositoryCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<RepositoryCacheItem>()));
+        }
+
+        IObservable<IReadOnlyList<IRepositoryModel>> GetAllRepositoriesForAllOrganizations()
+        {
+            return GetUserOrganizations()
+                .SelectMany(org => org.ToObservable())
+                .SelectMany(org => GetOrganizationRepositories(org.Login).Take(1));
+        }
+
+        IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
+        {
+            return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
+                hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
+                    () => apiClient.GetRepositoriesForOrganization(organization).Select(
+                        RepositoryCacheItem.Create).ToList(),
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(7)))
+                .ToReadOnlyList(Create));
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
