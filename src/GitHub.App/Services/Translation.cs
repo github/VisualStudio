@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GitHub.Extensions;
 using Newtonsoft.Json;
+using NullGuard;
 using Octokit;
 
 namespace GitHub.Services
@@ -13,29 +14,29 @@ namespace GitHub.Services
         readonly ErrorMessage defaultMessage;
         readonly Func<Exception, ErrorMessage> translator;
 
-        public Translation(string original, string heading, string message)
+        public Translation([AllowNull]string original, string heading, string message)
         {
             Original = original;
             defaultMessage = new ErrorMessage(heading, message);
         }
 
-        public Translation(string original, Func<Exception, ErrorMessage> translator)
+        public Translation([AllowNull]string original, Func<Exception, ErrorMessage> translator)
         {
             Original = original;
             this.translator = translator;
         }
 
-        public Translation(string original, string heading, string messageFormatString, Func<Exception, string> translator) : this(original, heading, messageFormatString)
+        public Translation([AllowNull]string original, string heading, string messageFormatString, Func<Exception, string> translator)
+            : this(original, heading, messageFormatString)
         {
             this.translator = e => new ErrorMessage(heading, String.Format(CultureInfo.InvariantCulture, messageFormatString, translator(e)));
         }
 
         public string Original { get; private set; }
 
+        [return: AllowNull]
         public ErrorMessage Translate(Exception exception)
         {
-            if (exception == null) throw new ArgumentNullException("exception");
-
             var match = Match(exception);
             if (match == null) return null;
 

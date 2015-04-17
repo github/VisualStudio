@@ -95,12 +95,15 @@ namespace GitHub.Api
             return gitHubClient.Organization.GetAllForCurrent();
         }
 
-        public IObservable<Repository> GetUserRepositories()
+        public IObservable<Repository> GetUserRepositories(RepositoryType repositoryType)
         {
-            return Observable.Merge(
-                GetAllRepositoriesForCurrentUser(),
-                GetOrganizations().SelectMany(GetAllRepositoriesForOrganization)
-            );
+            var request = new RepositoryRequest
+            {
+                Type = repositoryType,
+                Direction = SortDirection.Ascending,
+                Sort = RepositorySort.FullName
+            };
+            return gitHubClient.Repository.GetAllForCurrent(request);
         }
 
         public IObservable<string> GetGitIgnoreTemplates()
@@ -144,6 +147,11 @@ namespace GitHub.Api
                     return "(unknown)";
                 }
             }
+        }
+
+        public IObservable<Repository> GetRepositoriesForOrganization(string organization)
+        {
+            return gitHubClient.Repository.GetAllForOrg(organization);
         }
     }
 }

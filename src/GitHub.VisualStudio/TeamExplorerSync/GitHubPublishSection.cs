@@ -92,11 +92,12 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         void StartFlow(UIControllerFlow controllerFlow)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            var ret = uiProvider.RunUI(controllerFlow, null);
+            var ret = uiProvider.SetupUI(controllerFlow, null);
             ret.Subscribe((c) => { }, () =>
             {
                 Initialize();
             });
+            uiProvider.RunUI();
         }
 
         void ShowInvitation()
@@ -117,14 +118,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             creation
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe((c) =>
-            {
-                SectionContent = c;
-                c.DataContext = this;
-            },
-            () =>
-            {
-                ServiceProvider.GetExportedValue<IVSServices>().ShowMessage("Repository published successfully.");
-            });
+                {
+                    SectionContent = c;
+                    c.DataContext = this;
+                });
             ui.Start(null);
         }
     }
