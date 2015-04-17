@@ -127,7 +127,7 @@ namespace GitHub.ViewModels
         {
             [return: AllowNull]
             get { return baseRepositoryPath; }
-            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, value); }
+            set { this.RaiseAndSetIfChanged(ref baseRepositoryPath, StripSurroundingQuotes(value)); }
         }
 
         /// <summary>
@@ -286,6 +286,19 @@ namespace GitHub.ViewModels
             });
 
             return createCommand;
+        }
+
+        static string StripSurroundingQuotes(string path)
+        {
+            if (string.IsNullOrEmpty(path)
+                || path.Length < 2
+                || !path.StartsWith("\"", StringComparison.Ordinal)
+                || !path.EndsWith("\"", StringComparison.Ordinal))
+            {
+                return path;
+            }
+
+            return path.Substring(1, path.Length - 2);
         }
     }
 }
