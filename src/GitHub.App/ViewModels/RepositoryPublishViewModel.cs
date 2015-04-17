@@ -25,19 +25,22 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        readonly IRepositoryPublishService repositoryPublishService;
+        readonly IVSServices vsServices;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
-        readonly IRepositoryPublishService repositoryPublishService;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly ObservableAsPropertyHelper<string> title;
-
+        
         [ImportingConstructor]
         public RepositoryPublishViewModel(
             IRepositoryHosts hosts,
             IRepositoryPublishService repositoryPublishService,
             IVSServices vsServices)
         {
+            this.vsServices = vsServices;
+
             title = this.WhenAny(
                 x => x.SelectedHost,
                 x => x.Value != null ?
@@ -77,7 +80,7 @@ namespace GitHub.ViewModels
                 .Select(h => h.Count > 1)
                 .ToProperty(this, x => x.IsHostComboBoxVisible, initialValue: false);
 
-            InitializeValidation(vsServices);
+            InitializeValidation();
 
             PublishRepository = InitializePublishRepositoryCommand();
 
@@ -125,18 +128,7 @@ namespace GitHub.ViewModels
         ReactiveCommand<Unit> InitializePublishRepositoryCommand()
         {
             var canCreate = this.WhenAny(x => x.RepositoryNameValidator.ValidationResult.IsValid, x => x.Value);
-            var publishCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
-            publishCommand.ThrownExceptions.Subscribe(ex =>
-            {
-                if (!ex.IsCriticalException())
-                {
-                    // TODO: Throw a proper error.
-                    log.Error("Error creating repository.", ex);
-                    UserError.Throw(new PublishRepositoryUserError(ex.Message));
-                }
-            });
-
-            return publishCommand;
+            return ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
         }
 
         private IObservable<Unit> OnPublishRepository(object arg)
@@ -145,10 +137,21 @@ namespace GitHub.ViewModels
             var account = SelectedAccount;
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
-                .SelectUnit();
+                .SelectUnit()
+                .Do(_ => vsServices.ShowMessage("Repository published successfully."))
+                .Catch<Unit, Exception>(ex =>
+                {
+                    if (!ex.IsCriticalException())
+                    {
+                        log.Error(ex);
+                        var error = new PublishRepositoryUserError(ex.Message);
+                        vsServices.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
+                    }
+                    return Observable.Return(Unit.Default);
+                });
         }
 
-        void InitializeValidation(IVSServices vsServices)
+        void InitializeValidation()
         {
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
