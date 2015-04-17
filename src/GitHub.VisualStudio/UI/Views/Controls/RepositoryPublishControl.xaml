@@ -10,8 +10,7 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:tfcrd="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
-             xmlns:tl="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer;assembly=Microsoft.TeamFoundation.Controls"
-             xmlns:ttvc="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.Converters;assembly=Microsoft.TeamFoundation.Controls"
+             xmlns:converters="clr-namespace:GitHub.VisualStudio.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="432"
@@ -33,20 +32,12 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Height" Value="23" />
         </Style>
-        <Style TargetType="{x:Type tfcrd:LabeledTextBox}">
-            <Setter Property="Margin" Value="0,0,0,6" />
-        </Style>
+        
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
     </UserControl.Resources>
 
     <StackPanel Margin="8,6,18,0" Orientation="Vertical" Style="{DynamicResource DialogContainerStackPanel}">
-        <StackPanel.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <tfcrd:TFCachedResourceDictionary
-                        Source="pack://application:,,,/Microsoft.TeamFoundation.Controls;component/WPF/SharedResources.xaml" />
-                </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
-        </StackPanel.Resources>
+
         <DockPanel VerticalAlignment="Top" Margin="0,0,0,13">
             <ui:OcticonImage
                 x:Name="octokit"
@@ -102,10 +93,20 @@
             </ComboBox.ItemsSource>
         </ComboBox>
 
-        <tfcrd:LabeledTextBox 
-            x:Name="nameText"
-            HintText="Repository Name"
-            MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
+        <!-- TODO: Make this a user control -->
+        <Grid>
+            <TextBox x:Name="nameText"
+                     Margin="0"
+                     Background="Transparent"
+                     Height="23"
+                     Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey }}" />
+
+            <TextBlock Margin="7,4,0,0"
+                       IsHitTestVisible="False"
+                       Visibility="{Binding ElementName=nameText, Path=Text.Length, Converter={StaticResource CountToVisibilityConverter}}"
+                       Text="Repository Name"
+                       Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+        </Grid>
 
         <StackPanel>
             <uirx:ValidationMessage
@@ -119,13 +120,25 @@
                 Padding="2,0" />
         </StackPanel>
 
-        <tfcrd:LabeledTextBox
-            x:Name="description"
-            Height="52"
-            HintText="Description (optional)"
-            AcceptsReturn="True" />
+        <!-- TODO: Make this a user control -->
+        <Grid>
+            <TextBox x:Name="description"
+                     Height="52"
+                     AcceptsReturn="True"
+                     Margin="0,8,0,0"
+                     Background="Transparent"
+                     Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey }}" />
 
-        <CheckBox x:Name="makePrivate" Margin="0,3,0,6" Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}">
+            <TextBlock Margin="7,12,0,0"
+                       IsHitTestVisible="False"
+                       Visibility="{Binding ElementName=description, Path=Text.Length, Converter={StaticResource CountToVisibilityConverter}}"
+                       Text="Description (Optional)"
+                       Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+        </Grid>
+
+        <CheckBox x:Name="makePrivate"
+                  Margin="0,8,0,0"
+                  Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}">
             <TextBlock TextWrapping="Wrap">
                 <TextBlock.Inlines>
                     <Run>Private Repository</Run>
@@ -167,6 +180,7 @@
         <Button
             IsDefault="True"
             x:Name="publishRepositoryButton"
+            Margin="0,8,0,0"
             HorizontalAlignment="Left">
             <TextBlock>Publish</TextBlock>
         </Button>
