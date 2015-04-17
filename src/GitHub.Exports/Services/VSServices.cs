@@ -25,6 +25,7 @@ namespace GitHub.Services
         void ShowMessage(string message);
         void ShowWarning(string message);
         void ShowError(string message);
+        void ClearNotifications();
 
         void ActivityLogMessage(string message);
         void ActivityLogWarning(string message);
@@ -129,7 +130,12 @@ namespace GitHub.Services
                 manager.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
         }
 
-
+        public void ClearNotifications()
+        {
+            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            if (manager != null)
+                manager.ClearNotifications();
+		}
 
         public void ActivityLogMessage(string message)
         {

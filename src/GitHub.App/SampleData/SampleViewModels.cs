@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Helpers;
@@ -34,7 +35,11 @@ namespace GitHub.SampleData
             RepositoryName = "Hello-World";
             Description = "A description";
             KeepPrivate = true;
-            Accounts = new ReactiveList<IAccount> { new AccountDesigner("GitHub") };
+            Accounts = new ReactiveList<IAccount>
+            {
+                new AccountDesigner { Login = "shana" },
+                new AccountDesigner { Login = "GitHub", IsUser = false }
+            };
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>
             {
                 GitIgnoreItem.Create("VisualStudio"),
@@ -296,15 +301,64 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public sealed class AccountDesigner : Account
+    public sealed class AccountDesigner : IAccount
     {
-        public AccountDesigner() : this("some-name")
+        public AccountDesigner()
         {
+            Login = "octocat";
+            IsUser = true;
         }
 
-        public AccountDesigner(string login)
-            : base(login, true, false, 0, 0, Observable.Return(AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")))
+        public BitmapSource Avatar
         {
+            get
+            {
+                return IsUser
+                    ? AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")
+                    : AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
+            }
+        }
+
+        public bool HasMaximumPrivateRepositories
+        {
+            get;
+            set;
+        }
+
+        public bool IsEnterprise
+        {
+            get;
+            set;
+        }
+
+        public bool IsOnFreePlan
+        {
+            get;
+            set;
+        }
+
+        public bool IsUser
+        {
+            get;
+            set;
+        }
+
+        public string Login
+        {
+            get;
+            set;
+        }
+
+        public int OwnedPrivateRepos
+        {
+            get;
+            set;
+        }
+
+        public long PrivateReposInPlan
+        {
+            get;
+            set;
         }
     }
 
@@ -323,7 +377,7 @@ namespace GitHub.SampleData
         public RepositoryModelDesigner(string name, string owner)
         {
             Name = name;
-            Owner = new AccountDesigner(owner);
+            Owner = new AccountDesigner { Login = owner };
         }
 
         public UriString CloneUrl { get; set; }

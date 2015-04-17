@@ -142,7 +142,6 @@
     <Compile Include="Caches\SharedCache.cs" />
     <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Info\EnvironmentExtensions.cs" />
     <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Infrastructure\ExportWrappers.cs" />
     <Compile Include="Models\Account.cs" />
