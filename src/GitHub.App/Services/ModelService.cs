@@ -34,14 +34,22 @@ namespace GitHub.Services
         public IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject("gitignores", GetOrderedGitIgnoreTemplatesFromApi, TimeSpan.FromDays(1), TimeSpan.FromDays(7))
+                hostCache.GetAndRefreshObject(
+                    "gitignores",
+                    GetOrderedGitIgnoreTemplatesFromApi,
+                    TimeSpan.FromDays(1),
+                    TimeSpan.FromDays(7))
                 .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None));
         }
 
         public IObservable<IReadOnlyList<LicenseItem>> GetLicenses()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject("licenses", GetOrderedLicensesFromApi, TimeSpan.FromDays(1), TimeSpan.FromDays(7))
+                hostCache.GetAndRefreshObject(
+                    "licenses",
+                    GetOrderedLicensesFromApi,
+                    TimeSpan.FromDays(1),
+                    TimeSpan.FromDays(7))
                 .ToReadOnlyList(Create, LicenseItem.None));
         }
 
@@ -82,8 +90,8 @@ namespace GitHub.Services
 
         IObservable<IEnumerable<AccountCacheItem>> GetUserOrganizations()
         {
-            return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject("orgs",
+            return GetUserFromCache().SelectMany(user =>
+                hostCache.GetAndRefreshObject(user.Login + "|orgs",
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
                     TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)));
         }
@@ -108,11 +116,11 @@ namespace GitHub.Services
 
         IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
-            return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject(Enum.GetName(typeof(RepositoryType), repositoryType) + ":repos",
+            return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
+                hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
                     () => GetUserRepositoriesFromApi(repositoryType),
                         TimeSpan.FromMinutes(5),
-                        TimeSpan.FromDays(7))
+                        TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create));
         }
 
@@ -134,12 +142,12 @@ namespace GitHub.Services
 
         IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
         {
-            return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject(organization + "|repos",
+            return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
+                hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
                     () => apiClient.GetRepositoriesForOrganization(organization).Select(
                         RepositoryCacheItem.Create).ToList(),
                         TimeSpan.FromMinutes(5),
-                        TimeSpan.FromDays(7))
+                        TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create));
         }
 
