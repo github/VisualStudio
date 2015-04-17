@@ -79,7 +79,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <ComboBox x:Name="accountsComboBox">
+        <ComboBox x:Name="accountsComboBox" ItemsSource="{Binding Accounts}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -93,13 +93,6 @@
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
-            <ComboBox.ItemsSource>
-                <x:Array Type="sampleData:AccountDesigner">
-                    <sampleData:AccountDesigner />
-                    <sampleData:AccountDesigner />
-                    <sampleData:AccountDesigner />
-                </x:Array>
-            </ComboBox.ItemsSource>
         </ComboBox>
 
         <tfcrd:LabeledTextBox 

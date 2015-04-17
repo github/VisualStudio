@@ -67,15 +67,8 @@
 			<ListBox
 				x:Name="repositoryList"
 				HorizontalContentAlignment="Stretch"
+                ItemsSource="{Binding FilteredRepositories}"
 				Style="{DynamicResource LightListBox}">
-				<ListBox.ItemsSource>
-					<x:Array Type="sampleData:RepositoryModelDesigner">
-						<sampleData:RepositoryModelDesigner Name="github" />
-						<sampleData:RepositoryModelDesigner Name="windows" />
-						<sampleData:RepositoryModelDesigner Name="ReactiveUI" />
-						<sampleData:RepositoryModelDesigner Name="this-is-a-stupidly-long-name-for-a-repository-its-actually-kind-of-insane-how-long-can-it-even-be-wo" />
-					</x:Array>
-				</ListBox.ItemsSource>
 				<ListBox.GroupStyle>
 					<GroupStyle HidesIfEmpty="true">
 						<GroupStyle.ContainerStyle>
