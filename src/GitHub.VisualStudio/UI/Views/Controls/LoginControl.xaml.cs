@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Input;
 using GitHub.Controls;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.UI;
 using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
-using System.Reactive.Subjects;
-using GitHub.Extensions;
-using System.Windows.Input;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -18,18 +17,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for LoginControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Login)]
-    public partial class LoginControl : IViewFor<ILoginControlViewModel>, IView, IDisposable
+    public partial class LoginControl : ViewUserControl, IViewFor<ILoginControlViewModel>, IView
     {
-        readonly Subject<object> close;
-
         public LoginControl()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
-            SharedDictionaryManager.Load("GitHub.UI.Reactive");
-
             InitializeComponent();
-
-            close = new Subject<object>();
 
             DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
 
@@ -43,8 +35,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 {
                     if (ret == Authentication.AuthenticationResult.Success)
                     {
-                        close.OnNext(null);
-                        close.OnCompleted();
+                        NotifyDone();
                     }
                 });
             });
@@ -139,27 +130,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             [return: AllowNull]
             get { return (ILoginControlViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
-        }
-
-        public IObservable<object> Done { get { return close; } }
-
-        bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    close.Dispose();
-                }
-                disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }
