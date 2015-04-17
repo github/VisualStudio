@@ -5,7 +5,7 @@
     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
 
     <Style TargetType="{x:Type local:ValidationMessage}">
-        <Setter Property="Padding" Value="2,6" />
+        <Setter Property="Padding" Value="2,0,2,4" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ValidationMessage}">
