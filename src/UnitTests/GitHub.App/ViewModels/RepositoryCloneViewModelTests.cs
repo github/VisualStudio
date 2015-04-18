@@ -1,20 +1,41 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
-using Microsoft.Reactive.Testing;
 using NSubstitute;
-using ReactiveUI.Testing;
 using Rothko;
 using Xunit;
 
 public class RepositoryCloneViewModelTests
 {
+    public class TheCtor
+    {
+        [Fact]
+        public void LoadsRepositories()
+        {
+            var repos = new IRepositoryModel[]
+            {
+                Substitute.For<IRepositoryModel>(),
+                Substitute.For<IRepositoryModel>(),
+                Substitute.For<IRepositoryModel>()
+            };
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(Observable.Return(repos));
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+
+            Assert.Equal(3, vm.FilteredRepositories.Count);
+        }
+    }
+
     public class TheCloneCommand
     {
         [Fact]
