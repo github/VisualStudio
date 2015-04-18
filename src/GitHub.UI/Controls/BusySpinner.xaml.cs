@@ -5,7 +5,7 @@ using System.Windows.Data;
 using System.Windows.Media.Animation;
 using NullGuard;
 
-namespace GitHub.VisualStudio.UI.Views.Controls
+namespace GitHub.UI
 {
     /// <summary>
     /// Interaction logic for BusySpinner.xaml

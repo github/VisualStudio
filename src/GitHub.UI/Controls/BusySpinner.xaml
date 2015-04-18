@@ -1,7 +1,7 @@
-﻿<UserControl x:Uid="UserControl_1" x:Class="GitHub.VisualStudio.UI.Views.Controls.BusySpinner"
+﻿<UserControl x:Uid="BusySpinner" x:Class="GitHub.UI.BusySpinner"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:c="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
+             xmlns:c="clr-namespace:GitHub.UI"
              Height="32" Width="32">
     
     <UserControl.Resources>
@@ -15,7 +15,7 @@
             </Storyboard>
         </ResourceDictionary>
     </UserControl.Resources>
-        
+
     <Grid x:Uid="grid" x:Name="grid">
         <Grid.RenderTransform>
             <ScaleTransform x:Uid="SpinnerScale" x:Name="SpinnerScale" 
