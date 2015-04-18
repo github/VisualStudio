@@ -90,6 +90,7 @@
             <TextBox x:Name="nameText"
                      Margin="0"
                      Height="23"
+                     MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"
                      Background="{DynamicResource {x:Static vsshell:VsBrushes.SearchBoxBackgroundKey }}"
                      Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey }}" />
 
