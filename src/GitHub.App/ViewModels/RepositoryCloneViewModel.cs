@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
@@ -17,12 +16,14 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType=UIViewType.Clone)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
+        readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
         readonly IVSServices vsServices;
+        readonly IReactiveCommand<Unit> loadRepositoriesCommand;
 
         [ImportingConstructor]
-        RepositoryCloneViewModel(
+        public RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
             IOperatingSystem operatingSystem,
@@ -36,15 +37,14 @@ namespace GitHub.ViewModels
             IOperatingSystem operatingSystem,
             IVSServices vsServices)
         {
+            this.repositoryHost = repositoryHost;
             this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
             this.vsServices = vsServices;
 
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
-            repositoryHost.ModelService.GetRepositories()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(Repositories.AddRange);
+            loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
 
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
@@ -64,6 +64,16 @@ namespace GitHub.ViewModels
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
+
+            loadRepositoriesCommand.ExecuteAsync(null).Subscribe();
+        }
+
+        IObservable<Unit> OnLoadRepositories(object value)
+        {
+            return repositoryHost.ModelService.GetRepositories()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Do(Repositories.AddRange)
+                .Select(_ => Unit.Default);
         }
 
         bool FilterRepository(IRepositoryModel repo)
