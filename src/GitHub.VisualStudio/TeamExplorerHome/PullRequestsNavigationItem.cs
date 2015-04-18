@@ -11,8 +11,7 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerNavigationItem(PullRequestsNavigationItemId,
-        NavigationItemPriority.PullRequests,
-        TargetPageId = TeamExplorerPageIds.Home)]
+        NavigationItemPriority.PullRequests)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {
