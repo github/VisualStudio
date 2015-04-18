@@ -11,8 +11,7 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerNavigationItem(GraphsNavigationItemId,
-        NavigationItemPriority.Graphs,
-        TargetPageId = TeamExplorerPageIds.Home)]
+        NavigationItemPriority.Graphs)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GraphsNavigationItem : TeamExplorerNavigationItemBase
     {

@@ -11,8 +11,7 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerNavigationItem(WikiNavigationItemId,
-        NavigationItemPriority.Wiki,
-        TargetPageId = TeamExplorerPageIds.Home)]
+        NavigationItemPriority.Wiki)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class WikiNavigationItem : TeamExplorerNavigationItemBase
     {

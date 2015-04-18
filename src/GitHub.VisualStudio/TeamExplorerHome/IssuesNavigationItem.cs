@@ -11,8 +11,7 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerNavigationItem(IssuesNavigationItemId,
-        NavigationItemPriority.Issues,
-        TargetPageId = TeamExplorerPageIds.Home)]
+        NavigationItemPriority.Issues)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {
