@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Akavache;
@@ -299,6 +300,19 @@ public class ModelServiceTests
             await modelService.InvalidateAll();
 
             Assert.Equal(0, (await cache.GetAllObjects<AccountCacheItem>()).Count());
+        }
+
+        [Fact]
+        public async Task VaccumsTheCache()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var cache = Substitute.For<IBlobCache>();
+            cache.InvalidateAll().Returns(Observable.Return(Unit.Default));
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            await modelService.InvalidateAll();
+
+            cache.Received().Vacuum();
         }
     }
 

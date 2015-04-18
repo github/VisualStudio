@@ -111,7 +111,7 @@ namespace GitHub.Services
 
         public IObservable<Unit> InvalidateAll()
         {
-            return hostCache.InvalidateAll();
+            return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
