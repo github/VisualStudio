@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
+using NLog;
 using NullGuard;
 using ReactiveUI;
 using Rothko;
@@ -17,7 +18,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType=UIViewType.Clone)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
-        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
@@ -25,6 +26,7 @@ namespace GitHub.ViewModels
         readonly IVSServices vsServices;
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ObservableAsPropertyHelper<bool> isLoading;
+        bool loadingFailed;
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(
@@ -77,10 +79,11 @@ namespace GitHub.ViewModels
                 .Catch<IReadOnlyList<IRepositoryModel>, Exception>(ex =>
                 {
                     log.Error("Error while loading repositories", ex);
-                    return Observable.Return(new IRepositoryModel[] { });
+                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
+                        .Select(_ => new IRepositoryModel[] { });
                 });
-       }
-
+        }
+       
         bool FilterRepository(IRepositoryModel repo)
         {
             if (string.IsNullOrWhiteSpace(FilterText))
@@ -184,6 +187,12 @@ namespace GitHub.ViewModels
         public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
         {
             get { return loadRepositoriesCommand; }
+        }
+
+        public bool LoadingFailed
+        {
+            get { return loadingFailed; }
+            private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
         }
     }
 }

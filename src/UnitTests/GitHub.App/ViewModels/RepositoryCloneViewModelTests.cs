@@ -67,6 +67,30 @@ public class RepositoryCloneViewModelTests
         }
     }
 
+    public class TheLoadingFailedProperty
+    {
+        [Fact]
+        public void IsTrueIfLoadingReposFails()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            Assert.False(vm.LoadingFailed);
+
+            repoSubject.OnError(new InvalidOperationException("Doh!"));
+
+            Assert.True(vm.LoadingFailed);
+        }
+    }
+
     public class TheCloneCommand
     {
         [Fact]

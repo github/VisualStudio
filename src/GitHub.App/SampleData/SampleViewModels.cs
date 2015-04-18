@@ -442,6 +442,11 @@ namespace GitHub.SampleData
             get;
             private set;
         }
+
+        public bool LoadingFailed
+        {
+            get { return false; }
+        }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection
