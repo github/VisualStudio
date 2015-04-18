@@ -255,6 +255,7 @@
     <Compile Include="TeamExplorerHome\PulseNavigationItem.cs" />
     <Compile Include="TeamExplorerSync\GitHubPublishSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
+    <Compile Include="UI\Views\Controls\BusySpinner.xaml.cs" />
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
     </Compile>
@@ -338,6 +339,10 @@
   <ItemGroup>
     <Page Include="SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\BusySpinner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
       <Generator>MSBuild:Compile</Generator>
