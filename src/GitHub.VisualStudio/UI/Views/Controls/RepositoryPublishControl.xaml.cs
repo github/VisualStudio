@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.UI;
-using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
@@ -17,18 +15,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Publish)]
-    public partial class RepositoryPublishControl : IViewFor<IRepositoryPublishViewModel>, IView, IDisposable
+    public partial class RepositoryPublishControl : SimpleViewUserControl, IViewFor<IRepositoryPublishViewModel>, IView
     {
-        readonly Subject<object> close;
-
         public RepositoryPublishControl()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
-            SharedDictionaryManager.Load("GitHub.UI.Reactive");
-
             InitializeComponent();
-
-            close = new Subject<object>();
 
             this.WhenActivated(d =>
             {
@@ -59,7 +50,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
-                ViewModel.PublishRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
+            ViewModel.PublishRepository.Subscribe(_ => NotifyDone());
 
                 nameText.Text = ViewModel.DefaultRepositoryName;
             });
@@ -90,27 +81,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             [return: AllowNull]
             get { return (IRepositoryPublishViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
-        }
-
-        public IObservable<object> Done { get { return close; } }
-
-        bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    close.Dispose();
-                }
-                disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

@@ -173,6 +173,7 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next));
             }
+            view.Cancel.Subscribe(_ => Stop());
         }
 
         IView CreateViewAndViewModel(UIViewType viewType)
