@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
@@ -15,6 +14,7 @@ using Rothko;
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
         readonly IRepositoryCloneService cloneService;
@@ -22,7 +22,7 @@ namespace GitHub.ViewModels
         readonly IVSServices vsServices;
 
         [ImportingConstructor]
-        RepositoryCloneViewModel(
+        public RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
             IOperatingSystem operatingSystem,
