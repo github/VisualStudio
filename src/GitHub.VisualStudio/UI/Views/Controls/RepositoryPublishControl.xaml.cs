@@ -42,7 +42,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.SelectedAccount, v => v.accountsComboBox.SelectedItem));
 
                 d(this.BindCommand(ViewModel, vm => vm.PublishRepository, v => v.publishRepositoryButton));
-                d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.publishingSpinner.Visibility));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeToMicroLink));
                 //d(this.BindCommand(ViewModel, vm => vm.UpgradeAccountPlan, v => v.upgradeAccountLink));
 
@@ -50,7 +49,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
-            ViewModel.PublishRepository.Subscribe(_ => NotifyDone());
+                ViewModel.PublishRepository.Subscribe(_ => NotifyDone());
+
+                d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value)
+                .Subscribe(x => NotifyIsBusy(x)));
 
                 nameText.Text = ViewModel.DefaultRepositoryName;
             });
