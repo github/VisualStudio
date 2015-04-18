@@ -15,44 +15,49 @@ namespace GitHub.VisualStudio
 {
     public static class Services
     {
+        public static IServiceProvider PackageServiceProvider { get; set; }
+
+        /// <summary>
+        /// Three ways of getting a service. First, trying the passed-in <paramref name="provider"/>,
+        /// then <see cref="PackageServiceProvider"/>, then <see cref="T:Microsoft.VisualStudio.Shell.Package"/>
+        /// If the passed-in provider returns null, try PackageServiceProvider or Package, returning the fetched value
+        /// regardless of whether it's null or not. Package.GetGlobalService is never called if PackageServiceProvider is set.
+        /// This is on purpose, to support easy unit testing outside VS.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="Ret"></typeparam>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        static Ret GetGlobalService<T, Ret>(IServiceProvider provider = null) where T : class where Ret : class
+        {
+            Ret ret = null;
+            if (provider != null)
+                ret = provider.GetService(typeof(T)) as Ret;
+            if (ret != null)
+                return ret;
+            if (PackageServiceProvider != null)
+                return PackageServiceProvider.GetService(typeof(T)) as Ret;
+            return Package.GetGlobalService(typeof(T)) as Ret;
+        }
+
         public static IComponentModel ComponentModel
         {
-            get { return Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel; }
+            get { return GetGlobalService<SComponentModel, IComponentModel>(); }
         }
 
-        public static IVsWebBrowsingService WebBrowsingService
+        public static IVsWebBrowsingService GetWebBrowsingService(this IServiceProvider provider)
         {
-            get { return Package.GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService; }
-        }
-
-        public static IVsTextManager TextManager
-        {
-            get { return Package.GetGlobalService(typeof(SVsTextManager)) as IVsTextManager; }
+            return GetGlobalService<SVsWebBrowsingService, IVsWebBrowsingService>(provider);
         }
 
         public static IVsOutputWindow OutputWindow
         {
-            get { return Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow; }
-        }
-
-        public static IVsSolution Solution
-        {
-            get { return Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution; }
-        }
-
-        public static IVsWebBrowsingService WebBrowsing
-        {
-            get { return Package.GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService; }
-        }
-
-        public static IVsUIShell Shell
-        {
-            get { return Package.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell; }
+            get { return GetGlobalService<SVsOutputWindow, IVsOutputWindow>(); }
         }
 
         public static DTE Dte
         {
-            get { return Package.GetGlobalService(typeof(DTE)) as DTE; }
+            get { return GetGlobalService<DTE, DTE>(); }
         }
 
         public static DTE2 Dte2
@@ -60,14 +65,14 @@ namespace GitHub.VisualStudio
             get { return Dte as DTE2; }
         }
 
-        public static IVsSolution GetSolution(this IServiceProvider provider)
+        public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
         {
-            return provider.GetService(typeof(SVsSolution)) as IVsSolution;
+            return GetGlobalService<SVsActivityLog, IVsActivityLog>(provider);
         }
 
-        public static IVsWebBrowsingService GetWebBrowsing(this IServiceProvider provider)
+        public static IVsSolution GetSolution(this IServiceProvider provider)
         {
-            return provider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
+            return GetGlobalService<SVsSolution, IVsSolution>(provider);
         }
 
         public static T GetExportedValue<T>(this IServiceProvider serviceProvider)
