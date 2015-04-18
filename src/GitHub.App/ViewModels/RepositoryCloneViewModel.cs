@@ -178,10 +178,7 @@ namespace GitHub.ViewModels
 
         public bool IsLoading
         {
-            get
-            {
-                return isLoading.Value;
-            }
+            get { return isLoading.Value; }
         }
 
         public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand

@@ -69,6 +69,7 @@
     <Compile Include="Controls\BusySpinner.xaml.cs">
       <DependentUpon>BusySpinner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\GitHubProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

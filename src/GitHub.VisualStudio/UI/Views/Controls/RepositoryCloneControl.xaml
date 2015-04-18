@@ -27,6 +27,17 @@
             DockPanel.Dock="Top"
 		    PromptText="Search repositories" 
 		    Margin="10" />
+        
+        <ui:GitHubProgressBar
+            x:Name="loadingProgressBar"
+            DockPanel.Dock="Top"
+            Foreground="{DynamicResource GitHubAccentBrush}"
+            Style="{DynamicResource GitHubProgressBar}"
+            HorizontalContentAlignment="Stretch"
+            Visibility="Visible"
+            IsIndeterminate="True"
+            Margin="0" />
+
         <ui:OcticonCircleButton
             DockPanel.Dock="Bottom"
 			IsDefault="True"
