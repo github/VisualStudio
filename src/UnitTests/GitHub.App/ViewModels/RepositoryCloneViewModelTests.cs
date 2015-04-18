@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
@@ -11,10 +12,10 @@ using Xunit;
 
 public class RepositoryCloneViewModelTests
 {
-    public class TheCtor
+    public class TheLoadRepositoriesCommand
     {
         [Fact]
-        public void LoadsRepositories()
+        public async Task LoadsRepositories()
         {
             var repos = new IRepositoryModel[]
             {
@@ -25,14 +26,44 @@ public class RepositoryCloneViewModelTests
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories().Returns(Observable.Return(repos));
             var cloneService = Substitute.For<IRepositoryCloneService>();
-
             var vm = new RepositoryCloneViewModel(
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IVSServices>());
 
+            await vm.LoadRepositoriesCommand.ExecuteAsync();
+
             Assert.Equal(3, vm.FilteredRepositories.Count);
+        }
+    }
+
+    public class TheIsLoadingProperty
+    {
+        [Fact]
+        public void StartsTrueBecomesFalseWhenCompleted()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            Assert.True(vm.IsLoading);
+
+            repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
+            repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
+
+            Assert.True(vm.IsLoading);
+
+            repoSubject.OnCompleted();
+
+            Assert.False(vm.IsLoading);
         }
     }
 

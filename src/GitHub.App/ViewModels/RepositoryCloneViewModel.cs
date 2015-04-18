@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
@@ -16,11 +17,14 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType=UIViewType.Clone)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
+        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
         readonly IVSServices vsServices;
-        readonly IReactiveCommand<Unit> loadRepositoriesCommand;
+        readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
+        readonly ObservableAsPropertyHelper<bool> isLoading;
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(
@@ -45,7 +49,8 @@ namespace GitHub.ViewModels
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
             loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
-
+            isLoading = loadRepositoriesCommand.IsExecuting.ToProperty(this, x => x.IsLoading);
+            loadRepositoriesCommand.Subscribe(Repositories.AddRange);
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
@@ -64,17 +69,17 @@ namespace GitHub.ViewModels
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
 
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
-
-            loadRepositoriesCommand.ExecuteAsync(null).Subscribe();
         }
 
-        IObservable<Unit> OnLoadRepositories(object value)
+        IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
         {
             return repositoryHost.ModelService.GetRepositories()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Do(Repositories.AddRange)
-                .Select(_ => Unit.Default);
-        }
+                .Catch<IReadOnlyList<IRepositoryModel>, Exception>(ex =>
+                {
+                    log.Error("Error while loading repositories", ex);
+                    return Observable.Return(new IRepositoryModel[] { });
+                });
+       }
 
         bool FilterRepository(IRepositoryModel repo)
         {
@@ -169,6 +174,19 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return filterText; }
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
+        }
+
+        public bool IsLoading
+        {
+            get
+            {
+                return isLoading.Value;
+            }
+        }
+
+        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
+        {
+            get { return loadRepositoriesCommand; }
         }
     }
 }
