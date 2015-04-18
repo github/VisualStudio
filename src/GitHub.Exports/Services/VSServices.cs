@@ -10,6 +10,8 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.Services
 {
@@ -24,6 +26,10 @@ namespace GitHub.Services
         void ShowWarning(string message);
         void ShowError(string message);
         void ClearNotifications();
+
+        void ActivityLogMessage(string message);
+        void ActivityLogWarning(string message);
+        void ActivityLogError(string message);
     }
 
     [Export(typeof(IVSServices))]
@@ -129,6 +135,40 @@ namespace GitHub.Services
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
             if (manager != null)
                 manager.ClearNotifications();
+		}
+
+        public void ActivityLogMessage(string message)
+        {
+            var log = VisualStudio.Services.GetActivityLog(serviceProvider);
+            if (log != null)
+            {
+                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
+                            Info.ApplicationInfo.ApplicationSafeName, message)))
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log message to activity log: {0}", message));
+            }
+        }
+
+        public void ActivityLogError(string message)
+        {
+            var log = VisualStudio.Services.GetActivityLog(serviceProvider);
+            if (log != null)
+            {
+
+                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
+                            Info.ApplicationInfo.ApplicationSafeName, message)))
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log error to activity log: {0}", message));
+            }
+        }
+
+        public void ActivityLogWarning(string message)
+        {
+            var log = VisualStudio.Services.GetActivityLog(serviceProvider);
+            if (log != null)
+            {
+                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,
+                            Info.ApplicationInfo.ApplicationSafeName, message)))
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
+            }
         }
 
         static class GitCoreServices
