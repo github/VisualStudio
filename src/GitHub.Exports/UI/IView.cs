@@ -6,5 +6,6 @@ namespace GitHub.UI
     {
         object ViewModel { get; set; }
         IObservable<object> Done { get; }
+        IObservable<object> Cancel { get; }
     }
 }

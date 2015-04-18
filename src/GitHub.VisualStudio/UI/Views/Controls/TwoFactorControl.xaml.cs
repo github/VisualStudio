@@ -7,7 +7,6 @@ using GitHub.UI;
 using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using ReactiveUI;
-using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -15,18 +14,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
-    public partial class TwoFactorControl : IViewFor<ITwoFactorDialogViewModel>, IView, IDisposable
+    public partial class TwoFactorControl : ViewUserControl, IViewFor<ITwoFactorDialogViewModel>, IView, IDisposable
     {
-        readonly Subject<object> close;
-
         public TwoFactorControl()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
-            SharedDictionaryManager.Load("GitHub.UI.Reactive");
-
             InitializeComponent();
-
-            close = new Subject<object>();
 
             DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
 
@@ -41,14 +33,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     view => view.authenticationSentLabel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.IsSms, view => view.resendCodeButton.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.Description, view => view.description.Text));
-                d(MessageBus.Current.Listen<KeyEventArgs>()
-                    .Where(x => ViewModel.IsShowing && x.Key == Key.Escape && !x.Handled)
-                    .Subscribe(key =>
-                    {
-                        key.Handled = true;
-                        close.OnNext(null);
-                        close.OnCompleted();
-                    }));
             });
             IsVisibleChanged += (s, e) =>
             {
@@ -82,27 +66,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             get { return ViewModel; }
             set { ViewModel = (ITwoFactorDialogViewModel)value; }
-        }
-
-        public IObservable<object> Done { get { return close; } }
-
-        bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    close.Dispose();
-                }
-                disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }
