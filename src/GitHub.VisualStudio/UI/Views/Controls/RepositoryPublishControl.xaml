@@ -100,18 +100,6 @@
                        Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
         </Grid>
 
-        <StackPanel>
-            <uirx:ValidationMessage
-                x:Name="nameValidationMessage"
-                ValidatesControl="{Binding ElementName=nameText}" />
-            <uirx:ValidationMessage
-                x:Name="safeRepositoryNameWarning"
-                ValidatesControl="{Binding ElementName=nameText}"
-                Icon="alert"
-                Fill="#f39c12"
-                Padding="2,0" />
-        </StackPanel>
-
         <!-- TODO: Make this a user control -->
         <Grid>
             <TextBox x:Name="description"
@@ -166,9 +154,7 @@
                     Margin="5,0"/>
             </StackPanel>
         </Label>
-
-        <uirx:UserErrorMessages x:Name="userErrorMessages" />
-        
+       
         <Button
             IsDefault="True"
             x:Name="publishRepositoryButton"
