@@ -11,8 +11,7 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
     [TeamExplorerNavigationItem(PulseNavigationItemId,
-        NavigationItemPriority.Pulse,
-        TargetPageId = TeamExplorerPageIds.Home)]
+        NavigationItemPriority.Pulse)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PulseNavigationItem : TeamExplorerNavigationItemBase
     {
