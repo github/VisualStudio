@@ -6,7 +6,6 @@ using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.UI;
-using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
@@ -23,9 +22,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
         public RepositoryPublishControl()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
-            SharedDictionaryManager.Load("GitHub.UI.Reactive");
-
             InitializeComponent();
 
             close = new Subject<object>();

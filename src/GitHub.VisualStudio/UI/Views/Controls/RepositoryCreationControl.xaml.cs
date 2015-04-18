@@ -7,7 +7,6 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.UI;
-using GitHub.UI.Helpers;
 using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
@@ -19,18 +18,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
-    public partial class RepositoryCreationControl : IViewFor<IRepositoryCreationViewModel>, IView, IDisposable
+    public partial class RepositoryCreationControl : ViewUserControl, IViewFor<IRepositoryCreationViewModel>, IView
     {
-        readonly Subject<object> close;
-
         public RepositoryCreationControl()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
-            SharedDictionaryManager.Load("GitHub.UI.Reactive");
-
             InitializeComponent();
-
-            close = new Subject<object>();
 
             var clearErrorWhenChanged = this.WhenAny(
                 x => x.ViewModel.RepositoryName,
@@ -79,7 +71,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
 
-                ViewModel.CreateRepository.Subscribe(_ => { close.OnNext(null); close.OnCompleted(); });
+                ViewModel.CreateRepository.Subscribe(_ => NotifyDone());
             });
             IsVisibleChanged += (s, e) =>
             {
@@ -109,27 +101,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             get
             { return (IRepositoryCreationViewModel)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
-        }
-
-        public IObservable<object> Done { get { return close; } }
-
-        bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    close.Dispose();
-                }
-                disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }
