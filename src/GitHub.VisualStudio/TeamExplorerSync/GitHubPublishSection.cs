@@ -13,6 +13,8 @@ using GitHub.Info;
 using ReactiveUI;
 using System.Reactive.Linq;
 using GitHub.Extensions;
+using System.ComponentModel;
+using GitHub.VisualStudio.UI.Views.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -121,6 +123,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                 {
                     SectionContent = c;
                     c.DataContext = this;
+                    ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
                 });
             ui.Start(null);
         }
