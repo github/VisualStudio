@@ -27,6 +27,59 @@
     <!--End ContextMenu-->
     
     <!-- ProgressBar -->
+    <Style x:Key="GitHubProgressBar" TargetType="{x:Type ui:GitHubProgressBar}">
+        <Setter Property="Foreground" Value="#999999" />
+        <Setter Property="Background" Value="#DDDDDD" />
+        <Setter Property="Height" Value="4" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Margin="{TemplateBinding Padding}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Determinate">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                   Storyboard.TargetName="InDeterminateGrid">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Indeterminate">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                   Storyboard.TargetName="DeterminateGrid">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Rectangle HorizontalAlignment="Stretch" Fill="{TemplateBinding Background}" StrokeThickness="0" />
+                        <Grid x:Name="DeterminateGrid">
+                            <Rectangle HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}"
+                         Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IndicatorWidth}" StrokeThickness="0" />
+                        </Grid>
+                        <Grid x:Name="InDeterminateGrid">
+                            <Rectangle Fill="{TemplateBinding Foreground}" Width="4" x:Name="R0" Opacity="0"
+                         HorizontalAlignment="Left" />
+                            <Rectangle Fill="{TemplateBinding Foreground}" Width="4" x:Name="R1" Opacity="0"
+                         HorizontalAlignment="Left" />
+                            <Rectangle Fill="{TemplateBinding Foreground}" Width="4" x:Name="R2" Opacity="0"
+                         HorizontalAlignment="Left" />
+                            <Rectangle Fill="{TemplateBinding Foreground}" Width="4" x:Name="R3" Opacity="0"
+                         HorizontalAlignment="Left" />
+                            <Rectangle Fill="{TemplateBinding Foreground}" Width="4" x:Name="R4" Opacity="0"
+                         HorizontalAlignment="Left" />
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="GitHubSyncProgressBar" TargetType="{x:Type ProgressBar}">
         <Style.Resources>
             <PathGeometry x:Key="CircleBottomX"
