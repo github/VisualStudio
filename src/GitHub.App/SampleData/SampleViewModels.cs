@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
-using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -433,6 +431,17 @@ namespace GitHub.SampleData
         public string FilterText { get; set; }
 
         public new string Title { get { return "Clone a GitHub Repository"; } }
+
+        public bool IsLoading
+        {
+            get { return false; }
+        }
+
+        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
+        {
+            get;
+            private set;
+        }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection
