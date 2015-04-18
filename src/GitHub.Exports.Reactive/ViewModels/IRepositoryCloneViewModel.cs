@@ -34,6 +34,11 @@ namespace GitHub.ViewModels
         /// </summary>
         bool IsLoading { get; }
 
+        /// <summary>
+        /// If true, then we failed to load the repositories.
+        /// </summary>
+        bool LoadingFailed { get; }
+
         string FilterText { get; set; }
     }
 }
