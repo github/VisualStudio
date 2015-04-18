@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Controls;
+using System.Windows.Input;
+using ReactiveUI;
 
 namespace GitHub.UI
 {
@@ -8,13 +11,24 @@ namespace GitHub.UI
     /// Base class for all of our user controls. This one does not import GitHub resource/styles and is used by the 
     /// publish control.
     /// </summary>
-    public class SimpleViewUserControl : UserControl, IDisposable
+    public class SimpleViewUserControl : UserControl, IDisposable, IActivatable
     {
         readonly Subject<object> close = new Subject<object>();
         readonly Subject<object> cancel = new Subject<object>();
 
         public SimpleViewUserControl()
         {
+            this.WhenActivated(d =>
+            {
+                d(this.Events()
+                    .KeyUp
+                    .Where(x => x.Key == Key.Escape && !x.Handled)
+                    .Subscribe(key =>
+                    {
+                        key.Handled = true;
+                        NotifyCancel();
+                    }));
+            });
         }
 
         public IObservable<object> Done { get { return close; } }

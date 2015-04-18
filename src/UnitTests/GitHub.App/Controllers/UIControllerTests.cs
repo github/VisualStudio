@@ -38,11 +38,11 @@ public class UIControllerTests
         {
             var factory = provider.GetExportFactoryProvider();
             factory.GetViewModel(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
-            factory.GetView(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ILoginControlViewModel>, UserControl>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ILoginControlViewModel>, ViewUserControl>(), () => { }));
             factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
-            factory.GetView(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ITwoFactorDialogViewModel>, UserControl>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ITwoFactorDialogViewModel>, ViewUserControl>(), () => { }));
             factory.GetViewModel(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
-            factory.GetView(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IRepositoryCloneViewModel>, UserControl>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IRepositoryCloneViewModel>, ViewUserControl>(), () => { }));
             return factory;
         }
 
@@ -52,6 +52,8 @@ public class UIControllerTests
             var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
+            var loginView = factory.GetView(GitHub.Exports.UIViewType.Login);
+            loginView.Value.Cancel.Returns(Observable.Empty<object>());
             var cm = provider.GetConnectionManager();
             var cons = new System.Collections.ObjectModel.ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);

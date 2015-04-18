@@ -33,13 +33,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     view => view.authenticationSentLabel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.IsSms, view => view.resendCodeButton.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.Description, view => view.description.Text));
-                d(MessageBus.Current.Listen<KeyEventArgs>()
-                    .Where(x => ViewModel.IsShowing && x.Key == Key.Escape && !x.Handled)
-                    .Subscribe(key =>
-                    {
-                        key.Handled = true;
-                        NotifyDone();
-                    }));
             });
             IsVisibleChanged += (s, e) =>
             {
