@@ -37,6 +37,19 @@
             Visibility="Visible"
             IsIndeterminate="True"
             Margin="0" />
+        <StackPanel
+            x:Name="loadingFailedMessage"
+            DockPanel.Dock="Top"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Margin="0,4,0,4">
+            <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource GitHubWarningBrush}">
+                Some or all repositories failed to load.
+            </TextBlock>
+            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource GHTextBrush}">
+                Close the dialog and click the Clone button to try again.
+            </TextBlock>
+        </StackPanel>
 
         <ui:OcticonCircleButton
             DockPanel.Dock="Bottom"
