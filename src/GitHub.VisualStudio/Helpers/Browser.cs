@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
-using GitHub.Info;
+using GitHub.Extensions;
 using GitHub.Services;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Rothko;
-using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Helpers
 {
