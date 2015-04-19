@@ -447,6 +447,12 @@ namespace GitHub.SampleData
         {
             get { return false; }
         }
+
+        public bool NoRepositoriesFound
+        {
+            get;
+            set;
+        }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection

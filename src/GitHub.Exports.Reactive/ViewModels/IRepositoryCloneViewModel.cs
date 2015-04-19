@@ -39,6 +39,11 @@ namespace GitHub.ViewModels
         /// </summary>
         bool LoadingFailed { get; }
 
+        /// <summary>
+        /// Set to true if no repositories were found.
+        /// </summary>
+        bool NoRepositoriesFound { get; }
+
         string FilterText { get; set; }
     }
 }
