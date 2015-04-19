@@ -176,8 +176,8 @@ namespace GitHub.Caches
                         // Purge the cache for next time.
                         // Re throw so that the caller can decide 
                         // what the fallback is
-                        cache.Invalidate(GetCacheKey(url));
-                        return Observable.Throw<BitmapImage>(ex);
+                        return cache.Invalidate(GetCacheKey(url))
+                            .ContinueAfter(() => Observable.Throw<BitmapImage>(ex));
                     });
             });
         }
