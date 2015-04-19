@@ -22,7 +22,8 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isSms;
 
         [ImportingConstructor]
-        public TwoFactorDialogViewModel(IVisualStudioBrowser browser,
+        public TwoFactorDialogViewModel(
+            IVisualStudioBrowser browser,
             ITwoFactorChallengeHandler twoFactorChallengeHandler)
         {
             Title = "Two-Factor authentication required";
@@ -33,7 +34,7 @@ namespace GitHub.ViewModels
             CancelCommand = ReactiveCommand.Create();
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
-            ResendCodeCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
+            ResendCodeCommand = ReactiveCommand.Create();
 
             description = this.WhenAny(x => x.TwoFactorType, x => x.Value)
                 .Select(type =>
@@ -80,14 +81,7 @@ namespace GitHub.ViewModels
             return Observable.Merge(ok, cancel, resend)
                 .Take(1)
                 .Do(_ =>
-                {
-                    bool authenticationCodeSent = error.ChallengeResult == TwoFactorChallengeResult.RequestResendCode;
-                    if (!authenticationCodeSent)
-                    {
-                        TwoFactorType = TwoFactorType.None;
-                    }
-                    IsAuthenticationCodeSent = authenticationCodeSent;
-                });
+                    IsAuthenticationCodeSent = error.ChallengeResult == TwoFactorChallengeResult.RequestResendCode);
         }
 
         public TwoFactorType TwoFactorType
@@ -120,7 +114,7 @@ namespace GitHub.ViewModels
 
         public ReactiveCommand<object> OkCommand { get; private set; }
         public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
-        public ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; private set; }
+        public ReactiveCommand<object> ResendCodeCommand { get; private set; }
         public ReactivePropertyValidator AuthenticationCodeValidator { get; private set; }
     }
 }
