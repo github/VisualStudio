@@ -55,4 +55,29 @@ public class GitClientTests
             config.Received().Set<string>("remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*");
         }
     }
+
+    public class TheSetTrackingMethod
+    {
+        [Fact]
+        public async Task SetsTheRemoteTrackingBranch()
+        {
+            var config = Substitute.For<Configuration>();
+            var origin = Substitute.For<Remote>();
+            var branches = Substitute.For<BranchCollection>();
+            var repository = Substitute.For<IRepository>();
+            repository.Config.Returns(config);
+            repository.Branches.Returns(branches);
+            repository.Network.Remotes["origin"].Returns(origin);
+            var localBranch = Substitute.For<Branch>();
+            var remoteBranch = Substitute.For<Branch>(); ;
+            branches["refs/heads/master"].Returns(localBranch);
+            branches["refs/remotes/origin/master"].Returns(remoteBranch);
+
+            var gitClient = new GitClient();
+
+            await gitClient.SetTrackingBranch(repository, "master", "origin");
+
+            branches.Received().Update(localBranch, Arg.Any<Action<BranchUpdater>>());
+        }
+    }
 }
