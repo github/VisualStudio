@@ -2,19 +2,195 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
-using Microsoft.Reactive.Testing;
 using NSubstitute;
-using ReactiveUI.Testing;
 using Rothko;
 using Xunit;
 
 public class RepositoryCloneViewModelTests
 {
+    public class TheLoadRepositoriesCommand
+    {
+        [Fact]
+        public async Task LoadsRepositories()
+        {
+            var repos = new IRepositoryModel[]
+            {
+                Substitute.For<IRepositoryModel>(),
+                Substitute.For<IRepositoryModel>(),
+                Substitute.For<IRepositoryModel>()
+            };
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(Observable.Return(repos));
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+
+            await vm.LoadRepositoriesCommand.ExecuteAsync();
+
+            Assert.Equal(3, vm.FilteredRepositories.Count);
+        }
+    }
+
+    public class TheIsLoadingProperty
+    {
+        [Fact]
+        public void StartsTrueBecomesFalseWhenCompleted()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+
+            Assert.False(vm.IsLoading);
+
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            Assert.True(vm.IsLoading);
+
+            repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
+            repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
+
+            Assert.True(vm.IsLoading);
+
+            repoSubject.OnCompleted();
+
+            Assert.False(vm.IsLoading);
+        }
+
+        [Fact]
+        public void IsFalseWhenLoadingReposFailsImmediately()
+        {
+            var repoSubject = Observable.Throw<IRepositoryModel[]>(new InvalidOperationException("Doh!"));
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            Assert.True(vm.LoadingFailed);
+            Assert.False(vm.IsLoading);
+        }
+    }
+
+    public class TheNoRepositoriesFoundProperty
+    {
+        [Fact]
+        public void IsTrueInitially()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+
+            Assert.True(vm.NoRepositoriesFound);
+        }
+
+        [Fact]
+        public void IsFalseWhenLoading()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
+
+            Assert.False(vm.NoRepositoriesFound);
+        }
+
+        [Fact]
+        public void IsFalseWhenFailed()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            repoSubject.OnError(new InvalidOperationException());
+
+            Assert.False(vm.NoRepositoriesFound);
+        }
+
+        [Fact]
+        public void IsTrueWhenLoadingCompleteNotFailedAndNoRepositories()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            repoSubject.OnCompleted();
+
+            Assert.True(vm.NoRepositoriesFound);
+        }
+    }
+
+        public class TheLoadingFailedProperty
+    {
+        [Fact]
+        public void IsTrueIfLoadingReposFails()
+        {
+            var repoSubject = new Subject<IRepositoryModel[]>();
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            Assert.False(vm.LoadingFailed);
+
+            repoSubject.OnError(new InvalidOperationException("Doh!"));
+
+            Assert.True(vm.LoadingFailed);
+            Assert.False(vm.IsLoading);
+        }
+    }
+
     public class TheCloneCommand
     {
         [Fact]

@@ -27,6 +27,30 @@
             DockPanel.Dock="Top"
 		    PromptText="Search repositories" 
 		    Margin="10" />
+        
+        <ui:GitHubProgressBar
+            x:Name="loadingProgressBar"
+            DockPanel.Dock="Top"
+            Foreground="{DynamicResource GitHubAccentBrush}"
+            Style="{DynamicResource GitHubProgressBar}"
+            HorizontalContentAlignment="Stretch"
+            Visibility="Visible"
+            IsIndeterminate="True"
+            Margin="0" />
+        <StackPanel
+            x:Name="loadingFailedMessage"
+            DockPanel.Dock="Top"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Margin="0,4,0,4">
+            <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource GitHubWarningBrush}">
+                Some or all repositories failed to load.
+            </TextBlock>
+            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource GHTextBrush}">
+                Close the dialog and click the Clone button to try again.
+            </TextBlock>
+        </StackPanel>
+
         <ui:OcticonCircleButton
             DockPanel.Dock="Bottom"
 			IsDefault="True"
@@ -64,55 +88,56 @@
                     <Setter Property="Margin" Value="0" />
                 </Style>
             </Border.Resources>
-			<ListBox
+            <Grid Margin="0">
+                <ListBox
 				x:Name="repositoryList"
 				HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding FilteredRepositories}"
 				Style="{DynamicResource LightListBox}">
-				<ListBox.GroupStyle>
-					<GroupStyle HidesIfEmpty="true">
-						<GroupStyle.ContainerStyle>
-							<Style TargetType="{x:Type GroupItem}">
-								<Setter Property="Template">
-									<Setter.Value>
-										<ControlTemplate TargetType="{x:Type GroupItem}">
-											<StackPanel Orientation="Vertical" Margin="0">
-												<Border
+                    <ListBox.GroupStyle>
+                        <GroupStyle HidesIfEmpty="true">
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <StackPanel Orientation="Vertical" Margin="0">
+                                                    <Border
 													Background="#F8F8F8"
 													Style="{StaticResource repositoryBorderStyle}">
-													<StackPanel
+                                                        <StackPanel
 														Orientation="Horizontal"
 														VerticalAlignment="Center"
 														Margin="0">
-														<Image
+                                                            <Image
 															x:Name="avatar"
 															Width="16"
 															Height="16"
 															Margin="10,0,6,0"
 															RenderOptions.BitmapScalingMode="HighQuality"
 															Source="{Binding Items[0].Owner.Avatar}" />
-                                                        <TextBlock
+                                                            <TextBlock
 															Text="{Binding Path=Name}"
 															Style="{StaticResource cloneRepoHeaderStyle}" />
-													</StackPanel>
-												</Border>
-												<ItemsPresenter Margin="0" />
-											</StackPanel>
-										</ControlTemplate>
-									</Setter.Value>
-								</Setter>
-							</Style>
-						</GroupStyle.ContainerStyle>
-					</GroupStyle>
-				</ListBox.GroupStyle>
-				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<Border Style="{StaticResource repositoryBorderStyle}">
-							<StackPanel
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <ItemsPresenter Margin="0" />
+                                                </StackPanel>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource repositoryBorderStyle}">
+                                <StackPanel
 								Orientation="Horizontal"
 								VerticalAlignment="Center"
 								Margin="0">
-								<ui:OcticonImage
+                                    <ui:OcticonImage
 									x:Name="iconPath" 
 									Width="16"
 									Height="16" 
@@ -120,30 +145,38 @@
 									VerticalAlignment="Center"
 									Icon="{Binding Icon}"
 									Foreground="#D0D0D0" />
-								
-								<ui:TrimmedTextBlock
+
+                                    <ui:TrimmedTextBlock
                                     x:Name="label"
 									VerticalAlignment="Center"
 									Text="{Binding Name}"
 									Foreground="#666"
 									TextTrimming="CharacterEllipsis" />
-							</StackPanel>
-						</Border>
-						<DataTemplate.Triggers>
-							<MultiDataTrigger>
-								<MultiDataTrigger.Conditions>
-									<Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True" />
-									<Condition Binding="{Binding Path=(Selector.IsSelectionActive), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True" />
-								</MultiDataTrigger.Conditions>
-								<MultiDataTrigger.Setters>
-									<Setter Property="Foreground" Value="White" TargetName="iconPath" />
-                                    <Setter Property="Foreground" Value="White" TargetName="label" />
-                                </MultiDataTrigger.Setters>
-							</MultiDataTrigger>
-						</DataTemplate.Triggers>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-			</ListBox>
+                                </StackPanel>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True" />
+                                        <Condition Binding="{Binding Path=(Selector.IsSelectionActive), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Foreground" Value="White" TargetName="iconPath" />
+                                        <Setter Property="Foreground" Value="White" TargetName="label" />
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel
+                    x:Name="noRepositoriesMessage"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="0,-70,0,0">
+                    <TextBlock HorizontalAlignment="Center">No repositories</TextBlock>
+                </StackPanel>
+            </Grid>
 		</Border>
     </DockPanel>
 </uirx:ViewUserControl>

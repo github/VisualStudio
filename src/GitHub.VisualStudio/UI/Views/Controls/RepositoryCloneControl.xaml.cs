@@ -31,12 +31,16 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             this.WhenActivated(d =>
             {
+                d(this.OneWayBind(ViewModel, vm => vm.IsLoading, v => v.loadingProgressBar.Visibility));
+                d(this.OneWayBind(ViewModel, vm => vm.LoadingFailed, v => v.loadingFailedMessage.Visibility));
+
                 d(this.OneWayBind(ViewModel, vm => vm.FilteredRepositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
                 d(this.Bind(ViewModel, vm => vm.SelectedRepository, v => v.repositoryList.SelectedItem));
                 d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
                 d(this.OneWayBind(ViewModel, vm => vm.FilterTextIsEnabled, v => v.filterText.IsEnabled));
                 d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
                 d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
+                d(ViewModel.LoadRepositoriesCommand.ExecuteAsync().Subscribe());
                 ViewModel.CloneCommand.Subscribe(_ => NotifyDone());
             });
             IsVisibleChanged += (s, e) =>

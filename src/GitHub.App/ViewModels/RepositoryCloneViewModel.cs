@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,6 +8,7 @@ using System.Reactive.Linq;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
+using NLog;
 using NullGuard;
 using ReactiveUI;
 using Rothko;
@@ -17,9 +19,16 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
+        readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
         readonly IVSServices vsServices;
+        readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
+        readonly ObservableAsPropertyHelper<bool> isLoading;
+        readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
+        bool loadingFailed;
 
         [ImportingConstructor]
         RepositoryCloneViewModel(
@@ -36,18 +45,23 @@ namespace GitHub.ViewModels
             IOperatingSystem operatingSystem,
             IVSServices vsServices)
         {
+            this.repositoryHost = repositoryHost;
             this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
             this.vsServices = vsServices;
 
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
-            repositoryHost.ModelService.GetRepositories()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(Repositories.AddRange);
-
+            loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
+            isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
+                .CombineLatest(loadRepositoriesCommand.IsExecuting, (failed, loading) => !failed && loading)
+                .ToProperty(this, x => x.IsLoading);
+            loadRepositoriesCommand.Subscribe(Repositories.AddRange);
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
+            noRepositoriesFound = this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
+                , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
+                .ToProperty(this, x => x.NoRepositoriesFound);
 
             var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
@@ -66,6 +80,17 @@ namespace GitHub.ViewModels
             BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
         }
 
+        IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
+        {
+            return repositoryHost.ModelService.GetRepositories()
+                .Catch<IReadOnlyList<IRepositoryModel>, Exception>(ex =>
+                {
+                    log.Error("Error while loading repositories", ex);
+                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
+                        .Select(_ => new IRepositoryModel[] { });
+                });
+        }
+       
         bool FilterRepository(IRepositoryModel repo)
         {
             if (string.IsNullOrWhiteSpace(FilterText))
@@ -159,6 +184,27 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return filterText; }
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
+        }
+
+        public bool IsLoading
+        {
+            get { return isLoading.Value; }
+        }
+
+        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
+        {
+            get { return loadRepositoriesCommand; }
+        }
+
+        public bool LoadingFailed
+        {
+            get { return loadingFailed; }
+            private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
+        }
+
+        public bool NoRepositoriesFound
+        {
+            get { return noRepositoriesFound.Value; }
         }
     }
 }
