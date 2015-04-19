@@ -26,6 +26,7 @@ namespace GitHub.ViewModels
         readonly IVSServices vsServices;
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ObservableAsPropertyHelper<bool> isLoading;
+        readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
         bool loadingFailed;
 
         [ImportingConstructor]
@@ -57,6 +58,9 @@ namespace GitHub.ViewModels
             loadRepositoriesCommand.Subscribe(Repositories.AddRange);
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
+            noRepositoriesFound = this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
+                , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
+                .ToProperty(this, x => x.NoRepositoriesFound);
 
             var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
@@ -195,6 +199,11 @@ namespace GitHub.ViewModels
         {
             get { return loadingFailed; }
             private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
+        }
+
+        public bool NoRepositoriesFound
+        {
+            get { return noRepositoriesFound.Value; }
         }
     }
 }
