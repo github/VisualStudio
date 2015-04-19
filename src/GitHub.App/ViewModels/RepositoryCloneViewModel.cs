@@ -22,7 +22,7 @@ namespace GitHub.ViewModels
         readonly IVSServices vsServices;
 
         [ImportingConstructor]
-        public RepositoryCloneViewModel(
+        RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
             IOperatingSystem operatingSystem,
