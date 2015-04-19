@@ -51,7 +51,9 @@ namespace GitHub.ViewModels
             Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
             loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
-            isLoading = loadRepositoriesCommand.IsExecuting.ToProperty(this, x => x.IsLoading);
+            isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
+                .CombineLatest(loadRepositoriesCommand.IsExecuting, (failed, loading) => !failed && loading)
+                .ToProperty(this, x => x.IsLoading);
             loadRepositoriesCommand.Subscribe(Repositories.AddRange);
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);

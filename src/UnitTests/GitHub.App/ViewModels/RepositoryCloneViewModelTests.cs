@@ -52,6 +52,9 @@ public class RepositoryCloneViewModelTests
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IVSServices>());
+
+            Assert.False(vm.IsLoading);
+
             vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
 
             Assert.True(vm.IsLoading);
@@ -63,6 +66,24 @@ public class RepositoryCloneViewModelTests
 
             repoSubject.OnCompleted();
 
+            Assert.False(vm.IsLoading);
+        }
+
+        [Fact]
+        public void IsFalseWhenLoadingReposFailsImmediately()
+        {
+            var repoSubject = Observable.Throw<IRepositoryModel[]>(new InvalidOperationException("Doh!"));
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(repoSubject);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
+
+            Assert.True(vm.LoadingFailed);
             Assert.False(vm.IsLoading);
         }
     }
@@ -88,6 +109,7 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnError(new InvalidOperationException("Doh!"));
 
             Assert.True(vm.LoadingFailed);
+            Assert.False(vm.IsLoading);
         }
     }
 
