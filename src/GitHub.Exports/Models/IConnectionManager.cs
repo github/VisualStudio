@@ -1,8 +1,7 @@
-﻿using GitHub.Primitives;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using GitHub.Services;
+using System.Diagnostics.CodeAnalysis;
+using GitHub.Primitives;
 
 namespace GitHub.Models
 {
@@ -17,6 +16,7 @@ namespace GitHub.Models
         void RequestLogout(IConnection connection);
 
         // for telling IRepositoryHosts that we need to login from cache
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         event Func<IConnection, IObservable<IConnection>> DoLogin;
     }
 }
