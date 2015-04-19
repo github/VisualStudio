@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Input;
-using GitHub.Models;
-using System;
-using ReactiveUI;
 using System.Reactive;
+using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -12,6 +10,11 @@ namespace GitHub.ViewModels
     /// </summary>
     public interface IRepositoryCloneViewModel : IViewModel
     {
+        /// <summary>
+        /// Command to load the repositories.
+        /// </summary>
+        IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand { get; }
+
         /// <summary>
         /// Command to clone the currently selected repository.
         /// </summary>
@@ -25,6 +28,22 @@ namespace GitHub.ViewModels
         IRepositoryModel SelectedRepository { get; set; }
 
         bool FilterTextIsEnabled { get; }
+
+        /// <summary>
+        /// Whether or not we are currently loading repositories.
+        /// </summary>
+        bool IsLoading { get; }
+
+        /// <summary>
+        /// If true, then we failed to load the repositories.
+        /// </summary>
+        bool LoadingFailed { get; }
+
+        /// <summary>
+        /// Set to true if no repositories were found.
+        /// </summary>
+        bool NoRepositoriesFound { get; }
+
         string FilterText { get; set; }
     }
 }
