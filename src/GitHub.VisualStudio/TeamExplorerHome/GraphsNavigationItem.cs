@@ -30,18 +30,6 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
         }
 
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            UpdateState();
-            base.ContextChanged(sender, e);
-        }
-
-        protected override void RepoChanged()
-        {
-            UpdateState();
-            base.RepoChanged();
-        }
-
         protected async override void UpdateState()
         {
             IsVisible = IsEnabled = await Refresh().ConfigureAwait(true);
