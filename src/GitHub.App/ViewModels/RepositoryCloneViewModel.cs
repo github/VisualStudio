@@ -77,7 +77,7 @@ namespace GitHub.ViewModels
                 .Select(repo => repo != null);
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
 
-            BaseRepositoryPath = cloneService.GetLocalClonePathFromGitProvider(cloneService.DefaultClonePath);
+            BaseRepositoryPath = cloneService.DefaultClonePath;
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
