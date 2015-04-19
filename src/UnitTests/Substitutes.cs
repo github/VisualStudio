@@ -38,6 +38,9 @@ namespace UnitTests
             get
             {
                 var ret = Substitute.For<IOperatingSystem>();
+                // this expansion happens when the GetLocalClonePathFromGitProvider call is setup by default
+                // see IVSServices property above
+                ret.Environment.ExpandEnvironmentVariables(Args.String).Returns(x => x[0]);
                 return ret;
             }
         }
@@ -88,7 +91,7 @@ namespace UnitTests
             var os = OperatingSystem;
             var git = IGitRepositoriesExt;
             var vs = IVSServices;
-            var clone = cloneService ?? new RepositoryCloneService(new Lazy<IServiceProvider>(() => ret), os);
+            var clone = cloneService ?? new RepositoryCloneService(os, vs);
             var create = creationService ?? new RepositoryCreationService(clone);
             var hosts = RepositoryHosts;
             var exports = ExportFactoryProvider;
