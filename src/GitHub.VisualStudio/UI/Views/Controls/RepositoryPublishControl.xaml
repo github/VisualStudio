@@ -90,6 +90,7 @@
             <TextBox x:Name="nameText"
                      Margin="0"
                      Height="23"
+                     MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"
                      Background="{DynamicResource {x:Static vsshell:VsBrushes.SearchBoxBackgroundKey }}"
                      Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey }}" />
 
@@ -99,18 +100,6 @@
                        Text="Repository Name"
                        Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
         </Grid>
-
-        <StackPanel>
-            <uirx:ValidationMessage
-                x:Name="nameValidationMessage"
-                ValidatesControl="{Binding ElementName=nameText}" />
-            <uirx:ValidationMessage
-                x:Name="safeRepositoryNameWarning"
-                ValidatesControl="{Binding ElementName=nameText}"
-                Icon="alert"
-                Fill="#f39c12"
-                Padding="2,0" />
-        </StackPanel>
 
         <!-- TODO: Make this a user control -->
         <Grid>
@@ -166,9 +155,7 @@
                     Margin="5,0"/>
             </StackPanel>
         </Label>
-
-        <uirx:UserErrorMessages x:Name="userErrorMessages" />
-        
+       
         <Button
             IsDefault="True"
             x:Name="publishRepositoryButton"

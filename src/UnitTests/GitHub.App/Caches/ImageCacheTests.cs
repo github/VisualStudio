@@ -37,6 +37,26 @@ public class ImageCacheTests
         }
 
         [Fact]
+        public async Task WhenLoadingFromCacheFailsInvalidatesCacheEntry()
+        {
+            var cache = new InMemoryBlobCache();
+            await cache.Insert("https://fake/", new byte[] { 0, 0, 0 });
+            var cacheFactory = Substitute.For<IBlobCacheFactory>();
+            cacheFactory.CreateBlobCache(Args.String).Returns(cache);
+            var imageDownloader = Substitute.For<IImageDownloader>();
+            imageDownloader.DownloadImageBytes(Args.Uri).Returns(_ => { throw new InvalidOperationException(); });
+            var imageCache = new ImageCache(cacheFactory, Substitute.For<IEnvironment>(), new Lazy<IImageDownloader>(() => imageDownloader));
+
+            var retrieved = await imageCache
+                .GetImage(new Uri("https://fake/"))
+                .Catch(Observable.Return<BitmapSource>(null))
+                .FirstAsync();
+
+            Assert.Null(retrieved);
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
+        }
+        
+        [Fact]
         public async Task DownloadsImageWhenMissingAndCachesIt()
         {
             var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
