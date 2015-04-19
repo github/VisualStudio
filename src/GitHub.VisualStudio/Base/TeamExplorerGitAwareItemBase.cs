@@ -8,6 +8,7 @@ using System.Linq;
 using GitHub.VisualStudio.Helpers;
 using System.Threading;
 using System.Diagnostics;
+using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -19,6 +20,7 @@ namespace GitHub.VisualStudio.Base
         Uri activeRepoUri;
         string activeRepoName = string.Empty;
         SynchronizationContext syncContext;
+        private UIContext gitUIContext;
 
         public TeamExplorerGitAwareItemBase()
         {
@@ -32,13 +34,25 @@ namespace GitHub.VisualStudio.Base
         protected void Initialize()
         {
             if (ServiceProvider != null)
-                UpdateRepo();
+            {
+                if (GitUIContext == null)
+                    GitUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                UIContextChanged(GitUIContext.IsActive);
+            }
         }
 
-        protected override void ContextChanged(object sender, ContextChangedEventArgs e)
+        void UIContextChanged(object sender, UIContextChangedEventArgs e)
         {
-            base.ContextChanged(sender, e);
-            Initialize();
+            UIContextChanged(e.Activated);
+        }
+
+        void UIContextChanged(bool active)
+        {
+            if (active)
+                GitService = ServiceProvider.GetService<IGitExt>();
+            else
+                GitService = null;
+            UpdateRepo();
         }
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -51,18 +65,7 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateRepo()
         {
-            if (gitService == null)
-            {
-                var gitProviderUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
-                if (gitProviderUIContext.IsActive)
-                {
-                    Debug.Assert(ServiceProvider != null, "ServiceProvider must be set before subscribing to git changes");
-                    gitService = ServiceProvider.GetService<IGitExt>();
-                    gitService.PropertyChanged += CheckAndUpdate;
-                }
-            }
-
-            if (gitService != null)
+            if (GitService != null)
                 UpdateRepo(gitService.ActiveRepositories.FirstOrDefault());
             else
                 UpdateRepo(null);
@@ -96,10 +99,41 @@ namespace GitHub.VisualStudio.Base
 
             if (disposing)
             {
-                if (gitService != null)
-                    gitService.PropertyChanged -= CheckAndUpdate;
+                GitUIContext = null;
+                GitService = null;
             }
             disposed = true;
+        }
+
+        [AllowNull]
+        UIContext GitUIContext
+        {
+            [return: AllowNull]
+            get
+            { return gitUIContext; }
+            set
+            {
+                if (gitUIContext != null)
+                    gitUIContext.UIContextChanged -= UIContextChanged;
+                gitUIContext = value;
+                if (gitUIContext != null)
+                    gitUIContext.UIContextChanged += UIContextChanged;
+            }
+        }
+
+        [AllowNull]
+        IGitExt GitService
+        {
+            [return: AllowNull]
+            get { return gitService; }
+            set
+            {
+                if (gitService != null)
+                    gitService.PropertyChanged -= CheckAndUpdate;
+                gitService = value;
+                if (gitService != null)
+                    gitService.PropertyChanged += CheckAndUpdate;
+            }
         }
 
         [AllowNull]
