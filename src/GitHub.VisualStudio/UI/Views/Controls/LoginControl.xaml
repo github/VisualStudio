@@ -74,10 +74,6 @@
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
-                        <uirx:ErrorMessageDisplay x:Name="dotComTwoFactorAuthFailedMessage" Message="Two factor authentication failed">
-                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">Authentication codes are only valid for a short period of time</TextBlock>
-                        </uirx:ErrorMessageDisplay>
-
                         <StackPanel Style="{StaticResource FormFieldStackPanel}">
                             <StackPanel Margin="0,0,0,10">
                                 <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
@@ -107,10 +103,6 @@
                         <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                             Check your username and password, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
                         </TextBlock>
-                    </uirx:ErrorMessageDisplay>
-
-                    <uirx:ErrorMessageDisplay x:Name="enterpriseTwoFactorAuthFailedMessage" Message="Two factor authentication failed">
-                        <TextBlock TextWrapping="Wrap" TextAlignment="Center">Authentication codes are only valid for a short period of time</TextBlock>
                     </uirx:ErrorMessageDisplay>
 
                     <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host">

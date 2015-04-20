@@ -126,13 +126,6 @@ namespace GitHub.ViewModels
             protected set { this.RaiseAndSetIfChanged(ref showLogInFailedError, value); }
         }
 
-        bool showTwoFactorAuthFailed;
-        public bool ShowTwoFactorAuthFailedError
-        {
-            get { return showTwoFactorAuthFailed; }
-            set { this.RaiseAndSetIfChanged(ref showTwoFactorAuthFailed, value); }
-        }
-
         bool showConnectingToHostFailed;
         public bool ShowConnectingToHostFailed
         {
@@ -147,7 +140,6 @@ namespace GitHub.ViewModels
             return Observable.Defer(() =>
             {
                 ShowLogInFailedError = false;
-                ShowTwoFactorAuthFailedError = false;
                 ShowConnectingToHostFailed = false;
 
                 return hostAddress != null ?
@@ -162,7 +154,6 @@ namespace GitHub.ViewModels
                         ShowLogInFailedError = true;
                         break;
                     case AuthenticationResult.VerificationFailure:
-                        ShowTwoFactorAuthFailedError = true;
                         break;
                     case AuthenticationResult.EnterpriseServerNotFound:
                         ShowConnectingToHostFailed = true;
@@ -199,7 +190,6 @@ namespace GitHub.ViewModels
             await ResetValidation();
 
             ShowLogInFailedError = false;
-            ShowTwoFactorAuthFailedError = false;
         }
 
         protected virtual Task ResetValidation()

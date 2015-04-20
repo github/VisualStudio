@@ -97,7 +97,7 @@ namespace GitHub.Models
 
             // We need to intercept the 2FA handler to get the token:
             var interceptingTwoFactorChallengeHandler =
-                new Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>(ex =>
+                new Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>(ex =>
                     twoFactorChallengeHandler.HandleTwoFactorException(ex)
                     .Do(twoFactorChallengeResult =>
                         authenticationCode = twoFactorChallengeResult.AuthenticationCode));
@@ -147,8 +147,9 @@ namespace GitHub.Models
                                 // Retry with the old scopes. If we have a stashed 2FA token, we use it:
                                 if (authenticationCode != null)
                                     return ApiClient.GetOrCreateApplicationAuthenticationCode(
+                                        interceptingTwoFactorChallengeHandler,
                                         authenticationCode,
-                                        true);
+                                        useOldScopes: true);
 
                                 // Otherwise, we use the default handler:
                                 return ApiClient.GetOrCreateApplicationAuthenticationCode(
