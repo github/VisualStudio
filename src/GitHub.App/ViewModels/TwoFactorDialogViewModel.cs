@@ -16,6 +16,7 @@ namespace GitHub.ViewModels
     public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
+        bool isBusy;
         bool invalidAuthenticationCode;
         string authenticationCode;
         TwoFactorType twoFactorType;
@@ -31,8 +32,12 @@ namespace GitHub.ViewModels
             Title = "Two-Factor authentication required";
             twoFactorChallengeHandler.SetViewModel(this);
 
-            OkCommand = ReactiveCommand.Create(this.WhenAny(x => x.AuthenticationCode,
-                code => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6));
+            var canVerify = this.WhenAny(
+                x => x.AuthenticationCode,
+                x => x.IsBusy,
+                (code, busy) => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6 && !busy.Value);
+
+            OkCommand = ReactiveCommand.Create(canVerify);
             CancelCommand = ReactiveCommand.Create();
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
@@ -74,10 +79,12 @@ namespace GitHub.ViewModels
 
         public IObservable<RecoveryOptionResult> Show(UserError userError)
         {
+            IsBusy = false;
             var error = userError as TwoFactorRequiredUserError;
             InvalidAuthenticationCode = error.RetryFailed;
             TwoFactorType = error.TwoFactorType;
             var ok = OkCommand
+                .Do(_ => IsBusy = true)
                 .Select(_ => AuthenticationCode == null
                     ? RecoveryOptionResult.CancelOperation
                     : RecoveryOptionResult.RetryOperation)
@@ -135,6 +142,12 @@ namespace GitHub.ViewModels
         public bool ShowErrorMessage
         {
             get { return showErrorMessage.Value; }
+        }
+
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
     }
 }
