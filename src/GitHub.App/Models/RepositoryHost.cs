@@ -97,7 +97,7 @@ namespace GitHub.Models
 
             // We need to intercept the 2FA handler to get the token:
             var interceptingTwoFactorChallengeHandler =
-                new Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>(ex =>
+                new Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>(ex =>
                     twoFactorChallengeHandler.HandleTwoFactorException(ex)
                     .Do(twoFactorChallengeResult =>
                         authenticationCode = twoFactorChallengeResult.AuthenticationCode));
