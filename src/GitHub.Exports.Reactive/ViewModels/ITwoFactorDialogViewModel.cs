@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -14,6 +13,7 @@ namespace GitHub.ViewModels
 
         IObservable<RecoveryOptionResult> Show(UserError error);
 
+        bool IsBusy { get; }
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }
         bool ShowErrorMessage { get; }
