@@ -41,11 +41,12 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             simpleApiClient = null;
             var visible = await UpdateState().ConfigureAwait(true);
 
+            IsVisible = IsEnabled = visible;
+
             if (visible)
             {
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
-                IsVisible = IsEnabled = visible;
                 Icon = GetIcon(false, true, false);
                 var repo = await simpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
