@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
-using GitHub.Helpers;
 using GitHub.Models;
 using NullGuard;
 using Splat;
@@ -97,6 +96,25 @@ namespace GitHub.Services
         BitmapImage DefaultAvatar(IAvatarContainer apiAccount)
         {
             return apiAccount.IsUser ? DefaultUserBitmapImage : DefaultOrgBitmapImage;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    imageCache.Dispose();
+                }
+                disposed = true;
+            }
         }
     }
 }
