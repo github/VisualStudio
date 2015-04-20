@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace GitHub.Models
 {
-    public interface IRepositoryHosts : IReactiveObject 
+    public interface IRepositoryHosts : IReactiveObject, IDisposable
     {
         IRepositoryHost EnterpriseHost { get; set; }
         IRepositoryHost GitHubHost { get; }

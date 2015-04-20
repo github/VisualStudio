@@ -11,6 +11,7 @@ using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using NLog;
 using NullGuard;
 using Octokit;
 
@@ -20,6 +21,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IApiClient apiClient;
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
@@ -180,6 +183,32 @@ namespace GitHub.Services
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
             return hostCache.InsertObject("user", user);
+        }
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    try
+                    {
+                        hostCache.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        log.Warn("Exception occured while disposing host cache", e);
+                    }
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public class LicenseCacheItem

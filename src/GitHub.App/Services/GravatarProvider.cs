@@ -79,5 +79,11 @@ namespace GitHub.Services
                 return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
             }
         }
+
+        public void Dispose()
+        {
+            // Let the AvatarProvider dispose the image cache.
+            GC.SuppressFinalize(this);
+        }
     }
 }
