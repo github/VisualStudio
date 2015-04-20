@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -6,7 +7,6 @@ using GitHub.Controls;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.UI;
-using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
@@ -59,7 +59,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.Login, v => v.dotComLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.IsLoggingIn, v => v.dotComLogInButton.ShowSpinner));
 
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ForgotPassword, v => v.dotComForgotPasswordLink.Command));
+            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigateForgotPassword, v => v.dotComForgotPasswordLink.Command));
+            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigatePricing, v => v.pricingLink.Command));
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowLogInFailedError, v => v.dotComLoginFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowConnectingToHostFailed, v => v.dotComConnectionFailedMessage.Visibility));
@@ -81,7 +82,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Login, v => v.enterpriseLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, v => v.enterpriseLogInButton.ShowSpinner));
 
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ForgotPassword, v => v.enterpriseForgotPasswordLink.Command));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateForgotPassword, v => v.enterpriseForgotPasswordLink.Command));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateLearnMore, v => v.learnMoreLink.Command));
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowLogInFailedError, v => v.enterpriseLoginFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowConnectingToHostFailed, v => v.enterpriseConnectingFailedMessage.Visibility));

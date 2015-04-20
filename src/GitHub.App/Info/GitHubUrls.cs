@@ -32,6 +32,16 @@ namespace GitHub.Info
         public const string UserBilling = GitHub + "/account/billing";
 
         /// <summary>
+        /// The URL for the Enterprise learn more page.
+        /// </summary>
+        public static readonly Uri LearnMore = new Uri("https://enterprise.github.com/");
+
+        /// <summary>
+        /// Url for Plans and Pricing
+        /// </summary>
+        public static readonly Uri Pricing = new Uri(GitHub + "/pricing?referral_code=GitHubExtensionForVisualStudio");
+
+        /// <summary>
         /// The url for viewing signup information and plans on github.com.
         /// This includes a specific referral_code so we can track people
         /// coming to the site from the Windows App.
@@ -50,6 +60,11 @@ namespace GitHub.Info
         /// This doesn't change per enterprise repo.
         /// </remarks>
         public static readonly Uri GitHubEnterpriseWeb = new Uri("https://enterprise.github.com");
+
+        /// <summary>
+        /// The URL to learn more about two-factor authentication.
+        /// </summary>
+        public static readonly Uri TwoFactorLearnMore = new Uri("https://help.github.com/articles/about-two-factor-authentication");
 
         /// <summary>
         /// The GitHub maintained repo of common .gitignores.

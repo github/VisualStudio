@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -73,6 +76,5 @@ namespace GitHub.UI
                 disposed = true;
             }
         }
-
     }
 }
