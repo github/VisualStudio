@@ -22,13 +22,5 @@ namespace GitHub.Services
         /// <param name="repositoryParentDirectory">The directory that will contain the repository directory.</param>
         /// <returns></returns>
         IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath);
-
-        /// <summary>
-        /// Pokes the Git service provider (from VS) for the default clone
-        /// path set in the global settings.
-        /// </summary>
-        /// <param name="defaultPath">Path to use in case we can't find the one set in VS</param>
-        /// <returns></returns>
-        string GetLocalClonePathFromGitProvider(string fallbackPath);
     }
 }
