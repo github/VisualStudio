@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public GitHubInvitationContent()
         {
+            SharedDictionaryManager.Load("GitHub.VisualStudio");
             SharedDictionaryManager.Load("GitHub.UI");
             InitializeComponent();
 
