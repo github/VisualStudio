@@ -63,7 +63,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigatePricing, v => v.pricingLink.Command));
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowLogInFailedError, v => v.dotComLoginFailedMessage.Visibility));
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowTwoFactorAuthFailedError, v => v.dotComTwoFactorAuthFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowConnectingToHostFailed, v => v.dotComConnectionFailedMessage.Visibility));
         }
 
@@ -87,7 +86,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateLearnMore, v => v.learnMoreLink.Command));
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowLogInFailedError, v => v.enterpriseLoginFailedMessage.Visibility));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowTwoFactorAuthFailedError, v => v.enterpriseTwoFactorAuthFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowConnectingToHostFailed, v => v.enterpriseConnectingFailedMessage.Visibility));
         }
 

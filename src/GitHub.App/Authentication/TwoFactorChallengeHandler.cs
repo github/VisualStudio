@@ -26,7 +26,7 @@ namespace GitHub.Authentication
             CurrentViewModel = vm;
         }
 
-        public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorRequiredException exception)
+        public IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
         {
             var userError = new TwoFactorRequiredUserError(exception);
             return twoFactorDialog.Show(userError)
