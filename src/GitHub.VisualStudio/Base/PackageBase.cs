@@ -3,8 +3,6 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TeamFoundation;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -69,12 +67,6 @@ namespace GitHub.VisualStudio.Base
             if (serviceProvider == null)
                 return default(T);
             return (T)serviceProvider.GetService(typeof(T));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        public Ret GetService<T, Ret>() where Ret : class
-        {
-            return GetService<T>() as Ret;
         }
 
         public T GetExportedValue<T>()
