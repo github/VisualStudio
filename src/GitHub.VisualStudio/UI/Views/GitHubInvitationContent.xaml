@@ -14,9 +14,6 @@
     <StackPanel Margin="8,0">
         <StackPanel.Resources>
             <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <tfcrd:TFCachedResourceDictionary Source="pack://application:,,,/Microsoft.TeamFoundation.Controls;component/WPF/SharedResources.xaml" xmlns:tfcrd="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls" />
-                </ResourceDictionary.MergedDictionaries>
                 <Style TargetType="Label">
                     <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
                     <Setter Property="Padding" Value="0" />
