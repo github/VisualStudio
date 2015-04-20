@@ -17,18 +17,18 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
-        readonly Lazy<IServiceProvider> serviceProvider;
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
+        readonly IVSServices vsservices;
 
 
         [ImportingConstructor]
-        public RepositoryCloneService(Lazy<IServiceProvider> serviceProvider, IOperatingSystem operatingSystem)
+        public RepositoryCloneService(IOperatingSystem operatingSystem, IVSServices vsservices)
         {
-            this.serviceProvider = serviceProvider;
             this.operatingSystem = operatingSystem;
+            this.vsservices = vsservices;
 
-            defaultClonePath = operatingSystem.Environment.GetUserDocumentsPathForApplication();
+            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserDocumentsPathForApplication());
         }
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
@@ -44,14 +44,14 @@ namespace GitHub.Services
                 operatingSystem.Directory.CreateDirectory(path);
 
                 // this will throw if it can't find it
-                VSServices.Clone(cloneUrl, path, true);
+                vsservices.Clone(cloneUrl, path, true);
                 return Unit.Default;
             });
         }
 
-        public string GetLocalClonePathFromGitProvider(string fallbackPath)
+        string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
-            var ret = VSServices.GetLocalClonePathFromGitProvider();
+            var ret = vsservices.GetLocalClonePathFromGitProvider();
             if (!string.IsNullOrEmpty(ret))
                 ret = operatingSystem.Environment.ExpandEnvironmentVariables(ret);
             else
@@ -60,8 +60,5 @@ namespace GitHub.Services
         }
 
         public string DefaultClonePath { get { return defaultClonePath; } }
-
-        IServiceProvider ServiceProvider { get { return serviceProvider.Value; } }
-        IVSServices VSServices { get { return ServiceProvider.GetService<IVSServices>(); } }
     }
 }

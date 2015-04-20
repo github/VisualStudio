@@ -13,6 +13,7 @@ using ReactiveUI;
 using Rothko;
 using UnitTests;
 using Xunit;
+using GitHub.Extensions;
 
 public class RepositoryCreationViewModelTests
 {
