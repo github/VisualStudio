@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.UI;
-using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using ReactiveUI;
 
@@ -28,7 +26,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.ResendCodeCommand, view => view.resendCodeButton));
 
                 d(this.Bind(ViewModel, vm => vm.AuthenticationCode, view => view.authenticationCode.Text));
-
+                d(this.OneWayBind(ViewModel, vm => vm.NavigateLearnMore, view => view.twoFactorReadMoreLink.Command));
                 d(this.OneWayBind(ViewModel, vm => vm.IsAuthenticationCodeSent,
                     view => view.authenticationSentLabel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.IsSms, view => view.resendCodeButton.Visibility));

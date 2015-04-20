@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -74,5 +77,11 @@ namespace GitHub.UI
             }
         }
 
+        protected void OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            var hyperLink = e.OriginalSource as Hyperlink;
+            if (hyperLink == null) return;
+            Process.Start(new ProcessStartInfo(hyperLink.NavigateUri.ToString()));
+        }
     }
 }

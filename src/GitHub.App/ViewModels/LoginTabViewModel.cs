@@ -3,18 +3,17 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using GitHub.Authentication;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Info;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
-using GitHub.Primitives;
-using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -53,7 +52,7 @@ namespace GitHub.ViewModels
 
             Reset = ReactiveCommand.CreateAsyncTask(_ => Clear());
 
-            ForgotPassword = ReactiveCommand.CreateAsyncObservable(_ =>
+            NavigateForgotPassword = ReactiveCommand.CreateAsyncObservable(_ =>
             {
                 browser.OpenUrl(new Uri(BaseUri, GitHubUrls.ForgotPasswordPath));
                 return Observable.Return(Unit.Default);
@@ -72,7 +71,7 @@ namespace GitHub.ViewModels
 
         public IReactiveCommand<AuthenticationResult> Login { get; private set; }
         public IReactiveCommand<Unit> Reset { get; private set; }
-        public IReactiveCommand<Unit> ForgotPassword { get; private set; }
+        public IReactiveCommand<Unit> NavigateForgotPassword { get; private set; }
 
         string usernameOrEmail;
         [AllowNull]
