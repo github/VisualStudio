@@ -64,13 +64,6 @@ namespace GitHub.ViewModels
         bool ShowLogInFailedError { get; }
 
         /// <summary>
-        /// Gets a value indicating whether to show log an error message
-        /// due to a log in failure caused by an invalid two factor 
-        /// authentication code.
-        /// </summary>
-        bool ShowTwoFactorAuthFailedError { get; }
-
-        /// <summary>
         /// Gets a command which, when invoked, resets all properties 
         /// and validators.
         /// </summary>

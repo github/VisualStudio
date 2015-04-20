@@ -1,5 +1,4 @@
 ﻿using System;
-using GitHub.Authentication;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -10,12 +9,15 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OkCommand { get; }
         ReactiveCommand<object> CancelCommand { get; }
         ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; }
-        ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; }
+        ReactiveCommand<object> ResendCodeCommand { get; }
 
         IObservable<RecoveryOptionResult> Show(UserError error);
 
+        bool IsBusy { get; }
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }
+        bool ShowErrorMessage { get; }
+        bool InvalidAuthenticationCode { get; }
         string Description { get; }
         string AuthenticationCode { get; set; }
 

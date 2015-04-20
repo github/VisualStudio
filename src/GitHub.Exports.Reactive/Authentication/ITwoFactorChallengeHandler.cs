@@ -8,6 +8,6 @@ namespace GitHub.Authentication
     {
         void SetViewModel(IViewModel vm);
         IViewModel CurrentViewModel { get; }
-        IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorRequiredException exception);
+        IObservable<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception);
     }
 }

@@ -18,20 +18,20 @@
         Style="{DynamicResource DialogContainerStackPanel}"
         helpers:AccessKeysManagerScoping.IsEnabled="True">
         <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
-        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12" >
+        <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,12">
             <TextBlock 
                 Text="Two-factor authentication" 
                 Padding="0" 
                 Margin="0,0,12,0"
                 Style="{DynamicResource GitHubH1TextBlock}"
-                Foreground="{DynamicResource GHTextBrush}"/>
-            <TextBlock 
-                Name="authenticationSentLabel"
-                Text="authentication code sent!" 
-                Padding="0" 
-                Margin="0"
-                Style="{DynamicResource GitHubH1TextBlock}" 
-                Foreground="{DynamicResource GitHubAccentBrush}" />
+                Foreground="{DynamicResource GHTextBrush}" />
+            <uirx:ErrorMessageDisplay
+                x:Name="authenticationSentLabel"
+                Foreground="{DynamicResource GitHubAccentBrush}"
+                Message="Authentication code sent!" />
+            <uirx:ErrorMessageDisplay
+                x:Name="authenticationFailedLabel"
+                Message="Invalid authentication code" />
         </WrapPanel>
 
         <ui:HorizontalShadowDivider />
