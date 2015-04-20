@@ -48,7 +48,7 @@ namespace GitHub.Api
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
+            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             bool useOldScopes = false)
         {
             var newAuthorization = new NewAuthorization
@@ -59,7 +59,7 @@ namespace GitHub.Api
                 Note = ProductName + " on " + GetMachineNameSafe()
             };
 
-            Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
+            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
                 ex => Observable.Start(() => twoFactorChallengeHander(ex), RxApp.MainThreadScheduler).Merge();
 
             return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
@@ -108,12 +108,12 @@ namespace GitHub.Api
 
         public IObservable<string> GetGitIgnoreTemplates()
         {
-            return gitHubClient.Miscellaneous.GetGitIgnoreTemplates();
+            return gitHubClient.Miscellaneous.GetAllGitIgnoreTemplates();
         }
 
         public IObservable<LicenseMetadata> GetLicenses()
         {
-            return gitHubClient.Miscellaneous.GetLicenses();
+            return gitHubClient.Miscellaneous.GetAllLicenses();
         }
 
         public HostAddress HostAddress { get; private set; }

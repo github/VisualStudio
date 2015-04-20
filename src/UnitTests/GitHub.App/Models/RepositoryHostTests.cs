@@ -22,7 +22,7 @@ public class RepositoryHostTests
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
-            apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
+            apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
                 .Returns(Observable.Return(new ApplicationAuthorization("1234")));
             apiClient.GetUser().Returns(Observable.Return(new User()));
             var modelService = Substitute.For<IModelService>();
@@ -39,7 +39,7 @@ public class RepositoryHostTests
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
-            apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
+            apiClient.GetOrCreateApplicationAuthenticationCode(Arg.Any<Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>>(), Args.Boolean)
                 .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("lagavulin")));
             var hostCache = new InMemoryBlobCache();
