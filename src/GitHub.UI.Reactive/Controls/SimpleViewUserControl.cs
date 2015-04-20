@@ -76,12 +76,5 @@ namespace GitHub.UI
                 disposed = true;
             }
         }
-
-        protected void OnRequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            var hyperLink = e.OriginalSource as Hyperlink;
-            if (hyperLink == null) return;
-            Process.Start(new ProcessStartInfo(hyperLink.NavigateUri.ToString()));
-        }
     }
 }
