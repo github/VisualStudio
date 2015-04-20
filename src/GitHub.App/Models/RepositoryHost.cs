@@ -147,8 +147,9 @@ namespace GitHub.Models
                                 // Retry with the old scopes. If we have a stashed 2FA token, we use it:
                                 if (authenticationCode != null)
                                     return ApiClient.GetOrCreateApplicationAuthenticationCode(
+                                        interceptingTwoFactorChallengeHandler,
                                         authenticationCode,
-                                        true);
+                                        useOldScopes: true);
 
                                 // Otherwise, we use the default handler:
                                 return ApiClient.GetOrCreateApplicationAuthenticationCode(

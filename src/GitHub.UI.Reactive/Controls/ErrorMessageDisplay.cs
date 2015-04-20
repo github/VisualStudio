@@ -9,7 +9,7 @@ namespace GitHub.UI
     /// description of the error, potential remedies, links etc).
     /// See ErrorMessageDisplay.xaml for currently available styles.
     /// </summary>
-    public class ErrorMessageDisplay: ContentControl
+    public class ErrorMessageDisplay : ContentControl
     {
         public static readonly DependencyProperty MessageProperty =
             DependencyProperty.Register("Message", typeof(string), typeof(ErrorMessageDisplay), new PropertyMetadata(""));

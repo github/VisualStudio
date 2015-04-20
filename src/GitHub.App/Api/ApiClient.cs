@@ -49,6 +49,7 @@ namespace GitHub.Api
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
+            string authenticationCode = null,
             bool useOldScopes = false)
         {
             var newAuthorization = new NewAuthorization
@@ -62,32 +63,29 @@ namespace GitHub.Api
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
                 ex => Observable.Start(() => twoFactorChallengeHander(ex), RxApp.MainThreadScheduler).Merge();
 
-            return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
-                clientId,
-                clientSecret,
-                newAuthorization,
-                dispatchedHandler);
-        }
+            var authorizationsClient = gitHubClient.Authorization;
 
-        public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            string authenticationCode,
-            bool useOldScopes = false)
-        {
-            Guard.ArgumentNotEmptyString(authenticationCode, "authenticationCode");
-
-            var newAuthorization = new NewAuthorization
-            {
-                Scopes = useOldScopes
-                    ? oldAuthorizationScopes
-                    : newAuthorizationScopes,
-                Note = ProductName + " on " + GetMachineNameSafe()
-            };
-
-            return gitHubClient.Authorization.GetOrCreateApplicationAuthentication(
-                clientId,
-                clientSecret,
-                newAuthorization,
-                authenticationCode);
+            return (authenticationCode == null
+                    ? authorizationsClient.GetOrCreateApplicationAuthentication(
+                        clientId,
+                        clientSecret,
+                        newAuthorization,
+                        dispatchedHandler)
+                    : authorizationsClient.GetOrCreateApplicationAuthentication(
+                        clientId,
+                        clientSecret,
+                        newAuthorization,
+                        authenticationCode))
+                .Catch<ApplicationAuthorization, TwoFactorAuthorizationException>(ex => dispatchedHandler(ex)
+                    .SelectMany(result =>
+                        result.ResendCodeRequested
+                            ? GetOrCreateApplicationAuthenticationCode(
+                                dispatchedHandler,
+                                useOldScopes: useOldScopes)
+                            : GetOrCreateApplicationAuthenticationCode(
+                                dispatchedHandler,
+                                authenticationCode: result.AuthenticationCode,
+                                useOldScopes: useOldScopes)));
         }
 
         public IObservable<Organization> GetOrganizations()
