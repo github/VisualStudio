@@ -196,12 +196,6 @@ namespace GitHub.Models
                 });
         }
 
-        public IObservable<Unit> LogOut(HostAddress address)
-        {
-            var host = LookupHost(address);
-            return LogOut(host);
-        }
-
         public IObservable<Unit> LogOut(IRepositoryHost host)
         {
             var address = host.Address;
