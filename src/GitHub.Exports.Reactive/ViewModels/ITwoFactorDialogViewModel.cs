@@ -9,7 +9,7 @@ namespace GitHub.ViewModels
     {
         ReactiveCommand<object> OkCommand { get; }
         ReactiveCommand<object> CancelCommand { get; }
-        ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; }
+        ReactiveCommand<object> NavigateLearnMore { get; }
         ReactiveCommand<RecoveryOptionResult> ResendCodeCommand { get; }
 
         IObservable<RecoveryOptionResult> Show(UserError error);

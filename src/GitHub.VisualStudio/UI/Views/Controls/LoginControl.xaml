@@ -96,7 +96,7 @@
                     </Border>
 
                     <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                        Don’t have an account? <Hyperlink NavigateUri="https://github.com/pricing?referral_code=GitHubWindows" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
+                        Don’t have an account? <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
                     </TextBlock>
                 </StackPanel>
             </TabItem>
@@ -141,7 +141,7 @@
                     </Border>
                         
                     <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                        Don’t have GitHub Enterprise? <Hyperlink x:Name="LearnMoreButton" NavigateUri="https://enterprise.github.com/" ToolTip="enterprise.github.com">Learn more</Hyperlink>
+                        Don’t have GitHub Enterprise? <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com">Learn more</Hyperlink>
                     </TextBlock>
                 </StackPanel>
             </TabItem>
