@@ -52,7 +52,7 @@ namespace GitHub.ViewModels
 
             Reset = ReactiveCommand.CreateAsyncTask(_ => Clear());
 
-            ForgotPassword = ReactiveCommand.CreateAsyncObservable(_ =>
+            NavigateForgotPassword = ReactiveCommand.CreateAsyncObservable(_ =>
             {
                 browser.OpenUrl(new Uri(BaseUri, GitHubUrls.ForgotPasswordPath));
                 return Observable.Return(Unit.Default);
@@ -71,7 +71,7 @@ namespace GitHub.ViewModels
 
         public IReactiveCommand<AuthenticationResult> Login { get; private set; }
         public IReactiveCommand<Unit> Reset { get; private set; }
-        public IReactiveCommand<Unit> ForgotPassword { get; private set; }
+        public IReactiveCommand<Unit> NavigateForgotPassword { get; private set; }
 
         string usernameOrEmail;
         [AllowNull]

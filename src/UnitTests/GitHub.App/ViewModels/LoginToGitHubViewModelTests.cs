@@ -39,7 +39,7 @@ public class LoginToGitHubViewModelTests
             var browser = Substitute.For<IVisualStudioBrowser>();
             var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
 
-            loginViewModel.ForgotPassword.Execute(null);
+            loginViewModel.NavigateForgotPassword.Execute(null);
 
             browser.Received().OpenUrl(new Uri(HostAddress.GitHubDotComHostAddress.WebUri, GitHubUrls.ForgotPasswordPath));
         }

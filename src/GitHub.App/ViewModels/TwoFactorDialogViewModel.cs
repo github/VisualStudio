@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Exports;
+using GitHub.Info;
 using GitHub.Services;
 using GitHub.Validation;
 using NullGuard;
@@ -39,7 +40,8 @@ namespace GitHub.ViewModels
 
             OkCommand = ReactiveCommand.Create(canVerify);
             CancelCommand = ReactiveCommand.Create();
-            ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
+            NavigateLearnMore = ReactiveCommand.Create();
+            NavigateLearnMore.Subscribe(x => browser.OpenUrl(GitHubUrls.TwoFactorLearnMore));
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
             ResendCodeCommand = ReactiveCommand.Create();
 
@@ -129,7 +131,7 @@ namespace GitHub.ViewModels
         }
 
         public ReactiveCommand<object> OkCommand { get; private set; }
-        public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
+        public ReactiveCommand<object> NavigateLearnMore { get; private set; }
         public ReactiveCommand<object> ResendCodeCommand { get; private set; }
         public ReactivePropertyValidator AuthenticationCodeValidator { get; private set; }
 

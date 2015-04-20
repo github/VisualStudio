@@ -1,7 +1,10 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Authentication;
+using GitHub.Info;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -29,6 +32,13 @@ namespace GitHub.ViewModels
                 x => x.EnterpriseUrlValidator.ValidationResult.IsValid,
                 (x, y, z) => x.Value && y.Value && z.Value)
                 .ToProperty(this, x => x.CanLogin);
+
+            NavigateLearnMore = ReactiveCommand.CreateAsyncObservable(_ =>
+            {
+                browser.OpenUrl(GitHubUrls.LearnMore);
+                return Observable.Return(Unit.Default);
+
+            });
         }
 
         readonly ObservableAsPropertyHelper<bool> canLogin;
@@ -63,6 +73,12 @@ namespace GitHub.ViewModels
             {
                 return new Uri(EnterpriseUrl);
             }
+        }
+
+        public IReactiveCommand<Unit> NavigateLearnMore
+        {
+            get;
+            private set;
         }
 
         protected override async Task ResetValidation()
