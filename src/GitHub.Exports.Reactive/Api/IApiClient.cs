@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using GitHub.Primitives;
 using Octokit;
 
@@ -22,10 +21,8 @@ namespace GitHub.Api
         /// <returns></returns>
         IObservable<Repository> GetRepositoriesForOrganization(string organization);
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            Func<TwoFactorRequiredException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
-            bool useOldScopes = false);
-        IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
-            string authenticationCode,
+            Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
+            string authenticationCode = null,
             bool useOldScopes = false);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();

@@ -3,18 +3,17 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using GitHub.Authentication;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Info;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
-using GitHub.Primitives;
-using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -127,13 +126,6 @@ namespace GitHub.ViewModels
             protected set { this.RaiseAndSetIfChanged(ref showLogInFailedError, value); }
         }
 
-        bool showTwoFactorAuthFailed;
-        public bool ShowTwoFactorAuthFailedError
-        {
-            get { return showTwoFactorAuthFailed; }
-            set { this.RaiseAndSetIfChanged(ref showTwoFactorAuthFailed, value); }
-        }
-
         bool showConnectingToHostFailed;
         public bool ShowConnectingToHostFailed
         {
@@ -148,7 +140,6 @@ namespace GitHub.ViewModels
             return Observable.Defer(() =>
             {
                 ShowLogInFailedError = false;
-                ShowTwoFactorAuthFailedError = false;
                 ShowConnectingToHostFailed = false;
 
                 return hostAddress != null ?
@@ -163,7 +154,6 @@ namespace GitHub.ViewModels
                         ShowLogInFailedError = true;
                         break;
                     case AuthenticationResult.VerificationFailure:
-                        ShowTwoFactorAuthFailedError = true;
                         break;
                     case AuthenticationResult.EnterpriseServerNotFound:
                         ShowConnectingToHostFailed = true;
@@ -200,7 +190,6 @@ namespace GitHub.ViewModels
             await ResetValidation();
 
             ShowLogInFailedError = false;
-            ShowTwoFactorAuthFailedError = false;
         }
 
         protected virtual Task ResetValidation()

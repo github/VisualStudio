@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.UI;
-using GitHub.UI.Helpers;
 using GitHub.ViewModels;
 using ReactiveUI;
 
@@ -25,6 +23,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.BindCommand(ViewModel, vm => vm.OkCommand, view => view.okButton));
+                d(this.OneWayBind(ViewModel, vm => vm.IsBusy, view => view.okButton.ShowSpinner));
                 d(this.BindCommand(ViewModel, vm => vm.ResendCodeCommand, view => view.resendCodeButton));
 
                 d(this.Bind(ViewModel, vm => vm.AuthenticationCode, view => view.authenticationCode.Text));
@@ -33,6 +32,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     view => view.authenticationSentLabel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.IsSms, view => view.resendCodeButton.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.Description, view => view.description.Text));
+                d(this.OneWayBind(ViewModel, vm => vm.InvalidAuthenticationCode, view => view.authenticationFailedLabel.Visibility));
             });
             IsVisibleChanged += (s, e) =>
             {
