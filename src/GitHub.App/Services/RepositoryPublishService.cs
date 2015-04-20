@@ -43,7 +43,9 @@ namespace GitHub.Services
                 .SelectMany(r => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
                     .Select(gitHubRepo => Tuple.Create(gitHubRepo, r)))
                     .SelectMany(repo => gitClient.SetRemote(repo.Item2, "origin", new Uri(repo.Item1.CloneUrl)).Select(_ => repo))
-                    .SelectMany(repo => gitClient.Push(repo.Item2, "master", "origin").Select(_ => repo.Item1));
+                    .SelectMany(repo => gitClient.Push(repo.Item2, "master", "origin").Select(_ => repo))
+                    .SelectMany(repo => gitClient.Fetch(repo.Item2, "origin").Select(_ => repo))
+                    .SelectMany(repo => gitClient.SetTrackingBranch(repo.Item2, "master", "origin").Select(_ => repo.Item1));
         }
     }
 }
