@@ -11,7 +11,10 @@ namespace GitHub.Authentication
             : base(exception.Message, innerException: exception)
         {
             TwoFactorType = exception.TwoFactorType;
+            RetryFailed = exception is TwoFactorChallengeFailedException;
         }
+
+        public bool RetryFailed { get; private set; }
 
         public TwoFactorType TwoFactorType { get; private set; }
 

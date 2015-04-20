@@ -16,10 +16,12 @@ namespace GitHub.ViewModels
     public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
+        bool invalidAuthenticationCode;
         string authenticationCode;
         TwoFactorType twoFactorType;
         readonly ObservableAsPropertyHelper<string> description;
         readonly ObservableAsPropertyHelper<bool> isSms;
+        readonly ObservableAsPropertyHelper<bool> showErrorMessage;
 
         [ImportingConstructor]
         public TwoFactorDialogViewModel(
@@ -35,6 +37,12 @@ namespace GitHub.ViewModels
             ShowHelpCommand = new ReactiveCommand<RecoveryOptionResult>(Observable.Return(true), _ => null);
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
             ResendCodeCommand = ReactiveCommand.Create();
+
+            showErrorMessage = this.WhenAny(
+                x => x.IsAuthenticationCodeSent,
+                x => x.InvalidAuthenticationCode,
+                (authSent, invalid) => invalid.Value && !authSent.Value)
+                .ToProperty(this, x => x.ShowErrorMessage);
 
             description = this.WhenAny(x => x.TwoFactorType, x => x.Value)
                 .Select(type =>
@@ -66,7 +74,8 @@ namespace GitHub.ViewModels
 
         public IObservable<RecoveryOptionResult> Show(UserError userError)
         {
-            TwoFactorRequiredUserError error = userError as TwoFactorRequiredUserError;
+            var error = userError as TwoFactorRequiredUserError;
+            InvalidAuthenticationCode = error.RetryFailed;
             TwoFactorType = error.TwoFactorType;
             var ok = OkCommand
                 .Select(_ => AuthenticationCode == null
@@ -116,5 +125,16 @@ namespace GitHub.ViewModels
         public ReactiveCommand<RecoveryOptionResult> ShowHelpCommand { get; private set; }
         public ReactiveCommand<object> ResendCodeCommand { get; private set; }
         public ReactivePropertyValidator AuthenticationCodeValidator { get; private set; }
+
+        public bool InvalidAuthenticationCode
+        {
+            get { return invalidAuthenticationCode; }
+            set { this.RaiseAndSetIfChanged(ref invalidAuthenticationCode, value); }
+        }
+
+        public bool ShowErrorMessage
+        {
+            get { return showErrorMessage.Value; }
+        }
     }
 }

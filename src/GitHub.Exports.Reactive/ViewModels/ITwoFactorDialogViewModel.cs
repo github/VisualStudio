@@ -16,6 +16,8 @@ namespace GitHub.ViewModels
 
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }
+        bool ShowErrorMessage { get; }
+        bool InvalidAuthenticationCode { get; }
         string Description { get; }
         string AuthenticationCode { get; set; }
 
