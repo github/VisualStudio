@@ -7,22 +7,23 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+             xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White">
     <UserControl.Resources>
         <ResourceDictionary>
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
                 <Setter Property="Padding" Value="0" />
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-        <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,6">
+        <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="6,0,0,6">
             <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
-            <Label Margin="6 0 6 0">|</Label>
+            <Label Margin="3 0 3 0">|</Label>
             <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
-            <Label Margin="6 0 6 0">|</Label>
+            <Label Margin="3 0 3 0">|</Label>
             <TextBlock Grid.Row="1"><Hyperlink x:Name="signOut" Click="signOut_Click">Sign out</Hyperlink></TextBlock>
         </WrapPanel>
       </Grid>

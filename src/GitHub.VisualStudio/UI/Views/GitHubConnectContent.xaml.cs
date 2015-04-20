@@ -13,23 +13,30 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public GitHubConnectContent()
         {
+            SharedDictionaryManager.Load("GitHub.VisualStudio");
             SharedDictionaryManager.Load("GitHub.UI");
             InitializeComponent();
         }
 
         void cloneLink_Click(object sender, RoutedEventArgs e)
         {
+            cloneLink.IsEnabled = false;
             ViewModel.DoClone();
+            cloneLink.IsEnabled = true;
         }
 
         void createLink_Click(object sender, RoutedEventArgs e)
         {
+            createLink.IsEnabled = false;
             ViewModel.DoCreate();
+            createLink.IsEnabled = true;
         }
 
         void signOut_Click(object sender, RoutedEventArgs e)
         {
+            signOut.IsEnabled = false;
             ViewModel.SignOut();
+            signOut.IsEnabled = true;
         }
 
         public GitHubConnectSection ViewModel
