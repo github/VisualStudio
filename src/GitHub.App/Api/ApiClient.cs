@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reactive;
+using System.Net.NetworkInformation;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,7 +29,7 @@ namespace GitHub.Api
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
         readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
         static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
-        static Lazy<string> lazyFingerprint = new Lazy<string>(() => GetSha256Hash(lazyNote.Value));
+        static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
         public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
@@ -133,6 +134,11 @@ namespace GitHub.Api
             }
         }
 
+        static string GetFingerprint()
+        {
+            return GetSha256Hash(ProductName + ":" + GetMachineIdentifier());
+        }
+
         static string GetMachineNameSafe()
         {
             try
@@ -149,6 +155,25 @@ namespace GitHub.Api
                 {
                     return "(unknown)";
                 }
+            }
+        }
+
+        static string GetMachineIdentifier()
+        {
+            try
+            {
+                // adapted from http://stackoverflow.com/a/1561067
+                var fastedValidNetworkInterface = NetworkInterface.GetAllNetworkInterfaces()
+                    .OrderBy(nic => nic.Speed)
+                    .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
+                    .Select(nic => nic.GetPhysicalAddress().ToString())
+                    .FirstOrDefault(address => address.Length > 12);
+
+                return fastedValidNetworkInterface ?? GetMachineNameSafe();
+            }
+            catch (Exception)
+            {
+                return GetMachineNameSafe();
             }
         }
 
