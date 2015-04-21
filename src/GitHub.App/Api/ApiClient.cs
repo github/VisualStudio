@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Primitives;
@@ -155,6 +156,11 @@ namespace GitHub.Api
         public IObservable<Repository> GetRepositoriesForOrganization(string organization)
         {
             return gitHubClient.Repository.GetAllForOrg(organization);
+        }
+
+        public IObservable<Unit> DeleteApplicationAuthorization(int id)
+        {
+            return gitHubClient.Authorization.Delete(id);
         }
     }
 }

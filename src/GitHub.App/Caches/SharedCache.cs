@@ -1,12 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reflection;
 using Akavache;
-using ReactiveUI;
 
 namespace GitHub.Caches
 {
@@ -14,6 +10,7 @@ namespace GitHub.Caches
     /// A cache for data that's not host specific
     /// </summary>
     [Export(typeof(ISharedCache))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";

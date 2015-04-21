@@ -110,6 +110,7 @@ namespace GitHub.Models
                     return Observable.Return(Unit.Default);
 
                 return loginCache.SaveLogin(token, "x-oauth-basic", Address)
+                    .SelectMany(_ => ModelService.SaveAuthorizationTokenId(authorization.Id))
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
@@ -203,7 +204,13 @@ namespace GitHub.Models
 
             log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", apiBaseUri);
 
-            return loginCache.EraseLogin(Address)
+            return ModelService.DeleteAuthorizationToken()
+                .Catch<Unit, Exception>(e =>
+                {
+                    log.Warn("ASSERT! Failed to delete authorization token", e);
+                    return Observable.Return(Unit.Default);
+                })
+                .SelectMany(_ => loginCache.EraseLogin(Address))
                 .Catch<Unit, Exception>(e =>
                 {
                     log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);
@@ -304,7 +311,7 @@ namespace GitHub.Models
         {
             get
             {
-                return String.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, apiBaseUri);
+                return string.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, apiBaseUri);
             }
         }
 
