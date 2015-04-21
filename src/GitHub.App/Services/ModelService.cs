@@ -5,8 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
@@ -119,17 +117,6 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
-        static string GetSha256Hash(string input)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = Encoding.UTF8.GetBytes(input);
-                var hash = sha256.ComputeHash(bytes);
-
-                return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
-            }
-        }
-
         IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
@@ -222,29 +209,6 @@ namespace GitHub.Services
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        public IObservable<string> GetOrGenerateFingerprint()
-        {
-            return hostCache.GetObject<string>("oauth-fingerprint")
-                .Catch<string, KeyNotFoundException>(e => Observable.Return(Guid.NewGuid().ToString()));
-        }
-
-        public IObservable<Unit> SaveAuthorizationTokenId(int id)
-        {
-            return hostCache.InsertObject("oauth-token-id", id)
-                .Catch<Unit, Exception>(e => Observable.Return(Unit.Default));
-        }
-
-        public IObservable<Unit> DeleteAuthorizationToken()
-        {
-            return hostCache.GetObject<int>("oauth-token-id")
-                .SelectMany(apiClient.DeleteApplicationAuthorization)
-                .Catch<Unit, Exception>(e =>
-                {
-                    log.Error("Could not delete authorization token", e);
-                    return Observable.Return(Unit.Default);
-                });
         }
 
         public class LicenseCacheItem

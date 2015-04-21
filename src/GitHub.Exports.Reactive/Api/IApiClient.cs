@@ -24,10 +24,9 @@ namespace GitHub.Api
         IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             string authenticationCode = null,
-            bool useOldScopes = false,
-            string fingerprint = null);
+            bool useOldScopes = false);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
-        IObservable<Unit> DeleteApplicationAuthorization(int id);
+        IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
     }
 }
