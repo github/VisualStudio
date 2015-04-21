@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Models;
@@ -39,6 +40,26 @@ namespace GitHub.Factories
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
 
             return new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    loginCache.Dispose();
+                    avatarProvider.Dispose();
+                }
+                disposed = true;
+            }
         }
     }
 }

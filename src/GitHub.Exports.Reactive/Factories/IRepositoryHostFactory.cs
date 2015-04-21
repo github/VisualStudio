@@ -1,9 +1,10 @@
-﻿using GitHub.Models;
+﻿using System;
+using GitHub.Models;
 using GitHub.Primitives;
 
 namespace GitHub.Factories
 {
-    public interface IRepositoryHostFactory
+    public interface IRepositoryHostFactory : IDisposable
     {
         IRepositoryHost Create(HostAddress hostAddress);
     }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
-using Akavache;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
@@ -271,6 +270,32 @@ namespace GitHub.Models
         {
             return Observable.Defer(() => ApiClient.GetUser().WhereNotNull()
                 .Select(user => new AccountCacheItem(user)));
+        }
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    try
+                    {
+                        ModelService.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        log.Warn("Exception occured while disposing RepositoryHost's ModelService", e);
+                    }
+                }
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         internal string DebuggerDisplay

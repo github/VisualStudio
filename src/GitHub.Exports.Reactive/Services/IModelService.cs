@@ -10,7 +10,7 @@ namespace GitHub.Services
     /// Class used to retrieve GitHub API data and turn them into models suitable for binding to in the UI.
     /// This handles the API retrieval and caching.
     /// </summary>
-    public interface IModelService
+    public interface IModelService : IDisposable
     {
         IObservable<AccountCacheItem> GetUserFromCache();
         IObservable<Unit> InsertUser(AccountCacheItem user);
