@@ -105,10 +105,11 @@ namespace GitHub.Models
             // in multiple places in the chain below:
             var saveAuthorizationToken = new Func<ApplicationAuthorization, IObservable<Unit>>(authorization =>
             {
-                if (authorization == null || String.IsNullOrWhiteSpace(authorization.Token))
+                var token = authorization != null ? authorization.Token : null;
+                if (string.IsNullOrWhiteSpace(token))
                     return Observable.Return(Unit.Default);
 
-                return loginCache.SaveLogin(usernameOrEmail, authorization.Token, Address)
+                return loginCache.SaveLogin(token, "x-oauth-basic", Address)
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
@@ -116,9 +117,10 @@ namespace GitHub.Models
             // that don't support authorization tokens, and for the API client to use until an authorization
             // token has been created and acquired:
             return loginCache.SaveLogin(usernameOrEmail, password, Address)
+                .SelectMany(_ => ModelService.GetOrGenerateFingerprint())
                 .ObserveOn(RxApp.MainThreadScheduler)
                 // Try to get an authorization token, save it, then get the user to log in:
-                .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
+                .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler, fingerprint: fingerprint))
                 .SelectMany(saveAuthorizationToken)
                 .SelectMany(_ => GetUserFromApi())
                 .Catch<AccountCacheItem, ApiException>(firstTryEx =>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Reactive.Linq;
 using GitHub.Authentication;
@@ -50,14 +51,16 @@ namespace GitHub.Api
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             string authenticationCode = null,
-            bool useOldScopes = false)
+            bool useOldScopes = false,
+            string fingerprint = null)
         {
             var newAuthorization = new NewAuthorization
             {
                 Scopes = useOldScopes
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
-                Note = ProductName + " on " + GetMachineNameSafe()
+                Note = ProductName + " on " + GetMachineNameSafe(),
+                Fingerprint = fingerprint
             };
 
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
@@ -81,11 +84,13 @@ namespace GitHub.Api
                         result.ResendCodeRequested
                             ? GetOrCreateApplicationAuthenticationCode(
                                 dispatchedHandler,
-                                useOldScopes: useOldScopes)
+                                useOldScopes: useOldScopes,
+                                fingerprint: fingerprint)
                             : GetOrCreateApplicationAuthenticationCode(
                                 dispatchedHandler,
                                 authenticationCode: result.AuthenticationCode,
-                                useOldScopes: useOldScopes)));
+                                useOldScopes: useOldScopes,
+                                fingerprint: fingerprint)));
         }
 
         public IObservable<Organization> GetOrganizations()
