@@ -77,5 +77,15 @@ namespace GitHub.Primitives
                    || hostUri.IsSameHost(GitHubDotComHostAddress.ApiUri)
                    || hostUri.IsSameHost(gistUri);
         }
+
+        public bool IsGitHubDotCom()
+        {
+            return IsGitHubDotComUri(ApiUri);
+        }
+
+        public string Title
+        {
+            get {  return IsGitHubDotCom() ? "GitHub" : ApiUri.Host; }
+        }
     }
 }
