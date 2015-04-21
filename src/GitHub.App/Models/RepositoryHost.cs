@@ -110,7 +110,6 @@ namespace GitHub.Models
                     return Observable.Return(Unit.Default);
 
                 return loginCache.SaveLogin(token, "x-oauth-basic", Address)
-                    .SelectMany(_ => ModelService.SaveAuthorizationTokenId(authorization.Id))
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
@@ -118,10 +117,9 @@ namespace GitHub.Models
             // that don't support authorization tokens, and for the API client to use until an authorization
             // token has been created and acquired:
             return loginCache.SaveLogin(usernameOrEmail, password, Address)
-                .SelectMany(_ => ModelService.GetOrGenerateFingerprint())
                 .ObserveOn(RxApp.MainThreadScheduler)
                 // Try to get an authorization token, save it, then get the user to log in:
-                .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler, fingerprint: fingerprint))
+                .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
                 .SelectMany(_ => GetUserFromApi())
                 .Catch<AccountCacheItem, ApiException>(firstTryEx =>
@@ -204,13 +202,7 @@ namespace GitHub.Models
 
             log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", apiBaseUri);
 
-            return ModelService.DeleteAuthorizationToken()
-                .Catch<Unit, Exception>(e =>
-                {
-                    log.Warn("ASSERT! Failed to delete authorization token", e);
-                    return Observable.Return(Unit.Default);
-                })
-                .SelectMany(_ => loginCache.EraseLogin(Address))
+            return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
                 {
                     log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);

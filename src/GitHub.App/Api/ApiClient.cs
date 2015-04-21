@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using GitHub.Authentication;
 using GitHub.Primitives;
+using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
@@ -23,6 +27,8 @@ namespace GitHub.Api
         readonly string[] oldAuthorizationScopes = { "user", "repo" };
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
         readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
+        static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
+        static Lazy<string> lazyFingerprint = new Lazy<string>(() => GetSha256Hash(lazyNote.Value));
 
         public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
@@ -52,16 +58,15 @@ namespace GitHub.Api
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             string authenticationCode = null,
-            bool useOldScopes = false,
-            string fingerprint = null)
+            bool useOldScopes = false)
         {
             var newAuthorization = new NewAuthorization
             {
                 Scopes = useOldScopes
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
-                Note = ProductName + " on " + GetMachineNameSafe(),
-                Fingerprint = fingerprint
+                Note = lazyNote.Value,
+                Fingerprint = lazyFingerprint.Value
             };
 
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
@@ -69,29 +74,12 @@ namespace GitHub.Api
 
             var authorizationsClient = gitHubClient.Authorization;
 
-            return (authenticationCode == null
-                    ? authorizationsClient.GetOrCreateApplicationAuthentication(
+            return authorizationsClient.CreateAndDeleteExistingApplicationAuthentication(
                         clientId,
                         clientSecret,
                         newAuthorization,
-                        dispatchedHandler)
-                    : authorizationsClient.GetOrCreateApplicationAuthentication(
-                        clientId,
-                        clientSecret,
-                        newAuthorization,
-                        authenticationCode))
-                .Catch<ApplicationAuthorization, TwoFactorAuthorizationException>(ex => dispatchedHandler(ex)
-                    .SelectMany(result =>
-                        result.ResendCodeRequested
-                            ? GetOrCreateApplicationAuthenticationCode(
-                                dispatchedHandler,
-                                useOldScopes: useOldScopes,
-                                fingerprint: fingerprint)
-                            : GetOrCreateApplicationAuthenticationCode(
-                                dispatchedHandler,
-                                authenticationCode: result.AuthenticationCode,
-                                useOldScopes: useOldScopes,
-                                fingerprint: fingerprint)));
+                        dispatchedHandler,
+                        true);
         }
 
         public IObservable<Organization> GetOrganizations()
@@ -134,6 +122,17 @@ namespace GitHub.Api
             return gitHubClient.Repository.GetAllForCurrent();
         }
 
+        static string GetSha256Hash(string input)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(input);
+                var hash = sha256.ComputeHash(bytes);
+
+                return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
+            }
+        }
+
         static string GetMachineNameSafe()
         {
             try
@@ -158,9 +157,9 @@ namespace GitHub.Api
             return gitHubClient.Repository.GetAllForOrg(organization);
         }
 
-        public IObservable<Unit> DeleteApplicationAuthorization(int id)
+        public IObservable<Unit> DeleteApplicationAuthorization(int id, [AllowNull]string twoFactorAuthorizationCode)
         {
-            return gitHubClient.Authorization.Delete(id);
+            return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
         }
     }
 }
