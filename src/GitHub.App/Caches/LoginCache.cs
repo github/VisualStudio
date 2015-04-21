@@ -56,21 +56,28 @@ namespace GitHub.Caches
         }
 
         bool disposed;
-
-        public void Dispose()
+        void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
+                if (disposed) return;
+
                 try
                 {
                     cache.Dispose();
                 }
                 catch (Exception e)
                 {
-                    log.Warn("Exception occured while disposing shared cache", e);
+                    log.Warn("Exception occurred while disposing shared cache", e);
                 }
                 disposed = true;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

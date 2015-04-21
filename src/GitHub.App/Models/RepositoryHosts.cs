@@ -217,19 +217,18 @@ namespace GitHub.Models
         bool disposed = false;
         protected void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
+                if (disposed) return;
+
+                try
                 {
-                    try
-                    {
-                        connectionManager.DoLogin -= RunLoginHandler;
-                        disposables.Dispose();
-                    }
-                    catch (Exception e)
-                    {
-                        log.Warn("Exception occured while disposing RepositoryHosts", e);
-                    }
+                    connectionManager.DoLogin -= RunLoginHandler;
+                    disposables.Dispose();
+                }
+                catch (Exception e)
+                {
+                    log.Warn("Exception occured while disposing RepositoryHosts", e);
                 }
                 disposed = true;
             }

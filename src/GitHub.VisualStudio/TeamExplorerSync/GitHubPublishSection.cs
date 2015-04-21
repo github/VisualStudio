@@ -66,17 +66,17 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.RepoChanged();
         }
 
-        bool disposed = false;
+        bool disposed;
         protected override void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
+                if (!disposed)
                 {
                     if (disposable != null)
                         disposable.Dispose();
+                    disposed = true;
                 }
-                disposed = true;
             }
             base.Dispose(disposing);
         }

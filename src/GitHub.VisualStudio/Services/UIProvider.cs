@@ -194,18 +194,17 @@ namespace GitHub.VisualStudio
             StopUI();
         }
 
-        bool disposed = false;
+        bool disposed;
         protected void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
+                if (disposed) return;
+
+                StopUI();
+                if (tempContainer != null)
                 {
-                    StopUI();
-                    if (tempContainer != null)
-                    {
-                        tempContainer.Dispose();
-                    }
+                    tempContainer.Dispose();
                 }
                 disposed = true;
             }

@@ -18,17 +18,6 @@ namespace GitHub.Caches
         readonly AsyncSubject<Unit> shutdown = new AsyncSubject<Unit>();
         public IObservable<Unit> Shutdown { get { return shutdown; } }
 
-        bool disposed = false;
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            Scheduler = null;
-            shutdown.OnNext(Unit.Default);
-            shutdown.OnCompleted();
-            disposed = true;
-        }
-
         public IObservable<Unit> Flush()
         {
             if (disposed) return ExceptionHelper.ObservableThrowObjectDisposedException<Unit>("CredentialCache");
@@ -217,6 +206,25 @@ namespace GitHub.Caches
                     return new Tuple<string, string>(credential.Username, credential.Password);
                 return null;
             }
+        }
+
+        bool disposed;
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+
+                Scheduler = null;
+                shutdown.OnNext(Unit.Default);
+                shutdown.OnCompleted();
+                disposed = true;
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

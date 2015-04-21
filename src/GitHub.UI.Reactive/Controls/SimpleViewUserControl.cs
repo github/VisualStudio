@@ -41,12 +41,6 @@ namespace GitHub.UI
 
         public IObservable<bool> IsBusy{ get { return isBusy; } }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         protected void NotifyDone()
         {
             close.OnNext(null);
@@ -64,17 +58,23 @@ namespace GitHub.UI
             isBusy.OnNext(busy);
         }
 
-        bool disposed = false;
+        bool disposed;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    close.Dispose();
-                }
+                if (disposed) return;
+
+                close.Dispose();
                 disposed = true;
             }
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
     }
 }

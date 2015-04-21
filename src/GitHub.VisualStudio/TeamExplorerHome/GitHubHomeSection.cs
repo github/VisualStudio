@@ -86,7 +86,6 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                     visible = (ret == EnterpriseProbeResult.Ok);
                 }
             }
-
             return visible;
         }
 
@@ -99,10 +98,13 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         bool disposed;
         protected override void Dispose(bool disposing)
         {
-            if (disposing && !disposed)
+            if (disposing)
             {
-                holder.ClearServiceProvider(ServiceProvider);
-                disposed = true;
+                if (!disposed)
+                {
+                    holder.ClearServiceProvider(ServiceProvider);
+                    disposed = true;
+                }
             }
             base.Dispose(disposing);
         }
