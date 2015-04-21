@@ -170,6 +170,9 @@
         <Setter Property="Margin" Value="24,10,0,6" />
         <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
     </Style>
+    <Style x:Key="GitHubH2TextBlock" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource GitHubH1TextBlock}">
+        <Setter Property="FontSize" Value="20" />
+    </Style>
     <Style x:Key="GitHubDescriptionTextBlock" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource GitHubTextBlock}">
         <Setter Property="Margin" Value="24,0" />
         <Setter Property="HorizontalAlignment" Value="Left" />
