@@ -58,57 +58,6 @@ namespace GitHub.Caches
             return UserAccount.InvalidateObject<Uri>(enterpriseHostApiBaseUriCacheKey);
         }
 
-        public IDisposable BindPropertyToCache<TSource, TProperty>(TSource source,
-            Expression<Func<TSource, TProperty>> property,
-            TProperty defaultValue)
-        {
-            return BindPropertyToCache(source, property, x => x, x => x, defaultValue);
-        }
-
-        public IDisposable BindPropertyToCache<TSource, TProperty, TCacheValue>(TSource source,
-            Expression<Func<TSource, TProperty>> property,
-            Func<TProperty, TCacheValue> mapToCache,
-            Func<TCacheValue, TProperty> mapFromCache,
-            TCacheValue defaultValue)
-        {
-            var propertyInfo = GetPropertyNameAndSetAction(property, source);
-            var propertySetter = propertyInfo.Item2;
-            propertySetter(mapFromCache(defaultValue));
-            var restoreCachedValue = new Action<TCacheValue>(value => propertySetter(mapFromCache(value)));
-
-            // TODO: We may want a way to preserve the cache key should we ever rename the property or type.
-            //       We could look for specific attributes to do this. But for now, let's not worry about it.
-
-            string cacheKey = "Application:" + typeof(TSource).Name + ":" + propertyInfo.Item1;
-            var propertyObservable = source.WhenAny(property, prop => prop.Value).Select(mapToCache);
-
-            return LocalMachine.GetObject<TCacheValue>(cacheKey)
-                .Catch(Observable.Return(defaultValue))
-                .SingleAsync()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(cachedValue =>
-                {
-                    restoreCachedValue(cachedValue);
-                    propertyObservable
-                        .Throttle(TimeSpan.FromSeconds(2), RxApp.TaskpoolScheduler)
-                        .SelectMany(width => LocalMachine.InsertObject(cacheKey, width))
-                        .Subscribe();
-                });
-        }
-
-        static Tuple<string, Action<TProperty>> GetPropertyNameAndSetAction<TSource, TProperty>(
-            Expression<Func<TSource, TProperty>> expression,
-            TSource source)
-        {
-            var member = expression.Body as MemberExpression;
-            Debug.Assert(member != null, "Expression should be a property and not method or some other thing.");
-            var property = member.Member as PropertyInfo;
-            Debug.Assert(property != null, "Expression should be a property and not field or some other thing.");
-            var propertySetterAction = new Action<TProperty>(value => property.SetValue(source, value));
-            return Tuple.Create(property.Name, propertySetterAction);
-        }
-
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);

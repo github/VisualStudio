@@ -31,22 +31,5 @@ namespace GitHub.Caches
         /// </summary>
         /// <returns></returns>
         IObservable<Unit> InvalidateEnterpriseHostUri();
-
-        /// <summary>
-        /// Helper method used to bind a property of a view model to a value in the cache.
-        /// </summary>
-        IDisposable BindPropertyToCache<TSource, TProperty>(TSource source,
-            Expression<Func<TSource, TProperty>> property,
-            TProperty defaultValue);
-
-        /// <summary>
-        /// Helper method used to bind a property of a view model to a value in the cache with a mapping function to
-        /// and from the cache.
-        /// </summary>
-        IDisposable BindPropertyToCache<TSource, TProperty, TCacheValue>(TSource source,
-            Expression<Func<TSource, TProperty>> property,
-            Func<TProperty, TCacheValue> mapToCache,
-            Func<TCacheValue, TProperty> mapFromCache,
-            TCacheValue defaultValue);
     }
 }
