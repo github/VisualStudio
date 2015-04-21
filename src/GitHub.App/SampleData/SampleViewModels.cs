@@ -282,6 +282,10 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public void Dispose()
+        {
+        }
+
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
             throw new NotImplementedException();

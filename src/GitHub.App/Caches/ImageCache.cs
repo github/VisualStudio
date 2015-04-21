@@ -212,11 +212,18 @@ namespace GitHub.Caches
 
         public void Dispose()
         {
-            cacheFactory.Select(x =>
+            try
             {
-                x.Dispose();
-                return x.Shutdown;
-            }).Wait();
+                cacheFactory.Select(x =>
+                {
+                    x.Dispose();
+                    return x.Shutdown;
+                }).Wait();
+            }
+            catch (Exception e)
+            {
+                log.Warn("Exception occured while disposing ImageCache", e);
+            }
         }
 
         class UriComparer : IEqualityComparer<Uri>

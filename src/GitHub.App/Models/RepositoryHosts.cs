@@ -4,7 +4,9 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Akavache;
 using GitHub.Authentication;
 using GitHub.Caches;
@@ -12,9 +14,7 @@ using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
 using NullGuard;
-using System.Reactive.Subjects;
 using ReactiveUI;
-using System.Reactive.Disposables;
 
 namespace GitHub.Models
 {
@@ -39,7 +39,7 @@ namespace GitHub.Models
             this.connectionManager = connectionManager;
 
             RepositoryHostFactory = repositoryHostFactory;
-
+            disposables.Add(repositoryHostFactory);
             GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
 
@@ -55,6 +55,7 @@ namespace GitHub.Models
                 .Where(x => connectionManager.Connections.Any(c => c.HostAddress == x))
                 .Select(repositoryHostFactory.Create)
                 .Do(x => EnterpriseHost = x)
+                .Do(disposables.Add)
                 .SelectUnit();
 
             var persistEntepriseHostObs = this.WhenAny(x => x.EnterpriseHost, x => x.Value)
@@ -100,7 +101,9 @@ namespace GitHub.Models
                 {
                     var host = LookupHost(x.HostAddress);
                     if (host.Address != x.HostAddress)
+                    {
                         host = RepositoryHostFactory.Create(x.HostAddress);
+                    }
                     return host;
                 })
                 .Select(h => LogOut(h))
@@ -144,6 +147,7 @@ namespace GitHub.Models
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
+            disposables.Add(host);
             return host.LogIn(usernameOrEmail, password)
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
@@ -176,6 +180,7 @@ namespace GitHub.Models
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
+            disposables.Add(host);
             return host.LogInFromCache()
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
@@ -189,12 +194,6 @@ namespace GitHub.Models
                             EnterpriseHost = host;
                     }
                 });
-        }
-
-        public IObservable<Unit> LogOut(HostAddress address)
-        {
-            var host = LookupHost(address);
-            return LogOut(host);
         }
 
         public IObservable<Unit> LogOut(IRepositoryHost host)
@@ -211,6 +210,7 @@ namespace GitHub.Models
                     else
                         EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
+                    disposables.Remove(host);
                 });
         }
 
@@ -221,9 +221,15 @@ namespace GitHub.Models
             {
                 if (disposing)
                 {
-                    connectionManager.DoLogin -= RunLoginHandler;
-                    disposables.Dispose();
-
+                    try
+                    {
+                        connectionManager.DoLogin -= RunLoginHandler;
+                        disposables.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        log.Warn("Exception occured while disposing RepositoryHosts", e);
+                    }
                 }
                 disposed = true;
             }

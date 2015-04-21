@@ -7,7 +7,7 @@ using GitHub.Services;
 
 namespace GitHub.Models
 {
-    public interface IRepositoryHost
+    public interface IRepositoryHost : IDisposable
     {
         HostAddress Address { get; }
         IApiClient ApiClient { get; }
