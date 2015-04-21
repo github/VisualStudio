@@ -109,7 +109,7 @@ public class RepositoryCloneViewModelTests
         }
 
         [Fact]
-        public void IsFalseWhenLoading()
+        public void IsFalseWhenLoadingAndCompletedWithRepository()
         {
             var repoSubject = new Subject<IRepositoryModel[]>();
             var repositoryHost = Substitute.For<IRepositoryHost>();
@@ -124,6 +124,11 @@ public class RepositoryCloneViewModelTests
 
             repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
 
+            Assert.False(vm.NoRepositoriesFound);
+
+            repoSubject.OnCompleted();
+
+            Assert.Equal(1, vm.FilteredRepositories.Count);
             Assert.False(vm.NoRepositoriesFound);
         }
 
@@ -166,7 +171,7 @@ public class RepositoryCloneViewModelTests
         }
     }
 
-        public class TheLoadingFailedProperty
+    public class TheLoadingFailedProperty
     {
         [Fact]
         public void IsTrueIfLoadingReposFails()
