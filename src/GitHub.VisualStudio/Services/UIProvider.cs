@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Disposables;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
@@ -21,6 +22,8 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class UIProvider : IServiceProvider, IUIProvider, IDisposable
     {
+        readonly CompositeDisposable disposables = new CompositeDisposable();
+
         [AllowNull]
         public ExportProvider ExportProvider { get; private set; }
 
@@ -48,7 +51,10 @@ namespace GitHub.VisualStudio
             Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
             ExportProvider = componentModel.DefaultExportProvider;
 
-            tempContainer = new CompositionContainer(new ComposablePartExportProvider() { SourceProvider = ExportProvider });
+            tempContainer = AddToDisposables(new CompositionContainer(new ComposablePartExportProvider()
+            {
+                SourceProvider = ExportProvider
+            }));
             tempParts = new Dictionary<string, ComposablePart>();
         }
 
@@ -56,11 +62,11 @@ namespace GitHub.VisualStudio
         public object TryGetService(Type serviceType)
         {
             string contract = AttributedModelServices.GetContractName(serviceType);
-            var instance = tempContainer.GetExportedValueOrDefault<object>(contract);
+            var instance = AddToDisposables(tempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
-            instance = ExportProvider.GetExportedValues<object>(contract).FirstOrDefault();
+            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault());
 
             if (instance != null)
                 return instance;
@@ -189,6 +195,16 @@ namespace GitHub.VisualStudio
             }
         }
 
+        T AddToDisposables<T>(T instance)
+        {
+            var disposable = instance as IDisposable;
+            if (disposable != null)
+            {
+                disposables.Add(disposable);
+            }
+            return instance;
+        }
+
         void StopUIFlowWhenWindowIsClosedByUser(object sender, EventArgs e)
         {
             StopUI();
@@ -201,7 +217,9 @@ namespace GitHub.VisualStudio
             {
                 if (disposing)
                 {
+
                     StopUI();
+                    disposables.Dispose();
                     if (tempContainer != null)
                     {
                         tempContainer.Dispose();
