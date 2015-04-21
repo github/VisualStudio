@@ -9,7 +9,6 @@ namespace GitHub.VisualStudio.Base
 {
     public abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
     {
-        bool disposed = false;
         [AllowNull]
         protected IServiceProvider ServiceProvider
         {
@@ -31,21 +30,8 @@ namespace GitHub.VisualStudio.Base
             GC.SuppressFinalize(this);
         }
 
-        ~TeamExplorerBase()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
-                return;
-
-            if (disposing)
-            {
-            }
-
-            disposed = true;
         }
 
         [return: AllowNull]

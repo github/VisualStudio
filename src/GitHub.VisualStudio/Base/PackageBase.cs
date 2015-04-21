@@ -81,27 +81,28 @@ namespace GitHub.VisualStudio.Base
         }
 
         bool disposed;
-
         protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
             if (disposing)
             {
-                try
+                if (!disposed)
                 {
-                    var hosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
-                    if (hosts != null)
+                    try
                     {
-                        hosts.Dispose();
+                        var hosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
+                        if (hosts != null)
+                        {
+                            hosts.Dispose();
+                        }
                     }
-                }
-                catch (Exception)
-                {
-                    // Let's not crash the dispose. Chances are, the process shout down will handle this.
+                    catch (Exception)
+                    {
+                        // Let's not crash the dispose. Chances are, the process shout down will handle this.
+                    }
+                    disposed = true;
                 }
             }
             base.Dispose(disposing);
-            disposed = true;
         }
     }
 }

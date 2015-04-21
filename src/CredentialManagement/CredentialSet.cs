@@ -11,8 +11,6 @@ namespace GitHub.Authentication.CredentialManagement
 {
     public class CredentialSet : List<Credential>, IDisposable
     {
-        bool _disposed;
-
         public CredentialSet()
         {
         }
@@ -27,33 +25,24 @@ namespace GitHub.Authentication.CredentialManagement
 
         public string Target { get; set; }
 
+        bool disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                if (Count > 0)
+                {
+                    ForEach(cred => cred.Dispose());
+                }
+                disposed = true;
+            }
+        }
 
         public void Dispose()
         {
             Dispose(true);
-
-            // Prevent GC Collection since we have already disposed of this object
             GC.SuppressFinalize(this);
-        }
-
-        ~CredentialSet()
-        {
-            Dispose(false);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    if (Count > 0)
-                    {
-                        ForEach(cred => cred.Dispose());
-                    }
-                }
-            }
-            _disposed = true;
         }
 
         public CredentialSet Load()

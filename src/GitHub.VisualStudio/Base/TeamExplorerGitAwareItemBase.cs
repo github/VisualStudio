@@ -16,7 +16,6 @@ namespace GitHub.VisualStudio.Base
     {
         IGitRepositoryInfo activeRepo;
         IGitExt gitService;
-        bool disposed;
         Uri activeRepoUri;
         string activeRepoName = string.Empty;
         SynchronizationContext syncContext;
@@ -90,19 +89,19 @@ namespace GitHub.VisualStudio.Base
             RepoChanged();
         }
 
+        bool disposed;
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
-            if (disposed)
-                return;
-
             if (disposing)
             {
-                GitUIContext = null;
-                GitService = null;
+                if (!disposed)
+                {
+                    GitUIContext = null;
+                    GitService = null;
+                    disposed = true;
+                }
             }
-            disposed = true;
+            base.Dispose(disposing);
         }
 
         [AllowNull]

@@ -284,6 +284,7 @@ namespace GitHub.SampleData
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
         }
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)

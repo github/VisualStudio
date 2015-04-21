@@ -272,21 +272,20 @@ namespace GitHub.Models
                 .Select(user => new AccountCacheItem(user)));
         }
 
-        bool disposed = false;
+        bool disposed;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
+                if (disposed) return;
+
+                try
                 {
-                    try
-                    {
-                        ModelService.Dispose();
-                    }
-                    catch (Exception e)
-                    {
-                        log.Warn("Exception occured while disposing RepositoryHost's ModelService", e);
-                    }
+                    ModelService.Dispose();
+                }
+                catch (Exception e)
+                {
+                    log.Warn("Exception occured while disposing RepositoryHost's ModelService", e);
                 }
                 disposed = true;
             }
