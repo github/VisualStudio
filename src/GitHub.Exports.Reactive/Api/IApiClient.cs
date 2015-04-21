@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.Primitives;
 using Octokit;
 
@@ -27,5 +28,6 @@ namespace GitHub.Api
             string fingerprint = null);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
+        IObservable<Unit> DeleteApplicationAuthorization(int id);
     }
 }

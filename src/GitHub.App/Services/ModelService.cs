@@ -230,6 +230,23 @@ namespace GitHub.Services
                 .Catch<string, KeyNotFoundException>(e => Observable.Return(Guid.NewGuid().ToString()));
         }
 
+        public IObservable<Unit> SaveAuthorizationTokenId(int id)
+        {
+            return hostCache.InsertObject("oauth-token-id", id)
+                .Catch<Unit, Exception>(e => Observable.Return(Unit.Default));
+        }
+
+        public IObservable<Unit> DeleteAuthorizationToken()
+        {
+            return hostCache.GetObject<int>("oauth-token-id")
+                .SelectMany(apiClient.DeleteApplicationAuthorization)
+                .Catch<Unit, Exception>(e =>
+                {
+                    log.Error("Could not delete authorization token", e);
+                    return Observable.Return(Unit.Default);
+                });
+        }
+
         public class LicenseCacheItem
         {
             public static LicenseCacheItem Create(LicenseMetadata licenseMetadata)

@@ -19,6 +19,8 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
         IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
         IObservable<string> GetOrGenerateFingerprint();
+        IObservable<Unit> SaveAuthorizationTokenId(int id);
+        IObservable<Unit> DeleteAuthorizationToken();
         IObservable<Unit> InvalidateAll();
     }
 }
