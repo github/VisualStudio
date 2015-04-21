@@ -118,9 +118,13 @@ namespace GitHub.VisualStudio
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
-                foreach(IConnection c in e.OldItems)
+                // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
+                if (DoLogin == null)
                 {
-                    Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
+                    foreach (IConnection c in e.OldItems)
+                    {
+                        Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
+                    }
                 }
             }
             SaveConnectionsToCache();
