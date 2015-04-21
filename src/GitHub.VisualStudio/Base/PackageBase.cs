@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Threading;
-using GitHub.Models;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 
@@ -78,31 +76,6 @@ namespace GitHub.VisualStudio.Base
                 return default(T);
             var exportProvider = componentModel.DefaultExportProvider;
             return exportProvider.GetExportedValue<T>();
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    try
-                    {
-                        var hosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
-                        if (hosts != null)
-                        {
-                            hosts.Dispose();
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // Let's not crash the dispose. Chances are, the process shout down will handle this.
-                    }
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
         }
     }
 }
