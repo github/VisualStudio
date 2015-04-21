@@ -59,7 +59,7 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
     <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="logodark,logo" />
+      <Bitmap guid="guidImages" href="Resources\logo_16x16.png" usedList="logo" />
     </Bitmaps>
   </Commands>
   
@@ -81,8 +81,7 @@
     </GuidSymbol>
     
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
-      <IDSymbol name="logodark" value="1" />
-      <IDSymbol name="logo" value="2" />
+      <IDSymbol name="logo" value="1" />
     </GuidSymbol>
   </Symbols>
 

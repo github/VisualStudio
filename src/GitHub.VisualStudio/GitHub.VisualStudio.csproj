@@ -292,6 +292,7 @@
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -299,6 +300,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Resources\preview_200x200.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\logo_32x32%402x.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="Resources\logo_16x16.png" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -310,9 +320,6 @@
     <VSCTCompile Include="GitHub.VisualStudio.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Images.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\pulse.png" />
@@ -330,10 +337,6 @@
     </Content>
     <Resource Include="Resources\default_org_avatar.png" />
     <Resource Include="Resources\default_user_avatar.png" />
-    <Content Include="Resources\Package.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Page Include="SharedDictionary.xaml">
