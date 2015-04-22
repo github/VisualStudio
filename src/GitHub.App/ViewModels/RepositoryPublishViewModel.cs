@@ -100,6 +100,7 @@ namespace GitHub.ViewModels
             }
 
             this.WhenAny(x => x.SelectedConnection, x => x.Value)
+                .Where(x => RepositoryNameValidator.ValidationResult != null && SafeRepositoryNameWarningValidator.ValidationResult != null)
                 .Subscribe(async _ =>
                 {
                     var name = RepositoryName;
