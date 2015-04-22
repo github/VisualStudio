@@ -6,7 +6,7 @@ namespace GitHub.ViewModels
 {
     public interface IRepositoryPublishViewModel : IRepositoryForm
     {
-        ReactiveList<IRepositoryHost> RepositoryHosts { get; }
+        ReactiveList<IConnection> Connections { get; }
 
         /// <summary>
         /// Command that creates the repository.
@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The selected host to publish to.
         /// </summary>
-        IRepositoryHost SelectedHost { get; set; }
+        IConnection SelectedConnection { get; set; }
 
         /// <summary>
         /// Sets the default repository name when prepopulating the form.
