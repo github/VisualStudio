@@ -99,7 +99,8 @@ namespace GitHub.ViewModels
                 DefaultRepositoryName    = defaultRepositoryName;
             }
 
-            this.WhenAny(x => x.SelectedConnection, x => x.Value)
+            this.WhenAny(x => x.SelectedConnection, x => x.SelectedAccount,
+                (a,b) => true)
                 .Where(x => RepositoryNameValidator.ValidationResult != null && SafeRepositoryNameWarningValidator.ValidationResult != null)
                 .Subscribe(async _ =>
                 {
