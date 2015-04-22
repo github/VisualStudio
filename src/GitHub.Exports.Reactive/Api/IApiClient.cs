@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.Primitives;
 using Octokit;
 
@@ -26,5 +27,6 @@ namespace GitHub.Api
             bool useOldScopes = false);
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
+        IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
     }
 }
