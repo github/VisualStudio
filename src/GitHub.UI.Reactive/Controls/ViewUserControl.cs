@@ -10,8 +10,8 @@ namespace GitHub.UI
     {
         public ViewUserControl()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
-            SharedDictionaryManager.Load("GitHub.UI.Reactive");
+            SharedDictionaryManager.Load("GitHub.UI", Resources);
+            SharedDictionaryManager.Load("GitHub.UI.Reactive", Resources);
         }
     }
 }

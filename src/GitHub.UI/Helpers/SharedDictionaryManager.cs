@@ -10,7 +10,7 @@ namespace GitHub.UI.Helpers
     public static class SharedDictionaryManager
     {
         static ResourceDictionary mergedDictionaries = new ResourceDictionary();
-        static HashSet<string> dictionaries = new HashSet<string>();
+        static Dictionary<string, ResourceDictionary> dictionaries = new Dictionary<string, ResourceDictionary>();
 
         static SharedDictionaryManager()
         {
@@ -20,7 +20,7 @@ namespace GitHub.UI.Helpers
         static Assembly LoadAssemblyFromRunDir(object sender, ResolveEventArgs e)
         {
             var name = new AssemblyName(e.Name);
-            if (!dictionaries.Contains(name.Name))
+            if (!dictionaries.ContainsKey(name.Name))
                 return null;
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filename = Path.Combine(path, name.Name + ".dll");
@@ -29,25 +29,18 @@ namespace GitHub.UI.Helpers
             return Assembly.LoadFrom(filename);
         }
 
-        public static ResourceDictionary Load(string assemblyname)
+        public static ResourceDictionary Load(string assemblyname, ResourceDictionary resources)
         {
-            if (!dictionaries.Contains(assemblyname))
+            ResourceDictionary dic;
+            if (!dictionaries.ContainsKey(assemblyname))
             {
-                dictionaries.Add(assemblyname);
-                Uri loc;
-                //if (System.Reflection.Assembly.GetCallingAssembly().GetName().Name == assemblyname)
-                //    loc = new Uri("/SharedDictionary.xaml", UriKind.Relative);
-                //else
-                    loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.RelativeOrAbsolute);
-                var dic = (ResourceDictionary)Application.LoadComponent(loc);
-                if (Application.Current == null)
-                {
-                    // Possibly in a unit test scenario.
-                    return mergedDictionaries;
-                }
-                Application.Current.Resources.MergedDictionaries.Add(dic);
-                mergedDictionaries.MergedDictionaries.Add(dic);
+                var loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.RelativeOrAbsolute);
+                dic = (ResourceDictionary)Application.LoadComponent(loc);
+                dictionaries.Add(assemblyname, dic);
             }
+            else
+                dic = dictionaries[assemblyname];
+            resources.MergedDictionaries.Add(dic);
             return mergedDictionaries;
         }
 

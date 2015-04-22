@@ -12,7 +12,7 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public GitHubHomeContent()
         {
-            SharedDictionaryManager.Load("GitHub.UI");
+            SharedDictionaryManager.Load("GitHub.UI", Resources);
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IGitHubHomeSection;
