@@ -193,15 +193,30 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public sealed class RepositoryPublishViewModelDesigner : RepositoryCreationViewModelDesigner, IRepositoryPublishViewModel
     {
+        class Conn : IConnection
+        {
+            public HostAddress HostAddress { get; set; }
+
+            public string Username { get; set; }
+
+            public IObservable<IConnection> Login()
+            {
+                return null;
+            }
+
+            public void Logout()
+            {
+            }
+        }
+
         public RepositoryPublishViewModelDesigner()
         {
-            var gitHubHost = new RepositoryHostDesigner("GitHub");
-            RepositoryHosts = new ReactiveList<IRepositoryHost>
+            Connections = new ReactiveList<IConnection>
             {
-                gitHubHost,
-                new RepositoryHostDesigner("ghe.io")
+                new Conn() { HostAddress = new HostAddress() },
+                new Conn() { HostAddress = HostAddress.Create("ghe.io") }
             };
-            SelectedHost = gitHubHost;
+            SelectedConnection = Connections[0];
         }
 
         public string DefaultRepositoryName
@@ -232,13 +247,13 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ReactiveList<IRepositoryHost> RepositoryHosts
+        public ReactiveList<IConnection> Connections
         {
             get;
             private set;
         }
 
-        public IRepositoryHost SelectedHost
+        public IConnection SelectedConnection
         {
             get; set;
         }
