@@ -11,8 +11,8 @@
              d:DesignHeight="432"
              Style="{DynamicResource DialogUserControl}">
 
-    <StackPanel Style="{DynamicResource DialogContainerStackPanel}">
-        <StackPanel.Resources>
+    <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
+        <DockPanel.Resources>
             <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
@@ -23,19 +23,20 @@
             <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
                 <Setter Property="Margin" Value="0" />
             </Style>
-        </StackPanel.Resources>
-        <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
+        </DockPanel.Resources>
+        <StackPanel DockPanel.Dock="Top">
+            <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
 
-        <TextBlock
-            x:Name="loginLabelPrefix"
-            HorizontalAlignment="Center"
-            Margin="0,0,0,10"
-            Style="{DynamicResource GitHubH1TextBlock}"
-            IsHitTestVisible="False"
-            Text="Log in" />
+            <TextBlock
+                x:Name="loginLabelPrefix"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,10"
+                Style="{DynamicResource GitHubH1TextBlock}"
+                IsHitTestVisible="False"
+                Text="Log in" />
             
-        <ui:HorizontalShadowDivider />
-            
+            <ui:HorizontalShadowDivider />
+        </StackPanel>
         <TabControl 
             x:Name="hostTabControl"
             Margin="30,0"
@@ -48,8 +49,9 @@
                 <Style TargetType="{x:Type TabPanel}">
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
-                <Style x:Key="TabStackPanel" TargetType="{x:Type StackPanel}">
+                <Style x:Key="TabDockPanel" TargetType="{x:Type DockPanel}">
                     <Setter Property="Margin" Value="0,20,0,0" />
+                    <Setter Property="LastChildFill" Value="True" />
                 </Style>
                 <Style x:Key="FormFieldStackPanel" TargetType="{x:Type StackPanel}">
                     <Setter Property="Margin" Value="0,0,0,20" />
@@ -60,7 +62,17 @@
             </TabControl.Resources>
 
             <TabItem x:Name="dotComTab" Header="GitHub">
-                <StackPanel Style="{StaticResource TabStackPanel}">
+                <DockPanel Style="{StaticResource TabDockPanel}">
+                    <StackPanel DockPanel.Dock="Bottom" Margin="0">
+                        <Border Style="{StaticResource LoginButtonBorder}">
+                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                        </Border>
+
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
+                            Don’t have an account? <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+
                     <StackPanel x:Name="dotComloginControlsPanel">
                         <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed">
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
@@ -86,32 +98,36 @@
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
-
-                    <Border Style="{StaticResource LoginButtonBorder}">
-                        <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
-                    </Border>
-
-                    <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                        Don’t have an account? <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
-                    </TextBlock>
-                </StackPanel>
+                </DockPanel>
             </TabItem>
 
             <TabItem x:Name="enterpriseTab" Header="GitHub Enterprise" Margin="10,0,-10,0">
-                <StackPanel Style="{StaticResource TabStackPanel}">
-                    <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Message="Log in failed">
-                        <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                <DockPanel Style="{StaticResource TabDockPanel}">
+                    <StackPanel DockPanel.Dock="Bottom">
+                        <Border Style="{StaticResource LoginButtonBorder}">
+                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                        </Border>
+                        
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
+                            Don’t have GitHub Enterprise? <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com">Learn more</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                    
+                    <StackPanel
+                        x:Name="enterpriseloginControlsPanel"
+                        Style="{StaticResource FormFieldStackPanel}">
+                        <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Message="Log in failed">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                             Check your username and password, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
-                        </TextBlock>
-                    </uirx:ErrorMessageDisplay>
+                            </TextBlock>
+                        </uirx:ErrorMessageDisplay>
 
-                    <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host">
-                        <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                        <uirx:ErrorMessageDisplay x:Name="enterpriseConnectingFailedMessage" Message="Could not connect to host">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                             The host isn't available or is not a GitHub Enterprise server. Check the address and try again.
-                        </TextBlock>
-                    </uirx:ErrorMessageDisplay>
+                            </TextBlock>
+                        </uirx:ErrorMessageDisplay>
 
-                    <StackPanel x:Name="enterpriseloginControlsPanel" Style="{StaticResource FormFieldStackPanel}">
                         <StackPanel Margin="0,0,0,10">
                             <ui:PromptTextBox x:Name="enterpriseUserNameOrEmail" PromptText="Username or email" />
                             <uirx:ValidationMessage x:Name="enterpriseUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUserNameOrEmail}"/>
@@ -127,16 +143,8 @@
                             <uirx:ValidationMessage x:Name="enterpriseUrlValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUrl}" TextChangeThrottle="1.0"/>
                         </StackPanel>
                     </StackPanel>
-
-                    <Border Style="{StaticResource LoginButtonBorder}">
-                        <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
-                    </Border>
-                        
-                    <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                        Don’t have GitHub Enterprise? <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com">Learn more</Hyperlink>
-                    </TextBlock>
-                </StackPanel>
+                </DockPanel>
             </TabItem>
         </TabControl>
-    </StackPanel>
+    </DockPanel>
 </uirx:ViewUserControl>
