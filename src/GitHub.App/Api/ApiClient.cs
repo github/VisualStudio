@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reactive;
+using System.Net.NetworkInformation;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,7 +29,7 @@ namespace GitHub.Api
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
         readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
         static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
-        static Lazy<string> lazyFingerprint = new Lazy<string>(() => GetSha256Hash(lazyNote.Value));
+        static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
         public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
@@ -58,7 +59,8 @@ namespace GitHub.Api
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             string authenticationCode = null,
-            bool useOldScopes = false)
+            bool useOldScopes = false,
+            bool useFingerPrint = true)
         {
             var newAuthorization = new NewAuthorization
             {
@@ -66,7 +68,7 @@ namespace GitHub.Api
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
                 Note = lazyNote.Value,
-                Fingerprint = lazyFingerprint.Value
+                Fingerprint = useFingerPrint ? lazyFingerprint.Value : null
             };
 
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
@@ -74,11 +76,19 @@ namespace GitHub.Api
 
             var authorizationsClient = gitHubClient.Authorization;
 
-            return authorizationsClient.CreateAndDeleteExistingApplicationAuthentication(
+            return string.IsNullOrEmpty(authenticationCode)
+                ? authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
                         clientId,
                         clientSecret,
                         newAuthorization,
                         dispatchedHandler,
+                        true)
+                :   authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
+                        clientId,
+                        clientSecret,
+                        newAuthorization,
+                        dispatchedHandler,
+                        authenticationCode,
                         true);
         }
 
@@ -133,6 +143,11 @@ namespace GitHub.Api
             }
         }
 
+        static string GetFingerprint()
+        {
+            return GetSha256Hash(ProductName + ":" + GetMachineIdentifier());
+        }
+
         static string GetMachineNameSafe()
         {
             try
@@ -149,6 +164,25 @@ namespace GitHub.Api
                 {
                     return "(unknown)";
                 }
+            }
+        }
+
+        static string GetMachineIdentifier()
+        {
+            try
+            {
+                // adapted from http://stackoverflow.com/a/1561067
+                var fastedValidNetworkInterface = NetworkInterface.GetAllNetworkInterfaces()
+                    .OrderBy(nic => nic.Speed)
+                    .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
+                    .Select(nic => nic.GetPhysicalAddress().ToString())
+                    .FirstOrDefault(address => address.Length > 12);
+
+                return fastedValidNetworkInterface ?? GetMachineNameSafe();
+            }
+            catch (Exception)
+            {
+                return GetMachineNameSafe();
             }
         }
 
