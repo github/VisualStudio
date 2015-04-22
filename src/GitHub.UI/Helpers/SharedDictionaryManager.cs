@@ -29,7 +29,7 @@ namespace GitHub.UI.Helpers
             return Assembly.LoadFrom(filename);
         }
 
-        public static ResourceDictionary Load(string assemblyname)
+        public static ResourceDictionary Load(string assemblyname, ResourceDictionary resources)
         {
             if (!dictionaries.Contains(assemblyname))
             {
@@ -40,12 +40,7 @@ namespace GitHub.UI.Helpers
                 //else
                     loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.RelativeOrAbsolute);
                 var dic = (ResourceDictionary)Application.LoadComponent(loc);
-                if (Application.Current == null)
-                {
-                    // Possibly in a unit test scenario.
-                    return mergedDictionaries;
-                }
-                Application.Current.Resources.MergedDictionaries.Add(dic);
+                resources.MergedDictionaries.Add(dic);
                 mergedDictionaries.MergedDictionaries.Add(dic);
             }
             return mergedDictionaries;
