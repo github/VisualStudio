@@ -10,6 +10,7 @@ using NLog;
 namespace GitHub.Caches
 {
     [Export(typeof(ILoginCache))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class LoginCache : ILoginCache
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
@@ -20,7 +21,6 @@ namespace GitHub.Caches
         [ImportingConstructor]
         public LoginCache(ISharedCache cache)
         {
-
             this.cache = cache;
         }
 
@@ -31,7 +31,8 @@ namespace GitHub.Caches
 
         public IObservable<LoginInfo> GetLoginAsync(HostAddress hostAddress)
         {
-            return cache.Secure.GetLoginAsync(hostAddress.CredentialCacheKeyHost).Catch(Observable.Return(empty));
+            return cache.Secure.GetLoginAsync(hostAddress.CredentialCacheKeyHost)
+                .Catch<LoginInfo, Exception>(e => Observable.Return(empty));
         }
 
         public IObservable<Unit> SaveLogin(string user, string password, HostAddress hostAddress)

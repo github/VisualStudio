@@ -25,7 +25,7 @@ namespace GitHub.Models
         static readonly AccountCacheItem unverifiedUser = new AccountCacheItem();
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
-        readonly Uri apiBaseUri;
+        readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
 
         bool isLoggedIn;
@@ -44,9 +44,9 @@ namespace GitHub.Models
 
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
-            apiBaseUri = apiClient.HostAddress.ApiUri;
-            isEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
-            Title = MakeTitle(apiBaseUri);
+            hostAddress = apiClient.HostAddress;
+            isEnterprise = !hostAddress.IsGitHubDotCom();
+            Title = apiClient.HostAddress.Title;
         }
 
         public HostAddress Address { get; private set; }
@@ -105,10 +105,11 @@ namespace GitHub.Models
             // in multiple places in the chain below:
             var saveAuthorizationToken = new Func<ApplicationAuthorization, IObservable<Unit>>(authorization =>
             {
-                if (authorization == null || String.IsNullOrWhiteSpace(authorization.Token))
+                var token = authorization != null ? authorization.Token : null;
+                if (string.IsNullOrWhiteSpace(token))
                     return Observable.Return(Unit.Default);
 
-                return loginCache.SaveLogin(usernameOrEmail, authorization.Token, Address)
+                return loginCache.SaveLogin(token, "x-oauth-basic", Address)
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
@@ -118,7 +119,7 @@ namespace GitHub.Models
             return loginCache.SaveLogin(usernameOrEmail, password, Address)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 // Try to get an authorization token, save it, then get the user to log in:
-                .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
+                .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
                 .SelectMany(_ => GetUserFromApi())
                 .Catch<AccountCacheItem, ApiException>(firstTryEx =>
@@ -145,15 +146,19 @@ namespace GitHub.Models
                             {
                                 // Retry with the old scopes. If we have a stashed 2FA token, we use it:
                                 if (authenticationCode != null)
+                                {
                                     return ApiClient.GetOrCreateApplicationAuthenticationCode(
                                         interceptingTwoFactorChallengeHandler,
                                         authenticationCode,
-                                        useOldScopes: true);
+                                        useOldScopes: true,
+                                        useFingerprint: false);
+                                }
 
                                 // Otherwise, we use the default handler:
                                 return ApiClient.GetOrCreateApplicationAuthenticationCode(
                                     interceptingTwoFactorChallengeHandler,
-                                    useOldScopes: true);
+                                    useOldScopes: true,
+                                    useFingerprint: false);
                             })
                             // Then save the authorization token (if there is one) and get the user:
                             .SelectMany(saveAuthorizationToken)
@@ -199,7 +204,7 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", apiBaseUri);
+            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", hostAddress.ApiUri);
 
             return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
@@ -218,13 +223,6 @@ namespace GitHub.Models
                 {
                     IsLoggedIn = false;
                 });
-        }
-
-        static string MakeTitle(Uri apiBaseUri)
-        {
-            return HostAddress.IsGitHubDotComUri(apiBaseUri)
-                ? "GitHub"
-                : apiBaseUri.Host;
         }
 
         static IObservable<AuthenticationResult> GetAuthenticationResultForUser(AccountCacheItem account)
@@ -261,7 +259,7 @@ namespace GitHub.Models
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
                         user != null ? user.Login : "(null)",
-                        apiBaseUri,
+                        hostAddress.ApiUri,
                         result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
         }
@@ -301,7 +299,7 @@ namespace GitHub.Models
         {
             get
             {
-                return String.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, apiBaseUri);
+                return string.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, hostAddress.ApiUri);
             }
         }
 

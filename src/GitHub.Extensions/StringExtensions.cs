@@ -36,6 +36,7 @@ namespace GitHub.Extensions
             return string.IsNullOrEmpty(s);
         }
 
+        [return: AllowNull]
         public static string ToNullIfEmpty([AllowNull]this string s)
         {
             return s.IsNullOrEmpty() ? null : s;
@@ -47,6 +48,7 @@ namespace GitHub.Extensions
             return s.First() == c;
         }
 
+        [return: AllowNull]
         public static string RightAfter([AllowNull]this string s, string search)
         {
             if (s == null) return null;
@@ -57,6 +59,7 @@ namespace GitHub.Extensions
             return s.Substring(lastIndex + search.Length);
         }
 
+        [return: AllowNull]
         public static string RightAfterLast(this string s, string search)
         {
             if (s == null) return null;
@@ -67,6 +70,7 @@ namespace GitHub.Extensions
             return s.Substring(lastIndex + search.Length);
         }
 
+        [return: AllowNull]
         public static string LeftBeforeLast([AllowNull]this string s, string search)
         {
             if (s == null) return null;
@@ -78,6 +82,7 @@ namespace GitHub.Extensions
         }
 
         // Returns a file name even if the path is FUBAR.
+        [return: AllowNull]
         public static string ParseFileName([AllowNull]this string path)
         {
             if (path == null) return null;
@@ -85,12 +90,14 @@ namespace GitHub.Extensions
         }
 
         // Returns the parent directory even if the path is FUBAR.
+        [return: AllowNull]
         public static string ParseParentDirectory([AllowNull]this string path)
         {
             if (path == null) return null;
             return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).LeftBeforeLast(Path.DirectorySeparatorChar + "");
         }
 
+        [return: AllowNull]
         public static string EnsureStartsWith([AllowNull]this string s, char c)
         {
             if (s == null) return null;
@@ -98,12 +105,14 @@ namespace GitHub.Extensions
         }
 
         // Ensures the string ends with the specified character.
+        [return: AllowNull]
         public static string EnsureEndsWith([AllowNull]this string s, char c)
         {
             if (s == null) return null;
             return s.TrimEnd(c) + c;
         }
 
+        [return: AllowNull]
         public static string NormalizePath([AllowNull]this string path)
         {
             if (String.IsNullOrEmpty(path)) return null;
@@ -111,6 +120,7 @@ namespace GitHub.Extensions
             return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }
 
+        [return: AllowNull]
         public static string TrimEnd([AllowNull]this string s, string suffix)
         {
             if (s == null) return null;
