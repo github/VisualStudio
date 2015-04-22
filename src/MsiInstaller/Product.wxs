@@ -14,6 +14,10 @@
       <Custom Action="AlreadyUpdated" After="FindRelatedProducts">SELFFOUND</Custom>
       <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
     </InstallExecuteSequence>
+
+    <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts" >Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+    <SetProperty Id="REINSTALLMODE" Value="emu" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+
     <MediaTemplate EmbedCab="yes" />
     <Feature Id="ProductFeature" Title="GitHub Extension for Visual Studio" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
