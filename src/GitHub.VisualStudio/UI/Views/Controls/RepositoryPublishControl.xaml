@@ -63,7 +63,7 @@
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Title}"/>
+                        <TextBlock Text="{Binding HostAddress.Title}"/>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
