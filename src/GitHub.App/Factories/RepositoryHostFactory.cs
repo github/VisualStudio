@@ -42,24 +42,23 @@ namespace GitHub.Factories
             return new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler);
         }
 
+        bool disposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+
+                loginCache.Dispose();
+                avatarProvider.Dispose();
+                disposed = true;
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-        
-        bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    loginCache.Dispose();
-                    avatarProvider.Dispose();
-                }
-                disposed = true;
-            }
         }
     }
 }

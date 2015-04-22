@@ -265,18 +265,17 @@ namespace GitHub.Controllers
                 Fire(Trigger.Cancel);
         }
 
-        bool disposed = false; // To detect redundant calls
+        bool disposed; // To detect redundant calls
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    Debug.WriteLine("Disposing ({0})", GetHashCode());
-                    disposables.Dispose();
-                    if (transition != null)
-                        transition.Dispose();
-                }
+                if (disposed) return;
+
+                Debug.WriteLine("Disposing ({0})", GetHashCode());
+                disposables.Dispose();
+                if (transition != null)
+                    transition.Dispose();
                 disposed = true;
             }
         }
