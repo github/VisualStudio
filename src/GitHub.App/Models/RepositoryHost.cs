@@ -146,15 +146,19 @@ namespace GitHub.Models
                             {
                                 // Retry with the old scopes. If we have a stashed 2FA token, we use it:
                                 if (authenticationCode != null)
+                                {
                                     return ApiClient.GetOrCreateApplicationAuthenticationCode(
                                         interceptingTwoFactorChallengeHandler,
                                         authenticationCode,
-                                        useOldScopes: true);
+                                        useOldScopes: true,
+                                        useFingerprint: false);
+                                }
 
                                 // Otherwise, we use the default handler:
                                 return ApiClient.GetOrCreateApplicationAuthenticationCode(
                                     interceptingTwoFactorChallengeHandler,
-                                    useOldScopes: true);
+                                    useOldScopes: true,
+                                    useFingerprint: false);
                             })
                             // Then save the authorization token (if there is one) and get the user:
                             .SelectMany(saveAuthorizationToken)
