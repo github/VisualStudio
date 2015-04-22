@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.Composition;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -55,23 +55,27 @@ namespace GitHub.Caches
             return UserAccount.InvalidateObject<Uri>(enterpriseHostApiBaseUriCacheKey);
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            Dispose(true);
-        }
-
+        bool disposed;
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
+                if (disposed) return;
+
                 UserAccount.Dispose();
                 UserAccount.Shutdown.Wait();
                 LocalMachine.Dispose();
                 LocalMachine.Shutdown.Wait();
                 Secure.Dispose();
                 Secure.Shutdown.Wait();
+                disposed = true;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

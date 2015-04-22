@@ -124,8 +124,8 @@ namespace GitHub.VisualStudio.Base
             {
                 if (!disposed)
                 {
-                    disposed = true;
                     UnsubscribeToSectionProvider();
+                    disposed = true;
                 }
             }
             base.Dispose(disposing);

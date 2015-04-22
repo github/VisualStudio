@@ -208,7 +208,6 @@
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Base\TeamExplorerGitAwareItemBase.cs" />
-    <None Include="Base\TeamExplorerGitAwareItem_Solution.cs" />
     <Compile Include="Base\TeamExplorerInvitationBase.cs" />
     <Compile Include="Base\TeamExplorerServiceHolder.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />

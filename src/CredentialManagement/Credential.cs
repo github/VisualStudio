@@ -12,8 +12,6 @@ namespace GitHub.Authentication.CredentialManagement
         const int maxPasswordLengthInBytes = NativeMethods.CREDUI_MAX_PASSWORD_LENGTH * 2;
 
         static readonly object _lockObject = new object();
-        bool _disposed;
-
         static readonly SecurityPermission _unmanagedCodePermission;
 
         CredentialType _type;
@@ -64,35 +62,27 @@ namespace GitHub.Authentication.CredentialManagement
             _lastWriteTime = DateTime.MinValue;
         }
 
+        bool disposed;
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                SecurePassword.Clear();
+                SecurePassword.Dispose();
+                disposed = true;
+            }
+        }
 
         public void Dispose()
         {
             Dispose(true);
-
-            // Prevent GC Collection since we have already disposed of this object
             GC.SuppressFinalize(this);
-        }
-        ~Credential()
-        {
-            Dispose(false);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    SecurePassword.Clear();
-                    SecurePassword.Dispose();
-                }
-            }
-            _disposed = true;
         }
 
         private void CheckNotDisposed()
         {
-            if (_disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException("Credential object is already disposed.");
             }

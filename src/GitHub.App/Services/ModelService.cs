@@ -185,21 +185,20 @@ namespace GitHub.Services
             return hostCache.InsertObject("user", user);
         }
 
-        bool disposed = false;
+        bool disposed;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposing)
             {
-                if (disposing)
+                if (disposed) return;
+
+                try
                 {
-                    try
-                    {
-                        hostCache.Dispose();
-                    }
-                    catch (Exception e)
-                    {
-                        log.Warn("Exception occured while disposing host cache", e);
-                    }
+                    hostCache.Dispose();
+                }
+                catch (Exception e)
+                {
+                    log.Warn("Exception occured while disposing host cache", e);
                 }
                 disposed = true;
             }
