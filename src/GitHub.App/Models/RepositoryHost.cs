@@ -105,10 +105,11 @@ namespace GitHub.Models
             // in multiple places in the chain below:
             var saveAuthorizationToken = new Func<ApplicationAuthorization, IObservable<Unit>>(authorization =>
             {
-                if (authorization == null || String.IsNullOrWhiteSpace(authorization.Token))
+                var token = authorization != null ? authorization.Token : null;
+                if (string.IsNullOrWhiteSpace(token))
                     return Observable.Return(Unit.Default);
 
-                return loginCache.SaveLogin(usernameOrEmail, authorization.Token, Address)
+                return loginCache.SaveLogin(token, "x-oauth-basic", Address)
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
@@ -118,7 +119,7 @@ namespace GitHub.Models
             return loginCache.SaveLogin(usernameOrEmail, password, Address)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 // Try to get an authorization token, save it, then get the user to log in:
-                .SelectMany(_ => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
+                .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
                 .SelectMany(_ => GetUserFromApi())
                 .Catch<AccountCacheItem, ApiException>(firstTryEx =>
@@ -295,7 +296,7 @@ namespace GitHub.Models
         {
             get
             {
-                return String.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, hostAddress.ApiUri);
+                return string.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, hostAddress.ApiUri);
             }
         }
 
