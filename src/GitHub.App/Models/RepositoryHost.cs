@@ -25,7 +25,7 @@ namespace GitHub.Models
         static readonly AccountCacheItem unverifiedUser = new AccountCacheItem();
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
-        readonly Uri apiBaseUri;
+        readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
 
         bool isLoggedIn;
@@ -44,9 +44,9 @@ namespace GitHub.Models
 
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
-            apiBaseUri = apiClient.HostAddress.ApiUri;
-            isEnterprise = !HostAddress.IsGitHubDotComUri(apiBaseUri);
-            Title = MakeTitle(apiBaseUri);
+            hostAddress = apiClient.HostAddress;
+            isEnterprise = !hostAddress.IsGitHubDotCom();
+            Title = apiClient.HostAddress.Title;
         }
 
         public HostAddress Address { get; private set; }
@@ -200,7 +200,7 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", apiBaseUri);
+            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", hostAddress.ApiUri);
 
             return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
@@ -219,13 +219,6 @@ namespace GitHub.Models
                 {
                     IsLoggedIn = false;
                 });
-        }
-
-        static string MakeTitle(Uri apiBaseUri)
-        {
-            return HostAddress.IsGitHubDotComUri(apiBaseUri)
-                ? "GitHub"
-                : apiBaseUri.Host;
         }
 
         static IObservable<AuthenticationResult> GetAuthenticationResultForUser(AccountCacheItem account)
@@ -262,7 +255,7 @@ namespace GitHub.Models
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
                         user != null ? user.Login : "(null)",
-                        apiBaseUri,
+                        hostAddress.ApiUri,
                         result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
         }
@@ -303,7 +296,7 @@ namespace GitHub.Models
         {
             get
             {
-                return string.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, apiBaseUri);
+                return string.Format(CultureInfo.InvariantCulture, "RepositoryHost: {0} {1}", Title, hostAddress.ApiUri);
             }
         }
 
