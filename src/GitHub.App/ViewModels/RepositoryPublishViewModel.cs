@@ -25,6 +25,7 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        readonly IRepositoryHosts hosts;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly IVSServices vsServices;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
@@ -32,14 +33,16 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly ObservableAsPropertyHelper<string> title;
-        
+
         [ImportingConstructor]
         public RepositoryPublishViewModel(
             IRepositoryHosts hosts,
             IRepositoryPublishService repositoryPublishService,
-            IVSServices vsServices)
+            IVSServices vsServices,
+            IConnectionManager connectionManager)
         {
             this.vsServices = vsServices;
+            this.hosts = hosts;
 
             title = this.WhenAny(
                 x => x.SelectedHost,
@@ -49,17 +52,16 @@ namespace GitHub.ViewModels
             )
             .ToProperty(this, x => x.Title);
 
-            RepositoryHosts = new ReactiveList<IRepositoryHost>(
-                new[] { hosts.GitHubHost, hosts.EnterpriseHost }.Where(h => h.IsLoggedIn));
+            Connections = new ReactiveList<IConnection>(connectionManager.Connections);
             this.repositoryPublishService = repositoryPublishService;
 
-            if (RepositoryHosts.Any())
+            if (Connections.Any())
             {
-                SelectedHost = RepositoryHosts[0];
+                SelectedConnection = Connections.FirstOrDefault(x => x.HostAddress.IsGitHubDotCom()) ?? Connections[0];
             }
 
-            accounts = this.WhenAny(x => x.SelectedHost, x => x.Value)
-                .WhereNotNull()
+            accounts = this.WhenAny(x => x.SelectedConnection, x => x.Value != null ? hosts.LookupHost(x.Value.HostAddress) : RepositoryHosts.DisconnectedRepositoryHost)
+                .Where(x => !(x is DisconnectedRepositoryHost))
                 .SelectMany(host => host.ModelService.GetAccounts())
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
@@ -75,7 +77,7 @@ namespace GitHub.ViewModels
                     }
                 });
 
-            isHostComboBoxVisible = this.WhenAny(x => x.RepositoryHosts, x => x.Value)
+            isHostComboBoxVisible = this.WhenAny(x => x.Connections, x => x.Value)
                 .WhereNotNull()
                 .Select(h => h.Count > 1)
                 .ToProperty(this, x => x.IsHostComboBoxVisible, initialValue: false);
@@ -96,6 +98,16 @@ namespace GitHub.ViewModels
             {
                 DefaultRepositoryName    = defaultRepositoryName;
             }
+
+            this.WhenAny(x => x.SelectedConnection, x => x.Value)
+                .Subscribe(async _ =>
+                {
+                    var name = RepositoryName;
+                    RepositoryName = null;
+                    await RepositoryNameValidator.ResetAsync();
+                    await SafeRepositoryNameWarningValidator.ResetAsync();
+                    RepositoryName = name;
+                });
         }
 
         public string DefaultRepositoryName { get; private set; }
@@ -104,15 +116,21 @@ namespace GitHub.ViewModels
         public bool IsPublishing { get { return isPublishing.Value; } }
 
         public IReactiveCommand<Unit> PublishRepository { get; private set; }
-        public ReactiveList<IRepositoryHost> RepositoryHosts { get; private set; }
+        public ReactiveList<IConnection> Connections { get; private set; }
 
-        IRepositoryHost selectedHost;
+        IConnection selectedConnection;
         [AllowNull]
-        public IRepositoryHost SelectedHost
+        public IConnection SelectedConnection
         {
             [return: AllowNull]
-            get { return selectedHost; }
-            set { this.RaiseAndSetIfChanged(ref selectedHost, value); }
+            get { return selectedConnection; }
+            set { this.RaiseAndSetIfChanged(ref selectedConnection, value); }
+        }
+
+        IRepositoryHost SelectedHost
+        {
+            [return:AllowNull]
+            get { return selectedConnection != null ? hosts.LookupHost(selectedConnection.HostAddress) : null; }
         }
 
         public IReadOnlyList<IAccount> Accounts

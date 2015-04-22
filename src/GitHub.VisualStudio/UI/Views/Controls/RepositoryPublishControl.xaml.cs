@@ -23,9 +23,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             this.WhenActivated(d =>
             {
-                d(this.OneWayBind(ViewModel, vm => vm.RepositoryHosts, v => v.hostsComboBox.ItemsSource));
+                d(this.OneWayBind(ViewModel, vm => vm.Connections, v => v.hostsComboBox.ItemsSource));
                 d(this.OneWayBind(ViewModel, vm => vm.IsHostComboBoxVisible, v => v.hostsComboBox.Visibility));
-                d(this.Bind(ViewModel, vm => vm.SelectedHost, v => v.hostsComboBox.SelectedItem));
+                d(this.Bind(ViewModel, vm => vm.SelectedConnection, v => v.hostsComboBox.SelectedItem));
 
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 
