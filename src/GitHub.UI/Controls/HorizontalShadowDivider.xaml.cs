@@ -8,7 +8,7 @@ namespace GitHub.UI
     {
         public HorizontalShadowDivider()
         {
-            Resources.MergedDictionaries.Add(SharedDictionaryManager.Load("GitHub.UI"));
+            SharedDictionaryManager.Load("GitHub.UI", Resources);
             InitializeComponent();
         }
     }
