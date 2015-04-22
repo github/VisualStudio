@@ -59,7 +59,8 @@ namespace GitHub.Api
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             string authenticationCode = null,
-            bool useOldScopes = false)
+            bool useOldScopes = false,
+            bool useFingerPrint = true)
         {
             var newAuthorization = new NewAuthorization
             {
@@ -67,7 +68,7 @@ namespace GitHub.Api
                     ? oldAuthorizationScopes
                     : newAuthorizationScopes,
                 Note = lazyNote.Value,
-                Fingerprint = lazyFingerprint.Value
+                Fingerprint = useFingerPrint ? lazyFingerprint.Value : null
             };
 
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> dispatchedHandler =
@@ -75,11 +76,19 @@ namespace GitHub.Api
 
             var authorizationsClient = gitHubClient.Authorization;
 
-            return authorizationsClient.CreateAndDeleteExistingApplicationAuthentication(
+            return string.IsNullOrEmpty(authenticationCode)
+                ? authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
                         clientId,
                         clientSecret,
                         newAuthorization,
                         dispatchedHandler,
+                        true)
+                :   authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
+                        clientId,
+                        clientSecret,
+                        newAuthorization,
+                        dispatchedHandler,
+                        authenticationCode,
                         true);
         }
 
