@@ -1,4 +1,5 @@
 ﻿using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -63,7 +64,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             else if (SectionConnection != connection)
             {
                 SectionConnection = connection;
-                // TODO: set title according to type of host
+                Title = connection.HostAddress.Title;
                 IsVisible = true;
                 IsExpanded = true;
             }
