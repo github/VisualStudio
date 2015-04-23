@@ -15,6 +15,38 @@
         </Setter>
     </Style>
 
+    <Style x:Key="InlineValidationMessage" TargetType="{x:Type local:ValidationMessage}">
+        <Setter Property="Padding" Value="2,0,2,4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ValidationMessage}">
+                    <Grid x:Name="grid" Visibility="Collapsed" Margin="{TemplateBinding Padding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Width="16" Height="16" Grid.Column="0"
+                                 Visibility="{TemplateBinding ShowError, Converter={ui:BooleanToVisibilityConverter}}">
+                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="1024" Fill="{TemplateBinding Fill}"/>
+                        </Viewbox>
+                        <TextBlock Grid.Column="1" Text="{TemplateBinding Text}"
+                                   Margin="3,0,0,2"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsShowingMessage" Value="True">
+                            <Setter Property="Visibility" Value="Visible" TargetName="grid" />
+                        </Trigger>
+
+                        <Trigger Property="IsShowingMessage" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" TargetName="grid" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <SolidColorBrush
         x:Key="GitHubErrorAdornmentBrush"
         Color="{DynamicResource GitHubErrorColor}"

@@ -107,12 +107,21 @@ namespace GitHub.UI
             get { return (Brush)GetValue(FillProperty); }
             set { SetValue(FillProperty, value); }
         }
-        
+
+        public static readonly DependencyProperty ErrorAdornerTemplateProperty = DependencyProperty.Register("ErrorAdornerTemplate", typeof(string), typeof(ValidationMessage), new PropertyMetadata("validationTemplate"));
+        [AllowNull]
+        public string ErrorAdornerTemplate
+        {
+            [return: AllowNull]
+            get { return (string)GetValue(ErrorAdornerTemplateProperty); }
+            set { SetValue(ErrorAdornerTemplateProperty, value); }
+        }
+
         void ShowValidateError(bool showError)
         {
             IsShowingMessage = showError;
 
-            if (ValidatesControl == null) return;
+            if (ValidatesControl == null || !IsAdornerEnabled()) return;
 
             var bindingExpression = ValidatesControl.GetBindingExpression(TextBox.TagProperty);
             if (bindingExpression == null) return;
@@ -133,9 +142,12 @@ namespace GitHub.UI
 
         void CreateBinding(TextBox textBox)
         {
-            if (textBox == null) return;
+            if (textBox == null || !IsAdornerEnabled())
+            {
+                return;
+            }
 
-            var template = FindResource("validationTemplate") as ControlTemplate;
+            var template = FindResource(ErrorAdornerTemplate) as ControlTemplate;
             if (template != null)
                 System.Windows.Controls.Validation.SetErrorTemplate(textBox, template);
 
@@ -143,7 +155,13 @@ namespace GitHub.UI
             validationBinding.NotifyOnValidationError = true;
             validationBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
             validationBinding.ValidationRules.Add(new ExceptionValidationRule());
-            textBox.SetBinding(TextBox.TagProperty, validationBinding);
+            textBox.SetBinding(TagProperty, validationBinding);
+        }
+
+        bool IsAdornerEnabled()
+        {
+            return !string.IsNullOrEmpty(ErrorAdornerTemplate)
+                && !ErrorAdornerTemplate.Equals("None", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
