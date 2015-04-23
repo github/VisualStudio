@@ -25,9 +25,16 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Viewbox Width="16" Height="16" Grid.Column="0"
-                                 Visibility="{TemplateBinding ShowError, Converter={ui:BooleanToVisibilityConverter}}">
-                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="1024" Fill="{TemplateBinding Fill}"/>
+                        <Viewbox
+                            Width="16"
+                            Height="16"
+                            Grid.Column="0"
+                            Visibility="{TemplateBinding ShowError, Converter={ui:BooleanToVisibilityConverter}}">
+                            <ui:OcticonPath
+                                x:Name="icon"
+                                Icon="{TemplateBinding Icon}"
+                                Height="1024"
+                                Fill="{TemplateBinding Fill}"/>
                         </Viewbox>
                         <TextBlock Grid.Column="1" Text="{TemplateBinding Text}"
                                    Margin="3,0,0,2"
@@ -53,8 +60,18 @@
         PresentationOptions:Freeze="true" />
     
     <ControlTemplate x:Key="validationTemplate">
-        <Grid ToolTip="{Binding ElementName=adornerPlaceholder, Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}">
-            <AdornedElementPlaceholder Name="adornerPlaceholder" Grid.Column="0" />
+        <!--
+            In order for the Tooltip to show up over the adorned textbox, we need to make the background of the 
+            adornment (grid) transparent. But that changes the cursor type, so we change it back to IBeam.
+        -->
+        <Grid
+            ToolTip="{Binding ElementName=adornerPlaceholder, Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}"
+            Background="Transparent"
+            Cursor="IBeam">
+            
+            <AdornedElementPlaceholder
+                Name="adornerPlaceholder"
+                Grid.Column="0" />
             <Viewbox
                 Grid.Column="0"
                 Margin="0,0,4,0"
