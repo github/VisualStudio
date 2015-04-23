@@ -110,7 +110,7 @@
                      PresentationOptions:Freeze="true" />
 
     <!-- dark red used for file diff exceptions -->
-    <Color x:Key="GitHubErrorColor">#740000</Color>
+    <Color x:Key="GitHubErrorColor">#E74C3C</Color>
     <SolidColorBrush x:Key="GitHubErrorBrush" Color="{StaticResource GitHubErrorColor}"
                      PresentationOptions:Freeze="true" />
 
