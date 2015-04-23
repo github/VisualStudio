@@ -74,6 +74,7 @@
                     </StackPanel>
 
                     <StackPanel x:Name="dotComloginControlsPanel">
+                        
                         <uirx:ErrorMessageDisplay x:Name="dotComLoginFailedMessage" Message="Log in failed">
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                 Check your username and password, then try again (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
@@ -86,16 +87,22 @@
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
+                        <uirx:ValidationMessage
+                            x:Name="dotComUserNameOrEmailValidationMessage"
+                            ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
+
+                        <uirx:ValidationMessage
+                            x:Name="dotComPasswordValidationMessage"
+                            ValidatesControl="{Binding ElementName=dotComPassword}" />
+                        
                         <StackPanel Style="{StaticResource FormFieldStackPanel}">
-                            <StackPanel Margin="0,0,0,10">
-                                <ui:PromptTextBox x:Name="dotComUserNameOrEmail" PromptText="Username or email" />
-                                <uirx:ValidationMessage x:Name="dotComUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=dotComUserNameOrEmail}" />
-                            </StackPanel>
+                            <ui:PromptTextBox
+                                x:Name="dotComUserNameOrEmail"
+                                PromptText="Username or email"
+                                Margin="0,0,0,10" />
                             
-                            <StackPanel>
-                                <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
-                                <uirx:ValidationMessage x:Name="dotComPasswordValidationMessage" ValidatesControl="{Binding ElementName=dotComPassword}" />
-                            </StackPanel>
+                            <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
+                                
                         </StackPanel>
                     </StackPanel>
                 </DockPanel>
@@ -116,6 +123,20 @@
                     <StackPanel
                         x:Name="enterpriseloginControlsPanel"
                         Style="{StaticResource FormFieldStackPanel}">
+                        
+                        <uirx:ValidationMessage
+                            x:Name="enterpriseUserNameOrEmailValidationMessage"
+                            ValidatesControl="{Binding ElementName=enterpriseUserNameOrEmail}"/>
+                        
+                        <uirx:ValidationMessage
+                            x:Name="enterprisePasswordValidationMessage"
+                            ValidatesControl="{Binding ElementName=enterprisePassword}" />
+
+                        <uirx:ValidationMessage
+                            x:Name="enterpriseUrlValidationMessage"
+                            ValidatesControl="{Binding ElementName=enterpriseUrl}"
+                            TextChangeThrottle="1.0"/>
+                        
                         <uirx:ErrorMessageDisplay x:Name="enterpriseLoginFailedMessage" Message="Log in failed">
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                             Check your username and password, then try again (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
@@ -128,20 +149,14 @@
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
-                        <StackPanel Margin="0,0,0,10">
-                            <ui:PromptTextBox x:Name="enterpriseUserNameOrEmail" PromptText="Username or email" />
-                            <uirx:ValidationMessage x:Name="enterpriseUserNameOrEmailValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUserNameOrEmail}"/>
-                        </StackPanel>
+                        <ui:PromptTextBox
+                            x:Name="enterpriseUserNameOrEmail"
+                            PromptText="Username or email"
+                            Margin="0,0,0,10" />
 
-                        <StackPanel Margin="0,0,0,10">
-                            <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="Password" />
-                            <uirx:ValidationMessage x:Name="enterprisePasswordValidationMessage" ValidatesControl="{Binding ElementName=enterprisePassword}"/>
-                        </StackPanel>
-
-                        <StackPanel>
-                            <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="GitHub Enterprise server address" />
-                            <uirx:ValidationMessage x:Name="enterpriseUrlValidationMessage" ValidatesControl="{Binding ElementName=enterpriseUrl}" TextChangeThrottle="1.0"/>
-                        </StackPanel>
+                        <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="Password" Margin="0,0,0,10" />
+                        
+                        <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="GitHub Enterprise server address" />
                     </StackPanel>
                 </DockPanel>
             </TabItem>
