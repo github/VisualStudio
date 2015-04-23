@@ -102,6 +102,9 @@ namespace GitHub.ViewModels
                     return parsedReference != repoName ? "Will be created as " + parsedReference : null;
                 });
 
+            this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
+                .Subscribe(_ => {});
+
             CreateRepository = InitializeCreateRepositoryCommand();
 
             canKeepPrivate = CanKeepPrivateObservable.CombineLatest(CreateRepository.IsExecuting,
