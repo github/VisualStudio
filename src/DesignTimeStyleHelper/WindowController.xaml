@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:DesignTimeStyleHelper"
         mc:Ignorable="d"
         Title="WindowController"
-        Height="432"
+        Height="440"
         Width="414"
         MinWidth="414"
-        MinHeight="432">
+        MinHeight="440">
     <Grid x:Name="Container">
         
     </Grid>
