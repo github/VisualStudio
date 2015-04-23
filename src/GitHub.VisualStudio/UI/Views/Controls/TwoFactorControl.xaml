@@ -12,7 +12,7 @@
     xmlns:pfui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
     mc:Ignorable="d"
     d:DesignWidth="414"
-    d:DesignHeight="432"
+    d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}">
     <StackPanel
         Style="{DynamicResource DialogContainerStackPanel}"
