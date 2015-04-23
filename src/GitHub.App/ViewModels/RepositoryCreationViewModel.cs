@@ -103,7 +103,7 @@ namespace GitHub.ViewModels
                 });
 
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
-                .Subscribe(_ => {});
+                .Subscribe();
 
             CreateRepository = InitializeCreateRepositoryCommand();
 
