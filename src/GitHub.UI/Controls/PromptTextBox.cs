@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using NullGuard;
 
 namespace GitHub.UI

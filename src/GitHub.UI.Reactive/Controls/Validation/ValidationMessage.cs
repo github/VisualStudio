@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media;
 using GitHub.Extensions.Reactive;
 using GitHub.Validation;
@@ -27,6 +30,7 @@ namespace GitHub.UI
 
             this.WhenAny(x => x.ValidatesControl, x => x.Value)
                 .WhereNotNull()
+                .Do(CreateBinding)
                 .Select(control =>
                     Observable.Merge(
                         control.Events().TextChanged
@@ -39,10 +43,7 @@ namespace GitHub.UI
                             .Where(__ => string.IsNullOrEmpty(ValidatesControl.Text))
                             .Select(_ => false)))
                 .Switch()
-                .Subscribe(showError =>
-                {
-                    IsShowingMessage = showError;
-                });
+                .Subscribe(ShowValidateError);
         }
 
         public static readonly DependencyProperty IsShowingMessageProperty = DependencyProperty.Register("IsShowingMessage", typeof(bool), typeof(ValidationMessage));
@@ -105,6 +106,62 @@ namespace GitHub.UI
             [return: AllowNull]
             get { return (Brush)GetValue(FillProperty); }
             set { SetValue(FillProperty, value); }
+        }
+
+        public static readonly DependencyProperty ErrorAdornerTemplateProperty = DependencyProperty.Register("ErrorAdornerTemplate", typeof(string), typeof(ValidationMessage), new PropertyMetadata("validationTemplate"));
+        [AllowNull]
+        public string ErrorAdornerTemplate
+        {
+            [return: AllowNull]
+            get { return (string)GetValue(ErrorAdornerTemplateProperty); }
+            set { SetValue(ErrorAdornerTemplateProperty, value); }
+        }
+
+        void ShowValidateError(bool showError)
+        {
+            IsShowingMessage = showError;
+
+            if (ValidatesControl == null || !IsAdornerEnabled()) return;
+
+            var bindingExpression = ValidatesControl.GetBindingExpression(TextBox.TagProperty);
+            if (bindingExpression == null) return;
+            var validationError = new ValidationError(
+                new ExceptionValidationRule(),
+                BindingOperations.GetBindingExpression(ValidatesControl, TextBox.TagProperty));
+
+            if (showError)
+            {
+                validationError.ErrorContent = Text;
+                System.Windows.Controls.Validation.MarkInvalid(bindingExpression, validationError);
+            }
+            else
+            {
+                System.Windows.Controls.Validation.ClearInvalid(bindingExpression);
+            }
+        }
+
+        void CreateBinding(TextBox textBox)
+        {
+            if (textBox == null || !IsAdornerEnabled())
+            {
+                return;
+            }
+
+            var template = FindResource(ErrorAdornerTemplate) as ControlTemplate;
+            if (template != null)
+                System.Windows.Controls.Validation.SetErrorTemplate(textBox, template);
+
+            var validationBinding = new Binding { Source = textBox, Path = new PropertyPath("Tag") };
+            validationBinding.NotifyOnValidationError = true;
+            validationBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            validationBinding.ValidationRules.Add(new ExceptionValidationRule());
+            textBox.SetBinding(TagProperty, validationBinding);
+        }
+
+        bool IsAdornerEnabled()
+        {
+            return !string.IsNullOrEmpty(ErrorAdornerTemplate)
+                && !ErrorAdornerTemplate.Equals("None", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

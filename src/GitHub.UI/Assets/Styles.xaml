@@ -110,7 +110,7 @@
                      PresentationOptions:Freeze="true" />
 
     <!-- dark red used for file diff exceptions -->
-    <Color x:Key="GitHubErrorColor">#740000</Color>
+    <Color x:Key="GitHubErrorColor">#E74C3C</Color>
     <SolidColorBrush x:Key="GitHubErrorBrush" Color="{StaticResource GitHubErrorColor}"
                      PresentationOptions:Freeze="true" />
 
@@ -189,6 +189,14 @@
     
     <Style x:Key="DialogContainerStackPanel" TargetType="StackPanel">
         <Setter Property="Margin" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusManager.IsFocusScope" Value="True" />
+        <Setter Property="helpers:AccessKeysManagerScoping.IsEnabled" Value="True" />
+    </Style>
+    
+    <Style x:Key="DialogContainerDockPanel" TargetType="DockPanel">
+        <Setter Property="LastChildFill" Value="True" />
+        <Setter Property="Margin" Value="0,0,0,30" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FocusManager.IsFocusScope" Value="True" />
         <Setter Property="helpers:AccessKeysManagerScoping.IsEnabled" Value="True" />
