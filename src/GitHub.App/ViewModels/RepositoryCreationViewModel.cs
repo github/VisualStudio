@@ -57,7 +57,6 @@ namespace GitHub.ViewModels
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
 
-            BaseRepositoryPath = repositoryCreationService.DefaultClonePath;
             Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", repositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
@@ -103,6 +102,9 @@ namespace GitHub.ViewModels
                     return parsedReference != repoName ? "Will be created as " + parsedReference : null;
                 });
 
+            this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
+                .Subscribe(_ => {});
+
             CreateRepository = InitializeCreateRepositoryCommand();
 
             canKeepPrivate = CanKeepPrivateObservable.CombineLatest(CreateRepository.IsExecuting,
@@ -119,6 +121,8 @@ namespace GitHub.ViewModels
             licenses = repositoryHost.ModelService.GetLicenses()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
+
+            BaseRepositoryPath = repositoryCreationService.DefaultClonePath;
         }
 
         string baseRepositoryPath;
