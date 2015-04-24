@@ -44,6 +44,10 @@
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixVSExtension">
       <HintPath>$(WixExtDir)\WixVSExtension.dll</HintPath>
       <Name>WixVSExtension</Name>
