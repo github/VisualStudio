@@ -7,6 +7,7 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:uihelpers="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d"
@@ -53,8 +54,8 @@
                 <ColumnDefinition ColumnDefinition.Width="Auto" />
                 <ColumnDefinition ColumnDefinition.Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" KeyboardNavigation.TabIndex="0" HorizontalAlignment="Left"><Hyperlink x:Name="connect" Click="connect_Click">Connect…</Hyperlink></TextBlock>
-            <TextBlock Grid.Column="1" KeyboardNavigation.TabIndex="1" HorizontalAlignment="Right"><Hyperlink x:Name="signup" Click="signup_Click">Sign up</Hyperlink></TextBlock>
+            <vsui:ActionLinkButton KeyboardNavigation.TabIndex="0" HorizontalAlignment="Left" x:Name="connect" Click="connect_Click">Connect…</vsui:ActionLinkButton>
+            <vsui:ActionLinkButton Grid.Column="1" KeyboardNavigation.TabIndex="1" HorizontalAlignment="Right" x:Name="signup" Click="signup_Click">Sign up</vsui:ActionLinkButton>
         </Grid>
 
     </StackPanel>
