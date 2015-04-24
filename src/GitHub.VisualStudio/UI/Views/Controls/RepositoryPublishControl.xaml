@@ -6,6 +6,7 @@
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
+             xmlns:uihelpers="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
@@ -26,13 +27,18 @@
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>
-        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ComboBoxStyleKey}}">
-            <Setter Property="Margin" Value="0,0,0,8" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Height" Value="23" />
-        </Style>
-        
-        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <uihelpers:CachedResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+                <uihelpers:CachedResourceDictionary Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ComboBoxStyleKey}}">
+                <Setter Property="Margin" Value="0,0,0,8" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="Height" Value="23" />
+            </Style>
+            <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <StackPanel Margin="8,6,18,0" Orientation="Vertical" Style="{DynamicResource DialogContainerStackPanel}">
