@@ -150,7 +150,7 @@ function Write-Version {
 
     Write-VersionCsproj $version
     Write-VersionVsixManifest $version
-	Write-VersionInstaller $version
+    Write-VersionInstaller $version
     Write-VersionAssemblyInfo $version
 }
 
