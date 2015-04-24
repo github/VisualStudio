@@ -17,6 +17,14 @@
     <StackPanel
         Style="{DynamicResource DialogContainerStackPanel}"
         helpers:AccessKeysManagerScoping.IsEnabled="True">
+        <StackPanel.Resources>
+            <Style x:Key="AuthenticationMessage" TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="{DynamicResource GitHubErrorBrush}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyLight}" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+        </StackPanel.Resources>
         <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
         <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,12">
             <TextBlock 
@@ -25,13 +33,15 @@
                 Margin="0,0,12,0"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 Foreground="{DynamicResource GHTextBrush}" />
-            <uirx:ErrorMessageDisplay
+            <TextBlock
                 x:Name="authenticationSentLabel"
+                Style="{StaticResource AuthenticationMessage}"
                 Foreground="{DynamicResource GitHubAccentBrush}"
-                Message="Authentication code sent!" />
-            <uirx:ErrorMessageDisplay
+                Text="Authentication code sent!" />
+            <TextBlock
                 x:Name="authenticationFailedLabel"
-                Message="Invalid authentication code" />
+                Style="{StaticResource AuthenticationMessage}"
+                Text="Invalid authentication code" />
         </WrapPanel>
 
         <ui:HorizontalShadowDivider />
@@ -47,7 +57,7 @@
         <uirx:TwoFactorInput
             x:Name="authenticationCode"
             TabIndex="1" />
-        <StackPanel
+          <StackPanel
                 Orientation="Horizontal"
                 HorizontalAlignment="Center"
                 Margin="0,24,0,60">
