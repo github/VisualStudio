@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:VSExtension="http://schemas.microsoft.com/wix/VSExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
-  <?define BA510407-937D-43AB-A0D0-A23EB3EFE376" ?>
+  <?define UpgradeCode="BA510407-937D-43AB-A0D0-A23EB3EFE376" ?>
 
   <?include Version.wxi ?>
   <?include ProductInfo.wxi ?>
