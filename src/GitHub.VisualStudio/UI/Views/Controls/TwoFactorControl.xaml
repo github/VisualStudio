@@ -43,11 +43,13 @@
         <Grid Margin="0,12,0,0" Height="18">
             <uirx:ErrorMessageDisplay
                 x:Name="authenticationFailedLabel"
+                Message="Try entering the code again or clicking the resend button to get a new authentication code."
                 Content="Invalid authentication code" />
             <uirx:ErrorMessageDisplay
                 x:Name="authenticationSentLabel"
                 Icon="check"
                 IconFill="{DynamicResource GitHubAccentBrush}"
+                Message="If you do not receive the authentication code, contact support@github.com."
                 Content="Authentication code sent!" />
         </Grid>
         <StackPanel

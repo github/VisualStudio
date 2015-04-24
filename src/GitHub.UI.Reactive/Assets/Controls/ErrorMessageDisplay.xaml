@@ -42,4 +42,17 @@
     </Style>
 
     <Style TargetType="{x:Type uirx:ErrorMessageDisplay}" BasedOn="{StaticResource ErrorMessageStyle}" />
+
+    <Style TargetType="ToolTip">
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}" Value="">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>
