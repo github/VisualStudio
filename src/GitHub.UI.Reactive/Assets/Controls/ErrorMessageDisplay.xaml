@@ -5,6 +5,7 @@
 
     <Style x:Key="ErrorMessageStyle" TargetType="{x:Type uirx:ErrorMessageDisplay}">
         <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
+        <Setter Property="IconFill" Value="{DynamicResource GitHubErrorBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type uirx:ErrorMessageDisplay}">
@@ -24,7 +25,7 @@
                                 x:Name="icon"
                                 Icon="{TemplateBinding Icon}"
                                 Height="1024"
-                                Fill="{DynamicResource GitHubErrorBrush}"/>
+                                Fill="{TemplateBinding IconFill}" />
                         </Viewbox>
                         <ContentPresenter
                             Grid.Column="1"
