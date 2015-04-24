@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Services;
+using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Octokit;
+using ReactiveUI.Testing;
 using Xunit;
 
 public class ModelServiceTests
@@ -192,6 +195,27 @@ public class ModelServiceTests
             Assert.Equal("fake", cachedOrgs[1].Login);
             var cachedUser = await cache.GetObject<AccountCacheItem>("user");
             Assert.Equal("octocat", cachedUser.Login);
+        }
+
+        [Fact]
+        public async Task OnlyRetrievesOneUserEvenIfCacheOrApiReturnsMoreThanOne()
+        {
+            // This should be impossible, but let's pretend it does happen.
+            var users = new[]
+            {
+                CreateOctokitUser("peppermintpatty"),
+                CreateOctokitUser("peppermintpatty")
+            };
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetUser().Returns(users.ToObservable());
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var cache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetAccounts();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("peppermintpatty", fetched[0].Login);
         }
     }
 

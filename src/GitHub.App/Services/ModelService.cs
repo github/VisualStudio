@@ -88,6 +88,7 @@ namespace GitHub.Services
         {
             return hostCache.GetAndRefreshObject("user",
                 () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
+                .Take(1)
                 .ToList();
         }
 
@@ -96,7 +97,10 @@ namespace GitHub.Services
             return GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
-                    TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)));
+                    TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)))
+                .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
+                    // This could happen if we try to call this before the user is logged in.
+                    _ => Observable.Return(Enumerable.Empty<AccountCacheItem>()));
         }
 
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
