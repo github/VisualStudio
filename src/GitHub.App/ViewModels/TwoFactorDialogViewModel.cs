@@ -98,8 +98,7 @@ namespace GitHub.ViewModels
             var cancel = CancelCommand.Select(_ => RecoveryOptionResult.CancelOperation);
             return Observable.Merge(ok, cancel, resend)
                 .Take(1)
-                .Do(_ =>
-                    IsAuthenticationCodeSent = error.ChallengeResult == TwoFactorChallengeResult.RequestResendCode);
+                .Do(_ => IsAuthenticationCodeSent = error.ChallengeResult == TwoFactorChallengeResult.RequestResendCode);
         }
 
         public TwoFactorType TwoFactorType
