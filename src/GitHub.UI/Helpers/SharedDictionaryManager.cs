@@ -52,4 +52,27 @@ namespace GitHub.UI.Helpers
             }
         }
     }
+
+    public class CachedResourceDictionary : ResourceDictionary
+    {
+        static Dictionary<Uri, ResourceDictionary> dictionaries = new Dictionary<Uri, ResourceDictionary>();
+
+        Uri sourceUri;
+        public new Uri Source
+        {
+            get { return sourceUri; }
+            set
+            {
+                sourceUri = value;
+                ResourceDictionary ret;
+                if (dictionaries.TryGetValue(value, out ret))
+                {
+                    MergedDictionaries.Add(ret);
+                    return;
+                }
+                base.Source = value;
+                dictionaries.Add(value, this);
+            }
+        }
+    }
 }
