@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using System.Windows;
 using GitHub.Exports;
+using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
@@ -32,15 +33,22 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     view => view.authenticationSentLabel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.IsSms, view => view.resendCodeButton.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.Description, view => view.description.Text));
-                d(this.OneWayBind(ViewModel, vm => vm.InvalidAuthenticationCode, view => view.authenticationFailedLabel.Visibility));
+                d(this.OneWayBind(ViewModel, vm => vm.ShowErrorMessage, view => view.authenticationFailedLabel.Visibility));
+                d(this.ViewModel.ResendCodeCommand.Subscribe(_ => SetFocus()));
+                d(this.ViewModel.OkCommand.Subscribe(_ => SetFocus()));
             });
             IsVisibleChanged += (s, e) =>
             {
                 if (IsVisible)
                 {
-                    authenticationCode.TryFocus().Subscribe();
+                    SetFocus();
                 }
             };
+        }
+
+        void SetFocus()
+        {
+            authenticationCode.TryFocus().Subscribe();
         }
 
         public ITwoFactorDialogViewModel ViewModel

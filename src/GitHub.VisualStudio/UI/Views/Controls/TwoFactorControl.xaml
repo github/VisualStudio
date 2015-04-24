@@ -25,13 +25,6 @@
                 Margin="0,0,12,0"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 Foreground="{DynamicResource GHTextBrush}" />
-            <uirx:ErrorMessageDisplay
-                x:Name="authenticationSentLabel"
-                Foreground="{DynamicResource GitHubAccentBrush}"
-                Message="Authentication code sent!" />
-            <uirx:ErrorMessageDisplay
-                x:Name="authenticationFailedLabel"
-                Message="Invalid authentication code" />
         </WrapPanel>
 
         <ui:HorizontalShadowDivider />
@@ -47,11 +40,23 @@
         <uirx:TwoFactorInput
             x:Name="authenticationCode"
             TabIndex="1" />
+        <Grid Margin="0,12,0,0" Height="18">
+            <uirx:ErrorMessageDisplay
+                x:Name="authenticationFailedLabel"
+                Message="Try entering the code again or clicking the resend button to get a new authentication code."
+                Content="Invalid authentication code" />
+            <uirx:ErrorMessageDisplay
+                x:Name="authenticationSentLabel"
+                Icon="check"
+                IconFill="{DynamicResource GitHubAccentBrush}"
+                Message="If you do not receive the authentication code, contact support@github.com."
+                Content="Authentication code sent!" />
+        </Grid>
         <StackPanel
-                Orientation="Horizontal"
-                HorizontalAlignment="Center"
-                Margin="0,24,0,60">
-            <ui:OcticonCircleButton 
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Margin="0,18,0,60">
+            <ui:OcticonCircleButton
                 x:Name="okButton" 
                 TabIndex="2" 
                 Icon="check"

@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using NullGuard;
 
 namespace GitHub.UI
 {
@@ -16,6 +18,12 @@ namespace GitHub.UI
 
         public static readonly DependencyProperty IconProperty =
             DependencyProperty.Register("Icon", typeof(Octicon), typeof(ErrorMessageDisplay), new PropertyMetadata(Octicon.stop));
+
+        public static readonly DependencyProperty IconMarginProperty =
+            DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(ErrorMessageDisplay), new PropertyMetadata(new Thickness(0, 0, 4, 0)));
+
+        public static readonly DependencyProperty IconFillProperty =
+            DependencyProperty.Register("IconFill", typeof(Brush), typeof(ErrorMessageDisplay), new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0xe7, 0x4c, 0x3c))));
 
         /// <summary>
         /// Gets or sets the error message, treat this as the title.
@@ -34,6 +42,20 @@ namespace GitHub.UI
         {
             get { return (Octicon)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
+        }
+
+        public Thickness IconMargin
+        {
+            [return: AllowNull]
+            get { return (Thickness)GetValue(IconMarginProperty); }
+            set { SetValue(IconMarginProperty, value); }
+        }
+
+        public Brush IconFill
+        {
+            [return: AllowNull]
+            get { return (Brush)GetValue(IconFillProperty); }
+            set { SetValue(IconFillProperty, value); }
         }
     }
 }
