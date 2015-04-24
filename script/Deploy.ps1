@@ -259,7 +259,8 @@ function Build-Vsix([string]$directory) {
 function Build-Installer([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
 
-    $content = @"<?xml version="1.0" encoding="utf-8"?>
+    $content = @"
+<?xml version="1.0" encoding="utf-8"?>
 <Include>
   <?define VsixFile="GitHub.VisualStudio.vsix" ?>
   <?define VsixPath="$directory" ?>

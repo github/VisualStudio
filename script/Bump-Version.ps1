@@ -98,11 +98,12 @@ function Write-VersionInstaller{
         $version
     )
 
-    $content = @'<?xml version="1.0" encoding="utf-8"?>
+    $content = @"
+<?xml version="1.0" encoding="utf-8"?>
 <Include>
   <?define VersionNumber="$version" ?>
 </Include>
-'@
+"@
 
 	$content | Set-Content Get-WiXVersionFile
 }
