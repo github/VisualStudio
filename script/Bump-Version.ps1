@@ -60,7 +60,7 @@ function Bump-Version {
         return $proposedVersion
     }
 
-    New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, ($currentVersion.Revision + 1)
+    New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), ($currentVersion.Revision)
 }
 
 function Write-VersionCsproj {
