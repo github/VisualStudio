@@ -12,7 +12,7 @@
              xmlns:converters="clr-namespace:GitHub.VisualStudio.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="432"
+             d:DesignHeight="440"
              d:DesignWidth="414"
              Margin="0"
              Background="Transparent">

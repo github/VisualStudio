@@ -49,7 +49,8 @@
                         <Trigger Property="IsShowingMessage" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" TargetName="grid" />
                         </Trigger>
-                    </ControlTemplate.Triggers>                </ControlTemplate>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>

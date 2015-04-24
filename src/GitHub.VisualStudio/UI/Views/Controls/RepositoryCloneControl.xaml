@@ -11,7 +11,7 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d"
              d:DesignWidth="414"
-             d:DesignHeight="432"
+             d:DesignHeight="440"
              Background="Transparent">
     <d:DesignProperties.DataContext>
         <Binding>

@@ -31,9 +31,6 @@ namespace GitHub.UI
                 .Subscribe(result =>
                 {
                     DataContext = result;
-                    ErrorMessageFontWeight = result.ErrorCauseOrResolution.IsNullOrEmpty()
-                        ? FontWeights.Normal
-                        : FontWeights.Bold;
                 });
 
             Unloaded += (o, e) =>
@@ -81,7 +78,7 @@ namespace GitHub.UI
             set { SetValue(FillProperty, value); }
         }
 
-        public static readonly DependencyProperty ErrorMessageFontWeightProperty = DependencyProperty.Register("ErrorMessageFontWeight", typeof(FontWeight), typeof(UserErrorMessages), new PropertyMetadata(FontWeights.Bold));
+        public static readonly DependencyProperty ErrorMessageFontWeightProperty = DependencyProperty.Register("ErrorMessageFontWeight", typeof(FontWeight), typeof(UserErrorMessages), new PropertyMetadata(FontWeights.Normal));
         public FontWeight ErrorMessageFontWeight
         {
             [return: AllowNull]

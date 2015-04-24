@@ -103,7 +103,7 @@ namespace GitHub.ViewModels
                 });
 
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
-                .Subscribe(_ => {});
+                .Subscribe();
 
             CreateRepository = InitializeCreateRepositoryCommand();
 
@@ -285,9 +285,8 @@ namespace GitHub.ViewModels
             {
                 if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
-                    // TODO: Throw a proper error.
                     log.Error("Error creating repository.", ex);
-                    UserError.Throw(new PublishRepositoryUserError(ex.Message));
+                    UserError.Throw(TranslateRepositoryCreateException(ex));
                 }
             });
 
@@ -305,6 +304,25 @@ namespace GitHub.ViewModels
             }
 
             return path.Substring(1, path.Length - 2);
+        }
+
+        PublishRepositoryUserError TranslateRepositoryCreateException(Exception ex)
+        {
+            var existsException = ex as RepositoryExistsException;
+            if (existsException != null && SelectedAccount != null)
+            {
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Repository '{0}/{1}' already exists.",
+                    SelectedAccount.Login, RepositoryName);
+                return new PublishRepositoryUserError(message, "Change the repository name or select a different account and try again.");
+            }
+            var quotaExceededException = ex as PrivateRepositoryQuotaExceededException;
+            if (quotaExceededException != null && SelectedAccount != null)
+            {
+                return new PublishRepositoryUserError("Exceeded private repositories quota.", quotaExceededException.Message);
+            }
+            return new PublishRepositoryUserError(ex.Message);
         }
     }
 }
