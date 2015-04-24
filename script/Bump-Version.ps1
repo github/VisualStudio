@@ -105,7 +105,8 @@ function Write-VersionInstaller{
 </Include>
 "@
 
-	$content | Set-Content Get-WiXVersionFile
+    $file = Get-WiXVersionFile
+    $content | Set-Content $file
 }
 
 function Write-VersionAssemblyInfo {
