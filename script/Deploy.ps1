@@ -259,15 +259,6 @@ function Build-Vsix([string]$directory) {
 function Build-Installer([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
 
-    $content = @"
-<?xml version="1.0" encoding="utf-8"?>
-<Include>
-  <?define VsixFile="GitHub.VisualStudio.vsix" ?>
-  <?define VsixPath="$directory" ?>
-</Include>
-"@
-    $content | Set-Content Get-WiXVsixFile
-
     Run-Command -Fatal { & $msbuild $solution /property:Configuration=Publish /verbosity:minimal }
 
     Copy-Item (Join-Path $rootDirectory build\$configuration\ghfvs.msi) $directory
