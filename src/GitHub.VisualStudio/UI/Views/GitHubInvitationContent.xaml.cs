@@ -13,8 +13,6 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public GitHubInvitationContent()
         {
-            SharedDictionaryManager.Load("GitHub.VisualStudio", Resources);
-            SharedDictionaryManager.Load("GitHub.UI", Resources);
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IGitHubInvitationSection;
