@@ -29,8 +29,12 @@ function Invoke-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
     Die "``$Command`` failed" $output
 }
 
-function Get-WiXManifestPath {
-    Join-Path $gitHubDirectory Product.wxs
+function Get-WiXVersionFile {
+    Join-Path $gitHubDirectory Version.wxi
+}
+
+function Get-WiXVsixFile {
+    Join-Path $gitHubDirectory Vsix.wxi
 }
 
 function Get-WixManifestXml {

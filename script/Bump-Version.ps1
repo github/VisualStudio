@@ -60,7 +60,7 @@ function Bump-Version {
         return $proposedVersion
     }
 
-    New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, ($currentVersion.Revision + 1)
+    New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), ($currentVersion.Revision)
 }
 
 function Write-VersionCsproj {
@@ -98,12 +98,15 @@ function Write-VersionInstaller{
         $version
     )
 
-    $document = Get-WiXManifestXml
+    $content = @"
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define VersionNumber="$version" ?>
+</Include>
+"@
 
-    $numberOfReplacements = 0
-    $document.WiX.Product.Version = $version.ToString()
-
-    $document.Save((Get-WiXManifestPath))
+    $file = Get-WiXVersionFile
+    $content | Set-Content $file
 }
 
 function Write-VersionAssemblyInfo {
@@ -147,7 +150,7 @@ function Write-Version {
 
     Write-VersionCsproj $version
     Write-VersionVsixManifest $version
-	#Write-VersionInstaller $version
+    Write-VersionInstaller $version
     Write-VersionAssemblyInfo $version
 }
 
