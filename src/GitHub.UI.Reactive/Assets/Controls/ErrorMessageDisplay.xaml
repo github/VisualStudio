@@ -6,6 +6,7 @@
     <Style x:Key="ErrorMessageStyle" TargetType="{x:Type uirx:ErrorMessageDisplay}">
         <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
         <Setter Property="IconFill" Value="{DynamicResource GitHubErrorBrush}" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type uirx:ErrorMessageDisplay}">

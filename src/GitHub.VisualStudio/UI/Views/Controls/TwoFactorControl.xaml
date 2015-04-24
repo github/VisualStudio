@@ -40,7 +40,7 @@
         <uirx:TwoFactorInput
             x:Name="authenticationCode"
             TabIndex="1" />
-        <Grid Margin="0,12,0,0">
+        <Grid Margin="0,12,0,0" Height="18">
             <uirx:ErrorMessageDisplay
                 x:Name="authenticationFailedLabel"
                 Content="Invalid authentication code" />
@@ -50,11 +50,11 @@
                 IconFill="{DynamicResource GitHubAccentBrush}"
                 Content="Authentication code sent!" />
         </Grid>
-          <StackPanel
-                Orientation="Horizontal"
-                HorizontalAlignment="Center"
-                Margin="0,24,0,60">
-            <ui:OcticonCircleButton 
+        <StackPanel
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Margin="0,18,0,60">
+            <ui:OcticonCircleButton
                 x:Name="okButton" 
                 TabIndex="2" 
                 Icon="check"
