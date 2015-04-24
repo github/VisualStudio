@@ -98,12 +98,13 @@ function Write-VersionInstaller{
         $version
     )
 
-    $document = Get-WiXManifestXml
+    $content = @'<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define VersionNumber="$version" ?>
+</Include>
+'@
 
-    $numberOfReplacements = 0
-    $document.WiX.Product.Version = $version.ToString()
-
-    $document.Save((Get-WiXManifestPath))
+	$content | Set-Content Get-WiXVersionFile
 }
 
 function Write-VersionAssemblyInfo {
@@ -147,7 +148,7 @@ function Write-Version {
 
     Write-VersionCsproj $version
     Write-VersionVsixManifest $version
-	#Write-VersionInstaller $version
+	Write-VersionInstaller $version
     Write-VersionAssemblyInfo $version
 }
 

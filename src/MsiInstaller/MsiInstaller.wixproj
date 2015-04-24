@@ -15,6 +15,8 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
+    <SuppressValidation>False</SuppressValidation>
+    <SuppressIces>ICE80</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -49,6 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="ProductInfo.wxi" />
+    <Content Include="Version.wxi" />
+    <Content Include="Vsix.wxi" />
   </ItemGroup>
   <PropertyGroup>
     <WixToolPath>$(SolutionDir)packages\WiX.Toolset.2015.3.10.0.1503\tools\wix\</WixToolPath>
