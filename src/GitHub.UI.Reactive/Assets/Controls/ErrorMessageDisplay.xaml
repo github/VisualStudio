@@ -3,28 +3,56 @@
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                     xmlns:uirx="clr-namespace:GitHub.UI">
 
-    <Style x:Key="ErrorMessageCenteredNoIcon" TargetType="{x:Type uirx:ErrorMessageDisplay}">
-        <Setter Property="Foreground" Value="{DynamicResource GitHubErrorBrush}" />
+    <Style x:Key="ErrorMessageStyle" TargetType="{x:Type uirx:ErrorMessageDisplay}">
+        <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
+        <Setter Property="IconFill" Value="{DynamicResource GitHubErrorBrush}" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type uirx:ErrorMessageDisplay}">
-                    <StackPanel TextBlock.TextAlignment="Center">
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            Foreground="{TemplateBinding Foreground}" 
-                            FontSize="14" 
-                            FontFamily="{DynamicResource GitHubFontFamilyLight}" 
-                            Text="{TemplateBinding Message}" />
-
-                        <ContentPresenter 
-                            HorizontalAlignment="Center"
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox
+                            Grid.Column="0"
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Right"
+                            Margin="{TemplateBinding IconMargin}"
+                            Width="16"
+                            Height="16">
+                            <ui:OcticonPath
+                                x:Name="icon"
+                                Icon="{TemplateBinding Icon}"
+                                Height="1024"
+                                Fill="{TemplateBinding IconFill}" />
+                        </Viewbox>
+                        <ContentPresenter
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                            ToolTip="{TemplateBinding Message}"
                             Content="{TemplateBinding Content}" />
-                    </StackPanel>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type uirx:ErrorMessageDisplay}" BasedOn="{StaticResource ErrorMessageCenteredNoIcon}" />
+    <Style TargetType="{x:Type uirx:ErrorMessageDisplay}" BasedOn="{StaticResource ErrorMessageStyle}" />
+
+    <Style TargetType="ToolTip">
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content}" Value="">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>
