@@ -308,6 +308,17 @@ public class ModelServiceTests
             Assert.Equal("octokit.objc", cachedOctokitRepositories[2].Name);
             Assert.Equal("octokit", cachedOctokitRepositories[2].Owner.Login);
         }
+
+        [Fact]
+        public async Task WhenNotLoggedInReturnsEmptyCollection()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
+
+            var repos = await modelService.GetRepositories();
+
+            Assert.Equal(0, repos.Count);
+        }
     }
 
     public class TheInvalidateAllMethod

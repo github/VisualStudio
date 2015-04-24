@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -99,7 +100,7 @@ namespace GitHub.Services
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
                     TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)))
                 .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
-                    // This could happen if we try to call this before the user is logged in.
+                    // This could in theory happen if we try to call this before the user is logged in.
                     _ => Observable.Return(Enumerable.Empty<AccountCacheItem>()));
         }
 
@@ -128,7 +129,11 @@ namespace GitHub.Services
                     () => GetUserRepositoriesFromApi(repositoryType),
                         TimeSpan.FromMinutes(5),
                         TimeSpan.FromDays(7)))
-                .ToReadOnlyList(Create));
+                .ToReadOnlyList(Create))
+                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                    // This could in theory happen if we try to call this before the user is logged in.
+                    _ => Observable.Return(new ReadOnlyCollection<IRepositoryModel>(new IRepositoryModel[] { })));
+            ;
         }
 
         IObservable<IEnumerable<RepositoryCacheItem>> GetUserRepositoriesFromApi(RepositoryType repositoryType)
