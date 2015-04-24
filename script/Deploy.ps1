@@ -258,6 +258,7 @@ function Build-Vsix([string]$directory) {
 
 function Build-Installer([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
+
     Run-Command -Fatal { & $msbuild $solution /property:Configuration=Publish /verbosity:minimal }
 
     Copy-Item (Join-Path $rootDirectory build\$configuration\ghfvs.msi) $directory
