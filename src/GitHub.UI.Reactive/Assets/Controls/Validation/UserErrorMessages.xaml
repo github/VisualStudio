@@ -8,10 +8,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:UserErrorMessages}">
-                    <Grid x:Name="grid" Visibility="Hidden" Opacity="0">
-                        
+                    <Grid x:Name="grid" Visibility="Hidden" Opacity="0" HorizontalAlignment="Center">
                         <Grid.LayoutTransform>
-                            <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="0"></ScaleTransform>
+                            <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="0" />
                         </Grid.LayoutTransform>
 
                         <Grid.ColumnDefinitions>
@@ -19,34 +18,27 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Viewbox Grid.Column="0" VerticalAlignment="Top" 
-                                 Margin="{TemplateBinding IconMargin}"
-                                 HorizontalAlignment ="Right" Width="16" Height="16">
-                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="1024" Fill="{TemplateBinding Fill}"/>
+                        <Viewbox
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Margin="{TemplateBinding IconMargin}"
+                            HorizontalAlignment="Right"
+                            Width="16"
+                            Height="16">
+                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="1024" Fill="{TemplateBinding Fill}" />
                         </Viewbox>
                         <ContentControl Grid.Column="1" Content="{Binding}">
                             <ContentControl.Resources>
-
                                 <DataTemplate DataType="{x:Type rxui:UserError}">
-
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Path=ErrorMessage}" 
-                                           FontWeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=ErrorMessageFontWeight}"
-                                           TextWrapping="Wrap"
-                                           Margin="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=MessageMargin}"/>
-
-                                        <TextBlock x:Name="descriptionTextBlock" Text="{Binding Path=ErrorCauseOrResolution}" 
-                                       TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <DataTemplate.Triggers>
-                                        <Trigger SourceName="descriptionTextBlock" Property="Text" Value="">
-                                            <Setter TargetName="descriptionTextBlock" Property="Visibility" Value="Hidden" />
-                                        </Trigger>
-                                    </DataTemplate.Triggers>
-
+                                    <TextBlock
+                                        Text="{Binding Path=ErrorMessage}"
+                                        ToolTip="{Binding Path=ErrorCauseOrResolution}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        TextWrapping="Wrap"
+                                        FontWeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=ErrorMessageFontWeight}"
+                                        Margin="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:UserErrorMessages}},Path=MessageMargin}"/>
                                 </DataTemplate>
-
                             </ContentControl.Resources>
                         </ContentControl>
                     </Grid>

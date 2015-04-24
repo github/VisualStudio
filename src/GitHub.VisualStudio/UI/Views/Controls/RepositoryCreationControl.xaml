@@ -35,6 +35,14 @@
         </ui:OcticonCircleButton>
 
         <StackPanel>
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
+                    <Setter Property="IconMargin" Value="-1,2,7,0" />
+                    <Setter Property="ErrorMessageFontWeight" Value="Normal" />
+                    <Setter Property="Icon" Value="stop" />
+                    <Setter Property="Margin" Value="0,5,0,0"/>
+                </Style>
+                </StackPanel.Resources>
             <ui:HorizontalShadowDivider />
             <Grid
                 FocusManager.IsFocusScope="True"
@@ -62,14 +70,6 @@
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Padding" Value="0" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
-                    </Style>
-
-                    <Style TargetType="{x:Type uirx:UserErrorMessages}" BasedOn="{StaticResource {x:Type uirx:UserErrorMessages}}">
-                        <Setter Property="IconMargin" Value="-1,2,7,0" />
-                        <Setter Property="ErrorMessageFontWeight" Value="Normal" />
-                        <Setter Property="Icon" Value="alert" />
-                        <Setter Property="Fill" Value="#f39c12" />
-                        <Setter Property="Margin" Value="0,5,0,0"/>
                     </Style>
                 </Grid.Resources>
 
@@ -243,10 +243,10 @@
                 </Grid>
             </Grid>
             <uirx:UserErrorMessages
-                    x:Name="userErrorMessages"
-                    Icon="stop"
-                    HorizontalContentAlignment="Stretch"
-                    Margin="0" />
+                x:Name="userErrorMessages"
+                HorizontalAlignment="Center"
+                HorizontalContentAlignment="Stretch"
+                Margin="0" />
         </StackPanel>
      
     </DockPanel>
