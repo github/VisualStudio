@@ -188,20 +188,23 @@ namespace GitHub.Caches
 
             return Observable.Defer(() =>
             {
-                var bitmapImage = new BitmapImage();
-
-                bitmapImage.BeginInit();
-                if (desiredWidth != null && desiredHeight != null)
+                using (sourceStream)
                 {
-                    bitmapImage.DecodePixelWidth = (int)desiredWidth;
-                    bitmapImage.DecodePixelHeight = (int)desiredHeight;
+                    var bitmapImage = new BitmapImage();
+
+                    bitmapImage.BeginInit();
+                    if (desiredWidth != null && desiredHeight != null)
+                    {
+                        bitmapImage.DecodePixelWidth = (int)desiredWidth;
+                        bitmapImage.DecodePixelHeight = (int)desiredHeight;
+                    }
+                    bitmapImage.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.StreamSource = sourceStream;
+                    bitmapImage.EndInit();
+                    bitmapImage.Freeze();
+                    return Observable.Return(bitmapImage);
                 }
-                bitmapImage.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.StreamSource = sourceStream;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-                return Observable.Return(bitmapImage);
             });
         }
 
