@@ -109,7 +109,7 @@ namespace GitHub.Models
                 if (string.IsNullOrWhiteSpace(token))
                     return Observable.Return(Unit.Default);
 
-                return loginCache.SaveLogin(token, "x-oauth-basic", Address)
+                return loginCache.SaveLogin(usernameOrEmail, token, Address)
                     .ObserveOn(RxApp.MainThreadScheduler);
             });
 
