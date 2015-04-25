@@ -169,7 +169,7 @@ namespace GitHub.Caches
         {
             return cacheFactory.SelectMany(cache =>
             {
-                return LoadImage(new MemoryStream(x))
+                return LoadImage(new MemoryStream(x), 32, 32)
                     .Catch<BitmapImage, Exception>(ex =>
                     {
                         // This image is likely corrupt. 
