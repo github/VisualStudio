@@ -43,13 +43,13 @@
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             Margin="0,4,0,4">
-            <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource GitHubWarningBrush}">
-                Some or all repositories failed to load.
-            </TextBlock>
-            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource GHTextBrush}">
-                Close the dialog and click the Clone button to try again.
-            </TextBlock>
-        </StackPanel>
+			<uirx:ErrorMessageDisplay
+                Icon="stop"
+                Visibility="Visible"
+                Margin="8,0"
+                Content="An error occurred while loading repositories"
+                Message="Some or all repositories may not have loaded. Close the dialog and try again." />
+		</StackPanel>
 
         <ui:OcticonCircleButton
             DockPanel.Dock="Bottom"
