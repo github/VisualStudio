@@ -3,46 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
 >
-    <Color x:Key="ActionLinkColor">#0097FB</Color>
-    <SolidColorBrush x:Key="ActionLinkBrushKey" Color="{StaticResource ActionLinkColor}" PresentationOptions:Freeze="true"/>
-    <Color x:Key="ActionLinkDisabledColor">#999</Color>
-    <SolidColorBrush x:Key="ActionLinkDisabledBrushKey" Color="{StaticResource ActionLinkDisabledColor}" PresentationOptions:Freeze="true"/>
 
-    <Style TargetType="{x:Type Hyperlink}">
-        <Style.Triggers>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="UIElement.IsMouseOver" Value="false"/>
-                    <Condition Property="IsEnabled" Value="true"/>
-                </MultiTrigger.Conditions>
-                <MultiTrigger.Setters>
-                    <Setter Property="Hyperlink.TextDecorations" Value="None"/>
-                    <Setter Property="Hyperlink.Foreground" Value="{DynamicResource ActionLinkBrushKey}" />
-                    <Setter Property="FrameworkElement.Cursor" Value="None" />
-                </MultiTrigger.Setters>
-            </MultiTrigger>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="IsMouseOver" Value="true"/>
-                    <Condition Property="IsEnabled" Value="true"/>
-                </MultiTrigger.Conditions>
-                <MultiTrigger.Setters>
-                    <Setter Property="Hyperlink.TextDecorations" Value="Underline"/>
-                    <Setter Property="Hyperlink.Foreground" Value="{DynamicResource ActionLinkBrushKey}" />
-                    <Setter Property="FrameworkElement.Cursor" Value="Hand" />
-                </MultiTrigger.Setters>
-            </MultiTrigger>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="IsEnabled" Value="false"/>
-                </MultiTrigger.Conditions>
-                <MultiTrigger.Setters>
-                    <Setter Property="Hyperlink.TextDecorations" Value="None"/>
-                    <Setter Property="Hyperlink.Foreground" Value="{DynamicResource ActionLinkDisabledBrushKey}" />
-                </MultiTrigger.Setters>
-            </MultiTrigger>
-        </Style.Triggers>
-    </Style>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/UI/Views/Controls/ActionLinkButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
 
 </ResourceDictionary>
