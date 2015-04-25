@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:uihelpers="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
@@ -25,11 +26,11 @@
     </UserControl.Resources>
     <Grid>
         <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="6,0,0,6">
-            <TextBlock><Hyperlink x:Name="cloneLink" Click="cloneLink_Click">Clone</Hyperlink></TextBlock>
+            <vsui:ActionLinkButton x:Name="cloneLink" Click="cloneLink_Click">Clone</vsui:ActionLinkButton>
             <Label Margin="3 0 3 0">|</Label>
-            <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
+            <vsui:ActionLinkButton x:Name="createLink" Click="createLink_Click">Create</vsui:ActionLinkButton>
             <Label Margin="3 0 3 0">|</Label>
-            <TextBlock Grid.Row="1"><Hyperlink x:Name="signOut" Click="signOut_Click">Sign out</Hyperlink></TextBlock>
+            <vsui:ActionLinkButton x:Name="signOut" Click="signOut_Click">Sign out</vsui:ActionLinkButton>
         </WrapPanel>
       </Grid>
 </UserControl>
