@@ -2,13 +2,14 @@
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Reactive;
 using System.Net.NetworkInformation;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using GitHub.Authentication;
 using GitHub.Primitives;
+using NLog;
 using NullGuard;
 using Octokit;
 using Octokit.Reactive;
@@ -18,6 +19,8 @@ namespace GitHub.Api
 {
     public class ApiClient : IApiClient
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
         const string clientId = "";
         const string clientSecret = "";
@@ -134,12 +137,20 @@ namespace GitHub.Api
 
         static string GetSha256Hash(string input)
         {
-            using (var sha256 = SHA256.Create())
+            try
             {
-                var bytes = Encoding.UTF8.GetBytes(input);
-                var hash = sha256.ComputeHash(bytes);
+                using (var sha256 = SHA256.Create())
+                {
+                    var bytes = Encoding.UTF8.GetBytes(input);
+                    var hash = sha256.ComputeHash(bytes);
 
-                return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
+                    return string.Join("", hash.Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error("IMPOSSIBLE! Generating Sha256 hash caused an exception.", e);
+                return null;
             }
         }
 
@@ -154,14 +165,16 @@ namespace GitHub.Api
             {
                 return Dns.GetHostName();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                log.Info("Failed to retrieve host name using `DNS.GetHostName`.", e);
                 try
                 {
                     return Environment.MachineName;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    log.Info("Failed to retrieve host name using `Environment.MachineName`.", ex);
                     return "(unknown)";
                 }
             }
@@ -180,8 +193,9 @@ namespace GitHub.Api
 
                 return fastedValidNetworkInterface ?? GetMachineNameSafe();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                log.Info("Could not retrieve MAC address. Fallback to using machine name.", e);
                 return GetMachineNameSafe();
             }
         }
