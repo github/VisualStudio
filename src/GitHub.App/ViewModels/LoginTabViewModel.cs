@@ -43,7 +43,7 @@ namespace GitHub.ViewModels
             {
                 if (!ex.IsCriticalException())
                 {
-                    log.Error(String.Format(CultureInfo.InvariantCulture, "Error logging into GitHub.com the website'{0}'", UsernameOrEmail), ex);
+                    log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri, UsernameOrEmail), ex);
                     ShowConnectingToHostFailed = true;
                 }
             });
@@ -178,7 +178,6 @@ namespace GitHub.ViewModels
                             new InvalidOperationException("Unknown EnterpriseLoginResult: " + authResult));
                 }
             });
-
         }
 
         async Task Clear()
