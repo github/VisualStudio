@@ -43,7 +43,12 @@ namespace GitHub.Services
                     GetOrderedGitIgnoreTemplatesFromApi,
                     TimeSpan.FromDays(1),
                     TimeSpan.FromDays(7))
-                .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None));
+                .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None))
+                .Catch<IReadOnlyList<GitIgnoreItem>, Exception>(e =>
+                {
+                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
+                    return Observable.Return(new GitIgnoreItem[] { GitIgnoreItem.None });
+                });
         }
 
         public IObservable<IReadOnlyList<LicenseItem>> GetLicenses()
@@ -54,7 +59,12 @@ namespace GitHub.Services
                     GetOrderedLicensesFromApi,
                     TimeSpan.FromDays(1),
                     TimeSpan.FromDays(7))
-                .ToReadOnlyList(Create, LicenseItem.None));
+                .ToReadOnlyList(Create, LicenseItem.None))
+                .Catch<IReadOnlyList<LicenseItem>, Exception>(e =>
+                {
+                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
+                    return Observable.Return(new LicenseItem[] { LicenseItem.None });
+                });
         }
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
@@ -72,8 +82,7 @@ namespace GitHub.Services
                 .WhereNotNull()
                 .Select(LicenseCacheItem.Create)
                 .ToList()
-                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)))
-                .Catch<IEnumerable<LicenseCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<LicenseCacheItem>()));
+                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)));
         }
 
         IObservable<IEnumerable<string>> GetOrderedGitIgnoreTemplatesFromApi()
@@ -81,8 +90,7 @@ namespace GitHub.Services
             return apiClient.GetGitIgnoreTemplates()
                 .WhereNotNull()
                 .ToList()
-                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended))
-                .Catch<IEnumerable<string>, Exception>(_ => Observable.Return(Enumerable.Empty<string>()));
+                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
