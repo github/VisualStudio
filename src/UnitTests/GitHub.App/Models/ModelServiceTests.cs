@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
-using GitHub.Extensions;
 using GitHub.Services;
-using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Octokit;
-using ReactiveUI.Testing;
 using Xunit;
 
 public class ModelServiceTests
@@ -76,7 +73,7 @@ public class ModelServiceTests
         }
 
         [Fact]
-        public async Task ReturnsEmptyCollectionWhenGitIgnoreEndpointNotFound()
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionnWhenGitIgnoreEndpointNotFound()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetGitIgnoreTemplates()
@@ -88,8 +85,23 @@ public class ModelServiceTests
 
             Assert.Equal(1, fetched.Count);
             Assert.Equal("None", fetched[0].Name);
-            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("gitignores");
-            Assert.Equal(0, cached.Count);
+        }
+
+        [Fact]
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetGitIgnoreTemplates()
+                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
+            var cache = Substitute.For<IBlobCache>();
+            cache.Get(Args.String)
+                .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetGitIgnoreTemplates();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("None", fetched[0].Name);
         }
     }
 
@@ -121,7 +133,7 @@ public class ModelServiceTests
         }
 
         [Fact]
-        public async Task ReturnsEmptyCollectionWhenLicenseApiNotFound()
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionWhenLicenseApiNotFound()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses()
@@ -133,8 +145,21 @@ public class ModelServiceTests
 
             Assert.Equal(1, fetched.Count);
             Assert.Equal("None", fetched[0].Name);
-            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("licenses");
-            Assert.Equal(0, cached.Count);
+        }
+
+        [Fact]
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var cache = Substitute.For<IBlobCache>();
+            cache.Get(Args.String)
+                .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetLicenses();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("None", fetched[0].Name);
         }
     }
 
