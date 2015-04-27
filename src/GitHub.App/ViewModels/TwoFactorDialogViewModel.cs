@@ -137,7 +137,7 @@ namespace GitHub.ViewModels
         public bool InvalidAuthenticationCode
         {
             get { return invalidAuthenticationCode; }
-            set { this.RaiseAndSetIfChanged(ref invalidAuthenticationCode, value); }
+            private set { this.RaiseAndSetIfChanged(ref invalidAuthenticationCode, value); }
         }
 
         public bool ShowErrorMessage
