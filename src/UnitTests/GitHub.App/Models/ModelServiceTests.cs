@@ -73,7 +73,7 @@ public class ModelServiceTests
         }
 
         [Fact]
-        public async Task ReturnsEmptyCollectionWhenGitIgnoreEndpointNotFound()
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionnWhenGitIgnoreEndpointNotFound()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetGitIgnoreTemplates()
@@ -85,8 +85,23 @@ public class ModelServiceTests
 
             Assert.Equal(1, fetched.Count);
             Assert.Equal("None", fetched[0].Name);
-            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("gitignores");
-            Assert.Equal(0, cached.Count);
+        }
+
+        [Fact]
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetGitIgnoreTemplates()
+                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
+            var cache = Substitute.For<IBlobCache>();
+            cache.Get(Args.String)
+                .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetGitIgnoreTemplates();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("None", fetched[0].Name);
         }
     }
 
@@ -118,7 +133,7 @@ public class ModelServiceTests
         }
 
         [Fact]
-        public async Task ReturnsEmptyCollectionWhenLicenseApiNotFound()
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionWhenLicenseApiNotFound()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses()
@@ -130,8 +145,21 @@ public class ModelServiceTests
 
             Assert.Equal(1, fetched.Count);
             Assert.Equal("None", fetched[0].Name);
-            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("licenses");
-            Assert.Equal(0, cached.Count);
+        }
+
+        [Fact]
+        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var cache = Substitute.For<IBlobCache>();
+            cache.Get(Args.String)
+                .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetLicenses();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("None", fetched[0].Name);
         }
     }
 
@@ -192,6 +220,27 @@ public class ModelServiceTests
             Assert.Equal("fake", cachedOrgs[1].Login);
             var cachedUser = await cache.GetObject<AccountCacheItem>("user");
             Assert.Equal("octocat", cachedUser.Login);
+        }
+
+        [Fact]
+        public async Task OnlyRetrievesOneUserEvenIfCacheOrApiReturnsMoreThanOne()
+        {
+            // This should be impossible, but let's pretend it does happen.
+            var users = new[]
+            {
+                CreateOctokitUser("peppermintpatty"),
+                CreateOctokitUser("peppermintpatty")
+            };
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.GetUser().Returns(users.ToObservable());
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var cache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+
+            var fetched = await modelService.GetAccounts();
+
+            Assert.Equal(1, fetched.Count);
+            Assert.Equal("peppermintpatty", fetched[0].Login);
         }
     }
 
@@ -283,6 +332,17 @@ public class ModelServiceTests
             Assert.Equal("octokit", cachedOctokitRepositories[1].Owner.Login);
             Assert.Equal("octokit.objc", cachedOctokitRepositories[2].Name);
             Assert.Equal("octokit", cachedOctokitRepositories[2].Owner.Login);
+        }
+
+        [Fact]
+        public async Task WhenNotLoggedInReturnsEmptyCollection()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
+
+            var repos = await modelService.GetRepositories();
+
+            Assert.Equal(0, repos.Count);
         }
     }
 

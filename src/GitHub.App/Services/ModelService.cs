@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -42,7 +43,12 @@ namespace GitHub.Services
                     GetOrderedGitIgnoreTemplatesFromApi,
                     TimeSpan.FromDays(1),
                     TimeSpan.FromDays(7))
-                .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None));
+                .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None))
+                .Catch<IReadOnlyList<GitIgnoreItem>, Exception>(e =>
+                {
+                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
+                    return Observable.Return(new GitIgnoreItem[] { GitIgnoreItem.None });
+                });
         }
 
         public IObservable<IReadOnlyList<LicenseItem>> GetLicenses()
@@ -53,7 +59,12 @@ namespace GitHub.Services
                     GetOrderedLicensesFromApi,
                     TimeSpan.FromDays(1),
                     TimeSpan.FromDays(7))
-                .ToReadOnlyList(Create, LicenseItem.None));
+                .ToReadOnlyList(Create, LicenseItem.None))
+                .Catch<IReadOnlyList<LicenseItem>, Exception>(e =>
+                {
+                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
+                    return Observable.Return(new LicenseItem[] { LicenseItem.None });
+                });
         }
 
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
@@ -71,8 +82,7 @@ namespace GitHub.Services
                 .WhereNotNull()
                 .Select(LicenseCacheItem.Create)
                 .ToList()
-                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)))
-                .Catch<IEnumerable<LicenseCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<LicenseCacheItem>()));
+                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)));
         }
 
         IObservable<IEnumerable<string>> GetOrderedGitIgnoreTemplatesFromApi()
@@ -80,14 +90,14 @@ namespace GitHub.Services
             return apiClient.GetGitIgnoreTemplates()
                 .WhereNotNull()
                 .ToList()
-                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended))
-                .Catch<IEnumerable<string>, Exception>(_ => Observable.Return(Enumerable.Empty<string>()));
+                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
         {
             return hostCache.GetAndRefreshObject("user",
                 () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
+                .Take(1)
                 .ToList();
         }
 
@@ -96,7 +106,14 @@ namespace GitHub.Services
             return GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
-                    TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)));
+                    TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)))
+                .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
+                    // This could in theory happen if we try to call this before the user is logged in.
+                    e =>
+                    {
+                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", e);
+                        return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                    });
         }
 
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
@@ -124,7 +141,17 @@ namespace GitHub.Services
                     () => GetUserRepositoriesFromApi(repositoryType),
                         TimeSpan.FromMinutes(5),
                         TimeSpan.FromDays(7)))
-                .ToReadOnlyList(Create));
+                .ToReadOnlyList(Create))
+                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                    // This could in theory happen if we try to call this before the user is logged in.
+                    e =>
+                    {
+                        string message = string.Format(CultureInfo.InvariantCulture,
+                            "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
+                            repositoryType);
+                        log.Error(message, e);
+                        return Observable.Return(new IRepositoryModel[] { });
+                    });
         }
 
         IObservable<IEnumerable<RepositoryCacheItem>> GetUserRepositoriesFromApi(RepositoryType repositoryType)
@@ -151,7 +178,18 @@ namespace GitHub.Services
                         RepositoryCacheItem.Create).ToList(),
                         TimeSpan.FromMinutes(5),
                         TimeSpan.FromDays(7)))
-                .ToReadOnlyList(Create));
+                .ToReadOnlyList(Create))
+                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                    // This could in theory happen if we try to call this before the user is logged in.
+                    e =>
+                    {
+                        string message = string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
+                            organization);
+                        log.Error(message, e);
+                        return Observable.Return(new IRepositoryModel[] { });
+                    });
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)

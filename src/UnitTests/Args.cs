@@ -24,4 +24,7 @@ internal static class Args
     public static Uri Uri { get { return Arg.Any<Uri>(); } }
     public static LibGit2Sharp.Branch Branch { get { return Arg.Any<LibGit2Sharp.Branch>(); } }
     public static Remote Remote { get { return Arg.Any<Remote>(); } }
+    public static Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>
+        TwoFactorChallengCallback
+        { get { return Arg.Any<Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>> (); } }
 }

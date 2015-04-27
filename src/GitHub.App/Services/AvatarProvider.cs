@@ -3,14 +3,12 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
 using GitHub.Models;
 using NullGuard;
-using Splat;
 
 namespace GitHub.Services
 {
@@ -19,7 +17,6 @@ namespace GitHub.Services
     public class AvatarProvider : IAvatarProvider
     {
         readonly IImageCache imageCache;
-        readonly MemoizingMRUCache<IAvatarContainer, AsyncSubject<BitmapSource>> userAvatarCache;
         readonly IBlobCache cache;
 
         public BitmapImage DefaultUserBitmapImage { get; private set; }
@@ -44,11 +41,6 @@ namespace GitHub.Services
 
             DefaultUserBitmapImage = CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
             DefaultOrgBitmapImage = CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
-
-            // NB: We pick 32 here to be roughly the same size as the list of items
-            // in the commit list, to the nearest round number
-            userAvatarCache = new MemoizingMRUCache<IAvatarContainer, AsyncSubject<BitmapSource>>(
-                (account, _) => GetAvatarForAccount(account), 32);
         }
 
         public static BitmapImage CreateBitmapImage(string packUrl)
@@ -65,32 +57,19 @@ namespace GitHub.Services
                 return Observable.Return(DefaultAvatar(apiAccount));
             }
 
-            lock (userAvatarCache)
-            {
-                return userAvatarCache.Get(apiAccount);
-            }
-        }
+            Uri avatarUrl;
+            Uri.TryCreate(apiAccount.AvatarUrl, UriKind.Absolute, out avatarUrl);
+            Debug.Assert(avatarUrl != null, "Cannot have a null avatar url");
 
+            return imageCache.GetImage(avatarUrl)
+                .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(apiAccount)));
+        }
+            
         public IObservable<Unit> InvalidateAvatar([AllowNull] IAvatarContainer apiAccount)
         {
             return apiAccount == null || String.IsNullOrWhiteSpace(apiAccount.Login)
                 ? Observable.Return(Unit.Default)
                 : cache.Invalidate(apiAccount.Login);
-        }
-
-        AsyncSubject<BitmapSource> GetAvatarForAccount(IAvatarContainer account)
-        {
-            var ret = new AsyncSubject<BitmapSource>();
-
-            Uri avatarUrl;
-            Uri.TryCreate(account.AvatarUrl, UriKind.Absolute, out avatarUrl);
-            Debug.Assert(avatarUrl != null, "Cannot have a null avatar url");
-
-            imageCache.GetImage(avatarUrl)
-                .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(account)))
-                .Multicast(ret).Connect();
-
-            return ret;
         }
 
         BitmapImage DefaultAvatar(IAvatarContainer apiAccount)
