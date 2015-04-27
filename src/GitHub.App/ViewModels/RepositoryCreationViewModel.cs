@@ -117,8 +117,17 @@ namespace GitHub.ViewModels
             gitIgnoreTemplates = repositoryHost.ModelService.GetGitIgnoreTemplates()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.GitIgnoreTemplates, initialValue: new GitIgnoreItem[] { });
-            
-            licenses = repositoryHost.ModelService.GetLicenses()
+
+            this.WhenAny(x => x.GitIgnoreTemplates, x => x.Value)
+                .WhereNotNull()
+                .Where(ignores => ignores.Any())
+                .Subscribe(ignores =>
+                {
+                    SelectedGitIgnoreTemplate = ignores.FirstOrDefault(
+                        template => template.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase));
+                });
+
+        licenses = repositoryHost.ModelService.GetLicenses()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
 
