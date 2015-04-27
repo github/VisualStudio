@@ -32,8 +32,8 @@ public class ImageCacheTests
             var retrieved = await imageCache.GetImage(new Uri("https://fake/")).FirstAsync();
 
             Assert.NotNull(retrieved);
-            Assert.Equal(1, retrieved.PixelWidth);
-            Assert.Equal(1, retrieved.PixelHeight);
+            Assert.Equal(32, retrieved.PixelWidth);
+            Assert.Equal(32, retrieved.PixelHeight);
         }
 
         [Fact]
@@ -71,8 +71,8 @@ public class ImageCacheTests
             var retrieved = await imageCache.GetImage(imageUri).FirstAsync();
 
             Assert.NotNull(retrieved);
-            Assert.Equal(1, retrieved.PixelWidth);
-            Assert.Equal(1, retrieved.PixelHeight);
+            Assert.Equal(32, retrieved.PixelWidth);
+            Assert.Equal(32, retrieved.PixelHeight);
         }
 
         [Fact]

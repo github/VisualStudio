@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -14,15 +15,21 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 return;
             }
 
-            var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-            var b = color.GetBrightness();
-            Dark = b > 0.5f;
+            OnThemeChanged();
+
             VSColorTheme.ThemeChanged += _ =>
             {
-                color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-                b = color.GetBrightness();
-                Dark = b > 0.5f;
+                OnThemeChanged();
             };
+        }
+
+        void OnThemeChanged()
+        {
+            var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
+            Debug.Assert(color != null, "The theme color EnvironmentColors.ToolWindowTextColorKey is null");
+            if (color == null) return;
+            var brightness = color.GetBrightness();
+            Dark = brightness > 0.5f;
         }
 
         public bool Dark

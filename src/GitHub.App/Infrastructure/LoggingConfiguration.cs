@@ -1,18 +1,14 @@
-﻿using GitHub.Extensions;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Globalization;
+using System.IO;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
 using Rothko;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitHub.Infrastructure
 {
@@ -24,6 +20,9 @@ namespace GitHub.Infrastructure
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class LoggingConfiguration : ILoggingConfiguration
     {
+        // See http://nlog-project.org/wiki/Layout_Renderers for logging layout options.
+        const string layout = "${longdate}|${level:uppercase=true}|thread:${threadid:padding=2}|${logger:shortName=true}|${message}${onexception:inner=${newline}${exception:format=tostring}}";
+
         [ImportingConstructor]
         public LoggingConfiguration(IProgram program, IOperatingSystem os, IVSServices vsservice)
         {
@@ -47,7 +46,7 @@ namespace GitHub.Infrastructure
                 conf.LoggingRules.Add(new LoggingRule("*", LogLevel.Fatal, fileTarget));
             }
             fileTarget.FileName = Path.Combine(os.Environment.GetLocalGitHubApplicationDataPath(), "extension.log");
-            fileTarget.Layout = "${message}";
+            fileTarget.Layout = layout;
 
             try
             {
