@@ -342,7 +342,7 @@ public class RepositoryCreationViewModelTests
     public class TheGitIgnoreTemplatesProperty
     {
         [Fact]
-        public void IsPopulatedByTheApiAndSortedWithRecommendedFirstAndSelectsFirst()
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
         {
             var gitIgnoreTemplates = new[]
             {
@@ -374,7 +374,6 @@ public class RepositoryCreationViewModelTests
             Assert.False(result[3].Recommended);
             Assert.Equal("WordPress", result[4].Name);
             Assert.False(result[4].Recommended);
-            Assert.Equal(result[0], vm.SelectedGitIgnoreTemplate);
         }
     }
 
@@ -415,6 +414,52 @@ public class RepositoryCreationViewModelTests
             Assert.Equal("artistic-2.0", result[4].Key);
             Assert.False(result[4].Recommended);
             Assert.Equal(result[0], vm.SelectedLicense);
+        }
+    }
+
+    public class TheSelectedGitIgnoreProperty
+    {
+        [Fact]
+        public void DefaultsToVisualStudio()
+        {
+            var gitignores = new[]
+            {
+                GitIgnoreItem.None,
+                GitIgnoreItem.Create("C++"),
+                GitIgnoreItem.Create("Node"),
+                GitIgnoreItem.Create("VisualStudio"),
+            };
+            var provider = Substitutes.ServiceProvider;
+            var hosts = provider.GetRepositoryHosts();
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Args.HostAddress).Returns(host);
+            host.ModelService
+                .GetGitIgnoreTemplates()
+                .Returns(gitignores.ToObservable().ToReadOnlyList());
+            var vm = GetMeAViewModel(provider);
+
+            Assert.Equal("VisualStudio", vm.SelectedGitIgnoreTemplate.Name);
+        }
+
+        [Fact]
+        public void DefaultsToNoneIfVisualStudioIsMissingSomehow()
+        {
+            var gitignores = new[]
+            {
+                GitIgnoreItem.None,
+                GitIgnoreItem.Create("C++"),
+                GitIgnoreItem.Create("Node"),
+            };
+            var provider = Substitutes.ServiceProvider;
+            var hosts = provider.GetRepositoryHosts();
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(Args.HostAddress).Returns(host);
+            host.ModelService
+                .GetGitIgnoreTemplates()
+                .Returns(gitignores.ToObservable().ToReadOnlyList());
+            var vm = GetMeAViewModel(provider);
+
+            Assert.Equal("None", vm.SelectedGitIgnoreTemplate.Name);
         }
     }
 
