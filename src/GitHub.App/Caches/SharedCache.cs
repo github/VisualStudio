@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
+using NLog;
 
 namespace GitHub.Caches
 {
@@ -14,25 +16,45 @@ namespace GitHub.Caches
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         static SharedCache()
         {
-            BlobCache.ApplicationName = Info.ApplicationInfo.ApplicationName;
+            try
+            {
+                BlobCache.ApplicationName = Info.ApplicationInfo.ApplicationName;
+            }
+            catch (Exception e)
+            {
+                log.Error("Error while running the static inializer for SharedCache", e);
+            }
         }
 
-        public SharedCache() : this(BlobCache.UserAccount, BlobCache.LocalMachine, null)
+        public SharedCache() : this(null, null, null)
         {
         }
 
-        protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache, ISecureBlobCache secureCache)
+        protected SharedCache(
+            IBlobCache userAccountCache = null,
+            IBlobCache localMachineCache = null,
+            ISecureBlobCache secureCache = null)
         {
+            
             if (secureCache == null)
             {
-                BlobCache.Secure = new CredentialCache();
-                secureCache = BlobCache.Secure;
+                try
+                {
+                    BlobCache.Secure = new CredentialCache();
+                    secureCache = BlobCache.Secure;
+                }
+                catch (Exception e)
+                {
+                    log.Error("Failed to set up secure cache.", e);
+                    secureCache = new InMemoryBlobCache();
+                }
             }
-            UserAccount = userAccountCache;
-            LocalMachine = localMachineCache;
+            UserAccount = userAccountCache ?? GetBlobCacheWithFallback(() => BlobCache.UserAccount, "UserAccount");
+            LocalMachine = localMachineCache ?? GetBlobCacheWithFallback(() => BlobCache.LocalMachine, "LocalMachine");
             Secure = secureCache;
         }
 
@@ -76,6 +98,19 @@ namespace GitHub.Caches
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        static IBlobCache GetBlobCacheWithFallback(Func<IBlobCache> blobCacheFunc, string cacheName)
+        {
+            try
+            {
+                return blobCacheFunc();
+            }
+            catch (Exception e)
+            {
+                log.Error(string.Format(CultureInfo.InvariantCulture, "Failed to set the {0} cache.", cacheName), e);
+                return new InMemoryBlobCache();
+            }
         }
     }
 }
