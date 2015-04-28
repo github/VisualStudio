@@ -14,6 +14,8 @@ using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NullGuard;
+using NLog;
+using System.Reactive.Linq;
 
 namespace GitHub.VisualStudio
 {
@@ -22,7 +24,12 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class UIProvider : IServiceProvider, IUIProvider, IDisposable
     {
-        readonly CompositeDisposable disposables = new CompositeDisposable();
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        CompositeDisposable disposables = new CompositeDisposable();
+        readonly IServiceProvider serviceProvider;
+        CompositionContainer tempContainer;
+        readonly Dictionary<string, ComposablePart> tempParts;
+        ExportLifetimeContext<IUIController> currentUIFlow;
 
         [AllowNull]
         public ExportProvider ExportProvider { get; private set; }
@@ -37,10 +44,7 @@ namespace GitHub.VisualStudio
             }
         }
 
-        readonly IServiceProvider serviceProvider;
-        readonly CompositionContainer tempContainer;
-        readonly Dictionary<string, ComposablePart> tempParts;
-        ExportLifetimeContext<IUIController> currentUIFlow;
+        bool Initialized { get { return ExportProvider != null; } }
 
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -49,7 +53,18 @@ namespace GitHub.VisualStudio
 
             var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
             Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+            if (componentModel == null)
+            {
+                log.Error("Service of type SComponentModel not found");
+                return;
+            }
             ExportProvider = componentModel.DefaultExportProvider;
+
+            if (ExportProvider == null)
+            {
+                log.Error("DefaultExportProvider could not be obtained.");
+                return;
+            }
 
             tempContainer = AddToDisposables(new CompositionContainer(new ComposablePartExportProvider()
             {
@@ -61,6 +76,9 @@ namespace GitHub.VisualStudio
         [return: AllowNull]
         public object TryGetService(Type serviceType)
         {
+            if (!Initialized)
+                return null;
+
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(tempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
@@ -114,6 +132,12 @@ namespace GitHub.VisualStudio
 
         public void AddService(Type t, object instance)
         {
+            if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot add service.");
+                return;
+            }
+
             var batch = new CompositionBatch();
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
@@ -125,6 +149,12 @@ namespace GitHub.VisualStudio
 
         public void RemoveService(Type t)
         {
+            if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot remove service.");
+                return;
+            }
+
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
@@ -142,6 +172,12 @@ namespace GitHub.VisualStudio
         UI.WindowController windowController;
         public IObservable<object> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
+            if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot setup UI.");
+                return Observable.Return<object>(null);
+            }
+
             StopUI();
 
             var factory = GetService<IExportFactoryProvider>();
@@ -167,31 +203,72 @@ namespace GitHub.VisualStudio
 
         public void RunUI()
         {
+            if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot run UI.");
+                return;
+            }
+
             Debug.Assert(windowController != null, "WindowController is null, did you forget to call SetupUI?");
             if (windowController == null)
+            {
+                log.Error("WindowController is null, cannot run UI.");
                 return;
-            windowController.ShowModal();
+            }
+            try
+            {
+                windowController.ShowModal();
+            }
+            catch (Exception ex)
+            {
+                log.Error("WindowController ShowModal failed. {0}", ex);
+            }
         }
 
         public void RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
+            if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot run UI for {0}.", controllerFlow);
+                return;
+            }
+
             SetupUI(controllerFlow, connection);
-            windowController.ShowModal();
+            try
+            {
+                windowController.ShowModal();
+            }
+            catch (Exception ex)
+            {
+                log.Error("WindowController ShowModal failed for {0}. {1}", controllerFlow, ex);
+            }
         }
 
         public void StopUI()
         {
+            if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot stop UI.");
+                return;
+            }
+
             StopUI(currentUIFlow);
             currentUIFlow = null;
         }
 
         static void StopUI(ExportLifetimeContext<IUIController> disposable)
         {
-            if (disposable != null)
+            try {
+                if (disposable != null && disposable.Value != null)
+                {
+                    if (!disposable.Value.IsStopped)
+                        disposable.Value.Stop();
+                    disposable.Dispose();
+                }
+            }
+            catch (Exception ex)
             {
-                if (!disposable.Value.IsStopped)
-                    disposable.Value.Stop();
-                disposable.Dispose();
+                log.Error("Failed to dispose UI. {0}", ex);
             }
         }
 
@@ -218,11 +295,12 @@ namespace GitHub.VisualStudio
                 if (disposed) return;
 
                 StopUI();
-				disposables.Dispose();
+                if (disposables != null)
+				    disposables.Dispose();
+                disposables = null;
                 if (tempContainer != null)
-                {
                     tempContainer.Dispose();
-                }
+                tempContainer = null;
                 disposed = true;
             }
         }
