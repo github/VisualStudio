@@ -30,6 +30,7 @@ namespace GitHub.VisualStudio
         CompositionContainer tempContainer;
         readonly Dictionary<string, ComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
+        readonly Version currentVersion;
 
         [AllowNull]
         public ExportProvider ExportProvider { get; private set; }
@@ -49,6 +50,7 @@ namespace GitHub.VisualStudio
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
+            this.currentVersion = typeof(UIProvider).Assembly.GetName().Version;
             this.serviceProvider = serviceProvider;
 
             var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
@@ -85,6 +87,7 @@ namespace GitHub.VisualStudio
                 return instance;
 
             instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault());
+            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
 
             if (instance != null)
                 return instance;
