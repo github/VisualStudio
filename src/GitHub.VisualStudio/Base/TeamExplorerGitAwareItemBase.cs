@@ -47,6 +47,10 @@ namespace GitHub.VisualStudio.Base
 
         void UIContextChanged(bool active)
         {
+            Debug.Assert(ServiceProvider != null, "UIContextChanged called before service provider is set");
+            if (ServiceProvider == null)
+                return;
+
             if (active)
                 GitService = ServiceProvider.GetService<IGitExt>();
             else
@@ -56,9 +60,13 @@ namespace GitHub.VisualStudio.Base
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            var service = GitService;
+            if (service == null)
+                return;
+
             if (e.PropertyName == "ActiveRepositories")
             {
-                syncContext.Post((o) => UpdateRepo(o as IGitRepositoryInfo), gitService.ActiveRepositories.FirstOrDefault());
+                syncContext.Post((o) => UpdateRepo(o as IGitRepositoryInfo), service.ActiveRepositories.FirstOrDefault());
             }
         }
 
@@ -82,8 +90,12 @@ namespace GitHub.VisualStudio.Base
                 var uri  = Services.GetUriFromRepository(gitRepo);
                 if (uri != null)
                 {
-                    ActiveRepoUri = uri;
-                    ActiveRepoName = activeRepoUri.GetUser() + "/" + activeRepoUri.GetRepo();
+                    var name = uri.GetRepo();
+                    if (name != null)
+                    {
+                        ActiveRepoUri = uri;
+                        ActiveRepoName = activeRepoUri.GetUser() + "/" + activeRepoUri.GetRepo();
+                    }
                 }
             }
             RepoChanged();

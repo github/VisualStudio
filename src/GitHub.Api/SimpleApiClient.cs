@@ -35,7 +35,7 @@ namespace GitHub.Api
 
         public async Task<Repository> GetRepository()
         {
-            if (owner == null)
+            if (owner == null && OriginalUrl != null)
             {
                 owner = OriginalUrl.GetUser();
                 repoName = OriginalUrl.GetRepo();
@@ -48,6 +48,7 @@ namespace GitHub.Api
                     }
                     catch // TODO: if the repo is private, then it'll throw
                     {
+                        owner = null;
                     }
                 }
             }
