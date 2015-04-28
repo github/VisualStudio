@@ -14,7 +14,9 @@
         MinWidth="414"
         HasMinimizeButton="False"
         HasMaximizeButton="False"
-        Background="White">
+        Background="White"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
     <Grid x:Name="Container">
         
     </Grid>
