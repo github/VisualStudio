@@ -12,8 +12,6 @@ namespace GitHub.Extensions
 
         public static bool IsSameHost(this Uri uri, Uri compareUri)
         {
-            if (compareUri == null)
-                return false;
             return uri.Host.Equals(compareUri.Host, StringComparison.OrdinalIgnoreCase);
         }
 
