@@ -14,7 +14,7 @@ namespace GitHub.VisualStudio.Base
     public class TeamExplorerNavigationItemBase : TeamExplorerGitAwareItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
         [AllowNull]
-        public ISimpleApiClient SimpleApiClient { get; private set; }
+        public ISimpleApiClient SimpleApiClient { [return: AllowNull] get; private set; }
 
         readonly ISimpleApiClientFactory apiFactory;
         readonly ITeamExplorerServiceHolder holder;
@@ -40,6 +40,7 @@ namespace GitHub.VisualStudio.Base
         [AllowNull]
         public object Icon
         {
+            [return: AllowNull]
             get { return icon; }
             set { icon = value; this.RaisePropertyChange(); }
         }
@@ -48,6 +49,7 @@ namespace GitHub.VisualStudio.Base
         [AllowNull]
         public Image Image
         {
+            [return: AllowNull]
             get { return image; }
             set { image = value; this.RaisePropertyChange(); }
         }

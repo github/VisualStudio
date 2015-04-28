@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullGuard;
+using System;
 
 namespace GitHub.Extensions
 {
@@ -21,6 +22,7 @@ namespace GitHub.Extensions
             return new Uri(uri, new Uri(absolutePath, UriKind.Relative));
         }
 
+        [return: AllowNull]
         public static Uri ToHttps(this Uri uri)
         {
             if (uri == null
@@ -41,10 +43,12 @@ namespace GitHub.Extensions
             return uri == null ? "" : uri.ToString().ToUpperInvariant();
         }
 
+        [return: AllowNull]
         public static string GetUser(this Uri uri)
         {
             var parts = uri.Segments;
-            if (parts.Length < 2)
+            // only parse urls in the format domain/user/repo
+            if (parts.Length < 3)
                 return null;
             var u = parts[1];
             if (u == null)
@@ -53,9 +57,11 @@ namespace GitHub.Extensions
             return u;
         }
 
+        [return: AllowNull]
         public static string GetRepo(this Uri uri)
         {
             var parts = uri.Segments;
+            // only parse urls in the format domain/user/repo
             if (parts.Length < 3)
                 return null;
             var name = parts[2];
