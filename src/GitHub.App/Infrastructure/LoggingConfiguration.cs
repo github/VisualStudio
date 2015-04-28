@@ -21,7 +21,7 @@ namespace GitHub.Infrastructure
     public class LoggingConfiguration : ILoggingConfiguration
     {
         // See http://nlog-project.org/wiki/Layout_Renderers for logging layout options.
-        const string layout = "${longdate}|${level:uppercase=true}|thread:${threadid:padding=2}|${logger:shortName=true}|${message}${onexception:inner=${newline}${exception:format=tostring}}";
+        const string layout = "${longdate}|${level:uppercase=true}|thread:${threadid:padding=2}|${logger:shortName=true}|${message}${onexception:inner=${newline}${exception:format=ToString,StackTrace}}";
 
         [ImportingConstructor]
         public LoggingConfiguration(IProgram program, IOperatingSystem os, IVSServices vsservice)
@@ -43,7 +43,7 @@ namespace GitHub.Infrastructure
             {
                 fileTarget = new FileTarget();
                 conf.AddTarget(Path.GetRandomFileName(), fileTarget);
-                conf.LoggingRules.Add(new LoggingRule("*", LogLevel.Fatal, fileTarget));
+                conf.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, fileTarget));
             }
             fileTarget.FileName = Path.Combine(os.Environment.GetLocalGitHubApplicationDataPath(), "extension.log");
             fileTarget.Layout = layout;
