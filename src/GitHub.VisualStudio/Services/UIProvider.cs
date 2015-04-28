@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Shell;
 using NullGuard;
 using NLog;
 using System.Reactive.Linq;
+using GitHub.Infrastructure;
 
 namespace GitHub.VisualStudio
 {
@@ -30,6 +31,8 @@ namespace GitHub.VisualStudio
         CompositionContainer tempContainer;
         readonly Dictionary<string, ComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
+        readonly Version currentVersion;
+        bool initializingLogging = false;
 
         [AllowNull]
         public ExportProvider ExportProvider { get; private set; }
@@ -49,6 +52,7 @@ namespace GitHub.VisualStudio
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
+            this.currentVersion = typeof(UIProvider).Assembly.GetName().Version;
             this.serviceProvider = serviceProvider;
 
             var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
@@ -79,12 +83,25 @@ namespace GitHub.VisualStudio
             if (!Initialized)
                 return null;
 
+            if (!initializingLogging && log.Factory.Configuration == null)
+            {
+                initializingLogging = true;
+                try
+                {
+                    var logging = TryGetService<ILoggingConfiguration>();
+                    logging.Configure();
+                }
+                catch
+                {
+                }
+            }
+
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(tempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
-            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault());
+            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
 
             if (instance != null)
                 return instance;
