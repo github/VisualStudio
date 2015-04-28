@@ -21,7 +21,7 @@ namespace GitHub.Infrastructure
     public class LoggingConfiguration : ILoggingConfiguration
     {
         // See http://nlog-project.org/wiki/Layout_Renderers for logging layout options.
-        const string layout = "${longdate}|${level:uppercase=true}|thread:${threadid:padding=2}|${logger:shortName=true}|${message}${onexception:inner=${newline}${exception:format=ToString,StackTrace}}";
+        const string layout = "${longdate}|${level:uppercase=true}|thread:${threadid:padding=2}|${logger:shortName=true}|${message}${onexception:inner=${newline}${exception:innerformat=ToString,StackTrace:format=ToString,StackTrace}}";
 
         [ImportingConstructor]
         public LoggingConfiguration(IProgram program, IOperatingSystem os, IVSServices vsservice)
