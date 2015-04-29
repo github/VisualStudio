@@ -23,15 +23,23 @@ namespace GitHub.Extensions
         }
 
         [return: AllowNull]
-        public static Uri ToHttps(this Uri uri)
+        public static Uri ToHttps([AllowNull] this Uri uri)
         {
-            if (uri == null
-                || uri.Scheme != Uri.UriSchemeHttp
-                || (uri.Port != 80 && uri.Port != -1)
-                || uri.IsLoopback)
-                return uri;
+            if (uri == null)
+                return null;
+
+            var str = uri.ToString();
+            if (str.EndsWith(".git", StringComparison.Ordinal))
+                str = str.Remove(str.Length - 4);
+
+            if (str.StartsWith("git@github.com:", StringComparison.Ordinal))
+                str = str.Replace("git@github.com:", "https://github.com/");
+
+            if (!Uri.TryCreate(str, UriKind.Absolute, out uri))
+                return null;
 
             var uriBuilder = new UriBuilder(uri);
+
             uriBuilder.Scheme = Uri.UriSchemeHttps;
             // trick to keep uriBuilder from explicitly appending :80 to the HTTPS URI
             uriBuilder.Port = -1;
