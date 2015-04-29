@@ -28,4 +28,22 @@ public class URITests
             Assert.Equal(new Uri(uri).GetRepo(), expected);
         }
     }
+
+    public class TheHttpsMethod
+    {
+        [Theory]
+        [InlineData(null, null)]
+        [InlineData("", null)]
+        [InlineData("git@github.com:bla/test.git", "https://github.com/bla/test")]
+        [InlineData("git://github.com/bla/test.git", "https://github.com/bla/test")]
+        public void CreatesHttpsUrl(string uri, string expected)
+        {
+            Uri value = null;
+            Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out value);
+
+            var ret = value.ToHttps();
+            var ret2 = ret != null ? ret.ToString() : null;
+            Assert.Equal(expected, ret2);
+        }
+    }
 }
