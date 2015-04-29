@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -85,17 +86,21 @@ namespace GitHub.VisualStudio.Base
             return visible;
         }
 
-        protected async void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
+        protected void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
         {
-            var repo = await SimpleApiClient.GetRepository();
-            var url = repo.HtmlUrl;
-
-            Debug.Assert(!string.IsNullOrEmpty(repo.HtmlUrl), "Could not get repository information");
-            if (string.IsNullOrEmpty(repo.HtmlUrl))
+            var uri = ActiveRepoUri;
+            Debug.Assert(uri != null, "OpenInBrowser: uri should never be null");
+            if (uri == null)
                 return;
 
-            var wiki = new Uri(repo.HtmlUrl + "/" + endpoint);
-            OpenInBrowser(browser, wiki);
+            var https = uri.ToHttps();
+            if (https == null)
+                return;
+
+            if (!Uri.TryCreate(https.ToString() + "/" + endpoint, UriKind.Absolute, out uri))
+                return;
+
+            OpenInBrowser(browser, uri);
         }
 
         protected override void RepoChanged()
