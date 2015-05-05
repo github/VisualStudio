@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -428,6 +429,8 @@ namespace GitHub.SampleData
             FilteredRepositories = repositories.CreateDerivedCollection(
                 x => x
             );
+
+            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
         }
 
         public IReactiveCommand<Unit> CloneCommand
@@ -489,6 +492,12 @@ namespace GitHub.SampleData
         }
 
         public bool CanClone
+        {
+            get;
+            private set;
+        }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator
         {
             get;
             private set;

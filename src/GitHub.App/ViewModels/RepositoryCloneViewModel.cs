@@ -6,8 +6,10 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
@@ -75,12 +77,16 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            var canCloneObservable = this.WhenAny(x => x.SelectedRepository, x => x.Value)
-                .Select(repo => repo != null);
+            BaseRepositoryPath = cloneService.DefaultClonePath;
+            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
+
+            var canCloneObservable = this.WhenAny(
+                x => x.SelectedRepository,
+                x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
+                (x, y) => x.Value != null && y.Value);
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
-            
-            BaseRepositoryPath = cloneService.DefaultClonePath;
+
             BrowseForDirectory = ReactiveCommand.Create();
         }
 
@@ -219,6 +225,12 @@ namespace GitHub.ViewModels
         public bool CanClone
         {
             get { return canClone.Value; }
+        }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator
+        {
+            get;
+            private set;
         }
 
         IObservable<Unit> ShowBrowseForDirectoryDialog()

@@ -2,18 +2,12 @@
 using System.Reactive;
 using System.Windows.Input;
 using GitHub.Models;
-using GitHub.Validation;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     public interface IRepositoryCreationViewModel : IRepositoryForm, IRepositoryCreationTarget
     {
-        /// <summary>
-        /// Validates the base repository path.
-        /// </summary>
-        ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
-
         /// <summary>
         /// Command that launches a dialog to browse for the directory in which to create the repository.
         /// </summary>

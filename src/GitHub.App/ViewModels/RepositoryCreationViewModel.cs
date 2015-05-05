@@ -124,7 +124,7 @@ namespace GitHub.ViewModels
                         template => template.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase));
                 });
 
-        licenses = repositoryHost.ModelService.GetLicenses()
+            licenses = repositoryHost.ModelService.GetLicenses()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
 

@@ -84,6 +84,11 @@
                     Target="{Binding ElementName=clonePath}">Path</Label>
 
                 <ui:PromptTextBox x:Name="clonePath" Grid.Column="1" Margin="0,2" />
+                <uirx:ValidationMessage
+                    x:Name="pathValidationMessage"
+                    Grid.Column="1"
+                    Grid.Row="4"
+                    ValidatesControl="{Binding ElementName=clonePath}" />
                 <Button
                     x:Name="browsePathButton"
                     Grid.Column="2"
