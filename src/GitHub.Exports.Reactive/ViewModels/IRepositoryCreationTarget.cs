@@ -1,4 +1,5 @@
-﻿using GitHub.Validation;
+﻿using System.Windows.Input;
+using GitHub.Validation;
 
 namespace GitHub.ViewModels
 {
@@ -13,5 +14,10 @@ namespace GitHub.ViewModels
         /// Validates the base repository path.
         /// </summary>
         ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
+
+        /// <summary>
+        /// Command that launches a dialog to browse for the directory in which to create the repository.
+        /// </summary>
+        ICommand BrowseForDirectory { get; }
     }
 }

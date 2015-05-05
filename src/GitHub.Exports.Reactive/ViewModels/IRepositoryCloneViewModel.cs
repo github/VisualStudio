@@ -21,11 +21,6 @@ namespace GitHub.ViewModels
         IReactiveCommand<Unit> CloneCommand { get; }
 
         /// <summary>
-        /// Command that launches a dialog to browse for the directory in which to create the repository.
-        /// </summary>
-        IReactiveCommand<object> BrowseForDirectory { get; }
-
-        /// <summary>
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
         IReactiveDerivedList<IRepositoryModel> FilteredRepositories { get; }
