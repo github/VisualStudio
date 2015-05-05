@@ -8,7 +8,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// ViewModel for the the Clone Repository dialog
     /// </summary>
-    public interface IRepositoryCloneViewModel : IViewModel
+    public interface IRepositoryCloneViewModel : IViewModel, IRepositoryCreationTarget
     {
         /// <summary>
         /// Command to load the repositories.
@@ -55,10 +55,5 @@ namespace GitHub.ViewModels
         bool CanClone { get; }
 
         string FilterText { get; set; }
-
-        /// <summary>
-        /// The destination path for the cloned repository.
-        /// </summary>
-        string BaseRepositoryPath { get; set; }
     }
 }

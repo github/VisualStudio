@@ -93,6 +93,7 @@
     <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
+    <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
