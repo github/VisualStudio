@@ -28,6 +28,8 @@ namespace GitHub.ViewModels
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ObservableAsPropertyHelper<bool> isLoading;
         readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
+        readonly ObservableAsPropertyHelper<bool> canClone;
+        string baseRepositoryPath;
         bool loadingFailed;
 
         [ImportingConstructor]
@@ -73,11 +75,13 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            var canClone = this.WhenAny(x => x.SelectedRepository, x => x.Value)
+            var canCloneObservable = this.WhenAny(x => x.SelectedRepository, x => x.Value)
                 .Select(repo => repo != null);
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
-
+            canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
+            
             BaseRepositoryPath = cloneService.DefaultClonePath;
+            BrowseForDirectory = ReactiveCommand.Create();
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
@@ -120,7 +124,6 @@ namespace GitHub.ViewModels
             });
         }
 
-        string baseRepositoryPath;
         /// <summary>
         /// Path to clone repositories into
         /// </summary>
@@ -205,6 +208,46 @@ namespace GitHub.ViewModels
         public bool NoRepositoriesFound
         {
             get { return noRepositoriesFound.Value; }
+        }
+
+        public IReactiveCommand<object> BrowseForDirectory
+        {
+            get;
+            private set;
+        }
+
+        public bool CanClone
+        {
+            get { return canClone.Value; }
+        }
+
+        IObservable<Unit> ShowBrowseForDirectoryDialog()
+        {
+            return Observable.Start(() =>
+            {
+                // We store this in a local variable to prevent it changing underneath us while the
+                // folder dialog is open.
+                var localBaseRepositoryPath = BaseRepositoryPath;
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
+                    "Select a containing folder for your new repository.");
+
+                if (!browseResult.Success)
+                    return;
+
+                var directory = browseResult.DirectoryPath ?? localBaseRepositoryPath;
+
+                try
+                {
+                    BaseRepositoryPath = directory;
+                }
+                catch (Exception e)
+                {
+                    // TODO: We really should limit this to exceptions we know how to handle.
+                    log.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
+                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                }
+            }, RxApp.MainThreadScheduler);
         }
     }
 }

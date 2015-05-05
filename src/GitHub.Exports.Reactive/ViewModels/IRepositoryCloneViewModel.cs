@@ -21,6 +21,11 @@ namespace GitHub.ViewModels
         IReactiveCommand<Unit> CloneCommand { get; }
 
         /// <summary>
+        /// Command that launches a dialog to browse for the directory in which to create the repository.
+        /// </summary>
+        IReactiveCommand<object> BrowseForDirectory { get; }
+
+        /// <summary>
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
         IReactiveDerivedList<IRepositoryModel> FilteredRepositories { get; }
@@ -44,6 +49,16 @@ namespace GitHub.ViewModels
         /// </summary>
         bool NoRepositoriesFound { get; }
 
+        /// <summary>
+        /// Set to true if a repository is selected.
+        /// </summary>
+        bool CanClone { get; }
+
         string FilterText { get; set; }
+
+        /// <summary>
+        /// The destination path for the cloned repository.
+        /// </summary>
+        string BaseRepositoryPath { get; set; }
     }
 }

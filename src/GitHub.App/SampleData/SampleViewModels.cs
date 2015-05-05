@@ -423,6 +423,8 @@ namespace GitHub.SampleData
                 new RepositoryModelDesigner("github", "github")
             };
 
+            BrowseForDirectory = ReactiveCommand.Create();
+
             FilteredRepositories = repositories.CreateDerivedCollection(
                 x => x
             );
@@ -472,6 +474,24 @@ namespace GitHub.SampleData
         {
             get;
             set;
+        }
+
+        public IReactiveCommand<object> BrowseForDirectory
+        {
+            get;
+            private set;
+        }
+
+        public string BaseRepositoryPath
+        {
+            get;
+            set;
+        }
+
+        public bool CanClone
+        {
+            get;
+            private set;
         }
     }
 
