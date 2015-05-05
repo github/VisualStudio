@@ -117,6 +117,7 @@
     <Compile Include="Caches\ImageCache.cs" />
     <Compile Include="Extensions\AkavacheExtensions.cs" />
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
+    <Compile Include="Extensions\ValidationExtensions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />

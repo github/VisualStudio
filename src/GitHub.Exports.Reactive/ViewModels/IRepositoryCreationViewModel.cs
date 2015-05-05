@@ -7,13 +7,8 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface IRepositoryCreationViewModel : IRepositoryForm
+    public interface IRepositoryCreationViewModel : IRepositoryForm, IRepositoryCreationTarget
     {
-        /// <summary>
-        /// The path where the repository is created. A folder named after the repository is created in this directory.
-        /// </summary>
-        string BaseRepositoryPath { get; set; }
-
         /// <summary>
         /// Validates the base repository path.
         /// </summary>
