@@ -479,7 +479,7 @@ namespace GitHub.SampleData
             set;
         }
 
-        public IReactiveCommand<object> BrowseForDirectory
+        public ICommand BrowseForDirectory
         {
             get;
             private set;

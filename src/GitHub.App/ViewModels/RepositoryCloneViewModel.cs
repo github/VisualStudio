@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -28,6 +29,7 @@ namespace GitHub.ViewModels
         readonly IOperatingSystem operatingSystem;
         readonly IVSServices vsServices;
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
+        readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<bool> isLoading;
         readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
@@ -87,7 +89,7 @@ namespace GitHub.ViewModels
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
 
-            BrowseForDirectory = ReactiveCommand.Create();
+            browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
@@ -216,10 +218,9 @@ namespace GitHub.ViewModels
             get { return noRepositoriesFound.Value; }
         }
 
-        public IReactiveCommand<object> BrowseForDirectory
+        public ICommand BrowseForDirectory
         {
-            get;
-            private set;
+            get { return browseForDirectoryCommand; }
         }
 
         public bool CanClone

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Reactive;
-using System.Windows.Input;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -8,11 +7,6 @@ namespace GitHub.ViewModels
 {
     public interface IRepositoryCreationViewModel : IRepositoryForm, IRepositoryCreationTarget
     {
-        /// <summary>
-        /// Command that launches a dialog to browse for the directory in which to create the repository.
-        /// </summary>
-        ICommand BrowseForDirectory { get; }
-
         /// <summary>
         /// Command that creates the repository.
         /// </summary>
