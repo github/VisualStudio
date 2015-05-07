@@ -149,9 +149,6 @@ namespace GitHub.Services
                     new Translation<HttpRequestException>("Refresh failed", "Could not connect to the remote server. The server or your internect connection could be down")) },
         }));
 
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-
         public static string GetUserFriendlyErrorMessage(this Exception exception, ErrorType errorType, params object[] messageArgs)
         {
             var translation = exception.GetUserFriendlyError(errorType, messageArgs);
@@ -297,11 +294,6 @@ namespace GitHub.Services
         static ErrorMap Map(ErrorMessage defaultMessage, params Translation[] translations)
         {
             return new ErrorMap(defaultMessage, translations, null);
-        }
-
-        static ErrorMap Map(ErrorMessage defaultMessage, IEnumerable<IRecoveryCommand> recoveryCommands)
-        {
-            return new ErrorMap(defaultMessage, null, recoveryCommands);
         }
     }
 }

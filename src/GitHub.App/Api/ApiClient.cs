@@ -125,16 +125,6 @@ namespace GitHub.Api
 
         public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
 
-        IObservable<Repository> GetAllRepositoriesForOrganization(Organization org)
-        {
-            return gitHubClient.Repository.GetAllForOrg(org.Login);
-        }
-
-        IObservable<Repository> GetAllRepositoriesForCurrentUser()
-        {
-            return gitHubClient.Repository.GetAllForCurrent();
-        }
-
         static string GetSha256Hash(string input)
         {
             try
