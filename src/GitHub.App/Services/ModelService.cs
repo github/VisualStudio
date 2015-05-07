@@ -255,9 +255,6 @@ namespace GitHub.Services
                 return new LicenseCacheItem { Key = licenseMetadata.Key, Name = licenseMetadata.Name };
             }
 
-            public LicenseCacheItem()
-            {}
-
             public string Key { get; set; }
             public string Name { get; set; }
         }

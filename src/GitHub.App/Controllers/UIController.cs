@@ -23,7 +23,7 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
+        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
