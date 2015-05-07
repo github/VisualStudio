@@ -55,7 +55,7 @@ namespace GitHub.Authentication.CredentialManagement
         {
             uint count;
 
-            var pCredentials = IntPtr.Zero;
+            IntPtr pCredentials;
             bool result = NativeMethods.CredEnumerateW(Target, 0, out count, out pCredentials);
             if (!result)
             {
