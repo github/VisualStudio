@@ -226,14 +226,16 @@ namespace GitHub.Authentication.CredentialManagement
             byte[] passwordBytes = Encoding.Unicode.GetBytes(Password);
             ValidatePasswordLength(passwordBytes);
 
-            NativeMethods.CREDENTIAL credential = new NativeMethods.CREDENTIAL();
-            credential.TargetName = Target;
-            credential.UserName = Username;
-            credential.CredentialBlob = Marshal.StringToCoTaskMemUni(Password);
-            credential.CredentialBlobSize = passwordBytes.Length;
-            credential.Comment = Description;
-            credential.Type = (int)Type;
-            credential.Persist = (int)PersistenceType;
+            var credential = new NativeMethods.CREDENTIAL
+            {
+                TargetName = Target,
+                UserName = Username,
+                CredentialBlob = Marshal.StringToCoTaskMemUni(Password),
+                CredentialBlobSize = passwordBytes.Length,
+                Comment = Description,
+                Type = (int)Type,
+                Persist = (int)PersistenceType
+            };
 
             bool result = NativeMethods.CredWrite(ref credential, 0);
             if (!result)
@@ -251,17 +253,20 @@ namespace GitHub.Authentication.CredentialManagement
 
             ValidatePasswordLength(passwordBytes);
 
-            NativeMethods.CREDENTIAL credential = new NativeMethods.CREDENTIAL();
-            credential.TargetName = Target;
-            credential.UserName = Username;
-            IntPtr blob = Marshal.AllocCoTaskMem(passwordBytes.Length);
+            var blob = Marshal.AllocCoTaskMem(passwordBytes.Length);
             Marshal.Copy(passwordBytes, 0, blob, passwordBytes.Length);
-            credential.CredentialBlob = blob;
-            credential.CredentialBlobSize = passwordBytes.Length;
-            credential.Comment = Description;
-            credential.Type = (int)Type;
-            credential.Persist = (int)PersistenceType;
 
+            var credential = new NativeMethods.CREDENTIAL
+            {
+                TargetName = Target,
+                UserName = Username,
+                CredentialBlob = blob,
+                CredentialBlobSize = passwordBytes.Length,
+                Comment = Description,
+                Type = (int)Type,
+                Persist = (int)PersistenceType
+            };
+            
             bool result = NativeMethods.CredWrite(ref credential, 0);
             Marshal.FreeCoTaskMem(blob);
             if (!result)
