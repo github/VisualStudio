@@ -80,7 +80,7 @@ namespace GitHub.ViewModels
             isHostComboBoxVisible = this.WhenAny(x => x.Connections, x => x.Value)
                 .WhereNotNull()
                 .Select(h => h.Count > 1)
-                .ToProperty(this, x => x.IsHostComboBoxVisible, initialValue: false);
+                .ToProperty(this, x => x.IsHostComboBoxVisible);
 
             InitializeValidation();
 
