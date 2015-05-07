@@ -60,7 +60,7 @@ namespace GitHub.Authentication.CredentialManagement
             if (!result)
             {
                 var lastError = Marshal.GetLastWin32Error();
-                Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Win32Exception: {0}", new Win32Exception(lastError).ToString()));
+                Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Win32Exception: {0}", new Win32Exception(lastError)));
                 return;
             }
 

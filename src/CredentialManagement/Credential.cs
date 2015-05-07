@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
@@ -339,7 +340,11 @@ namespace GitHub.Authentication.CredentialManagement
         {
             if (passwordBytes.Length > maxPasswordLengthInBytes)
             {
-                throw new ArgumentOutOfRangeException("The password has exceeded " + maxPasswordLengthInBytes + " bytes.");
+                var message = string.Format(CultureInfo.InvariantCulture,
+                    "The password length ({0} bytes) exceeds the maximum password length ({1} bytes).",
+                    passwordBytes.Length,
+                    maxPasswordLengthInBytes);
+                throw new ArgumentOutOfRangeException(message);
             }
         }
     }
