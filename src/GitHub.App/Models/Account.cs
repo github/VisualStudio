@@ -11,7 +11,7 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class Account : ReactiveObject, IAccount
     {
-        ObservableAsPropertyHelper<BitmapSource> avatar;
+        readonly ObservableAsPropertyHelper<BitmapSource> avatar;
 
         public Account(
             string login,

@@ -31,8 +31,8 @@ namespace GitHub.Api
         readonly string[] oldAuthorizationScopes = { "user", "repo" };
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
         readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
-        static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
-        static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
+        readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
+        readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
         public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
