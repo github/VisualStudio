@@ -4,7 +4,6 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using Rothko;
-using GitHub.Info;
 using GitHub.Extensions;
 
 namespace GitHub.Services

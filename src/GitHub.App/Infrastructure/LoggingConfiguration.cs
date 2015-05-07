@@ -26,7 +26,7 @@ namespace GitHub.Infrastructure
         [ImportingConstructor]
         public LoggingConfiguration(IProgram program, IOperatingSystem os, IVSServices vsservice)
         {
-            NLog.Config.LoggingConfiguration conf = null;
+            NLog.Config.LoggingConfiguration conf;
             string assemblyFolder = program.ExecutingAssemblyDirectory;
             try
             {

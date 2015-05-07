@@ -9,7 +9,6 @@ using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Models;
 using GitHub.Primitives;
-using NLog;
 using Octokit;
 using ReactiveUI;
 
