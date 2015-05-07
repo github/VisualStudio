@@ -115,7 +115,7 @@ namespace GitHub.ViewModels
             {
                 var repository = SelectedRepository;
                 Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                vsServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, SelectedRepository.Name));
+                vsServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
                 return Observable.Return(Unit.Default);
             });
         }
