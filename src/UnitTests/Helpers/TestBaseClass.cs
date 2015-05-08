@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EntryExitDecoratorInterfaces;
 using GitHub.VisualStudio;
-using MethodDecoratorInterfaces;
 
 public class TestBaseClass : IEntryExitDecorator
 {
