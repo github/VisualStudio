@@ -41,12 +41,6 @@ namespace GitHub.ViewModels
             });
         }
 
-        readonly ObservableAsPropertyHelper<bool> canLogin;
-        public override bool CanLogin
-        {
-            get { return canLogin.Value; }
-        }
-
         protected override IObservable<AuthenticationResult> LogIn(object args)
         {
             return LogInToHost(HostAddress.Create(EnterpriseUrl));
