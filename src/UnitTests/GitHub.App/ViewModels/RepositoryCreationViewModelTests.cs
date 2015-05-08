@@ -34,7 +34,7 @@ public class RepositoryCreationViewModelTests
         return new RepositoryCreationViewModel(repositoryHost, os, creationService, avatarProvider);
     }
 
-    public class TheSafeRepositoryNameProperty
+    public class TheSafeRepositoryNameProperty : TestBaseClass
     {
         [Fact]
         public void IsTheSameAsTheRepositoryNameWhenTheInputIsSafe()
@@ -69,7 +69,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheBrowseForDirectoryCommand
+    public class TheBrowseForDirectoryCommand : TestBaseClass
     {
         [Fact]
         public async Task SetsTheBaseRepositoryPathWhenUserChoosesADirectory()
@@ -103,7 +103,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheBaseRepositoryPathProperty
+    public class TheBaseRepositoryPathProperty : TestBaseClass
     {
         [Fact]
         public void IsSetFromTheRepositoryCreationService()
@@ -117,7 +117,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheBaseRepositoryPathValidatorProperty
+    public class TheBaseRepositoryPathValidatorProperty : TestBaseClass
     {
         [Fact]
         public void IsFalseWhenPathEmpty()
@@ -232,7 +232,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheRepositoryNameValidatorProperty
+    public class TheRepositoryNameValidatorProperty : TestBaseClass
     {
         [Fact]
         public void IsFalseWhenRepoNameEmpty()
@@ -294,7 +294,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheSafeRepositoryNameWarningValidatorProperty
+    public class TheSafeRepositoryNameWarningValidatorProperty : TestBaseClass
     {
         [Fact]
         public void IsTrueWhenRepoNameIsSafe()
@@ -320,7 +320,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheAccountsProperty
+    public class TheAccountsProperty : TestBaseClass
     {
         [Fact]
         public void IsPopulatedByTheRepositoryHost()
@@ -339,7 +339,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheGitIgnoreTemplatesProperty
+    public class TheGitIgnoreTemplatesProperty : TestBaseClass
     {
         [Fact]
         public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
@@ -377,7 +377,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheLicensesProperty
+    public class TheLicensesProperty : TestBaseClass
     {
         [Fact]
         public void IsPopulatedByTheModelService()
@@ -417,7 +417,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheSelectedGitIgnoreProperty
+    public class TheSelectedGitIgnoreProperty : TestBaseClass
     {
         [Fact]
         public void DefaultsToVisualStudio()
@@ -463,7 +463,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheCreateRepositoryCommand
+    public class TheCreateRepositoryCommand : TestBaseClass
     {
         [Fact]
         public async Task DisplaysUserErrorWhenCreationFails()
@@ -602,7 +602,7 @@ public class RepositoryCreationViewModelTests
         }
     }
 
-    public class TheCanKeepPrivateProperty
+    public class TheCanKeepPrivateProperty : TestBaseClass
     {
         [Theory]
         [InlineData(true, false, false, false)]

@@ -6,7 +6,7 @@ using Xunit;
 
 public class VSServicesTests
 {
-    public class TheCloneMethod
+    public class TheCloneMethod : TestBaseClass
     {
         [Theory]
         [InlineData(true, CloneOptions.RecurseSubmodule)]
