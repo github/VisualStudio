@@ -17,7 +17,7 @@ using Xunit;
 
 public class RepositoryHostTests
 {
-    public class TheLoginMethod
+    public class TheLoginMethod : TestBaseClass
     {
         [Fact]
         public async Task LogsTheUserInSuccessfullyAndCachesRelevantInfo()

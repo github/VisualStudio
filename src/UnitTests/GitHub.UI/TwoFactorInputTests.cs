@@ -7,7 +7,7 @@ using Xunit;
 
 public class TwoFactorInputTests
 {
-    public class TheTextProperty
+    public class TheTextProperty : TestBaseClass
     {
         [STAFact]
         public void SetsTextBoxesToIndividualCharacters()

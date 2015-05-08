@@ -8,7 +8,7 @@ using Xunit;
 
 public class GitClientTests
 {
-    public class ThePushMethod
+    public class ThePushMethod : TestBaseClass
     {
         [Fact]
         public async Task PushesToDefaultOrigin()
@@ -39,7 +39,7 @@ public class GitClientTests
         }
     }
 
-    public class TheSetRemoteMethod
+    public class TheSetRemoteMethod : TestBaseClass
     {
         [Fact]
         public async Task SetsTheConfigToTheRemoteBranch()
@@ -56,7 +56,7 @@ public class GitClientTests
         }
     }
 
-    public class TheSetTrackingMethod
+    public class TheSetTrackingMethod : TestBaseClass
     {
         [Fact]
         public async Task SetsTheRemoteTrackingBranch()

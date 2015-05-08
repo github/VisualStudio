@@ -10,7 +10,7 @@ using Xunit;
 
 public class ConnectionManagerTests
 {
-    public class TheConnectionsProperty
+    public class TheConnectionsProperty : TestBaseClass
     {
         [Fact]
         public void IsLoadedFromCache()

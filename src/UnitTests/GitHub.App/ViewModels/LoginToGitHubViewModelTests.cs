@@ -9,7 +9,7 @@ using Xunit;
 
 public class LoginToGitHubViewModelTests
 {
-    public class TheSignupCommand
+    public class TheSignupCommand : TestBaseClass
     {
         [Fact]
         public void LaunchesBrowserToSignUpPage()
@@ -27,7 +27,7 @@ public class LoginToGitHubViewModelTests
         }
     }
 
-    public class TheForgotPasswordCommand
+    public class TheForgotPasswordCommand : TestBaseClass
     {
         [Fact]
         public void LaunchesBrowserToForgotPasswordPage()

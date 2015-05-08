@@ -15,7 +15,7 @@ using Xunit;
 
 public class ModelServiceTests
 {
-    public class TheGetUserFromCacheMethod
+    public class TheGetUserFromCacheMethod : TestBaseClass
     {
         [Fact]
         public async Task RetrievesUserFromCache()
@@ -31,7 +31,7 @@ public class ModelServiceTests
         }
     }
 
-    public class TheInsertUserMethod
+    public class TheInsertUserMethod : TestBaseClass
     {
         [Fact]
         public async Task AddsUserToCache()
@@ -47,7 +47,7 @@ public class ModelServiceTests
         }
     }
 
-    public class TheGetGitIgnoreTemplatesMethod
+    public class TheGetGitIgnoreTemplatesMethod : TestBaseClass
     {
         [Fact]
         public async Task CanRetrieveAndCacheGitIgnores()
@@ -105,7 +105,7 @@ public class ModelServiceTests
         }
     }
 
-    public class TheGetLicensesMethod
+    public class TheGetLicensesMethod : TestBaseClass
     {
         [Fact]
         public async Task CanRetrieveAndCacheLicenses()
@@ -163,7 +163,7 @@ public class ModelServiceTests
         }
     }
 
-    public class TheGetAccountsMethod
+    public class TheGetAccountsMethod : TestBaseClass
     {
         [Fact]
         public async Task CanRetrieveAndCacheUserAndAccounts()
@@ -244,7 +244,7 @@ public class ModelServiceTests
         }
     }
 
-    public class TheGetRepositoriesMethod
+    public class TheGetRepositoriesMethod : TestBaseClass
     {
         [Fact]
         public async Task CanRetrieveAndCacheRepositoriesForUserAndOrganizations()
@@ -346,7 +346,7 @@ public class ModelServiceTests
         }
     }
 
-    public class TheInvalidateAllMethod
+    public class TheInvalidateAllMethod : TestBaseClass
     {
         [Fact]
         public async Task InvalidatesTheCache()

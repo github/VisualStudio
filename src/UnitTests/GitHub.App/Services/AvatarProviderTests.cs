@@ -15,7 +15,7 @@ using Xunit;
 
 public class AvatarProviderTests
 {
-    public class TheDefaultOrgBitmapImageProperty
+    public class TheDefaultOrgBitmapImageProperty : TestBaseClass
     {
         [STAFact]
         public async Task CanBeAccessedFromMultipleThreads()
@@ -40,7 +40,7 @@ public class AvatarProviderTests
         }
     }
 
-    public class TheDefaultUserBitmapImageProperty
+    public class TheDefaultUserBitmapImageProperty : TestBaseClass
     {
         [STAFact]
         public async Task CanBeAccessedFromMultipleThreads()
@@ -65,7 +65,7 @@ public class AvatarProviderTests
         }
     }
 
-    public class TheGetAvatarMethod
+    public class TheGetAvatarMethod : TestBaseClass
     {
         [STAFact]
         public async Task GetsAvatarFromCache()
@@ -124,7 +124,7 @@ public class AvatarProviderTests
         }
     }
 
-    public class TheInvalidateAvatarMethod
+    public class TheInvalidateAvatarMethod : TestBaseClass
     {
         [Fact]
         public void DoesNotThrowOnNullUserOrAvatarUrl()
@@ -141,7 +141,7 @@ public class AvatarProviderTests
         }
     }
 
-    public class TheGetBytesFromBitmapImageMethod
+    public class TheGetBytesFromBitmapImageMethod : TestBaseClass
     {
         [Fact]
         public void GetsBytesFromImage()

@@ -15,7 +15,7 @@ using Xunit;
 
 public class ImageCacheTests
 {
-    public class TheGetImageBytesMethod
+    public class TheGetImageBytesMethod : TestBaseClass
     {
         [Fact]
         public async Task RetrievesImageFromCacheAndDoesNotFetchIt()
@@ -137,7 +137,7 @@ public class ImageCacheTests
         }
     }
 
-    public class TheInvalidateMethod
+    public class TheInvalidateMethod : TestBaseClass
     {
         [Fact]
         public async Task RemovesImageFromCache()
@@ -155,7 +155,7 @@ public class ImageCacheTests
         }
     }
 
-    public class TheSeedImageMethod
+    public class TheSeedImageMethod : TestBaseClass
     {
         [Fact]
         public async Task AddsImageDirectlyToCache()
