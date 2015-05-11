@@ -6,7 +6,6 @@
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
@@ -29,8 +28,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+                <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ComboBoxStyleKey}}">
                 <Setter Property="Margin" Value="0,0,0,8" />

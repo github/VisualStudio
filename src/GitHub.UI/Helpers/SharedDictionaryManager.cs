@@ -1,37 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Windows;
-using System.Reflection;
-using System.IO;
 
 namespace GitHub.UI.Helpers
 {
-    public static class SharedDictionaryManager
+    public class SharedDictionaryManager : ResourceDictionary
     {
-        static ResourceDictionary mergedDictionaries = new ResourceDictionary();
-        static Dictionary<string, ResourceDictionary> dictionaries = new Dictionary<string, ResourceDictionary>();
+        static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
 
-        public static ResourceDictionary Load(string assemblyname, ResourceDictionary resources)
+        Uri sourceUri;
+        public new Uri Source
         {
-            ResourceDictionary dic;
-            if (!dictionaries.ContainsKey(assemblyname))
+            get { return sourceUri; }
+            set
             {
-                var loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.RelativeOrAbsolute);
-                dic = (ResourceDictionary)Application.LoadComponent(loc);
-                dictionaries.Add(assemblyname, dic);
-            }
-            else
-                dic = dictionaries[assemblyname];
-            resources.MergedDictionaries.Add(dic);
-            return mergedDictionaries;
-        }
-
-        public static ResourceDictionary SharedDictionary
-        {
-            get
-            {
-                return mergedDictionaries;
+                sourceUri = value;
+                ResourceDictionary ret;
+                if (resourceDicts.TryGetValue(value, out ret))
+                {
+                    MergedDictionaries.Add(ret);
+                    return;
+                }
+                base.Source = value;
+                resourceDicts.Add(value, this);
             }
         }
     }

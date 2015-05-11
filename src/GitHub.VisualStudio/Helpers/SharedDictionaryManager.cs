@@ -10,7 +10,7 @@ namespace GitHub.VisualStudio.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary
     {
-        static string[] ourAssemblies =
+        static readonly string[] ourAssemblies =
         {
             "GitHub.Api",
             "GitHub.App",
@@ -23,9 +23,6 @@ namespace GitHub.VisualStudio.Helpers
             "GitHub.UI.Reactive",
             "GitHub.VisualStudio"
         };
-
-        static ResourceDictionary mergedDictionaries = new ResourceDictionary();
-        static Dictionary<string, ResourceDictionary> dictionaries = new Dictionary<string, ResourceDictionary>();
 
         static SharedDictionaryManager()
         {
@@ -54,31 +51,8 @@ namespace GitHub.VisualStudio.Helpers
             return null;
         }
 
-        public static ResourceDictionary Load(string assemblyname, ResourceDictionary resources)
-        {
-            ResourceDictionary dic;
-            if (!dictionaries.ContainsKey(assemblyname))
-            {
-                var loc = new Uri(string.Format(CultureInfo.InvariantCulture, "/{0};component/SharedDictionary.xaml", assemblyname), UriKind.RelativeOrAbsolute);
-                dic = (ResourceDictionary)Application.LoadComponent(loc);
-                dictionaries.Add(assemblyname, dic);
-            }
-            else
-                dic = dictionaries[assemblyname];
-            resources.MergedDictionaries.Add(dic);
-            return mergedDictionaries;
-        }
-
-        public static ResourceDictionary SharedDictionary
-        {
-            get
-            {
-                return mergedDictionaries;
-            }
-        }
-
 #region ResourceDictionaryImplementation
-        static Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
+        static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
 
         Uri sourceUri;
         public new Uri Source
