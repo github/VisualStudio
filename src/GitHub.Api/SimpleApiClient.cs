@@ -19,18 +19,17 @@ namespace GitHub.Api
         readonly Lazy<IWikiProbe> wikiProbe;
 
         Repository repositoryCache = new Repository();
-        string owner = null;
-        string repoName = null;
+        string owner;
+        string repoName;
 
         internal SimpleApiClient(HostAddress hostAddress, Uri repoUrl, GitHubClient githubClient,
             Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
-            this.HostAddress = hostAddress;
-            this.client = githubClient;
+            HostAddress = hostAddress;
+            OriginalUrl = repoUrl;
+            client = githubClient;
             this.enterpriseProbe = enterpriseProbe;
             this.wikiProbe = wikiProbe;
-            this.OriginalUrl = repoUrl;
-            
         }
 
         public async Task<Repository> GetRepository()
@@ -63,8 +62,10 @@ namespace GitHub.Api
 
             var probe = wikiProbe.Value;
             Debug.Assert(probe != null, "Lazy<Wiki> probe is not set, something is wrong.");
+#if !DEBUG
             if (probe == null)
                 return WikiProbeResult.Failed;
+#endif
             return await probe.ProbeAsync(repo);
         }
 
@@ -72,8 +73,10 @@ namespace GitHub.Api
         {
             var probe = enterpriseProbe.Value;
             Debug.Assert(probe != null, "Lazy<Enterprise> probe is not set, something is wrong.");
+#if !DEBUG
             if (probe == null)
                 return EnterpriseProbeResult.Failed;
+#endif
             return await probe.ProbeAsync(HostAddress.WebUri);
         }
     }

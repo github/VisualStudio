@@ -55,12 +55,12 @@ namespace GitHub.Authentication.CredentialManagement
         {
             uint count;
 
-            var pCredentials = IntPtr.Zero;
+            IntPtr pCredentials;
             bool result = NativeMethods.CredEnumerateW(Target, 0, out count, out pCredentials);
             if (!result)
             {
                 var lastError = Marshal.GetLastWin32Error();
-                Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Win32Exception: {0}", new Win32Exception(lastError).ToString()));
+                Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, "Win32Exception: {0}", new Win32Exception(lastError)));
                 return;
             }
 

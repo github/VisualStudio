@@ -34,12 +34,8 @@ namespace GitHub.Caches
         {
         }
 
-        protected SharedCache(
-            IBlobCache userAccountCache = null,
-            IBlobCache localMachineCache = null,
-            ISecureBlobCache secureCache = null)
+        protected SharedCache(IBlobCache userAccountCache, IBlobCache localMachineCache, ISecureBlobCache secureCache)
         {
-            
             if (secureCache == null)
             {
                 try

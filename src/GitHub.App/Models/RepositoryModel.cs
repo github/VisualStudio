@@ -1,6 +1,5 @@
 ﻿using GitHub.Primitives;
 using GitHub.UI;
-using Octokit;
 
 namespace GitHub.Models
 {
