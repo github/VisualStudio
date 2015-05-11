@@ -55,16 +55,19 @@ namespace GitHub.VisualStudio
         }
 
         const string defaultLogPath = @"%AppData%\GitHubVisualStudio\vs.log";
-        static object filelock = new object();
+        static readonly object filelock = new object();
         static void DefaultLogger(string log)
         {
             var path = Environment.ExpandEnvironmentVariables(defaultLogPath);
             var dir = Path.GetDirectoryName(path);
             lock (filelock)
             {
-                if (!Directory.Exists(dir))
+                try
+                {
                     Directory.CreateDirectory(dir);
-                File.AppendAllText(path, log, Encoding.UTF8);
+                    File.AppendAllText(path, log, Encoding.UTF8);
+                }
+                catch {} // if we can't log, *shrug*
             }
         }
     }
