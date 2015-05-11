@@ -38,11 +38,11 @@ public class UIControllerTests
         {
             var factory = provider.GetExportFactoryProvider();
             factory.GetViewModel(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
-            factory.GetView(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ILoginControlViewModel>, ViewUserControl>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Login).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ILoginControlViewModel>, SimpleViewUserControl>(), () => { }));
             factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
-            factory.GetView(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ITwoFactorDialogViewModel>, ViewUserControl>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ITwoFactorDialogViewModel>, SimpleViewUserControl>(), () => { }));
             factory.GetViewModel(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
-            factory.GetView(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IRepositoryCloneViewModel>, ViewUserControl>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IRepositoryCloneViewModel>, SimpleViewUserControl>(), () => { }));
             return factory;
         }
 
