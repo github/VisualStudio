@@ -98,7 +98,6 @@
     <Compile Include="Controls\TwoFactorInput.xaml.cs">
       <DependentUpon>TwoFactorInput.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ViewUserControl.cs" />
     <Compile Include="Helpers\FocusHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\script\SolutionInfo.cs">
