@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Rothko;
 using GitHub.Extensions;
+using NLog;
 
 namespace GitHub.Services
 {
@@ -17,10 +18,11 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSServices vsservices;
-
 
         [ImportingConstructor]
         public RepositoryCloneService(IOperatingSystem operatingSystem, IVSServices vsservices)
@@ -43,8 +45,17 @@ namespace GitHub.Services
 
                 operatingSystem.Directory.CreateDirectory(path);
 
-                // this will throw if it can't find it
-                vsservices.Clone(cloneUrl, path, true);
+                try
+                {
+                    // this will throw if it can't find it
+                    vsservices.Clone(cloneUrl, path, true);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Could not clone {0} to {1}. {2}", cloneUrl, path, ex);
+                    throw ex;
+                }
+                
                 return Unit.Default;
             });
         }
