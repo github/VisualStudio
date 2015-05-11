@@ -41,10 +41,7 @@ namespace GitHub.VisualStudio
         [AllowNull]
         public IServiceProvider GitServiceProvider {
             get { return gitServiceProvider; }
-            set {
-                if (gitServiceProvider == null)
-                    gitServiceProvider = value;
-            }
+            set { gitServiceProvider = value; }
         }
 
         bool Initialized { get { return ExportProvider != null; } }
