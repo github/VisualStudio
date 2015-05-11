@@ -20,7 +20,7 @@ namespace GitHub.Models
 {
     [Export(typeof(IRepositoryHosts))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class RepositoryHosts : ReactiveObject, IRepositoryHosts, IDisposable
+    public class RepositoryHosts : ReactiveObject, IRepositoryHosts
     {
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
@@ -122,7 +122,7 @@ namespace GitHub.Models
             var host = LookupHost(address);
             if (host == DisconnectedRepositoryHost)
                 LogInFromCache(address)
-                    .Subscribe((c) => handler.OnNext(connection), () => handler.OnCompleted());
+                    .Subscribe(c => handler.OnNext(connection), () => handler.OnCompleted());
             else
             {
                 handler.OnNext(connection);
@@ -214,7 +214,7 @@ namespace GitHub.Models
                 });
         }
 
-        bool disposed = false;
+        bool disposed;
         protected void Dispose(bool disposing)
         {
             if (disposing)

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows;
 using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
@@ -23,7 +20,7 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Previous, Finish }
+        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;

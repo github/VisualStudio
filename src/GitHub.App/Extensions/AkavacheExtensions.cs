@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
 using Akavache;
 
@@ -114,7 +113,7 @@ namespace GitHub.Extensions
         {
             var fetch = Observable.Defer(() => blobCache.GetCreatedAt(key))
                 .Select(x => fetchPredicate == null || x == null || fetchPredicate(x.Value))
-                .Where(x => x != false)
+                .Where(predicateIsTrue => predicateIsTrue)
                 .SelectMany(_ =>
                 {
                     return fetchFunc()

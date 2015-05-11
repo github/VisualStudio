@@ -4,13 +4,13 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using Rothko;
-using GitHub.Info;
 using GitHub.Extensions;
 
 namespace GitHub.Services
 {
     /// <summary>
-    /// Service used to clone GitHub repositories. It wraps the <see cref="IGitRepositoriesExt"/> service provided
+    /// Service used to clone GitHub repositories. It wraps the
+    /// <see cref="Microsoft.TeamFoundation.Git.Controls.Extensibility.IGitRepositoriesExt"/> service provided
     /// by Team Explorer.
     /// </summary>
     [Export(typeof(IRepositoryCloneService))]

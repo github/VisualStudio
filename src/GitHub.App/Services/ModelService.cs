@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -47,7 +46,7 @@ namespace GitHub.Services
                 .Catch<IReadOnlyList<GitIgnoreItem>, Exception>(e =>
                 {
                     log.Info("Failed to retrieve GitIgnoreTemplates", e);
-                    return Observable.Return(new GitIgnoreItem[] { GitIgnoreItem.None });
+                    return Observable.Return(new[] { GitIgnoreItem.None });
                 });
         }
 
@@ -63,7 +62,7 @@ namespace GitHub.Services
                 .Catch<IReadOnlyList<LicenseItem>, Exception>(e =>
                 {
                     log.Info("Failed to retrieve GitIgnoreTemplates", e);
-                    return Observable.Return(new LicenseItem[] { LicenseItem.None });
+                    return Observable.Return(new[] { LicenseItem.None });
                 });
         }
 
@@ -254,9 +253,6 @@ namespace GitHub.Services
             {
                 return new LicenseCacheItem { Key = licenseMetadata.Key, Name = licenseMetadata.Name };
             }
-
-            public LicenseCacheItem()
-            {}
 
             public string Key { get; set; }
             public string Name { get; set; }
