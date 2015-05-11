@@ -14,6 +14,8 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using Stateless;
+using System.Windows;
+using System.Reactive.Concurrency;
 
 namespace GitHub.Controllers
 {
