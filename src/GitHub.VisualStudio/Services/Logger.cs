@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using EnvDTE;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
+using System.IO;
+using System.Text;
 
 namespace GitHub.VisualStudio
 {
@@ -20,10 +19,9 @@ namespace GitHub.VisualStudio
         }
     }
 
-
     public static class VsOutputLogger
     {
-        static Lazy<Action<string>> logger = new Lazy<Action<string>>(() => GetWindow().OutputString);
+        static Lazy<Action<string>> logger = new Lazy<Action<string>>(() => DefaultLogger);
 
         static Action<string> Logger
         {
@@ -56,43 +54,21 @@ namespace GitHub.VisualStudio
             Logger(message + Environment.NewLine);
         }
 
-        static OutputWindowPane GetWindow()
+        const string defaultLogPath = @"%AppData%\GitHubVisualStudio\vs.log";
+        static readonly object filelock = new object();
+        static void DefaultLogger(string log)
         {
-            var dte = Services.Dte2;
-            return dte.ToolWindows.OutputWindow.ActivePane;
-        }
-
-        public static void LogToGeneralOutput(string msg)
-        {
-            Guid generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane; // P.S. There's also the GUID_OutWindowDebugPane available.
-            IVsOutputWindowPane generalPane;
-
-            if (Services.OutputWindow == null)
-                return;
-
-            int hr = Services.OutputWindow.GetPane(ref generalPaneGuid, out generalPane);
-            if (ErrorHandler.Failed(hr))
+            var path = Environment.ExpandEnvironmentVariables(defaultLogPath);
+            var dir = Path.GetDirectoryName(path);
+            lock (filelock)
             {
-                hr = Services.OutputWindow.CreatePane(ref generalPaneGuid, "Log", 1, 0);
-                if (ErrorHandler.Succeeded(hr))
-                    hr = Services.OutputWindow.GetPane(ref generalPaneGuid, out generalPane);
-            }
-
-            Debug.Assert(ErrorHandler.Succeeded(hr), "Failed to get log window");
-
-            if (ErrorHandler.Succeeded(hr))
-            {
-                hr = generalPane.OutputString(msg);
-                Debug.Assert(ErrorHandler.Succeeded(hr), "Failed to print to log window");
-            }
-
-            if (ErrorHandler.Succeeded(hr))
-            {
-                hr = generalPane.Activate(); // Brings this pane into view
-                Debug.Assert(ErrorHandler.Succeeded(hr), "Failed to activate log window");
+                try
+                {
+                    Directory.CreateDirectory(dir);
+                    File.AppendAllText(path, log, Encoding.UTF8);
+                }
+                catch {} // if we can't log, *shrug*
             }
         }
-
-
     }
 }

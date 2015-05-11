@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:uihelpers="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
@@ -16,8 +16,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <uihelpers:CachedResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
-                <uihelpers:CachedResourceDictionary Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

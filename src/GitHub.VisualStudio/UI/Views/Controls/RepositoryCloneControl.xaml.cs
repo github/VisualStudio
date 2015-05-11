@@ -21,7 +21,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Clone)]
-    public partial class RepositoryCloneControl : ViewUserControl, IViewFor<IRepositoryCloneViewModel>, IView
+    public partial class RepositoryCloneControl : SimpleViewUserControl, IViewFor<IRepositoryCloneViewModel>, IView
     {
         public RepositoryCloneControl()
         {
