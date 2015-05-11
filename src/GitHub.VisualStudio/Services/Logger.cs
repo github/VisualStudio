@@ -67,6 +67,9 @@ namespace GitHub.VisualStudio
             Guid generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane; // P.S. There's also the GUID_OutWindowDebugPane available.
             IVsOutputWindowPane generalPane;
 
+            if (Services.OutputWindow == null)
+                return;
+
             int hr = Services.OutputWindow.GetPane(ref generalPaneGuid, out generalPane);
             if (ErrorHandler.Failed(hr))
             {

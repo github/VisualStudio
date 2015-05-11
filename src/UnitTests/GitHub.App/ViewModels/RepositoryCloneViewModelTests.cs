@@ -12,7 +12,7 @@ using Xunit;
 
 public class RepositoryCloneViewModelTests
 {
-    public class TheLoadRepositoriesCommand
+    public class TheLoadRepositoriesCommand : TestBaseClass
     {
         [Fact]
         public async Task LoadsRepositories()
@@ -38,7 +38,7 @@ public class RepositoryCloneViewModelTests
         }
     }
 
-    public class TheIsLoadingProperty
+    public class TheIsLoadingProperty : TestBaseClass
     {
         [Fact]
         public void StartsTrueBecomesFalseWhenCompleted()
@@ -89,7 +89,7 @@ public class RepositoryCloneViewModelTests
         }
     }
 
-    public class TheNoRepositoriesFoundProperty
+    public class TheNoRepositoriesFoundProperty : TestBaseClass
     {
         [Fact]
         public void IsTrueInitially()
@@ -171,7 +171,7 @@ public class RepositoryCloneViewModelTests
         }
     }
 
-    public class TheLoadingFailedProperty
+    public class TheLoadingFailedProperty : TestBaseClass
     {
         [Fact]
         public void IsTrueIfLoadingReposFails()
@@ -196,7 +196,7 @@ public class RepositoryCloneViewModelTests
         }
     }
 
-    public class TheCloneCommand
+    public class TheCloneCommand : TestBaseClass
     {
         [Fact]
         public void IsEnabledWhenRepositorySelected()

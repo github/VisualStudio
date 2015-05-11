@@ -66,7 +66,6 @@ namespace GitHub.ViewModels
         }
         protected IRepositoryHosts RepositoryHosts { get; private set; }
         protected abstract Uri BaseUri { get; }
-        protected virtual IObservable<bool> CanLoginObservable { get; private set; }
         public IReactiveCommand<Unit> SignUp { get; private set; }
 
         public IReactiveCommand<AuthenticationResult> Login { get; private set; }
@@ -113,8 +112,8 @@ namespace GitHub.ViewModels
             get { return isLoggingIn.Value; }
         }
 
-        readonly ObservableAsPropertyHelper<bool> canLogin;
-        public virtual bool CanLogin
+        protected ObservableAsPropertyHelper<bool> canLogin;
+        public bool CanLogin
         {
             get { return canLogin.Value; }
         }

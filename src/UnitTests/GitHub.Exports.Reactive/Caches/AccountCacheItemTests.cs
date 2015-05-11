@@ -6,7 +6,7 @@ using Xunit;
 
 public class AccountCacheItemTests
 {
-    public class TheConstructor
+    public class TheConstructor : TestBaseClass
     {
         [Theory]
         [InlineData("https://foo.com", true)]
