@@ -88,7 +88,7 @@ public class RepositoryPublishViewModelTests
 
     }
 
-    public class TheConnectionsProperty
+    public class TheConnectionsProperty : TestBaseClass
     {
         [Theory]
         [InlineData(GitHubUrls.GitHub, "https://ghe.io" )]
@@ -123,7 +123,7 @@ public class RepositoryPublishViewModelTests
         }
     }
 
-    public class TheSelectedConnectionProperty
+    public class TheSelectedConnectionProperty : TestBaseClass
     {
         [Theory]
         [InlineData(GitHubUrls.GitHub, "https://ghe.io")]
@@ -152,7 +152,7 @@ public class RepositoryPublishViewModelTests
         }
     }
 
-    public class TheAccountsProperty
+    public class TheAccountsProperty : TestBaseClass
     {
         [Fact]
         public void IsPopulatedByTheAccountsForTheSelectedHost()
@@ -184,7 +184,7 @@ public class RepositoryPublishViewModelTests
         }
     }
 
-    public class TheSafeRepositoryNameProperty
+    public class TheSafeRepositoryNameProperty : TestBaseClass
     {
         [Fact]
         public void IsTheSameAsTheRepositoryNameWhenTheInputIsSafe()
@@ -225,7 +225,7 @@ public class RepositoryPublishViewModelTests
         }
     }
 
-    public class TheRepositoryNameValidatorProperty
+    public class TheRepositoryNameValidatorProperty : TestBaseClass
     {
         [Fact]
         public void IsFalseWhenRepoNameEmpty()
@@ -273,7 +273,7 @@ public class RepositoryPublishViewModelTests
         }
     }
 
-    public class TheSafeRepositoryNameWarningValidatorProperty
+    public class TheSafeRepositoryNameWarningValidatorProperty : TestBaseClass
     {
         [Fact]
         public void IsTrueWhenRepoNameIsSafe()
@@ -322,7 +322,7 @@ public class RepositoryPublishViewModelTests
         }
     }
 
-    public class ThePublishRepositoryCommand
+    public class ThePublishRepositoryCommand : TestBaseClass
     {
         [Fact]
         public async Task DisplaysSuccessMessageWhenCompletedWithoutError()

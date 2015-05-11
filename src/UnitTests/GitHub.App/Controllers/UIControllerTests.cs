@@ -16,7 +16,7 @@ using GitHub.Authentication;
 
 public class UIControllerTests
 {
-    public class TheDisposeMethod
+    public class TheDisposeMethod : TestBaseClass
     {
         [Fact]
         public void WithMultipleCallsDoesNotThrowException()
@@ -32,7 +32,7 @@ public class UIControllerTests
         }
     }
 
-    public class TheStartMethod
+    public class TheStartMethod : TestBaseClass
     {
         IExportFactoryProvider SetupFactory(IServiceProvider provider)
         {

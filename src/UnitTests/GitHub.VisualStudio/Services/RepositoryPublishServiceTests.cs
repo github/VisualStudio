@@ -10,7 +10,7 @@ using Xunit;
 
 public class RepositoryPublishServiceTests
 {
-    public class ThePublishMethod
+    public class ThePublishMethod : TestBaseClass
     {
         [Fact]
         public async Task CreatesRepositoryAndPushesLocalToIt()

@@ -10,7 +10,7 @@ using UnitTests;
 
 public class RepositoryCloneServiceTests
 {
-    public class TheCloneRepositoryMethod
+    public class TheCloneRepositoryMethod : TestBaseClass
     {
         [Fact]
         public async Task ClonesToRepositoryPath()

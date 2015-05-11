@@ -11,7 +11,7 @@ using UnitTests;
 
 public class RepositoryCreationServiceTests
 {
-    public class TheCreateRepositoryMethod
+    public class TheCreateRepositoryMethod : TestBaseClass
     {
         [Fact]
         public void CreatesRepositoryOnlineViaApiAndThenClonesIt()

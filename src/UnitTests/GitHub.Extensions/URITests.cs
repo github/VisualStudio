@@ -7,7 +7,7 @@ using GitHub.Extensions;
 
 public class URITests
 {
-    public class TheGetUserMethod
+    public class TheGetUserMethod : TestBaseClass
     {
         [Theory]
         [InlineData("git://test/athing", null)]
@@ -18,7 +18,7 @@ public class URITests
         }
     }
 
-    public class TheGetRepoMethod
+    public class TheGetRepoMethod : TestBaseClass
     {
         [Theory]
         [InlineData("git://test/athing", null)]
@@ -29,7 +29,7 @@ public class URITests
         }
     }
 
-    public class TheHttpsMethod
+    public class TheHttpsMethod : TestBaseClass
     {
         [Theory]
         [InlineData(null, null)]
