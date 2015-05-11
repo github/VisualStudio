@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="2"
              d:DesignWidth="200"
@@ -12,7 +13,15 @@
              Margin="0,0,0,25"
              IsHitTestVisible="False"
              VerticalAlignment="Top">
-    <Grid IsHitTestVisible="False">
+      <UserControl.Resources>
+        <ResourceDictionary>
+          <ResourceDictionary.MergedDictionaries>
+            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+          </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+      </UserControl.Resources>
+      
+      <Grid IsHitTestVisible="False">
         <Rectangle 
             Height="1" 
             Fill="{StaticResource HorizontalDividerBorderBrush}"

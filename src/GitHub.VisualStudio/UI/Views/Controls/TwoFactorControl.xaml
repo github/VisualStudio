@@ -15,15 +15,14 @@
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}">
 
-    <uirx:SimpleViewUserControl.Resources>
+    <UserControl.Resources>
         <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
             <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </uirx:SimpleViewUserControl.Resources>
-
+    </UserControl.Resources>
   
     <StackPanel
         Style="{DynamicResource DialogContainerStackPanel}"
