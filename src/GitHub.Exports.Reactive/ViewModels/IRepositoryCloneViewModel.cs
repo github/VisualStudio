@@ -8,7 +8,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// ViewModel for the the Clone Repository dialog
     /// </summary>
-    public interface IRepositoryCloneViewModel : IViewModel
+    public interface IRepositoryCloneViewModel : IViewModel, IRepositoryCreationTarget
     {
         /// <summary>
         /// Command to load the repositories.
@@ -43,6 +43,11 @@ namespace GitHub.ViewModels
         /// Set to true if no repositories were found.
         /// </summary>
         bool NoRepositoriesFound { get; }
+
+        /// <summary>
+        /// Set to true if a repository is selected.
+        /// </summary>
+        bool CanClone { get; }
 
         string FilterText { get; set; }
     }

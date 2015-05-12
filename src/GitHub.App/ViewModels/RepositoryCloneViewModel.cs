@@ -5,9 +5,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Validation;
 using NLog;
 using NullGuard;
 using ReactiveUI;
@@ -26,8 +29,11 @@ namespace GitHub.ViewModels
         readonly IOperatingSystem operatingSystem;
         readonly IVSServices vsServices;
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
+        readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<bool> isLoading;
         readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
+        readonly ObservableAsPropertyHelper<bool> canClone;
+        string baseRepositoryPath;
         bool loadingFailed;
 
         [ImportingConstructor]
@@ -73,11 +79,17 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            var canClone = this.WhenAny(x => x.SelectedRepository, x => x.Value)
-                .Select(repo => repo != null);
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(canClone, OnCloneRepository);
-
             BaseRepositoryPath = cloneService.DefaultClonePath;
+            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
+
+            var canCloneObservable = this.WhenAny(
+                x => x.SelectedRepository,
+                x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
+                (x, y) => x.Value != null && y.Value);
+            canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
+            CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
+
+            browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
@@ -120,7 +132,6 @@ namespace GitHub.ViewModels
             });
         }
 
-        string baseRepositoryPath;
         /// <summary>
         /// Path to clone repositories into
         /// </summary>
@@ -205,6 +216,51 @@ namespace GitHub.ViewModels
         public bool NoRepositoriesFound
         {
             get { return noRepositoriesFound.Value; }
+        }
+
+        public ICommand BrowseForDirectory
+        {
+            get { return browseForDirectoryCommand; }
+        }
+
+        public bool CanClone
+        {
+            get { return canClone.Value; }
+        }
+
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator
+        {
+            get;
+            private set;
+        }
+
+        IObservable<Unit> ShowBrowseForDirectoryDialog()
+        {
+            return Observable.Start(() =>
+            {
+                // We store this in a local variable to prevent it changing underneath us while the
+                // folder dialog is open.
+                var localBaseRepositoryPath = BaseRepositoryPath;
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
+                    "Select a containing folder for your new repository.");
+
+                if (!browseResult.Success)
+                    return;
+
+                var directory = browseResult.DirectoryPath ?? localBaseRepositoryPath;
+
+                try
+                {
+                    BaseRepositoryPath = directory;
+                }
+                catch (Exception e)
+                {
+                    // TODO: We really should limit this to exceptions we know how to handle.
+                    log.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
+                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                }
+            }, RxApp.MainThreadScheduler);
         }
     }
 }

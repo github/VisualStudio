@@ -9,6 +9,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
@@ -78,11 +79,7 @@ namespace GitHub.ViewModels
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 
-            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
-                .IfNullOrEmpty("Please enter a repository path")
-                .IfTrue(x => x.Length > 200, "Path too long")
-                .IfContainsInvalidPathChars("Path contains invalid characters")
-                .IfPathNotRooted("Please enter a valid path");
+            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
@@ -127,7 +124,7 @@ namespace GitHub.ViewModels
                         template => template.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase));
                 });
 
-        licenses = repositoryHost.ModelService.GetLicenses()
+            licenses = repositoryHost.ModelService.GetLicenses()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
 

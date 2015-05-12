@@ -199,7 +199,7 @@ public class RepositoryCloneViewModelTests
     public class TheCloneCommand : TestBaseClass
     {
         [Fact]
-        public void IsEnabledWhenRepositorySelected()
+        public void IsEnabledWhenRepositorySelectedAndPathValid()
         {
             var repositoryHost = Substitute.For<IRepositoryHost>();
             var cloneService = Substitute.For<IRepositoryCloneService>();
@@ -208,12 +208,30 @@ public class RepositoryCloneViewModelTests
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IVSServices>());
+            Assert.False(vm.CloneCommand.CanExecute(null));
 
+            vm.BaseRepositoryPath = @"c:\fake\path";
+            vm.SelectedRepository = Substitute.For<IRepositoryModel>();
+
+            Assert.True(vm.CloneCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void IsNotEnabledWhenPathIsNotValid()
+        {
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSServices>());
+            vm.BaseRepositoryPath = @"c:|fake\path";
             Assert.False(vm.CloneCommand.CanExecute(null));
 
             vm.SelectedRepository = Substitute.For<IRepositoryModel>();
 
-            Assert.True(vm.CloneCommand.CanExecute(null));
+            Assert.False(vm.CloneCommand.CanExecute(null));
         }
 
         [Fact]
