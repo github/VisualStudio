@@ -97,7 +97,7 @@ namespace GitHub.Api
 
         public IObservable<Organization> GetOrganizations()
         {
-            return gitHubClient.Organization.GetAllForCurrent();
+            return gitHubClient.Organization.GetAllForCurrent().Catch(Observable.Empty<Organization>());
         }
 
         public IObservable<Repository> GetUserRepositories(RepositoryType repositoryType)
