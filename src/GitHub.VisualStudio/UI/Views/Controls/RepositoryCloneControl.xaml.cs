@@ -39,7 +39,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.BaseRepositoryPath, v => v.clonePath.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
                 d(this.BindCommand(ViewModel, vm => vm.BrowseForDirectory, v => v.browsePathButton));
-                d(this.Bind(ViewModel, vm => vm.CanClone, v => v.browsePathButton.IsEnabled));
                 d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
                 d(this.OneWayBind(ViewModel, vm => vm.FilterTextIsEnabled, v => v.filterText.IsEnabled));
                 d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
