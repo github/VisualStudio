@@ -79,7 +79,6 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            BaseRepositoryPath = cloneService.DefaultClonePath;
             BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
 
             var canCloneObservable = this.WhenAny(
@@ -90,6 +89,9 @@ namespace GitHub.ViewModels
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
+            this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
+                .Subscribe();
+            BaseRepositoryPath = cloneService.DefaultClonePath;
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
