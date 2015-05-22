@@ -38,10 +38,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected override async void UpdateState()
         {
-            bool visible = await Refresh().ConfigureAwait(true);
+            bool visible = await Refresh();
             if (visible)
             {
-                var repo = await SimpleApiClient.GetRepository().ConfigureAwait(true);
+                var repo = await SimpleApiClient.GetRepository();
                 visible = repo != null && repo.HasIssues;
             }
 

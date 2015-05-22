@@ -18,8 +18,8 @@ namespace GitHub.VisualStudio.Base
         IGitExt gitService;
         Uri activeRepoUri;
         string activeRepoName = string.Empty;
-        SynchronizationContext syncContext;
-        private UIContext gitUIContext;
+        readonly SynchronizationContext syncContext;
+        UIContext gitUIContext;
 
         public TeamExplorerGitAwareItemBase()
         {
