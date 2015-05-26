@@ -205,7 +205,7 @@ function Announce-DeployCompleted {
     $branch = Get-CheckedOutBranch
     Pop-Location
     $duration = ((Get-Date) - $startTime).TotalSeconds
-    $message = "{0}'s {1} deployment of VisualStudio/{2} is done! {3:F1}s {4}" -f $campfireUser, $ReleaseChannel, $branch, $duration, $vsixUrl
+    $message = "{0}'s {1} deployment of VisualStudio/{2} is done! {3:F1}s" -f $campfireUser, $ReleaseChannel, $branch, $duration
     Announce-Message $message
 }
 
@@ -275,7 +275,7 @@ function Write-Manifest([string]$directory) {
     $manifest = @{
         NewestExtension = @{
             Version = [string](Read-CurrentVersionVsix)
-            Url = $vsixUrl
+            Commit = [string](Get-HeadSha1)
         }
     }
 
@@ -283,16 +283,11 @@ function Write-Manifest([string]$directory) {
     [Newtonsoft.Json.JsonConvert]::SerializeObject($manifest) | Out-File $manifestPath -Encoding UTF8
 }
 
-function Write-VersionFile([string]$directory) {
-    $versionFile = Join-Path $directory VERSION
-    Get-HeadSha1 | Set-Content $versionFile
-}
-
 function Save-MD5([string]$path) {
     $p = Get-Item $path
     $file = $p.Name
-    $outpath = Join-Path $p.Directory.FullName "$file.md5"
-    Get-FileHash $path -Algorithm MD5 | %{ "MD5 ($file) = $($_.Hash)" } | Out-File $outputpath
+    $outpath = (Join-Path $p.Directory.FullName "$file.md5")
+    Get-FileHash $path -Algorithm MD5 | %{ "MD5 ($file) = $($_.Hash)" } | Out-File $outpath
 }
 
 function Save-TopLevelFiles([string]$directory) {
@@ -301,13 +296,13 @@ function Save-TopLevelFiles([string]$directory) {
     $versionSpecificDirectory = New-Item (Join-Path $directory (Read-CurrentVersionVsix)) -Type Directory
 
     Move-Item $files $versionSpecificDirectory.FullName
-    Save-MD5 Join-Path $versionSpecificDirectory ghfvs.msi
-    Save-MD5 Join-Path $versionSpecificDirectory GitHub.VisualStudio.vsix
+    Save-MD5 (Join-Path $versionSpecificDirectory ghfvs.msi)
+    Save-MD5 (Join-Path $versionSpecificDirectory GitHub.VisualStudio.vsix)
 
     Add-Type -assembly "system.io.compression.filesystem"
     $destination = Join-path -path $directory -ChildPath "ghfvs-$($versionSpecificDirectory.name).zip"
     Run-Command -Fatal { [io.compression.zipfile]::CreateFromDirectory($versionSpecificDirectory.fullname, $destination) }
-    return "ghfvs-$($versionSpecificDirectory.name).zip'
+    return "ghfvs-$($versionSpecificDirectory.name).zip"
 }
 
 function Upload-Symbols {
@@ -337,7 +332,8 @@ function Upload-Symbols {
 function Upload-Vsix([string]$directory) {
     Write-Output "Uploading extension to S3..."
     # We don't allow the top-level files to be cached to keep caching proxies from hiding our updates.
-    Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $_.Directory.FullName -eq $directory } }
+    #Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $_.Directory.FullName -eq $directory } }
+    Run-Command -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $false } }
 }
 
 if ($NoPush -and $ReleaseChannel -eq "production") {
@@ -377,7 +373,6 @@ Announce-DeployStarted
     Build-Installer $tempDirectory
     Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
     Write-Manifest $tempDirectory
-    Write-VersionFile $tempDirectory
     $zipfile = Save-TopLevelFiles $tempDirectory
 
     Write-Output "Ready at ${tempDirectory}"
@@ -387,6 +382,6 @@ Announce-DeployStarted
 
     Remove-Item -Recurse $tempDirectory
 
-    Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
+    Write-Output "Finished deploying GitHub for Visual Studio to ${bucketName}\${keyPrefix}"
     Announce-DeployCompleted
 }
