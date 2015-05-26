@@ -68,17 +68,16 @@ $bucketName = ""
 if ($S3Bucket -eq "production") {
     $bucketName = "github-vs"
 } else {
-    $bucketName = "github-vs-dev"
+    $bucketName = "github-windows-dev"
 }
 
 $keyPrefix = ""
 if ($ReleaseChannel -ne "production") {
-    $keyPrefix = $ReleaseChannel.ToLower() + "/"
+    $keyPrefix = "ghfvs/" + $ReleaseChannel.ToLower() + "/"
 }
 
 $configuration = "Release"
 $installUrl = "http://$bucketName.s3.amazonaws.com/$keyPrefix"
-$vsixUrl = "${installUrl}GitHub.VisualStudio.vsix"
 
 $startTime = Get-Date
 
@@ -289,12 +288,26 @@ function Write-VersionFile([string]$directory) {
     Get-HeadSha1 | Set-Content $versionFile
 }
 
+function Save-MD5([string]$path) {
+    $p = Get-Item $path
+    $file = $p.Name
+    $outpath = Join-Path $p.Directory.FullName "$file.md5"
+    Get-FileHash $path -Algorithm MD5 | %{ "MD5 ($file) = $($_.Hash)" } | Out-File $outputpath
+}
+
 function Save-TopLevelFiles([string]$directory) {
     $files = Get-ChildItem $directory | %{ $_.FullName }
 
     $versionSpecificDirectory = New-Item (Join-Path $directory (Read-CurrentVersionVsix)) -Type Directory
 
-    Copy-Item $files $versionSpecificDirectory.FullName
+    Move-Item $files $versionSpecificDirectory.FullName
+    Save-MD5 Join-Path $versionSpecificDirectory ghfvs.msi
+    Save-MD5 Join-Path $versionSpecificDirectory GitHub.VisualStudio.vsix
+
+    Add-Type -assembly "system.io.compression.filesystem"
+    $destination = Join-path -path $directory -ChildPath "ghfvs-$($versionSpecificDirectory.name).zip"
+    Run-Command -Fatal { [io.compression.zipfile]::CreateFromDirectory($versionSpecificDirectory.fullname, $destination) }
+    return "ghfvs-$($versionSpecificDirectory.name).zip'
 }
 
 function Upload-Symbols {
@@ -365,11 +378,11 @@ Announce-DeployStarted
     Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
     Write-Manifest $tempDirectory
     Write-VersionFile $tempDirectory
-    Save-TopLevelFiles $tempDirectory
+    $zipfile = Save-TopLevelFiles $tempDirectory
 
     Write-Output "Ready at ${tempDirectory}"
 
-    Upload-Symbols
+    #Upload-Symbols
     Upload-Vsix $tempDirectory
 
     Remove-Item -Recurse $tempDirectory
