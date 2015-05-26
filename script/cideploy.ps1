@@ -31,5 +31,5 @@ $newVersion =  read-currentVersion | %{ "$($_.major).$($_.minor).$($_.build).$($
 #$newVersion = "None"
 
 Push-Location $scriptsDirectory
-.\Deploy "speakeasy" -NoChat:$true -NoPush:$true -NewVersion $newVersion
+.\Deploy "speakeasy" "development" "$newVersion" -NoChat:$true -NoPush:$true
 Pop-Location

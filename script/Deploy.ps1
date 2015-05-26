@@ -283,11 +283,18 @@ function Write-Manifest([string]$directory) {
     [Newtonsoft.Json.JsonConvert]::SerializeObject($manifest) | Out-File $manifestPath -Encoding UTF8
 }
 
-function Save-MD5([string]$path) {
-    $p = Get-Item $path
-    $file = $p.Name
-    $outpath = (Join-Path $p.Directory.FullName "$file.md5")
-    Get-FileHash $path -Algorithm MD5 | %{ "MD5 ($file) = $($_.Hash)" } | Out-File $outpath
+function Get-MD5($path) {
+    $fullPath = Resolve-Path $path
+    $md5 = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
+    $file = [System.IO.File]::Open($fullPath,[System.IO.Filemode]::Open, [System.IO.FileAccess]::Read)
+    [System.BitConverter]::ToString($md5.ComputeHash($file)) | %{$_ -replace "-", ""}
+    $file.Dispose()
+}
+
+function Save-MD5($path, $file) {
+    $outpath = (Join-Path $path.FullName "$file.md5")
+    $hash = Get-MD5 (Join-Path $path $file)
+    [System.IO.File]::AppendAllText("$outpath", "$hash  $file", [System.Text.Encoding]::Ascii)
 }
 
 function Save-TopLevelFiles([string]$directory) {
@@ -296,8 +303,8 @@ function Save-TopLevelFiles([string]$directory) {
     $versionSpecificDirectory = New-Item (Join-Path $directory (Read-CurrentVersionVsix)) -Type Directory
 
     Move-Item $files $versionSpecificDirectory.FullName
-    Save-MD5 (Join-Path $versionSpecificDirectory ghfvs.msi)
-    Save-MD5 (Join-Path $versionSpecificDirectory GitHub.VisualStudio.vsix)
+    Save-MD5 $versionSpecificDirectory "ghfvs.msi"
+    Save-MD5 $versionSpecificDirectory "GitHub.VisualStudio.vsix"
 
     Add-Type -assembly "system.io.compression.filesystem"
     $destination = Join-path -path $directory -ChildPath "ghfvs-$($versionSpecificDirectory.name).zip"
@@ -382,6 +389,6 @@ Announce-DeployStarted
 
     Remove-Item -Recurse $tempDirectory
 
-    Write-Output "Finished deploying GitHub for Visual Studio to ${bucketName}\${keyPrefix}"
+    Write-Output "Finished deploying GitHub for Visual Studio to ${bucketName}/${keyPrefix}"
     Announce-DeployCompleted
 }
