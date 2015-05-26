@@ -1,15 +1,15 @@
 [submodule "submodules/rothko"]
 	path = submodules/rothko
-	url = https://github.com/haacked/Rothko.git
+	url = git@github.com:Haacked/Rothko.git
 [submodule "submodules/reactiveui"]
 	path = submodules/reactiveui
-	url = https://github.com/shana/ReactiveUI
+	url = git@github.com:shana/ReactiveUI
 [submodule "submodules/octokit.net"]
 	path = submodules/octokit.net
-	url = https://github.com/shana/Octokit.Net
+	url = git@github.com:shana/Octokit.Net
 [submodule "submodules/splat"]
 	path = submodules/splat
-	url = https://github.com/shana/splat.git
+	url = git@github.com:shana/splat.git
 [submodule "submodules/akavache"]
 	path = submodules/akavache
-	url = https://github.com/shana/Akavache
+	url = git@github.com:shana/Akavache
