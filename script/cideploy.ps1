@@ -333,8 +333,6 @@ Run-Command -Fatal {
 
 Run-Command -Fatal { Require-CleanWorkTree "deploy" -WarnOnly:$Force }
 
-Require-HeadIsPushedToOrigin
-
 Announce-DeployStarted
 
 & {
