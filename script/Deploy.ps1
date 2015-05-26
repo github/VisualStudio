@@ -60,7 +60,9 @@ $rootDirectory = Split-Path ($scriptsDirectory)
 #$git = Get-Command git.cmd
 . $scriptsDirectory\common.ps1
 
-Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
+if (!$NoChat) {
+    Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
+}
 
 $bucketName = ""
 if ($S3Bucket -eq "production") {
@@ -254,7 +256,8 @@ function Create-TempDirectory {
 
 function Build-Vsix([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
-    Run-Command -Fatal { & $msbuild $solution /target:Rebuild /property:Configuration=$configuration /property:ReleaseChannel=$ReleaseChannel /property:S3Bucket=$S3Bucket /property:DeployExtension=false /verbosity:minimal }
+    Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
+    Run-Command -Fatal { & $msbuild $solution /target:Rebuild /property:Configuration=$configuration /p:ReleaseChannel=$ReleaseChannel /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 }
 
     Copy-Item (Join-Path $rootDirectory build\$configuration\GitHub.VisualStudio.vsix) $directory
 }
@@ -358,13 +361,13 @@ Announce-DeployStarted
     $tempDirectory = Create-TempDirectory
     Build-Vsix $tempDirectory
     Add-SignatureToVsix (Join-Path $tempDirectory GitHub.VisualStudio.vsix)
-	Build-Installer $tempDirectory
-	Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
+    Build-Installer $tempDirectory
+    Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
     Write-Manifest $tempDirectory
     Write-VersionFile $tempDirectory
     Save-TopLevelFiles $tempDirectory
 
-	Write-Output "Ready at ${tempDirectory}"
+    Write-Output "Ready at ${tempDirectory}"
 
     Upload-Symbols
     Upload-Vsix $tempDirectory

@@ -11,6 +11,8 @@ if (!$git) {
   throw "Couldn't find installed an git.exe"
 }
 
+$nuget = Join-Path $rootDirectory "script\nuget\nuget.exe"
+
 function Get-ApplicationVersionElement([xml]$csproj) {
     $xmlns = New-Object Xml.XmlNamespaceManager($csproj.NameTable)
     $xmlns.AddNamespace("vs", $csproj.Project.xmlns)
