@@ -40,6 +40,9 @@ Param(
     ,
     [switch]
     $NoChat = $false
+    ,
+    [switch]
+    $NoPush = $false
 )
 
 Set-StrictMode -Version Latest
@@ -321,19 +324,27 @@ function Upload-Vsix([string]$directory) {
     Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $_.Directory.FullName -eq $directory } }
 }
 
+if ($NoPush -and $ReleaseChannel -eq "production") {
+    Die "-NoPush cannot be used for production deployments."
+}
+
 Run-Command -Fatal {
     if ($NewVersion) {
         if ($NewVersion -ne "None") {
-            Bump-Version $NewVersion
+            Bump-Version $NewVersion -NoPush:$NoPush
         }
     } else {
-        Bump-Version
+        Bump-Version -NoPush:$NoPush
     }
 }
 
 Run-Command -Fatal { Require-CleanWorkTree "deploy" -WarnOnly:$Force }
 
-Require-HeadIsPushedToOrigin
+if ($NoPush) {
+    Write-Output "Skipping HEAD push check because -NoPush"
+} else {
+    Require-HeadIsPushedToOrigin
+}
 
 Announce-DeployStarted
 

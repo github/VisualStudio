@@ -16,6 +16,9 @@ Param(
     [ValidateScript({ ($_.Major -ge 0) -and ($_.Minor -ge 0) -and ($_.Build -ge 0) -and ($_.Revision -ge 0) })]
     [System.Version]
     $NewVersion = $null
+    ,
+    [switch]
+    $NoPush = $false
 )
 
 Set-StrictMode -Version Latest
@@ -196,4 +199,9 @@ $currentVersion = Read-CurrentVersion
 $NewVersion = Bump-Version $currentVersion $NewVersion
 Write-Version $NewVersion
 Commit-VersionBump $NewVersion
-Push-Changes
+
+if ($NoPush) {
+    Write-Output "Skipping push because -NoPush"
+} else {
+    Push-Changes
+}
