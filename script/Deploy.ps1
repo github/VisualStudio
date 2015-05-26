@@ -16,7 +16,7 @@
 .PARAMETER Force
     Allow deploying even if the working tree isn't clean and/or HEAD hasn't
     been pushed to the origin remote.
-.PARAMETER NoCampfire
+.PARAMETER NoChat
     By default, Campfire is notified when deploys start/end. Passing this
     switch will cause Campfire messages to be printed to the console instead.
 #>
@@ -24,7 +24,7 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("staff")]
+    [ValidateSet("beta", "staff", "production", "test", "speakeasy")]
     [string]
     $ReleaseChannel
     ,
@@ -39,7 +39,7 @@ Param(
     $Force = $false
     ,
     [switch]
-    $NoCampfire = $false
+    $NoChat = $false
 )
 
 Set-StrictMode -Version Latest
@@ -171,7 +171,7 @@ function Get-ShortSha1 {
 }
 
 function Announce-Message([string]$message) {
-    if ($NoCampfire) {
+    if ($NoChat) {
         Write-Output $message
     } else {
         HubotTell-NativeRoom $message

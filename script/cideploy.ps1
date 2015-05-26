@@ -27,7 +27,8 @@ $scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
 . $scriptsDirectory\common.ps1
 
 $speakEasyVersion = [System.Version]$env:SPEAKEASY_VERSION
-$newVersion =  read-currentVersion | %{ "$($_.major).$($_.minor).$($_.build).$($_.revision + $speakEasyVersion.minor)" }
+#$newVersion =  read-currentVersion | %{ "$($_.major).$($_.minor).$($_.build).$($_.revision + $speakEasyVersion.minor)" }
+$newVersion = "None"
 
 Push-Location $scriptsDirectory
 .\Deploy "speakeasy" -NoChat:$true -NoPush:$true -NewVersion $newVersion
