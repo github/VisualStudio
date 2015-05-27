@@ -38,7 +38,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected override async void UpdateState()
         {
-            IsVisible = IsEnabled = await Refresh().ConfigureAwait(true);
+            IsVisible = IsEnabled = await Refresh();
         }
     }
 }

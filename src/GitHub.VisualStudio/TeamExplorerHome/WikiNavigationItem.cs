@@ -38,10 +38,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected override async void UpdateState()
         {
-            bool visible = await Refresh().ConfigureAwait(true);
+            bool visible = await Refresh();
             if (visible)
             {
-                var ret = await SimpleApiClient.HasWiki().ConfigureAwait(true);
+                var ret = await SimpleApiClient.HasWiki();
                 visible = (ret == WikiProbeResult.Ok);
             }
             

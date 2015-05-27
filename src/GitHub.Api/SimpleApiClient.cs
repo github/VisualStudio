@@ -56,7 +56,7 @@ namespace GitHub.Api
 
         public async Task<WikiProbeResult> HasWiki()
         {
-            var repo = await GetRepository();
+            var repo = await GetRepository().ConfigureAwait(false);
             if (repo == null || !repo.HasWiki)
                 return WikiProbeResult.NotFound;
 
@@ -66,7 +66,7 @@ namespace GitHub.Api
             if (probe == null)
                 return WikiProbeResult.Failed;
 #endif
-            return await probe.ProbeAsync(repo);
+            return await probe.ProbeAsync(repo).ConfigureAwait(false);
         }
 
         public async Task<EnterpriseProbeResult> IsEnterprise()
@@ -77,7 +77,7 @@ namespace GitHub.Api
             if (probe == null)
                 return EnterpriseProbeResult.Failed;
 #endif
-            return await probe.ProbeAsync(HostAddress.WebUri);
+            return await probe.ProbeAsync(HostAddress.WebUri).ConfigureAwait(false);
         }
     }
 }
