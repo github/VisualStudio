@@ -40,6 +40,9 @@ Param(
     ,
     [switch]
     $NoPush = $false
+    ,
+    [switch]
+    $NoBuild = $false
 )
 
 Set-StrictMode -Version Latest
@@ -334,6 +337,10 @@ Run-Command -Fatal {
     } else {
         Bump-Version -ReleaseChannel:$ReleaseChannel -Branch:$Branch -NoPush:$NoPush
     }
+}
+
+if ($NoBuild) {
+    break
 }
 
 Announce-DeployStarted
