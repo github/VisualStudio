@@ -16,6 +16,15 @@ Param(
     [ValidateScript({ ($_.Major -ge 0) -and ($_.Minor -ge 0) -and ($_.Build -ge 0) -and ($_.Revision -ge 0) })]
     [System.Version]
     $NewVersion = $null
+    ,
+    [string]
+    $ReleaseChannel = "dev"
+    ,
+    [string]
+    $Branch
+    ,
+    [switch]
+    $NoPush = $false
 )
 
 Set-StrictMode -Version Latest
@@ -60,7 +69,11 @@ function Bump-Version {
         return $proposedVersion
     }
 
-    New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), ($currentVersion.Revision)
+    if ($ReleaseChannel -eq "production") {
+        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), 0
+    } else {
+        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, ($currentVersion.Revision + 1)
+    }
 }
 
 function Write-VersionCsproj {
@@ -176,12 +189,11 @@ function Commit-VersionBump {
 function Push-Changes {
     Push-Location $rootDirectory
 
-    $branch = Get-CheckedOutBranch
-    Write-Output "Pushing $branch to GitHub..."
+    Write-Output "Pushing $Branch to GitHub..."
 
-    $output = & $git push origin $branch 2>&1
+    $output = & $git push origin $Branch 2>&1
     if ($LastExitCode -ne 0) {
-        Die "Error pushing $branch to GitHub" $output
+        Die "Error pushing $Branch to GitHub" $output
     }
 
     Pop-Location
@@ -196,4 +208,9 @@ $currentVersion = Read-CurrentVersion
 $NewVersion = Bump-Version $currentVersion $NewVersion
 Write-Version $NewVersion
 Commit-VersionBump $NewVersion
-Push-Changes
+
+if ($NoPush) {
+    Write-Output "Skipping push because -NoPush"
+} else {
+    Push-Changes
+}

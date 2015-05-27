@@ -6,9 +6,7 @@
     GitHub. Then builds GitHub for Visual Studio and deploys it to the
     specified release channel and bucket.
 .PARAMETER ReleaseChannel
-    The release channel to which you wish to deploy. Options are: staff
-.PARAMETER S3Bucket
-    Specifies which S3 bucket to upload to. Options are: development, production. Defaults to production.
+    The release channel to which you wish to deploy. Options are: dev, alpha, beta, production
 .PARAMETER NewVersion
     Specifies the version number with which to stamp the build. Specify "None"
     to avoid changing the version number at all. By default, uses the currently
@@ -16,7 +14,7 @@
 .PARAMETER Force
     Allow deploying even if the working tree isn't clean and/or HEAD hasn't
     been pushed to the origin remote.
-.PARAMETER NoCampfire
+.PARAMETER NoChat
     By default, Campfire is notified when deploys start/end. Passing this
     switch will cause Campfire messages to be printed to the console instead.
 #>
@@ -24,22 +22,27 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("staff")]
+    [ValidateSet("dev", "alpha", "beta", "production")]
     [string]
-    $ReleaseChannel
-    ,
-    [ValidateSet("development", "production")]
-    [string]
-    $S3Bucket = "production"
+    $ReleaseChannel = "dev"
     ,
     [string]
     $NewVersion
+    ,
+    [string]
+    $Branch
     ,
     [switch]
     $Force = $false
     ,
     [switch]
-    $NoCampfire = $false
+    $NoChat = $false
+    ,
+    [switch]
+    $NoPush = $false
+    ,
+    [switch]
+    $NoBuild = $false
 )
 
 Set-StrictMode -Version Latest
@@ -50,30 +53,28 @@ $env:PATH = "$scriptsDirectory;$modulesPath;$env:PATH"
 $env:PSModulePath = $env:PSModulePath + ";$modulesPath"
 Import-Module "$modulesPath\wix"
 Import-Module "$modulesPath\vsix"
-#Get-Command -ListImported
-Write-Output $scriptsDirectory
 
 $rootDirectory = Split-Path ($scriptsDirectory)
-#$git = Get-Command git.cmd
+
 . $scriptsDirectory\common.ps1
 
-Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
-
-$bucketName = ""
-if ($S3Bucket -eq "production") {
-    $bucketName = "github-vs"
-} else {
-    $bucketName = "github-vs-dev"
+if (!$NoChat) {
+    Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
 }
 
-$keyPrefix = ""
-if ($ReleaseChannel -ne "production") {
-    $keyPrefix = $ReleaseChannel.ToLower() + "/"
+if (!$Branch) {
+    $Branch = Get-CheckedOutBranch
 }
+
+Write-Output "Branch is $Branch"
+
+$bucketName = "github-vs"
+
+$keyPrefix = "releases/" + $ReleaseChannel.ToLower() + "/"
+$symbolsPrefix = "symbols/" + $ReleaseChannel.ToLower() + "/"
 
 $configuration = "Release"
 $installUrl = "http://$bucketName.s3.amazonaws.com/$keyPrefix"
-$vsixUrl = "${installUrl}GitHub.VisualStudio.vsix"
 
 $startTime = Get-Date
 
@@ -171,7 +172,7 @@ function Get-ShortSha1 {
 }
 
 function Announce-Message([string]$message) {
-    if ($NoCampfire) {
+    if ($NoChat) {
         Write-Output $message
     } else {
         HubotTell-NativeRoom $message
@@ -180,37 +181,27 @@ function Announce-Message([string]$message) {
 
 function Announce-DeployStarted {
     $campfireUser = Get-CampfireUsername
-    Push-Location $rootDirectory
-    $branch = Get-CheckedOutBranch
-    Pop-Location
 
-    $url = "https://github.com/github/VisualStudio/"
     $deployedVersion = Get-DeployedSha1 | Get-ShortSha1
     if ($deployedVersion) {
         $url += "compare/{0}...{1}" -f $deployedVersion, (Get-HeadSha1 | Get-ShortSha1)
     } else {
-        $url += "tree/{0}" -f $branch
+        $url += "tree/{0}" -f $Branch
     }
-    $message = "{0} is deploying VisualStudio/{1} to {2} {3}" -f $campfireUser, $branch, $ReleaseChannel, $url
+    $message = "{0} is deploying VisualStudio/{1} to {2}" -f $campfireUser, $Branch, $ReleaseChannel
     Announce-Message $message
 }
 
 function Announce-DeployCompleted {
     $campfireUser = Get-CampfireUsername
-    Push-Location $rootDirectory
-    $branch = Get-CheckedOutBranch
-    Pop-Location
     $duration = ((Get-Date) - $startTime).TotalSeconds
-    $message = "{0}'s {1} deployment of VisualStudio/{2} is done! {3:F1}s {4}" -f $campfireUser, $ReleaseChannel, $branch, $duration, $vsixUrl
+    $message = "{0}'s {1} deployment of VisualStudio/{2} is done! {3:F1}s" -f $campfireUser, $ReleaseChannel, $Branch, $duration
     Announce-Message $message
 }
 
 function Announce-DeployFailed([string]$error) {
     $campfireUser = Get-CampfireUsername
-    Push-Location $rootDirectory
-    $branch = Get-CheckedOutBranch
-    Pop-Location
-    $message = "{0}'s deploy of VisualStudio/{1} to {2} failed: {3}" -f $campfireUser, $branch, $ReleaseChannel, $error
+    $message = "{0}'s deploy of VisualStudio/{1} to {2} failed: {3}" -f $campfireUser, $Branch, $ReleaseChannel, $error
     Announce-Message $message
 }
 
@@ -251,7 +242,8 @@ function Create-TempDirectory {
 
 function Build-Vsix([string]$directory) {
     $solution = Join-Path $rootDirectory GitHubVs.sln
-    Run-Command -Fatal { & $msbuild $solution /target:Rebuild /property:Configuration=$configuration /property:ReleaseChannel=$ReleaseChannel /property:S3Bucket=$S3Bucket /property:DeployExtension=false /verbosity:minimal }
+    Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
+    Run-Command -Fatal { & $msbuild $solution /target:Rebuild /property:Configuration=$configuration /p:ReleaseChannel=$ReleaseChannel /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 }
 
     Copy-Item (Join-Path $rootDirectory build\$configuration\GitHub.VisualStudio.vsix) $directory
 }
@@ -270,7 +262,7 @@ function Write-Manifest([string]$directory) {
     $manifest = @{
         NewestExtension = @{
             Version = [string](Read-CurrentVersionVsix)
-            Url = $vsixUrl
+            Commit = [string](Get-HeadSha1)
         }
     }
 
@@ -278,9 +270,18 @@ function Write-Manifest([string]$directory) {
     [Newtonsoft.Json.JsonConvert]::SerializeObject($manifest) | Out-File $manifestPath -Encoding UTF8
 }
 
-function Write-VersionFile([string]$directory) {
-    $versionFile = Join-Path $directory VERSION
-    Get-HeadSha1 | Set-Content $versionFile
+function Get-MD5($path) {
+    $fullPath = Resolve-Path $path
+    $md5 = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
+    $file = [System.IO.File]::Open($fullPath,[System.IO.Filemode]::Open, [System.IO.FileAccess]::Read)
+    [System.BitConverter]::ToString($md5.ComputeHash($file)) | %{$_ -replace "-", ""}
+    $file.Dispose()
+}
+
+function Save-MD5($path, $file) {
+    $outpath = (Join-Path $path.FullName "$file.md5")
+    $hash = Get-MD5 (Join-Path $path $file)
+    [System.IO.File]::AppendAllText("$outpath", "$hash  $file", [System.Text.Encoding]::Ascii)
 }
 
 function Save-TopLevelFiles([string]$directory) {
@@ -288,7 +289,14 @@ function Save-TopLevelFiles([string]$directory) {
 
     $versionSpecificDirectory = New-Item (Join-Path $directory (Read-CurrentVersionVsix)) -Type Directory
 
-    Copy-Item $files $versionSpecificDirectory.FullName
+    Move-Item $files $versionSpecificDirectory.FullName
+    Save-MD5 $versionSpecificDirectory "ghfvs.msi"
+    Save-MD5 $versionSpecificDirectory "GitHub.VisualStudio.vsix"
+
+    Add-Type -assembly "system.io.compression.filesystem"
+    $destination = Join-path -path $directory -ChildPath "ghfvs-$($versionSpecificDirectory.name).zip"
+    Run-Command -Fatal { [io.compression.zipfile]::CreateFromDirectory($versionSpecificDirectory.fullname, $destination) }
+    return "ghfvs-$($versionSpecificDirectory.name).zip"
 }
 
 function Upload-Symbols {
@@ -300,17 +308,8 @@ function Upload-Symbols {
     $buildDirectory = Join-Path $rootDirectory build\$configuration
     Run-Command -Quiet -Fatal { & $symstore add /r /f "$buildDirectory\*.*" /t "GitHub for Visual Studio" /s $symbols }
 
-    if ($S3Bucket -eq "production") {
-        # Upload our symbols to the same place as GHfW's symbols so that
-        # developers only need to use a single symbol server.
-        $symbolsBucket = "github-windows"
-    } else {
-        # This is a test deploy, so we shouldn't pollute the standard symbol server.
-        $symbolsBucket = $bucketName
-    }
-
     Write-Output "Uploading symbols to S3..."
-    Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $symbols -S3Bucket $symbolsBucket -KeyPrefix "symbols/" -Lowercase }
+    Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $symbols -S3Bucket $bucketName -KeyPrefix  $symbolsPrefix -Lowercase }
 
     Remove-Item -Recurse $symbols
 }
@@ -318,22 +317,31 @@ function Upload-Symbols {
 function Upload-Vsix([string]$directory) {
     Write-Output "Uploading extension to S3..."
     # We don't allow the top-level files to be cached to keep caching proxies from hiding our updates.
-    Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $_.Directory.FullName -eq $directory } }
+    #Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $_.Directory.FullName -eq $directory } }
+    Run-Command -Fatal { Upload-DirectoryToS3 $directory -S3Bucket $bucketName -KeyPrefix $keyPrefix -AllowCachingUnless { $false } }
 }
 
-Run-Command -Fatal {
-    if ($NewVersion) {
-        if ($NewVersion -ne "None") {
-            Bump-Version $NewVersion
-        }
-    } else {
-        Bump-Version
-    }
-}
+#if ($NoPush -and $ReleaseChannel -eq "production") {
+#    Die "-NoPush cannot be used for production deployments."
+#}
 
 Run-Command -Fatal { Require-CleanWorkTree "deploy" -WarnOnly:$Force }
 
 Require-HeadIsPushedToOrigin
+
+Run-Command -Fatal {
+    if ($NewVersion) {
+        if ($NewVersion -ne "None") {
+            Bump-Version $NewVersion -ReleaseChannel:$ReleaseChannel -Branch:$Branch -NoPush:$NoPush
+        }
+    } else {
+        Bump-Version -ReleaseChannel:$ReleaseChannel -Branch:$Branch -NoPush:$NoPush
+    }
+}
+
+if ($NoBuild) {
+    break
+}
 
 Announce-DeployStarted
 
@@ -347,19 +355,18 @@ Announce-DeployStarted
     $tempDirectory = Create-TempDirectory
     Build-Vsix $tempDirectory
     Add-SignatureToVsix (Join-Path $tempDirectory GitHub.VisualStudio.vsix)
-	Build-Installer $tempDirectory
-	Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
+    Build-Installer $tempDirectory
+    Add-SignatureToWiX (Join-Path $tempDirectory ghfvs.msi)
     Write-Manifest $tempDirectory
-    Write-VersionFile $tempDirectory
-    Save-TopLevelFiles $tempDirectory
+    $zipfile = Save-TopLevelFiles $tempDirectory
 
-	Write-Output "Ready at ${tempDirectory}"
+    Write-Output "Ready at ${tempDirectory}"
 
     Upload-Symbols
     Upload-Vsix $tempDirectory
 
     Remove-Item -Recurse $tempDirectory
 
-    Write-Output "Finished deploying GitHub for Visual Studio to ${vsixUrl}"
+    Write-Output "Finished deploying GitHub for Visual Studio to ${bucketName}/${keyPrefix}"
     Announce-DeployCompleted
 }
