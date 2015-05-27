@@ -26,8 +26,9 @@ $scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
 
 . $scriptsDirectory\common.ps1
 
-$newVersion = $null
-$noPush = $false
+#$newVersion = $null
+$newVersion = "None"
+$noPush = $true
 $channel = "dev"
 $branch = [string]$env:SPEAKEASY_BRANCH
 
