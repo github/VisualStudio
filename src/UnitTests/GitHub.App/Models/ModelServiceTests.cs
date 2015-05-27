@@ -344,6 +344,19 @@ public class ModelServiceTests
 
             Assert.Equal(0, repos.Count);
         }
+
+        [Fact]
+        public async Task WhenLoggedInDoesNotBlowUpOnUnexpectedNetworkProblems()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, new InMemoryBlobCache(), Substitute.For<IAvatarProvider>());
+            apiClient.GetOrganizations()
+                .Returns(Observable.Throw<Organization>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
+
+            var repos = await modelService.GetRepositories();
+
+            Assert.Equal(0, repos.Count);
+        }
     }
 
     public class TheInvalidateAllMethod : TestBaseClass
