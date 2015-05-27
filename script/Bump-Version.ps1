@@ -10,6 +10,9 @@
 #>
 
 Param(
+    [string]
+    $ReleaseChannel = "dev"
+    ,
     # It would be nice to use our Validate-Version function here, but we
     # can't because this Param definition has to come before any other code in the
     # file.
@@ -63,7 +66,11 @@ function Bump-Version {
         return $proposedVersion
     }
 
-    New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), ($currentVersion.Revision)
+    if ($ReleaseChannel -eq "production") {
+        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, ($currentVersion.Build + 1), 0
+    } else {
+        New-Object -TypeName System.Version -ArgumentList $currentVersion.Major, $currentVersion.Minor, $currentVersion.Build, ($currentVersion.Revision + 1)
+    }
 }
 
 function Write-VersionCsproj {

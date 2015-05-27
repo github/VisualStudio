@@ -6,9 +6,7 @@
     GitHub. Then builds GitHub for Visual Studio and deploys it to the
     specified release channel and bucket.
 .PARAMETER ReleaseChannel
-    The release channel to which you wish to deploy. Options are: staff
-.PARAMETER S3Bucket
-    Specifies which S3 bucket to upload to. Options are: development, production. Defaults to production.
+    The release channel to which you wish to deploy. Options are: dev, alpha, beta, production
 .PARAMETER NewVersion
     Specifies the version number with which to stamp the build. Specify "None"
     to avoid changing the version number at all. By default, uses the currently
@@ -24,13 +22,9 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("beta", "staff", "production", "test", "speakeasy")]
+    [ValidateSet("dev", "alpha", "beta", "production")]
     [string]
-    $ReleaseChannel
-    ,
-    [ValidateSet("development", "production")]
-    [string]
-    $S3Bucket = "production"
+    $ReleaseChannel = "dev"
     ,
     [string]
     $NewVersion
@@ -64,17 +58,10 @@ if (!$NoChat) {
     Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
 }
 
-$bucketName = ""
-if ($S3Bucket -eq "production") {
-    $bucketName = "github-vs"
-} else {
-    $bucketName = "github-windows-dev"
-}
+$bucketName = "github-vs"
 
-$keyPrefix = ""
-if ($ReleaseChannel -ne "production") {
-    $keyPrefix = "ghfvs/" + $ReleaseChannel.ToLower() + "/"
-}
+$keyPrefix = "releases/" + $ReleaseChannel.ToLower() + "/"
+$symbolsPrefix = "symbols/" + $ReleaseChannel.ToLower() + "/"
 
 $configuration = "Release"
 $installUrl = "http://$bucketName.s3.amazonaws.com/$keyPrefix"
@@ -321,17 +308,8 @@ function Upload-Symbols {
     $buildDirectory = Join-Path $rootDirectory build\$configuration
     Run-Command -Quiet -Fatal { & $symstore add /r /f "$buildDirectory\*.*" /t "GitHub for Visual Studio" /s $symbols }
 
-    if ($S3Bucket -eq "production") {
-        # Upload our symbols to the same place as GHfW's symbols so that
-        # developers only need to use a single symbol server.
-        $symbolsBucket = "github-windows"
-    } else {
-        # This is a test deploy, so we shouldn't pollute the standard symbol server.
-        $symbolsBucket = $bucketName
-    }
-
     Write-Output "Uploading symbols to S3..."
-    Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $symbols -S3Bucket $symbolsBucket -KeyPrefix "symbols/" -Lowercase }
+    Run-Command -Quiet -Fatal { Upload-DirectoryToS3 $symbols -S3Bucket $bucketName -KeyPrefix  $symbolsPrefix -Lowercase }
 
     Remove-Item -Recurse $symbols
 }
@@ -347,6 +325,10 @@ if ($NoPush -and $ReleaseChannel -eq "production") {
     Die "-NoPush cannot be used for production deployments."
 }
 
+Run-Command -Fatal { Require-CleanWorkTree "deploy" -WarnOnly:$Force }
+
+Require-HeadIsPushedToOrigin
+
 Run-Command -Fatal {
     if ($NewVersion) {
         if ($NewVersion -ne "None") {
@@ -355,14 +337,6 @@ Run-Command -Fatal {
     } else {
         Bump-Version -NoPush:$NoPush
     }
-}
-
-Run-Command -Fatal { Require-CleanWorkTree "deploy" -WarnOnly:$Force }
-
-if ($NoPush) {
-    Write-Output "Skipping HEAD push check because -NoPush"
-} else {
-    Require-HeadIsPushedToOrigin
 }
 
 Announce-DeployStarted
@@ -384,7 +358,7 @@ Announce-DeployStarted
 
     Write-Output "Ready at ${tempDirectory}"
 
-    #Upload-Symbols
+    Upload-Symbols
     Upload-Vsix $tempDirectory
 
     Remove-Item -Recurse $tempDirectory

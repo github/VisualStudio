@@ -26,10 +26,22 @@ $scriptsDirectory = Split-Path $MyInvocation.MyCommand.Path
 
 . $scriptsDirectory\common.ps1
 
-$speakEasyVersion = [System.Version]$env:SPEAKEASY_VERSION
-$newVersion =  read-currentVersion | %{ "$($_.major).$($_.minor).$($_.build).$($_.revision + $speakEasyVersion.minor)" }
-#$newVersion = "None"
+$newVersion = $null
+$noPush = $false
+$channel = "dev"
+$branch = [string]$env:SPEAKEASY_BRANCH
+
+if ($branch.StartsWith("release")) {
+    $channel = "production"
+} elseif ($branch.StartsWith("alpha")) {
+    $channel = "alpha"
+} elseif ($branch.StartsWith("beta")) {
+    $channel = "beta"
+} else {
+    $noPush = $true
+    $newVersion = "None"
+}
 
 Push-Location $scriptsDirectory
-.\Deploy "speakeasy" "development" "$newVersion" -NoChat:$true -NoPush:$true
+.\Deploy $channel $newVersion -NoChat:$true -NoPush:$noPush
 Pop-Location
