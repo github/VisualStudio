@@ -29,6 +29,9 @@ Param(
     [string]
     $NewVersion
     ,
+    [string]
+    $Branch
+    ,
     [switch]
     $Force = $false
     ,
@@ -47,16 +50,20 @@ $env:PATH = "$scriptsDirectory;$modulesPath;$env:PATH"
 $env:PSModulePath = $env:PSModulePath + ";$modulesPath"
 Import-Module "$modulesPath\wix"
 Import-Module "$modulesPath\vsix"
-#Get-Command -ListImported
-Write-Output $scriptsDirectory
 
 $rootDirectory = Split-Path ($scriptsDirectory)
-#$git = Get-Command git.cmd
+
 . $scriptsDirectory\common.ps1
 
 if (!$NoChat) {
     Import-Module (Join-Path $scriptsDirectory Modules\CampfireUtilities)
 }
+
+if (!$Branch) {
+    $Branch = Get-CheckedOutBranch
+}
+
+Write-Output "Branch is $Branch"
 
 $bucketName = "github-vs"
 
@@ -171,37 +178,27 @@ function Announce-Message([string]$message) {
 
 function Announce-DeployStarted {
     $campfireUser = Get-CampfireUsername
-    Push-Location $rootDirectory
-    $branch = Get-CheckedOutBranch
-    Pop-Location
 
-    $url = "https://github.com/github/VisualStudio/"
     $deployedVersion = Get-DeployedSha1 | Get-ShortSha1
     if ($deployedVersion) {
         $url += "compare/{0}...{1}" -f $deployedVersion, (Get-HeadSha1 | Get-ShortSha1)
     } else {
-        $url += "tree/{0}" -f $branch
+        $url += "tree/{0}" -f $Branch
     }
-    $message = "{0} is deploying VisualStudio/{1} to {2} {3}" -f $campfireUser, $branch, $ReleaseChannel, $url
+    $message = "{0} is deploying VisualStudio/{1} to {2}" -f $campfireUser, $Branch, $ReleaseChannel
     Announce-Message $message
 }
 
 function Announce-DeployCompleted {
     $campfireUser = Get-CampfireUsername
-    Push-Location $rootDirectory
-    $branch = Get-CheckedOutBranch
-    Pop-Location
     $duration = ((Get-Date) - $startTime).TotalSeconds
-    $message = "{0}'s {1} deployment of VisualStudio/{2} is done! {3:F1}s" -f $campfireUser, $ReleaseChannel, $branch, $duration
+    $message = "{0}'s {1} deployment of VisualStudio/{2} is done! {3:F1}s" -f $campfireUser, $ReleaseChannel, $Branch, $duration
     Announce-Message $message
 }
 
 function Announce-DeployFailed([string]$error) {
     $campfireUser = Get-CampfireUsername
-    Push-Location $rootDirectory
-    $branch = Get-CheckedOutBranch
-    Pop-Location
-    $message = "{0}'s deploy of VisualStudio/{1} to {2} failed: {3}" -f $campfireUser, $branch, $ReleaseChannel, $error
+    $message = "{0}'s deploy of VisualStudio/{1} to {2} failed: {3}" -f $campfireUser, $Branch, $ReleaseChannel, $error
     Announce-Message $message
 }
 
@@ -332,10 +329,10 @@ Require-HeadIsPushedToOrigin
 Run-Command -Fatal {
     if ($NewVersion) {
         if ($NewVersion -ne "None") {
-            Bump-Version $NewVersion -NoPush:$NoPush
+            Bump-Version $NewVersion -ReleaseChannel:$ReleaseChannel -Branch:$Branch -NoPush:$NoPush
         }
     } else {
-        Bump-Version -NoPush:$NoPush
+        Bump-Version -ReleaseChannel:$ReleaseChannel -Branch:$Branch -NoPush:$NoPush
     }
 }
 

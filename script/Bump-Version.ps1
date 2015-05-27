@@ -10,15 +10,18 @@
 #>
 
 Param(
-    [string]
-    $ReleaseChannel = "dev"
-    ,
     # It would be nice to use our Validate-Version function here, but we
     # can't because this Param definition has to come before any other code in the
     # file.
     [ValidateScript({ ($_.Major -ge 0) -and ($_.Minor -ge 0) -and ($_.Build -ge 0) -and ($_.Revision -ge 0) })]
     [System.Version]
     $NewVersion = $null
+    ,
+    [string]
+    $ReleaseChannel = "dev"
+    ,
+    [string]
+    $Branch
     ,
     [switch]
     $NoPush = $false
@@ -186,12 +189,11 @@ function Commit-VersionBump {
 function Push-Changes {
     Push-Location $rootDirectory
 
-    $branch = Get-CheckedOutBranch
-    Write-Output "Pushing $branch to GitHub..."
+    Write-Output "Pushing $Branch to GitHub..."
 
-    $output = & $git push origin $branch 2>&1
+    $output = & $git push origin $Branch 2>&1
     if ($LastExitCode -ne 0) {
-        Die "Error pushing $branch to GitHub" $output
+        Die "Error pushing $Branch to GitHub" $output
     }
 
     Pop-Location

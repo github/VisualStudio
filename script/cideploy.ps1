@@ -43,5 +43,5 @@ if ($branch.StartsWith("release")) {
 }
 
 Push-Location $scriptsDirectory
-.\Deploy $channel $newVersion -NoChat:$true -NoPush:$noPush
+.\Deploy $channel $newVersion $branch -NoChat:$true -NoPush:$noPush
 Pop-Location
