@@ -112,7 +112,12 @@ namespace GitHub.Services
                     {
                         log.Error("Retrieve user organizations failed because user is not stored in the cache.", e);
                         return Observable.Return(Enumerable.Empty<AccountCacheItem>());
-                    });
+                    })
+                 .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
+                 {
+                     log.Error("Retrieve user organizations failed.", e);
+                     return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                 });
         }
 
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()

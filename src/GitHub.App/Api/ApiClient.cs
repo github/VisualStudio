@@ -54,11 +54,6 @@ namespace GitHub.Api
             return gitHubClient.User.Current();
         }
 
-        public IObservable<User> GetAllUsersForAllOrganizations()
-        {
-            return GetOrganizations().SelectMany(org => gitHubClient.Organization.Member.GetAll(org.Login));
-        }
-
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
             Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> twoFactorChallengeHander,
             string authenticationCode = null,
