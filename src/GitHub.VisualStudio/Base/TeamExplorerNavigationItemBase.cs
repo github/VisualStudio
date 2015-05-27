@@ -9,6 +9,7 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using GitHub.Extensions;
+using System.Threading;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -19,12 +20,14 @@ namespace GitHub.VisualStudio.Base
 
         readonly ISimpleApiClientFactory apiFactory;
         readonly ITeamExplorerServiceHolder holder;
+        readonly SynchronizationContext syncContext;
 
         public TeamExplorerNavigationItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
             : base()
         {
             this.apiFactory = apiFactory;
             this.holder = holder;
+            syncContext = SynchronizationContext.Current;
             IsVisible = false;
             IsEnabled = true;
             SubscribeToSectionProvider();
@@ -57,7 +60,7 @@ namespace GitHub.VisualStudio.Base
 
         protected virtual async void UpdateState()
         {
-            var visible = await Refresh().ConfigureAwait(true);
+            var visible = await Refresh();
             IsVisible = IsEnabled = visible;
         }
 
@@ -79,7 +82,7 @@ namespace GitHub.VisualStudio.Base
                 if (!visible)
                 {
                     // enterprise probe
-                    var ret = await SimpleApiClient.IsEnterprise();
+                    var ret = await SimpleApiClient.IsEnterprise().ConfigureAwait(false);
                     visible = (ret == EnterpriseProbeResult.Ok);
                 }
             }
@@ -112,10 +115,14 @@ namespace GitHub.VisualStudio.Base
 
         void SubscribeToSectionProvider()
         {
-            holder.Subscribe(this, (provider) =>
+            holder.Subscribe(this, (prov) =>
             {
-                ServiceProvider = provider;
-                Initialize();
+                syncContext.Post((p) =>
+                {
+                    var provider = p as IServiceProvider;
+                    ServiceProvider = provider;
+                    Initialize();
+                }, prov);
             });
         }
 

@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         protected async override void RepoChanged()
         {
             simpleApiClient = null;
-            var visible = await UpdateState().ConfigureAwait(true);
+            var visible = await UpdateState();
 
             IsVisible = IsEnabled = visible;
 
@@ -82,7 +82,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                 if (!visible)
                 {
                     // enterprise probe
-                    var ret = await simpleApiClient.IsEnterprise().ConfigureAwait(true);
+                    var ret = await simpleApiClient.IsEnterprise().ConfigureAwait(false);
                     visible = (ret == EnterpriseProbeResult.Ok);
                 }
             }
@@ -92,7 +92,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         public override void Loaded(object sender, SectionLoadedEventArgs e)
         {
             base.Loaded(sender, e);
-            holder.Notify();
+            Task.Run(() => holder.Notify());
         }
 
         bool disposed;
