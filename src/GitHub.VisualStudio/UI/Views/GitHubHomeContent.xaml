@@ -7,13 +7,11 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
-             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
-             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d"
              d:DesignHeight="48"
              Height="48"
              d:DesignWidth="300"
-             Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowBackgroundKey}}"
+             Background="Transparent"
              DataContext="{Binding ViewModel}">
     <d:DesignProperties.DataContext>
         <Binding>
@@ -29,7 +27,6 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
                 <Setter Property="Padding" Value="0" />
             </Style>
         </ResourceDictionary>
@@ -49,11 +46,11 @@
                 VerticalAlignment="Center" 
                 Margin="0,0,8,0"
                 Icon="{Binding Path=Icon}"
-                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                Foreground="{DynamicResource VsBrush.ToolWindowText}" />
 
             <StackPanel Orientation="Vertical" Margin="0" Grid.Column="1">
-                <Label Content="{Binding Path=RepoName}" />
-                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+                <Label Content="{Binding Path=RepoName}"  Foreground="{DynamicResource VsBrush.ToolWindowText}"/>
+                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource VsBrush.GrayText}" />
             </StackPanel>
         </Grid>
     </StackPanel>
