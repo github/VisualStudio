@@ -44,23 +44,15 @@
           If you do not want an image next to your command, remove the Icon node /> -->
 
       <Button guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100" type="Button">
-      <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup" />
-      <Icon guid="guidImages" id="logo" />
-      <Strings>
-        <ButtonText>&amp;Connect to GitHub</ButtonText>
-      </Strings>
+        <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup" />
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>&amp;Connect to GitHub</ButtonText>
+        </Strings>
       </Button>
     </Buttons>
-   
-    <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
-    <!--  The bitmap id is defined in a way that is a little bit different from the others: 
-            the declaration starts with a guid for the bitmap strip, then there is the resource id of the 
-            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
-            inside a button definition. An important aspect of this declaration is that the element id 
-            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-    <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\logo_16x16.png" usedList="logo" />
-    </Bitmaps>
+
   </Commands>
   
   <Symbols>
