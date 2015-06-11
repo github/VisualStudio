@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Windows.Media;
 
 namespace GitHub.UI
@@ -57,7 +59,10 @@ namespace GitHub.UI
         
         public static SolidColorBrush CreateBrush(string color)
         {
-            return CreateBrush((Color)ColorConverter.ConvertFromString(color));
+            var colorObject = ColorConverter.ConvertFromString(color);
+            Debug.Assert(colorObject != null,
+                string.Format(CultureInfo.InvariantCulture, "Cannot convert string '{0}' to a Color instance.", color));
+            return CreateBrush((Color)colorObject);
         }
     }
 }

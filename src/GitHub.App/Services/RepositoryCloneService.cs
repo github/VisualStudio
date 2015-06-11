@@ -63,11 +63,9 @@ namespace GitHub.Services
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
             var ret = vsservices.GetLocalClonePathFromGitProvider();
-            if (!string.IsNullOrEmpty(ret))
-                ret = operatingSystem.Environment.ExpandEnvironmentVariables(ret);
-            else
-                ret = fallbackPath;
-            return ret;
+            return !string.IsNullOrEmpty(ret)
+                ? operatingSystem.Environment.ExpandEnvironmentVariables(ret)
+                : fallbackPath;
         }
 
         public string DefaultClonePath { get { return defaultClonePath; } }

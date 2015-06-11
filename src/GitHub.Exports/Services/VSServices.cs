@@ -94,6 +94,7 @@ namespace GitHub.Services
         static string PokeTheRegistryForLocalClonePath()
         {
             var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl\General");
+            if (key == null) return null;
             return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
         }
 

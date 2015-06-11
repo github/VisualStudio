@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -78,6 +79,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         static ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRepositoryModel> repositories)
         {
             var view = new ListCollectionView((IList)repositories);
+            Debug.Assert(view.GroupDescriptions != null, "view.GroupDescriptions is null");
             view.GroupDescriptions.Add(new RepositoryGroupDescription());
             return view;
         }
