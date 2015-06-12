@@ -72,18 +72,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
         static DrawingBrush GetDrawingForIcon(Brush color)
         {
-            Octicon icon = Octicon.mark_github;
-            return new DrawingBrush() {
-                Drawing = new GeometryDrawing()
-                {
-                    Brush = color,
-                    Pen = new Pen(color, 1.0).FreezeThis(),
-                    Geometry = OcticonPath.GetGeometryForIcon(icon).FreezeThis()
-                }
-                .FreezeThis(),
-                Stretch = Stretch.Uniform
-            }
-            .FreezeThis();
+            return SharedResources.GetDrawingForIcon(Octicon.mark_github, color);
         }
     }
 }

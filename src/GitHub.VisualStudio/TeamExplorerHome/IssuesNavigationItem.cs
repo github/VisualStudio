@@ -7,6 +7,8 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using GitHub.UI;
+using System.Windows.Media;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -26,8 +28,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             this.browser = browser;
             Text = "Issues";
-            Image = Resources.issue_opened;
-            ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
+            Icon = SharedResources.GetDrawingForIcon(Octicon.issue_opened, new SolidColorBrush(Color.FromRgb(66, 66, 66)));
+            ArgbColor = Helpers.Colors.LightBlueNavigationItem.ToInt32();
         }
 
         public override void Execute()

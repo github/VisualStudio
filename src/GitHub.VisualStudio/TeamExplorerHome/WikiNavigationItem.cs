@@ -7,6 +7,8 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using System.Windows.Media;
+using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -26,8 +28,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             this.browser = browser;
             Text = "Wiki";
-            Image = Resources.book;
-            ArgbColor = Colors.BlueNavigationItem.ToInt32();
+            Icon = SharedResources.GetDrawingForIcon(Octicon.book, new SolidColorBrush(Color.FromRgb(66, 66, 66)));
+            ArgbColor = Helpers.Colors.BlueNavigationItem.ToInt32();
         }
 
         public override void Execute()
