@@ -8,8 +8,6 @@
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
-             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
-             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d"
              DataContext="{Binding ViewModel}" d:DesignWidth="230" d:DesignHeight="120">
 
@@ -26,7 +24,6 @@
         <StackPanel.Resources>
             <ResourceDictionary>
                 <Style TargetType="Label">
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ResourceDictionary>
@@ -45,9 +42,9 @@
                 VerticalAlignment="Center" 
                 Margin="0,6,8,8"
                 Icon="mark_github"
-                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                Foreground="{DynamicResource VsBrush.ToolWindowText}" />
 
-            <TextBlock Grid.Column="1" Margin="0,6,8,8" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" TextWrapping="Wrap" Text="{Binding Description}" />
+            <TextBlock Grid.Column="1" Margin="0,6,8,8" Foreground="{DynamicResource VsBrush.GrayText}" TextWrapping="Wrap" Text="{Binding Description}" />
         </Grid>
         <Grid Margin="0,0,0,6" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.TabIndex="1">
             <Grid.ColumnDefinitions>

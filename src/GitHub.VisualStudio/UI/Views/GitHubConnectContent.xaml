@@ -8,7 +8,6 @@
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
-             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White">
@@ -19,7 +18,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource VsBrush.GrayText}" />
                 <Setter Property="Padding" Value="0" />
             </Style>
         </ResourceDictionary>

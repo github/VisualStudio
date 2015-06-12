@@ -8,7 +8,6 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
-             xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:converters="clr-namespace:GitHub.VisualStudio.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
@@ -31,7 +30,7 @@
                 <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
                 <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Static vsshell:VsResourceKeys.ComboBoxStyleKey}}">
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource VSStyledComboBox}">
                 <Setter Property="Margin" Value="0,0,0,8" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="Height" Value="23" />
@@ -51,14 +50,14 @@
                 VerticalAlignment="Center"
                 Margin="0,6,8,0"
                 Icon="mark_github"
-                Foreground="{DynamicResource {x:Static vsshell:VsBrushes.ToolWindowTextKey}}" />
+                Foreground="{DynamicResource VsBrush.ToolWindowText}" />
             <Border Height="32" Margin="0,6,0,0" DockPanel.Dock="Right">
                 <TextBlock
                     TextWrapping="Wrap"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Stretch"
                     Text="This repository does not have a remote. Fill out the form to publish it to GitHub."
-                    Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}"
+                    Foreground="{DynamicResource VsBrush.GrayText}"
                     TextTrimming="CharacterEllipsis"
                     ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
             </Border>
@@ -96,14 +95,14 @@
                      Margin="0"
                      Height="23"
                      MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"
-                     Background="{DynamicResource {x:Static vsshell:VsBrushes.SearchBoxBackgroundKey }}"
-                     Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey }}" />
+                     Background="{DynamicResource VsBrush.SearchBoxBackground}"
+                     Foreground="{DynamicResource VsBrush.WindowText}" />
 
             <TextBlock Margin="7,4,0,0"
                        IsHitTestVisible="False"
                        Visibility="{Binding ElementName=nameText, Path=Text.Length, Converter={StaticResource CountToVisibilityConverter}}"
                        Text="Repository Name"
-                       Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+                       Foreground="{DynamicResource VsBrush.GrayText}" />
         </Grid>
 
         <!-- TODO: Make this a user control -->
@@ -112,25 +111,19 @@
                      Height="52"
                      AcceptsReturn="True"
                      Margin="0,8,0,0"
-                     Background="{DynamicResource {x:Static vsshell:VsBrushes.SearchBoxBackgroundKey }}"
-                     Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey }}" />
+                     Background="{DynamicResource VsBrush.SearchBoxBackground}"
+                     Foreground="{DynamicResource VsBrush.WindowText}" />
 
             <TextBlock Margin="7,12,0,0"
                        IsHitTestVisible="False"
                        Visibility="{Binding ElementName=description, Path=Text.Length, Converter={StaticResource CountToVisibilityConverter}}"
                        Text="Description (Optional)"
-                       Foreground="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey }}" />
+                       Foreground="{DynamicResource VsBrush.GrayText}" />
         </Grid>
 
         <CheckBox x:Name="makePrivate"
                   Margin="0,8,0,0"
-                  Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}">
-            <TextBlock TextWrapping="Wrap">
-                <TextBlock.Inlines>
-                    <Run>Private Repository</Run>
-                </TextBlock.Inlines>
-            </TextBlock>
-        </CheckBox>
+                  Style="{StaticResource VSStyledCheckBox}">Private Repository</CheckBox>
         
         <Label x:Name="upgradeToMicroPlanWarning" HorizontalAlignment="Left" Visibility="Collapsed">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
@@ -162,6 +155,7 @@
         </Label>
        
         <Button
+            Style="{StaticResource VSStyledButton}"
             IsDefault="True"
             x:Name="publishRepositoryButton"
             Margin="0,8,0,0"
