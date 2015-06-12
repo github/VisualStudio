@@ -10,6 +10,7 @@ using GitHub.Services;
 using GitHub.Api;
 using GitHub.Primitives;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -94,7 +95,14 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         public override void Loaded(object sender, SectionLoadedEventArgs e)
         {
             base.Loaded(sender, e);
-            Task.Run(() => holder.Notify());
+            Task.Run(() => holder.NotifyServiceProvider());
+        }
+
+        protected override void SetActiveRepo(IGitRepositoryInfo repo)
+        {
+            base.SetActiveRepo(repo);
+            holder.SetActiveRepo(ActiveRepo);
+            Task.Run(() => holder.NotifyActiveRepo());
         }
 
         bool disposed;

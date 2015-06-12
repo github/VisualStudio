@@ -13,6 +13,7 @@ using GitHub.Extensions;
 using System.ComponentModel.Composition;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -20,15 +21,24 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        Dictionary<object, Action<IServiceProvider>> handlers = new Dictionary<object, Action<IServiceProvider>>();
+        Dictionary<object, Action<IServiceProvider>> serviceProviderHandlers = new Dictionary<object, Action<IServiceProvider>>();
+        Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
 
         IServiceProvider serviceProvider;
-        bool notified = false;
+        IGitRepositoryInfo activeRepo;
+        bool serviceProviderNotified = false;
+        bool activeRepoNotified = false;
 
         [AllowNull]
         public IServiceProvider ServiceProvider
         {
             [return: AllowNull] get { return serviceProvider; }
+        }
+
+        [AllowNull]
+        public IGitRepositoryInfo ActiveRepo
+        {
+            [return: AllowNull] get { return activeRepo; }
         }
 
         public void SetServiceProvider([AllowNull] IServiceProvider provider)
@@ -37,7 +47,7 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             serviceProvider = provider;
-            notified = false;
+            serviceProviderNotified = false;
         }
 
         public void ClearServiceProvider([AllowNull] IServiceProvider provider)
@@ -46,36 +56,74 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             serviceProvider = null;
-            handlers.Clear();
-
+            serviceProviderHandlers.Clear();
         }
 
-        public void Notify()
+        public void SetActiveRepo([AllowNull] IGitRepositoryInfo repo)
         {
-            notified = true;
-            foreach (var handler in handlers.Values)
+            if (repo == null || activeRepo == repo)
+                return;
+
+            activeRepo = repo;
+            activeRepoNotified = false;
+        }
+
+        public void ClearActiveRepo([AllowNull] IGitRepositoryInfo repo)
+        {
+            if (activeRepo != repo)
+                return;
+
+            activeRepo = null;
+            activeRepoHandlers.Clear();
+        }
+
+        public void NotifyServiceProvider()
+        {
+            serviceProviderNotified = true;
+            foreach (var handler in serviceProviderHandlers.Values)
                 handler(serviceProvider);
+        }
+
+        public void NotifyActiveRepo()
+        {
+            activeRepoNotified = true;
+            foreach (var handler in activeRepoHandlers.Values)
+                handler(activeRepo);
         }
 
         public void Subscribe(object who, Action<IServiceProvider> handler)
         {
             var provider = ServiceProvider;
-            if (!handlers.ContainsKey(who))
-                handlers.Add(who, handler);
+            if (!serviceProviderHandlers.ContainsKey(who))
+                serviceProviderHandlers.Add(who, handler);
             else
-                handlers[who] = handler;
+                serviceProviderHandlers[who] = handler;
 
-            if (provider != null && notified)
+            if (provider != null && serviceProviderNotified)
                 handler(provider);
+        }
+
+        public void Subscribe(object who, Action<IGitRepositoryInfo> handler)
+        {
+            var repo = ActiveRepo;
+            if (!activeRepoHandlers.ContainsKey(who))
+                activeRepoHandlers.Add(who, handler);
+            else
+                activeRepoHandlers[who] = handler;
+
+            if (repo != null && activeRepoNotified)
+                handler(repo);
         }
 
         public void Unsubscribe(object who)
         {
-            if (handlers.ContainsKey(who))
-                handlers.Remove(who);
+            if (serviceProviderHandlers.ContainsKey(who))
+                serviceProviderHandlers.Remove(who);
+            if (activeRepoHandlers.ContainsKey(who))
+                activeRepoHandlers.Remove(who);
         }
 
-        public TeamExplorerHome.GitHubHomeSection HomeSection
+        public IGitAwareItem HomeSection
         {
             [return:AllowNull]
             get
@@ -85,7 +133,7 @@ namespace GitHub.VisualStudio.Base
                 var page = PageService;
                 if (page == null)
                     return null;
-                return page.GetSection(new Guid(TeamExplorerHome.GitHubHomeSection.GitHubHomeSectionId)) as TeamExplorerHome.GitHubHomeSection;
+                return page.GetSection(new Guid(TeamExplorerHome.GitHubHomeSection.GitHubHomeSectionId)) as IGitAwareItem;
             }
         }
 

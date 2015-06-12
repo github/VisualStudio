@@ -12,8 +12,7 @@ using System.Windows.Media;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
-    [TeamExplorerNavigationItem(IssuesNavigationItemId,
-        NavigationItemPriority.Issues)]
+    //[TeamExplorerNavigationItem(IssuesNavigationItemId, NavigationItemPriority.Issues)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {

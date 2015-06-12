@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,6 +42,22 @@ namespace GitHub.Services
         /// <param name="handler">The handler to call when ServiceProvider is set</param>
         void Subscribe(object who, Action<IServiceProvider> handler);
         /// <summary>
+        /// A IGitRepositoryInfo representing the currently active repository
+        /// </summary>
+        IGitRepositoryInfo ActiveRepo { get; }
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="repo"></param>
+        void SetActiveRepo(IGitRepositoryInfo repo);
+        void ClearActiveRepo(IGitRepositoryInfo repo);
+        /// <summary>
+        /// Subscribe to be notified when the active repository is set and Notify is called.
+        /// </summary>
+        /// <param name="who">The instance that is interested in being called (or a unique key/object for that instance)</param>
+        /// <param name="handler">The handler to call when ActiveRepo is set</param>
+        void Subscribe(object who, Action<IGitRepositoryInfo> handler);
+        /// <summary>
         /// Unsubscribe from notifications
         /// </summary>
         /// <param name="who">The instance/key that previously subscribed to notifications</param>
@@ -48,6 +65,19 @@ namespace GitHub.Services
         /// <summary>
         /// Notifies all subscribers
         /// </summary>
-        void Notify();
+        void NotifyServiceProvider();
+        /// <summary>
+        /// Notifies all subscribers
+        /// </summary>
+        void NotifyActiveRepo();
+
+        IGitAwareItem HomeSection { get; }
+    }
+
+    public interface IGitAwareItem
+    {
+        IGitRepositoryInfo ActiveRepo { get; }
+        Uri ActiveRepoUri { get; }
+        string ActiveRepoName { get; }
     }
 }

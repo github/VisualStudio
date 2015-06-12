@@ -10,10 +10,11 @@ using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using GitHub.Extensions;
 using System.Threading;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerNavigationItemBase : TeamExplorerGitAwareItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
+    public class TeamExplorerNavigationItemBase : TeamExplorerGitRepoInfo, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
         [AllowNull]
         public ISimpleApiClient SimpleApiClient { [return: AllowNull] get; private set; }
@@ -30,7 +31,7 @@ namespace GitHub.VisualStudio.Base
             syncContext = SynchronizationContext.Current;
             IsVisible = false;
             IsEnabled = true;
-            SubscribeToSectionProvider();
+            SubscribeToActiveRepo();
         }
 
         int argbColor;
@@ -106,29 +107,43 @@ namespace GitHub.VisualStudio.Base
             OpenInBrowser(browser, uri);
         }
 
-        protected override void RepoChanged()
+        void RepoChanged()
         {
+            var home = holder.HomeSection;
+            ActiveRepoName = home.ActiveRepoName;
+            ActiveRepoUri = home.ActiveRepoUri;
             SimpleApiClient = null;
             UpdateState();
-            base.RepoChanged();
         }
 
-        void SubscribeToSectionProvider()
+        //void SubscribeToSectionProvider()
+        //{
+        //    holder.Subscribe(this, (IServiceProvider prov) =>
+        //    {
+        //        syncContext.Post((p) =>
+        //        {
+        //            var provider = p as IServiceProvider;
+        //            ServiceProvider = provider;
+        //            Initialize();
+        //        }, prov);
+        //    });
+        //}
+
+        void Unsubscribe()
         {
-            holder.Subscribe(this, (prov) =>
+            holder.Unsubscribe(this);
+        }
+
+        void SubscribeToActiveRepo()
+        {
+            holder.Subscribe(this, (IGitRepositoryInfo repo) =>
             {
                 syncContext.Post((p) =>
                 {
-                    var provider = p as IServiceProvider;
-                    ServiceProvider = provider;
-                    Initialize();
-                }, prov);
+                    ActiveRepo = p as IGitRepositoryInfo;
+                    RepoChanged();
+                }, repo);
             });
-        }
-
-        void UnsubscribeToSectionProvider()
-        {
-            holder.Unsubscribe(this);
         }
 
         bool disposed;
@@ -138,7 +153,7 @@ namespace GitHub.VisualStudio.Base
             {
                 if (!disposed)
                 {
-                    UnsubscribeToSectionProvider();
+                    Unsubscribe();
                     disposed = true;
                 }
             }
