@@ -230,6 +230,7 @@
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Program.cs" />
+    <Compile Include="Services\SharedResources.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
@@ -327,15 +328,10 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pulse.png" />
     <Resource Include="FodyWeavers.xml" />
     <CodeAnalysisDictionary Include="..\..\script\CodeAnalysisDictionary.xml">
       <Link>Properties\CodeAnalysisDictionary.xml</Link>
     </CodeAnalysisDictionary>
-    <None Include="Resources\book.png" />
-    <None Include="Resources\git_pull_request.png" />
-    <None Include="Resources\graph.png" />
-    <None Include="Resources\issue_opened.png" />
     <Content Include="LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

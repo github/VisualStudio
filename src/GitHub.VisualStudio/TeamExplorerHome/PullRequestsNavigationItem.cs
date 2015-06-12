@@ -7,6 +7,8 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using GitHub.UI;
+using System.Windows.Media;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -26,8 +28,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             this.browser = browser;
             Text = "Pull Requests";
-            Image = Resources.git_pull_request;
-            ArgbColor = Colors.RedNavigationItem.ToInt32();
+            Icon = SharedResources.GetDrawingForIcon(Octicon.git_pull_request, new SolidColorBrush(Color.FromRgb(66, 66, 66)));
+            ArgbColor = Helpers.Colors.RedNavigationItem.ToInt32();
         }
 
         public override void Execute()
