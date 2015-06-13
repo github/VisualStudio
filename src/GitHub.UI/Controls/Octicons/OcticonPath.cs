@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -58,15 +59,9 @@ namespace GitHub.UI
         // Initializes the cache dictionary with lazy entries for all available octicons
         static Dictionary<Octicon, Lazy<Geometry>> PrepareCache()
         {
-            var c = new Dictionary<Octicon, Lazy<Geometry>>();
-            var threadSafetyMode = LazyThreadSafetyMode.None;
-
-            foreach (Octicon icon in Enum.GetValues(typeof(Octicon)))
-            {
-                c.Add(icon, new Lazy<Geometry>(() => LoadGeometry(icon), threadSafetyMode));
-            }
-
-            return c;
+            return Enum.GetValues(typeof(Octicon))
+                .Cast<Octicon>()
+                .ToDictionary(icon => icon, icon => new Lazy<Geometry>(() => LoadGeometry(icon), LazyThreadSafetyMode.None));
         }
 
         static Geometry LoadGeometry(Octicon icon)

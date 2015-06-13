@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,10 +33,10 @@ namespace GitHub.UI
                 Loaded += (sender, args) =>
                 {
                     highlightElement = Template.FindName("TabHighlight", this) as FrameworkElement;
+                    Debug.Assert(highlightElement != null, "The template 'TabHighlight' is null or not a FrameworkElement");
                     highlightTransform = Template.FindName("TabHighlightTransform", this) as TranslateTransform;
-
+                    Debug.Assert(highlightTransform != null, "The template 'TabHighlightTransform' is null or not a FrameworkElement");
                     highlightElement.Visibility = Visibility.Visible;
-
                     UpdateHighlight();
                 };
 

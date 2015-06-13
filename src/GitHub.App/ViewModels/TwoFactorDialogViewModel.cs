@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.Reactive.Linq;
 using GitHub.Authentication;
 using GitHub.Exports;
@@ -83,6 +85,8 @@ namespace GitHub.ViewModels
         {
             IsBusy = false;
             var error = userError as TwoFactorRequiredUserError;
+            Debug.Assert(error != null,
+                String.Format(CultureInfo.InvariantCulture, "The user error is '{0}' not a TwoFactorRequiredUserError", userError));
             InvalidAuthenticationCode = error.RetryFailed;
             TwoFactorType = error.TwoFactorType;
             var ok = OkCommand

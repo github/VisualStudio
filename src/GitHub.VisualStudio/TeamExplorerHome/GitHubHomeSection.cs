@@ -48,6 +48,8 @@ namespace GitHub.VisualStudio.TeamExplorerHome
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
+                Debug.Assert(simpleApiClient != null,
+                    "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await simpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
             }
