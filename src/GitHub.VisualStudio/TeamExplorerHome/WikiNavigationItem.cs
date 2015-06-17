@@ -4,16 +4,12 @@ using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
-using System.Windows.Media;
 using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
-    [TeamExplorerNavigationItem(WikiNavigationItemId,
-        NavigationItemPriority.Wiki)]
+    [TeamExplorerNavigationItem(WikiNavigationItemId, NavigationItemPriority.Wiki)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
@@ -24,12 +20,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         [ImportingConstructor]
         public WikiNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
                                     ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder)
+            : base(apiFactory, holder, Octicon.book)
         {
             this.browser = browser;
             Text = "Wiki";
-            Icon = SharedResources.GetDrawingForIcon(Octicon.book, new SolidColorBrush(Color.FromRgb(66, 66, 66)));
-            ArgbColor = Helpers.Colors.BlueNavigationItem.ToInt32();
+            ArgbColor = Colors.BlueNavigationItem.ToInt32();
         }
 
         public override void Execute()
@@ -38,16 +33,15 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.Execute();
         }
 
-        protected override async void UpdateState()
+        public override async void Invalidate()
         {
-            bool visible = await Refresh();
+            var visible = await ShouldBeVisible();
             if (visible)
             {
-                var ret = await SimpleApiClient.HasWiki();
-                visible = (ret == WikiProbeResult.Ok);
+                var repo = await SimpleApiClient.GetRepository();
+                visible = repo.HasWiki && SimpleApiClient.HasWiki();
             }
-            
-            IsVisible = IsEnabled = visible;
+            IsVisible = visible;
         }
     }
 }

@@ -208,7 +208,6 @@
     <None Include="..\..\script\Key.snk">
       <Link>Key.snk</Link>
     </None>
-    <Compile Include="Base\TeamExplorerGitAwareItemBase.cs" />
     <Compile Include="Base\TeamExplorerGitRepoInfo.cs" />
     <Compile Include="Base\TeamExplorerInvitationBase.cs" />
     <Compile Include="Base\TeamExplorerServiceHolder.cs" />
@@ -223,7 +222,6 @@
     <Compile Include="Base\TeamExplorerBase.cs" />
     <Compile Include="Base\TeamExplorerItemBase.cs" />
     <Compile Include="Base\TeamExplorerNavigationItemBase.cs" />
-    <Compile Include="Base\TeamExplorerNavigationLinkBase.cs" />
     <Compile Include="Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Helpers\Colors.cs" />

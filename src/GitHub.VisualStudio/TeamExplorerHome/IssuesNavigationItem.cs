@@ -4,15 +4,12 @@ using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
 using GitHub.UI;
-using System.Windows.Media;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
-    //[TeamExplorerNavigationItem(IssuesNavigationItemId, NavigationItemPriority.Issues)]
+    [TeamExplorerNavigationItem(IssuesNavigationItemId, NavigationItemPriority.Issues)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {
@@ -23,12 +20,11 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         [ImportingConstructor]
         public IssuesNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
                                     ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder)
+            : base(apiFactory, holder, Octicon.issue_opened)
         {
             this.browser = browser;
             Text = "Issues";
-            Icon = SharedResources.GetDrawingForIcon(Octicon.issue_opened, new SolidColorBrush(Color.FromRgb(66, 66, 66)));
-            ArgbColor = Helpers.Colors.LightBlueNavigationItem.ToInt32();
+            ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
         }
 
         public override void Execute()
@@ -37,16 +33,17 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.Execute();
         }
 
-        protected override async void UpdateState()
+        public override async void Invalidate()
         {
-            bool visible = await Refresh();
+            IsVisible = false;
+
+            var visible = await ShouldBeVisible();
             if (visible)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                visible = repo != null && repo.HasIssues;
+                visible = repo.HasIssues;
             }
-
-            IsVisible = IsEnabled = visible;
+            IsVisible = visible;
         }
     }
 }

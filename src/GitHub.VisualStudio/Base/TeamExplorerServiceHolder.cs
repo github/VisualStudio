@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Threading.Tasks;
-using GitHub.Api;
-using GitHub.Primitives;
 using GitHub.Services;
-using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using GitHub.Extensions;
@@ -14,6 +8,8 @@ using System.ComponentModel.Composition;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using System.Linq;
+using System.Threading;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -21,106 +17,133 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        Dictionary<object, Action<IServiceProvider>> serviceProviderHandlers = new Dictionary<object, Action<IServiceProvider>>();
         Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
-
-        IServiceProvider serviceProvider;
         IGitRepositoryInfo activeRepo;
-        bool serviceProviderNotified = false;
         bool activeRepoNotified = false;
 
+        IServiceProvider serviceProvider;
+        IGitExt gitService;
+        UIContext gitUIContext;
+
+        // ActiveRepositories PropertyChanged event comes in on a non-main thread
+        readonly SynchronizationContext syncContext;
+
+        public TeamExplorerServiceHolder()
+        {
+            syncContext = SynchronizationContext.Current;
+        }
+
+        // set by the sections when they get initialized
         [AllowNull]
         public IServiceProvider ServiceProvider
         {
             [return: AllowNull] get { return serviceProvider; }
+            set
+            {
+                if (serviceProvider == value)
+                    return;
+
+                serviceProvider = value;
+                GitService = null;
+                if (serviceProvider == null)
+                    return;
+                if (GitUIContext == null)
+                    GitUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                UIContextChanged(GitUIContext.IsActive);
+            }
         }
 
         [AllowNull]
         public IGitRepositoryInfo ActiveRepo
         {
             [return: AllowNull] get { return activeRepo; }
-        }
-
-        public void SetServiceProvider([AllowNull] IServiceProvider provider)
-        {
-            if (provider == null || serviceProvider == provider)
-                return;
-
-            serviceProvider = provider;
-            serviceProviderNotified = false;
-        }
-
-        public void ClearServiceProvider([AllowNull] IServiceProvider provider)
-        {
-            if (serviceProvider != provider)
-                return;
-
-            serviceProvider = null;
-            serviceProviderHandlers.Clear();
-        }
-
-        public void SetActiveRepo([AllowNull] IGitRepositoryInfo repo)
-        {
-            if (repo == null || activeRepo == repo)
-                return;
-
-            activeRepo = repo;
-            activeRepoNotified = false;
-        }
-
-        public void ClearActiveRepo([AllowNull] IGitRepositoryInfo repo)
-        {
-            if (activeRepo != repo)
-                return;
-
-            activeRepo = null;
-            activeRepoHandlers.Clear();
-        }
-
-        public void NotifyServiceProvider()
-        {
-            serviceProviderNotified = true;
-            foreach (var handler in serviceProviderHandlers.Values)
-                handler(serviceProvider);
-        }
-
-        public void NotifyActiveRepo()
-        {
-            activeRepoNotified = true;
-            foreach (var handler in activeRepoHandlers.Values)
-                handler(activeRepo);
-        }
-
-        public void Subscribe(object who, Action<IServiceProvider> handler)
-        {
-            var provider = ServiceProvider;
-            if (!serviceProviderHandlers.ContainsKey(who))
-                serviceProviderHandlers.Add(who, handler);
-            else
-                serviceProviderHandlers[who] = handler;
-
-            if (provider != null && serviceProviderNotified)
-                handler(provider);
+            private set
+            {
+                if (activeRepo.Compare(value))
+                    return;
+                activeRepo = value;
+                NotifyActiveRepo();
+            }
         }
 
         public void Subscribe(object who, Action<IGitRepositoryInfo> handler)
         {
-            var repo = ActiveRepo;
-            if (!activeRepoHandlers.ContainsKey(who))
-                activeRepoHandlers.Add(who, handler);
-            else
-                activeRepoHandlers[who] = handler;
-
-            if (repo != null && activeRepoNotified)
-                handler(repo);
+            lock(activeRepoHandlers)
+            {
+                var repo = ActiveRepo;
+                if (!activeRepoHandlers.ContainsKey(who))
+                    activeRepoHandlers.Add(who, handler);
+                else
+                    activeRepoHandlers[who] = handler;
+                if (activeRepoNotified)
+                    handler(repo);
+            }
         }
 
         public void Unsubscribe(object who)
         {
-            if (serviceProviderHandlers.ContainsKey(who))
-                serviceProviderHandlers.Remove(who);
             if (activeRepoHandlers.ContainsKey(who))
                 activeRepoHandlers.Remove(who);
+        }
+
+        /// <summary>
+        /// Clears the current ServiceProvider if it matches the one that is passed in.
+        /// This is usually called on Dispose, which might happen after another section
+        /// has changed the ServiceProvider to something else, which is why we require
+        /// the parameter to match.
+        /// </summary>
+        /// <param name="provider">If the current ServiceProvider matches this, clear it</param>
+        public void ClearServiceProvider(IServiceProvider provider)
+        {
+            if (serviceProvider != provider)
+                return;
+
+            ServiceProvider = null;
+        }
+
+        void NotifyActiveRepo()
+        {
+            lock (activeRepoHandlers)
+            {
+                activeRepoNotified = true;
+                foreach (var handler in activeRepoHandlers.Values)
+                    handler(activeRepo);
+            }
+        }
+
+        void UIContextChanged(object sender, UIContextChangedEventArgs e)
+        {
+            UIContextChanged(e.Activated);
+        }
+
+        void UIContextChanged(bool active)
+        {
+            Debug.Assert(ServiceProvider != null, "UIContextChanged called before service provider is set");
+            if (ServiceProvider == null)
+                return;
+
+            if (active)
+                GitService = ServiceProvider.GetService<IGitExt>();
+            else
+                GitService = null;
+
+            if (GitService != null)
+                ActiveRepo = gitService.ActiveRepositories.FirstOrDefault();
+            else
+                ActiveRepo = null;
+        }
+
+        void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var service = GitService;
+            if (service == null)
+                return;
+
+            if (e.PropertyName == "ActiveRepositories")
+            {
+                // so annoying that this is on the wrong thread
+                syncContext.Post((repo) => ActiveRepo = repo as IGitRepositoryInfo, service.ActiveRepositories.FirstOrDefault());
+            }
         }
 
         public IGitAwareItem HomeSection
@@ -141,6 +164,36 @@ namespace GitHub.VisualStudio.Base
         {
             [return:AllowNull]
             get { return ServiceProvider.GetService<ITeamExplorerPage>(); }
+        }
+
+        [AllowNull]
+        UIContext GitUIContext
+        {
+            [return: AllowNull]
+            get { return gitUIContext; }
+            set
+            {
+                if (gitUIContext != null)
+                    gitUIContext.UIContextChanged -= UIContextChanged;
+                gitUIContext = value;
+                if (gitUIContext != null)
+                    gitUIContext.UIContextChanged += UIContextChanged;
+            }
+        }
+
+        [AllowNull]
+        IGitExt GitService
+        {
+            [return: AllowNull]
+            get { return gitService; }
+            set
+            {
+                if (gitService != null)
+                    gitService.PropertyChanged -= CheckAndUpdate;
+                gitService = value;
+                if (gitService != null)
+                    gitService.PropertyChanged += CheckAndUpdate;
+            }
         }
     }
 }

@@ -22,10 +22,7 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerGitAwareItemBase()
         {
             syncContext = SynchronizationContext.Current;
-        }
-
-        protected virtual void RepoChanged()
-        {
+            ActiveRepo = null;
         }
 
         protected void Initialize()
@@ -76,12 +73,12 @@ namespace GitHub.VisualStudio.Base
                 UpdateRepo(null);
         }
 
-        void UpdateRepo([AllowNull]IGitRepositoryInfo repo)
+        protected void UpdateRepo([AllowNull]IGitRepositoryInfo repo)
         {
-            if (ActiveRepo == repo)
+            if (ActiveRepo.Compare(repo))
                 return;
 
-            SetActiveRepo(repo);
+            ActiveRepo = repo;
             if (repo != null)
             {
                 var gitRepo = Services.GetRepoFromIGit(repo);
@@ -99,9 +96,8 @@ namespace GitHub.VisualStudio.Base
             RepoChanged();
         }
 
-        protected virtual void SetActiveRepo(IGitRepositoryInfo repo)
+        protected virtual void RepoChanged()
         {
-            ActiveRepo = repo;
         }
 
         bool disposed;

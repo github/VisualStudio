@@ -5,12 +5,11 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using System.Diagnostics;
 using GitHub.Services;
 using GitHub.Api;
 using GitHub.Primitives;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -20,103 +19,39 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 
-        readonly ISimpleApiClientFactory apiFactory;
-        readonly ITeamExplorerServiceHolder holder;
-        ISimpleApiClient simpleApiClient;
-
         [ImportingConstructor]
         public GitHubHomeSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
-            : base()
+            : base(apiFactory, holder)
         {
-            this.apiFactory = apiFactory;
-            this.holder = holder;
             Title = "GitHub";
-            IsVisible = false;
-            IsExpanded = true;
             View = new GitHubHomeContent();
             View.DataContext = this;
         }
 
         protected async override void RepoChanged()
         {
-            simpleApiClient = null;
-            var visible = await UpdateState();
+            IsVisible = false;
 
-            IsVisible = IsEnabled = visible;
+            base.RepoChanged();
 
-            if (visible)
+            IsVisible = await ShouldBeVisible();
+
+            if (IsVisible)
             {
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
-                Debug.Assert(simpleApiClient != null,
+                Debug.Assert(SimpleApiClient != null,
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
-                var repo = await simpleApiClient.GetRepository();
+                var repo = await SimpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
             }
-
-            base.RepoChanged();
         }
 
-        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        public override async void Refresh()
         {
-            base.Initialize(sender, e);
-            Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
-            if (holder == null)
-                return;
-            holder.SetServiceProvider(e.ServiceProvider);
-        }
-
-        async Task<bool> UpdateState()
-        {
-            bool visible = false;
-
-            if (simpleApiClient == null)
-            {
-                var uri = ActiveRepoUri;
-                if (uri == null)
-                    return false;
-
-                simpleApiClient = apiFactory.Create(uri);
-
-                if (HostAddress.IsGitHubDotComUri(uri))
-                    visible = true;
-
-                if (!visible)
-                {
-                    // enterprise probe
-                    var ret = await simpleApiClient.IsEnterprise().ConfigureAwait(false);
-                    visible = (ret == EnterpriseProbeResult.Ok);
-                }
-            }
-            return visible;
-        }
-
-        public override void Loaded(object sender, SectionLoadedEventArgs e)
-        {
-            base.Loaded(sender, e);
-            Task.Run(() => holder.NotifyServiceProvider());
-        }
-
-        protected override void SetActiveRepo(IGitRepositoryInfo repo)
-        {
-            base.SetActiveRepo(repo);
-            holder.SetActiveRepo(ActiveRepo);
-            Task.Run(() => holder.NotifyActiveRepo());
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    holder.ClearServiceProvider(ServiceProvider);
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
+            IsVisible = await ShouldBeVisible();
+            base.Refresh();
         }
 
         static Octicon GetIcon(bool isPrivate, bool isHosted, bool isFork)

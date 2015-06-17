@@ -4,16 +4,12 @@ using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
 using GitHub.UI;
-using System.Windows.Media;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
-    [TeamExplorerNavigationItem(PullRequestsNavigationItemId,
-        NavigationItemPriority.PullRequests)]
+    [TeamExplorerNavigationItem(PullRequestsNavigationItemId, NavigationItemPriority.PullRequests)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {
@@ -24,23 +20,17 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         [ImportingConstructor]
         public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
                                     ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder)
+            : base(apiFactory, holder, Octicon.git_pull_request)
         {
             this.browser = browser;
             Text = "Pull Requests";
-            Icon = SharedResources.GetDrawingForIcon(Octicon.git_pull_request, new SolidColorBrush(Color.FromRgb(66, 66, 66)));
-            ArgbColor = Helpers.Colors.RedNavigationItem.ToInt32();
+            ArgbColor = Colors.RedNavigationItem.ToInt32();
         }
 
         public override void Execute()
         {
             OpenInBrowser(browser, "pulls");
             base.Execute();
-        }
-
-        protected override async void UpdateState()
-        {
-            IsVisible = IsEnabled = await Refresh();
         }
     }
 }

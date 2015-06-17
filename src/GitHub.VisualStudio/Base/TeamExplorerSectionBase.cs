@@ -1,13 +1,21 @@
 ﻿using System;
 using GitHub.VisualStudio.Helpers;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
+using GitHub.Services;
+using System.Diagnostics;
+using System.Threading;
+using GitHub.Extensions;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.Api;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerSectionBase : TeamExplorerGitAwareItemBase, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerItemBase, ITeamExplorerSection, INotifyPropertySource
     {
+        protected IConnectionManager connectionManager;
+
         bool isBusy;
         public bool IsBusy
         {
@@ -38,33 +46,85 @@ namespace GitHub.VisualStudio.Base
             set { title = value; this.RaisePropertyChange(); }
         }
 
-        public virtual void Cancel()
-        {
-        }
-
         [return: AllowNull]
         public virtual object GetExtensibilityService(Type serviceType)
         {
             return null;
         }
 
+        public TeamExplorerSectionBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            : base(apiFactory, holder)
+        {
+            IsVisible = false;
+            IsEnabled = true;
+            IsExpanded = true;
+        }
+
+        public TeamExplorerSectionBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+            IConnectionManager cm) : this(apiFactory, holder)
+        {
+            connectionManager = cm;
+        }
+
+        public virtual void Cancel()
+        {
+        }
+
         public virtual void Initialize(object sender, SectionInitializeEventArgs e)
         {
+#if DEBUG
+//            VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize", DateTime.Now, GetType());
+#endif
             ServiceProvider = e.ServiceProvider;
+            Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
+            if (holder == null)
+                return;
+            holder.ServiceProvider = e.ServiceProvider;
+            SubscribeToRepoChanges();
+#if DEBUG
+//            VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize DONE", DateTime.Now, GetType());
+#endif
         }
 
         public virtual void Loaded(object sender, SectionLoadedEventArgs e)
         {
-            Initialize();
         }
 
         public virtual void Refresh()
         {
-            Initialize();
         }
 
         public virtual void SaveContext(object sender, SectionSaveContextEventArgs e)
         {
+        }
+
+        void SubscribeToRepoChanges()
+        {
+            holder.Subscribe(this, (IGitRepositoryInfo repo) =>
+            {
+                ActiveRepo = repo;
+                RepoChanged();
+            });
+        }
+
+        void Unsubscribe()
+        {
+            holder.Unsubscribe(this);
+            holder.ClearServiceProvider(ServiceProvider);
+        }
+
+        bool disposed;
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!disposed)
+                {
+                    Unsubscribe();
+                    disposed = true;
+                }
+            }
+            base.Dispose(disposing);
         }
     }
 }

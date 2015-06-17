@@ -1,19 +1,16 @@
-﻿using GitHub.Models;
-using GitHub.Primitives;
+﻿using GitHub.Api;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
-using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using System;
 using System.Collections.Specialized;
 
 namespace GitHub.VisualStudio.TeamExplorerConnect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase
     {
-        readonly IConnectionManager connectionManager;
         readonly int sectionIndex;
 
         protected GitHubConnectContent View
@@ -24,14 +21,14 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
 
         protected IConnection SectionConnection { get; set; }
 
-        public GitHubConnectSection(IConnectionManager manager, int index)
+        public GitHubConnectSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager manager, int index)
+            : base(apiFactory, holder, manager)
         {
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
             IsExpanded = false;
 
-            connectionManager = manager;
             sectionIndex = index;
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;

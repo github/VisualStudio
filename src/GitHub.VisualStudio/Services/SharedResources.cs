@@ -9,9 +9,16 @@ namespace GitHub.VisualStudio
     {
         static readonly Dictionary<string, DrawingBrush> drawingBrushes = new Dictionary<string, DrawingBrush>();
 
-        public static DrawingBrush GetDrawingForIcon(Octicon icon, Brush color)
+        public static DrawingBrush GetDrawingForIcon(Octicon icon, Color color, string theme = null)
+        {
+            return GetDrawingForIcon(icon, new SolidColorBrush(color).FreezeThis(), theme);
+        }
+
+        public static DrawingBrush GetDrawingForIcon(Octicon icon, Brush colorBrush, string theme = null)
         {
             string name = icon.ToString();
+            if (theme != null)
+                name += "_" + theme;
             if (drawingBrushes.ContainsKey(name))
                 return drawingBrushes[name];
 
@@ -19,8 +26,8 @@ namespace GitHub.VisualStudio
             {
                 Drawing = new GeometryDrawing()
                 {
-                    Brush = color,
-                    Pen = new Pen(color, 1.0).FreezeThis(),
+                    Brush = colorBrush,
+                    Pen = new Pen(colorBrush, 1.0).FreezeThis(),
                     Geometry = OcticonPath.GetGeometryForIcon(icon).FreezeThis()
                 }
                 .FreezeThis(),

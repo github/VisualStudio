@@ -15,6 +15,7 @@ using System.Reactive.Linq;
 using GitHub.Extensions;
 using System.ComponentModel;
 using GitHub.VisualStudio.UI.Views.Controls;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio.TeamExplorerHome
 {
@@ -24,7 +25,6 @@ namespace GitHub.VisualStudio.TeamExplorerHome
     {
         public const string GitHubPublishSectionId = "92655B52-360D-4BF5-95C5-D9E9E596AC76";
 
-        readonly IConnectionManager connectionManager;
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
         IDisposable disposable;
 
@@ -36,9 +36,10 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         }
 
         [ImportingConstructor]
-        public GitHubPublishSection(IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
+        public GitHubPublishSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
+            : base(apiFactory, holder, cm)
         {
-            connectionManager = cm;
+
             lazyBrowser = browser;
             Title = "Publish to GitHub";
             IsVisible = false;
@@ -50,6 +51,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         protected override void RepoChanged()
         {
+            base.RepoChanged();
             if (ActiveRepo != null && ActiveRepoUri == null)
             {
                 // not published yet
@@ -63,7 +65,6 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             {
                 IsVisible = false;
             }
-            base.RepoChanged();
         }
 
         bool disposed;
@@ -97,7 +98,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             var ret = uiProvider.SetupUI(controllerFlow, null);
             ret.Subscribe((c) => { }, () =>
             {
-                Initialize();
+                //Initialize();
             });
             uiProvider.RunUI();
         }

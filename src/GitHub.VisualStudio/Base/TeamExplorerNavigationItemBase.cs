@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Primitives;
@@ -11,27 +10,100 @@ using NullGuard;
 using GitHub.Extensions;
 using System.Threading;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.UI;
+using Microsoft.VisualStudio.PlatformUI;
+using System.Drawing;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerNavigationItemBase : TeamExplorerGitRepoInfo, ITeamExplorerNavigationItem2, INotifyPropertySource
+    public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
-        [AllowNull]
-        public ISimpleApiClient SimpleApiClient { [return: AllowNull] get; private set; }
+        Octicon octicon;
 
-        readonly ISimpleApiClientFactory apiFactory;
-        readonly ITeamExplorerServiceHolder holder;
-        readonly SynchronizationContext syncContext;
-
-        public TeamExplorerNavigationItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
-            : base()
+        public TeamExplorerNavigationItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
+            : base(apiFactory, holder)
         {
-            this.apiFactory = apiFactory;
-            this.holder = holder;
-            syncContext = SynchronizationContext.Current;
+            this.octicon = octicon;
+
             IsVisible = false;
             IsEnabled = true;
-            SubscribeToActiveRepo();
+
+            OnThemeChanged();
+            VSColorTheme.ThemeChanged += _ =>
+            {
+                OnThemeChanged();
+            };
+
+            holder.Subscribe(this, UpdateRepo);
+        }
+
+        public override async void Invalidate()
+        {
+            IsVisible = false;
+            IsVisible = await ShouldBeVisible();
+        }
+
+        void OnThemeChanged()
+        {
+            var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
+            Debug.Assert(color != null, "The theme color EnvironmentColors.ToolWindowTextColorKey is null");
+            if (color == null) return;
+            var brightness = color.GetBrightness();
+            var dark = brightness > 0.5f;
+
+            Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
+        }
+
+        protected override void RepoChanged()
+        {
+            var home = holder.HomeSection;
+            Debug.Assert(home != null, "Notifications should only happen when the home section is alive");
+            if (home == null)
+                ActiveRepo = null;
+            base.RepoChanged();
+        }
+
+        void UpdateRepo(IGitRepositoryInfo repo)
+        {
+            ActiveRepo = repo;
+            RepoChanged();
+            Invalidate();
+        }
+
+        protected void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
+        {
+            var uri = ActiveRepoUri;
+            Debug.Assert(uri != null, "OpenInBrowser: uri should never be null");
+            if (uri == null)
+                return;
+
+            var https = uri.ToHttps();
+            if (https == null)
+                return;
+
+            if (!Uri.TryCreate(https.ToString() + "/" + endpoint, UriKind.Absolute, out uri))
+                return;
+
+            OpenInBrowser(browser, uri);
+        }
+
+        void Unsubscribe()
+        {
+            holder.Unsubscribe(this);
+        }
+
+        bool disposed;
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!disposed)
+                {
+                    Unsubscribe();
+                    disposed = true;
+                }
+            }
+            base.Dispose(disposing);
         }
 
         int argbColor;
@@ -55,109 +127,8 @@ namespace GitHub.VisualStudio.Base
         public Image Image
         {
             [return: AllowNull]
-            get { return image; }
+            get{ return image; }
             set { image = value; this.RaisePropertyChange(); }
-        }
-
-        protected virtual async void UpdateState()
-        {
-            var visible = await Refresh();
-            IsVisible = IsEnabled = visible;
-        }
-
-        protected async Task<bool> Refresh()
-        {
-            bool visible = false;
-
-            if (SimpleApiClient == null)
-            {
-                var uri = ActiveRepoUri;
-                if (uri == null)
-                    return visible;
-
-                if (HostAddress.IsGitHubDotComUri(uri))
-                    visible = true;
-
-                SimpleApiClient = apiFactory.Create(uri);
-
-                if (!visible)
-                {
-                    // enterprise probe
-                    var ret = await SimpleApiClient.IsEnterprise().ConfigureAwait(false);
-                    visible = (ret == EnterpriseProbeResult.Ok);
-                }
-            }
-            return visible;
-        }
-
-        protected void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
-        {
-            var uri = ActiveRepoUri;
-            Debug.Assert(uri != null, "OpenInBrowser: uri should never be null");
-            if (uri == null)
-                return;
-
-            var https = uri.ToHttps();
-            if (https == null)
-                return;
-
-            if (!Uri.TryCreate(https.ToString() + "/" + endpoint, UriKind.Absolute, out uri))
-                return;
-
-            OpenInBrowser(browser, uri);
-        }
-
-        void RepoChanged()
-        {
-            var home = holder.HomeSection;
-            ActiveRepoName = home.ActiveRepoName;
-            ActiveRepoUri = home.ActiveRepoUri;
-            SimpleApiClient = null;
-            UpdateState();
-        }
-
-        //void SubscribeToSectionProvider()
-        //{
-        //    holder.Subscribe(this, (IServiceProvider prov) =>
-        //    {
-        //        syncContext.Post((p) =>
-        //        {
-        //            var provider = p as IServiceProvider;
-        //            ServiceProvider = provider;
-        //            Initialize();
-        //        }, prov);
-        //    });
-        //}
-
-        void Unsubscribe()
-        {
-            holder.Unsubscribe(this);
-        }
-
-        void SubscribeToActiveRepo()
-        {
-            holder.Subscribe(this, (IGitRepositoryInfo repo) =>
-            {
-                syncContext.Post((p) =>
-                {
-                    ActiveRepo = p as IGitRepositoryInfo;
-                    RepoChanged();
-                }, repo);
-            });
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    Unsubscribe();
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
         }
     }
 }

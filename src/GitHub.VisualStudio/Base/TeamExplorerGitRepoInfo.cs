@@ -1,16 +1,18 @@
-﻿using GitHub.Services;
+﻿using GitHub.Api;
+using GitHub.Services;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using NullGuard;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerGitRepoInfo : TeamExplorerItemBase, IGitAwareItem
+    public class TeamExplorerGitRepoInfo : TeamExplorerBase, IGitAwareItem
     {
+        public TeamExplorerGitRepoInfo()
+        {
+            ActiveRepo = null;
+        }
+
         IGitRepositoryInfo activeRepo;
         [AllowNull]
         public IGitRepositoryInfo ActiveRepo
@@ -27,6 +29,6 @@ namespace GitHub.VisualStudio.Base
 
         [AllowNull]
         public Uri ActiveRepoUri { [return: AllowNull] get; set; }
-        public string ActiveRepoName {[return: AllowNull] get; set; }
+        public string ActiveRepoName { get; set; }
     }
 }
