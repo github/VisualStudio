@@ -9,25 +9,20 @@ using GitHub.VisualStudio.Helpers;
 using System.Threading;
 using System.Diagnostics;
 using Microsoft.TeamFoundation.Controls;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerGitAwareItemBase : TeamExplorerItemBase
+    public class TeamExplorerGitAwareItemBase : TeamExplorerGitRepoInfo
     {
-        IGitRepositoryInfo activeRepo;
         IGitExt gitService;
-        Uri activeRepoUri;
-        string activeRepoName = string.Empty;
         readonly SynchronizationContext syncContext;
         UIContext gitUIContext;
 
         public TeamExplorerGitAwareItemBase()
         {
             syncContext = SynchronizationContext.Current;
-        }
-
-        protected virtual void RepoChanged()
-        {
+            ActiveRepo = null;
         }
 
         protected void Initialize()
@@ -78,9 +73,9 @@ namespace GitHub.VisualStudio.Base
                 UpdateRepo(null);
         }
 
-        void UpdateRepo([AllowNull]IGitRepositoryInfo repo)
+        protected void UpdateRepo([AllowNull]IGitRepositoryInfo repo)
         {
-            if (ActiveRepo == repo)
+            if (ActiveRepo.Compare(repo))
                 return;
 
             ActiveRepo = repo;
@@ -94,11 +89,15 @@ namespace GitHub.VisualStudio.Base
                     if (name != null)
                     {
                         ActiveRepoUri = uri;
-                        ActiveRepoName = activeRepoUri.GetUser() + "/" + activeRepoUri.GetRepo();
+                        ActiveRepoName = ActiveRepoUri.GetUser() + "/" + ActiveRepoUri.GetRepo();
                     }
                 }
             }
             RepoChanged();
+        }
+
+        protected virtual void RepoChanged()
+        {
         }
 
         bool disposed;
@@ -145,34 +144,6 @@ namespace GitHub.VisualStudio.Base
                 if (gitService != null)
                     gitService.PropertyChanged += CheckAndUpdate;
             }
-        }
-
-        [AllowNull]
-        protected IGitRepositoryInfo ActiveRepo
-        {
-            [return: AllowNull]
-            get { return activeRepo; }
-            private set
-            {
-                activeRepoName = string.Empty;
-                activeRepoUri = null;
-                activeRepo = value;
-            }
-        }
-
-        [AllowNull]
-        protected Uri ActiveRepoUri
-        {
-            [return: AllowNull]
-            get
-            { return activeRepoUri; }
-            private set { activeRepoUri = value; }
-        }
-
-        protected string ActiveRepoName
-        {
-            get { return activeRepoName; }
-            private set { activeRepoName = value; }
         }
     }
 }

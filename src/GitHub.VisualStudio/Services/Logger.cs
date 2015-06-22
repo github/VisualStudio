@@ -1,8 +1,11 @@
-﻿using System;
+﻿using GitHub.Info;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace GitHub.VisualStudio
 {
@@ -22,6 +25,8 @@ namespace GitHub.VisualStudio
     public static class VsOutputLogger
     {
         static Lazy<Action<string>> logger = new Lazy<Action<string>>(() => DefaultLogger);
+        static readonly string defaultLogPath;
+        static readonly object fileLock = new object();
 
         static Action<string> Logger
         {
@@ -30,7 +35,14 @@ namespace GitHub.VisualStudio
 
         static VsOutputLogger()
         {
-            Debug.Listeners.Add(new VSTraceListener());
+            //Debug.Listeners.Add(new VSTraceListener());
+            var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ApplicationInfo.ApplicationName);
+            defaultLogPath = Path.Combine(dir, ApplicationInfo.ApplicationName + "-te.log");
+            try
+            {
+                Directory.CreateDirectory(dir);
+            }
+            catch { }
         }
 
         public static void SetLogger(Action<string> log)
@@ -49,25 +61,25 @@ namespace GitHub.VisualStudio
             Logger(message);
         }
 
+        public static void WriteLine(string format, params object[] args)
+        {
+            var message = string.Format(CultureInfo.CurrentCulture, format, args);
+            WriteLine(message);
+        }
+
         public static void WriteLine(string message)
         {
             Logger(message + Environment.NewLine);
         }
 
-        const string defaultLogPath = @"%AppData%\GitHubVisualStudio\vs.log";
-        static readonly object filelock = new object();
-        static void DefaultLogger(string log)
+        static async void DefaultLogger(string msg)
         {
-            var path = Environment.ExpandEnvironmentVariables(defaultLogPath);
-            var dir = Path.GetDirectoryName(path);
-            lock (filelock)
+            // this codepath is called multiple times on loading
+            // doing a little delay so that calling code doesn't get slowed down by this
+            await System.Threading.Tasks.Task.Delay(500);
+            lock(fileLock)
             {
-                try
-                {
-                    Directory.CreateDirectory(dir);
-                    File.AppendAllText(path, log, Encoding.UTF8);
-                }
-                catch {} // if we can't log, *shrug*
+                File.AppendAllText(defaultLogPath, msg, Encoding.UTF8);
             }
         }
     }

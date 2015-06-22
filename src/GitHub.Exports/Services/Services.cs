@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.Models;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio
 {
@@ -53,6 +55,32 @@ namespace GitHub.VisualStudio
         public static IVsOutputWindow OutputWindow
         {
             get { return GetGlobalService<SVsOutputWindow, IVsOutputWindow>(); }
+        }
+
+        static IVsOutputWindowPane outputWindowPane = null;
+        public static IVsOutputWindowPane OutputWindowPane
+        {
+            get
+            {
+                if (outputWindowPane == null)
+                {
+                    // First make sure the output window is visible
+                    var uiShell = GetGlobalService<SVsUIShell, IVsUIShell>();
+                    // Get the frame of the output window
+                    Guid outputWindowGuid = new Guid("{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}");
+                    IVsWindowFrame outputWindowFrame = null;
+                    ErrorHandler.ThrowOnFailure(uiShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate, ref outputWindowGuid, out outputWindowFrame));
+                    // Show the output window
+                    if (outputWindowFrame != null)
+                        ErrorHandler.ThrowOnFailure(outputWindowFrame.Show());
+
+                    Guid paneGuid = new Guid("E37A42B1-C1AE-475C-9982-7F49FE61918D");
+                    ErrorHandler.ThrowOnFailure(OutputWindow.CreatePane(ref paneGuid, ApplicationInfo.ApplicationSafeName, 1 /*visible=true*/, 0 /*clearWithSolution=false*/));
+                    ErrorHandler.ThrowOnFailure(OutputWindow.GetPane(ref paneGuid, out outputWindowPane));
+                }
+
+                return outputWindowPane;
+            }
         }
 
         public static DTE Dte

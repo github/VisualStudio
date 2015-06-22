@@ -13,9 +13,17 @@ namespace GitHub.VisualStudio.Helpers
         public static Color YellowNavigationItem     = Color.FromRgb(0xF9, 0xC9, 0x00);
         public static Color PurpleNavigationItem     = Color.FromRgb(0xAE, 0x3C, 0xBA);
 
+        public static Color LightThemeNavigationItem = Color.FromRgb(66, 66, 66);
+        public static Color DarkThemeNavigationItem = Color.FromRgb(200, 200, 200);
+
         public static int ToInt32(this Color color)
         {
             return BitConverter.ToInt32(new byte[]{ color.B, color.G, color.R, color.A }, 0);
+        }
+
+        public static Color ToColor(this System.Drawing.Color color)
+        {
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
     }
 }

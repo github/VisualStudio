@@ -10,8 +10,8 @@ namespace GitHub.Api
     {
         HostAddress HostAddress { get; }
         Uri OriginalUrl { get; }
-        Task<EnterpriseProbeResult> IsEnterprise();
         Task<Repository> GetRepository();
-        Task<WikiProbeResult> HasWiki();
+        bool HasWiki();
+        bool IsEnterprise();
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using Microsoft.TeamFoundation.Client;
 using NullGuard;
 using GitHub.Services;
 
