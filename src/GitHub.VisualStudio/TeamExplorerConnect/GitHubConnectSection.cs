@@ -27,7 +27,7 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
-            IsExpanded = false;
+            IsExpanded = true;
 
             sectionIndex = index;
 
@@ -56,14 +56,12 @@ namespace GitHub.VisualStudio.TeamExplorerConnect
             if (connection == null)
             {
                 IsVisible = false;
-                IsExpanded = false;
             }
             else if (SectionConnection != connection)
             {
                 SectionConnection = connection;
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
-                IsExpanded = true;
             }
         }
 

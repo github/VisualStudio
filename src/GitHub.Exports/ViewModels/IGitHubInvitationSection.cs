@@ -1,11 +1,15 @@
 ﻿using GitHub.UI;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorer
 {
     public interface IGitHubInvitationSection
     {
-        string Description { get; set; }
+        string Name { get; }
+        string Description { get; }
+        bool CanSignUp { get; }
+        bool CanConnect { get;  }
         void Connect();
         void SignUp();
+        void Login();
     }
 }

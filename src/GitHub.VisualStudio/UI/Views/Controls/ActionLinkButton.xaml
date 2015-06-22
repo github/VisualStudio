@@ -4,19 +4,13 @@
     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
     xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
 >
-    <Color x:Key="ActionLinkColorDark">#0097FB</Color>
-    <Color x:Key="ActionLinkColorLight">#0066CC</Color>
-    <SolidColorBrush x:Key="ActionLinkBrushDark" Color="{StaticResource ActionLinkColorDark}" PresentationOptions:Freeze="true"/>
-    <SolidColorBrush x:Key="ActionLinkBrushLight" Color="{StaticResource ActionLinkColorLight}" PresentationOptions:Freeze="true"/>
-
-    <Style TargetType="{x:Type vsui:ActionLinkButton}">
+    <Style x:Key="ActionLinkButton" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Focusable" Value="False" />
-        <Setter Property="Foreground" Value="{DynamicResource ActionLinkBrushDark}" />
-        <Setter Property="Dark" Value="True"/>
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource VsBrush.ControlLinkText}" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="vsui:ActionLinkButton">
+                <ControlTemplate TargetType="Button">
                     <TextBlock>
                             <Hyperlink Foreground="{TemplateBinding Foreground}" >
                                 <Hyperlink.Resources>
@@ -59,25 +53,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-
-        <Style.Triggers>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="Dark" Value="true"/>
-                </MultiTrigger.Conditions>
-                <MultiTrigger.Setters>
-                    <Setter Property="Foreground" Value="{DynamicResource ActionLinkBrushDark}" />
-                </MultiTrigger.Setters>
-            </MultiTrigger>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="Dark" Value="false"/>
-                </MultiTrigger.Conditions>
-                <MultiTrigger.Setters>
-                    <Setter Property="Foreground" Value="{DynamicResource ActionLinkBrushLight}" />
-                </MultiTrigger.Setters>
-            </MultiTrigger>
-        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

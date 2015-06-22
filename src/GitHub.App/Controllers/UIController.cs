@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
@@ -231,10 +232,8 @@ namespace GitHub.Controllers
             }
             else
             {
-                var list = connectionManager.Connections.ToObservable()
-                        .SelectMany(c => c.Login());
-
-                list.Select(c => hosts.LookupHost(c.HostAddress)).Any(h => h.IsLoggedIn)
+                connectionManager
+                    .IsLoggedIn(hosts)
                     .Do(loggedin =>
                     {
                         machine.Configure(UIViewType.None)

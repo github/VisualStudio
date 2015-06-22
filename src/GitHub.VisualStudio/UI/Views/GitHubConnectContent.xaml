@@ -10,7 +10,8 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White">
+             d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
+             KeyboardNavigation.TabNavigation="Local">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -25,11 +26,11 @@
     </UserControl.Resources>
     <Grid>
         <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="6,0,0,6">
-            <vsui:ActionLinkButton x:Name="cloneLink" Click="cloneLink_Click">Clone</vsui:ActionLinkButton>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click">Clone</Button>
             <Label Margin="3 0 3 0">|</Label>
-            <vsui:ActionLinkButton x:Name="createLink" Click="createLink_Click">Create</vsui:ActionLinkButton>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click">Create</Button>
             <Label Margin="3 0 3 0">|</Label>
-            <vsui:ActionLinkButton x:Name="signOut" Click="signOut_Click">Sign out</vsui:ActionLinkButton>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click">Sign out</Button>
         </WrapPanel>
       </Grid>
 </UserControl>
