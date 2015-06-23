@@ -120,6 +120,16 @@ namespace GitHub.UI
                     && args.Key != Key.D7
                     && args.Key != Key.D8
                     && args.Key != Key.D9
+                    && args.Key != Key.NumPad0
+                    && args.Key != Key.NumPad1
+                    && args.Key != Key.NumPad2
+                    && args.Key != Key.NumPad3
+                    && args.Key != Key.NumPad4
+                    && args.Key != Key.NumPad5
+                    && args.Key != Key.NumPad6
+                    && args.Key != Key.NumPad7
+                    && args.Key != Key.NumPad8
+                    && args.Key != Key.NumPad9
                     && args.Key != Key.Tab
                     && args.Key != Key.Escape
                     && args.Key != Key.Delete
