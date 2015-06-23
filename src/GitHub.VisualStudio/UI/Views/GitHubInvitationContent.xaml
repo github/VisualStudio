@@ -66,15 +66,15 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" KeyboardNavigation.TabIndex="0" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="login" Click="login_Click"
-                    Visibility="{Binding CanSignUp, Converter={StaticResource BooleanToVisibilityConverter}}">Login</Button>
+                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}">Login</Button>
             <TextBlock Grid.Column="1" Margin="3,0,3,0"
-                    Visibility="{Binding CanSignUp, Converter={StaticResource BooleanToVisibilityConverter}}">or</TextBlock>
+                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}">or</TextBlock>
             <Button Grid.Column="2" KeyboardNavigation.TabIndex="1" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="signup" Click="signup_Click"
-                    Visibility="{Binding CanSignUp, Converter={StaticResource BooleanToVisibilityConverter}}">Sign up</Button>
+                    Visibility="{Binding ShowSignup, Converter={StaticResource BooleanToVisibilityConverter}}">Sign up</Button>
             <Button Grid.Column="3" KeyboardNavigation.TabIndex="2" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Right" x:Name="connect" Click="connect_Click"
-                    Visibility="{Binding CanConnect, Converter={StaticResource BooleanToVisibilityConverter}}">Get Started</Button>
+                    Visibility="{Binding ShowGetStarted, Converter={StaticResource BooleanToVisibilityConverter}}">Get Started</Button>
             <Rectangle Grid.Column="4" Width="16" Height="16" Margin="8,0,0,0" Fill="{StaticResource ConnectArrowBrush}"
-                    Visibility="{Binding CanConnect, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    Visibility="{Binding ShowGetStarted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </Grid>
 
     </StackPanel>

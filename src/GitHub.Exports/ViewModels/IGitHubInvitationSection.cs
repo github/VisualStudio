@@ -6,8 +6,9 @@ namespace GitHub.VisualStudio.TeamExplorer
     {
         string Name { get; }
         string Description { get; }
-        bool CanSignUp { get; }
-        bool CanConnect { get;  }
+        bool ShowLogin { get; }
+        bool ShowSignup { get;  }
+        bool ShowGetStarted { get; }
         void Connect();
         void SignUp();
         void Login();

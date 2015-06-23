@@ -40,8 +40,9 @@ namespace GitHub.VisualStudio.TeamExplorerSync
             Name = "GitHub";
             Provider = "GitHub, Inc";
             Description = "Powerful collaboration, code review, and code management for open source and private projects.";
-            CanSignUp = false;
-            CanConnect = true;
+            ShowLogin = false;
+            ShowSignup = false;
+            ShowGetStarted = false;
             IsVisible = true;
             IsExpanded = true;
             var view = new GitHubInvitationContent();
@@ -49,12 +50,31 @@ namespace GitHub.VisualStudio.TeamExplorerSync
             view.DataContext = this;
         }
 
-        public async override void Initialize(object sender, SectionInitializeEventArgs e)
+        async void RTMSetup()
         {
             loggedIn = await connectionManager.IsLoggedIn(hosts);
+            ShowGetStarted = true;
+            ShowLogin = !loggedIn;
+            ShowSignup = !loggedIn;
+        }
 
-            CanSignUp = !loggedIn;
+        async void PreRTMSetup()
+        {
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
+            else
+            {
+                ShowGetStarted = true;
+                ShowSignup = true;
+            }
+        }
+
+        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        {
             base.Initialize(sender, e);
+            // replace this with RTMSetup() when the time comes
+            PreRTMSetup();
         }
 
         public async void Connect()
@@ -80,29 +100,30 @@ namespace GitHub.VisualStudio.TeamExplorerSync
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var ret = uiProvider.SetupUI(controllerFlow, null);
-            ret.Subscribe((c) => { }, () =>
+            ret.Subscribe((c) => { }, async () =>
             {
-                Connect();
+                loggedIn = await connectionManager.IsLoggedIn(hosts);
+                if (loggedIn)
+                    ShowPublish();
             });
             uiProvider.RunUI();
         }
 
         void ShowPublish()
         {
+            IsBusy = true;
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
             disposable = uiflow;
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
-            creation
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe((c) =>
-                {
-                    SectionContent = c;
-                    c.DataContext = this;
-                    ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
-                });
+            creation.Subscribe((c) =>
+            {
+                SectionContent = c;
+                c.DataContext = this;
+                ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+            });
             ui.Start(null);
         }
 
@@ -142,18 +163,26 @@ namespace GitHub.VisualStudio.TeamExplorerSync
             set { description = value; this.RaisePropertyChange(); }
         }
 
-        bool canSignUp;
-        public bool CanSignUp
+        bool showLogin;
+        public bool ShowLogin
         {
-            get { return canSignUp; }
-            set { canSignUp = value; this.RaisePropertyChange(); }
+            get { return showLogin; }
+            set { showLogin = value; this.RaisePropertyChange(); }
         }
 
-        bool canConnect;
-        public bool CanConnect
+
+        bool showSignup;
+        public bool ShowSignup
         {
-            get { return canConnect; }
-            set { canConnect = value; this.RaisePropertyChange(); }
+            get { return showSignup; }
+            set { showSignup = value; this.RaisePropertyChange(); }
+        }
+
+        bool showGetStarted;
+        public bool ShowGetStarted
+        {
+            get { return showGetStarted; }
+            set { showGetStarted = value; this.RaisePropertyChange(); }
         }
     }
 }
