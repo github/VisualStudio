@@ -11,8 +11,7 @@ namespace GitHub.Extensions
         {
             return cm.Connections.ToObservable()
                     .SelectMany(c => c.Login())
-                    .Select(c => hosts.LookupHost(c.HostAddress)).Any(h => h.IsLoggedIn)
-                    .ObserveOn(RxApp.MainThreadScheduler);
+                    .Select(c => hosts.LookupHost(c.HostAddress)).Any(h => h.IsLoggedIn);
         }
     }
 }
