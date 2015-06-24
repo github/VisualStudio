@@ -85,8 +85,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Caches\AccountCacheItem.cs" />
+    <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
+    <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />

@@ -4,20 +4,17 @@ using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
-using System.Linq;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Info;
 using ReactiveUI;
 using System.Reactive.Linq;
 using GitHub.Extensions;
-using System.ComponentModel;
-using GitHub.VisualStudio.UI.Views.Controls;
 using GitHub.Api;
+using GitHub.VisualStudio.TeamExplorer;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorerSync
 {
     [TeamExplorerSection(GitHubPublishSectionId, TeamExplorerPageIds.GitCommits, 10)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
@@ -26,45 +23,108 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         public const string GitHubPublishSectionId = "92655B52-360D-4BF5-95C5-D9E9E596AC76";
 
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
+        readonly IRepositoryHosts hosts;
         IDisposable disposable;
-
-        string description = String.Empty;
-        public string Description
-        {
-            get { return description; }
-            set { description = value; this.RaisePropertyChange(); }
-        }
+        bool loggedIn;
 
         [ImportingConstructor]
-        public GitHubPublishSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
+        public GitHubPublishSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+            IConnectionManager cm, Lazy<IVisualStudioBrowser> browser,
+            IRepositoryHosts hosts)
             : base(apiFactory, holder, cm)
         {
 
             lazyBrowser = browser;
+            this.hosts = hosts;
             Title = "Publish to GitHub";
-            IsVisible = false;
-            IsExpanded = true;
+            Name = "GitHub";
+            Provider = "GitHub, Inc";
             Description = "Powerful collaboration, code review, and code management for open source and private projects.";
-
-            cm.Connections.CollectionChanged += (s,e) => Refresh();
+            ShowLogin = false;
+            ShowSignup = false;
+            ShowGetStarted = false;
+            IsVisible = true;
+            IsExpanded = true;
+            var view = new GitHubInvitationContent();
+            SectionContent = view;
+            view.DataContext = this;
         }
 
-        protected override void RepoChanged()
+        async void RTMSetup()
         {
-            base.RepoChanged();
-            if (ActiveRepo != null && ActiveRepoUri == null)
-            {
-                // not published yet
-                IsVisible = true;
-                if (connectionManager.Connections.Count > 0)
-                    ShowPublish();
-                else
-                    ShowInvitation();
-            }
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            ShowGetStarted = true;
+            ShowLogin = !loggedIn;
+            ShowSignup = !loggedIn;
+        }
+
+        async void PreRTMSetup()
+        {
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
             else
             {
-                IsVisible = false;
+                ShowGetStarted = true;
+                ShowSignup = true;
             }
+        }
+
+        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        {
+            base.Initialize(sender, e);
+            // replace this with RTMSetup() when the time comes
+            PreRTMSetup();
+        }
+
+        public async void Connect()
+        {
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
+            else
+                Login();
+        }
+
+        public void SignUp()
+        {
+            OpenInBrowser(lazyBrowser, GitHubUrls.Plans);
+        }
+
+        public void Login()
+        {
+            StartFlow(UIControllerFlow.Authentication);
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var ret = uiProvider.SetupUI(controllerFlow, null);
+            ret.Subscribe((c) => { }, async () =>
+            {
+                loggedIn = await connectionManager.IsLoggedIn(hosts);
+                if (loggedIn)
+                    ShowPublish();
+            });
+            uiProvider.RunUI();
+        }
+
+        void ShowPublish()
+        {
+            IsBusy = true;
+            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var factory = uiProvider.GetService<IExportFactoryProvider>();
+            var uiflow = factory.UIControllerFactory.CreateExport();
+            disposable = uiflow;
+            var ui = uiflow.Value;
+            var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            creation.Subscribe((c) =>
+            {
+                SectionContent = c;
+                c.DataContext = this;
+                ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+            });
+            ui.Start(null);
         }
 
         bool disposed;
@@ -82,51 +142,47 @@ namespace GitHub.VisualStudio.TeamExplorerHome
             base.Dispose(disposing);
         }
 
-        public void Connect()
+        string name = String.Empty;
+        public string Name
         {
-            StartFlow(UIControllerFlow.Authentication);
+            get { return name; }
+            set { name = value; this.RaisePropertyChange(); }
         }
 
-        public void SignUp()
+        string provider = String.Empty;
+        public string Provider
         {
-            OpenInBrowser(lazyBrowser, GitHubUrls.Plans);
+            get { return provider; }
+            set { provider = value; this.RaisePropertyChange(); }
         }
 
-        void StartFlow(UIControllerFlow controllerFlow)
+        string description = String.Empty;
+        public string Description
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            var ret = uiProvider.SetupUI(controllerFlow, null);
-            ret.Subscribe((c) => { }, () =>
-            {
-                //Initialize();
-            });
-            uiProvider.RunUI();
+            get { return description; }
+            set { description = value; this.RaisePropertyChange(); }
         }
 
-        void ShowInvitation()
+        bool showLogin;
+        public bool ShowLogin
         {
-            var view = new GitHubInvitationContent();
-            SectionContent = view;
-            view.DataContext = this;
+            get { return showLogin; }
+            set { showLogin = value; this.RaisePropertyChange(); }
         }
 
-        void ShowPublish()
+
+        bool showSignup;
+        public bool ShowSignup
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            var factory = uiProvider.GetService<IExportFactoryProvider>();
-            var uiflow = factory.UIControllerFactory.CreateExport();
-            disposable = uiflow;
-            var ui = uiflow.Value;
-            var creation = ui.SelectFlow(UIControllerFlow.Publish);
-            creation
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe((c) =>
-                {
-                    SectionContent = c;
-                    c.DataContext = this;
-                    ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
-                });
-            ui.Start(null);
+            get { return showSignup; }
+            set { showSignup = value; this.RaisePropertyChange(); }
+        }
+
+        bool showGetStarted;
+        public bool ShowGetStarted
+        {
+            get { return showGetStarted; }
+            set { showGetStarted = value; this.RaisePropertyChange(); }
         }
     }
 }

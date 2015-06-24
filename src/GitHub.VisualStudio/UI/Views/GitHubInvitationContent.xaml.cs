@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using GitHub.VisualStudio.TeamExplorerHome;
-using GitHub.UI.Helpers;
+using GitHub.VisualStudio.TeamExplorer;
 using NullGuard;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -40,6 +39,11 @@ namespace GitHub.VisualStudio.UI.Views
         void signup_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.SignUp();
+        }
+
+        void login_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Login();
         }
     }
 }
