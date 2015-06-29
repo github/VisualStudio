@@ -46,8 +46,6 @@ namespace GitHub.VisualStudio.Base
         void OnThemeChanged()
         {
             var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-            Debug.Assert(color != null, "The theme color EnvironmentColors.ToolWindowTextColorKey is null");
-            if (color == null) return;
             var brightness = color.GetBrightness();
             var dark = brightness > 0.5f;
 
