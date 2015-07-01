@@ -1,4 +1,5 @@
 ﻿using GitHub.Services;
+using Microsoft.TeamFoundation.Controls;
 using System;
 using System.Diagnostics;
 
@@ -33,6 +34,11 @@ namespace GitHub.Extensions
         public static T GetService<T>(this IServiceProvider serviceProvider)
         {
             return (T)serviceProvider.GetService(typeof(T));
+        }
+
+        public static ITeamExplorerSection GetSection(this IServiceProvider serviceProvider, Guid section)
+        {
+            return serviceProvider?.GetService<ITeamExplorerPage>()?.GetSection(section);
         }
     }
 }

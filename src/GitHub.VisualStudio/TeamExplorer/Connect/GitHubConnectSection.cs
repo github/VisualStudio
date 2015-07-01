@@ -1,11 +1,14 @@
-﻿using GitHub.Api;
+﻿using System;
+using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.Extensions;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using System.Collections.Specialized;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -21,6 +24,30 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         protected IConnection SectionConnection { get; set; }
 
+        bool loggedIn;
+        bool LoggedIn
+        {
+            get { return loggedIn; }
+            set {
+                loggedIn = ShowLogout = value;
+                ShowLogin = !value;
+            }
+        }
+
+        bool showLogin;
+        public bool ShowLogin
+        {
+            get { return showLogin; }
+            set { showLogin = value;  this.RaisePropertyChange(); }
+        }
+
+        bool showLogout;
+        public bool ShowLogout
+        {
+            get { return showLogout; }
+            set { showLogout = value;  this.RaisePropertyChange(); }
+        }
+
         public GitHubConnectSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager manager, int index)
             : base(apiFactory, holder, manager)
         {
@@ -28,6 +55,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IsEnabled = true;
             IsVisible = false;
             IsExpanded = true;
+            LoggedIn = false;
 
             sectionIndex = index;
 
@@ -55,13 +83,26 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             if (connection == null)
             {
+                LoggedIn = false;
                 IsVisible = false;
+                if (sectionIndex == 0 && ServiceProvider != null)
+                {
+                    var section = ServiceProvider?.GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
+                    IsVisible = !(section?.IsVisible ?? true); // only show this when the invitation section is hidden. When in doubt, don't show it.
+                    if (section != null)
+                        section.PropertyChanged += (s, p) =>
+                        {
+                            if (p.PropertyName == "IsVisible")
+                                IsVisible = LoggedIn || !((ITeamExplorerSection)s).IsVisible;
+                        };
+                }
             }
             else if (SectionConnection != connection)
             {
                 SectionConnection = connection;
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
+                LoggedIn = true;
             }
         }
 
@@ -74,10 +115,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
-
-            // when we start up the connection list is loaded before we can get notifications so refresh manually
-            if (SectionConnection == null && connectionManager.Connections.Count > sectionIndex)
-                Refresh(connectionManager.Connections[sectionIndex]);
+            UpdateConnection();
         }
 
         void UpdateConnection()
@@ -85,16 +123,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             if (connectionManager.Connections.Count > sectionIndex)
                 Refresh(connectionManager.Connections[sectionIndex]);
             else
-                Refresh(null);
+                Refresh(SectionConnection);
         }
 
         void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
-            {
-                View = new GitHubConnectContent();
-                View.ViewModel = this;
-            }
+                View = new GitHubConnectContent() { DataContext = this };
         }
 
         public void DoCreate()
@@ -114,6 +149,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public void SignOut()
         {
             SectionConnection.Logout();
+        }
+
+        public void Login()
+        {
+            StartFlow(UIControllerFlow.Authentication);
         }
 
         void StartFlow(UIControllerFlow controllerFlow)
