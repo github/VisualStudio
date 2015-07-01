@@ -14,6 +14,8 @@ namespace GitHub.VisualStudio.UI.Views
         public GitHubConnectContent()
         {
             InitializeComponent();
+
+            DataContextChanged += (s, e) => ViewModel = e.NewValue as GitHubConnectSection;
         }
 
         void cloneLink_Click(object sender, RoutedEventArgs e)
@@ -35,6 +37,13 @@ namespace GitHub.VisualStudio.UI.Views
             signOut.IsEnabled = false;
             ViewModel.SignOut();
             signOut.IsEnabled = true;
+        }
+
+        private void login_Click(object sender, RoutedEventArgs e)
+        {
+            login.IsEnabled = false;
+            ViewModel.Login();
+            login.IsEnabled = true;
         }
 
         public GitHubConnectSection ViewModel

@@ -7,6 +7,8 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerInvitationBase : TeamExplorerBase, ITeamExplorerServiceInvitation, INotifyPropertySource
     {
+        public static readonly Guid TeamExplorerInvitationSectionGuid = new Guid("8914ac06-d960-4537-8345-cb13c00378d8");
+
         public virtual void Initialize(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
