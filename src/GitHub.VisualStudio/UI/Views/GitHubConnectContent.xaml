@@ -18,6 +18,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <Style TargetType="Label">
                 <Setter Property="Foreground" Value="{DynamicResource VsBrush.GrayText}" />
                 <Setter Property="Padding" Value="0" />
@@ -30,7 +31,10 @@
             <Label Margin="3 0 3 0">|</Label>
             <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click">Create</Button>
             <Label Margin="3 0 3 0">|</Label>
-            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click">Sign out</Button>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click"
+                    Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}">Sign out</Button>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click"
+                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}">Login</Button>
         </WrapPanel>
       </Grid>
 </UserControl>
