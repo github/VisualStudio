@@ -44,7 +44,6 @@ namespace GitHub.VisualStudio.Base
                     return;
 
                 serviceProvider = value;
-                GitService = null;
                 if (serviceProvider == null)
                     return;
                 if (GitUIContext == null)
@@ -113,6 +112,7 @@ namespace GitHub.VisualStudio.Base
 
         void UIContextChanged(object sender, UIContextChangedEventArgs e)
         {
+            ActiveRepo = null;
             UIContextChanged(e.Activated);
         }
 
@@ -123,12 +123,12 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             if (active)
-                GitService = ServiceProvider.GetService<IGitExt>();
-            else
-                GitService = null;
-
-            if (GitService != null)
-                ActiveRepo = gitService.ActiveRepositories.FirstOrDefault();
+            {
+                if (GitService == null)
+                    GitService = ServiceProvider.GetService<IGitExt>();
+                if (ActiveRepo == null)
+                    ActiveRepo = gitService.ActiveRepositories.FirstOrDefault();
+            }
             else
                 ActiveRepo = null;
         }
@@ -141,8 +141,10 @@ namespace GitHub.VisualStudio.Base
 
             if (e.PropertyName == "ActiveRepositories")
             {
-                // so annoying that this is on the wrong thread
-                syncContext.Post((repo) => ActiveRepo = repo as IGitRepositoryInfo, service.ActiveRepositories.FirstOrDefault());
+                var repo = service.ActiveRepositories.FirstOrDefault();
+                if (!repo.Compare(ActiveRepo))
+                    // so annoying that this is on the wrong thread
+                    syncContext.Post((r) => ActiveRepo = r as IGitRepositoryInfo, repo);
             }
         }
 
