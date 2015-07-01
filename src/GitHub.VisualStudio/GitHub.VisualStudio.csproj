@@ -256,7 +256,6 @@
     <Compile Include="TeamExplorerHome\PulseNavigationItem.cs" />
     <Compile Include="TeamExplorerSync\GitHubPublishSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
-    <Compile Include="UI\Views\Controls\ActionLinkButton.cs" />
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
     </Compile>
