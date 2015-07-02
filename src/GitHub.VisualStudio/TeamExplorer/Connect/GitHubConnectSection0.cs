@@ -4,7 +4,7 @@ using GitHub.Services;
 using Microsoft.TeamFoundation.Controls;
 using System.ComponentModel.Composition;
 
-namespace GitHub.VisualStudio.TeamExplorerConnect
+namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     [TeamExplorerSection(GitHubConnectSection0Id, TeamExplorerPageIds.Connect, 10)]
     [PartCreationPolicy(CreationPolicy.NonShared)]

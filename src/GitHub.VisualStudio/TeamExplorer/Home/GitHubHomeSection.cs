@@ -11,7 +11,7 @@ using GitHub.Primitives;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorer.Home
 {
     [TeamExplorerSection(GitHubHomeSectionId, TeamExplorerPageIds.Home, 10)]
     [PartCreationPolicy(CreationPolicy.NonShared)]

@@ -7,41 +7,39 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    [TeamExplorerNavigationItem(IssuesNavigationItemId, NavigationItemPriority.Issues)]
+    [TeamExplorerNavigationItem(WikiNavigationItemId, NavigationItemPriority.Wiki)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class IssuesNavigationItem : TeamExplorerNavigationItemBase
+    public class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
-        public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
+        public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
 
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public IssuesNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
+        public WikiNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
                                     ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder, Octicon.issue_opened)
+            : base(apiFactory, holder, Octicon.book)
         {
             this.browser = browser;
-            Text = "Issues";
-            ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
+            Text = "Wiki";
+            ArgbColor = Colors.BlueNavigationItem.ToInt32();
         }
 
         public override void Execute()
         {
-            OpenInBrowser(browser, "issues");
+            OpenInBrowser(browser, "wiki");
             base.Execute();
         }
 
         public override async void Invalidate()
         {
-            IsVisible = false;
-
             var visible = await IsAGitHubRepo();
             if (visible)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                visible = repo.HasIssues;
+                visible = repo.HasWiki && SimpleApiClient.HasWiki();
             }
             IsVisible = visible;
         }

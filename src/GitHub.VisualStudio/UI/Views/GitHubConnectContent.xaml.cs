@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using GitHub.VisualStudio.TeamExplorerConnect;
+using GitHub.VisualStudio.TeamExplorer.Connect;
 using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views

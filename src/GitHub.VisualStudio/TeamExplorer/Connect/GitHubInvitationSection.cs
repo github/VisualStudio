@@ -11,7 +11,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Media;
 
-namespace GitHub.VisualStudio.TeamExplorerConnect
+namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     [TeamExplorerServiceInvitation(GitHubInvitationSectionId, GitHubInvitationSectionPriority)]
     [PartCreationPolicy(CreationPolicy.NonShared)]

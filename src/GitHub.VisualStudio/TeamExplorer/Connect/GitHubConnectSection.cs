@@ -7,7 +7,7 @@ using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
 using System.Collections.Specialized;
 
-namespace GitHub.VisualStudio.TeamExplorerConnect
+namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase
     {

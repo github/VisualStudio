@@ -13,7 +13,7 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.Validation;
 using GitHub.ViewModels;
-using GitHub.VisualStudio.TeamExplorerHome;
+using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
 
 namespace GitHub.SampleData

@@ -1,6 +1,6 @@
 ﻿using GitHub.UI;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorer.Home
 {
     public interface IGitHubHomeSection
     {

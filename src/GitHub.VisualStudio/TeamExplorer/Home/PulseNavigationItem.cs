@@ -7,7 +7,7 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorer.Home
 {
     [TeamExplorerNavigationItem(PulseNavigationItemId, NavigationItemPriority.Pulse)]
     [PartCreationPolicy(CreationPolicy.NonShared)]

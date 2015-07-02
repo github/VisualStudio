@@ -7,39 +7,41 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 
-namespace GitHub.VisualStudio.TeamExplorerHome
+namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    [TeamExplorerNavigationItem(WikiNavigationItemId, NavigationItemPriority.Wiki)]
+    [TeamExplorerNavigationItem(IssuesNavigationItemId, NavigationItemPriority.Issues)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class WikiNavigationItem : TeamExplorerNavigationItemBase
+    public class IssuesNavigationItem : TeamExplorerNavigationItemBase
     {
-        public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
+        public const string IssuesNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA4";
 
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public WikiNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
+        public IssuesNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
                                     ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder, Octicon.book)
+            : base(apiFactory, holder, Octicon.issue_opened)
         {
             this.browser = browser;
-            Text = "Wiki";
-            ArgbColor = Colors.BlueNavigationItem.ToInt32();
+            Text = "Issues";
+            ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
         }
 
         public override void Execute()
         {
-            OpenInBrowser(browser, "wiki");
+            OpenInBrowser(browser, "issues");
             base.Execute();
         }
 
         public override async void Invalidate()
         {
+            IsVisible = false;
+
             var visible = await IsAGitHubRepo();
             if (visible)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                visible = repo.HasWiki && SimpleApiClient.HasWiki();
+                visible = repo.HasIssues;
             }
             IsVisible = visible;
         }

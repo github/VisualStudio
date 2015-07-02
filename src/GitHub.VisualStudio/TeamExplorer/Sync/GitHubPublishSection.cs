@@ -14,7 +14,7 @@ using GitHub.Extensions;
 using GitHub.Api;
 using GitHub.VisualStudio.TeamExplorer;
 
-namespace GitHub.VisualStudio.TeamExplorerSync
+namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
     [TeamExplorerSection(GitHubPublishSectionId, TeamExplorerPageIds.GitCommits, 10)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
