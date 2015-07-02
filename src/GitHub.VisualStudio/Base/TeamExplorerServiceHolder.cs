@@ -46,9 +46,8 @@ namespace GitHub.VisualStudio.Base
                 serviceProvider = value;
                 if (serviceProvider == null)
                     return;
-                if (GitUIContext == null)
-                    GitUIContext = UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
-                UIContextChanged(GitUIContext.IsActive);
+                GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                UIContextChanged(GitUIContext?.IsActive ?? false);
             }
         }
 
@@ -124,8 +123,7 @@ namespace GitHub.VisualStudio.Base
 
             if (active)
             {
-                if (GitService == null)
-                    GitService = ServiceProvider.GetService<IGitExt>();
+                GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
                 if (ActiveRepo == null)
                     ActiveRepo = gitService.ActiveRepositories.FirstOrDefault();
             }
@@ -144,7 +142,7 @@ namespace GitHub.VisualStudio.Base
                 var repo = service.ActiveRepositories.FirstOrDefault();
                 if (!repo.Compare(ActiveRepo))
                     // so annoying that this is on the wrong thread
-                    syncContext.Post((r) => ActiveRepo = r as IGitRepositoryInfo, repo);
+                    syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
             }
         }
 
@@ -175,6 +173,8 @@ namespace GitHub.VisualStudio.Base
             get { return gitUIContext; }
             set
             {
+                if (gitUIContext == value)
+                    return;
                 if (gitUIContext != null)
                     gitUIContext.UIContextChanged -= UIContextChanged;
                 gitUIContext = value;
@@ -190,6 +190,8 @@ namespace GitHub.VisualStudio.Base
             get { return gitService; }
             set
             {
+                if (gitService == value)
+                    return;
                 if (gitService != null)
                     gitService.PropertyChanged -= CheckAndUpdate;
                 gitService = value;
