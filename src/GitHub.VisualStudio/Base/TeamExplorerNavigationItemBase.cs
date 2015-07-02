@@ -52,15 +52,6 @@ namespace GitHub.VisualStudio.Base
             Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
         }
 
-        protected override void RepoChanged()
-        {
-            var home = holder.HomeSection;
-            Debug.Assert(home != null, "Notifications should only happen when the home section is alive");
-            if (home == null)
-                ActiveRepo = null;
-            base.RepoChanged();
-        }
-
         void UpdateRepo(IGitRepositoryInfo repo)
         {
             ActiveRepo = repo;
