@@ -43,7 +43,7 @@ namespace GitHub.VisualStudio.TeamExplorerSync
             ShowLogin = false;
             ShowSignup = false;
             ShowGetStarted = false;
-            IsVisible = true;
+            IsVisible = false;
             IsExpanded = true;
             var view = new GitHubInvitationContent();
             SectionContent = view;
@@ -52,27 +52,46 @@ namespace GitHub.VisualStudio.TeamExplorerSync
 
         async void RTMSetup()
         {
-            loggedIn = await connectionManager.IsLoggedIn(hosts);
-            ShowGetStarted = true;
-            ShowLogin = !loggedIn;
-            ShowSignup = !loggedIn;
+            if (ActiveRepo != null && ActiveRepoUri == null)
+            {
+                IsVisible = true;
+                loggedIn = await connectionManager.IsLoggedIn(hosts);
+                ShowGetStarted = true;
+                ShowLogin = !loggedIn;
+                ShowSignup = !loggedIn;
+            }
+            else
+                IsVisible = false;
         }
 
         async void PreRTMSetup()
         {
-            loggedIn = await connectionManager.IsLoggedIn(hosts);
-            if (loggedIn)
-                ShowPublish();
-            else
+            if (ActiveRepo != null && ActiveRepoUri == null)
             {
-                ShowGetStarted = true;
-                ShowSignup = true;
+                IsVisible = true;
+                loggedIn = await connectionManager.IsLoggedIn(hosts);
+                if (loggedIn)
+                    ShowPublish();
+                else
+                {
+                    ShowGetStarted = true;
+                    ShowSignup = true;
+                }
             }
+            else
+                IsVisible = false;
         }
 
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
+            // replace this with RTMSetup() when the time comes
+            PreRTMSetup();
+        }
+
+        protected override void RepoChanged()
+        {
+            base.RepoChanged();
             // replace this with RTMSetup() when the time comes
             PreRTMSetup();
         }

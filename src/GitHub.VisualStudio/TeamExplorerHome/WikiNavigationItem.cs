@@ -35,7 +35,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         public override async void Invalidate()
         {
-            var visible = await ShouldBeVisible();
+            var visible = await IsAGitHubRepo();
             if (visible)
             {
                 var repo = await SimpleApiClient.GetRepository();
