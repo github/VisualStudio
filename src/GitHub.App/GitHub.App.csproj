@@ -18,6 +18,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\script\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -135,6 +136,10 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\script\ApiClientConfiguration.cs" Condition="$(Buildtype) == 'Internal'">
+      <Link>Api\ApiClientConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="Api\ApiClientConfiguration.cs" Condition="$(Buildtype) != 'Internal'" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AkavacheSqliteLinkerOverride.cs" />

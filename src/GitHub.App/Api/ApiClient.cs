@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -17,13 +17,11 @@ using ReactiveUI;
 
 namespace GitHub.Api
 {
-    public class ApiClient : IApiClient
+    public partial class ApiClient : IApiClient
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
-        const string clientId = "";
-        const string clientSecret = "";
 
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
@@ -34,11 +32,17 @@ namespace GitHub.Api
         readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
         readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
+        string ClientId { get; set; }
+        string ClientSecret { get; set; }
+
         public ApiClient(HostAddress hostAddress, IObservableGitHubClient gitHubClient)
         {
+            Configure();
             HostAddress = hostAddress;
             this.gitHubClient = gitHubClient;
         }
+
+        partial void Configure();
 
         public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
         {
@@ -76,14 +80,14 @@ namespace GitHub.Api
 
             return string.IsNullOrEmpty(authenticationCode)
                 ? authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
-                        clientId,
-                        clientSecret,
+                        ClientId,
+                        ClientSecret,
                         newAuthorization,
                         dispatchedHandler,
                         true)
                 :   authorizationsClient.CreateAndDeleteExistingApplicationAuthorization(
-                        clientId,
-                        clientSecret,
+                        ClientId,
+                        ClientSecret,
                         newAuthorization,
                         dispatchedHandler,
                         authenticationCode,
@@ -116,7 +120,7 @@ namespace GitHub.Api
             return gitHubClient.Miscellaneous.GetAllLicenses();
         }
 
-        public HostAddress HostAddress { get; private set; }
+        public HostAddress HostAddress { get; }
 
         public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
 
