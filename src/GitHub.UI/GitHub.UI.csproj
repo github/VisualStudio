@@ -68,7 +68,7 @@
     </None>
     <Compile Include="Controls\GitHubProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\script\SolutionInfo.cs">
+    <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <None Include="packages.config" />

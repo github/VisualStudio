@@ -132,7 +132,7 @@
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Caches\CredentialCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\script\SolutionInfo.cs">
+    <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
   </ItemGroup>
