@@ -63,7 +63,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        protected async Task<bool> ShouldBeVisible()
+        protected async Task<bool> IsAGitHubRepo()
         {
             var uri = ActiveRepoUri;
             if (uri == null)

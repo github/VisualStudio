@@ -34,7 +34,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
             base.RepoChanged();
 
-            IsVisible = await ShouldBeVisible();
+            IsVisible = await IsAGitHubRepo();
 
             if (IsVisible)
             {
@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
 
         public override async void Refresh()
         {
-            IsVisible = await ShouldBeVisible();
+            IsVisible = await IsAGitHubRepo();
             base.Refresh();
         }
 

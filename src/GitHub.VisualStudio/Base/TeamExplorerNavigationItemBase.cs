@@ -40,7 +40,7 @@ namespace GitHub.VisualStudio.Base
         public override async void Invalidate()
         {
             IsVisible = false;
-            IsVisible = await ShouldBeVisible();
+            IsVisible = await IsAGitHubRepo();
         }
 
         void OnThemeChanged()

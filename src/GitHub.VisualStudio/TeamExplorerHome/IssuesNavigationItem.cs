@@ -37,7 +37,7 @@ namespace GitHub.VisualStudio.TeamExplorerHome
         {
             IsVisible = false;
 
-            var visible = await ShouldBeVisible();
+            var visible = await IsAGitHubRepo();
             if (visible)
             {
                 var repo = await SimpleApiClient.GetRepository();
