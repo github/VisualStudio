@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Models;
+using LibGit2Sharp;
 
 namespace GitHub.Services
 {
@@ -12,24 +13,21 @@ namespace GitHub.Services
     public class RepositoryPublishService : IRepositoryPublishService
     {
         readonly IGitClient gitClient;
-        readonly IVSServices services;
+        readonly Repository activeRepository;
 
         [ImportingConstructor]
         public RepositoryPublishService(IGitClient gitClient, IVSServices services)
         {
             this.gitClient = gitClient;
-            this.services = services;
+            this.activeRepository = services.GetActiveRepo();
         }
 
         public string LocalRepositoryName
         {
             get
             {
-                var repo = services.GetActiveRepo();
-                if (repo != null && repo.Info != null && !string.IsNullOrEmpty(repo.Info.WorkingDirectory))
-                {
-                    return new DirectoryInfo(repo.Info.WorkingDirectory).Name ?? "";
-                }
+                if (!string.IsNullOrEmpty(activeRepository?.Info?.WorkingDirectory))
+                    return new DirectoryInfo(activeRepository.Info.WorkingDirectory).Name ?? "";
                 return string.Empty;
             }
         }
@@ -39,7 +37,7 @@ namespace GitHub.Services
             IAccount account,
             IApiClient apiClient)
         {
-            return Observable.Defer(() => Observable.Return(services.GetActiveRepo()))
+            return Observable.Defer(() => Observable.Return(activeRepository))
                 .SelectMany(r => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
                     .Select(gitHubRepo => Tuple.Create(gitHubRepo, r)))
                     .SelectMany(repo => gitClient.SetRemote(repo.Item2, "origin", new Uri(repo.Item1.CloneUrl)).Select(_ => repo))

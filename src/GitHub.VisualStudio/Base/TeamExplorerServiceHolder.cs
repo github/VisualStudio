@@ -122,28 +122,24 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             if (active)
-            {
                 GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
-                if (ActiveRepo == null)
-                    ActiveRepo = gitService.ActiveRepositories.FirstOrDefault();
-            }
             else
                 ActiveRepo = null;
         }
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (e.PropertyName != "ActiveRepositories")
+                return;
+
             var service = GitService;
             if (service == null)
                 return;
 
-            if (e.PropertyName == "ActiveRepositories")
-            {
-                var repo = service.ActiveRepositories.FirstOrDefault();
-                if (!repo.Compare(ActiveRepo))
-                    // so annoying that this is on the wrong thread
-                    syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
-            }
+            var repo = service.ActiveRepositories.FirstOrDefault();
+            if (!repo.Compare(ActiveRepo))
+                // so annoying that this is on the wrong thread
+                syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
         }
 
         public IGitAwareItem HomeSection
