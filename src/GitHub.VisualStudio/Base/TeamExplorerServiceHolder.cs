@@ -17,7 +17,7 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
+        readonly Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
         IGitRepositoryInfo activeRepo;
         bool activeRepoNotified = false;
 
@@ -115,14 +115,18 @@ namespace GitHub.VisualStudio.Base
             UIContextChanged(e.Activated);
         }
 
-        void UIContextChanged(bool active)
+        async void UIContextChanged(bool active)
         {
             Debug.Assert(ServiceProvider != null, "UIContextChanged called before service provider is set");
             if (ServiceProvider == null)
                 return;
 
             if (active)
+            {
                 GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
+                if (ActiveRepo == null)
+                    ActiveRepo = await System.Threading.Tasks.Task.Run(() => GitService.ActiveRepositories.FirstOrDefault());
+            }
             else
                 ActiveRepo = null;
         }
