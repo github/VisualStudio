@@ -141,6 +141,7 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             var repo = service.ActiveRepositories.FirstOrDefault();
+            // this comparison is safe, the extension method supports null instances
             if (!repo.Compare(ActiveRepo))
                 // so annoying that this is on the wrong thread
                 syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
