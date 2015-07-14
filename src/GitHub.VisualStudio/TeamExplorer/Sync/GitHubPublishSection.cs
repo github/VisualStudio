@@ -85,8 +85,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
-            // replace this with RTMSetup() when the time comes
-            PreRTMSetup();
+            RTMSetup();
         }
 
         protected override void RepoChanged()
