@@ -82,13 +82,8 @@ namespace GitHub.Services
             var gitExt = serviceProvider.GetService<IGitExt>();
             if (gitExt.ActiveRepositories.Count > 0)
                 return gitExt.ActiveRepositories.First().RepositoryPath;
-            else
-            {
-                var repo = serviceProvider.GetSolution().GetRepoFromSolution();
-                if (repo != null)
-                    return repo.Info.Path;
-            }
-            return string.Empty;
+            var repo = serviceProvider.GetSolution().GetRepoFromSolution();
+            return repo?.Info?.Path ?? string.Empty;
         }
 
         static string PokeTheRegistryForLocalClonePath()

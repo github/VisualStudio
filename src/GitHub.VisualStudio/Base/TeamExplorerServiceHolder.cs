@@ -17,7 +17,7 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
+        readonly Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
         IGitRepositoryInfo activeRepo;
         bool activeRepoNotified = false;
 
@@ -115,7 +115,7 @@ namespace GitHub.VisualStudio.Base
             UIContextChanged(e.Activated);
         }
 
-        void UIContextChanged(bool active)
+        async void UIContextChanged(bool active)
         {
             Debug.Assert(ServiceProvider != null, "UIContextChanged called before service provider is set");
             if (ServiceProvider == null)
@@ -125,7 +125,7 @@ namespace GitHub.VisualStudio.Base
             {
                 GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
                 if (ActiveRepo == null)
-                    ActiveRepo = gitService.ActiveRepositories.FirstOrDefault();
+                    ActiveRepo = await System.Threading.Tasks.Task.Run(() => GitService.ActiveRepositories.FirstOrDefault());
             }
             else
                 ActiveRepo = null;
@@ -133,17 +133,18 @@ namespace GitHub.VisualStudio.Base
 
         void CheckAndUpdate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (e.PropertyName != "ActiveRepositories")
+                return;
+
             var service = GitService;
             if (service == null)
                 return;
 
-            if (e.PropertyName == "ActiveRepositories")
-            {
-                var repo = service.ActiveRepositories.FirstOrDefault();
-                if (!repo.Compare(ActiveRepo))
-                    // so annoying that this is on the wrong thread
-                    syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
-            }
+            var repo = service.ActiveRepositories.FirstOrDefault();
+            // this comparison is safe, the extension method supports null instances
+            if (!repo.Compare(ActiveRepo))
+                // so annoying that this is on the wrong thread
+                syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
         }
 
         public IGitAwareItem HomeSection
