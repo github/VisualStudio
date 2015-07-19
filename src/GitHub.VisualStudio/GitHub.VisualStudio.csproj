@@ -328,7 +328,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
-    <CodeAnalysisDictionary Include="..\..\script\CodeAnalysisDictionary.xml">
+    <CodeAnalysisDictionary Include="..\common\CodeAnalysisDictionary.xml">
       <Link>Properties\CodeAnalysisDictionary.xml</Link>
     </CodeAnalysisDictionary>
     <Content Include="LICENSE.txt">
