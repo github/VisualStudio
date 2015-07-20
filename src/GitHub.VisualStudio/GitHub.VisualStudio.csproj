@@ -26,6 +26,7 @@
     <StartArguments>/rootsuffix Exp</StartArguments>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <ApplicationVersion>1.0.10.3</ApplicationVersion>
+    <ApplicationVersion>1.0.11.2</ApplicationVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
