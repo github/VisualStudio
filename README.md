@@ -28,7 +28,7 @@ To be able to use the GitHub API, you'll need to:
 
 ## Contributing
 
-Visit the [Contributor Guidelines](CONTRIBUTING.md) for details.
+Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
 
 ## Copyright
 
