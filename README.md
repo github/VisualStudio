@@ -15,7 +15,7 @@ Official builds of this extension are available at [the official website](https:
 Clone the repository and its submodules in a git GUI client or via the command line:
 
 ```
-git clone git@github.com:github/VisualStudio
+git clone https://github.com/github/VisualStudio
 cd VisualStudio
 git submodule update --init
 ```
