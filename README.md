@@ -5,6 +5,8 @@ Most of the extension UI lives in the Team Explorer pane, which is available fro
 
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
+[![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Build requirements
 
 * Visual Studio 2015
