@@ -46,6 +46,10 @@ namespace GitHub.Services
     public interface IGitAwareItem
     {
         IGitRepositoryInfo ActiveRepo { get; }
+
+        /// <summary>
+        /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.
+        /// </summary>
         Uri ActiveRepoUri { get; }
         string ActiveRepoName { get; }
     }

@@ -28,7 +28,14 @@ namespace GitHub.VisualStudio.Base
             IsVisible = false;
             IsEnabled = true;
 
-            OnThemeChanged();
+            try
+            {
+                OnThemeChanged();
+            }
+            catch (ArgumentNullException)
+            {
+                // This throws in the unit test runner.
+            }
             VSColorTheme.ThemeChanged += _ =>
             {
                 OnThemeChanged();
@@ -63,17 +70,13 @@ namespace GitHub.VisualStudio.Base
         {
             var uri = ActiveRepoUri;
             Debug.Assert(uri != null, "OpenInBrowser: uri should never be null");
+#if !DEBUG
             if (uri == null)
                 return;
+#endif
+            var browseUrl = uri.Append(endpoint);
 
-            var https = uri.ToHttps();
-            if (https == null)
-                return;
-
-            if (!Uri.TryCreate(https.ToString() + "/" + endpoint, UriKind.Absolute, out uri))
-                return;
-
-            OpenInBrowser(browser, uri);
+            OpenInBrowser(browser, browseUrl);
         }
 
         void Unsubscribe()
