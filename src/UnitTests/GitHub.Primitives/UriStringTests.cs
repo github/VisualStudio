@@ -165,6 +165,8 @@ public class UriStringTests
         [InlineData("http://example.com/", "http://example.com/")]
         [InlineData("http://haacked@example.com/foo/bar", "http://example.com/foo/bar")]
         [InlineData("https://github.com/github/Windows", "https://github.com/github/Windows")]
+        [InlineData("https://github.com/github/Windows.git", "https://github.com/github/Windows")]
+        [InlineData("https://haacked@github.com/github/Windows.git", "https://github.com/github/Windows")]
         [InlineData("http://example.com:4000/github/Windows", "http://example.com:4000/github/Windows")]
         [InlineData("git@192.168.1.2:github/Windows.git", "https://192.168.1.2/github/Windows")]
         [InlineData("git@example.com:org/repo.git", "https://example.com/org/repo")]

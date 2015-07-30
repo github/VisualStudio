@@ -121,19 +121,19 @@ namespace GitHub.Primitives
 
         public Uri ToWebUri()
         {
-            if (url == null || (url.Scheme != Uri.UriSchemeHttp && url.Scheme != Uri.UriSchemeHttps))
+            var scheme = url != null && IsHypertextTransferProtocol
+                ? url.Scheme
+                : Uri.UriSchemeHttps;
+
+            return new UriBuilder
             {
-                return new UriBuilder
-                {
-                    Scheme = Uri.UriSchemeHttps,
-                    Host = Host,
-                    Path = NameWithOwner,
-                    Port = url?.Port == 80
-                        ? -1
-                        : (url?.Port ?? -1)
-                }.Uri;
-            }
-            return url;
+                Scheme = scheme,
+                Host = Host,
+                Path = NameWithOwner,
+                Port = url?.Port == 80
+                    ? -1
+                    : (url?.Port ?? -1)
+            }.Uri;
         }
 
         /// <summary>
