@@ -1,10 +1,10 @@
-﻿using System;
+﻿using GitHub.Primitives;
 
 namespace GitHub.Api
 {
     public interface ISimpleApiClientFactory
     {
-        ISimpleApiClient Create(Uri repoUrl);
+        ISimpleApiClient Create(UriString repositoryUrl);
         void ClearFromCache(ISimpleApiClient client);
     }
 }

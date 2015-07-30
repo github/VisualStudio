@@ -265,5 +265,18 @@ public class UriStringTests
             Assert.Equal(expected, source.Equals(compare));
             Assert.Equal(expected, EqualityComparer<UriString>.Default.Equals(source, compare));
         }
+
+        [Fact]
+        public void MakesUriStringSuitableForDictionaryKey()
+        {
+            var dictionary = new Dictionary<UriString, string>
+            {
+                { new UriString("https://github.com/foo/bar"), "whatever" }
+            };
+
+            Assert.False(dictionary.ContainsKey("https://github.com/foo/not-bar"));
+            Assert.True(dictionary.ContainsKey("https://github.com/foo/bar"));
+            Assert.True(dictionary.ContainsKey(new UriString("https://github.com/foo/bar")));
+        }
     }
 }

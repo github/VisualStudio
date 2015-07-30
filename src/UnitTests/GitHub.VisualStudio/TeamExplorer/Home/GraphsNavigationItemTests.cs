@@ -20,7 +20,7 @@ public class GraphsNavigationItemTests
             var holder = Substitute.For<ITeamExplorerServiceHolder>();
             var graphsNavigationItem = new GraphsNavigationItem(apiFactory, lazyBrowser, holder)
             {
-                ActiveRepoUri = new Uri(origin)
+                ActiveRepoUri = origin
             };
 
             graphsNavigationItem.Execute();

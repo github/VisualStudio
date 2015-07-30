@@ -1,5 +1,4 @@
-﻿using NullGuard;
-using System;
+﻿using System;
 
 namespace GitHub.Extensions
 {
@@ -29,47 +28,6 @@ namespace GitHub.Extensions
         public static bool IsSameHost(this Uri uri, Uri compareUri)
         {
             return uri.Host.Equals(compareUri.Host, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static Uri WithAbsolutePath(this Uri uri, string absolutePath)
-        {
-            absolutePath = absolutePath.EnsureStartsWith('/');
-
-            return new Uri(uri, new Uri(absolutePath, UriKind.Relative));
-        }
-
-        public static string ToUpperInvariantString(this Uri uri)
-        {
-            return uri == null ? "" : uri.ToString().ToUpperInvariant();
-        }
-
-        [return: AllowNull]
-        public static string GetUser(this Uri uri)
-        {
-            var parts = uri.Segments;
-            // only parse urls in the format domain/user/repo
-            if (parts.Length < 3)
-                return null;
-            var u = parts[1];
-            if (u == null)
-                return null;
-            u = u.TrimEnd('/');
-            return u;
-        }
-
-        [return: AllowNull]
-        public static string GetRepo(this Uri uri)
-        {
-            var parts = uri.Segments;
-            // only parse urls in the format domain/user/repo
-            if (parts.Length < 3)
-                return null;
-            var name = parts[2];
-            if (name == null)
-                return null;
-            if (name.EndsWith(".git", StringComparison.Ordinal))
-                name = name.Remove(name.Length - 4);
-            return name;
         }
     }
 }
