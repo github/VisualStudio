@@ -119,7 +119,11 @@ namespace GitHub.Primitives
 
         public bool IsValidUri => url != null;
 
-        public Uri ToWebUri()
+        /// <summary>
+        /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL.
+        /// </summary>
+        /// <returns></returns>
+        public Uri ToRepositoryUrl()
         {
             var scheme = url != null && IsHypertextTransferProtocol
                 ? url.Scheme

@@ -74,7 +74,7 @@ namespace GitHub.VisualStudio.Base
             if (uri == null)
                 return;
 #endif
-            var browseUrl = uri.ToWebUri().Append(endpoint);
+            var browseUrl = uri.ToRepositoryUrl().Append(endpoint);
 
             OpenInBrowser(browser, browseUrl);
         }

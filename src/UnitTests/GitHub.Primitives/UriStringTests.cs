@@ -159,7 +159,7 @@ public class UriStringTests
         }
     }
 
-    public class TheToUriMethod
+    public class TheToRepositoryUrlMethod
     {
         [Theory]
         [InlineData("http://example.com/", "http://example.com/")]
@@ -174,7 +174,7 @@ public class UriStringTests
         [InlineData("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
         public void ConvertsToWebUrl(string uriString, string expected)
         {
-            Assert.Equal(new Uri(expected), new UriString(uriString).ToWebUri());
+            Assert.Equal(new Uri(expected), new UriString(uriString).ToRepositoryUrl());
         }
     }
 

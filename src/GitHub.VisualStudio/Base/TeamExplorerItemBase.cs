@@ -66,7 +66,7 @@ namespace GitHub.VisualStudio.Base
 
             SimpleApiClient = apiFactory.Create(uri);
 
-            if (!HostAddress.IsGitHubDotComUri(uri.ToWebUri()))
+            if (!HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl()))
             {
                 var repo = await SimpleApiClient.GetRepository();
                 return repo.FullName == ActiveRepoName && SimpleApiClient.IsEnterprise();

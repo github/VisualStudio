@@ -128,7 +128,7 @@ namespace GitHub.VisualStudio
                 return null;
             using (var repo = new Repository(repoPath))
             {
-                return GetUriFromRepository(repo)?.ToWebUri();
+                return GetUriFromRepository(repo)?.ToRepositoryUrl();
             }
         }
 
