@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using GitHub.Extensions;
-using static System.String;
 
 namespace GitHub.Primitives
 {
@@ -47,7 +46,7 @@ namespace GitHub.Primitives
             if (RepositoryName != null)
             {
                 NameWithOwner = Owner != null 
-                    ? Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName) 
+                    ? string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName) 
                     : RepositoryName;
             }
         }
@@ -167,7 +166,7 @@ namespace GitHub.Primitives
             if (url != null)
             {
                 var urlBuilder = new UriBuilder(url);
-                if (!IsNullOrEmpty(urlBuilder.Query))
+                if (!string.IsNullOrEmpty(urlBuilder.Query))
                 {
                     var query = urlBuilder.Query;
                     if (query.StartsWith("?", StringComparison.Ordinal))
@@ -191,7 +190,7 @@ namespace GitHub.Primitives
                 }
                 return ToUriString(urlBuilder.Uri);
             }
-            return Concat(Value, addition);
+            return string.Concat(Value, addition);
         }
 
         public override string ToString()
@@ -228,7 +227,7 @@ namespace GitHub.Primitives
 
         static string GetRepositoryName(string repositoryNameSegment)
         {
-            if (IsNullOrEmpty(repositoryNameSegment) 
+            if (string.IsNullOrEmpty(repositoryNameSegment) 
                 || repositoryNameSegment.Equals("/", StringComparison.Ordinal))
             {
                 return null;
