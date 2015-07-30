@@ -125,6 +125,8 @@ namespace GitHub.Primitives
         /// <returns></returns>
         public Uri ToRepositoryUrl()
         {
+            if (url != null && IsFileUri) return url;
+
             var scheme = url != null && IsHypertextTransferProtocol
                 ? url.Scheme
                 : Uri.UriSchemeHttps;

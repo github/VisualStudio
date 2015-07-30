@@ -162,6 +162,7 @@ public class UriStringTests
     public class TheToRepositoryUrlMethod
     {
         [Theory]
+        [InlineData("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
         [InlineData("http://example.com/", "http://example.com/")]
         [InlineData("http://haacked@example.com/foo/bar", "http://example.com/foo/bar")]
         [InlineData("https://github.com/github/Windows", "https://github.com/github/Windows")]
