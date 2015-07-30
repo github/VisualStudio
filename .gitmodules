@@ -16,3 +16,6 @@
 [submodule "submodules/libgit2sharp"]
 	path = submodules/libgit2sharp
 	url = https://github.com/shana/libgit2sharp.git
+[submodule "script"]
+	path = script
+	url = git@github.com:github/VisualStudioBuildScripts
