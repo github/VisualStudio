@@ -38,30 +38,6 @@ namespace GitHub.Extensions
             return new Uri(uri, new Uri(absolutePath, UriKind.Relative));
         }
 
-        [return: AllowNull]
-        public static Uri ToHttps([AllowNull] this Uri uri)
-        {
-            if (uri == null)
-                return null;
-
-            var str = uri.ToString();
-            if (str.EndsWith(".git", StringComparison.Ordinal))
-                str = str.Remove(str.Length - 4);
-
-            if (str.StartsWith("git@github.com:", StringComparison.Ordinal))
-                str = str.Replace("git@github.com:", "https://github.com/");
-
-            if (!Uri.TryCreate(str, UriKind.Absolute, out uri))
-                return null;
-
-            var uriBuilder = new UriBuilder(uri);
-
-            uriBuilder.Scheme = Uri.UriSchemeHttps;
-            // trick to keep uriBuilder from explicitly appending :80 to the HTTPS URI
-            uriBuilder.Port = -1;
-            return uriBuilder.Uri;
-        }
-
         public static string ToUpperInvariantString(this Uri uri)
         {
             return uri == null ? "" : uri.ToString().ToUpperInvariant();
