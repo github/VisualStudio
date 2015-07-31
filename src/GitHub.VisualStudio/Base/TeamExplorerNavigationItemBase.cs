@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
+using System.Drawing;
 using GitHub.Api;
-using GitHub.Primitives;
+using GitHub.Extensions;
 using GitHub.Services;
+using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
-using NullGuard;
-using GitHub.Extensions;
-using System.Threading;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using GitHub.UI;
 using Microsoft.VisualStudio.PlatformUI;
-using System.Drawing;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using NullGuard;
 
 namespace GitHub.VisualStudio.Base
 {
