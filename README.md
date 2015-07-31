@@ -19,7 +19,9 @@ Clone the repository and its submodules in a git GUI client or via the command l
 ```
 git clone https://github.com/github/VisualStudio
 cd VisualStudio
-git submodule update --init
+git submodule init
+git submodule deinit script
+git submodule update
 ```
 
 Open the `GitHubVS.sln` solution with Visual Studio 2015.
