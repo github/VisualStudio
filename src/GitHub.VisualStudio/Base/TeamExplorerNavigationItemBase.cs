@@ -25,14 +25,7 @@ namespace GitHub.VisualStudio.Base
             IsVisible = false;
             IsEnabled = true;
 
-            try
-            {
-                OnThemeChanged();
-            }
-            catch (ArgumentNullException)
-            {
-                // This throws in the unit test runner.
-            }
+            OnThemeChanged();
             VSColorTheme.ThemeChanged += _ =>
             {
                 OnThemeChanged();
@@ -49,11 +42,18 @@ namespace GitHub.VisualStudio.Base
 
         void OnThemeChanged()
         {
-            var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-            var brightness = color.GetBrightness();
-            var dark = brightness > 0.5f;
+            try
+            {
+                var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
+                var brightness = color.GetBrightness();
+                var dark = brightness > 0.5f;
 
-            Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
+                Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
+            }
+            catch (ArgumentNullException)
+            {
+                // This throws in the unit test runner.
+            }
         }
 
         void UpdateRepo(IGitRepositoryInfo repo)
