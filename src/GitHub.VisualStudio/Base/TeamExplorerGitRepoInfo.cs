@@ -1,8 +1,7 @@
-﻿using GitHub.Api;
+﻿using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using NullGuard;
-using System;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -27,8 +26,11 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
+        /// <summary>
+        /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.
+        /// </summary>
         [AllowNull]
-        public Uri ActiveRepoUri { [return: AllowNull] get; set; }
+        public UriString ActiveRepoUri { [return: AllowNull] get; set; }
         public string ActiveRepoName { get; set; }
     }
 }

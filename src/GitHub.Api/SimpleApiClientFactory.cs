@@ -16,7 +16,7 @@ namespace GitHub.Api
         readonly Lazy<IEnterpriseProbeTask> lazyEnterpriseProbe;
         readonly Lazy<IWikiProbe> lazyWikiProbe;
 
-        static readonly Dictionary<Uri, ISimpleApiClient> cache = new Dictionary<Uri, ISimpleApiClient>();
+        static readonly Dictionary<UriString, ISimpleApiClient> cache = new Dictionary<UriString, ISimpleApiClient>();
 
         [ImportingConstructor]
         public SimpleApiClientFactory(IProgram program, Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
@@ -26,21 +26,21 @@ namespace GitHub.Api
             lazyWikiProbe = wikiProbe;
         }
 
-        public ISimpleApiClient Create(Uri repoUrl)
+        public ISimpleApiClient Create(UriString repositoryUrl)
         {
-            var contains = cache.ContainsKey(repoUrl);
+            var contains = cache.ContainsKey(repositoryUrl);
             if (contains)
-                return cache[repoUrl];
+                return cache[repositoryUrl];
 
             lock (cache)
             {
-                if (!cache.ContainsKey(repoUrl))
+                if (!cache.ContainsKey(repositoryUrl))
                 {
-                    var hostAddress = HostAddress.Create(repoUrl);
+                    var hostAddress = HostAddress.Create(repositoryUrl);
                     var apiBaseUri = hostAddress.ApiUri;
-                    cache.Add(repoUrl, new SimpleApiClient(hostAddress, repoUrl, new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), apiBaseUri), lazyEnterpriseProbe, lazyWikiProbe));
+                    cache.Add(repositoryUrl, new SimpleApiClient(hostAddress, repositoryUrl, new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), apiBaseUri), lazyEnterpriseProbe, lazyWikiProbe));
                 }
-                return cache[repoUrl];
+                return cache[repositoryUrl];
             }
         }
 

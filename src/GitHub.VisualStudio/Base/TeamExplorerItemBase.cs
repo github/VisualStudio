@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using Octokit;
-using System;
-using GitHub.Services;
-using GitHub.Api;
-using System.Threading.Tasks;
-using GitHub.Primitives;
-using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -49,16 +47,13 @@ namespace GitHub.VisualStudio.Base
             var repo = ActiveRepo;
             if (repo != null)
             {
-                var gitRepo = Services.GetRepoFromIGit(repo);
+                var gitRepo = repo.GetRepoFromIGit();
                 var uri = Services.GetUriFromRepository(gitRepo);
-                if (uri != null)
+                var name = uri.RepositoryName;
+                if (name != null)
                 {
-                    var name = uri.GetRepo();
-                    if (name != null)
-                    {
-                        ActiveRepoUri = uri;
-                        ActiveRepoName = ActiveRepoUri.GetUser() + "/" + ActiveRepoUri.GetRepo();
-                    }
+                    ActiveRepoUri = uri;
+                    ActiveRepoName = uri.NameWithOwner;
                 }
             }
         }
@@ -71,7 +66,7 @@ namespace GitHub.VisualStudio.Base
 
             SimpleApiClient = apiFactory.Create(uri);
 
-            if (!HostAddress.IsGitHubDotComUri(uri))
+            if (!HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl()))
             {
                 var repo = await SimpleApiClient.GetRepository();
                 return repo.FullName == ActiveRepoName && SimpleApiClient.IsEnterprise();

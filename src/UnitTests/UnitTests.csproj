@@ -42,9 +42,16 @@
       <HintPath>..\..\packages\Rx-Testing.2.2.5-custom\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Microsoft.TeamFoundation.Controls.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Provider">
+      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -140,11 +147,14 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
+    <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
     <Compile Include="GitHub.Exports\VSServicesTests.cs" />
-    <Compile Include="GitHub.Extensions\URITests.cs" />
+    <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
+    <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
+    <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
     <Compile Include="GitHubPackageTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
@@ -249,7 +259,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GitHub.Exports.Reactive\" />
+    <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
