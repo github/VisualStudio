@@ -35,9 +35,9 @@ namespace GitHub.Services
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
         {
-            Guard.ArgumentNotEmptyString(cloneUrl, "cloneUrl");
-            Guard.ArgumentNotEmptyString(repositoryName, "repositoryName");
-            Guard.ArgumentNotEmptyString(repositoryPath, "repositoryPath");
+            Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
+            Guard.ArgumentNotEmptyString(repositoryName, nameof(repositoryName));
+            Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
 
             return Observable.Start(() =>
             {

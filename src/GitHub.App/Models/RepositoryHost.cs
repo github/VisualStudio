@@ -86,8 +86,8 @@ namespace GitHub.Models
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
-            Guard.ArgumentNotEmptyString(usernameOrEmail, "usernameOrEmail");
-            Guard.ArgumentNotEmptyString(password, "password");
+            Guard.ArgumentNotEmptyString(usernameOrEmail, nameof(usernameOrEmail));
+            Guard.ArgumentNotEmptyString(password, nameof(password));
 
             // If we need to retry on fallback, we'll store the 2FA token 
             // from the first request to re-use:
