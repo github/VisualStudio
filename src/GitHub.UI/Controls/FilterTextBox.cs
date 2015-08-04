@@ -22,8 +22,6 @@ namespace GitHub.UI
             set { SetValue(PromptTextProperty, value); }
         }
 
-        public ICommand ClearCommand { get; private set; }
-
         public FilterTextBox()
         {
             // http://stackoverflow.com/a/661224/2114
