@@ -66,11 +66,9 @@ namespace GitHub.UI
 
         static TextBox FindTextBoxInAncestors(DependencyObject current)
         {
-            TextBox tb;
-
             while (current != null)
             {
-                tb = current as TextBox;
+                var tb = current as TextBox;
                 if (tb != null)
                     return tb;
 
