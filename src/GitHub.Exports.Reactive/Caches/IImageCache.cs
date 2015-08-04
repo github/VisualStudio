@@ -10,7 +10,7 @@ namespace GitHub.Caches
         /// Retrieves the image from the cache. If it's missing, it'll download it and cache it.
         /// </summary>
         /// <param name="url">The image Uri to fetch.</param>
-        /// <exception cref="KeyNotFoundException">Thrown if an image is missing and could not be fetched.</exception>
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">Thrown if an image is missing and could not be fetched.</exception>
         IObservable<BitmapSource> GetImage(Uri url);
 
         /// <summary>
