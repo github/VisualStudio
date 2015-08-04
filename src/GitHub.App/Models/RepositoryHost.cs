@@ -28,7 +28,7 @@ namespace GitHub.Models
         readonly ILoginCache loginCache;
 
         bool isLoggedIn;
-        bool isEnterprise;
+        readonly bool isEnterprise;
 
         public RepositoryHost(
             IApiClient apiClient,

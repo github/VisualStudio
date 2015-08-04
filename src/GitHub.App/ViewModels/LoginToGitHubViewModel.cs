@@ -15,7 +15,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginToGitHubViewModel : LoginTabViewModel, ILoginToGitHubViewModel
     {
-        Uri baseUri;
+        readonly Uri baseUri;
 
         [ImportingConstructor]
         public LoginToGitHubViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
