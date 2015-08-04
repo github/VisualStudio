@@ -53,7 +53,7 @@ namespace GitHub.Services
                 catch (Exception ex)
                 {
                     log.Error("Could not clone {0} to {1}. {2}", cloneUrl, path, ex);
-                    throw ex;
+                    throw;
                 }
                 
                 return Unit.Default;
