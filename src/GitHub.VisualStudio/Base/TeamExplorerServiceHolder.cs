@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Linq;
 using System.Threading;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -133,8 +134,11 @@ namespace GitHub.VisualStudio.Base
                         // and try again. See issue #23
                         if (repos == null)
                         {
+                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2001: ActiveRepositories is null. GitService: '{0}'", GitService));
                             GitService = ServiceProvider?.GetService<IGitExt>();
                             repos = GitService?.ActiveRepositories;
+                            if (repos == null)
+                                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
                         }
                         return repos?.FirstOrDefault();
                     });
