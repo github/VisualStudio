@@ -108,8 +108,6 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(repo);
-            if (ret == WikiProbeResult.Failed)
-                return false;
             return (ret == WikiProbeResult.Ok);
         }
 
@@ -122,8 +120,6 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(HostAddress.WebUri);
-            if (ret == EnterpriseProbeResult.Failed)
-                return false;
             return (ret == EnterpriseProbeResult.Ok);
         }
     }
