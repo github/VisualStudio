@@ -78,16 +78,12 @@ namespace GitHub.Api
 
         public bool HasWiki()
         {
-            if (hasWiki.HasValue)
-                return hasWiki.Value;
-            return false;
+            return hasWiki.HasValue && hasWiki.Value;
         }
 
         public bool IsEnterprise()
         {
-            if (isEnterprise.HasValue)
-                return isEnterprise.Value;
-            return false;
+            return isEnterprise.HasValue && isEnterprise.Value;
         }
 
         async Task<bool> HasWikiInternal(Repository repo)
