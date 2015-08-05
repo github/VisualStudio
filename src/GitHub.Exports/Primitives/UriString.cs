@@ -51,7 +51,7 @@ namespace GitHub.Primitives
             }
         }
 
-        static UriString ToUriString(Uri uri)
+        public static UriString ToUriString(Uri uri)
         {
             return uri == null ? null : new UriString(uri.ToString());
         }
