@@ -13,7 +13,7 @@ namespace GitHub.Api
         public HostAddress HostAddress { get; }
         public UriString OriginalUrl { get; }
 
-        readonly GitHubClient client;
+        readonly IGitHubClient client;
         readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);
@@ -23,7 +23,7 @@ namespace GitHub.Api
         bool? isEnterprise;
         bool? hasWiki;
 
-        internal SimpleApiClient(HostAddress hostAddress, UriString repoUrl, GitHubClient githubClient,
+        public SimpleApiClient(HostAddress hostAddress, UriString repoUrl, IGitHubClient githubClient,
             Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
             HostAddress = hostAddress;
