@@ -125,7 +125,19 @@ namespace GitHub.VisualStudio.Base
             {
                 GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
                 if (ActiveRepo == null)
-                    ActiveRepo = await System.Threading.Tasks.Task.Run(() => GitService.ActiveRepositories.FirstOrDefault());
+                    ActiveRepo = await System.Threading.Tasks.Task.Run(() =>
+                    {
+                        var repos = GitService?.ActiveRepositories;
+                        // Looks like this might return null after a while, for some unknown reason
+                        // if it does, let's refresh the GitService instance in case something got wonky
+                        // and try again. See issue #23
+                        if (repos == null)
+                        {
+                            GitService = ServiceProvider?.GetService<IGitExt>();
+                            repos = GitService?.ActiveRepositories;
+                        }
+                        return repos?.FirstOrDefault();
+                    });
             }
             else
                 ActiveRepo = null;
