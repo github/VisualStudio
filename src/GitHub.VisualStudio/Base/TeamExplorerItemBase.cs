@@ -48,8 +48,8 @@ namespace GitHub.VisualStudio.Base
             if (repo != null)
             {
                 var gitRepo = repo.GetRepoFromIGit();
-                var uri = Services.GetUriFromRepository(gitRepo);
-                var name = uri.RepositoryName;
+                var uri = gitRepo?.GetUri();
+                var name = uri?.RepositoryName;
                 if (name != null)
                 {
                     ActiveRepoUri = uri;

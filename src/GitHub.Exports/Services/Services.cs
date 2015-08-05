@@ -116,7 +116,7 @@ namespace GitHub.VisualStudio
             }
         }
 
-        public static Uri GetRepoUrlFromSolution(IVsSolution solution)
+        public static UriString GetRepoUrlFromSolution(IVsSolution solution)
         {
             string solutionDir, solutionFile, userFile;
             if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
@@ -128,7 +128,7 @@ namespace GitHub.VisualStudio
                 return null;
             using (var repo = new Repository(repoPath))
             {
-                return GetUriFromRepository(repo)?.ToRepositoryUrl();
+                return repo.GetUri();
             }
         }
 
@@ -145,7 +145,12 @@ namespace GitHub.VisualStudio
             return new Repository(repoPath);
         }
 
-        public static UriString GetUriFromRepository(Repository repo)
+        public static UriString GetUri(this Repository repo)
+        {
+            return UriString.ToUriString(GetUriFromRepository(repo)?.ToRepositoryUrl());
+        }
+
+        static UriString GetUriFromRepository(Repository repo)
         {
             return repo
                 ?.Network
