@@ -8,6 +8,7 @@ using System.Text;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Primitives;
+using NullGuard;
 
 namespace GitHub.VisualStudio
 {
@@ -16,10 +17,18 @@ namespace GitHub.VisualStudio
         public IEnumerable<ConnectionCacheItem> connections;
     }
 
+    class RepositoryCacheItem
+    {
+        public string Name { get; set;  }
+        public Uri CloneUrl { get; set;  }
+        public string LocalPath { get; set;  }
+    }
+
     class ConnectionCacheItem
     {
         public Uri HostUrl { get; set; }
         public string UserName { get; set; }
+        public IEnumerable<RepositoryCacheItem> Repositories;
     }
 
     [Export(typeof(IConnectionManager))]
@@ -81,15 +90,25 @@ namespace GitHub.VisualStudio
 
         public IConnection CreateConnection(HostAddress address, string username)
         {
-            return new Connection(this, address, username);
+            return SetupConnection(address, username);
         }
 
         public bool AddConnection(HostAddress address, string username)
         {
             if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
                 return false;
-            Connections.Add(new Connection(this, address, username));
+            Connections.Add(SetupConnection(address, username));
             return true;
+        }
+
+        void AddConnection(Uri hostUrl, string username, [AllowNull] IEnumerable<RepositoryCacheItem> repositories)
+        {
+            var address = HostAddress.Create(hostUrl);
+            if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
+                return;
+            var conn = SetupConnection(address, username);
+            repositories?.ForEach(r => conn.Repositories.Add(new SimpleRepositoryModel(r.Name, r.CloneUrl, r.LocalPath)));
+            Connections.Add(conn);
         }
 
         public bool RemoveConnection(HostAddress address)
@@ -112,6 +131,20 @@ namespace GitHub.VisualStudio
         public void RequestLogout(IConnection connection)
         {
             Connections.Remove(connection);
+        }
+
+        public void RefreshRepositories(IVSServices services)
+        {
+            var list = services.GetKnownRepositories();
+            Connections.ForEach(c => c.Repositories.Clear());
+            list.ForEach(r => Connections.FirstOrDefault(c => c.HostAddress == HostAddress.Create(r.CloneUrl))?.Repositories.Add(r));
+            SaveConnectionsToCache();
+        }
+
+        IConnection SetupConnection(HostAddress address, string username)
+        {
+            var conn = new Connection(this, address, username);
+            return conn;
         }
 
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -159,7 +192,7 @@ namespace GitHub.VisualStudio
             cacheData.connections.ForEach(c =>
             {
                 if (c.HostUrl != null)
-                    AddConnection(HostAddress.Create(c.HostUrl), c.UserName);
+                    AddConnection(c.HostUrl, c.UserName, c.Repositories);
             });
         }
 
@@ -169,7 +202,10 @@ namespace GitHub.VisualStudio
 
             var cache = new CacheData();
             cache.connections = Connections.Select(conn =>
-                new ConnectionCacheItem { HostUrl = conn.HostAddress.WebUri, UserName = conn.Username });
+                new ConnectionCacheItem {
+                    HostUrl = conn.HostAddress.WebUri, UserName = conn.Username,
+                    Repositories = conn.Repositories.Select(x =>
+                        new RepositoryCacheItem() { Name = x.Name, CloneUrl = x.CloneUrl.ToUri(), LocalPath = x.LocalPath }) });
             try
             {
                 string data = SimpleJson.SerializeObject(cache);

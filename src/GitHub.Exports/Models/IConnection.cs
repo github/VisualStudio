@@ -1,5 +1,7 @@
 ﻿using GitHub.Primitives;
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 
 namespace GitHub.Models
@@ -10,5 +12,6 @@ namespace GitHub.Models
         string Username { get; }
         IObservable<IConnection> Login();
         void Logout();
+        ObservableCollection<ISimpleRepositoryModel> Repositories { get; }
     }
 }

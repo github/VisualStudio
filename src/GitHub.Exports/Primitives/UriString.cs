@@ -52,11 +52,6 @@ namespace GitHub.Primitives
             }
         }
 
-        static UriString ToUriString(Uri uri)
-        {
-            return uri == null ? null : new UriString(uri.ToString());
-        }
-
         void SetUri(Uri uri)
         {
             Host = uri.Host;
@@ -219,7 +214,7 @@ namespace GitHub.Primitives
 
                     urlBuilder.Path = path + addition;
                 }
-                return ToUriString(urlBuilder.Uri);
+                return urlBuilder.Uri.ToUriString();
             }
             return String.Concat(Value, addition);
         }
@@ -270,6 +265,18 @@ namespace GitHub.Primitives
         bool IEquatable<UriString>.Equals(UriString other)
         {
             return other != null && ToString().Equals(other.ToString());
+        }
+    }
+}
+
+namespace GitHub.Extensions
+{
+    using Primitives;
+    public static class UriStringExtensions
+    {
+        public static UriString ToUriString(this Uri uri)
+        {
+            return uri == null ? null : new UriString(uri.ToString());
         }
     }
 }

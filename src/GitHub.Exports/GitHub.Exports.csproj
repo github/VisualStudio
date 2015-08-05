@@ -81,6 +81,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Instrumentation" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -98,6 +100,8 @@
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
+    <Compile Include="Models\ISimpleRepositoryModel.cs" />
+    <Compile Include="Models\SimpleRepositoryModel.cs" />
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\Services.cs" />
@@ -113,6 +117,7 @@
     <Compile Include="Services\VSExtensions.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
+    <Compile Include="ViewModels\IGitHubConnectSection.cs" />
     <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
     <Compile Include="ViewModels\IGitHubHomeSection.cs" />
     <Compile Include="Models\IProgram.cs" />

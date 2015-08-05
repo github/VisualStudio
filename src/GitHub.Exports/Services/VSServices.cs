@@ -12,6 +12,10 @@ using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Collections.Generic;
+using GitHub.Models;
+using System.Management;
+using System.Security.Principal;
 
 namespace GitHub.Services
 {
@@ -21,6 +25,7 @@ namespace GitHub.Services
         void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
         string GetActiveRepoPath();
         LibGit2Sharp.Repository GetActiveRepo();
+        IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
 
         void ShowMessage(string message);
         void ShowWarning(string message);
@@ -86,11 +91,51 @@ namespace GitHub.Services
             return repo?.Info?.Path ?? string.Empty;
         }
 
+        public IEnumerable<ISimpleRepositoryModel> GetKnownRepositories()
+        {
+            return PokeTheRegistryForRepositoryList();
+        }
+
+        const string TEGitKey = @"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl";
+        static RegistryKey OpenGitKey(string path)
+        {
+            return Registry.CurrentUser.OpenSubKey(TEGitKey + "\\" + path, true);
+        }
+
+        static IEnumerable<ISimpleRepositoryModel> PokeTheRegistryForRepositoryList()
+        {
+            using (var key = OpenGitKey("Repositories"))
+            {
+                return key.GetSubKeyNames().Select(x =>
+                {
+                    using (var subkey = key.OpenSubKey(x))
+                    {
+                        var path = subkey.GetValue("Path") as string;
+                        if (path != null)
+                        {
+                            var uri = VisualStudio.Services.GetRepoFromPath(path)?.GetUriFromRepository();
+                            var name = uri?.GetRepo();
+                            if (name != null)
+                            {
+                                name = uri.GetUser() + "/" + name;
+                                return new SimpleRepositoryModel(name, uri.ToHttps().ToString(), path);
+                            }
+                        }
+                    }
+                    return null;
+                })
+                .Where(x => x != null)
+                .ToList();
+            }
+        }
+
         static string PokeTheRegistryForLocalClonePath()
         {
-            var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl\General");
-            if (key == null) return null;
-            return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            using (var key = OpenGitKey("General"))
+            {
+                if (key == null) return null;
+                return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            }
         }
 
         public void ShowMessage(string message)

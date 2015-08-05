@@ -15,6 +15,8 @@ using GitHub.Validation;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
+using GitHub.VisualStudio.TeamExplorer.Connect;
+using System.Collections.ObjectModel;
 
 namespace GitHub.SampleData
 {
@@ -199,6 +201,7 @@ namespace GitHub.SampleData
             public HostAddress HostAddress { get; set; }
 
             public string Username { get; set; }
+            public ObservableCollection<ISimpleRepositoryModel> Repositories { get; set;  }
 
             public IObservable<IConnection> Login()
             {
@@ -399,11 +402,11 @@ namespace GitHub.SampleData
             Owner = new AccountDesigner { Login = owner };
         }
 
+        public string Name { get; set; }
         public UriString CloneUrl { get; set; }
+        public string LocalPath { get; set; }
 
         public Octicon Icon { get; set; }
-
-        public string Name { get; set; }
 
         public IAccount Owner { get; set; }
     }
@@ -529,6 +532,41 @@ namespace GitHub.SampleData
         {
             get;
             set;
+        }
+    }
+
+    public class GitHubConnectSectionDesigner : IGitHubConnectSection
+    {
+        public GitHubConnectSectionDesigner()
+        {
+            Repositories = new ObservableCollection<ISimpleRepositoryModel>();
+            Repositories.Add(new SimpleRepositoryModel("octokit", new Uri("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\octokit.net"));
+            Repositories.Add(new SimpleRepositoryModel("cefsharp", new Uri("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\cefsharp"));
+            Repositories.Add(new SimpleRepositoryModel("git-lfs", new Uri("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\git-lfs"));
+            Repositories.Add(new SimpleRepositoryModel("another octokit", new Uri("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\another-octokit.net"));
+            Repositories.Add(new SimpleRepositoryModel("some cefsharp", new Uri("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\something-else"));
+            Repositories.Add(new SimpleRepositoryModel("even more git-lfs", new Uri("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\A different path"));
+        }
+
+        public ObservableCollection<ISimpleRepositoryModel> Repositories
+        {
+            get; set;
+        }
+
+        public void DoClone()
+        {
+        }
+
+        public void DoCreate()
+        {
+        }
+
+        public void SignOut()
+        {
+        }
+
+        public void Login()
+        {
         }
     }
 }

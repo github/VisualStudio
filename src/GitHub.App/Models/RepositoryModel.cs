@@ -1,15 +1,15 @@
 ﻿using GitHub.Primitives;
 using GitHub.UI;
+using System;
 
 namespace GitHub.Models
 {
-    public class RepositoryModel : IRepositoryModel
+    public class RepositoryModel : SimpleRepositoryModel, IRepositoryModel
     {
-        public RepositoryModel(string name, string cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+        public RepositoryModel(string name, Uri cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+            : base(name, cloneUrl)
         {
-            Name = name;
             Owner = ownerAccount;
-            CloneUrl = cloneUrl;
             Icon = isPrivate
                 ? Octicon.@lock
                 : isFork
@@ -17,12 +17,7 @@ namespace GitHub.Models
                     : Octicon.repo;
         }
 
-        public string Name { get; private set; }
-
         public IAccount Owner { get; private set; }
-
-        public UriString CloneUrl { get; private set; }
-
         public Octicon Icon { get; private set; }
     }
 }

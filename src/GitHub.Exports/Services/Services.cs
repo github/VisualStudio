@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Models;
 using GitHub.Info;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {
@@ -144,7 +145,7 @@ namespace GitHub.VisualStudio
             return new Repository(repoPath);
         }
 
-        public static Uri GetUriFromRepository(Repository repo)
+        public static Uri GetUriFromRepository(this Repository repo)
         {
             if (repo == null)
                 return null;
@@ -163,7 +164,12 @@ namespace GitHub.VisualStudio
 
         public static Repository GetRepoFromIGit(this IGitRepositoryInfo repoInfo)
         {
-            var repoPath = Repository.Discover(repoInfo.RepositoryPath);
+            return GetRepoFromPath(repoInfo?.RepositoryPath);
+        }
+
+        public static Repository GetRepoFromPath(string path)
+        {
+            var repoPath = Repository.Discover(path);
             if (repoPath == null)
                 return null;
             return new Repository(repoPath);

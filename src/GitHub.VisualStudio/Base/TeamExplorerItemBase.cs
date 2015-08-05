@@ -57,7 +57,7 @@ namespace GitHub.VisualStudio.Base
                     if (name != null)
                     {
                         ActiveRepoUri = uri;
-                        ActiveRepoName = ActiveRepoUri.GetUser() + "/" + ActiveRepoUri.GetRepo();
+                        ActiveRepoName = uri.GetUser() + "/" + name;
                     }
                 }
             }

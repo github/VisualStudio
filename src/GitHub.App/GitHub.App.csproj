@@ -55,6 +55,10 @@
       <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Provider, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
@@ -119,6 +123,7 @@
     <Compile Include="Caches\ImageCache.cs" />
     <Compile Include="Extensions\AkavacheExtensions.cs" />
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
+    <Compile Include="Extensions\RepositoryModelExtensions.cs" />
     <Compile Include="Extensions\ValidationExtensions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
     <Compile Include="Services\AvatarProvider.cs" />

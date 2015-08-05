@@ -3,11 +3,9 @@ using GitHub.UI;
 
 namespace GitHub.Models
 {
-    public interface IRepositoryModel
+    public interface IRepositoryModel : ISimpleRepositoryModel
     {
         IAccount Owner { get; }
-        string Name { get; }
-        UriString CloneUrl { get; }
         Octicon Icon { get; }
     }
 }

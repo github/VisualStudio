@@ -216,7 +216,7 @@ namespace GitHub.Services
         {
             return new RepositoryModel(
                 repositoryCacheItem.Name,
-                repositoryCacheItem.CloneUrl,
+                new Uri(repositoryCacheItem.CloneUrl),
                 repositoryCacheItem.Private,
                 repositoryCacheItem.Fork,
                 Create(repositoryCacheItem.Owner));

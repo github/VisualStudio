@@ -1,18 +1,20 @@
-﻿using System;
-using GitHub.Api;
+﻿using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using GitHub.Extensions;
 using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
+using NullGuard;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using GitHub.VisualStudio.Helpers;
+using System.ComponentModel;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
-    public class GitHubConnectSection : TeamExplorerSectionBase
+    public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection, INotifyPropertyChanged
     {
         readonly int sectionIndex;
 
@@ -38,15 +40,17 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public bool ShowLogin
         {
             get { return showLogin; }
-            set { showLogin = value;  this.RaisePropertyChange(); }
+            set { showLogin = value; this.RaisePropertyChange(); }
         }
 
         bool showLogout;
         public bool ShowLogout
         {
             get { return showLogout; }
-            set { showLogout = value;  this.RaisePropertyChange(); }
+            set { showLogout = value; this.RaisePropertyChange(); }
         }
+
+        internal ITeamExplorerServiceHolder Holder { get { return holder; } }
 
         public GitHubConnectSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager manager, int index)
             : base(apiFactory, holder, manager)
@@ -100,6 +104,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             else if (SectionConnection != connection)
             {
                 SectionConnection = connection;
+                Repositories = connection.Repositories;
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
                 LoggedIn = true;
@@ -115,7 +120,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
-            UpdateConnection();
+            if (sectionIndex == 0)
+                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
+
+            // when we start up the connection list is loaded before we can get notifications so refresh manually
+            if (SectionConnection == null && connectionManager.Connections.Count > sectionIndex)
+                Refresh(connectionManager.Connections[sectionIndex]);
         }
 
         void UpdateConnection()
@@ -123,13 +133,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             if (connectionManager.Connections.Count > sectionIndex)
                 Refresh(connectionManager.Connections[sectionIndex]);
             else
-                Refresh(SectionConnection);
+                Refresh(null);
         }
 
         void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
-                View = new GitHubConnectContent() { DataContext = this };
+            {
+                View = new GitHubConnectContent();
+                View.ViewModel = this;
+            }
         }
 
         public void DoCreate()
@@ -161,6 +174,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
             uiProvider.RunUI(controllerFlow, SectionConnection);
+        }
+
+        ObservableCollection<ISimpleRepositoryModel> repositories;
+        public ObservableCollection<ISimpleRepositoryModel> Repositories
+        {
+            [return: AllowNull]
+            get { return repositories; }
+            set { repositories = value; this.RaisePropertyChange(); }
         }
     }
 }
