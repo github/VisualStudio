@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
-using System.Collections.Generic;
 
 namespace GitHub.Api
 {
@@ -28,10 +28,6 @@ namespace GitHub.Api
 
         public ISimpleApiClient Create(UriString repositoryUrl)
         {
-            var contains = cache.ContainsKey(repositoryUrl);
-            if (contains)
-                return cache[repositoryUrl];
-
             lock (cache)
             {
                 if (!cache.ContainsKey(repositoryUrl))
