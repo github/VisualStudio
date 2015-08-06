@@ -83,7 +83,13 @@ public class CredentialCacheTests : TestBaseClass
                 }
                 finally
                 {
-                    await credentialCache.Invalidate("key");
+                    try
+                    {
+                        await credentialCache.Invalidate("key");
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }
