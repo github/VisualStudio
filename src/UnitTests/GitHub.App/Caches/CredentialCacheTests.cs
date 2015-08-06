@@ -13,31 +13,32 @@ public class CredentialCacheTests : TestBaseClass
         [Fact]
         public async Task RetrievesValueWithAlternateKeys()
         {
+            const string key = nameof(RetrievesValueWithAlternateKeys);
             using (var credentialCache = new CredentialCache())
             {
                 try
                 {
                     var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject("git:key", credential);
+                    await credentialCache.InsertObject(key, credential);
 
-                    var retrieved = await credentialCache.GetObject<Tuple<string, string>>("key");
+                    var retrieved = await credentialCache.GetObject<Tuple<string, string>>(key);
 
                     Assert.Equal("somebody", retrieved.Item1);
                     Assert.Equal("somebody's secret", retrieved.Item2);
 
-                    var retrieved2 = await credentialCache.GetObject<Tuple<string, string>>("git:key/");
+                    var retrieved2 = await credentialCache.GetObject<Tuple<string, string>>("git:" + key + "/");
 
                     Assert.Equal("somebody", retrieved2.Item1);
                     Assert.Equal("somebody's secret", retrieved2.Item2);
 
-                    var retrieved3 = await credentialCache.GetObject<Tuple<string, string>>("login:key/");
+                    var retrieved3 = await credentialCache.GetObject<Tuple<string, string>>("login:" + key + "/");
 
                     Assert.Equal("somebody", retrieved3.Item1);
                     Assert.Equal("somebody's secret", retrieved3.Item2);
                 }
                 finally
                 {
-                    await credentialCache.Invalidate("git:key");
+                    await credentialCache.Invalidate(key);
                 }
             }
         }
@@ -67,7 +68,7 @@ public class CredentialCacheTests : TestBaseClass
     public class TheInsertObjectMethod
     {
         [Fact]
-        public async Task StoresCredentialForKey()
+        public async Task StoresCredentialForKeyAndGitKey()
         {
             using (var credentialCache = new CredentialCache())
             {
@@ -75,17 +76,20 @@ public class CredentialCacheTests : TestBaseClass
                 {
                     var credential = Tuple.Create("somebody", "somebody's secret");
 
-                    await credentialCache.InsertObject("key", credential);
+                    await credentialCache.InsertObject(nameof(StoresCredentialForKeyAndGitKey), credential);
 
-                    var retrieved = await credentialCache.GetObject<Tuple<string, string>>("key");
+                    var retrieved = await credentialCache.GetObject<Tuple<string, string>>(nameof(StoresCredentialForKeyAndGitKey));
                     Assert.Equal("somebody", retrieved.Item1);
                     Assert.Equal("somebody's secret", retrieved.Item2);
+                    var retrieved2 = await credentialCache.GetObject<Tuple<string, string>>("git:" + nameof(StoresCredentialForKeyAndGitKey));
+                    Assert.Equal("somebody", retrieved2.Item1);
+                    Assert.Equal("somebody's secret", retrieved2.Item2);
                 }
                 finally
                 {
                     try
                     {
-                        await credentialCache.Invalidate("key");
+                        await credentialCache.Invalidate(nameof(StoresCredentialForKeyAndGitKey));
                     }
                     catch (Exception)
                     {
@@ -129,15 +133,15 @@ public class CredentialCacheTests : TestBaseClass
                 try
                 {
                     var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject("key", credential);
+                    await credentialCache.InsertObject(nameof(RetrievesPasswordAsUnicodeBytes), credential);
 
-                    var retrieved = await credentialCache.Get("key");
+                    var retrieved = await credentialCache.Get(nameof(RetrievesPasswordAsUnicodeBytes));
 
                     Assert.Equal("somebody's secret", Encoding.Unicode.GetString(retrieved));
                 }
                 finally
                 {
-                    await credentialCache.Invalidate("key");
+                    await credentialCache.Invalidate(nameof(RetrievesPasswordAsUnicodeBytes));
                 }
             }
         }
@@ -173,14 +177,14 @@ public class CredentialCacheTests : TestBaseClass
                 try
                 {
                     var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject("key", credential);
+                    await credentialCache.InsertObject(nameof(InvalidatesTheCredential), credential);
                 }
                 finally
                 {
-                    await credentialCache.Invalidate("key");
+                    await credentialCache.Invalidate(nameof(InvalidatesTheCredential));
                 }
 
-                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get("unknownkey"));
+                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get("key"));
             }
         }
 
@@ -210,18 +214,16 @@ public class CredentialCacheTests : TestBaseClass
 
     public class TheInvalidateObjectMethod
     {
-        [Theory]
-        [InlineData("key")]
-        [InlineData("key/")]
-        [InlineData("git:key")]
-        public async Task InvalidatesTheCredential(string key)
+        [Fact]
+        public async Task InvalidatesTheCredential()
         {
+            const string key = nameof(InvalidatesTheCredential);
             using (var credentialCache = new CredentialCache())
             {
                 try
                 {
                     var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject("key", credential);
+                    await credentialCache.InsertObject(key, credential);
                 }
                 finally
                 {

@@ -180,9 +180,7 @@ namespace GitHub.Caches
             using (var credential = new Credential())
             {
                 credential.Target = key;
-                if (!credential.Load())
-                    return false;
-                return credential.Delete();
+                return credential.Load() && credential.Delete();
             }
         }
 
