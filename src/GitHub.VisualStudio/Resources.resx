@@ -120,13 +120,25 @@
   <data name="cloneLinkContent" xml:space="preserve">
     <value>Clone</value>
   </data>
+  <data name="connect_ClickContent" xml:space="preserve">
+    <value>Get Started</value>
+  </data>
   <data name="createLinkContent" xml:space="preserve">
     <value>Create</value>
   </data>
   <data name="loginContent" xml:space="preserve">
     <value>Login</value>
   </data>
+  <data name="login_ClickContent" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="orText" xml:space="preserve">
+    <value>or</value>
+  </data>
   <data name="signOutContent" xml:space="preserve">
     <value>Sign out</value>
+  </data>
+  <data name="signup_ClickContent" xml:space="preserve">
+    <value>Sign up</value>
   </data>
 </root>

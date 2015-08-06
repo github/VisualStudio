@@ -70,11 +70,29 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Get Started.
+        /// </summary>
+        internal static string connect_ClickContent {
+            get {
+                return ResourceManager.GetString("connect_ClickContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         internal static string createLinkContent {
             get {
                 return ResourceManager.GetString("createLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login.
+        /// </summary>
+        internal static string login_ClickContent {
+            get {
+                return ResourceManager.GetString("login_ClickContent", resourceCulture);
             }
         }
         
@@ -88,11 +106,29 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to or.
+        /// </summary>
+        internal static string orText {
+            get {
+                return ResourceManager.GetString("orText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign out.
         /// </summary>
         internal static string signOutContent {
             get {
                 return ResourceManager.GetString("signOutContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign up.
+        /// </summary>
+        internal static string signup_ClickContent {
+            get {
+                return ResourceManager.GetString("signup_ClickContent", resourceCulture);
             }
         }
     }
