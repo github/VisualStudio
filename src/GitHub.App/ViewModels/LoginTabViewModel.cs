@@ -13,6 +13,7 @@ using GitHub.Services;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -72,13 +73,20 @@ namespace GitHub.ViewModels
                 return Observable.Return(Unit.Default);
             });
         }
-        protected IRepositoryHosts RepositoryHosts { get; private set; }
+        protected IRepositoryHosts RepositoryHosts { get; }
         protected abstract Uri BaseUri { get; }
-        public IReactiveCommand<Unit> SignUp { get; private set; }
+        public IReactiveCommand<Unit> SignUp { get; }
 
-        public IReactiveCommand<AuthenticationResult> Login { get; private set; }
-        public IReactiveCommand<Unit> Reset { get; private set; }
-        public IReactiveCommand<Unit> NavigateForgotPassword { get; private set; }
+        public IReactiveCommand<AuthenticationResult> Login { get; }
+        public IReactiveCommand<Unit> Reset { get; }
+        public IReactiveCommand<Unit> NavigateForgotPassword { get; }
+
+        string loginFailedMessage = "Check your username and password, then try again";
+        public string LoginFailedMessage
+        {
+            get { return loginFailedMessage; }
+            set { this.RaiseAndSetIfChanged(ref loginFailedMessage, value); }
+        }
 
         string usernameOrEmail;
         [AllowNull]
