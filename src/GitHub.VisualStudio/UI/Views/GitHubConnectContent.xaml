@@ -9,6 +9,7 @@
              xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
              KeyboardNavigation.TabNavigation="Local">
@@ -27,14 +28,14 @@
     </UserControl.Resources>
     <Grid>
         <WrapPanel Orientation="Horizontal" Grid.Row="0" Margin="6,0,0,6">
-            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click">Clone</Button>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click" Content="{x:Static prop:Resources.cloneLinkContent}"/>
             <Label Margin="3 0 3 0">|</Label>
-            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click">Create</Button>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.createLinkContent}"/>
             <Label Margin="3 0 3 0">|</Label>
-            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click"
-                    Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}">Sign out</Button>
-            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click"
-                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}">Login</Button>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.signOutContent}"
+                    Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.loginContent}"
+                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </WrapPanel>
       </Grid>
 </UserControl>

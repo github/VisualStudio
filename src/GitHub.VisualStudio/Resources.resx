@@ -117,4 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="cloneLinkContent" xml:space="preserve">
+    <value>Clone</value>
+  </data>
+  <data name="createLinkContent" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="loginContent" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="signOutContent" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
 </root>
