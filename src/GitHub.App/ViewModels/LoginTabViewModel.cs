@@ -41,9 +41,17 @@ namespace GitHub.ViewModels
 
             Login.ThrownExceptions.Subscribe(ex =>
             {
-                if (!ex.IsCriticalException())
+                if (ex.IsCriticalException()) return;
+
+                log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri,
+                    UsernameOrEmail), ex);
+                if (ex is ForbiddenException)
                 {
-                    log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri, UsernameOrEmail), ex);
+                    ShowLogInFailedError = true;
+                    LoginFailedMessage = "Make sure to use your password and not a Personal Access token to log in.";
+                }
+                else
+                {
                     ShowConnectingToHostFailed = true;
                 }
             });
