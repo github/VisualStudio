@@ -61,6 +61,51 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid authentication code.
+        /// </summary>
+        internal static string authenticationFailedLabelContent {
+            get {
+                return ResourceManager.GetString("authenticationFailedLabelContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Try entering the code again or clicking the resend button to get a new authentication code..
+        /// </summary>
+        internal static string authenticationFailedLabelMessage {
+            get {
+                return ResourceManager.GetString("authenticationFailedLabelMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication code sent!.
+        /// </summary>
+        internal static string authenticationSentLabelContent {
+            get {
+                return ResourceManager.GetString("authenticationSentLabelContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you do not receive the authentication code, contact support@github.com..
+        /// </summary>
+        internal static string authenticationSentLabelMessage {
+            get {
+                return ResourceManager.GetString("authenticationSentLabelMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse.
+        /// </summary>
+        internal static string browsePathButtonContent {
+            get {
+                return ResourceManager.GetString("browsePathButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone.
         /// </summary>
         internal static string cloneLinkContent {
@@ -102,6 +147,33 @@ namespace GitHub.VisualStudio {
         internal static string createLinkContent {
             get {
                 return ResourceManager.GetString("createLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create.
+        /// </summary>
+        internal static string createRepositoryButtonText {
+            get {
+                return ResourceManager.GetString("createRepositoryButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description (Optional).
+        /// </summary>
+        internal static string descriptionOptionalText {
+            get {
+                return ResourceManager.GetString("descriptionOptionalText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        internal static string descriptionText {
+            get {
+                return ResourceManager.GetString("descriptionText", resourceCulture);
             }
         }
         
@@ -232,11 +304,65 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while loading repositories.
+        /// </summary>
+        internal static string ErrorMessageDisplayContent {
+            get {
+                return ResourceManager.GetString("ErrorMessageDisplayContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some or all repositories may not have loaded. Close the dialog and try again..
+        /// </summary>
+        internal static string ErrorMessageDisplayMessage {
+            get {
+                return ResourceManager.GetString("ErrorMessageDisplayMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search repositories.
+        /// </summary>
+        internal static string filterTextPromptText {
+            get {
+                return ResourceManager.GetString("filterTextPromptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Git ignore.
+        /// </summary>
+        internal static string ignoreTemplateListText {
+            get {
+                return ResourceManager.GetString("ignoreTemplateListText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Learn more.
         /// </summary>
         internal static string learnMoreLinkContent {
             get {
                 return ResourceManager.GetString("learnMoreLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to License.
+        /// </summary>
+        internal static string licenseListText {
+            get {
+                return ResourceManager.GetString("licenseListText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local path.
+        /// </summary>
+        internal static string localPathText {
+            get {
+                return ResourceManager.GetString("localPathText", resourceCulture);
             }
         }
         
@@ -268,6 +394,51 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Log in.
+        /// </summary>
+        internal static string loginLabelPrefixText {
+            get {
+                return ResourceManager.GetString("loginLabelPrefixText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Private Repository.
+        /// </summary>
+        internal static string makePrivateContent {
+            get {
+                return ResourceManager.GetString("makePrivateContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string nameText {
+            get {
+                return ResourceManager.GetString("nameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No repositories.
+        /// </summary>
+        internal static string noRepositoriesMessageText {
+            get {
+                return ResourceManager.GetString("noRepositoriesMessageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
+        /// </summary>
+        internal static string openTwoFactorAuthAppText {
+            get {
+                return ResourceManager.GetString("openTwoFactorAuthAppText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to or.
         /// </summary>
         internal static string orText {
@@ -277,11 +448,92 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to for $7/month.
+        /// </summary>
+        internal static string perMonthText {
+            get {
+                return ResourceManager.GetString("perMonthText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign up.
         /// </summary>
         internal static string pricingLinkContent {
             get {
                 return ResourceManager.GetString("pricingLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to private repositories..
+        /// </summary>
+        internal static string privateRepositoriesText {
+            get {
+                return ResourceManager.GetString("privateRepositoriesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Private repositories require a.
+        /// </summary>
+        internal static string privateRepoText {
+            get {
+                return ResourceManager.GetString("privateRepoText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish.
+        /// </summary>
+        internal static string publishText {
+            get {
+                return ResourceManager.GetString("publishText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Read more.
+        /// </summary>
+        internal static string readMoreText {
+            get {
+                return ResourceManager.GetString("readMoreText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This repository does not have a remote. Fill out the form to publish it to GitHub..
+        /// </summary>
+        internal static string RepoDoesNotHaveRemoteText {
+            get {
+                return ResourceManager.GetString("RepoDoesNotHaveRemoteText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repository Name.
+        /// </summary>
+        internal static string RepoNameText {
+            get {
+                return ResourceManager.GetString("RepoNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Resend.
+        /// </summary>
+        internal static string resendCodeButtonContent {
+            get {
+                return ResourceManager.GetString("resendCodeButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send the code to your registered SMS Device again.
+        /// </summary>
+        internal static string resendCodeButtonToolTip {
+            get {
+                return ResourceManager.GetString("resendCodeButtonToolTip", resourceCulture);
             }
         }
         
@@ -300,6 +552,69 @@ namespace GitHub.VisualStudio {
         internal static string signup_ClickContent {
             get {
                 return ResourceManager.GetString("signup_ClickContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two-factor authentication.
+        /// </summary>
+        internal static string twoFactorAuthText {
+            get {
+                return ResourceManager.GetString("twoFactorAuthText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage plans.
+        /// </summary>
+        internal static string upgradeAccountLinkContent {
+            get {
+                return ResourceManager.GetString("upgradeAccountLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to manage plans.
+        /// </summary>
+        internal static string upgradeAccountLinkToolTip {
+            get {
+                return ResourceManager.GetString("upgradeAccountLinkToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to micro plan.
+        /// </summary>
+        internal static string upgradeToMicroLinkContent {
+            get {
+                return ResourceManager.GetString("upgradeToMicroLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to upgrade.
+        /// </summary>
+        internal static string upgradeToMicroLinkToolTip {
+            get {
+                return ResourceManager.GetString("upgradeToMicroLinkToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verify.
+        /// </summary>
+        internal static string verifyText {
+            get {
+                return ResourceManager.GetString("verifyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;re using.
+        /// </summary>
+        internal static string youreUsingText {
+            get {
+                return ResourceManager.GetString("youreUsingText", resourceCulture);
             }
         }
     }

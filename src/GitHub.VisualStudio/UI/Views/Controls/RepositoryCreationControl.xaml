@@ -9,6 +9,7 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prop="clr-namespace:GitHub.VisualStudio"
              mc:Ignorable="d"
              d:DesignWidth="414"
              d:DesignHeight="440"
@@ -40,7 +41,7 @@
             x:Name="createRepositoryButton"
             HorizontalAlignment="Center"
             Icon="check">
-            <TextBlock>Create</TextBlock>
+            <TextBlock Text="{x:Static prop:Resources.createRepositoryButtonText}"/>
         </ui:OcticonCircleButton>
 
         <StackPanel>
@@ -101,7 +102,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}">Name</Label>
+                <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}" Content="{x:Static prop:Resources.nameText}"/>
                 <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
 
                 <StackPanel Grid.Column="1" Grid.Row="1">
@@ -117,10 +118,10 @@
                         Fill="#f39c12" />
                 </StackPanel>
 
-                <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}">Description</Label>
+                <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}" Content="{x:Static prop:Resources.descriptionText}"/>
                 <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
 
-                <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=localPathText}">Local path</Label>
+                <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=localPathText}" Content="{x:Static prop:Resources.localPathText}"/>
                 <Grid Grid.Column="1" Grid.Row="3">
 
                     <Grid.ColumnDefinitions>
@@ -136,7 +137,7 @@
                         Grid.Row="0"
                         Padding="0"
                         Margin="3,0,0,0"
-                        Style="{StaticResource GitHubBlueLinkButton}">Browse</Button>
+                        Style="{StaticResource GitHubBlueLinkButton}" Content="{x:Static prop:Resources.browsePathButtonContent}"/>
                 </Grid>
 
                 <uirx:ValidationMessage
@@ -145,7 +146,7 @@
                     Grid.Row="4"
                     ValidatesControl="{Binding ElementName=localPathText}" />
 
-                <Label Grid.Column="0" Grid.Row="5" Target="{Binding ElementName=ignoreTemplateList}">Git ignore</Label>
+                <Label Grid.Column="0" Grid.Row="5" Target="{Binding ElementName=ignoreTemplateList}" Content="{x:Static prop:Resources.ignoreTemplateListText}"/>
                 <uirx:FilteredComboBox
                     x:Name="ignoreTemplateList"
                     Grid.Column="1"
@@ -166,7 +167,7 @@
                     </ComboBox.ItemTemplate>
                 </uirx:FilteredComboBox>
 
-                <Label Grid.Column="0" Grid.Row="6" Target="{Binding ElementName=licenseList}">License</Label>
+                <Label Grid.Column="0" Grid.Row="6" Target="{Binding ElementName=licenseList}" Content="{x:Static prop:Resources.licenseListText}"/>
                 <uirx:FilteredComboBox
                     x:Name="licenseList"
                     Grid.Column="1"
@@ -217,35 +218,34 @@
                     x:Name="makePrivate"
                     Grid.Column="1"
                     Grid.Row="9"
-                    Content="Private Repository"
+                    Content="{x:Static prop:Resources.makePrivateContent}"
                     Style="{DynamicResource BlueRoundedCheckBox}"
                     Padding="8,0,0,0" />
                 <Grid Grid.Column="1" Grid.Row="10">
                     <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <TextBlock>Private repositories require a</TextBlock>
+                            <TextBlock Text="{x:Static prop:Resources.privateRepoText}"/>
                             <ui:OcticonLinkButton 
                             x:Name="upgradeToMicroLink"
                             FontSize="12"
                             Icon="link_external" 
-                            Content="micro plan"
-                            ToolTip="upgrade"
+                            Content="{x:Static prop:Resources.upgradeToMicroLinkContent}"
+                            ToolTip="{x:Static prop:Resources.upgradeToMicroLinkToolTip}"
                             Margin="5,0"/>
-                            <TextBlock>for $7/month</TextBlock>
+                            <TextBlock Text="{x:Static prop:Resources.perMonthText}"/>
                         </StackPanel>
                     </Label>
                     <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <TextBlock>You're using 
-                                <Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/>
-                                private repositories.
-                            </TextBlock>
+                            <TextBlock Text="{x:Static prop:Resources.youreUsingText}"/> 
+                                <TextBlock><Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/></TextBlock>
+                            <TextBlock Text="{x:Static prop:Resources.privateRepositoriesText}"/>
                             <ui:OcticonLinkButton 
                             x:Name="upgradeAccountLink"
                             FontSize="12"
                             Icon="link_external" 
-                            Content="Manage plans"
-                            ToolTip="manage plans"
+                            Content="{x:Static prop:Resources.upgradeToMicroLinkContent}"
+                            ToolTip="{x:Static prop:Resources.upgradeToMicroLinkToolTip}"
                             Margin="5,0"/>
                         </StackPanel>
                     </Label>

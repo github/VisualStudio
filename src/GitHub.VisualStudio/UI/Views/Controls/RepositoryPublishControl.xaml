@@ -10,6 +10,7 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:converters="clr-namespace:GitHub.VisualStudio.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prop="clr-namespace:GitHub.VisualStudio"
              mc:Ignorable="d" 
              d:DesignHeight="440"
              d:DesignWidth="414"
@@ -56,7 +57,7 @@
                     TextWrapping="Wrap"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Stretch"
-                    Text="This repository does not have a remote. Fill out the form to publish it to GitHub."
+                    Text="{x:Static prop:Resources.RepoDoesNotHaveRemoteText}"
                     Foreground="{DynamicResource VsBrush.GrayText}"
                     TextTrimming="CharacterEllipsis"
                     ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
@@ -101,7 +102,7 @@
             <TextBlock Margin="7,4,0,0"
                        IsHitTestVisible="False"
                        Visibility="{Binding ElementName=nameText, Path=Text.Length, Converter={StaticResource CountToVisibilityConverter}}"
-                       Text="Repository Name"
+                       Text="{x:Static prop:Resources.RepoNameText}"
                        Foreground="{DynamicResource VsBrush.GrayText}" />
         </Grid>
 
@@ -117,39 +118,38 @@
             <TextBlock Margin="7,12,0,0"
                        IsHitTestVisible="False"
                        Visibility="{Binding ElementName=description, Path=Text.Length, Converter={StaticResource CountToVisibilityConverter}}"
-                       Text="Description (Optional)"
+                       Text="{x:Static prop:Resources.descriptionOptionalText}"
                        Foreground="{DynamicResource VsBrush.GrayText}" />
         </Grid>
 
         <CheckBox x:Name="makePrivate"
                   Margin="0,8,0,0"
-                  Style="{StaticResource VSStyledCheckBox}">Private Repository</CheckBox>
+                  Style="{StaticResource VSStyledCheckBox}" Content="{x:Static prop:Resources.makePrivateContent}"/>
         
         <Label x:Name="upgradeToMicroPlanWarning" HorizontalAlignment="Left" Visibility="Collapsed">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock>Private repositories require a</TextBlock>
+                <TextBlock Text="{x:Static prop:Resources.privateRepoText}"/>
                 <ui:OcticonLinkButton
                     x:Name="upgradeToMicroLink"
                     FontSize="12"
                     Icon="link_external" 
-                    Content="micro plan"
-                    ToolTip="upgrade"
+                    Content="{x:Static prop:Resources.upgradeToMicroLinkContent}"
+                    ToolTip="{x:Static prop:Resources.upgradeToMicroLinkToolTip}"
                     Margin="5,0"/>
-                <TextBlock>for $7/month</TextBlock>
+                <TextBlock Text="{x:Static prop:Resources.perMonthText}"/>
             </StackPanel>
         </Label>
         <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock>You're using 
-                        <Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/>
-                        private repositories.
-                </TextBlock>
+                <TextBlock Text="{x:Static prop:Resources.youreUsingText}"/>
+                <TextBlock><Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/></TextBlock> 
+                <TextBlock Text="{x:Static prop:Resources.privateRepositoriesText}"/>
                 <ui:OcticonLinkButton 
                     x:Name="upgradeAccountLink"
                     FontSize="12"
                     Icon="link_external" 
-                    Content="Manage plans"
-                    ToolTip="manage plans"
+                    Content="{x:Static prop:Resources.upgradeAccountLinkContent}"
+                    ToolTip="{x:Static prop:Resources.upgradeAccountLinkToolTip}"
                     Margin="5,0"/>
             </StackPanel>
         </Label>
@@ -160,7 +160,7 @@
             x:Name="publishRepositoryButton"
             Margin="0,8,0,0"
             HorizontalAlignment="Left">
-            <TextBlock>Publish</TextBlock>
+            <TextBlock Text="{x:Static prop:Resources.publishText}"/>
         </Button>
 
     </StackPanel>

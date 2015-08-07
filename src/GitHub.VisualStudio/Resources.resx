@@ -117,6 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="authenticationFailedLabelContent" xml:space="preserve">
+    <value>Invalid authentication code</value>
+  </data>
+  <data name="authenticationFailedLabelMessage" xml:space="preserve">
+    <value>Try entering the code again or clicking the resend button to get a new authentication code.</value>
+  </data>
+  <data name="authenticationSentLabelContent" xml:space="preserve">
+    <value>Authentication code sent!</value>
+  </data>
+  <data name="authenticationSentLabelMessage" xml:space="preserve">
+    <value>If you do not receive the authentication code, contact support@github.com.</value>
+  </data>
+  <data name="browsePathButtonContent" xml:space="preserve">
+    <value>Browse</value>
+  </data>
   <data name="cloneLinkContent" xml:space="preserve">
     <value>Clone</value>
   </data>
@@ -131,6 +146,15 @@
   </data>
   <data name="createLinkContent" xml:space="preserve">
     <value>Create</value>
+  </data>
+  <data name="createRepositoryButtonText" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="descriptionOptionalText" xml:space="preserve">
+    <value>Description (Optional)</value>
+  </data>
+  <data name="descriptionText" xml:space="preserve">
+    <value>Description</value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
     <value>Don’t have an account? </value>
@@ -174,8 +198,26 @@
   <data name="enterpriseUserNameOrEmailPromptText" xml:space="preserve">
     <value>Username or email</value>
   </data>
+  <data name="ErrorMessageDisplayContent" xml:space="preserve">
+    <value>An error occurred while loading repositories</value>
+  </data>
+  <data name="ErrorMessageDisplayMessage" xml:space="preserve">
+    <value>Some or all repositories may not have loaded. Close the dialog and try again.</value>
+  </data>
+  <data name="filterTextPromptText" xml:space="preserve">
+    <value>Search repositories</value>
+  </data>
+  <data name="ignoreTemplateListText" xml:space="preserve">
+    <value>Git ignore</value>
+  </data>
   <data name="learnMoreLinkContent" xml:space="preserve">
     <value>Learn more</value>
+  </data>
+  <data name="licenseListText" xml:space="preserve">
+    <value>License</value>
+  </data>
+  <data name="localPathText" xml:space="preserve">
+    <value>Local path</value>
   </data>
   <data name="loginContent" xml:space="preserve">
     <value>Login</value>
@@ -183,19 +225,82 @@
   <data name="loginFailedText" xml:space="preserve">
     <value>Login failed.</value>
   </data>
+  <data name="loginLabelPrefixText" xml:space="preserve">
+    <value>Log in</value>
+  </data>
   <data name="login_ClickContent" xml:space="preserve">
     <value>Login</value>
+  </data>
+  <data name="makePrivateContent" xml:space="preserve">
+    <value>Private Repository</value>
+  </data>
+  <data name="nameText" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="noRepositoriesMessageText" xml:space="preserve">
+    <value>No repositories</value>
+  </data>
+  <data name="openTwoFactorAuthAppText" xml:space="preserve">
+    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
   </data>
   <data name="orText" xml:space="preserve">
     <value>or</value>
   </data>
+  <data name="perMonthText" xml:space="preserve">
+    <value>for $7/month</value>
+  </data>
   <data name="pricingLinkContent" xml:space="preserve">
     <value>Sign up</value>
+  </data>
+  <data name="privateRepositoriesText" xml:space="preserve">
+    <value>private repositories.</value>
+  </data>
+  <data name="privateRepoText" xml:space="preserve">
+    <value>Private repositories require a</value>
+  </data>
+  <data name="publishText" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="readMoreText" xml:space="preserve">
+    <value>Read more</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>This repository does not have a remote. Fill out the form to publish it to GitHub.</value>
+  </data>
+  <data name="RepoNameText" xml:space="preserve">
+    <value>Repository Name</value>
+  </data>
+  <data name="resendCodeButtonContent" xml:space="preserve">
+    <value>_Resend</value>
+  </data>
+  <data name="resendCodeButtonToolTip" xml:space="preserve">
+    <value>Send the code to your registered SMS Device again</value>
   </data>
   <data name="signOutContent" xml:space="preserve">
     <value>Sign out</value>
   </data>
   <data name="signup_ClickContent" xml:space="preserve">
     <value>Sign up</value>
+  </data>
+  <data name="twoFactorAuthText" xml:space="preserve">
+    <value>Two-factor authentication</value>
+  </data>
+  <data name="upgradeAccountLinkContent" xml:space="preserve">
+    <value>Manage plans</value>
+  </data>
+  <data name="upgradeAccountLinkToolTip" xml:space="preserve">
+    <value>manage plans</value>
+  </data>
+  <data name="upgradeToMicroLinkContent" xml:space="preserve">
+    <value>micro plan</value>
+  </data>
+  <data name="upgradeToMicroLinkToolTip" xml:space="preserve">
+    <value>upgrade</value>
+  </data>
+  <data name="verifyText" xml:space="preserve">
+    <value>Verify</value>
+  </data>
+  <data name="youreUsingText" xml:space="preserve">
+    <value>You're using</value>
   </data>
 </root>

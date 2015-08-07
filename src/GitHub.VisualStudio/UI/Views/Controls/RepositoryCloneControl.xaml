@@ -9,6 +9,7 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio"
              mc:Ignorable="d"
              d:DesignWidth="414"
              d:DesignHeight="440"
@@ -43,7 +44,7 @@
         <ui:FilterTextBox
 		    x:Name="filterText" 
             DockPanel.Dock="Top"
-		    PromptText="Search repositories" 
+		    PromptText="{x:Static prop:Resources.filterTextPromptText}" 
 		    Margin="10" />
         
         <ui:GitHubProgressBar
@@ -65,8 +66,8 @@
                 Icon="stop"
                 Visibility="Visible"
                 Margin="8,0"
-                Content="An error occurred while loading repositories"
-                Message="Some or all repositories may not have loaded. Close the dialog and try again." />
+                Content="{x:Static prop:Resources.ErrorMessageDisplayContent}"
+                Message="{x:Static prop:Resources.ErrorMessageDisplayMessage}" />
 		</StackPanel>
 
         <ui:OcticonCircleButton
@@ -104,7 +105,7 @@
                     VerticalContentAlignment="Center"
                     Padding="0"
                     Margin="4,0,4,0"
-                    Style="{StaticResource GitHubBlueLinkButton}">Browse</Button>
+                    Style="{StaticResource GitHubBlueLinkButton}" Content="{x:Static prop:Resources.browsePathButtonContent}"/>
             </Grid>
         </Border>
 
@@ -216,9 +217,7 @@
                     Margin="0,-70,0,0">
                     <TextBlock
                         HorizontalAlignment="Center"
-                        Style="{DynamicResource GitHubH2TextBlock}">
-                        No repositories
-                    </TextBlock>
+                        Style="{DynamicResource GitHubH2TextBlock}" Text="{x:Static prop:Resources.noRepositoriesMessageText}"/>
                 </StackPanel>
             </Grid>
 		</Border>

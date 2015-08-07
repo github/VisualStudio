@@ -44,7 +44,7 @@
                 Margin="0,0,0,10"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 IsHitTestVisible="False"
-                Text="Log in" />
+                Text="{x:Static prop:Resources.loginLabelPrefixText}" />
             
             <ui:HorizontalShadowDivider />
         </StackPanel>
