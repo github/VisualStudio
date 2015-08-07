@@ -79,11 +79,164 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not connect to github.com.
+        /// </summary>
+        internal static string couldNotConnectToGitHubText {
+            get {
+                return ResourceManager.GetString("couldNotConnectToGitHubText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not connect to the server..
+        /// </summary>
+        internal static string couldNotConnectToTheServerText {
+            get {
+                return ResourceManager.GetString("couldNotConnectToTheServerText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         internal static string createLinkContent {
             get {
                 return ResourceManager.GetString("createLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don’t have an account? .
+        /// </summary>
+        internal static string dontHaveAnAccountText {
+            get {
+                return ResourceManager.GetString("dontHaveAnAccountText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don’t have GitHub Enterprise? .
+        /// </summary>
+        internal static string dontHaveGitHubEnterpriseText {
+            get {
+                return ResourceManager.GetString("dontHaveGitHubEnterpriseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please check your internet connection and try again..
+        /// </summary>
+        internal static string dotComConnectionFailedMessageMessage {
+            get {
+                return ResourceManager.GetString("dotComConnectionFailedMessageMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (forgot your password?).
+        /// </summary>
+        internal static string dotComForgotPasswordLinkContent {
+            get {
+                return ResourceManager.GetString("dotComForgotPasswordLinkContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log in.
+        /// </summary>
+        internal static string dotComLogInButtonContent {
+            get {
+                return ResourceManager.GetString("dotComLogInButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check your username and password, then try again.
+        /// </summary>
+        internal static string dotComLoginFailedMessageMessage {
+            get {
+                return ResourceManager.GetString("dotComLoginFailedMessageMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        internal static string dotComPasswordPromptText {
+            get {
+                return ResourceManager.GetString("dotComPasswordPromptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username or email.
+        /// </summary>
+        internal static string dotComUserNameOrEmailPromptText {
+            get {
+                return ResourceManager.GetString("dotComUserNameOrEmailPromptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The host isn&apos;t available or is not a GitHub Enterprise server. Check the address and try again..
+        /// </summary>
+        internal static string enterpriseConnectingFailedMessage {
+            get {
+                return ResourceManager.GetString("enterpriseConnectingFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log in.
+        /// </summary>
+        internal static string enterpriseLogInButtonContent {
+            get {
+                return ResourceManager.GetString("enterpriseLogInButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check your username and password, then try again.
+        /// </summary>
+        internal static string enterpriseLoginFailedMessageMessage {
+            get {
+                return ResourceManager.GetString("enterpriseLoginFailedMessageMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        internal static string enterprisePasswordPromptText {
+            get {
+                return ResourceManager.GetString("enterprisePasswordPromptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GitHub Enterprise server address.
+        /// </summary>
+        internal static string enterpriseUrlPromptText {
+            get {
+                return ResourceManager.GetString("enterpriseUrlPromptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username or email.
+        /// </summary>
+        internal static string enterpriseUserNameOrEmailPromptText {
+            get {
+                return ResourceManager.GetString("enterpriseUserNameOrEmailPromptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Learn more.
+        /// </summary>
+        internal static string learnMoreLinkContent {
+            get {
+                return ResourceManager.GetString("learnMoreLinkContent", resourceCulture);
             }
         }
         
@@ -106,11 +259,29 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Login failed..
+        /// </summary>
+        internal static string loginFailedText {
+            get {
+                return ResourceManager.GetString("loginFailedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to or.
         /// </summary>
         internal static string orText {
             get {
                 return ResourceManager.GetString("orText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign up.
+        /// </summary>
+        internal static string pricingLinkContent {
+            get {
+                return ResourceManager.GetString("pricingLinkContent", resourceCulture);
             }
         }
         

@@ -123,17 +123,74 @@
   <data name="connect_ClickContent" xml:space="preserve">
     <value>Get Started</value>
   </data>
+  <data name="couldNotConnectToGitHubText" xml:space="preserve">
+    <value>Could not connect to github.com</value>
+  </data>
+  <data name="couldNotConnectToTheServerText" xml:space="preserve">
+    <value>Could not connect to the server.</value>
+  </data>
   <data name="createLinkContent" xml:space="preserve">
     <value>Create</value>
   </data>
+  <data name="dontHaveAnAccountText" xml:space="preserve">
+    <value>Don’t have an account? </value>
+  </data>
+  <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
+    <value>Don’t have GitHub Enterprise? </value>
+  </data>
+  <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
+    <value>Please check your internet connection and try again.</value>
+  </data>
+  <data name="dotComForgotPasswordLinkContent" xml:space="preserve">
+    <value>(forgot your password?)</value>
+  </data>
+  <data name="dotComLogInButtonContent" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="dotComLoginFailedMessageMessage" xml:space="preserve">
+    <value>Check your username and password, then try again</value>
+  </data>
+  <data name="dotComPasswordPromptText" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="dotComUserNameOrEmailPromptText" xml:space="preserve">
+    <value>Username or email</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>The host isn't available or is not a GitHub Enterprise server. Check the address and try again.</value>
+  </data>
+  <data name="enterpriseLogInButtonContent" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="enterpriseLoginFailedMessageMessage" xml:space="preserve">
+    <value>Check your username and password, then try again</value>
+  </data>
+  <data name="enterprisePasswordPromptText" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="enterpriseUrlPromptText" xml:space="preserve">
+    <value>GitHub Enterprise server address</value>
+  </data>
+  <data name="enterpriseUserNameOrEmailPromptText" xml:space="preserve">
+    <value>Username or email</value>
+  </data>
+  <data name="learnMoreLinkContent" xml:space="preserve">
+    <value>Learn more</value>
+  </data>
   <data name="loginContent" xml:space="preserve">
     <value>Login</value>
+  </data>
+  <data name="loginFailedText" xml:space="preserve">
+    <value>Login failed.</value>
   </data>
   <data name="login_ClickContent" xml:space="preserve">
     <value>Login</value>
   </data>
   <data name="orText" xml:space="preserve">
     <value>or</value>
+  </data>
+  <data name="pricingLinkContent" xml:space="preserve">
+    <value>Sign up</value>
   </data>
   <data name="signOutContent" xml:space="preserve">
     <value>Sign out</value>
