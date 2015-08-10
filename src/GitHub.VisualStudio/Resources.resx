@@ -303,4 +303,40 @@
   <data name="youreUsingText" xml:space="preserve">
     <value>You're using</value>
   </data>
+  <data name="cloneButtonText" xml:space="preserve">
+    <value>Clone</value>
+  </data>
+  <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
+    <value>Connect…</value>
+  </data>
+  <data name="GitHubInvitationSectionDescription" xml:space="preserve">
+    <value>Powerful collaboration, code review, and code management for open source and private projects.</value>
+  </data>
+  <data name="GitHubInvitationSectionSignUpLabel" xml:space="preserve">
+    <value>Sign up</value>
+  </data>
+  <data name="GitHubPublishSectionDescription" xml:space="preserve">
+    <value>Powerful collaboration, code review, and code management for open source and private projects.</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>Publish to GitHub</value>
+  </data>
+  <data name="GraphsNavigationItemText" xml:space="preserve">
+    <value>Graphs</value>
+  </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>Issues</value>
+  </data>
+  <data name="pathText" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Requests</value>
+  </data>
+  <data name="PulseNavigationItemText" xml:space="preserve">
+    <value>Pulse</value>
+  </data>
+  <data name="WikiNavigationItemText" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
 </root>

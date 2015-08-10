@@ -36,10 +36,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
             lazyBrowser = browser;
             this.hosts = hosts;
-            Title = "Publish to GitHub";
+            Title = Resources.GitHubPublishSectionTitle;
             Name = "GitHub";
             Provider = "GitHub, Inc";
-            Description = "Powerful collaboration, code review, and code management for open source and private projects.";
+            Description = Resources.GitHubPublishSectionDescription;
             ShowLogin = false;
             ShowSignup = false;
             ShowGetStarted = false;

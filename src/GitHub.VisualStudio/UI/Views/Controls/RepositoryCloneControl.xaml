@@ -77,7 +77,7 @@
 			x:Name="cloneButton"
 			HorizontalAlignment="Center"
 			Icon="check">
-            <TextBlock>Clone</TextBlock>
+            <TextBlock Text="{x:Static prop:Resources.cloneButtonText}"/>
         </ui:OcticonCircleButton>
 
         <Border DockPanel.Dock="Bottom" Style="{StaticResource repositoryBorderStyle}">
@@ -91,7 +91,7 @@
                     Grid.Column="0"
                     Grid.Row="3"
                     Margin="4,0"
-                    Target="{Binding ElementName=clonePath}">Path</Label>
+                    Target="{Binding ElementName=clonePath}" Content="{x:Static prop:Resources.pathText}"/>
 
                 <ui:PromptTextBox x:Name="clonePath" Grid.Column="1" Margin="0,2" />
                 <uirx:ValidationMessage

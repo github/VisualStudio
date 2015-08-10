@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             : base(apiFactory, holder, Octicon.graph)
         {
             this.browser = browser;
-            Text = "Graphs";
+            Text = Resources.GraphsNavigationItemText;
             ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
         }
 

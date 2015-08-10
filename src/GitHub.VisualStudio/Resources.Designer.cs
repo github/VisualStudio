@@ -108,6 +108,15 @@ namespace GitHub.VisualStudio {
         /// <summary>
         ///   Looks up a localized string similar to Clone.
         /// </summary>
+        internal static string cloneButtonText {
+            get {
+                return ResourceManager.GetString("cloneButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clone.
+        /// </summary>
         internal static string cloneLinkContent {
             get {
                 return ResourceManager.GetString("cloneLinkContent", resourceCulture);
@@ -331,11 +340,74 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connect….
+        /// </summary>
+        internal static string GitHubInvitationSectionConnectLabel {
+            get {
+                return ResourceManager.GetString("GitHubInvitationSectionConnectLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Powerful collaboration, code review, and code management for open source and private projects..
+        /// </summary>
+        internal static string GitHubInvitationSectionDescription {
+            get {
+                return ResourceManager.GetString("GitHubInvitationSectionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign up.
+        /// </summary>
+        internal static string GitHubInvitationSectionSignUpLabel {
+            get {
+                return ResourceManager.GetString("GitHubInvitationSectionSignUpLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Powerful collaboration, code review, and code management for open source and private projects..
+        /// </summary>
+        internal static string GitHubPublishSectionDescription {
+            get {
+                return ResourceManager.GetString("GitHubPublishSectionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish to GitHub.
+        /// </summary>
+        internal static string GitHubPublishSectionTitle {
+            get {
+                return ResourceManager.GetString("GitHubPublishSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graphs.
+        /// </summary>
+        internal static string GraphsNavigationItemText {
+            get {
+                return ResourceManager.GetString("GraphsNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Git ignore.
         /// </summary>
         internal static string ignoreTemplateListText {
             get {
                 return ResourceManager.GetString("ignoreTemplateListText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issues.
+        /// </summary>
+        internal static string IssuesNavigationItemText {
+            get {
+                return ResourceManager.GetString("IssuesNavigationItemText", resourceCulture);
             }
         }
         
@@ -448,6 +520,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        internal static string pathText {
+            get {
+                return ResourceManager.GetString("pathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to for $7/month.
         /// </summary>
         internal static string perMonthText {
@@ -489,6 +570,24 @@ namespace GitHub.VisualStudio {
         internal static string publishText {
             get {
                 return ResourceManager.GetString("publishText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Requests.
+        /// </summary>
+        internal static string PullRequestsNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestsNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pulse.
+        /// </summary>
+        internal static string PulseNavigationItemText {
+            get {
+                return ResourceManager.GetString("PulseNavigationItemText", resourceCulture);
             }
         }
         
@@ -606,6 +705,15 @@ namespace GitHub.VisualStudio {
         internal static string verifyText {
             get {
                 return ResourceManager.GetString("verifyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wiki.
+        /// </summary>
+        internal static string WikiNavigationItemText {
+            get {
+                return ResourceManager.GetString("WikiNavigationItemText", resourceCulture);
             }
         }
         
