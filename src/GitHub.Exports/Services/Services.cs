@@ -166,5 +166,10 @@ namespace GitHub.VisualStudio
                 return null;
             return new Repository(repoPath);
         }
+
+        public static UriString GetUriFromRepository(this IGitRepositoryInfo repoInfo)
+        {
+            return repoInfo.GetRepoFromIGit()?.GetUri();
+        }
     }
 }
