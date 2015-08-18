@@ -5,6 +5,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
+using System.Collections.Concurrent;
 
 namespace GitHub.Api
 {
@@ -16,7 +17,7 @@ namespace GitHub.Api
         readonly Lazy<IEnterpriseProbeTask> lazyEnterpriseProbe;
         readonly Lazy<IWikiProbe> lazyWikiProbe;
 
-        static readonly Dictionary<UriString, ISimpleApiClient> cache = new Dictionary<UriString, ISimpleApiClient>();
+        static readonly ConcurrentDictionary<UriString, ISimpleApiClient> cache = new ConcurrentDictionary<UriString, ISimpleApiClient>();
 
         [ImportingConstructor]
         public SimpleApiClientFactory(IProgram program, Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
@@ -28,25 +29,16 @@ namespace GitHub.Api
 
         public ISimpleApiClient Create(UriString repositoryUrl)
         {
-            lock (cache)
-            {
-                if (!cache.ContainsKey(repositoryUrl))
-                {
-                    var hostAddress = HostAddress.Create(repositoryUrl);
-                    var apiBaseUri = hostAddress.ApiUri;
-                    cache.Add(repositoryUrl, new SimpleApiClient(hostAddress, repositoryUrl, new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), apiBaseUri), lazyEnterpriseProbe, lazyWikiProbe));
-                }
-                return cache[repositoryUrl];
-            }
+            var hostAddress = HostAddress.Create(repositoryUrl);
+            return cache.GetOrAdd(repositoryUrl, new SimpleApiClient(hostAddress, repositoryUrl,
+                new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), hostAddress.ApiUri),
+                lazyEnterpriseProbe, lazyWikiProbe));
         }
 
         public void ClearFromCache(ISimpleApiClient client)
         {
-            lock (cache)
-            {
-                if (cache.ContainsKey(client.OriginalUrl))
-                    cache.Remove(client.OriginalUrl);
-            }
+            ISimpleApiClient c;
+            cache.TryRemove(client.OriginalUrl, out c);
         }
     }
 }
