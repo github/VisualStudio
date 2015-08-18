@@ -13,7 +13,6 @@ using GitHub.Services;
 using GitHub.Validation;
 using NLog;
 using NullGuard;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -46,7 +45,7 @@ namespace GitHub.ViewModels
 
                 log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri,
                     UsernameOrEmail), ex);
-                if (ex is ForbiddenException)
+                if (ex is Octokit.ForbiddenException)
                 {
                     ShowLogInFailedError = true;
                     LoginFailedMessage = "Make sure to use your password and not a Personal Access token to log in.";
