@@ -138,6 +138,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Args.cs" />
+    <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
+    <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
     <Compile Include="GitHub.App\Caches\CredentialCacheTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
