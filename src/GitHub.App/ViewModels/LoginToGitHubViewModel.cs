@@ -15,13 +15,11 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoginToGitHubViewModel : LoginTabViewModel, ILoginToGitHubViewModel
     {
-        readonly Uri baseUri;
-
         [ImportingConstructor]
         public LoginToGitHubViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
             : base(repositoryHosts, browser)
         {
-            baseUri = HostAddress.GitHubDotComHostAddress.WebUri;
+            BaseUri = HostAddress.GitHubDotComHostAddress.WebUri;
 
             NavigatePricing = ReactiveCommand.CreateAsyncObservable(_ =>
             {
@@ -31,16 +29,13 @@ namespace GitHub.ViewModels
             });
         }
 
-        public IReactiveCommand<Unit> NavigatePricing { get; private set; }
+        public IReactiveCommand<Unit> NavigatePricing { get; }
 
-        protected override Uri BaseUri
-            {
-                get { return baseUri; }
-            }
+        protected override Uri BaseUri { get; }
 
-            protected override IObservable<AuthenticationResult> LogIn(object args)
-            {
-                return LogInToHost(HostAddress.GitHubDotComHostAddress);
-            }
+        protected override IObservable<AuthenticationResult> LogIn(object args)
+        {
+            return LogInToHost(HostAddress.GitHubDotComHostAddress);
         }
+    }
 }
