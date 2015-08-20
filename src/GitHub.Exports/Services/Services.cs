@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Models;
 using GitHub.Info;
 using GitHub.Extensions;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio
 {
@@ -116,7 +117,7 @@ namespace GitHub.VisualStudio
             }
         }
 
-        public static Uri GetRepoUrlFromSolution(IVsSolution solution)
+        public static UriString GetRepoUrlFromSolution(IVsSolution solution)
         {
             string solutionDir, solutionFile, userFile;
             if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
@@ -128,7 +129,7 @@ namespace GitHub.VisualStudio
                 return null;
             using (var repo = new Repository(repoPath))
             {
-                return GetUriFromRepository(repo);
+                return repo.GetUri();
             }
         }
 
@@ -145,21 +146,18 @@ namespace GitHub.VisualStudio
             return new Repository(repoPath);
         }
 
-        public static Uri GetUriFromRepository(this Repository repo)
+        public static Uri GetUriFromRepository(Repository repo)
         {
-            if (repo == null)
-                return null;
-            var remote = repo.Network.Remotes.FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal));
-            if (remote == null)
-                return null;
-            Uri uri;
-            var url = remote.Url;
-            // fixup ssh urls
-            if (url.StartsWith("git@github.com:", StringComparison.Ordinal))
-                url = url.Replace("git@github.com:", "https://github.com/");
-            if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
-                return null;
-            return uri;
+            return UriString.ToUriString(GetUriFromRepository(repo)?.ToRepositoryUrl());
+        }
+
+        static UriString GetUriFromRepository(Repository repo)
+        {
+            return repo
+                ?.Network
+                .Remotes
+                .FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal))
+                ?.Url;
         }
 
         public static Repository GetRepoFromIGit(this IGitRepositoryInfo repoInfo)
@@ -173,6 +171,11 @@ namespace GitHub.VisualStudio
             if (repoPath == null)
                 return null;
             return new Repository(repoPath);
+        }
+
+        public static UriString GetUriFromRepository(this IGitRepositoryInfo repoInfo)
+        {
+            return repoInfo.GetRepoFromIGit()?.GetUri();
         }
     }
 }

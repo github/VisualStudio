@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -31,6 +29,7 @@ namespace GitHub.Primitives
 
         public UriString(string uriString) : base(NormalizePath(uriString))
         {
+            if (uriString == null) throw new ArgumentNullException(nameof(uriString), "Cannot create a null UriString");
             if (uriString.Length == 0) return;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out url))
             {
@@ -52,6 +51,11 @@ namespace GitHub.Primitives
             }
         }
 
+        public static UriString ToUriString(Uri uri)
+        {
+            return uri == null ? null : new UriString(uri.ToString());
+        }
+
         void SetUri(Uri uri)
         {
             Host = uri.Host;
@@ -66,43 +70,6 @@ namespace GitHub.Primitives
             }
             
             IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
-
-            if (String.IsNullOrEmpty(uri.Query)) return;
-            
-            try
-            {
-                var query = ParseQueryString(uri);
-                    
-                if (query.ContainsKey("branch") && !String.IsNullOrEmpty(query["branch"]))
-                {
-                    Branch = query["branch"].Replace("%2F", "/");
-                }
-
-                if (query.ContainsKey("pr") && !String.IsNullOrEmpty(query["pr"]))
-                {
-                    PullRequest = query["pr"].Replace("%2F", "/");
-                }
-
-                if (query.ContainsKey("filepath") && !String.IsNullOrEmpty(query["filepath"]))
-                {
-                    RelativePathToOpen = query["filepath"].Replace("%2F", "/").Replace('/', '\\');
-                }
-            }
-            catch //(Exception ex)
-            {
-                //log.WarnException("Failed to read URI query", ex);
-            }
-        }
-
-        // This is not a complete query string parsing algorithm, but it's good enough for our needs.
-        static IDictionary<string, string> ParseQueryString(Uri uri)
-        {
-            Debug.Assert(uri.Query.StartsWith('?'),
-                String.Format(CultureInfo.InvariantCulture, "Uri.Query doesn't start with '?': '{0}'", uri.Query));
-            return uri.Query.Substring(1).Split(new[] {'&'}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(pair => pair.Split('='))
-                .ToDictionary(pair => pair.First(), pair => pair.Length > 1 ? pair[1] : null,
-                    StringComparer.OrdinalIgnoreCase);
         }
 
         void SetFilePath(Uri uri)
@@ -139,8 +106,6 @@ namespace GitHub.Primitives
             return false;
         }
 
-        public string Branch { get; private set; }
-        public string PullRequest { get; set; }
         public string Host { get; private set; }
 
         public string Owner { get; private set; }
@@ -149,20 +114,31 @@ namespace GitHub.Primitives
 
         public string NameWithOwner { get; private set; }
 
-        public string RelativePathToOpen { get; private set; }
-
         public bool IsFileUri { get; private set; }
 
-        public bool IsValidUri
-        {
-            get { return url != null; }
-        }
+        public bool IsValidUri => url != null;
 
-        public Uri ToUri()
+        /// <summary>
+        /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL.
+        /// </summary>
+        /// <returns></returns>
+        public Uri ToRepositoryUrl()
         {
-            if (url == null)
-                throw new InvalidOperationException("This Uri String is not a valid Uri");
-            return url;
+            if (url != null && IsFileUri) return url;
+
+            var scheme = url != null && IsHypertextTransferProtocol
+                ? url.Scheme
+                : Uri.UriSchemeHttps;
+
+            return new UriBuilder
+            {
+                Scheme = scheme,
+                Host = Host,
+                Path = NameWithOwner,
+                Port = url?.Port == 80
+                    ? -1
+                    : (url?.Port ?? -1)
+            }.Uri;
         }
 
         /// <summary>
@@ -181,9 +157,7 @@ namespace GitHub.Primitives
         [SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
         public static implicit operator string(UriString uriString)
         {
-            if (uriString == null) return null;
-
-            return uriString.Value;
+            return uriString?.Value;
         }
 
         [SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "No.")]
@@ -214,7 +188,7 @@ namespace GitHub.Primitives
 
                     urlBuilder.Path = path + addition;
                 }
-                return urlBuilder.Uri.ToUriString();
+                return ToUriString(urlBuilder.Uri);
             }
             return String.Concat(Value, addition);
         }
@@ -248,7 +222,7 @@ namespace GitHub.Primitives
 
         static string NormalizePath(string path)
         {
-            return path == null ? null : path.Replace('\\', '/');
+            return path?.Replace('\\', '/');
         }
 
         static string GetRepositoryName(string repositoryNameSegment)

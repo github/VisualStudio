@@ -239,7 +239,6 @@ namespace GitHub.Caches
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         class UriComparer : IEqualityComparer<Uri>

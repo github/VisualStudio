@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Linq;
 using System.Threading;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -125,7 +126,22 @@ namespace GitHub.VisualStudio.Base
             {
                 GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
                 if (ActiveRepo == null)
-                    ActiveRepo = await System.Threading.Tasks.Task.Run(() => GitService.ActiveRepositories.FirstOrDefault());
+                    ActiveRepo = await System.Threading.Tasks.Task.Run(() =>
+                    {
+                        var repos = GitService?.ActiveRepositories;
+                        // Looks like this might return null after a while, for some unknown reason
+                        // if it does, let's refresh the GitService instance in case something got wonky
+                        // and try again. See issue #23
+                        if (repos == null)
+                        {
+                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2001: ActiveRepositories is null. GitService: '{0}'", GitService));
+                            GitService = ServiceProvider?.GetService<IGitExt>();
+                            repos = GitService?.ActiveRepositories;
+                            if (repos == null)
+                                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
+                        }
+                        return repos?.FirstOrDefault();
+                    });
             }
             else
                 ActiveRepo = null;

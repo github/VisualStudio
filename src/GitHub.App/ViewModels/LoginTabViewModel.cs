@@ -41,9 +41,17 @@ namespace GitHub.ViewModels
 
             Login.ThrownExceptions.Subscribe(ex =>
             {
-                if (!ex.IsCriticalException())
+                if (ex.IsCriticalException()) return;
+
+                log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri,
+                    UsernameOrEmail), ex);
+                if (ex is Octokit.ForbiddenException)
                 {
-                    log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri, UsernameOrEmail), ex);
+                    ShowLogInFailedError = true;
+                    LoginFailedMessage = "Make sure to use your password and not a Personal Access token to log in.";
+                }
+                else
+                {
                     ShowConnectingToHostFailed = true;
                 }
             });
@@ -64,13 +72,20 @@ namespace GitHub.ViewModels
                 return Observable.Return(Unit.Default);
             });
         }
-        protected IRepositoryHosts RepositoryHosts { get; private set; }
+        protected IRepositoryHosts RepositoryHosts { get; }
         protected abstract Uri BaseUri { get; }
-        public IReactiveCommand<Unit> SignUp { get; private set; }
+        public IReactiveCommand<Unit> SignUp { get; }
 
-        public IReactiveCommand<AuthenticationResult> Login { get; private set; }
-        public IReactiveCommand<Unit> Reset { get; private set; }
-        public IReactiveCommand<Unit> NavigateForgotPassword { get; private set; }
+        public IReactiveCommand<AuthenticationResult> Login { get; }
+        public IReactiveCommand<Unit> Reset { get; }
+        public IReactiveCommand<Unit> NavigateForgotPassword { get; }
+
+        string loginFailedMessage = "Check your username and password, then try again";
+        public string LoginFailedMessage
+        {
+            get { return loginFailedMessage; }
+            set { this.RaiseAndSetIfChanged(ref loginFailedMessage, value); }
+        }
 
         string usernameOrEmail;
         [AllowNull]

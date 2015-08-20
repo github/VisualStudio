@@ -1,14 +1,39 @@
 ﻿using System;
+using System.Net;
+using System.Reactive.Linq;
+using GitHub.Authentication;
 using GitHub.Info;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
+using Octokit;
 using Xunit;
 
 public class LoginToGitHubViewModelTests
 {
+    public class TheLoginCommand : TestBaseClass
+    {
+        [Fact]
+        public void ShowsHelpfulTooltipWhenForbiddenResponseReceived()
+        {
+            var response = Substitute.For<IResponse>();
+            response.StatusCode.Returns(HttpStatusCode.Forbidden);
+            var repositoryHosts = Substitute.For<IRepositoryHosts>();
+            repositoryHosts.LogIn(HostAddress.GitHubDotComHostAddress, Args.String, Args.String)
+                .Returns(_ => Observable.Throw<AuthenticationResult>(new ForbiddenException(response)));
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
+
+            loginViewModel.Login.Execute(null);
+
+            Assert.True(loginViewModel.ShowLogInFailedError);
+            Assert.Equal("Make sure to use your password and not a Personal Access token to log in.",
+                loginViewModel.LoginFailedMessage);
+        }
+    }
+
     public class TheSignupCommand : TestBaseClass
     {
         [Fact]

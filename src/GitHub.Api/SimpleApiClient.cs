@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
@@ -11,10 +10,10 @@ namespace GitHub.Api
 {
     public class SimpleApiClient : ISimpleApiClient
     {
-        public HostAddress HostAddress { get; private set; }
-        public Uri OriginalUrl { get; private set; }
+        public HostAddress HostAddress { get; }
+        public UriString OriginalUrl { get; }
 
-        readonly GitHubClient client;
+        readonly IGitHubClient client;
         readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);
@@ -24,7 +23,7 @@ namespace GitHub.Api
         bool? isEnterprise;
         bool? hasWiki;
 
-        internal SimpleApiClient(HostAddress hostAddress, Uri repoUrl, GitHubClient githubClient,
+        public SimpleApiClient(HostAddress hostAddress, UriString repoUrl, IGitHubClient githubClient,
             Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
             HostAddress = hostAddress;
@@ -51,19 +50,19 @@ namespace GitHub.Api
             {
                 if (owner == null && OriginalUrl != null)
                 {
-                    var own = OriginalUrl.GetUser();
-                    var name = OriginalUrl.GetRepo();
+                    var ownerLogin = OriginalUrl.Owner;
+                    var repositoryName = OriginalUrl.RepositoryName;
 
-                    if (own != null && name != null)
+                    if (ownerLogin != null && repositoryName != null)
                     {
-                        var repo = await client.Repository.Get(own, name);
+                        var repo = await client.Repository.Get(ownerLogin, repositoryName);
                         if (repo != null)
                         {
                             hasWiki = await HasWikiInternal(repo);
                             isEnterprise = await IsEnterpriseInternal();
                             repositoryCache = repo;
                         }
-                        owner = own;
+                        owner = ownerLogin;
                     }
                 }
             }
@@ -79,16 +78,12 @@ namespace GitHub.Api
 
         public bool HasWiki()
         {
-            if (hasWiki.HasValue)
-                return hasWiki.Value;
-            return false;
+            return hasWiki.HasValue && hasWiki.Value;
         }
 
         public bool IsEnterprise()
         {
-            if (isEnterprise.HasValue)
-                return isEnterprise.Value;
-            return false;
+            return isEnterprise.HasValue && isEnterprise.Value;
         }
 
         async Task<bool> HasWikiInternal(Repository repo)
@@ -109,8 +104,6 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(repo);
-            if (ret == WikiProbeResult.Failed)
-                return false;
             return (ret == WikiProbeResult.Ok);
         }
 
@@ -123,8 +116,6 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(HostAddress.WebUri);
-            if (ret == EnterpriseProbeResult.Failed)
-                return false;
             return (ret == EnterpriseProbeResult.Ok);
         }
     }
