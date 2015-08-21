@@ -16,6 +16,8 @@ namespace GitHub.VisualStudio.UI.Views
         public GitHubConnectContent()
         {
             InitializeComponent();
+
+            DataContextChanged += (s, e) => ViewModel = e.NewValue as IGitHubConnectSection;
         }
 
         void cloneLink_Click(object sender, RoutedEventArgs e)
@@ -48,7 +50,6 @@ namespace GitHub.VisualStudio.UI.Views
 
         void repositories_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            
             e.Handled = true;
         }
 
@@ -69,22 +70,42 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            try
-            {
-                if (values.Length != 2 || !(values[0] is ISimpleRepositoryModel) || !(values[1] is ITeamExplorerServiceHolder) || parameter as string != "IsCurrentRepository")
-                    return false;
+            if (values.Length != 2 || !(values[0] is ISimpleRepositoryModel) || !(values[1] is IGitAwareItem) || parameter as string != "IsCurrentRepository")
+                return false;
 
-                var repoInfo = (ISimpleRepositoryModel)values[0];
-                var holder = (ITeamExplorerServiceHolder)values[1];
-                if (holder.ActiveRepo == null)
-                    return false;
-                return holder.ActiveRepo.RepositoryPath == repoInfo.LocalPath;
-            }
-            catch
-            {
-            }
-            return false;
+            var item = (ISimpleRepositoryModel)values[0];
+            var context = (IGitAwareItem)values[1];
+            return context.ActiveRepo != null  && context.ActiveRepo.RepositoryPath == item.LocalPath;
         }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    public class FormatRepositoryName : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length != 2 || parameter as string != "FormatRepositoryName")
+                return String.Empty;
+
+            if (!(values[1] is IGitAwareItem))
+            {
+                if (values[0] is ISimpleRepositoryModel)
+                    return ((ISimpleRepositoryModel)values[0]).Name;
+                return String.Empty;
+            }
+                
+            var item = (ISimpleRepositoryModel)values[0];
+            var context = (IGitAwareItem)values[1];
+            var uri = context.ActiveRepo?.GetUriFromRepository();
+            if (uri != null && uri?.Owner == item.CloneUrl.Owner)
+                return item.CloneUrl.RepositoryName;
+            return item.Name;
+        }
+
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             return null;
