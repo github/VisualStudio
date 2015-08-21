@@ -249,15 +249,3 @@ namespace GitHub.Primitives
         }
     }
 }
-
-namespace GitHub.Extensions
-{
-    using Primitives;
-    public static class UriStringExtensions
-    {
-        public static UriString ToUriString(this Uri uri)
-        {
-            return uri == null ? null : new UriString(uri.ToString());
-        }
-    }
-}
