@@ -146,7 +146,7 @@ namespace GitHub.VisualStudio
             return new Repository(repoPath);
         }
 
-        public static Uri GetUriFromRepository(Repository repo)
+        public static UriString GetUri(this Repository repo)
         {
             return UriString.ToUriString(GetUriFromRepository(repo)?.ToRepositoryUrl());
         }
@@ -162,7 +162,10 @@ namespace GitHub.VisualStudio
 
         public static Repository GetRepoFromIGit(this IGitRepositoryInfo repoInfo)
         {
-            return GetRepoFromPath(repoInfo?.RepositoryPath);
+            var repoPath = Repository.Discover(repoInfo.RepositoryPath);
+            if (repoPath == null)
+                return null;
+            return new Repository(repoPath);
         }
 
         public static Repository GetRepoFromPath(string path)

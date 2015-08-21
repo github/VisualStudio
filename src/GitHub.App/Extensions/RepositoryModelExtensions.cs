@@ -17,13 +17,9 @@ namespace GitHub.Extensions
         {
             if (repo == null)
                 return null;
-            var gitRepo = repo.GetRepoFromIGit();
-            var uri = gitRepo.GetUriFromRepository();
-            var name = uri?.GetRepo();
-            if (name == null)
-                return null;
-            name = uri.GetUser() + "/" + name;
-            return new SimpleRepositoryModel(name, uri.ToHttps(), repo.RepositoryPath);
+            var uri = repo.GetUriFromRepository();
+            var name = uri?.NameWithOwner;
+            return name != null ? new SimpleRepositoryModel(name, uri, repo.RepositoryPath) : null;
         }
     }
 }

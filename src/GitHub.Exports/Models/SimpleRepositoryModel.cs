@@ -7,17 +7,10 @@ namespace GitHub.Models
 {
     public class SimpleRepositoryModel : ISimpleRepositoryModel
     {
-        public SimpleRepositoryModel(string name, string cloneUrl, string localPath = null)
+        public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
         {
             Name = name;
             CloneUrl = cloneUrl;
-            LocalPath = localPath;
-        }
-
-        public SimpleRepositoryModel(string name, Uri cloneUrl, string localPath = null)
-        {
-            Name = name;
-            CloneUrl = cloneUrl.ToUriString();
             LocalPath = localPath;
         }
         public string Name { get; private set; }

@@ -56,6 +56,13 @@ namespace GitHub.Primitives
             return uri == null ? null : new UriString(uri.ToString());
         }
 
+        public Uri ToUri()
+        {
+            if (url == null)
+                throw new InvalidOperationException("This Uri String is not a valid Uri");
+            return url;
+        }
+
         void SetUri(Uri uri)
         {
             Host = uri.Host;

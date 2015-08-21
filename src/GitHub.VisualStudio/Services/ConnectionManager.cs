@@ -20,7 +20,7 @@ namespace GitHub.VisualStudio
     class RepositoryCacheItem
     {
         public string Name { get; set;  }
-        public Uri CloneUrl { get; set;  }
+        public UriString CloneUrl { get; set;  }
         public string LocalPath { get; set;  }
     }
 
