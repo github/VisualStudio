@@ -17,6 +17,7 @@ namespace GitHub.VisualStudio
         public IEnumerable<ConnectionCacheItem> connections;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
     class RepositoryCacheItem
     {
         public string Name { get; set;  }
@@ -28,7 +29,7 @@ namespace GitHub.VisualStudio
     {
         public Uri HostUrl { get; set; }
         public string UserName { get; set; }
-        public IEnumerable<RepositoryCacheItem> Repositories;
+        //public IEnumerable<RepositoryCacheItem> Repositories;
     }
 
     [Export(typeof(IConnectionManager))]
@@ -101,13 +102,13 @@ namespace GitHub.VisualStudio
             return true;
         }
 
-        void AddConnection(Uri hostUrl, string username, [AllowNull] IEnumerable<RepositoryCacheItem> repositories)
+        void AddConnection(Uri hostUrl, string username /*, [AllowNull] IEnumerable<RepositoryCacheItem> repositories */)
         {
             var address = HostAddress.Create(hostUrl);
             if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
                 return;
             var conn = SetupConnection(address, username);
-            repositories?.ForEach(r => conn.Repositories.Add(new SimpleRepositoryModel(r.Name, r.CloneUrl, r.LocalPath)));
+            //repositories?.ForEach(r => conn.Repositories.Add(new SimpleRepositoryModel(r.Name, r.CloneUrl, r.LocalPath)));
             Connections.Add(conn);
         }
 
@@ -138,7 +139,7 @@ namespace GitHub.VisualStudio
             var list = services.GetKnownRepositories();
             Connections.ForEach(c => c.Repositories.Clear());
             list.ForEach(r => Connections.FirstOrDefault(c => c.HostAddress == HostAddress.Create(r.CloneUrl))?.Repositories.Add(r));
-            SaveConnectionsToCache();
+            //SaveConnectionsToCache();
         }
 
         IConnection SetupConnection(HostAddress address, string username)
@@ -192,7 +193,7 @@ namespace GitHub.VisualStudio
             cacheData.connections.ForEach(c =>
             {
                 if (c.HostUrl != null)
-                    AddConnection(c.HostUrl, c.UserName, c.Repositories);
+                    AddConnection(c.HostUrl, c.UserName /*, c.Repositories */);
             });
         }
 
@@ -202,10 +203,13 @@ namespace GitHub.VisualStudio
 
             var cache = new CacheData();
             cache.connections = Connections.Select(conn =>
-                new ConnectionCacheItem {
-                    HostUrl = conn.HostAddress.WebUri, UserName = conn.Username,
-                    Repositories = conn.Repositories.Select(x =>
-                        new RepositoryCacheItem() { Name = x.Name, CloneUrl = x.CloneUrl.ToUri(), LocalPath = x.LocalPath }) });
+                new ConnectionCacheItem
+                {
+                    HostUrl = conn.HostAddress.WebUri,
+                    UserName = conn.Username,
+                    /* Repositories = conn.Repositories.Select(x =>
+                        new RepositoryCacheItem() { Name = x.Name, CloneUrl = x.CloneUrl, LocalPath = x.LocalPath }) */
+                });
             try
             {
                 string data = SimpleJson.SerializeObject(cache);
