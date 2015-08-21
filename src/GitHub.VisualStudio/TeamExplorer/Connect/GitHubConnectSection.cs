@@ -9,12 +9,11 @@ using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
-    public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection, INotifyPropertyChanged
+    public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         readonly int sectionIndex;
 
@@ -122,10 +121,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             base.Initialize(sender, e);
             if (sectionIndex == 0)
                 connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
-
-            // when we start up the connection list is loaded before we can get notifications so refresh manually
-            if (SectionConnection == null && connectionManager.Connections.Count > sectionIndex)
-                Refresh(connectionManager.Connections[sectionIndex]);
+            UpdateConnection();
         }
 
         void UpdateConnection()
@@ -133,7 +129,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             if (connectionManager.Connections.Count > sectionIndex)
                 Refresh(connectionManager.Connections[sectionIndex]);
             else
-                Refresh(null);
+                Refresh(SectionConnection);
         }
 
         void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -141,7 +137,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
             {
                 View = new GitHubConnectContent();
-                View.ViewModel = this;
+                View.DataContext = this;
             }
         }
 
