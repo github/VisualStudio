@@ -30,7 +30,7 @@
       <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
       <ui:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
       <local:IsCurrentPropertyConverter x:Key="IsCurrentPropertyConverter" />
-      <local:FormatRepositoryName x:Key="FormatRepositoryName" />
+      <local:FormatRepositoryNameConverter x:Key="FormatRepositoryNameConverter" />
 
       <Style x:Key="RepoNameStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
@@ -151,7 +151,7 @@
                              Icon="{Binding Path=Icon}"/>
             <TextBlock       Grid.Column="1" Style="{StaticResource RepoNameStyle}">
               <TextBlock.Text>
-                <MultiBinding Converter="{StaticResource FormatRepositoryName}" ConverterParameter="FormatRepositoryName">
+                <MultiBinding Converter="{StaticResource FormatRepositoryNameConverter}" ConverterParameter="FormatRepositoryName">
                   <Binding/>
                   <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
                 </MultiBinding>
@@ -173,7 +173,7 @@
                   <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">Name:</TextBlock>
                   <TextBlock Grid.Row="0" Grid.Column="1">
                     <TextBlock.Text>
-                      <MultiBinding Converter="{StaticResource FormatRepositoryName}" ConverterParameter="FormatRepositoryName">
+                      <MultiBinding Converter="{StaticResource FormatRepositoryNameConverter}" ConverterParameter="FormatRepositoryName">
                         <Binding/>
                         <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
                       </MultiBinding>

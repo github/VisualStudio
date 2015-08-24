@@ -84,7 +84,7 @@ namespace GitHub.VisualStudio.UI.Views
         }
     }
 
-    public class FormatRepositoryName : IMultiValueConverter
+    public class FormatRepositoryNameConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

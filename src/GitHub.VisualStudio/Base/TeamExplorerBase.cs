@@ -46,9 +46,7 @@ namespace GitHub.VisualStudio.Base
         {
             var b = browser.Value;
             Debug.Assert(b != null, "Could not create a browser helper instance.");
-            if (b == null)
-                return;
-            b.OpenUrl(uri);
+            b?.OpenUrl(uri);
         }
     }
 }

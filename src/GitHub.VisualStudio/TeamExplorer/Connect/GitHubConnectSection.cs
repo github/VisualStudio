@@ -143,13 +143,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
+                View = new GitHubConnectContent { DataContext = this };
+        }
 
         void UpdateIcons(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                View = new GitHubConnectContent();
-                View.DataContext = this;
                 e.NewItems
                     .Cast<ISimpleRepositoryModel>()
                     .Select(async r =>
