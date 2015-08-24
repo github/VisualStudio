@@ -7,6 +7,9 @@ namespace GitHub.Extensions
 {
     public static class RepositoryModelExtensions
     {
+        /// <summary>
+        /// Create a SimpleRepositoryModel from a VS git repo object/
+        /// </summary>
         [return:AllowNull]
         public static ISimpleRepositoryModel ToModel([AllowNull] this IGitRepositoryInfo repo)
         {
