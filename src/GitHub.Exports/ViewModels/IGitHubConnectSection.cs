@@ -9,5 +9,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         void DoClone();
         void SignOut();
         void Login();
+        void OpenRepository();
     }
 }

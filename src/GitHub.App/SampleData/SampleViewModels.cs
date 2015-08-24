@@ -571,5 +571,9 @@ namespace GitHub.SampleData
         public void Login()
         {
         }
+
+        public void OpenRepository()
+        {
+        }
     }
 }

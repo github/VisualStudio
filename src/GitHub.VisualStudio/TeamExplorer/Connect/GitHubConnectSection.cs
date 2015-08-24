@@ -11,6 +11,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using GitHub.Extensions;
 using NullGuard;
+using Microsoft.VisualStudio;
+using System;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -119,6 +121,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 SectionConnection = connection;
                 Repositories = SectionConnection.Repositories;
+                if (Repositories.Count > 0)
+                    SelectedRepository = Repositories.FirstOrDefault(x => String.Equals(x.LocalPath, Holder.ActiveRepo?.RepositoryPath, StringComparison.CurrentCultureIgnoreCase));
                 Repositories.CollectionChanged += UpdateIcons;
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
@@ -162,7 +166,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     .Cast<ISimpleRepositoryModel>()
                     .Select(async r =>
                 {
-                    if (Holder.ActiveRepo.RepositoryPath == r.LocalPath)
+                    if (String.Equals(Holder.ActiveRepo?.RepositoryPath, r.LocalPath, StringComparison.CurrentCultureIgnoreCase))
                         SelectedRepository = r;
                     var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
                     r.SetIcon(repo.Private, repo.Fork);
@@ -192,6 +196,24 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public void Login()
         {
             StartFlow(UIControllerFlow.Authentication);
+        }
+
+        public void OpenRepository()
+        {
+            var old = Repositories.FirstOrDefault(x => String.Equals(Holder.ActiveRepo?.RepositoryPath, x.LocalPath, StringComparison.CurrentCultureIgnoreCase));
+            // open the solution selection dialog when the user wants to switch to a different repo
+            // since there's no other way of changing the source control context in VS
+            if (SelectedRepository != old)
+            {
+                if (ErrorHandler.Failed(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                    SelectedRepository = old;
+                else
+                {
+                    var service = ServiceProvider.TryGetService<ITeamExplorer>();
+                    if (service?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null) == null)
+                        SelectedRepository = old;
+                }
+            }
         }
 
         void StartFlow(UIControllerFlow controllerFlow)

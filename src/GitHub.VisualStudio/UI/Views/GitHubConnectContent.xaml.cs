@@ -50,6 +50,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         void repositories_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            ViewModel.OpenRepository();
             e.Handled = true;
         }
 
