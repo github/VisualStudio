@@ -66,24 +66,6 @@ namespace GitHub.VisualStudio.UI.Views
                 typeof(GitHubConnectContent));
     }
 
-    public class IsCurrentPropertyConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (values.Length != 2 || !(values[0] is ISimpleRepositoryModel) || !(values[1] is IGitAwareItem) || parameter as string != "IsCurrentRepository")
-                return false;
-
-            var item = (ISimpleRepositoryModel)values[0];
-            var context = (IGitAwareItem)values[1];
-            return context.ActiveRepo != null  && context.ActiveRepo.RepositoryPath == item.LocalPath;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            return null;
-        }
-    }
-
     public class FormatRepositoryNameConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -101,7 +83,7 @@ namespace GitHub.VisualStudio.UI.Views
             var item = (ISimpleRepositoryModel)values[0];
             var context = (IGitAwareItem)values[1];
             var uri = context.ActiveRepo?.GetUriFromRepository();
-            if (uri != null && uri?.Owner == item.CloneUrl.Owner)
+            if (uri?.Owner == item.CloneUrl.Owner)
                 return item.CloneUrl.RepositoryName;
             return item.Name;
         }

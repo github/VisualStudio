@@ -10,6 +10,7 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using GitHub.Extensions;
+using NullGuard;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -56,7 +57,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { repositories = value; this.RaisePropertyChange(); }
         }
 
-        internal ITeamExplorerServiceHolder Holder { get { return holder; } }
+        ISimpleRepositoryModel selectedRepository;
+        
+        [AllowNull]
+        public ISimpleRepositoryModel SelectedRepository {
+            [return: AllowNull] get { return selectedRepository; }
+            set { selectedRepository = value; this.RaisePropertyChange(); } }
+
+        internal ITeamExplorerServiceHolder Holder => holder;
 
         public GitHubConnectSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager manager, int index)
             : base(apiFactory, holder, manager)
@@ -154,6 +162,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     .Cast<ISimpleRepositoryModel>()
                     .Select(async r =>
                 {
+                    if (Holder.ActiveRepo.RepositoryPath == r.LocalPath)
+                        SelectedRepository = r;
                     var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
                     r.SetIcon(repo.Private, repo.Fork);
                 }).ToList();
