@@ -9,6 +9,8 @@ namespace GitHub.VisualStudio.Base
 {
     public abstract class TeamExplorerBase : NotificationAwareObject, IDisposable
     {
+        internal static readonly Guid TeamExplorerConnectionsSectionId = new Guid("ef6a7a99-f01f-4c91-ad31-183c1354dd97");
+
         [AllowNull]
         protected IServiceProvider ServiceProvider
         {

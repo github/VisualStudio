@@ -137,8 +137,14 @@ namespace GitHub.VisualStudio
         public void RefreshRepositories(IVSServices services)
         {
             var list = services.GetKnownRepositories();
-            Connections.ForEach(c => c.Repositories.Clear());
-            list.ForEach(r => Connections.FirstOrDefault(c => c.HostAddress == HostAddress.Create(r.CloneUrl))?.Repositories.Add(r));
+            list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress == HostAddress.Create(r.CloneUrl)))
+                .Where(g => g.Key != null)
+                .ForEach(g =>
+            {
+                var repos = g.Key.Repositories;
+                repos.Except(g).ToList().Select(c => repos.Remove(c));
+                g.Except(repos).ToList().ForEach(c => repos.Add(c));
+            });
             //SaveConnectionsToCache();
         }
 
