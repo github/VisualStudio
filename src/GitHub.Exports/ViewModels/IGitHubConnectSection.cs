@@ -5,8 +5,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public interface IGitHubConnectSection
     {
-        ObservableCollection<ISimpleRepositoryModel> Repositories { get; set; }
-
         void DoCreate();
         void DoClone();
         void SignOut();
