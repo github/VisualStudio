@@ -1,26 +1,19 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using GitHub.Primitives;
 using NullGuard;
 using GitHub.Services;
 
 namespace GitHub.VisualStudio.Base
 {
-    public abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
+    public abstract class TeamExplorerBase : NotificationAwareObject, IDisposable
     {
         [AllowNull]
         protected IServiceProvider ServiceProvider
         {
             [return: AllowNull]
             get; set;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void Dispose()

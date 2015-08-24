@@ -6,7 +6,7 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using NullGuard;
+using System.Linq;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using GitHub.Extensions;
@@ -47,6 +47,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             get { return showLogout; }
             set { showLogout = value; this.RaisePropertyChange(); }
+        }
+
+        ObservableCollection<ISimpleRepositoryModel> repositories;
+        public ObservableCollection<ISimpleRepositoryModel> Repositories
+        {
+            get { return repositories; }
+            set { repositories = value; this.RaisePropertyChange(); }
         }
 
         internal ITeamExplorerServiceHolder Holder { get { return holder; } }
@@ -103,7 +110,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             else if (SectionConnection != connection)
             {
                 SectionConnection = connection;
-                Repositories = connection.Repositories;
+                Repositories = SectionConnection.Repositories;
+                Repositories.CollectionChanged += UpdateIcons;
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
                 LoggedIn = true;
@@ -135,9 +143,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
+
+        void UpdateIcons(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 View = new GitHubConnectContent();
                 View.DataContext = this;
+                e.NewItems
+                    .Cast<ISimpleRepositoryModel>()
+                    .Select(async r =>
+                {
+                    var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
+                    r.SetIcon(repo.Private, repo.Fork);
+                }).ToList();
             }
         }
 
@@ -172,12 +191,19 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             uiProvider.RunUI(controllerFlow, SectionConnection);
         }
 
-        ObservableCollection<ISimpleRepositoryModel> repositories;
-        public ObservableCollection<ISimpleRepositoryModel> Repositories
+        bool disposed;
+        protected override void Dispose(bool disposing)
         {
-            [return: AllowNull]
-            get { return repositories; }
-            set { repositories = value; this.RaisePropertyChange(); }
+            if (disposing)
+            {
+                if (!disposed)
+                {
+                    if (Repositories != null)
+                        Repositories.CollectionChanged -= UpdateIcons;
+                    disposed = true;
+                }
+            }
+            base.Dispose(disposing);
         }
     }
 }

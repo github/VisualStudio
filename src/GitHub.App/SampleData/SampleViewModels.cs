@@ -401,6 +401,10 @@ namespace GitHub.SampleData
             Owner = new AccountDesigner { Login = owner };
         }
 
+        public void SetIcon(bool isPrivate, bool isFork)
+        {
+        }
+
         public string Name { get; set; }
         public UriString CloneUrl { get; set; }
         public string LocalPath { get; set; }

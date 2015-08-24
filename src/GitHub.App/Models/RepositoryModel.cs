@@ -1,6 +1,4 @@
 ﻿using GitHub.Primitives;
-using GitHub.UI;
-using System;
 
 namespace GitHub.Models
 {
@@ -10,14 +8,9 @@ namespace GitHub.Models
             : base(name, cloneUrl)
         {
             Owner = ownerAccount;
-            Icon = isPrivate
-                ? Octicon.@lock
-                : isFork
-                    ? Octicon.repo_forked
-                    : Octicon.repo;
+            SetIcon(isPrivate, isFork);
         }
 
         public IAccount Owner { get; private set; }
-        public Octicon Icon { get; private set; }
     }
 }

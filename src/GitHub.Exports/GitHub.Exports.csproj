@@ -99,12 +99,15 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Helpers\INotifyPropertySource.cs" />
+    <Compile Include="Helpers\PropertyNotifierExtensions.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\ISimpleRepositoryModel.cs" />
     <Compile Include="Models\SimpleRepositoryModel.cs" />
+    <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\Services.cs" />

@@ -230,8 +230,6 @@
     <Compile Include="Services\SharedResources.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
-    <Compile Include="Helpers\INotifyPropertySource.cs" />
-    <Compile Include="Helpers\PropertyNotifierExtensions.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

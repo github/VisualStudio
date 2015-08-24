@@ -28,6 +28,8 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
+        protected ISimpleApiClientFactory ApiFactory => apiFactory;
+
         public TeamExplorerItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
         {
             this.apiFactory = apiFactory;

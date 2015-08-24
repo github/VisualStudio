@@ -8,5 +8,8 @@ namespace GitHub.Models
         string Name { get; }
         UriString CloneUrl { get; }
         string LocalPath { get; }
+        Octicon Icon { get; }
+
+        void SetIcon(bool isPrivate, bool isFork);
     }
 }
