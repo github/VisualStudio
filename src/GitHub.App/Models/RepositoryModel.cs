@@ -48,7 +48,7 @@ namespace GitHub.Models
 
         public override bool Equals([AllowNull]object other)
         {
-            return other != null && Equals(other as RepositoryModel);
+            return other != null && this == other as RepositoryModel;
         }
 
         bool IEquatable<RepositoryModel>.Equals([AllowNull]RepositoryModel other)
