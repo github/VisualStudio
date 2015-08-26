@@ -133,6 +133,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
                 LoggedIn = true;
+
+                // Sort the repo list by name. Only set it once, we don't sort this list
+                // anywhere else so no need to reset it every time
+                var view = CollectionViewSource.GetDefaultView(Repositories);
+                if (view.SortDescriptions.Count == 0)
+                {
+                    view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+                    view.Refresh();
+                }
             }
         }
 
