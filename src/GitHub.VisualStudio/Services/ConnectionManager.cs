@@ -142,7 +142,7 @@ namespace GitHub.VisualStudio
                 .ForEach(g =>
             {
                 var repos = g.Key.Repositories;
-                repos.Except(g).ToList().Select(c => repos.Remove(c));
+                repos.Except(g).ToList().ForEach(c => repos.Remove(c));
                 g.Except(repos).ToList().ForEach(c => repos.Add(c));
             });
             //SaveConnectionsToCache();
