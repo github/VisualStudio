@@ -93,4 +93,22 @@ namespace GitHub.VisualStudio.UI.Views
             return null;
         }
     }
+
+    public class IsCurrentRepositoryConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length != 2 || parameter as string != "IsCurrentRepository" || !(values[0] is ISimpleRepositoryModel) || !(values[1] is IGitAwareItem))
+                return false;
+
+            var item = (ISimpleRepositoryModel)values[0];
+            var context = (IGitAwareItem)values[1];
+            return context.ActiveRepoUri == item.CloneUrl;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
 }
