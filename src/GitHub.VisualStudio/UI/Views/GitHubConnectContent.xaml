@@ -75,7 +75,17 @@
             </MultiDataTrigger.Conditions>
             <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
           </MultiDataTrigger>
+          <DataTrigger Value="True">
+            <DataTrigger.Binding>
+              <MultiBinding Converter="{StaticResource IsCurrentRepositoryConverter}" ConverterParameter="IsCurrentRepository">
+                <Binding/>
+                <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
+              </MultiBinding>
+            </DataTrigger.Binding>
+            <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
+          </DataTrigger>
         </Style.Triggers>
+
       </Style>
       
       <Style x:Key="RepositoriesListItemContainerStyle" TargetType="{x:Type ListBoxItem}">
