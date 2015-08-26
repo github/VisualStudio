@@ -575,5 +575,7 @@ namespace GitHub.SampleData
         public void OpenRepository()
         {
         }
+
+        public IConnection SectionConnection { get; }
     }
 }

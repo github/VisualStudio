@@ -10,5 +10,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         void SignOut();
         void Login();
         void OpenRepository();
+        IConnection SectionConnection { get; }
     }
 }

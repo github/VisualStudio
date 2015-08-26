@@ -26,7 +26,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { SectionContent = value; }
         }
 
-        protected IConnection SectionConnection { get; set; }
+        [AllowNull]
+        public IConnection SectionConnection { [return:AllowNull] get; set; }
 
         bool loggedIn;
         bool LoggedIn

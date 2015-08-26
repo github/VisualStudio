@@ -74,7 +74,7 @@ namespace GitHub.VisualStudio.UI.Views
             if (values.Length != 2 || parameter as string != "FormatRepositoryName")
                 return String.Empty;
 
-            if (!(values[1] is IGitAwareItem))
+            if (!(values[1] is IGitHubConnectSection))
             {
                 if (values[0] is ISimpleRepositoryModel)
                     return ((ISimpleRepositoryModel)values[0]).Name;
@@ -82,9 +82,8 @@ namespace GitHub.VisualStudio.UI.Views
             }
                 
             var item = (ISimpleRepositoryModel)values[0];
-            var context = (IGitAwareItem)values[1];
-            var uri = context.ActiveRepo?.GetUriFromRepository();
-            if (uri?.Owner == item.CloneUrl.Owner)
+            var context = (IGitHubConnectSection)values[1];
+            if (context.SectionConnection.Username == item.CloneUrl.Owner)
                 return item.CloneUrl.RepositoryName;
             return item.Name;
         }
