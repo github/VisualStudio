@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using GitHub.Extensions;
 using Microsoft.Win32;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
@@ -14,8 +13,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using GitHub.Models;
-using System.Management;
-using System.Security.Principal;
 
 namespace GitHub.Services
 {
@@ -26,6 +23,7 @@ namespace GitHub.Services
         string GetActiveRepoPath();
         LibGit2Sharp.Repository GetActiveRepo();
         IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
+        string SetDefaultProjectPath(string path);
 
         void ShowMessage(string message);
         void ShowWarning(string message);
@@ -133,6 +131,18 @@ namespace GitHub.Services
                 if (key == null) return null;
                 return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
             }
+        }
+
+        const string PathsKey = @"Software\Microsoft\VisualStudio\14.0\NewProjectDialog\MRUSettingsLocalProjectLocationEntries";
+        public string SetDefaultProjectPath(string path)
+        {
+            string old;
+            using (var key = Registry.CurrentUser.OpenSubKey(PathsKey, true))
+            {
+                old = (string)key.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                key.SetValue("Value0", path, RegistryValueKind.String);
+            }
+            return old;
         }
 
         public void ShowMessage(string message)

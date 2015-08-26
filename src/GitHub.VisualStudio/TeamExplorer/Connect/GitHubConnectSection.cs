@@ -13,12 +13,18 @@ using GitHub.Extensions;
 using NullGuard;
 using Microsoft.VisualStudio;
 using System;
+using System.Windows.Data;
+using System.ComponentModel;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         readonly int sectionIndex;
+        bool isCloning;
+        bool isCreating;
+        bool runCreateNewProject;
+        bool runOpenSolution;
 
         protected GitHubConnectContent View
         {
@@ -62,14 +68,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         }
 
         ISimpleRepositoryModel selectedRepository;
-
         [AllowNull]
         public ISimpleRepositoryModel SelectedRepository {
             [return: AllowNull] get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); } }
 
         internal ITeamExplorerServiceHolder Holder => holder;
-        bool cloning;
 
         public GitHubConnectSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager manager, int index)
             : base(apiFactory, holder, manager)
@@ -108,9 +112,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 LoggedIn = false;
                 IsVisible = false;
+
                 if (sectionIndex == 0 && ServiceProvider != null)
                 {
-                    var section = ServiceProvider?.GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
+                    var section = ServiceProvider.GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
                     IsVisible = !(section?.IsVisible ?? true); // only show this when the invitation section is hidden. When in doubt, don't show it.
                     if (section != null)
                         section.PropertyChanged += (s, p) =>
@@ -120,16 +125,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         };
                 }
             }
-            else
+            else if (connection != SectionConnection)
             {
                 SectionConnection = connection;
                 Repositories = SectionConnection.Repositories;
-                SelectedRepository = Repositories.FirstOrDefault(x => String.Equals(x.LocalPath, Holder.ActiveRepo?.RepositoryPath, StringComparison.CurrentCultureIgnoreCase));
-                Repositories.CollectionChanged += UpdateIcons;
-                var section = ServiceProvider.GetSection(TeamExplorerConnectionsSectionId);
-                if (section != null)
-                    section.PropertyChanged += UpdateRepositoryList;
-
                 Title = connection.HostAddress.Title;
                 IsVisible = true;
                 LoggedIn = true;
@@ -142,21 +141,34 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
                     view.Refresh();
                 }
+
+                SelectedRepository = Repositories.FirstOrDefault(x => String.Equals(x.LocalPath, Holder.ActiveRepo?.RepositoryPath, StringComparison.CurrentCultureIgnoreCase));
+                Repositories.CollectionChanged += UpdateIcons;
             }
         }
 
         public override void Refresh()
         {
             UpdateConnection();
+            if (sectionIndex == 0)
+                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
             base.Refresh();
         }
 
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
+            UpdateConnection();
+
+            // the first time we run, refresh the repositories list for all the connections
             if (sectionIndex == 0)
                 connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
-            UpdateConnection();
+
+            // watch for new repos added to the local repo list
+            var section = ServiceProvider.GetSection(TeamExplorerConnectionsSectionId);
+            if (section != null)
+                section.PropertyChanged += UpdateRepositoryList;
+
         }
 
         void UpdateConnection()
@@ -189,34 +201,44 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        void UpdateRepositoryList(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void UpdateRepositoryList(object sender, PropertyChangedEventArgs e)
         {
-            if (cloning && e.PropertyName == "IsBusy" && !((ITeamExplorerSection)sender).IsBusy)
+            if ((isCloning || isCreating) && e.PropertyName == "IsBusy" && !((ITeamExplorerSection)sender).IsBusy)
             {
-                Repositories.CollectionChanged += HandleClonedRepo;
-                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
-                Repositories.CollectionChanged -= HandleClonedRepo;
-                cloning = false;
+                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+
+                if (isCreating)
+                {
+                    vsservices.ClearNotifications();
+                    vsservices.ShowMessage("The repository has been successfully created.");
+                }
+
+                // this property change might trigger multiple times and we only want
+                // the first time, so switch out flags to keep this code from running more than once per action
+                runOpenSolution = isCloning;
+                runCreateNewProject = isCreating;
+                isCloning = isCreating = false;
+
+                Repositories.CollectionChanged += HandleNewRepo;
+                connectionManager.RefreshRepositories(vsservices);
+                Repositories.CollectionChanged -= HandleNewRepo;
             }
         }
 
 
         public void DoCreate()
         {
-            // this is done here and not via the constructor so nothing gets loaded
-            // until we get here
+            isCreating = true;
             StartFlow(UIControllerFlow.Create);
         }
 
         public void DoClone()
         {
-            cloning = true;
-            // this is done here and not via the constructor so nothing gets loaded
-            // until we get here
+            isCloning = true;
             StartFlow(UIControllerFlow.Clone);
         }
 
-        void HandleClonedRepo(object sender, NotifyCollectionChangedEventArgs e)
+        void HandleNewRepo(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -224,7 +246,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (newrepo != null)
                 {
                     SelectedRepository = newrepo;
-                    OpenRepository();
+                    if (runOpenSolution)
+                        OpenRepository();
+                    else if (runCreateNewProject)
+                        CreateNewProject();
                 }
             }
         }
@@ -246,13 +271,28 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // since there's no other way of changing the source control context in VS
             if (SelectedRepository != old)
             {
-                if (ErrorHandler.Failed(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                else
                     SelectedRepository = old;
+            }
+        }
+
+        public void CreateNewProject()
+        {
+            var old = Repositories.FirstOrDefault(x => String.Equals(Holder.ActiveRepo?.RepositoryPath, x.LocalPath, StringComparison.CurrentCultureIgnoreCase));
+            // open the solution selection dialog when the user wants to switch to a different repo
+            // since there's no other way of changing the source control context in VS
+            if (SelectedRepository != old)
+            {
+                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+                var oldpath = vsservices.SetDefaultProjectPath(SelectedRepository.LocalPath);
+                if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg("", "", 0)))
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                 else
                 {
-                    var service = ServiceProvider.TryGetService<ITeamExplorer>();
-                    if (service?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null) == null)
-                        SelectedRepository = old;
+                    SelectedRepository = old;
+                    vsservices.SetDefaultProjectPath(oldpath);
                 }
             }
         }
