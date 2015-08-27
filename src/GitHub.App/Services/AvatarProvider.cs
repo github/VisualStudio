@@ -67,7 +67,7 @@ namespace GitHub.Services
             
         public IObservable<Unit> InvalidateAvatar([AllowNull] IAvatarContainer apiAccount)
         {
-            return apiAccount == null || String.IsNullOrWhiteSpace(apiAccount.Login)
+            return String.IsNullOrWhiteSpace(apiAccount?.Login)
                 ? Observable.Return(Unit.Default)
                 : cache.Invalidate(apiAccount.Login);
         }

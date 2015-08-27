@@ -18,10 +18,7 @@ namespace GitHub.Services
 
             return Observable.Defer(() =>
             {
-                if (repository.Head != null
-                    && repository.Head != null
-                    && repository.Head.Commits != null
-                    && repository.Head.Commits.Any())
+                if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
                     var remote = repository.Network.Remotes[remoteName];
                     repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName);
