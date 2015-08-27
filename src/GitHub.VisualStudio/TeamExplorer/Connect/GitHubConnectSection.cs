@@ -205,14 +205,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             if ((isCloning || isCreating) && e.PropertyName == "IsBusy" && !((ITeamExplorerSection)sender).IsBusy)
             {
-                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-
-                if (isCreating)
-                {
-                    vsservices.ClearNotifications();
-                    vsservices.ShowMessage("The repository has been successfully created.");
-                }
-
                 // this property change might trigger multiple times and we only want
                 // the first time, so switch out flags to keep this code from running more than once per action
                 runOpenSolution = isCloning;
@@ -220,7 +212,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 isCloning = isCreating = false;
 
                 Repositories.CollectionChanged += HandleNewRepo;
-                connectionManager.RefreshRepositories(vsservices);
+                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
                 Repositories.CollectionChanged -= HandleNewRepo;
             }
         }
