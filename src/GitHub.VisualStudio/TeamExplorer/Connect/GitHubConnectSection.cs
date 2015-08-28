@@ -252,7 +252,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var old = Repositories.FirstOrDefault(x => String.Equals(Holder.ActiveRepo?.RepositoryPath, x.LocalPath, StringComparison.CurrentCultureIgnoreCase));
             // open the solution selection dialog when the user wants to switch to a different repo
             // since there's no other way of changing the source control context in VS
-            if (SelectedRepository != old)
+            if (!Equals(SelectedRepository, old))
             {
                 if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
                 {
