@@ -74,15 +74,11 @@ namespace GitHub.VisualStudio.UI.Views
             if (values.Length != 2 || parameter as string != "FormatRepositoryName")
                 return String.Empty;
 
-            if (!(values[1] is IGitHubConnectSection))
-            {
-                if (values[0] is ISimpleRepositoryModel)
-                    return ((ISimpleRepositoryModel)values[0]).Name;
-                return String.Empty;
-            }
-                
-            var item = (ISimpleRepositoryModel)values[0];
-            var context = (IGitHubConnectSection)values[1];
+            var item = values[0] as ISimpleRepositoryModel;
+            var context = values[1] as IGitHubConnectSection;
+            if (context == null)
+                return item?.Name ?? String.Empty;
+            
             if (context.SectionConnection.Username == item.CloneUrl.Owner)
                 return item.CloneUrl.RepositoryName;
             return item.Name;
@@ -98,12 +94,12 @@ namespace GitHub.VisualStudio.UI.Views
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Length != 2 || parameter as string != "IsCurrentRepository" || !(values[0] is ISimpleRepositoryModel) || !(values[1] is IGitAwareItem))
+            if (values.Length != 2 || parameter as string != "IsCurrentRepository")
                 return false;
 
-            var item = (ISimpleRepositoryModel)values[0];
-            var context = (IGitAwareItem)values[1];
-            return context.ActiveRepoUri == item.CloneUrl;
+            var item = values[0] as ISimpleRepositoryModel;
+            var context = values[1] as IGitAwareItem;
+            return item != null && context != null && context.ActiveRepoUri == item.CloneUrl;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
