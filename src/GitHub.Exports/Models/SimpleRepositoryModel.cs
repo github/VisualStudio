@@ -35,43 +35,22 @@ namespace GitHub.Models
 
         public override int GetHashCode()
         {
-            return (Name == null ? 0 : Name.GetHashCode()) ^ (CloneUrl == null ? 0 : CloneUrl.GetHashCode()) ^ (LocalPath == null ? 0 : LocalPath.TrimEnd('\\').ToUpperInvariant().GetHashCode());
+            return Name?.GetHashCode() ?? 0 ^ CloneUrl?.GetHashCode() ?? 0 ^ LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0;
         }
 
-        /// <summary>
-        /// This equality comparison will check if the references are the same,
-        /// and if they're not, it will explicitely check if the contents of this 
-        /// object are the same. If you only want reference checking, call
-        /// ReferenceEquals
-        /// </summary>
-        public static bool operator==(SimpleRepositoryModel lhs, SimpleRepositoryModel rhs)
+        public override bool Equals(object obj)
         {
-            if (ReferenceEquals(lhs, rhs))
+            if (ReferenceEquals(this, obj))
                 return true;
-            if ((object)lhs == null || (object)rhs == null)
-                return false;
-            return String.Equals(lhs.Name, rhs.Name) && String.Equals(lhs.CloneUrl, rhs.CloneUrl) && String.Equals(lhs.LocalPath?.TrimEnd('\\'), rhs.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
-        }
-
-        /// <summary>
-        /// This equality comparison will check if the references are the same,
-        /// and if they're not, it will explicitely check if the contents of this 
-        /// object are the same. If you only want reference checking, call
-        /// ReferenceEquals
-        /// </summary>
-        public static bool operator!=(SimpleRepositoryModel lhs, SimpleRepositoryModel rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        public override bool Equals(object other)
-        {
-            return other != null && this == other as SimpleRepositoryModel;
+            var other = obj as SimpleRepositoryModel;
+            return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
         bool IEquatable<SimpleRepositoryModel>.Equals(SimpleRepositoryModel other)
         {
-            return other != null && this == other;
+            if (ReferenceEquals(this, other))
+                return true;
+            return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
         internal string DebuggerDisplay

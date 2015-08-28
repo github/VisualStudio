@@ -17,43 +17,22 @@ namespace GitHub.Models
         public IAccount Owner { get; private set; }
         public override int GetHashCode()
         {
-            return (Owner != null ? 0 : Owner.GetHashCode()) ^ base.GetHashCode();
+            return Owner?.GetHashCode() ?? 0 ^ base.GetHashCode();
         }
 
-        /// <summary>
-        /// This equality comparison will check if the references are the same,
-        /// and if they're not, it will explicitely check if the contents of this 
-        /// object are the same. If you only want reference checking, call
-        /// ReferenceEquals
-        /// </summary>
-        public static bool operator ==([AllowNull]RepositoryModel lhs, [AllowNull]RepositoryModel rhs)
+        public override bool Equals([AllowNull]object obj)
         {
-            if (ReferenceEquals(lhs, rhs))
+            if (ReferenceEquals(this, obj))
                 return true;
-            if ((object)lhs == null || (object)rhs == null)
-                return false;
-            return lhs.Owner == rhs.Owner && (lhs as SimpleRepositoryModel) == (rhs as SimpleRepositoryModel);
-        }
-
-        /// <summary>
-        /// This equality comparison will check if the references are the same,
-        /// and if they're not, it will explicitely check if the contents of this 
-        /// object are the same. If you only want reference checking, call
-        /// ReferenceEquals
-        /// </summary>
-        public static bool operator !=([AllowNull]RepositoryModel lhs, [AllowNull]RepositoryModel rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        public override bool Equals([AllowNull]object other)
-        {
-            return other != null && this == other as RepositoryModel;
+            var other = obj as RepositoryModel;
+            return other != null && Equals(Owner, other.Owner) && base.Equals(obj);
         }
 
         bool IEquatable<RepositoryModel>.Equals([AllowNull]RepositoryModel other)
         {
-            return other != null && this == other;
+            if (ReferenceEquals(this, other))
+                return true;
+            return other != null && Equals(Owner, other.Owner) && base.Equals(other as SimpleRepositoryModel);
         }
 
         internal string DebuggerDisplay
