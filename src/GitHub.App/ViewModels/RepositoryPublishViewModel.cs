@@ -191,7 +191,7 @@ namespace GitHub.ViewModels
 
             this.WhenAny(x => x.SafeRepositoryNameWarningValidator.ValidationResult, x => x.Value)
                 .WhereNotNull() // When this is instantiated, it sends a null result.
-                .Select(result => result == null ? null : result.Message)
+                .Select(result => result?.Message)
                 .Subscribe(message =>
                 {
                     if (!string.IsNullOrEmpty(message))
