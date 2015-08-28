@@ -87,5 +87,18 @@ namespace GitHub.Primitives
         {
             get {  return IsGitHubDotCom() ? "GitHub" : ApiUri.Host; }
         }
+
+        public override int GetHashCode()
+        {
+            return WebUri?.GetHashCode() ?? 0 ^ ApiUri?.GetHashCode() ?? 0;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(this, obj))
+                return true;
+            var other = obj as HostAddress;
+            return obj != null && WebUri.IsSameHost(other.WebUri) && ApiUri.IsSameHost(other.ApiUri);
+        }
     }
 }

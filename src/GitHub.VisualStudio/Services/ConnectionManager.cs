@@ -96,7 +96,7 @@ namespace GitHub.VisualStudio
 
         public bool AddConnection(HostAddress address, string username)
         {
-            if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
+            if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
                 return false;
             Connections.Add(SetupConnection(address, username));
             return true;
@@ -105,7 +105,7 @@ namespace GitHub.VisualStudio
         void AddConnection(Uri hostUrl, string username /*, [AllowNull] IEnumerable<RepositoryCacheItem> repositories */)
         {
             var address = HostAddress.Create(hostUrl);
-            if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
+            if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
                 return;
             var conn = SetupConnection(address, username);
             //repositories?.ForEach(r => conn.Repositories.Add(new SimpleRepositoryModel(r.Name, r.CloneUrl, r.LocalPath)));
@@ -114,7 +114,7 @@ namespace GitHub.VisualStudio
 
         public bool RemoveConnection(HostAddress address)
         {
-            var c = Connections.FirstOrDefault(x => x.HostAddress == address);
+            var c = Connections.FirstOrDefault(x => x.HostAddress.Equals(address));
             if (c == null)
                 return false;
             Connections.Remove(c);
@@ -138,6 +138,8 @@ namespace GitHub.VisualStudio
         {
             var list = services.GetKnownRepositories();
             list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress == HostAddress.Create(r.CloneUrl)))
+            var list = vsServices.GetKnownRepositories();
+            list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
                 .Where(g => g.Key != null)
                 .ForEach(g =>
             {
