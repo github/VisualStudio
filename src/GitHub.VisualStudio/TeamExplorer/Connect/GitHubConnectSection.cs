@@ -15,6 +15,7 @@ using Microsoft.VisualStudio;
 using System;
 using System.Windows.Data;
 using System.ComponentModel;
+using ReactiveUI;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -23,8 +24,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly int sectionIndex;
         bool isCloning;
         bool isCreating;
-        bool runCreateNewProject;
-        bool runOpenSolution;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        SectionStateTracker sectionTracker;
 
         protected GitHubConnectContent View
         {
@@ -59,8 +60,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { showLogout = value; this.RaisePropertyChange(); }
         }
 
-        ObservableCollection<ISimpleRepositoryModel> repositories;
-        public ObservableCollection<ISimpleRepositoryModel> Repositories
+        IReactiveDerivedList<ISimpleRepositoryModel> repositories;
+        [AllowNull]
+        public IReactiveDerivedList<ISimpleRepositoryModel> Repositories
         {
             [return:AllowNull]
             get { return repositories; }
@@ -69,9 +71,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         ISimpleRepositoryModel selectedRepository;
         [AllowNull]
-        public ISimpleRepositoryModel SelectedRepository {
-            [return: AllowNull] get { return selectedRepository; }
-            set { selectedRepository = value; this.RaisePropertyChange(); } }
+        public ISimpleRepositoryModel SelectedRepository
+        {
+            [return: AllowNull]
+            get { return selectedRepository; }
+            set { selectedRepository = value; this.RaisePropertyChange(); }
+        }
 
         internal ITeamExplorerServiceHolder Holder => holder;
 
@@ -114,6 +119,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 LoggedIn = false;
                 IsVisible = false;
+                SectionConnection = null;
+                if (Repositories != null)
+                    Repositories.CollectionChanged -= UpdateRepositoryList;
+                Repositories = null;
 
                 if (sectionIndex == 0 && ServiceProvider != null)
                 {
@@ -127,33 +136,26 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         };
                 }
             }
-            else if (connection != SectionConnection)
+            else
             {
-                SectionConnection = connection;
-                Repositories = SectionConnection.Repositories;
-                Title = connection.HostAddress.Title;
-                IsVisible = true;
-                LoggedIn = true;
-
-                // Sort the repo list by name. Only set it once, we don't sort this list
-                // anywhere else so no need to reset it every time
-                var view = CollectionViewSource.GetDefaultView(Repositories);
-                if (view.SortDescriptions.Count == 0)
+                if (connection != SectionConnection)
                 {
-                    view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-                    view.Refresh();
+                    SectionConnection = connection;
+                    Repositories = SectionConnection.Repositories.CreateDerivedCollection(x => x,
+                                        orderer: OrderedComparer<ISimpleRepositoryModel>.OrderBy(x => x.Name).Compare);
+                    Repositories.CollectionChanged += UpdateRepositoryList;
+                    Title = connection.HostAddress.Title;
+                    IsVisible = true;
+                    LoggedIn = true;
+                    if (ServiceProvider != null)
+                        RefreshRepositories();
                 }
-
-                SelectedRepository = Repositories.FirstOrDefault(x => String.Equals(x.LocalPath, Holder.ActiveRepo?.RepositoryPath, StringComparison.CurrentCultureIgnoreCase));
-                Repositories.CollectionChanged += UpdateIcons;
             }
         }
 
         public override void Refresh()
         {
             UpdateConnection();
-            if (sectionIndex == 0)
-                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
             base.Refresh();
         }
 
@@ -162,15 +164,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             base.Initialize(sender, e);
             UpdateConnection();
 
-            // the first time we run, refresh the repositories list for all the connections
-            if (sectionIndex == 0)
-                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
-
             // watch for new repos added to the local repo list
             var section = ServiceProvider.GetSection(TeamExplorerConnectionsSectionId);
             if (section != null)
-                section.PropertyChanged += UpdateRepositoryList;
-
+                sectionTracker = new SectionStateTracker(section, RefreshRepositories);
         }
 
         void UpdateConnection()
@@ -181,44 +178,52 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 Refresh(SectionConnection);
         }
 
-        void OnPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OnPropertyChange(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
                 View = new GitHubConnectContent { DataContext = this };
         }
 
-        void UpdateIcons(object sender, NotifyCollectionChangedEventArgs e)
+        async void UpdateRepositoryList(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                e.NewItems
-                    .Cast<ISimpleRepositoryModel>()
-                    .Select(async r =>
+                // if we're cloning or creating, only one repo will be added to the list
+                // so we can handle just one new entry separately
+                if (isCloning || isCreating)
                 {
-                    if (String.Equals(Holder.ActiveRepo?.RepositoryPath, r.LocalPath, StringComparison.CurrentCultureIgnoreCase))
-                        SelectedRepository = r;
-                    var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
-                    r.SetIcon(repo.Private, repo.Fork);
-                }).ToList();
+                    var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().First();
+                    SelectedRepository = newrepo;
+                    // if we've cloned a repo but the user didn't open a project in it,
+                    // then update the newly-cloned repo icon because we're not going to
+                    // switch to the TE home page
+                    if (isCloning && !OpenRepository())
+                    {
+                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                        newrepo.SetIcon(repo.Private, repo.Fork);
+                    }
+                }
+                // looks like it's just a refresh with new stuff on the list, update the icons
+                else
+                {
+                    e.NewItems
+                        .Cast<ISimpleRepositoryModel>()
+                        .ForEach(async r =>
+                    {
+                        if (String.Equals(Holder.ActiveRepo?.RepositoryPath, r.LocalPath, StringComparison.CurrentCultureIgnoreCase))
+                            SelectedRepository = r;
+                        var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
+                        r.SetIcon(repo.Private, repo.Fork);
+                    });
+                }
             }
         }
 
-        void UpdateRepositoryList(object sender, PropertyChangedEventArgs e)
+        void RefreshRepositories()
         {
-            if ((isCloning || isCreating) && e.PropertyName == "IsBusy" && !((ITeamExplorerSection)sender).IsBusy)
-            {
-                // this property change might trigger multiple times and we only want
-                // the first time, so switch out flags to keep this code from running more than once per action
-                runOpenSolution = isCloning;
-                runCreateNewProject = isCreating;
-                isCloning = isCreating = false;
-
-                Repositories.CollectionChanged += HandleNewRepo;
-                connectionManager.RefreshRepositories(ServiceProvider.GetExportedValue<IVSServices>());
-                Repositories.CollectionChanged -= HandleNewRepo;
-            }
+            connectionManager.RefreshRepositories();
+            RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
-
 
         public void DoCreate()
         {
@@ -232,22 +237,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             StartFlow(UIControllerFlow.Clone);
         }
 
-        void HandleNewRepo(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().FirstOrDefault();
-                if (newrepo != null)
-                {
-                    SelectedRepository = newrepo;
-                    if (runOpenSolution)
-                        OpenRepository();
-                    else if (runCreateNewProject)
-                        CreateNewProject();
-                }
-            }
-        }
-
         public void SignOut()
         {
             SectionConnection.Logout();
@@ -258,7 +247,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             StartFlow(UIControllerFlow.Authentication);
         }
 
-        public void OpenRepository()
+        public bool OpenRepository()
         {
             var old = Repositories.FirstOrDefault(x => String.Equals(Holder.ActiveRepo?.RepositoryPath, x.LocalPath, StringComparison.CurrentCultureIgnoreCase));
             // open the solution selection dialog when the user wants to switch to a different repo
@@ -266,29 +255,17 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             if (SelectedRepository != old)
             {
                 if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                {
                     ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-                else
-                    SelectedRepository = old;
-            }
-        }
-
-        public void CreateNewProject()
-        {
-            var old = Repositories.FirstOrDefault(x => String.Equals(Holder.ActiveRepo?.RepositoryPath, x.LocalPath, StringComparison.CurrentCultureIgnoreCase));
-            // open the solution selection dialog when the user wants to switch to a different repo
-            // since there's no other way of changing the source control context in VS
-            if (SelectedRepository != old)
-            {
-                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-                var oldpath = vsservices.SetDefaultProjectPath(SelectedRepository.LocalPath);
-                if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg("", "", 0)))
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    return true;
+                }
                 else
                 {
                     SelectedRepository = old;
-                    vsservices.SetDefaultProjectPath(oldpath);
+                    return false;
                 }
             }
+            return false;
         }
 
         void StartFlow(UIControllerFlow controllerFlow)
@@ -306,11 +283,51 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (!disposed)
                 {
                     if (Repositories != null)
-                        Repositories.CollectionChanged -= UpdateIcons;
+                        Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;
                 }
             }
             base.Dispose(disposing);
+        }
+
+
+        class SectionStateTracker
+        {
+            enum SectionState
+            {
+                Idle,
+                Busy,
+                Refreshing
+            }
+
+            readonly Stateless.StateMachine<SectionState, string> machine;
+            readonly ITeamExplorerSection section;
+
+            public SectionStateTracker(ITeamExplorerSection section, Action onRefreshed)
+            {
+                this.section = section;
+                machine = new Stateless.StateMachine<SectionState, string>(SectionState.Idle);
+                machine.Configure(SectionState.Idle)
+                    .PermitIf("IsBusy", SectionState.Busy, () => this.section.IsBusy)
+                    .IgnoreIf("IsBusy", () => !this.section.IsBusy);
+                machine.Configure(SectionState.Busy)
+                    .Permit("Title", SectionState.Refreshing)
+                    .PermitIf("IsBusy", SectionState.Idle, () => !this.section.IsBusy)
+                    .IgnoreIf("IsBusy", () => this.section.IsBusy);
+                machine.Configure(SectionState.Refreshing)
+                    .Ignore("Title")
+                    .PermitIf("IsBusy", SectionState.Idle, () => !this.section.IsBusy)
+                    .IgnoreIf("IsBusy", () => this.section.IsBusy)
+                    .OnExit(onRefreshed);
+
+                section.PropertyChanged += TrackState;
+            }
+
+            void TrackState(object sender, PropertyChangedEventArgs e)
+            {
+                if (machine.PermittedTriggers.Contains(e.PropertyName))
+                    machine.Fire(e.PropertyName);
+            }
         }
     }
 }

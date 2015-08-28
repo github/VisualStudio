@@ -211,6 +211,10 @@ namespace GitHub.SampleData
             public void Logout()
             {
             }
+
+            public void Dispose()
+            {
+            }
         }
 
         public RepositoryPublishViewModelDesigner()
@@ -572,8 +576,9 @@ namespace GitHub.SampleData
         {
         }
 
-        public void OpenRepository()
+        public bool OpenRepository()
         {
+            return true;
         }
 
         public IConnection SectionConnection { get; }

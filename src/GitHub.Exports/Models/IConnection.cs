@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
-    public interface IConnection
+    public interface IConnection : IDisposable
     {
         HostAddress HostAddress { get; }
         string Username { get; }

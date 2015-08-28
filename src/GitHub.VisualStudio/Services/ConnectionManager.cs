@@ -27,6 +27,7 @@ namespace GitHub.VisualStudio
     public class ConnectionManager : IConnectionManager
     {
         readonly string cachePath;
+        readonly IVSServices vsServices;
         const string cacheFile = "ghfvs.connections";
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
@@ -39,8 +40,9 @@ namespace GitHub.VisualStudio
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public ConnectionManager(IProgram program)
+        public ConnectionManager(IProgram program, IVSServices services)
         {
+            vsServices = services;
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
             writeAllText = (path, content) => System.IO.File.WriteAllText(path, content);
@@ -59,8 +61,9 @@ namespace GitHub.VisualStudio
             Connections.CollectionChanged += RefreshConnections;
         }
 
-        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os)
+        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os, IVSServices services)
         {
+            vsServices = services;
             fileExists = (path) => os.File.Exists(path);
             readAllText = (path, encoding) => os.File.ReadAllText(path, encoding);
             writeAllText = (path, content) => os.File.WriteAllText(path, content);
@@ -106,7 +109,7 @@ namespace GitHub.VisualStudio
             var c = Connections.FirstOrDefault(x => x.HostAddress.Equals(address));
             if (c == null)
                 return false;
-            Connections.Remove(c);
+            RequestLogout(c);
             return true;
         }
 
@@ -123,10 +126,8 @@ namespace GitHub.VisualStudio
             Connections.Remove(connection);
         }
 
-        public void RefreshRepositories(IVSServices services)
+        public void RefreshRepositories()
         {
-            var list = services.GetKnownRepositories();
-            list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress == HostAddress.Create(r.CloneUrl)))
             var list = vsServices.GetKnownRepositories();
             list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
                 .Where(g => g.Key != null)
@@ -148,13 +149,12 @@ namespace GitHub.VisualStudio
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
-                // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
-                if (DoLogin == null)
+                foreach (IConnection c in e.OldItems)
                 {
-                    foreach (IConnection c in e.OldItems)
-                    {
+                    // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
+                    if (DoLogin == null)
                         Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
-                    }
+                    c.Dispose();
                 }
             }
             SaveConnectionsToCache();
