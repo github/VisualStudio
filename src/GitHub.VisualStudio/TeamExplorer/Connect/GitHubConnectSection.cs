@@ -91,7 +91,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             UpdateConnection();
         }
 
-        private void RefreshConnections(object sender, NotifyCollectionChangedEventArgs e)
+        void RefreshConnections(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -102,6 +102,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 case NotifyCollectionChangedAction.Remove:
                     if (connectionManager.Connections.Count <= sectionIndex)
                         Refresh(null);
+                    else
+                        Refresh(connectionManager.Connections[sectionIndex]);
                     break;
             }
         }
