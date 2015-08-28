@@ -15,6 +15,7 @@ using Microsoft.VisualStudio;
 using System;
 using System.Windows.Data;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -205,6 +206,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             if ((isCloning || isCreating) && e.PropertyName == "IsBusy" && !((ITeamExplorerSection)sender).IsBusy)
             {
+                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+                if (isCreating)
+                {
+                    vsservices.ClearNotifications();
+                    vsservices.ShowMessage(string.Format(CultureInfo.CurrentUICulture, "[{0}]({1} has been successfully created.", SelectedRepository.Name, SelectedRepository.CloneUrl));
+                }
+
                 // this property change might trigger multiple times and we only want
                 // the first time, so switch out flags to keep this code from running more than once per action
                 runOpenSolution = isCloning;
