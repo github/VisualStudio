@@ -8,7 +8,6 @@ using System.Text;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Primitives;
-using NullGuard;
 
 namespace GitHub.VisualStudio
 {
@@ -17,19 +16,10 @@ namespace GitHub.VisualStudio
         public IEnumerable<ConnectionCacheItem> connections;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    class RepositoryCacheItem
-    {
-        public string Name { get; set;  }
-        public UriString CloneUrl { get; set;  }
-        public string LocalPath { get; set;  }
-    }
-
     class ConnectionCacheItem
     {
         public Uri HostUrl { get; set; }
         public string UserName { get; set; }
-        //public IEnumerable<RepositoryCacheItem> Repositories;
     }
 
     [Export(typeof(IConnectionManager))]
@@ -102,13 +92,12 @@ namespace GitHub.VisualStudio
             return true;
         }
 
-        void AddConnection(Uri hostUrl, string username /*, [AllowNull] IEnumerable<RepositoryCacheItem> repositories */)
+        void AddConnection(Uri hostUrl, string username)
         {
             var address = HostAddress.Create(hostUrl);
             if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
                 return;
             var conn = SetupConnection(address, username);
-            //repositories?.ForEach(r => conn.Repositories.Add(new SimpleRepositoryModel(r.Name, r.CloneUrl, r.LocalPath)));
             Connections.Add(conn);
         }
 
@@ -147,7 +136,6 @@ namespace GitHub.VisualStudio
                 repos.Except(g).ToList().ForEach(c => repos.Remove(c));
                 g.Except(repos).ToList().ForEach(c => repos.Add(c));
             });
-            //SaveConnectionsToCache();
         }
 
         IConnection SetupConnection(HostAddress address, string username)
@@ -201,7 +189,7 @@ namespace GitHub.VisualStudio
             cacheData.connections.ForEach(c =>
             {
                 if (c.HostUrl != null)
-                    AddConnection(c.HostUrl, c.UserName /*, c.Repositories */);
+                    AddConnection(c.HostUrl, c.UserName);
             });
         }
 
@@ -215,8 +203,6 @@ namespace GitHub.VisualStudio
                 {
                     HostUrl = conn.HostAddress.WebUri,
                     UserName = conn.Username,
-                    /* Repositories = conn.Repositories.Select(x =>
-                        new RepositoryCacheItem() { Name = x.Name, CloneUrl = x.CloneUrl, LocalPath = x.LocalPath }) */
                 });
             try
             {
