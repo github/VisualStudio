@@ -61,7 +61,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                Debug.Fail(ex.ToString());
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the default cloning path from the registry '{0}'", ex));
             }
             return ret;
         }
@@ -91,7 +91,15 @@ namespace GitHub.Services
 
         public IEnumerable<ISimpleRepositoryModel> GetKnownRepositories()
         {
-            return PokeTheRegistryForRepositoryList();
+            try
+            {
+                return PokeTheRegistryForRepositoryList();
+            }
+            catch (Exception ex)
+            {
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
+                return Enumerable.Empty<ISimpleRepositoryModel>();
+            }
         }
 
         const string TEGitKey = @"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl";
