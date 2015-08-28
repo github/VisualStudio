@@ -14,6 +14,7 @@ using GitHub.Models;
 using NLog;
 using NullGuard;
 using Octokit;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -216,7 +217,7 @@ namespace GitHub.Services
         {
             return new RepositoryModel(
                 repositoryCacheItem.Name,
-                repositoryCacheItem.CloneUrl,
+                new UriString(repositoryCacheItem.CloneUrl),
                 repositoryCacheItem.Private,
                 repositoryCacheItem.Fork,
                 Create(repositoryCacheItem.Owner));

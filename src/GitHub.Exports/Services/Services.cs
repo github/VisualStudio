@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Models;
 using GitHub.Info;
+using GitHub.Extensions;
 using GitHub.Primitives;
 
 namespace GitHub.VisualStudio
@@ -162,6 +163,14 @@ namespace GitHub.VisualStudio
         public static Repository GetRepoFromIGit(this IGitRepositoryInfo repoInfo)
         {
             var repoPath = Repository.Discover(repoInfo.RepositoryPath);
+            if (repoPath == null)
+                return null;
+            return new Repository(repoPath);
+        }
+
+        public static Repository GetRepoFromPath(string path)
+        {
+            var repoPath = Repository.Discover(path);
             if (repoPath == null)
                 return null;
             return new Repository(repoPath);
