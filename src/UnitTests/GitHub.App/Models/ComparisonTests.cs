@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using UnitTests;
 using Xunit;
 
-public class RepositoryModelTests
+public class ComparisonTests
 {
-    public class ComparisonTests : TestBaseClass
+    public class RepositoryModelTests : TestBaseClass
     {
         [Theory]
         [InlineData("a name", "https://github.com/github/VisualStudio", null, "a name", "https://github.com/github/VisualStudio", null)]
@@ -52,6 +52,20 @@ public class RepositoryModelTests
             Assert.NotEqual(a, b);
             Assert.False(a == b);
             Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+        }
+    }
+
+    public class HostAddressTests : TestBaseClass
+    {
+        [Theory]
+        [InlineData("https://github.com/owner/repo")]
+        [InlineData("https://anotherurl.com/foo/bar")]
+        public void SameContentEqualsTrue(string url)
+        {
+            var a = HostAddress.Create(url);
+            var b = HostAddress.Create(url);
+            Assert.Equal(a, b);
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
     }
 }

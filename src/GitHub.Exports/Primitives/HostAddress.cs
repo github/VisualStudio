@@ -90,7 +90,7 @@ namespace GitHub.Primitives
 
         public override int GetHashCode()
         {
-            return WebUri?.GetHashCode() ?? 0 ^ ApiUri?.GetHashCode() ?? 0;
+            return (WebUri?.GetHashCode() ?? 0) ^ (ApiUri?.GetHashCode() ?? 0);
         }
 
         public override bool Equals(object obj)
