@@ -17,7 +17,7 @@ namespace GitHub.Models
         public IAccount Owner { get; private set; }
         public override int GetHashCode()
         {
-            return Owner?.GetHashCode() ?? 0 ^ base.GetHashCode();
+            return (Owner?.GetHashCode() ?? 0) ^ base.GetHashCode();
         }
 
         public override bool Equals([AllowNull]object obj)

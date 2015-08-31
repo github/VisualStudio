@@ -35,7 +35,7 @@ namespace GitHub.Models
 
         public override int GetHashCode()
         {
-            return Name?.GetHashCode() ?? 0 ^ CloneUrl?.GetHashCode() ?? 0 ^ LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0;
+            return (Name?.GetHashCode() ?? 0) ^ (CloneUrl?.GetHashCode() ?? 0) ^ (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
         }
 
         public override bool Equals(object obj)

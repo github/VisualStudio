@@ -26,7 +26,7 @@ public class RepositoryModelTests
             var a = new SimpleRepositoryModel(name1, new UriString(url1), path1);
             var b = new SimpleRepositoryModel(name2, new UriString(url2), path2);
             Assert.Equal(a, b);
-            Assert.True(a == b);
+            Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
@@ -38,7 +38,7 @@ public class RepositoryModelTests
             var a = new RepositoryModel(name1, new UriString(url1), false, false, account);
             var b = new RepositoryModel(name2, new UriString(url2), false, false, account);
             Assert.Equal(a, b);
-            Assert.True(a == b);
+            Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
