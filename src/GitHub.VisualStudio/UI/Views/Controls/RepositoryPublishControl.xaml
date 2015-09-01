@@ -123,7 +123,24 @@
 
         <CheckBox x:Name="makePrivate"
                   Margin="0,8,0,0"
-                  Style="{StaticResource VSStyledCheckBox}">Private Repository</CheckBox>
+                  Style="{StaticResource VSStyledCheckBox}">
+          <TextBlock TextWrapping="Wrap"
+                     Foreground="{DynamicResource VsBrush.ToolWindowText}"
+                     Background="{DynamicResource VsBrush.ToolWindowBackground}">
+            <TextBlock.Resources>
+              <Style TargetType="{x:Type TextBlock}">
+                <Style.Triggers>
+                  <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </TextBlock.Resources>
+            <TextBlock.Inlines>
+              <Run>Private Repository</Run>
+            </TextBlock.Inlines>
+          </TextBlock>
+        </CheckBox>
         
         <Label x:Name="upgradeToMicroPlanWarning" HorizontalAlignment="Left" Visibility="Collapsed">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
