@@ -31,11 +31,21 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
 
+                // BEGIN DANGER ZONE
+                //
+                // This replaces the default Bind behaviour as the Checkbox control
+                // does not raise an event here when it is hosted in the Team Explorer
+                // view.
+                //
+                // We've used this.Bind in other places (popups) so it's something
+                // we need to investigate further
+                //
                 d(Observable.FromEventPattern<RoutedEventArgs>(makePrivate, "Checked")
                     .Subscribe(_ => ViewModel.KeepPrivate = true));
-
                 d(Observable.FromEventPattern<RoutedEventArgs>(makePrivate, "Unchecked")
                     .Subscribe(_ => ViewModel.KeepPrivate = false));
+                // END DANGER ZONE
+
 
                 d(this.OneWayBind(ViewModel, vm => vm.CanKeepPrivate, v => v.makePrivate.IsEnabled));
 
