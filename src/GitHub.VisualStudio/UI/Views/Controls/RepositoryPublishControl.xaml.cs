@@ -30,7 +30,13 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
-                d(this.Bind(ViewModel, vm => vm.KeepPrivate, v => v.makePrivate.IsChecked));
+
+                d(Observable.FromEventPattern<RoutedEventArgs>(makePrivate, "Checked")
+                    .Subscribe(_ => ViewModel.KeepPrivate = true));
+
+                d(Observable.FromEventPattern<RoutedEventArgs>(makePrivate, "Unchecked")
+                    .Subscribe(_ => ViewModel.KeepPrivate = false));
+
                 d(this.OneWayBind(ViewModel, vm => vm.CanKeepPrivate, v => v.makePrivate.IsEnabled));
 
                 //d(this.OneWayBind(ViewModel, vm => vm.ShowUpgradeToMicroPlanWarning, v => v.upgradeToMicroPlanWarning.Visibility));
