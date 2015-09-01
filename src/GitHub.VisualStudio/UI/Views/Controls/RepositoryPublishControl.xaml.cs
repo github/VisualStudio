@@ -31,6 +31,16 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
 
+                d(this.WhenAnyValue(x => x.ViewModel.KeepPrivate)
+                    .Subscribe(keepPrivate =>
+                    {
+                        // because we removed this.Bind, set this by hand
+                        if (keepPrivate != makePrivate.IsChecked)
+                        {
+                            makePrivate.IsChecked = keepPrivate;
+                        }
+                    }));
+
                 // BEGIN DANGER ZONE
                 //
                 // This replaces the default Bind behaviour as the Checkbox control
