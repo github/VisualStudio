@@ -1,26 +1,21 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using GitHub.Primitives;
 using NullGuard;
 using GitHub.Services;
 
 namespace GitHub.VisualStudio.Base
 {
-    public abstract class TeamExplorerBase : IDisposable, INotifyPropertyChanged
+    public abstract class TeamExplorerBase : NotificationAwareObject, IDisposable
     {
+        internal static readonly Guid TeamExplorerConnectionsSectionId = new Guid("ef6a7a99-f01f-4c91-ad31-183c1354dd97");
+
         [AllowNull]
         protected IServiceProvider ServiceProvider
         {
             [return: AllowNull]
             get; set;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void Dispose()
@@ -53,9 +48,7 @@ namespace GitHub.VisualStudio.Base
         {
             var b = browser.Value;
             Debug.Assert(b != null, "Could not create a browser helper instance.");
-            if (b == null)
-                return;
-            b.OpenUrl(uri);
+            b?.OpenUrl(uri);
         }
     }
 }

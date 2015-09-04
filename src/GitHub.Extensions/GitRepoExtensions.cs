@@ -15,7 +15,7 @@ namespace GitHub.Extensions
             if (lhs == null && rhs == null)
                 return true;
             if (lhs != null && rhs != null)
-                return lhs.RepositoryPath == rhs.RepositoryPath;
+                return String.Equals(lhs.RepositoryPath, rhs.RepositoryPath, StringComparison.CurrentCultureIgnoreCase);
             return false;
         }
     }

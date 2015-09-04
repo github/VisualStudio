@@ -1,28 +1,47 @@
 ﻿using GitHub.Primitives;
-using GitHub.UI;
+using NullGuard;
+using System;
+using System.Globalization;
 
 namespace GitHub.Models
 {
-    public class RepositoryModel : IRepositoryModel
+    public class RepositoryModel : SimpleRepositoryModel, IRepositoryModel, IEquatable<RepositoryModel>
     {
-        public RepositoryModel(string name, string cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+        public RepositoryModel(string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+            : base(name, cloneUrl)
         {
-            Name = name;
             Owner = ownerAccount;
-            CloneUrl = cloneUrl;
-            Icon = isPrivate
-                ? Octicon.@lock
-                : isFork
-                    ? Octicon.repo_forked
-                    : Octicon.repo;
+            SetIcon(isPrivate, isFork);
         }
 
-        public string Name { get; private set; }
-
         public IAccount Owner { get; private set; }
+        public override int GetHashCode()
+        {
+            return (Owner?.GetHashCode() ?? 0) ^ base.GetHashCode();
+        }
 
-        public UriString CloneUrl { get; private set; }
+        public override bool Equals([AllowNull]object obj)
+        {
+            if (ReferenceEquals(this, obj))
+                return true;
+            var other = obj as RepositoryModel;
+            return other != null && Equals(Owner, other.Owner) && base.Equals(obj);
+        }
 
-        public Octicon Icon { get; private set; }
+        bool IEquatable<RepositoryModel>.Equals([AllowNull]RepositoryModel other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+            return other != null && Equals(Owner, other.Owner) && base.Equals(other as SimpleRepositoryModel);
+        }
+
+        internal string DebuggerDisplay
+        {
+            get
+            {
+                return String.Format(CultureInfo.InvariantCulture,
+                    "{4}\tName: {0} CloneUrl: {1} LocalPath: {2} Account: {3}", Name, CloneUrl, LocalPath, Owner, GetHashCode());
+            }
+        }
     }
 }

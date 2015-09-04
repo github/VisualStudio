@@ -1,10 +1,8 @@
 ﻿using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using GitHub.Extensions;
 using Microsoft.Win32;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
@@ -12,6 +10,8 @@ using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Collections.Generic;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -21,6 +21,8 @@ namespace GitHub.Services
         void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
         string GetActiveRepoPath();
         LibGit2Sharp.Repository GetActiveRepo();
+        IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
+        string SetDefaultProjectPath(string path);
 
         void ShowMessage(string message);
         void ShowWarning(string message);
@@ -58,7 +60,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                Debug.Fail(ex.ToString());
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the default cloning path from the registry '{0}'", ex));
             }
             return ret;
         }
@@ -86,11 +88,67 @@ namespace GitHub.Services
             return repo?.Info?.Path ?? string.Empty;
         }
 
+        public IEnumerable<ISimpleRepositoryModel> GetKnownRepositories()
+        {
+            try
+            {
+                return PokeTheRegistryForRepositoryList();
+            }
+            catch (Exception ex)
+            {
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
+                return Enumerable.Empty<ISimpleRepositoryModel>();
+            }
+        }
+
+        const string TEGitKey = @"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl";
+        static RegistryKey OpenGitKey(string path)
+        {
+            return Registry.CurrentUser.OpenSubKey(TEGitKey + "\\" + path, true);
+        }
+
+        static IEnumerable<ISimpleRepositoryModel> PokeTheRegistryForRepositoryList()
+        {
+            using (var key = OpenGitKey("Repositories"))
+            {
+                return key.GetSubKeyNames().Select(x =>
+                {
+                    using (var subkey = key.OpenSubKey(x))
+                    {
+                        var path = subkey?.GetValue("Path") as string;
+                        if (path != null)
+                        {
+                            var uri = VisualStudio.Services.GetRepoFromPath(path)?.GetUri();
+                            var name = uri?.NameWithOwner;
+                            if (name != null)
+                                return new SimpleRepositoryModel(name, uri, path);
+                        }
+                    }
+                    return null;
+                })
+                .Where(x => x != null)
+                .ToList();
+            }
+        }
+
         static string PokeTheRegistryForLocalClonePath()
         {
-            var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl\General");
-            if (key == null) return null;
-            return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            using (var key = OpenGitKey("General"))
+            {
+                return (string)key?.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            }
+        }
+
+        const string PathsKey = @"Software\Microsoft\VisualStudio\14.0\NewProjectDialog\MRUSettingsLocalProjectLocationEntries";
+        public string SetDefaultProjectPath(string path)
+        {
+            string old;
+            using (var key = Registry.CurrentUser.OpenSubKey(PathsKey, true))
+            {
+                old = (string)key?.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                key?.SetValue("Value0", path, RegistryValueKind.String);
+            }
+            return old;
         }
 
         public void ShowMessage(string message)

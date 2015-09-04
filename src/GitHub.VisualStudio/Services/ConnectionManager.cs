@@ -27,6 +27,7 @@ namespace GitHub.VisualStudio
     public class ConnectionManager : IConnectionManager
     {
         readonly string cachePath;
+        readonly IVSServices vsServices;
         const string cacheFile = "ghfvs.connections";
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
@@ -39,8 +40,9 @@ namespace GitHub.VisualStudio
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public ConnectionManager(IProgram program)
+        public ConnectionManager(IProgram program, IVSServices services)
         {
+            vsServices = services;
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
             writeAllText = (path, content) => System.IO.File.WriteAllText(path, content);
@@ -59,8 +61,9 @@ namespace GitHub.VisualStudio
             Connections.CollectionChanged += RefreshConnections;
         }
 
-        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os)
+        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os, IVSServices services)
         {
+            vsServices = services;
             fileExists = (path) => os.File.Exists(path);
             readAllText = (path, encoding) => os.File.ReadAllText(path, encoding);
             writeAllText = (path, content) => os.File.WriteAllText(path, content);
@@ -81,23 +84,32 @@ namespace GitHub.VisualStudio
 
         public IConnection CreateConnection(HostAddress address, string username)
         {
-            return new Connection(this, address, username);
+            return SetupConnection(address, username);
         }
 
         public bool AddConnection(HostAddress address, string username)
         {
-            if (Connections.FirstOrDefault(x => x.HostAddress == address) != null)
+            if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
                 return false;
-            Connections.Add(new Connection(this, address, username));
+            Connections.Add(SetupConnection(address, username));
             return true;
+        }
+
+        void AddConnection(Uri hostUrl, string username)
+        {
+            var address = HostAddress.Create(hostUrl);
+            if (Connections.FirstOrDefault(x => x.HostAddress.Equals(address)) != null)
+                return;
+            var conn = SetupConnection(address, username);
+            Connections.Add(conn);
         }
 
         public bool RemoveConnection(HostAddress address)
         {
-            var c = Connections.FirstOrDefault(x => x.HostAddress == address);
+            var c = Connections.FirstOrDefault(x => x.HostAddress.Equals(address));
             if (c == null)
                 return false;
-            Connections.Remove(c);
+            RequestLogout(c);
             return true;
         }
 
@@ -114,17 +126,35 @@ namespace GitHub.VisualStudio
             Connections.Remove(connection);
         }
 
+        public void RefreshRepositories()
+        {
+            var list = vsServices.GetKnownRepositories();
+            list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
+                .Where(g => g.Key != null)
+                .ForEach(g =>
+            {
+                var repos = g.Key.Repositories;
+                repos.Except(g).ToList().ForEach(c => repos.Remove(c));
+                g.Except(repos).ToList().ForEach(c => repos.Add(c));
+            });
+        }
+
+        IConnection SetupConnection(HostAddress address, string username)
+        {
+            var conn = new Connection(this, address, username);
+            return conn;
+        }
+
         void RefreshConnections(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
-                // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
-                if (DoLogin == null)
+                foreach (IConnection c in e.OldItems)
                 {
-                    foreach (IConnection c in e.OldItems)
-                    {
+                    // RepositoryHosts hasn't been loaded so it can't handle logging out, we have to do it ourselves
+                    if (DoLogin == null)
                         Api.SimpleCredentialStore.RemoveCredentials(c.HostAddress.CredentialCacheKeyHost);
-                    }
+                    c.Dispose();
                 }
             }
             SaveConnectionsToCache();
@@ -159,7 +189,7 @@ namespace GitHub.VisualStudio
             cacheData.connections.ForEach(c =>
             {
                 if (c.HostUrl != null)
-                    AddConnection(HostAddress.Create(c.HostUrl), c.UserName);
+                    AddConnection(c.HostUrl, c.UserName);
             });
         }
 
@@ -169,7 +199,11 @@ namespace GitHub.VisualStudio
 
             var cache = new CacheData();
             cache.connections = Connections.Select(conn =>
-                new ConnectionCacheItem { HostUrl = conn.HostAddress.WebUri, UserName = conn.Username });
+                new ConnectionCacheItem
+                {
+                    HostUrl = conn.HostAddress.WebUri,
+                    UserName = conn.Username,
+                });
             try
             {
                 string data = SimpleJson.SerializeObject(cache);

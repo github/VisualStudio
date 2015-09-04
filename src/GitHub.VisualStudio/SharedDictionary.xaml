@@ -45,5 +45,19 @@
       </DrawingGroup>
     </DrawingBrush.Drawing>
   </DrawingBrush>
-  
+
+  <Style x:Key="VerticalSeparator" TargetType="{x:Type Separator}">
+    <Setter Property="Control.Background" Value="{DynamicResource VsBrush.GrayText}" />
+    <Setter Property="FrameworkElement.Margin" Value="3,0,3,0" />
+    <Setter Property="UIElement.Focusable" Value="False" />
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type Separator}">
+          <Border SnapsToDevicePixels="True" Width="1" Background="{TemplateBinding Control.Background}"
+                      BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="{TemplateBinding Control.BorderThickness}" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
 </ResourceDictionary>

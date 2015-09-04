@@ -28,6 +28,8 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
+        protected ISimpleApiClientFactory ApiFactory => apiFactory;
+
         public TeamExplorerItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
         {
             this.apiFactory = apiFactory;
@@ -48,8 +50,7 @@ namespace GitHub.VisualStudio.Base
             if (repo != null)
             {
                 var uri = repo.GetUriFromRepository();
-                var name = uri?.RepositoryName;
-                if (name != null)
+                if (uri?.RepositoryName != null)
                 {
                     ActiveRepoUri = uri;
                     ActiveRepoName = uri.NameWithOwner;
