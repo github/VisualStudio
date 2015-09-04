@@ -76,8 +76,10 @@ namespace GitHub.VisualStudio.UI.Views
 
             var item = values[0] as ISimpleRepositoryModel;
             var context = values[1] as IGitHubConnectSection;
+            if (item == null)
+                return String.Empty;
             if (context == null)
-                return item?.Name ?? String.Empty;
+                return item.Name ?? String.Empty;
             
             if (context.SectionConnection.Username == item.CloneUrl.Owner)
                 return item.CloneUrl.RepositoryName;

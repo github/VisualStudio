@@ -1,7 +1,6 @@
 ﻿using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using GitHub.Extensions;
@@ -116,7 +115,7 @@ namespace GitHub.Services
                 {
                     using (var subkey = key.OpenSubKey(x))
                     {
-                        var path = subkey.GetValue("Path") as string;
+                        var path = subkey?.GetValue("Path") as string;
                         if (path != null)
                         {
                             var uri = VisualStudio.Services.GetRepoFromPath(path)?.GetUri();
@@ -136,8 +135,7 @@ namespace GitHub.Services
         {
             using (var key = OpenGitKey("General"))
             {
-                if (key == null) return null;
-                return (string)key.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                return (string)key?.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
             }
         }
 
@@ -147,8 +145,8 @@ namespace GitHub.Services
             string old;
             using (var key = Registry.CurrentUser.OpenSubKey(PathsKey, true))
             {
-                old = (string)key.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-                key.SetValue("Value0", path, RegistryValueKind.String);
+                old = (string)key?.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                key?.SetValue("Value0", path, RegistryValueKind.String);
             }
             return old;
         }
