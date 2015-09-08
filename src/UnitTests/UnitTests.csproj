@@ -38,6 +38,9 @@
       <HintPath>..\..\packages\EntryExitDecorator.Fody.0.3.0\lib\net45\EntryExitDecoratorInterfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LibGit2Sharp">
+      <HintPath>..\..\lib\LibGit2Sharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Reactive.Testing, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-Testing.2.2.5-custom\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
       <Private>True</Private>
@@ -135,10 +138,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Args.cs" />
+    <Compile Include="GitHub.Api\SimpleApiClientFactoryTests.cs" />
+    <Compile Include="GitHub.Api\SimpleApiClientTests.cs" />
+    <Compile Include="GitHub.App\Caches\CredentialCacheTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\RepositoryHostTests.cs" />
+    <Compile Include="GitHub.App\Models\ComparisonTests.cs" />
     <Compile Include="GitHub.App\Services\AvatarProviderTests.cs" />
     <Compile Include="GitHub.App\Services\GitClientTests.cs" />
     <Compile Include="GitHub.App\Services\RepositoryCloneServiceTests.cs" />
@@ -182,10 +189,6 @@
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
       <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
       <Name>Akavache_Net45</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
-      <Project>{ee6ed99f-cb12-4683-b055-d28fc7357a34}</Project>
-      <Name>LibGit2Sharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674B69B8-0780-4D54-AE2B-C15821FA51CB}</Project>

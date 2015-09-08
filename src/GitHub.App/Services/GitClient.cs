@@ -13,15 +13,12 @@ namespace GitHub.Services
     {
         public IObservable<Unit> Push(IRepository repository, string branchName, string remoteName)
         {
-            Guard.ArgumentNotEmptyString(branchName, "branchName");
-            Guard.ArgumentNotEmptyString(remoteName, "remoteName");
+            Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
+            Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Observable.Defer(() =>
             {
-                if (repository.Head != null
-                    && repository.Head != null
-                    && repository.Head.Commits != null
-                    && repository.Head.Commits.Any())
+                if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
                     var remote = repository.Network.Remotes[remoteName];
                     repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName);
@@ -32,7 +29,7 @@ namespace GitHub.Services
 
         public IObservable<Unit> Fetch(IRepository repository, string remoteName)
         {
-            Guard.ArgumentNotEmptyString(remoteName, "remoteName");
+            Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Observable.Defer(() =>
             {
@@ -44,7 +41,7 @@ namespace GitHub.Services
 
         public IObservable<Unit> SetRemote(IRepository repository, string remoteName, Uri url)
         {
-            Guard.ArgumentNotEmptyString(remoteName, "remoteName");
+            Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Observable.Defer(() =>
             {
@@ -57,8 +54,8 @@ namespace GitHub.Services
 
         public IObservable<Unit> SetTrackingBranch(IRepository repository, string branchName, string remoteName)
         {
-            Guard.ArgumentNotEmptyString(branchName, "branchName");
-            Guard.ArgumentNotEmptyString(remoteName, "remoteName");
+            Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
+            Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Observable.Defer(() =>
             {

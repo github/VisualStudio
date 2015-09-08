@@ -14,6 +14,7 @@ using GitHub.Models;
 using NLog;
 using NullGuard;
 using Octokit;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -110,7 +111,7 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", e);
+                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
                         return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                     })
                  .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
@@ -216,7 +217,7 @@ namespace GitHub.Services
         {
             return new RepositoryModel(
                 repositoryCacheItem.Name,
-                repositoryCacheItem.CloneUrl,
+                new UriString(repositoryCacheItem.CloneUrl),
                 repositoryCacheItem.Private,
                 repositoryCacheItem.Fork,
                 Create(repositoryCacheItem.Owner));

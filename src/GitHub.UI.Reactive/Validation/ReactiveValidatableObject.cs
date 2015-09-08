@@ -132,8 +132,8 @@ namespace GitHub.Validation
 
         public void SetErrorMessage(string propertyName, string errorMessage)
         {
-            Guard.ArgumentNotEmptyString(propertyName, "propertyName");
-            Guard.ArgumentNotEmptyString(errorMessage, "errorMessage");
+            Guard.ArgumentNotEmptyString(propertyName, nameof(propertyName));
+            Guard.ArgumentNotEmptyString(errorMessage, nameof(errorMessage));
 
             ValidatedProperty validatedProperty;
             if (!validatedProperties.TryGetValue(propertyName, out validatedProperty))

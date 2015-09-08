@@ -18,7 +18,7 @@ namespace GitHub.Authentication.CredentialManagement
         public CredentialSet(string target)
             : this()
         {
-            Guard.ArgumentNotEmptyString(target, "target");
+            Guard.ArgumentNotEmptyString(target, nameof(target));
 
             Target = target;
         }

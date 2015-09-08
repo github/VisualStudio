@@ -68,6 +68,7 @@
       <Link>Key.snk</Link>
     </None>
     <Compile Include="Controls\GitHubProgressBar.cs" />
+    <Compile Include="Converters\HasItemsVisibilityConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

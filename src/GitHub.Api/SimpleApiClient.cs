@@ -13,7 +13,7 @@ namespace GitHub.Api
         public HostAddress HostAddress { get; }
         public UriString OriginalUrl { get; }
 
-        readonly GitHubClient client;
+        readonly IGitHubClient client;
         readonly Lazy<IEnterpriseProbeTask> enterpriseProbe;
         readonly Lazy<IWikiProbe> wikiProbe;
         static readonly SemaphoreSlim sem = new SemaphoreSlim(1);
@@ -23,7 +23,7 @@ namespace GitHub.Api
         bool? isEnterprise;
         bool? hasWiki;
 
-        internal SimpleApiClient(HostAddress hostAddress, UriString repoUrl, GitHubClient githubClient,
+        public SimpleApiClient(HostAddress hostAddress, UriString repoUrl, IGitHubClient githubClient,
             Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
             HostAddress = hostAddress;
@@ -78,16 +78,12 @@ namespace GitHub.Api
 
         public bool HasWiki()
         {
-            if (hasWiki.HasValue)
-                return hasWiki.Value;
-            return false;
+            return hasWiki.HasValue && hasWiki.Value;
         }
 
         public bool IsEnterprise()
         {
-            if (isEnterprise.HasValue)
-                return isEnterprise.Value;
-            return false;
+            return isEnterprise.HasValue && isEnterprise.Value;
         }
 
         async Task<bool> HasWikiInternal(Repository repo)
@@ -108,8 +104,6 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(repo);
-            if (ret == WikiProbeResult.Failed)
-                return false;
             return (ret == WikiProbeResult.Ok);
         }
 
@@ -122,8 +116,6 @@ namespace GitHub.Api
                 return false;
 #endif
             var ret = await probe.ProbeAsync(HostAddress.WebUri);
-            if (ret == EnterpriseProbeResult.Failed)
-                return false;
             return (ret == EnterpriseProbeResult.Ok);
         }
     }

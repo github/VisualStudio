@@ -51,9 +51,16 @@ namespace GitHub.Primitives
             }
         }
 
-        static UriString ToUriString(Uri uri)
+        public static UriString ToUriString(Uri uri)
         {
             return uri == null ? null : new UriString(uri.ToString());
+        }
+
+        public Uri ToUri()
+        {
+            if (url == null)
+                throw new InvalidOperationException("This Uri String is not a valid Uri");
+            return url;
         }
 
         void SetUri(Uri uri)
@@ -166,7 +173,7 @@ namespace GitHub.Primitives
             if (url != null)
             {
                 var urlBuilder = new UriBuilder(url);
-                if (!string.IsNullOrEmpty(urlBuilder.Query))
+                if (!String.IsNullOrEmpty(urlBuilder.Query))
                 {
                     var query = urlBuilder.Query;
                     if (query.StartsWith("?", StringComparison.Ordinal))
@@ -190,7 +197,7 @@ namespace GitHub.Primitives
                 }
                 return ToUriString(urlBuilder.Uri);
             }
-            return string.Concat(Value, addition);
+            return String.Concat(Value, addition);
         }
 
         public override string ToString()
@@ -227,7 +234,7 @@ namespace GitHub.Primitives
 
         static string GetRepositoryName(string repositoryNameSegment)
         {
-            if (string.IsNullOrEmpty(repositoryNameSegment) 
+            if (String.IsNullOrEmpty(repositoryNameSegment) 
                 || repositoryNameSegment.Equals("/", StringComparison.Ordinal))
             {
                 return null;

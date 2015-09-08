@@ -52,7 +52,7 @@ namespace GitHub.Models
                 })
                 .WhereNotNull()
                 .Select(HostAddress.Create)
-                .Where(x => connectionManager.Connections.Any(c => c.HostAddress == x))
+                .Where(x => connectionManager.Connections.Any(c => c.HostAddress.Equals(x)))
                 .Select(repositoryHostFactory.Create)
                 .Do(x => EnterpriseHost = x)
                 .Do(disposables.Add)
