@@ -10,25 +10,14 @@
 
   <Style x:Key="VSStyledButton" TargetType="{x:Type Button}" BasedOn="{StaticResource VsButtonStyleKey}">
   </Style>
-  <Style x:Key="VSStyledCheckBox" TargetType="{x:Type CheckBox}">
-    <Setter Property="Control.Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="{x:Type CheckBox}">
-          <CheckBox Foreground="{DynamicResource VsBrush.ToolWindowText}" Background="{DynamicResource VsBrush.ToolWindowBackground}">
-              <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource VsBrush.ToolWindowText}" Background="{DynamicResource VsBrush.ToolWindowBackground}">
-                <TextBlock.Inlines>
-                    <Run Text="{TemplateBinding Content}" />
-                </TextBlock.Inlines>
-              </TextBlock>
-            </CheckBox>
-            <ControlTemplate.Triggers>
-              <Trigger Property="UIElement.IsMouseOver" Value="true">
-                <Setter Property="Background" Value="{DynamicResource VsBrush.ToolWindowBackground}"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
+  <Style x:Key="VSStyledCheckBox" BasedOn="{StaticResource VsCheckBoxStyleKey}" TargetType="{x:Type CheckBox}">
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
+    <Setter Property="Background" Value="{DynamicResource VsBrush.ToolWindowBackground}" />
+    <Style.Triggers>
+      <Trigger Property="UIElement.IsMouseOver" Value="true">
+        <Setter Property="Background" Value="{DynamicResource VsBrush.ToolWindowBackground}"/>
+      </Trigger>
+    </Style.Triggers>
   </Style>
   <Style x:Key="VSStyledComboBox" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource VsComboBoxStyleKey}">
   </Style>
