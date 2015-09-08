@@ -146,13 +146,13 @@
   
   <DockPanel>
     <WrapPanel Orientation="Horizontal" Margin="6,0,0,6" DockPanel.Dock="Top">
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click" Content="{x:Static prop:Resources.cloneLinkContent}"/>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click" Content="{x:Static prop:Resources.CloneLink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.createLinkContent}"/>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.signOutContent}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
               Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.loginContent}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
               Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </WrapPanel>
  

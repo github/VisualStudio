@@ -125,34 +125,6 @@
         <CheckBox x:Name="makePrivate"
                   Margin="0,8,0,0"
                   Style="{StaticResource VSStyledCheckBox}" Content="{x:Static prop:Resources.makePrivateContent}"/>
-        
-        <Label x:Name="upgradeToMicroPlanWarning" HorizontalAlignment="Left" Visibility="Collapsed">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock Text="{x:Static prop:Resources.privateRepoText}"/>
-                <ui:OcticonLinkButton
-                    x:Name="upgradeToMicroLink"
-                    FontSize="12"
-                    Icon="link_external" 
-                    Content="{x:Static prop:Resources.upgradeToMicroLinkContent}"
-                    ToolTip="{x:Static prop:Resources.upgradeToMicroLinkToolTip}"
-                    Margin="5,0"/>
-                <TextBlock Text="{x:Static prop:Resources.perMonthText}"/>
-            </StackPanel>
-        </Label>
-        <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <TextBlock Text="{x:Static prop:Resources.youreUsingText}"/>
-                <TextBlock><Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/></TextBlock> 
-                <TextBlock Text="{x:Static prop:Resources.privateRepositoriesText}"/>
-                <ui:OcticonLinkButton 
-                    x:Name="upgradeAccountLink"
-                    FontSize="12"
-                    Icon="link_external" 
-                    Content="{x:Static prop:Resources.upgradeAccountLinkContent}"
-                    ToolTip="{x:Static prop:Resources.upgradeAccountLinkToolTip}"
-                    Margin="5,0"/>
-            </StackPanel>
-        </Label>
        
         <Button
             Style="{StaticResource VSStyledButton}"

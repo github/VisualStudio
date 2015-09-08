@@ -41,7 +41,7 @@
             x:Name="createRepositoryButton"
             HorizontalAlignment="Center"
             Icon="check">
-            <TextBlock Text="{x:Static prop:Resources.createRepositoryButtonText}"/>
+            <TextBlock Text="{x:Static prop:Resources.CreateLink}"/>
         </ui:OcticonCircleButton>
 
         <StackPanel>
@@ -221,37 +221,9 @@
                     Content="{x:Static prop:Resources.makePrivateContent}"
                     Style="{DynamicResource BlueRoundedCheckBox}"
                     Padding="8,0,0,0" />
-                <Grid Grid.Column="1" Grid.Row="10">
-                    <Label x:Name="upgradeToMicroPlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <TextBlock Text="{x:Static prop:Resources.privateRepoText}"/>
-                            <ui:OcticonLinkButton 
-                            x:Name="upgradeToMicroLink"
-                            FontSize="12"
-                            Icon="link_external" 
-                            Content="{x:Static prop:Resources.upgradeToMicroLinkContent}"
-                            ToolTip="{x:Static prop:Resources.upgradeToMicroLinkToolTip}"
-                            Margin="5,0"/>
-                            <TextBlock Text="{x:Static prop:Resources.perMonthText}"/>
-                        </StackPanel>
-                    </Label>
-                    <Label x:Name="upgradePlanWarning"  HorizontalAlignment="Left" Visibility="Collapsed">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <TextBlock Text="{x:Static prop:Resources.youreUsingText}"/> 
-                                <TextBlock><Run x:Name="ownedPrivateReposText"/>/<Run  x:Name="privateReposInPlanText"/></TextBlock>
-                            <TextBlock Text="{x:Static prop:Resources.privateRepositoriesText}"/>
-                            <ui:OcticonLinkButton 
-                            x:Name="upgradeAccountLink"
-                            FontSize="12"
-                            Icon="link_external" 
-                            Content="{x:Static prop:Resources.upgradeToMicroLinkContent}"
-                            ToolTip="{x:Static prop:Resources.upgradeToMicroLinkToolTip}"
-                            Margin="5,0"/>
-                        </StackPanel>
-                    </Label>
-                </Grid>
             </Grid>
-            <uirx:UserErrorMessages
+
+          <uirx:UserErrorMessages
                 x:Name="userErrorMessages"
                 HorizontalAlignment="Center"
                 HorizontalContentAlignment="Stretch"

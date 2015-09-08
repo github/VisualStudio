@@ -27,11 +27,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             lazyBrowser = browser;
             CanConnect = true;
             CanSignUp = true;
-            ConnectLabel = Resources.GitHubInvitationSectionConnectLabel;
-            SignUpLabel = Resources.GitHubInvitationSectionSignUpLabel;
+            ConnectLabel = Resources.GetStartedLink;
+            SignUpLabel = Resources.SignUpLink;
             Name = "GitHub";
             Provider = "GitHub, Inc.";
-            Description = Resources.GitHubInvitationSectionDescription;
+            Description = Resources.BlurbText;
             Icon = GetDrawingForIcon(GetBrushForIcon());
 
             IsVisible = cm.Connections.Count == 0;

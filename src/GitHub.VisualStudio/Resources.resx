@@ -132,10 +132,7 @@
   <data name="browsePathButtonContent" xml:space="preserve">
     <value>Browse</value>
   </data>
-  <data name="cloneLinkContent" xml:space="preserve">
-    <value>Clone</value>
-  </data>
-  <data name="connect_ClickContent" xml:space="preserve">
+  <data name="GetStartedLink" xml:space="preserve">
     <value>Get Started</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
@@ -144,10 +141,7 @@
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
     <value>Could not connect to the server.</value>
   </data>
-  <data name="createLinkContent" xml:space="preserve">
-    <value>Create</value>
-  </data>
-  <data name="createRepositoryButtonText" xml:space="preserve">
+  <data name="CreateLink" xml:space="preserve">
     <value>Create</value>
   </data>
   <data name="descriptionOptionalText" xml:space="preserve">
@@ -165,43 +159,31 @@
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
     <value>Please check your internet connection and try again.</value>
   </data>
-  <data name="dotComForgotPasswordLinkContent" xml:space="preserve">
+  <data name="ForgotPasswordLink" xml:space="preserve">
     <value>(forgot your password?)</value>
   </data>
-  <data name="dotComLogInButtonContent" xml:space="preserve">
-    <value>Log in</value>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Login</value>
   </data>
-  <data name="dotComLoginFailedMessageMessage" xml:space="preserve">
+  <data name="LoginFailedMessage" xml:space="preserve">
     <value>Check your username and password, then try again</value>
   </data>
-  <data name="dotComPasswordPromptText" xml:space="preserve">
+  <data name="PasswordPrompt" xml:space="preserve">
     <value>Password</value>
   </data>
-  <data name="dotComUserNameOrEmailPromptText" xml:space="preserve">
+  <data name="UserNameOrEmailPromptText" xml:space="preserve">
     <value>Username or email</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
     <value>The host isn't available or is not a GitHub Enterprise server. Check the address and try again.</value>
   </data>
-  <data name="enterpriseLogInButtonContent" xml:space="preserve">
-    <value>Log in</value>
-  </data>
-  <data name="enterpriseLoginFailedMessageMessage" xml:space="preserve">
-    <value>Check your username and password, then try again</value>
-  </data>
-  <data name="enterprisePasswordPromptText" xml:space="preserve">
-    <value>Password</value>
-  </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
     <value>GitHub Enterprise server address</value>
   </data>
-  <data name="enterpriseUserNameOrEmailPromptText" xml:space="preserve">
-    <value>Username or email</value>
-  </data>
-  <data name="ErrorMessageDisplayContent" xml:space="preserve">
+  <data name="loadingFailedMessageMessage" xml:space="preserve">
     <value>An error occurred while loading repositories</value>
   </data>
-  <data name="ErrorMessageDisplayMessage" xml:space="preserve">
+  <data name="loadingFailedMessageContent" xml:space="preserve">
     <value>Some or all repositories may not have loaded. Close the dialog and try again.</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
@@ -219,17 +201,8 @@
   <data name="localPathText" xml:space="preserve">
     <value>Local path</value>
   </data>
-  <data name="loginContent" xml:space="preserve">
-    <value>Login</value>
-  </data>
-  <data name="loginFailedText" xml:space="preserve">
+  <data name="LoginFailedText" xml:space="preserve">
     <value>Login failed.</value>
-  </data>
-  <data name="loginLabelPrefixText" xml:space="preserve">
-    <value>Log in</value>
-  </data>
-  <data name="login_ClickContent" xml:space="preserve">
-    <value>Login</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
     <value>Private Repository</value>
@@ -245,12 +218,6 @@
   </data>
   <data name="orText" xml:space="preserve">
     <value>or</value>
-  </data>
-  <data name="perMonthText" xml:space="preserve">
-    <value>for $7/month</value>
-  </data>
-  <data name="pricingLinkContent" xml:space="preserve">
-    <value>Sign up</value>
   </data>
   <data name="privateRepositoriesText" xml:space="preserve">
     <value>private repositories.</value>
@@ -271,31 +238,19 @@
     <value>Repository Name</value>
   </data>
   <data name="resendCodeButtonContent" xml:space="preserve">
-    <value>_Resend</value>
+    <value>Resend</value>
   </data>
   <data name="resendCodeButtonToolTip" xml:space="preserve">
     <value>Send the code to your registered SMS Device again</value>
   </data>
-  <data name="signOutContent" xml:space="preserve">
+  <data name="SignOutLink" xml:space="preserve">
     <value>Sign out</value>
   </data>
-  <data name="signup_ClickContent" xml:space="preserve">
+  <data name="SignUpLink" xml:space="preserve">
     <value>Sign up</value>
   </data>
   <data name="twoFactorAuthText" xml:space="preserve">
     <value>Two-factor authentication</value>
-  </data>
-  <data name="upgradeAccountLinkContent" xml:space="preserve">
-    <value>Manage plans</value>
-  </data>
-  <data name="upgradeAccountLinkToolTip" xml:space="preserve">
-    <value>manage plans</value>
-  </data>
-  <data name="upgradeToMicroLinkContent" xml:space="preserve">
-    <value>micro plan</value>
-  </data>
-  <data name="upgradeToMicroLinkToolTip" xml:space="preserve">
-    <value>upgrade</value>
   </data>
   <data name="verifyText" xml:space="preserve">
     <value>Verify</value>
@@ -303,19 +258,13 @@
   <data name="youreUsingText" xml:space="preserve">
     <value>You're using</value>
   </data>
-  <data name="cloneButtonText" xml:space="preserve">
+  <data name="CloneLink" xml:space="preserve">
     <value>Clone</value>
   </data>
   <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
     <value>Connect…</value>
   </data>
-  <data name="GitHubInvitationSectionDescription" xml:space="preserve">
-    <value>Powerful collaboration, code review, and code management for open source and private projects.</value>
-  </data>
-  <data name="GitHubInvitationSectionSignUpLabel" xml:space="preserve">
-    <value>Sign up</value>
-  </data>
-  <data name="GitHubPublishSectionDescription" xml:space="preserve">
+  <data name="BlurbText" xml:space="preserve">
     <value>Powerful collaboration, code review, and code management for open source and private projects.</value>
   </data>
   <data name="GitHubPublishSectionTitle" xml:space="preserve">

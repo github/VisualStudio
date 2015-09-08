@@ -66,13 +66,13 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" KeyboardNavigation.TabIndex="0" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.login_ClickContent}"
+            <Button Grid.Column="0" KeyboardNavigation.TabIndex="0" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
                     Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <TextBlock Grid.Column="1" Margin="3,0,3,0"
                     Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static prop:Resources.orText}"/>
-            <Button Grid.Column="2" KeyboardNavigation.TabIndex="1" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="signup" Click="signup_Click" Content="{x:Static prop:Resources.signup_ClickContent}"
+            <Button Grid.Column="2" KeyboardNavigation.TabIndex="1" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="signup" Click="signup_Click" Content="{x:Static prop:Resources.SignUpLink}"
                     Visibility="{Binding ShowSignup, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            <Button Grid.Column="3" KeyboardNavigation.TabIndex="2" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Right" x:Name="connect" Click="connect_Click" Content="{x:Static prop:Resources.connect_ClickContent}"
+            <Button Grid.Column="3" KeyboardNavigation.TabIndex="2" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Right" x:Name="connect" Click="connect_Click" Content="{x:Static prop:Resources.GetStartedLink}"
                     Visibility="{Binding ShowGetStarted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <Rectangle Grid.Column="4" Width="16" Height="16" Margin="8,0,0,0" Fill="{StaticResource ConnectArrowBrush}"
                     Visibility="{Binding ShowGetStarted, Converter={StaticResource BooleanToVisibilityConverter}}"/>

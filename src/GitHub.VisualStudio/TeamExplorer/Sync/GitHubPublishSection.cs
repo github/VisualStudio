@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             Title = Resources.GitHubPublishSectionTitle;
             Name = "GitHub";
             Provider = "GitHub, Inc";
-            Description = Resources.GitHubPublishSectionDescription;
+            Description = Resources.BlurbText;
             ShowLogin = false;
             ShowSignup = false;
             ShowGetStarted = false;

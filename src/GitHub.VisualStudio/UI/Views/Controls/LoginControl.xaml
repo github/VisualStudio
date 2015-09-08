@@ -44,7 +44,7 @@
                 Margin="0,0,0,10"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 IsHitTestVisible="False"
-                Text="{x:Static prop:Resources.loginLabelPrefixText}" />
+                Text="{x:Static prop:Resources.LoginLink}" />
             
             <ui:HorizontalShadowDivider />
         </StackPanel>
@@ -78,11 +78,11 @@
                 <DockPanel Style="{StaticResource TabDockPanel}">
                     <StackPanel DockPanel.Dock="Bottom" Margin="0">
                         <Border Style="{StaticResource LoginButtonBorder}">
-                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="{x:Static prop:Resources.dotComLogInButtonContent}" IsDefault="True" />
+                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="{x:Static prop:Resources.LoginLink}" IsDefault="True" />
                         </Border>
 
                         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0" Text="{x:Static prop:Resources.dontHaveAnAccountText}">
-                            <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing"><TextBlock Text="{x:Static prop:Resources.pricingLinkContent}"/></Hyperlink>
+                            <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing"><TextBlock Text="{x:Static prop:Resources.SignUpLink}"/></Hyperlink>
                         </TextBlock>
                     </StackPanel>
 
@@ -91,16 +91,16 @@
                         <StackPanel Style="{StaticResource FormFieldStackPanel}">
                             <ui:PromptTextBox
                                 x:Name="dotComUserNameOrEmail"
-                                PromptText="{x:Static prop:Resources.dotComUserNameOrEmailPromptText}"
+                                PromptText="{x:Static prop:Resources.UserNameOrEmailPromptText}"
                                 Margin="0,0,0,10" />
                             
-                            <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="{x:Static prop:Resources.dotComPasswordPromptText}" />
+                            <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="{x:Static prop:Resources.PasswordPrompt}" />
 
                             <uirx:ErrorMessageDisplay
                                 x:Name="dotComLoginFailedMessage"
-                                Message="{x:Static prop:Resources.dotComLoginFailedMessageMessage}">
-                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.loginFailedText}">
-                                    <Hyperlink x:Name="dotComForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.dotComForgotPasswordLinkContent}"/></Hyperlink>
+                                Message="{x:Static prop:Resources.LoginFailedMessage}">
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.LoginFailedText}">
+                                    <Hyperlink x:Name="dotComForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.ForgotPasswordLink}"/></Hyperlink>
                                 </TextBlock>
                             </uirx:ErrorMessageDisplay>
 
@@ -127,7 +127,7 @@
                 <DockPanel Style="{StaticResource TabDockPanel}">
                     <StackPanel DockPanel.Dock="Bottom">
                         <Border Style="{StaticResource LoginButtonBorder}">
-                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="{x:Static prop:Resources.enterpriseLogInButtonContent}" IsDefault="True" />
+                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="{x:Static prop:Resources.LoginLink}" IsDefault="True" />
                         </Border>
                         
                         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0" Text="{x:Static prop:Resources.dontHaveGitHubEnterpriseText}">
@@ -141,10 +141,10 @@
                         
                         <ui:PromptTextBox
                             x:Name="enterpriseUserNameOrEmail"
-                            PromptText="{x:Static prop:Resources.enterpriseUserNameOrEmailPromptText}"
+                            PromptText="{x:Static prop:Resources.UserNameOrEmailPromptText}"
                             Margin="0,0,0,10" />
 
-                        <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="{x:Static prop:Resources.enterprisePasswordPromptText}" Margin="0,0,0,10" />
+                        <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="{x:Static prop:Resources.PasswordPrompt}" Margin="0,0,0,10" />
                         
                         <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="{x:Static prop:Resources.enterpriseUrlPromptText}" />
 
@@ -163,9 +163,9 @@
 
                         <uirx:ErrorMessageDisplay
                             x:Name="enterpriseLoginFailedMessage"
-                            Message="{x:Static prop:Resources.enterpriseLoginFailedMessageMessage}">
-                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.loginFailedText}">
-                                <Hyperlink x:Name="enterpriseForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.dotComForgotPasswordLinkContent}"/></Hyperlink>
+                            Message="{x:Static prop:Resources.LoginFailedMessage}">
+                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.LoginFailedText}">
+                                <Hyperlink x:Name="enterpriseForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.ForgotPasswordLink}"/></Hyperlink>
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
