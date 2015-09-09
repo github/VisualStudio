@@ -9,7 +9,7 @@
 
         public const string Notification_RepoCreated = "[{0}](u:{1}) has been successfully created.";
         public const string Notification_RepoCloned = "[{0}](u:{1}) has been successfully cloned.";
-        public const string Notification_CreateNewProject = "[Create a new project or solution](c:{0})";
-        public const string Notification_OpenProject = "[Open an existing project or solution](o:{0})";
+        public const string Notification_CreateNewProject = "[Create a new project or solution](c:{0}).";
+        public const string Notification_OpenProject = "[Open an existing project or solution](o:{0}).";
     }
 }
