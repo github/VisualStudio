@@ -17,6 +17,7 @@ using System.Windows.Data;
 using System.ComponentModel;
 using ReactiveUI;
 using GitHub.Exports;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -195,10 +196,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().First();
                     SelectedRepository = newrepo;
+                    if (isCreating)
+                    {
+                        var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+                        vsservices.ClearNotifications();
+                        vsservices.ShowMessage(string.Format(CultureInfo.CurrentUICulture, "[{0}]({1}) has been successfully created.", newrepo.Name, newrepo.CloneUrl));
+                    }
                     // if we've cloned a repo but the user didn't open a project in it,
                     // then update the newly-cloned repo icon because we're not going to
                     // switch to the TE home page
-                    if (isCloning && !OpenRepository())
+                    if ((isCloning && !OpenRepository()) || isCreating)
                     {
                         var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
