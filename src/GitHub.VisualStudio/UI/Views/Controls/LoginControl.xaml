@@ -131,7 +131,7 @@
                         </Border>
                         
                         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0" Text="{x:Static prop:Resources.dontHaveGitHubEnterpriseText}">
-                            <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com"><TextBlock Text="{x:Static prop:Resources.learnMoreLinkContent}"></TextBlock></Hyperlink>
+                            <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com"><TextBlock Text="{x:Static prop:Resources.learnMoreLink}"></TextBlock></Hyperlink>
                         </TextBlock>
                     </StackPanel>
                     

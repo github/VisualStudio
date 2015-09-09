@@ -192,7 +192,7 @@
   <data name="ignoreTemplateListText" xml:space="preserve">
     <value>Git ignore</value>
   </data>
-  <data name="learnMoreLinkContent" xml:space="preserve">
+  <data name="learnMoreLink" xml:space="preserve">
     <value>Learn more</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
@@ -219,17 +219,8 @@
   <data name="orText" xml:space="preserve">
     <value>or</value>
   </data>
-  <data name="privateRepositoriesText" xml:space="preserve">
-    <value>private repositories.</value>
-  </data>
-  <data name="privateRepoText" xml:space="preserve">
-    <value>Private repositories require a</value>
-  </data>
   <data name="publishText" xml:space="preserve">
     <value>Publish</value>
-  </data>
-  <data name="readMoreText" xml:space="preserve">
-    <value>Read more</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
     <value>This repository does not have a remote. Fill out the form to publish it to GitHub.</value>
@@ -254,9 +245,6 @@
   </data>
   <data name="verifyText" xml:space="preserve">
     <value>Verify</value>
-  </data>
-  <data name="youreUsingText" xml:space="preserve">
-    <value>You're using</value>
   </data>
   <data name="CloneLink" xml:space="preserve">
     <value>Clone</value>

@@ -199,7 +199,9 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                   </Grid.RowDefinitions>
-                  <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">Name:</TextBlock>
+                  <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">
+                    <Run Text="{x:Static prop:Resources.nameText}"/>:
+                  </TextBlock>
                   <TextBlock Grid.Row="0" Grid.Column="1">
                     <TextBlock.Text>
                       <MultiBinding Converter="{StaticResource FormatRepositoryNameConverter}" ConverterParameter="FormatRepositoryName">
@@ -208,7 +210,9 @@
                       </MultiBinding>
                     </TextBlock.Text>
                   </TextBlock>
-                  <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">Path:</TextBlock>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">
+                    <Run Text="{x:Static prop:Resources.pathText}"/>:
+                  </TextBlock>
                   <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=LocalPath}" />
                 </Grid>
               </ToolTip>

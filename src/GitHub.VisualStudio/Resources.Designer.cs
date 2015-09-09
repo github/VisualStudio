@@ -288,9 +288,9 @@ namespace GitHub.VisualStudio {
         /// <summary>
         ///   Looks up a localized string similar to Learn more.
         /// </summary>
-        public static string learnMoreLinkContent {
+        public static string learnMoreLink {
             get {
-                return ResourceManager.GetString("learnMoreLinkContent", resourceCulture);
+                return ResourceManager.GetString("learnMoreLink", resourceCulture);
             }
         }
         
@@ -421,24 +421,6 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to private repositories..
-        /// </summary>
-        public static string privateRepositoriesText {
-            get {
-                return ResourceManager.GetString("privateRepositoriesText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Private repositories require a.
-        /// </summary>
-        public static string privateRepoText {
-            get {
-                return ResourceManager.GetString("privateRepoText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Publish.
         /// </summary>
         public static string publishText {
@@ -462,15 +444,6 @@ namespace GitHub.VisualStudio {
         public static string PulseNavigationItemText {
             get {
                 return ResourceManager.GetString("PulseNavigationItemText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Read more.
-        /// </summary>
-        public static string readMoreText {
-            get {
-                return ResourceManager.GetString("readMoreText", resourceCulture);
             }
         }
         
@@ -561,15 +534,6 @@ namespace GitHub.VisualStudio {
         public static string WikiNavigationItemText {
             get {
                 return ResourceManager.GetString("WikiNavigationItemText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You&apos;re using.
-        /// </summary>
-        public static string youreUsingText {
-            get {
-                return ResourceManager.GetString("youreUsingText", resourceCulture);
             }
         }
     }
