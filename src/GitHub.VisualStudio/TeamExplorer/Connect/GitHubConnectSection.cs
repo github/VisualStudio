@@ -18,6 +18,8 @@ using System.ComponentModel;
 using ReactiveUI;
 using GitHub.Exports;
 using System.Globalization;
+using Microsoft.TeamFoundation.MVVM;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -197,11 +199,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().First();
                     SelectedRepository = newrepo;
                     if (isCreating)
-                    {
-                        var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-                        vsservices.ClearNotifications();
-                        vsservices.ShowMessage(string.Format(CultureInfo.CurrentUICulture, "[{0}]({1}) has been successfully created.", newrepo.Name, newrepo.CloneUrl));
-                    }
+                        HandleCreatedRepo(newrepo);
+
                     // if we've cloned a repo but the user didn't open a project in it,
                     // then update the newly-cloned repo icon because we're not going to
                     // switch to the TE home page
@@ -225,6 +224,27 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     });
                 }
             }
+        }
+
+        void HandleCreatedRepo(ISimpleRepositoryModel newrepo)
+        {
+            var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+            vsservices.ClearNotifications();
+            vsservices.ShowMessage(
+                string.Format(CultureInfo.CurrentUICulture, "[{0}](u:{1}) has been successfully created. [Create a new project or solution](p:{2})", newrepo.Name, newrepo.CloneUrl, newrepo.LocalPath),
+                new RelayCommand((o) =>
+                {
+                    var str = o.ToString();
+                    var prefix = str.Substring(0, 2);
+                    if (prefix == "u:")
+                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                    else if (prefix == "p:")
+                    {
+                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
+                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    }
+                })
+            );
         }
 
         void RefreshRepositories()

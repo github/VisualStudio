@@ -12,6 +12,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections.Generic;
 using GitHub.Models;
+using System.Windows.Input;
 
 namespace GitHub.Services
 {
@@ -25,6 +26,7 @@ namespace GitHub.Services
         string SetDefaultProjectPath(string path);
 
         void ShowMessage(string message);
+        void ShowMessage(string message, ICommand command);
         void ShowWarning(string message);
         void ShowError(string message);
         void ClearNotifications();
@@ -139,14 +141,39 @@ namespace GitHub.Services
             }
         }
 
-        const string PathsKey = @"Software\Microsoft\VisualStudio\14.0\NewProjectDialog\MRUSettingsLocalProjectLocationEntries";
+        const string NewProjectDialogKeyPath = @"Software\Microsoft\VisualStudio\14.0\NewProjectDialog";
+        const string MRUKeyPath = "MRUSettingsLocalProjectLocationEntries";
         public string SetDefaultProjectPath(string path)
         {
             string old;
-            using (var key = Registry.CurrentUser.OpenSubKey(PathsKey, true))
+            using (var newProjectKey = Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true))
             {
-                old = (string)key?.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-                key?.SetValue("Value0", path, RegistryValueKind.String);
+                using (var mruKey = newProjectKey?.OpenSubKey(MRUKeyPath, true))
+                {
+                    if (mruKey == null)
+                        return String.Empty;
+
+                    // is this already the default path? bail
+                    old = (string)mruKey.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                    if (String.Equals(path.TrimEnd('\\'), old.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase))
+                        return old;
+
+                    // grab the existing list of recent paths, throwing away the last one
+                    var numEntries = (int)mruKey.GetValue("MaximumEntries", 5);
+                    var entries = new List<string>(numEntries);
+                    for (int i = 0; i < numEntries - 1; i++)
+                    {
+                        var val = (string)mruKey.GetValue("Value" + i, String.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                        if (!String.IsNullOrEmpty(val))
+                            entries.Add(val);
+                    }
+
+                    newProjectKey.SetValue("LastUsedNewProjectPath", path);
+                    mruKey.SetValue("Value0", path);
+                    // bump list of recent paths one entry down
+                    for (int i = 0; i < entries.Count; i++)
+                        mruKey.SetValue("Value" + (i+1), entries[i]);
+                }
             }
             return old;
         }
@@ -156,6 +183,13 @@ namespace GitHub.Services
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
             if (manager != null)
                 manager.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
+        }
+
+        public void ShowMessage(string message, ICommand command)
+        {
+            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            if (manager != null)
+                manager.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
         }
 
         public void ShowWarning(string message)
