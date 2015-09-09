@@ -19,7 +19,7 @@ namespace GitHub.Extensions
             var dir = new DirectoryInfo(repository.LocalPath);
             return dir.EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)
                       .Any(x => ((x.Attributes.HasFlag(FileAttributes.Directory) || x.Attributes.HasFlag(FileAttributes.Normal)) &&
-                                !x.Name.StartsWith(".", StringComparison.Ordinal) && !x.Name.StartsWith("readme", StringComparison.Ordinal)));
+                                !x.Name.StartsWith(".", StringComparison.Ordinal) && !x.Name.StartsWith("readme", StringComparison.OrdinalIgnoreCase)));
         }
     }
 }

@@ -232,7 +232,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleClonedRepo(ISimpleRepositoryModel newrepo)
         {
-            
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
             if (newrepo.HasCommits() && newrepo.HasContent())
                 msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
