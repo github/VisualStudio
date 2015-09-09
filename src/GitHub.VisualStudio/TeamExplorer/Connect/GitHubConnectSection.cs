@@ -197,18 +197,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (isCloning || isCreating)
                 {
                     var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().First();
+
                     SelectedRepository = newrepo;
                     if (isCreating)
                         HandleCreatedRepo(newrepo);
+                    else
+                        HandleClonedRepo(newrepo);
 
-                    // if we've cloned a repo but the user didn't open a project in it,
-                    // then update the newly-cloned repo icon because we're not going to
-                    // switch to the TE home page
-                    if ((isCloning && !OpenRepository()) || isCreating)
-                    {
-                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
-                        newrepo.SetIcon(repo.Private, repo.Fork);
-                    }
+                    var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                    newrepo.SetIcon(repo.Private, repo.Fork);
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
                 else
@@ -228,23 +225,54 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void HandleCreatedRepo(ISimpleRepositoryModel newrepo)
         {
+            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
+            msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            ShowNotification(newrepo, msg);
+        }
+
+        void HandleClonedRepo(ISimpleRepositoryModel newrepo)
+        {
+            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
+            if (newrepo.HasCommits())
+                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
+            else
+                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            ShowNotification(newrepo, msg);
+        }
+
+        void ShowNotification(ISimpleRepositoryModel newrepo, string msg)
+        {
             var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
             vsservices.ClearNotifications();
             vsservices.ShowMessage(
-                string.Format(CultureInfo.CurrentUICulture, "[{0}](u:{1}) has been successfully created. [Create a new project or solution](p:{2})", newrepo.Name, newrepo.CloneUrl, newrepo.LocalPath),
+                msg,
                 new RelayCommand((o) =>
                 {
                     var str = o.ToString();
+                    /* the prefix is the action to perform:
+                     * u: launch browser with url
+                     * c: launch create new project dialog
+                     * o: launch open existing project dialog 
+                    */
                     var prefix = str.Substring(0, 2);
                     if (prefix == "u:")
                         OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
-                    else if (prefix == "p:")
+                    else if (prefix == "o:")
                     {
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
                             ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     }
+                    else if (prefix == "c:")
+                    {
+                        vsservices.SetDefaultProjectPath(newrepo.LocalPath);
+                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
+                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    }
                 })
             );
+#if DEBUG
+            VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{0} Notification", DateTime.Now));
+#endif
         }
 
         void RefreshRepositories()
@@ -356,11 +384,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
                 section.PropertyChanged += TrackState;
             }
-
+#if DEBUG
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+#endif
             void TrackState(object sender, PropertyChangedEventArgs e)
             {
                 if (machine.PermittedTriggers.Contains(e.PropertyName))
+                {
+#if DEBUG
+                    VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{3} {0} title:{1} busy:{2}", e.PropertyName, ((ITeamExplorerSection)sender).Title, ((ITeamExplorerSection)sender).IsBusy, DateTime.Now));
+#endif
                     machine.Fire(e.PropertyName);
+                }
             }
         }
     }
