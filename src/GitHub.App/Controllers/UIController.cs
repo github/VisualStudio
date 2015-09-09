@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
@@ -15,8 +17,6 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using Stateless;
-using System.Windows;
-using System.Reactive.Concurrency;
 
 namespace GitHub.Controllers
 {
@@ -265,10 +265,7 @@ namespace GitHub.Controllers
         public void Stop()
         {
             Debug.WriteLine("Stop ({0})", GetHashCode());
-            if (machine.IsInState(UIViewType.End))
-                Fire(Trigger.Next);
-            else
-                Fire(Trigger.Cancel);
+            Fire(machine.IsInState(UIViewType.End) ? Trigger.Next : Trigger.Cancel);
         }
 
         bool disposed; // To detect redundant calls
@@ -291,6 +288,6 @@ namespace GitHub.Controllers
             GC.SuppressFinalize(this);
         }
 
-        public bool IsStopped { get { return machine.IsInState(UIViewType.Finished); } }
+        public bool IsStopped => machine.IsInState(UIViewType.Finished);
     }
 }
