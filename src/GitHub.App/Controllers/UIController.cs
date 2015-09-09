@@ -236,6 +236,14 @@ namespace GitHub.Controllers
                     .IsLoggedIn(hosts)
                     .Do(loggedin =>
                     {
+                        if (!loggedin && currentFlow != UIControllerFlow.Authentication)
+                        {
+                            connectionManager.Connections.CollectionChanged += (s, e) => {
+                                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                                    uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
+                            };
+                        }
+
                         machine.Configure(UIViewType.None)
                             .Permit(Trigger.Auth, UIViewType.Login)
                             .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
