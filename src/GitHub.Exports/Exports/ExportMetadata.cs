@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel.Composition;
 using GitHub.UI;
 using GitHub.ViewModels;
+using System.Windows.Controls;
+using System.Linq;
 
 namespace GitHub.Exports {
 
@@ -41,5 +43,13 @@ namespace GitHub.Exports {
     public interface IViewModelMetadata
     {
         UIViewType ViewType { get; }
+    }
+
+    public static class ExportViewAttributeExtensions
+    {
+        public static bool IsViewType(this UserControl c, UIViewType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(x => x.AttributeType.Equals(typeof(ExportViewAttribute)) && (UIViewType)x.NamedArguments[0].TypedValue.Value == type);
+        }
     }
 }

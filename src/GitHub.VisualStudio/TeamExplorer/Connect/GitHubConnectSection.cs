@@ -16,6 +16,7 @@ using System;
 using System.Windows.Data;
 using System.ComponentModel;
 using ReactiveUI;
+using GitHub.Exports;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -227,13 +228,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void DoCreate()
         {
-            isCreating = true;
             StartFlow(UIControllerFlow.Create);
         }
 
         public void DoClone()
         {
-            isCloning = true;
             StartFlow(UIControllerFlow.Clone);
         }
 
@@ -272,7 +271,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
-            uiProvider.RunUI(controllerFlow, SectionConnection);
+            var ret = uiProvider.SetupUI(controllerFlow, SectionConnection);
+            ret.Subscribe((c) =>
+            {
+                if (c.IsViewType(UIViewType.Clone))
+                    isCloning = true;
+                else if (c.IsViewType(UIViewType.Create))
+                    isCreating = true;
+            });
+            uiProvider.RunUI();
         }
 
         bool disposed;
