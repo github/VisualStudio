@@ -180,5 +180,11 @@ namespace GitHub.VisualStudio
         {
             return repoInfo.GetRepoFromIGit()?.GetUri();
         }
+
+        public static bool HasCommits(this ISimpleRepositoryModel repository)
+        {
+            var repo = GetRepoFromPath(repository.LocalPath);
+            return repo?.Commits.Count() > 0;
+        }
     }
 }
