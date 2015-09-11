@@ -5,6 +5,7 @@ using GitHub.ViewModels;
 using System.Windows.Controls;
 using System.Linq;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace GitHub.Exports {
 
@@ -50,8 +51,14 @@ namespace GitHub.Exports {
     {
         public static bool IsViewType(this UserControl c, UIViewType type)
         {
-            Debug.Assert(c.GetType().GetCustomAttributesData().Any(x => x.AttributeType == typeof(ExportViewAttribute) && x.NamedArguments.Any() && x.NamedArguments[0].TypedValue.ArgumentType == typeof(UIViewType)), "Someone broke the ExportViewAttribute contract...");
-            return c.GetType().GetCustomAttributesData().Any(x => x.AttributeType == typeof(ExportViewAttribute) && (UIViewType)x.NamedArguments[0].TypedValue.Value == type);
+            return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
+        }
+
+        private static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
+        {
+            Debug.Assert(attributeData.NamedArguments != null);
+            return attributeData.AttributeType == typeof(ExportViewAttribute)
+                && (UIViewType)attributeData.NamedArguments[0].TypedValue.Value == viewType;
         }
     }
 }

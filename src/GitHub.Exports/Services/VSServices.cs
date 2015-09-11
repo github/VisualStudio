@@ -1,18 +1,18 @@
-﻿using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Input;
 using GitHub.Extensions;
-using Microsoft.Win32;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.Models;
 using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using System.Collections.Generic;
-using GitHub.Models;
-using System.Windows.Input;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Microsoft.Win32;
 
 namespace GitHub.Services
 {
@@ -181,41 +181,36 @@ namespace GitHub.Services
         public void ShowMessage(string message)
         {
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            if (manager != null)
-                manager.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
+            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
         }
 
         public void ShowMessage(string message, ICommand command)
         {
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            if (manager != null)
-                manager.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
+            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
         }
 
         public void ShowWarning(string message)
         {
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            if (manager != null)
-                manager.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
+            manager?.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
         }
 
         public void ShowError(string message)
         {
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            if (manager != null)
-                manager.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
+            manager?.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
         }
 
         public void ClearNotifications()
         {
             var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            if (manager != null)
-                manager.ClearNotifications();
-		}
+            manager?.ClearNotifications();
+        }
 
         public void ActivityLogMessage(string message)
         {
-            var log = VisualStudio.Services.GetActivityLog(serviceProvider);
+            var log = serviceProvider.GetActivityLog();
             if (log != null)
             {
                 if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
@@ -226,7 +221,7 @@ namespace GitHub.Services
 
         public void ActivityLogError(string message)
         {
-            var log = VisualStudio.Services.GetActivityLog(serviceProvider);
+            var log = serviceProvider.GetActivityLog();
             if (log != null)
             {
 
@@ -238,7 +233,7 @@ namespace GitHub.Services
 
         public void ActivityLogWarning(string message)
         {
-            var log = VisualStudio.Services.GetActivityLog(serviceProvider);
+            var log = serviceProvider.GetActivityLog();
             if (log != null)
             {
                 if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,

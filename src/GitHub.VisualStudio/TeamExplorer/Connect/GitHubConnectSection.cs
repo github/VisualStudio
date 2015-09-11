@@ -1,4 +1,11 @@
-﻿using GitHub.Api;
+﻿using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using GitHub.Api;
+using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
@@ -6,20 +13,10 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using System.Linq;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using GitHub.Extensions;
-using NullGuard;
-using Microsoft.VisualStudio;
-using System;
-using System.Windows.Data;
-using System.ComponentModel;
-using ReactiveUI;
-using GitHub.Exports;
-using System.Globalization;
 using Microsoft.TeamFoundation.MVVM;
-using GitHub.Primitives;
+using Microsoft.VisualStudio;
+using NullGuard;
+using ReactiveUI;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -109,10 +106,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         Refresh(connectionManager.Connections[sectionIndex]);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    if (connectionManager.Connections.Count <= sectionIndex)
-                        Refresh(null);
-                    else
-                        Refresh(connectionManager.Connections[sectionIndex]);
+                    Refresh(connectionManager.Connections.Count <= sectionIndex
+                        ? null
+                        : connectionManager.Connections[sectionIndex]);
                     break;
             }
         }
@@ -176,10 +172,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void UpdateConnection()
         {
-            if (connectionManager.Connections.Count > sectionIndex)
-                Refresh(connectionManager.Connections[sectionIndex]);
-            else
-                Refresh(SectionConnection);
+            Refresh(connectionManager.Connections.Count > sectionIndex
+                ? connectionManager.Connections[sectionIndex]
+                : SectionConnection);
         }
 
         void OnPropertyChange(object sender, PropertyChangedEventArgs e)
@@ -246,7 +241,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             vsservices.ClearNotifications();
             vsservices.ShowMessage(
                 msg,
-                new RelayCommand((o) =>
+                new RelayCommand(o =>
                 {
                     var str = o.ToString();
                     /* the prefix is the action to perform:
