@@ -17,6 +17,7 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using Stateless;
+using System.Collections.Specialized;
 
 namespace GitHub.Controllers
 {
@@ -36,6 +37,7 @@ namespace GitHub.Controllers
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
+        NotifyCollectionChangedEventHandler connectionAdded;
 
         [ImportingConstructor]
         public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
@@ -238,10 +240,11 @@ namespace GitHub.Controllers
                     {
                         if (!loggedin && currentFlow != UIControllerFlow.Authentication)
                         {
-                            connectionManager.Connections.CollectionChanged += (s, e) => {
-                                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                            connectionAdded = (s, e) => {
+                                if (e.Action == NotifyCollectionChangedAction.Add)
                                     uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
                             };
+                            connectionManager.Connections.CollectionChanged += connectionAdded;
                         }
 
                         machine.Configure(UIViewType.None)
@@ -278,6 +281,9 @@ namespace GitHub.Controllers
                 Debug.WriteLine("Disposing ({0})", GetHashCode());
                 disposables.Dispose();
                 transition?.Dispose();
+                if (connectionAdded != null)
+                    connectionManager.Connections.CollectionChanged -= connectionAdded;
+                connectionAdded = null;
                 disposed = true;
             }
         }

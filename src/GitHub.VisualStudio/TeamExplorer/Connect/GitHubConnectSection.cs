@@ -344,6 +344,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 if (!disposed)
                 {
+                    connectionManager.Connections.CollectionChanged -= RefreshConnections;
                     if (Repositories != null)
                         Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;
