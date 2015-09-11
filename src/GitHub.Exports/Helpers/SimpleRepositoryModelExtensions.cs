@@ -12,7 +12,7 @@ namespace GitHub.Extensions
         public static bool HasCommits(this ISimpleRepositoryModel repository)
         {
             var repo = Services.GetRepoFromPath(repository.LocalPath);
-            return repo?.Commits.Count() > 0;
+            return repo?.Commits.Any() ?? false;
         }
         public static bool MightContainSolution(this ISimpleRepositoryModel repository)
         {
