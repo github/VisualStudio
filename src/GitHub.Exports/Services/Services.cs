@@ -8,11 +8,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using GitHub.Models;
 using GitHub.Info;
-using GitHub.Extensions;
 using GitHub.Primitives;
 
 namespace GitHub.VisualStudio

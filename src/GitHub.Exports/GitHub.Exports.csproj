@@ -101,6 +101,7 @@
     </None>
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Helpers\PropertyNotifierExtensions.cs" />
+    <Compile Include="Helpers\SimpleRepositoryModelExtensions.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />

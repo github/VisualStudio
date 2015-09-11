@@ -1,4 +1,11 @@
-﻿using GitHub.Api;
+﻿using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using GitHub.Api;
+using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
@@ -6,17 +13,10 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using System.Linq;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using GitHub.Extensions;
-using NullGuard;
+using Microsoft.TeamFoundation.MVVM;
 using Microsoft.VisualStudio;
-using System;
-using System.Windows.Data;
-using System.ComponentModel;
+using NullGuard;
 using ReactiveUI;
-using System.Globalization;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -106,10 +106,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         Refresh(connectionManager.Connections[sectionIndex]);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    if (connectionManager.Connections.Count <= sectionIndex)
-                        Refresh(null);
-                    else
-                        Refresh(connectionManager.Connections[sectionIndex]);
+                    Refresh(connectionManager.Connections.Count <= sectionIndex
+                        ? null
+                        : connectionManager.Connections[sectionIndex]);
                     break;
             }
         }
@@ -173,10 +172,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void UpdateConnection()
         {
-            if (connectionManager.Connections.Count > sectionIndex)
-                Refresh(connectionManager.Connections[sectionIndex]);
-            else
-                Refresh(SectionConnection);
+            Refresh(connectionManager.Connections.Count > sectionIndex
+                ? connectionManager.Connections[sectionIndex]
+                : SectionConnection);
         }
 
         void OnPropertyChange(object sender, PropertyChangedEventArgs e)
@@ -194,21 +192,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (isCloning || isCreating)
                 {
                     var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().First();
+
                     SelectedRepository = newrepo;
                     if (isCreating)
-                    {
-                        var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-                        vsservices.ClearNotifications();
-                        vsservices.ShowMessage(string.Format(CultureInfo.CurrentUICulture, "[{0}]({1}) has been successfully created.", newrepo.Name, newrepo.CloneUrl));
-                    }
-                    // if we've cloned a repo but the user didn't open a project in it,
-                    // then update the newly-cloned repo icon because we're not going to
-                    // switch to the TE home page
-                    if ((isCloning && !OpenRepository()) || isCreating)
-                    {
-                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
-                        newrepo.SetIcon(repo.Private, repo.Fork);
-                    }
+                        HandleCreatedRepo(newrepo);
+                    else
+                        HandleClonedRepo(newrepo);
+
+                    var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                    newrepo.SetIcon(repo.Private, repo.Fork);
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
                 else
@@ -226,6 +218,58 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
+        void HandleCreatedRepo(ISimpleRepositoryModel newrepo)
+        {
+            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
+            msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            ShowNotification(newrepo, msg);
+        }
+
+        void HandleClonedRepo(ISimpleRepositoryModel newrepo)
+        {
+            var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
+            if (newrepo.HasCommits() && newrepo.MightContainSolution())
+                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_OpenProject, newrepo.LocalPath);
+            else
+                msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
+            ShowNotification(newrepo, msg);
+        }
+
+        void ShowNotification(ISimpleRepositoryModel newrepo, string msg)
+        {
+            var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+            vsservices.ClearNotifications();
+            vsservices.ShowMessage(
+                msg,
+                new RelayCommand(o =>
+                {
+                    var str = o.ToString();
+                    /* the prefix is the action to perform:
+                     * u: launch browser with url
+                     * c: launch create new project dialog
+                     * o: launch open existing project dialog 
+                    */
+                    var prefix = str.Substring(0, 2);
+                    if (prefix == "u:")
+                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                    else if (prefix == "o:")
+                    {
+                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
+                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    }
+                    else if (prefix == "c:")
+                    {
+                        vsservices.SetDefaultProjectPath(newrepo.LocalPath);
+                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
+                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    }
+                })
+            );
+#if DEBUG
+            VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{0} Notification", DateTime.Now));
+#endif
+        }
+
         void RefreshRepositories()
         {
             connectionManager.RefreshRepositories();
@@ -234,13 +278,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void DoCreate()
         {
-            isCreating = true;
             StartFlow(UIControllerFlow.Create);
         }
 
         public void DoClone()
         {
-            isCloning = true;
             StartFlow(UIControllerFlow.Clone);
         }
 
@@ -279,7 +321,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
-            uiProvider.RunUI(controllerFlow, SectionConnection);
+            var ret = uiProvider.SetupUI(controllerFlow, SectionConnection);
+            ret.Subscribe(c =>
+            {
+                if (c.IsViewType(UIViewType.Clone))
+                    isCloning = true;
+                else if (c.IsViewType(UIViewType.Create))
+                    isCreating = true;
+            });
+            uiProvider.RunUI();
         }
 
         bool disposed;
@@ -289,6 +339,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 if (!disposed)
                 {
+                    connectionManager.Connections.CollectionChanged -= RefreshConnections;
                     if (Repositories != null)
                         Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;
@@ -329,11 +380,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
                 section.PropertyChanged += TrackState;
             }
-
+#if DEBUG
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
+#endif
             void TrackState(object sender, PropertyChangedEventArgs e)
             {
                 if (machine.PermittedTriggers.Contains(e.PropertyName))
+                {
+#if DEBUG
+                    VsOutputLogger.WriteLine(String.Format(CultureInfo.InvariantCulture, "{3} {0} title:{1} busy:{2}", e.PropertyName, ((ITeamExplorerSection)sender).Title, ((ITeamExplorerSection)sender).IsBusy, DateTime.Now));
+#endif
                     machine.Fire(e.PropertyName);
+                }
             }
         }
     }

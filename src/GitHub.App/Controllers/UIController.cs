@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows;
 using System.Windows.Controls;
 using GitHub.Authentication;
 using GitHub.Exports;
@@ -15,8 +17,7 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using Stateless;
-using System.Windows;
-using System.Reactive.Concurrency;
+using System.Collections.Specialized;
 
 namespace GitHub.Controllers
 {
@@ -36,6 +37,7 @@ namespace GitHub.Controllers
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
         UIControllerFlow currentFlow;
+        NotifyCollectionChangedEventHandler connectionAdded;
 
         [ImportingConstructor]
         public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
@@ -236,6 +238,15 @@ namespace GitHub.Controllers
                     .IsLoggedIn(hosts)
                     .Do(loggedin =>
                     {
+                        if (!loggedin && currentFlow != UIControllerFlow.Authentication)
+                        {
+                            connectionAdded = (s, e) => {
+                                if (e.Action == NotifyCollectionChangedAction.Add)
+                                    uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
+                            };
+                            connectionManager.Connections.CollectionChanged += connectionAdded;
+                        }
+
                         machine.Configure(UIViewType.None)
                             .Permit(Trigger.Auth, UIViewType.Login)
                             .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
@@ -257,10 +268,7 @@ namespace GitHub.Controllers
         public void Stop()
         {
             Debug.WriteLine("Stop ({0})", GetHashCode());
-            if (machine.IsInState(UIViewType.End))
-                Fire(Trigger.Next);
-            else
-                Fire(Trigger.Cancel);
+            Fire(machine.IsInState(UIViewType.End) ? Trigger.Next : Trigger.Cancel);
         }
 
         bool disposed; // To detect redundant calls
@@ -273,6 +281,9 @@ namespace GitHub.Controllers
                 Debug.WriteLine("Disposing ({0})", GetHashCode());
                 disposables.Dispose();
                 transition?.Dispose();
+                if (connectionAdded != null)
+                    connectionManager.Connections.CollectionChanged -= connectionAdded;
+                connectionAdded = null;
                 disposed = true;
             }
         }
@@ -283,6 +294,6 @@ namespace GitHub.Controllers
             GC.SuppressFinalize(this);
         }
 
-        public bool IsStopped { get { return machine.IsInState(UIViewType.Finished); } }
+        public bool IsStopped => machine.IsInState(UIViewType.Finished);
     }
 }
