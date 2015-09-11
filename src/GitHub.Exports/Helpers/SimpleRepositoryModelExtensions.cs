@@ -14,7 +14,7 @@ namespace GitHub.Extensions
             var repo = Services.GetRepoFromPath(repository.LocalPath);
             return repo?.Commits.Count() > 0;
         }
-        public static bool HasContent(this ISimpleRepositoryModel repository)
+        public static bool MightContainSolution(this ISimpleRepositoryModel repository)
         {
             var dir = new DirectoryInfo(repository.LocalPath);
             return dir.EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)
