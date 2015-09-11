@@ -327,7 +327,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
             var ret = uiProvider.SetupUI(controllerFlow, SectionConnection);
-            ret.Subscribe((c) =>
+            ret.Subscribe(c =>
             {
                 if (c.IsViewType(UIViewType.Clone))
                     isCloning = true;

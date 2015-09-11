@@ -135,7 +135,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             disposable = uiflow;
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
-            creation.Subscribe((c) =>
+            creation.Subscribe(c =>
             {
                 SectionContent = c;
                 c.DataContext = this;
