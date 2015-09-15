@@ -1,9 +1,11 @@
-﻿using GitHub.Primitives;
+﻿using GitHub.Extensions;
+using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 
 namespace GitHub.Models
 {
@@ -18,6 +20,31 @@ namespace GitHub.Models
             Icon = Octicon.repo;
         }
 
+        public SimpleRepositoryModel(string path)
+        {
+            if (path == null)
+                throw new ArgumentNullException("path");
+            if (!Directory.Exists(path))
+                throw new ArgumentException("Path does not exist", path);
+            var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
+            var name = uri?.NameWithOwner;
+            if (name == null)
+                name = Path.GetDirectoryName(name);
+            Name = name;
+            LocalPath = path;
+            CloneUrl = uri;
+            Icon = Octicon.repo;
+        }
+
+        public static ISimpleRepositoryModel Create(string path)
+        {
+            if (path == null)
+                return null;
+            if (!Directory.Exists(path))
+                return null;
+            return new SimpleRepositoryModel(path);
+        }
+
         public void SetIcon(bool isPrivate, bool isFork)
         {
             Icon = isPrivate
@@ -27,15 +54,30 @@ namespace GitHub.Models
                         : Octicon.repo;
         }
 
+        public void Refresh()
+        {
+            if (LocalPath == null)
+                return;
+            var uri = GitHelpers.GetRepoFromPath(LocalPath)?.GetUri();
+            if (CloneUrl != uri)
+                CloneUrl = uri;
+        }
+
         public string Name { get; private set; }
-        public UriString CloneUrl { get; private set; }
+        UriString cloneUrl;
+        public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
         public string LocalPath { get; private set; }
         Octicon icon;
         public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
 
+        /// <summary>
+        /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
+        /// of a repository. Equals takes care of any hash collisions because of this
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
-            return (Name?.GetHashCode() ?? 0) ^ (CloneUrl?.GetHashCode() ?? 0) ^ (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
+            return (Name?.GetHashCode() ?? 0) ^ (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
         }
 
         public override bool Equals(object obj)
