@@ -129,7 +129,7 @@ namespace GitHub.VisualStudio
         public void RefreshRepositories()
         {
             var list = vsServices.GetKnownRepositories();
-            list.GroupBy(r => Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
+            list.GroupBy(r => Connections.FirstOrDefault(c => r.CloneUrl != null && c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
                 .Where(g => g.Key != null)
                 .ForEach(g =>
             {
