@@ -55,8 +55,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             if (ActiveRepo != null && ActiveRepoUri == null)
             {
                 IsVisible = true;
-                loggedIn = await connectionManager.IsLoggedIn(hosts);
                 ShowGetStarted = true;
+                loggedIn = await connectionManager.IsLoggedIn(hosts);
                 ShowLogin = !loggedIn;
                 ShowSignup = !loggedIn;
             }
