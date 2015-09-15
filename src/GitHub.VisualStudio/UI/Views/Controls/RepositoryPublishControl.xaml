@@ -124,7 +124,24 @@
 
         <CheckBox x:Name="makePrivate"
                   Margin="0,8,0,0"
-                  Style="{StaticResource VSStyledCheckBox}" Content="{x:Static prop:Resources.makePrivateContent}"/>
+                  Style="{StaticResource VSStyledCheckBox}">
+          <TextBlock TextWrapping="Wrap"
+                     Foreground="{DynamicResource VsBrush.ToolWindowText}"
+                     Background="{DynamicResource VsBrush.ToolWindowBackground}">
+            <TextBlock.Resources>
+              <Style TargetType="{x:Type TextBlock}">
+                <Style.Triggers>
+                  <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </TextBlock.Resources>
+            <TextBlock.Inlines>
+              <Run Content="{x:Static prop:Resources.makePrivateContent}"/>
+            </TextBlock.Inlines>
+          </TextBlock>
+        </CheckBox>
        
         <Button
             Style="{StaticResource VSStyledButton}"

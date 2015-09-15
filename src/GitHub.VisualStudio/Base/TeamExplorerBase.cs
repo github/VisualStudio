@@ -44,11 +44,15 @@ namespace GitHub.VisualStudio.Base
             return GetService<T>() as Ret;
         }
 
-        protected virtual void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, Uri uri)
+        protected static void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, Uri uri)
         {
-            var b = browser.Value;
-            Debug.Assert(b != null, "Could not create a browser helper instance.");
-            b?.OpenUrl(uri);
+            OpenInBrowser(browser.Value, uri);
+        }
+
+        protected static void OpenInBrowser(IVisualStudioBrowser browser, Uri uri)
+        {
+            Debug.Assert(browser != null, "Could not create a browser helper instance.");
+            browser?.OpenUrl(uri);
         }
     }
 }

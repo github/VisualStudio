@@ -30,33 +30,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
                 
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
-
-                d(this.WhenAnyValue(x => x.ViewModel.KeepPrivate)
-                    .Subscribe(keepPrivate =>
-                    {
-                        // because we removed this.Bind, set this by hand
-                        if (keepPrivate != makePrivate.IsChecked)
-                        {
-                            makePrivate.IsChecked = keepPrivate;
-                        }
-                    }));
-
-                // BEGIN DANGER ZONE
-                //
-                // This replaces the default Bind behaviour as the Checkbox control
-                // does not raise an event here when it is hosted in the Team Explorer
-                // view.
-                //
-                // We've used this.Bind in other places (popups) so it's something
-                // we need to investigate further
-                //
-                d(Observable.FromEventPattern<RoutedEventArgs>(makePrivate, "Checked")
-                    .Subscribe(_ => ViewModel.KeepPrivate = true));
-                d(Observable.FromEventPattern<RoutedEventArgs>(makePrivate, "Unchecked")
-                    .Subscribe(_ => ViewModel.KeepPrivate = false));
-                // END DANGER ZONE
-
-
+                d(this.Bind(ViewModel, vm => vm.KeepPrivate, v => v.makePrivate.IsChecked));
                 d(this.OneWayBind(ViewModel, vm => vm.CanKeepPrivate, v => v.makePrivate.IsEnabled));
 
                 d(this.OneWayBind(ViewModel, vm => vm.Accounts, v => v.accountsComboBox.ItemsSource));
