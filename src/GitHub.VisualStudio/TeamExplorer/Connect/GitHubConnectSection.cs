@@ -209,7 +209,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         .Cast<ISimpleRepositoryModel>()
                         .ForEach(async r =>
                     {
-                        if (String.Equals(Holder.ActiveRepo?.RepositoryPath, r.LocalPath, StringComparison.CurrentCultureIgnoreCase))
+                        if (Equals(Holder.ActiveRepo, r))
                             SelectedRepository = r;
                         var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
                         r.SetIcon(repo.Private, repo.Fork);
@@ -298,7 +298,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public bool OpenRepository()
         {
-            var old = Repositories.FirstOrDefault(x => String.Equals(Holder.ActiveRepo?.RepositoryPath, x.LocalPath, StringComparison.CurrentCultureIgnoreCase));
+            var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
             // open the solution selection dialog when the user wants to switch to a different repo
             // since there's no other way of changing the source control context in VS
             if (!Equals(SelectedRepository, old))

@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Linq;
 using System.Threading;
 using System.Globalization;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -18,8 +19,8 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        readonly Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
-        IGitRepositoryInfo activeRepo;
+        readonly Dictionary<object, Action<ISimpleRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ISimpleRepositoryModel>>();
+        ISimpleRepositoryModel activeRepo;
         bool activeRepoNotified = false;
 
         IServiceProvider serviceProvider;
@@ -48,24 +49,24 @@ namespace GitHub.VisualStudio.Base
                 if (serviceProvider == null)
                     return;
                 GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
-                UIContextChanged(GitUIContext?.IsActive ?? false);
+                UIContextChanged(GitUIContext?.IsActive ?? false, false);
             }
         }
 
         [AllowNull]
-        public IGitRepositoryInfo ActiveRepo
+        public ISimpleRepositoryModel ActiveRepo
         {
             [return: AllowNull] get { return activeRepo; }
             private set
             {
-                if (activeRepo.Compare(value))
+                if (Equals(activeRepo, value))
                     return;
                 activeRepo = value;
                 NotifyActiveRepo();
             }
         }
 
-        public void Subscribe(object who, Action<IGitRepositoryInfo> handler)
+        public void Subscribe(object who, Action<ISimpleRepositoryModel> handler)
         {
             lock(activeRepoHandlers)
             {
@@ -140,7 +141,7 @@ namespace GitHub.VisualStudio.Base
                             if (repos == null)
                                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
                         }
-                        return repos?.FirstOrDefault();
+                        return repos?.FirstOrDefault()?.ToModel();
                     });
             }
             else
@@ -156,11 +157,11 @@ namespace GitHub.VisualStudio.Base
             if (service == null)
                 return;
 
-            var repo = service.ActiveRepositories.FirstOrDefault();
+            var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel();
             // this comparison is safe, the extension method supports null instances
-            if (!repo.Compare(ActiveRepo))
+            if (!repo.Equals(ActiveRepo))
                 // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
+                syncContext.Post(r => ActiveRepo = r as ISimpleRepositoryModel, repo);
         }
 
         public IGitAwareItem HomeSection

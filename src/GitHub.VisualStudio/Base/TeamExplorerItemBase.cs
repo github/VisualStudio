@@ -7,6 +7,7 @@ using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using Octokit;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -49,7 +50,7 @@ namespace GitHub.VisualStudio.Base
             var repo = ActiveRepo;
             if (repo != null)
             {
-                var uri = repo.GetUriFromRepository();
+                var uri = repo.CloneUrl;
                 if (uri?.RepositoryName != null)
                 {
                     ActiveRepoUri = uri;
