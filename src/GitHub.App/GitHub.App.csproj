@@ -128,6 +128,7 @@
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="Extensions\RepositoryModelExtensions.cs" />
     <Compile Include="Extensions\ValidationExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
@@ -155,7 +156,6 @@
     <Compile Include="Caches\LoginCache.cs" />
     <Compile Include="Caches\SharedCache.cs" />
     <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Infrastructure\ExportWrappers.cs" />
     <Compile Include="Models\Account.cs" />
