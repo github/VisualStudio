@@ -58,7 +58,7 @@ namespace GitHub.ViewModels
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
 
-            Title = string.Format(CultureInfo.CurrentCulture, "Create a {0} Repository", repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, repositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
             SelectedLicense = LicenseItem.None;
 
@@ -88,15 +88,15 @@ namespace GitHub.ViewModels
                 .WhereNotNull();
 
             RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .IfNullOrEmpty("Please enter a repository name")
-                .IfTrue(x => x.Length > 100, "Repository name must be fewer than 100 characters")
-                .IfTrue(IsAlreadyRepoAtPath, "Repository with same name already exists at this location");
+                .IfNullOrEmpty(Resources.RepositoryNameValidatorEmpty)
+                .IfTrue(x => x.Length > 100, Resources.RepositoryNameValidatorTooLong)
+                .IfTrue(IsAlreadyRepoAtPath, Resources.RepositoryNameValidatorAlreadyExists);
 
             SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
                 .Add(repoName =>
                 {
                     var parsedReference = GetSafeRepositoryName(repoName);
-                    return parsedReference != repoName ? "Will be created as " + parsedReference : null;
+                    return parsedReference != repoName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
                 });
 
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
@@ -221,7 +221,7 @@ namespace GitHub.ViewModels
                 // folder dialog is open.
                 var localBaseRepositoryPath = BaseRepositoryPath;
                 var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
-                    "Select a containing folder for your new repository.");
+                    Resources.BrowseForDirectory);
 
                 if (!browseResult.Success)
                     return;
@@ -319,14 +319,14 @@ namespace GitHub.ViewModels
             {
                 string message = string.Format(
                     CultureInfo.InvariantCulture,
-                    "Repository '{0}/{1}' already exists.",
+                    Resources.RepositoryCreationFailedAlreadyExists,
                     SelectedAccount.Login, RepositoryName);
-                return new PublishRepositoryUserError(message, "Change the repository name or select a different account and try again.");
+                return new PublishRepositoryUserError(message, Resources.RepositoryCreationFailedAlreadyExistsMessage);
             }
             var quotaExceededException = ex as PrivateRepositoryQuotaExceededException;
             if (quotaExceededException != null && SelectedAccount != null)
             {
-                return new PublishRepositoryUserError("Exceeded private repositories quota.", quotaExceededException.Message);
+                return new PublishRepositoryUserError(Resources.RepositoryCreationFailedQuota, quotaExceededException.Message);
             }
             return new PublishRepositoryUserError(ex.Message);
         }

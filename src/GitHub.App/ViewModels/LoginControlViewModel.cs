@@ -19,7 +19,7 @@ namespace GitHub.ViewModels
             ILoginToGitHubViewModel loginToGitHubViewModel,
             ILoginToGitHubForEnterpriseViewModel loginToGitHubEnterpriseViewModel)
         {
-            Title = "Connect To GitHub";
+            Title = Resources.LoginTitle;
             RepositoryHosts = hosts;
             GitHubLogin = loginToGitHubViewModel;
             EnterpriseLogin = loginToGitHubEnterpriseViewModel;

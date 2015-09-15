@@ -26,11 +26,11 @@ namespace GitHub.ViewModels
             RepositoryHosts = repositoryHosts;
 
             UsernameOrEmailValidator = ReactivePropertyValidator.For(this, x => x.UsernameOrEmail)
-                .IfNullOrEmpty("Please enter your username or email address")
-                .IfMatch(@"\s", "Username or email address must not have spaces");
+                .IfNullOrEmpty(Resources.UsernameOrEmailValidatorEmpty)
+                .IfMatch(@"\s", Resources.UsernameOrEmailValidatorSpaces);
 
             PasswordValidator = ReactivePropertyValidator.For(this, x => x.Password)
-                .IfNullOrEmpty("Please enter your password");
+                .IfNullOrEmpty(Resources.PasswordValidatorEmpty);
 
             canLogin = this.WhenAny(
                 x => x.UsernameOrEmailValidator.ValidationResult.IsValid,
@@ -43,12 +43,11 @@ namespace GitHub.ViewModels
             {
                 if (ex.IsCriticalException()) return;
 
-                log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri,
-                    UsernameOrEmail), ex);
+                log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri, UsernameOrEmail), ex);
                 if (ex is Octokit.ForbiddenException)
                 {
                     ShowLogInFailedError = true;
-                    LoginFailedMessage = "Make sure to use your password and not a Personal Access token to log in.";
+                    LoginFailedMessage = Resources.LoginFailedForbiddenMessage;
                 }
                 else
                 {
@@ -80,7 +79,7 @@ namespace GitHub.ViewModels
         public IReactiveCommand<Unit> Reset { get; }
         public IReactiveCommand<Unit> NavigateForgotPassword { get; }
 
-        string loginFailedMessage = "Check your username and password, then try again";
+        string loginFailedMessage = Resources.LoginFailedMessage;
         public string LoginFailedMessage
         {
             get { return loginFailedMessage; }

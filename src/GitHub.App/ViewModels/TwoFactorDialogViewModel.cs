@@ -32,7 +32,7 @@ namespace GitHub.ViewModels
             IVisualStudioBrowser browser,
             ITwoFactorChallengeHandler twoFactorChallengeHandler)
         {
-            Title = "Two-Factor authentication required";
+            Title = Resources.TwoFactorTitle;
             twoFactorChallengeHandler.SetViewModel(this);
 
             var canVerify = this.WhenAny(
@@ -59,12 +59,11 @@ namespace GitHub.ViewModels
                     switch (type)
                     {
                         case TwoFactorType.Sms:
-                            return "We sent you a message via SMS with your authentication code.";
+                            return Resources.TwoFactorSms;
                         case TwoFactorType.AuthenticatorApp:
-                            return "Open the two-factor authentication app on your device to view your " +
-                                "authentication code.";
+                            return Resources.TwoFactorApp;
                         case TwoFactorType.Unknown:
-                            return "Enter a login authentication code here";
+                            return Resources.TwoFactorUnknown;
 
                         default:
                             return null;

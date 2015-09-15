@@ -22,9 +22,9 @@ namespace GitHub.ViewModels
         public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IVisualStudioBrowser browser) : base(hosts, browser)
         {
             EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
-                .IfNullOrEmpty("Please enter an Enterprise URL")
-                .IfNotUri("Please enter a valid Enterprise URL")
-                .IfGitHubDotComHost("Not an Enterprise server. Please enter an Enterprise URL");
+                .IfNullOrEmpty(Resources.EnterpriseUrlValidatorEmpty)
+                .IfNotUri(Resources.EnterpriseUrlValidatorInvalid)
+                .IfGitHubDotComHost(Resources.EnterpriseUrlValidatorNotAGitHubHost);
 
             canLogin = this.WhenAny(
                 x => x.UsernameOrEmailValidator.ValidationResult.IsValid,
