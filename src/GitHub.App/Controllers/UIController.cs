@@ -160,22 +160,22 @@ namespace GitHub.Controllers
                 var dvm = factory.GetViewModel(UIViewType.TwoFactor);
                 disposables.Add(dvm);
                 var twofa = dvm.Value;
-                twofa.WhenAny(x => x.IsShowing, x => x.Value)
+                disposables.Add(twofa.WhenAny(x => x.IsShowing, x => x.Value)
                     .Where(x => x)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => Fire(Trigger.Next));
+                    .Subscribe(_ => Fire(Trigger.Next)));
 
-                view.Done
+                disposables.Add(view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => Fire(Trigger.Finish));
+                    .Subscribe(_ => Fire(Trigger.Finish)));
             }
             else if (viewType != UIViewType.TwoFactor)
             {
-                view.Done
+                disposables.Add(view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => Fire(Trigger.Next));
+                    .Subscribe(_ => Fire(Trigger.Next)));
             }
-            view.Cancel.Subscribe(_ => Stop());
+            disposables.Add(view.Cancel.Subscribe(_ => Stop()));
         }
 
         IView CreateViewAndViewModel(UIViewType viewType)
