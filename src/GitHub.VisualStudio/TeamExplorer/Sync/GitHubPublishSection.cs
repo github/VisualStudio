@@ -13,6 +13,8 @@ using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Api;
 using GitHub.VisualStudio.TeamExplorer;
+using System.Reactive.Disposables;
+using System.Windows.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -24,7 +26,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
         readonly IRepositoryHosts hosts;
-        IDisposable disposable;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         bool loggedIn;
 
         [ImportingConstructor]
@@ -132,7 +134,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
-            disposable = uiflow;
+            disposables.Add(uiflow);
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
             creation.Subscribe(c =>
@@ -151,8 +153,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 if (!disposed)
                 {
-                    if (disposable != null)
-                        disposable.Dispose();
+                    disposables.Dispose();
                     disposed = true;
                 }
             }
