@@ -138,7 +138,7 @@
               </Style>
             </TextBlock.Resources>
             <TextBlock.Inlines>
-              <Run Content="{x:Static prop:Resources.makePrivateContent}"/>
+              <Run Text="{x:Static prop:Resources.makePrivateContent}"/>
             </TextBlock.Inlines>
           </TextBlock>
         </CheckBox>
