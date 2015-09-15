@@ -8,11 +8,9 @@ using Microsoft.TeamFoundation.Controls;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Info;
-using ReactiveUI;
 using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Api;
-using GitHub.VisualStudio.TeamExplorer;
 using System.Reactive.Disposables;
 using System.Windows.Controls;
 
@@ -28,6 +26,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         readonly IRepositoryHosts hosts;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         bool loggedIn;
+        readonly UserControl view;
 
         [ImportingConstructor]
         public GitHubPublishSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -47,7 +46,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             ShowGetStarted = false;
             IsVisible = false;
             IsExpanded = true;
-            var view = new GitHubInvitationContent();
+            view = new GitHubInvitationContent();
             SectionContent = view;
             view.DataContext = this;
         }
@@ -123,11 +122,43 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             disposables.Add(uiflow);
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            var busyTracker = new SerialDisposable();
             creation.Subscribe(c =>
             {
                 SectionContent = c;
                 c.DataContext = this;
-                ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+
+                var v = (IView)c;
+                busyTracker.Disposable = v.IsBusy.Subscribe(x => IsBusy = x);
+                disposables.Add(v.Error.Subscribe(x =>
+                {
+                    var vsServices = ServiceProvider.GetExportedValue<IVSServices>();
+                    vsServices.ShowError(x as string);
+                }));
+            },
+            () =>
+            {
+                var vsServices = ServiceProvider.GetExportedValue<IVSServices>();
+                vsServices.ShowMessage("Repository published successfully.");
+
+                var v = SectionContent as IView;
+                // the IsPublishing flag takes way too long to fire, don't wait for it, we're done
+                if (IsBusy)
+                {
+                    // we only want to dispose things when all the events are processed (IsPublishing is the last one)
+                    busyTracker.Disposable = v.IsBusy.Subscribe(_ =>
+                    {
+                        disposables.Clear();
+                        busyTracker.Dispose();
+                    });
+                    IsBusy = false;
+                }
+                else
+                {
+                    busyTracker.Dispose();
+                    disposables.Clear();
+                }
+                SectionContent = view;
             });
             ui.Start(null);
         }

@@ -151,23 +151,19 @@ namespace GitHub.ViewModels
             return ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
         }
 
-        private IObservable<Unit> OnPublishRepository(object arg)
+        IObservable<Unit> OnPublishRepository(object arg)
         {
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
                 .SelectUnit()
-                .Do(_ => vsServices.ShowMessage("Repository published successfully."))
                 .Catch<Unit, Exception>(ex =>
                 {
+                    log.Error(ex);
                     if (!ex.IsCriticalException())
-                    {
-                        log.Error(ex);
-                        var error = new PublishRepositoryUserError(ex.Message);
-                        vsServices.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
-                    }
-                    return Observable.Return(Unit.Default);
+                        ex = new UnhandledUserErrorException(new PublishRepositoryUserError(ex.Message));
+                    return Observable.Throw<Unit>(ex);
                 });
         }
 

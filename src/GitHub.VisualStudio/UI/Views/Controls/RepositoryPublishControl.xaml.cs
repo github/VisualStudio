@@ -42,10 +42,17 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
-                ViewModel.PublishRepository.Subscribe(_ => NotifyDone());
+                d(ViewModel.PublishRepository.Subscribe(_ => NotifyDone()));
+                d(ViewModel.PublishRepository.ThrownExceptions.Subscribe(ex =>
+                {
+                    var error = ex as UnhandledUserErrorException;
+                    if (error == null)
+                        NotifyError("Error publishing repository." + Environment.NewLine + ex.Message);
+                    else
+                        NotifyError((error.ReportedError.ErrorMessage + Environment.NewLine + error.ReportedError.ErrorCauseOrResolution).TrimEnd());
+                }));
 
-                d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value)
-                .Subscribe(x => NotifyIsBusy(x)));
+                d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value).Subscribe(x => NotifyIsBusy(x)));
 
                 nameText.Text = ViewModel.DefaultRepositoryName;
             });
