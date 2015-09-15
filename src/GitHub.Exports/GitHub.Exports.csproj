@@ -99,9 +99,10 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="Extensions\GitHelpers.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
-    <Compile Include="Helpers\PropertyNotifierExtensions.cs" />
-    <Compile Include="Helpers\SimpleRepositoryModelExtensions.cs" />
+    <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
+    <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
@@ -122,7 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
-    <Compile Include="Services\VSExtensions.cs" />
+    <Compile Include="Extensions\VSExtensions.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />

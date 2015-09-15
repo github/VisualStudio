@@ -7,6 +7,7 @@ using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using Octokit;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {

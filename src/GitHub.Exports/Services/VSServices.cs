@@ -120,7 +120,7 @@ namespace GitHub.Services
                         var path = subkey?.GetValue("Path") as string;
                         if (path != null)
                         {
-                            var uri = VisualStudio.Services.GetRepoFromPath(path)?.GetUri();
+                            var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
                             var name = uri?.NameWithOwner;
                             if (name != null)
                                 return new SimpleRepositoryModel(name, uri, path);
