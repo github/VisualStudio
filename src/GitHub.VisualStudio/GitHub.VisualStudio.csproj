@@ -251,6 +251,13 @@
     <Compile Include="TeamExplorer\Home\PulseNavigationItem.cs" />
     <Compile Include="TeamExplorer\Sync\GitHubPublishSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
+    <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\Views\Controls\GitHubPaneControl.xaml.cs">
+      <DependentUpon>GitHubPaneControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\PullRequestControl.xaml.cs">
+      <DependentUpon>PullRequestControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
     </Compile>
@@ -333,6 +340,10 @@
     <Resource Include="Resources\default_user_avatar.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Resources\icons\git_pull_request.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\icons\mark_github.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -343,6 +354,14 @@
     <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\GitHubPaneControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Controls\PullRequestControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
       <Generator>MSBuild:Compile</Generator>

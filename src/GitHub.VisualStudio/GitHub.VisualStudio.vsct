@@ -29,7 +29,20 @@
       <Group guid="guidGitHubCmdSet" id="idGitHubMenuGroup" priority="0x0500">
         <Parent guid="guidManageConnections" id="idManageConnections" />
       </Group>
+
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" priority="0x0500">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
     </Groups>
+
+    <Menus>
+      <Menu guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" priority="0x0000" type="ToolWindowToolbar">
+        <Strings>
+          <ButtonText>WindowToolBar</ButtonText>
+          <CommandName>Window Toolbar</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
     
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button 
@@ -51,6 +64,25 @@
           <ButtonText>&amp;Connect to GitHub</ButtonText>
         </Strings>
       </Button>
+
+      <Button guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>GitHub</ButtonText>
+        </Strings>
+      </Button>
+
+      <!--- Toolbar buttons -->
+      <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" priority="0x0100" type="Button">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
+        <Icon guid="guidImages" id="pullrequest" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Changes</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
   </Commands>
@@ -65,6 +97,7 @@
       <IDSymbol name="idGitHubMenuGroup" value="0x1020"/>
       <IDSymbol name="addConnectionCommand" value="0x110"/>
       <IDSymbol name="addConnectionCommandDark" value="0x111"/>
+      <IDSymbol name="showGitHubPaneCommand" value="0x200"/>
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->
@@ -74,7 +107,15 @@
     
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
       <IDSymbol name="logo" value="1" />
+      <IDSymbol name="pullrequest" value="2" />
     </GuidSymbol>
+
+    <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
+      <IDSymbol name="idGitHubToolbarMenuGroup" value="0x1110" />
+      <IDSymbol name="idGitHubToolbar" value="0x1120" />
+      <IDSymbol name="pullRequestCommand" value="0x201" />
+    </GuidSymbol>
+
   </Symbols>
 
 </CommandTable>

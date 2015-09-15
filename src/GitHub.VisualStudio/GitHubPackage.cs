@@ -9,6 +9,8 @@ using GitHub.UI;
 using GitHub.Services;
 using GitHub.Models;
 using GitHub.VisualStudio.UI;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio;
 
 namespace GitHub.VisualStudio
 {
@@ -33,6 +35,7 @@ namespace GitHub.VisualStudio
     [ProvideMenuResource("Menus.ctmenu", 1)]
     //[ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
+    [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     public class GitHubPackage : PackageBase
     {
         public GitHubPackage()
@@ -47,9 +50,17 @@ namespace GitHub.VisualStudio
 
         protected override void Initialize()
         {
-            base.Initialize();
-
             AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
+            AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
+            {
+                var window = FindToolWindow(typeof(GitHubPane), 0, true);
+                if (window == null || window.Frame == null)
+                    throw new NotSupportedException("Cannot create tool window");
+
+                var windowFrame = (IVsWindowFrame)window.Frame;
+                ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            });
+            base.Initialize();
         }
 
         void StartFlow(UIControllerFlow controllerFlow)

@@ -27,21 +27,21 @@ namespace GitHub.VisualStudio.Base
 
         protected void AddTopLevelMenuItem(
             Guid guid,
-            uint packageCommandId,
+            int cmdId,
             EventHandler eventHandler)
         {
             var mcs = GetService(typeof(IMenuCommandService)) as IMenuCommandService;
             Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
             if (mcs == null)
                 return;
-            var cmdId = new CommandID(guid, (int)packageCommandId);
-            var item = new MenuCommand(eventHandler, cmdId);
+            var id = new CommandID(guid, cmdId);
+            var item = new MenuCommand(eventHandler, id);
             mcs.AddCommand(item);
         }
 
         protected void AddDynamicMenuItem(
             Guid guid,
-            uint id,
+            int cmdId,
             Func<bool> canEnable,
             Action execute)
         {
@@ -49,7 +49,7 @@ namespace GitHub.VisualStudio.Base
             Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
             if (mcs == null)
                 return;
-            var cmdId = new CommandID(guid, (int)id);
+            var id = new CommandID(guid, cmdId);
             var item = new OleMenuCommand(
                 (s, e) => execute(),
                 (s, e) => { },
@@ -57,7 +57,7 @@ namespace GitHub.VisualStudio.Base
                 {
                     ((OleMenuCommand)s).Visible = canEnable();
                 },
-                cmdId);
+                id);
             mcs.AddCommand(item);
         }
 
