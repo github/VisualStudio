@@ -18,6 +18,7 @@ namespace GitHub.UI
     {
         readonly Subject<object> close = new Subject<object>();
         readonly Subject<object> cancel = new Subject<object>();
+        readonly Subject<object> error = new Subject<object>();
         readonly Subject<bool> isBusy = new Subject<bool>();
 
         public SimpleViewUserControl()
@@ -39,6 +40,8 @@ namespace GitHub.UI
 
         public IObservable<object> Cancel { get { return cancel; } }
 
+        public IObservable<object> Error { get { return error; } }
+
         public IObservable<bool> IsBusy{ get { return isBusy; } }
 
         protected void NotifyDone()
@@ -51,6 +54,12 @@ namespace GitHub.UI
         {
             cancel.OnNext(null);
             cancel.OnCompleted();
+        }
+
+        protected void NotifyError(string message)
+        {
+            error.OnNext(message);
+            error.OnCompleted();
         }
 
         protected void NotifyIsBusy(bool busy)
@@ -66,6 +75,7 @@ namespace GitHub.UI
                 if (disposed) return;
 
                 close.Dispose();
+                error.Dispose();
                 disposed = true;
             }
         }

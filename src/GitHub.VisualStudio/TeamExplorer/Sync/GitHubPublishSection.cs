@@ -8,11 +8,11 @@ using Microsoft.TeamFoundation.Controls;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Info;
-using ReactiveUI;
 using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Api;
-using GitHub.VisualStudio.TeamExplorer;
+using System.Reactive.Disposables;
+using System.Windows.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -24,8 +24,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
         readonly IRepositoryHosts hosts;
-        IDisposable disposable;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         bool loggedIn;
+        readonly UserControl view;
 
         [ImportingConstructor]
         public GitHubPublishSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -45,12 +46,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             ShowGetStarted = false;
             IsVisible = false;
             IsExpanded = true;
-            var view = new GitHubInvitationContent();
+            view = new GitHubInvitationContent();
             SectionContent = view;
             view.DataContext = this;
         }
 
-        async void RTMSetup()
+        async void Setup()
         {
             if (ActiveRepo != null && ActiveRepoUri == null)
             {
@@ -64,39 +65,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 IsVisible = false;
         }
 
-        async void PreRTMSetup()
-        {
-            if (ActiveRepo != null && ActiveRepoUri == null)
-            {
-                IsVisible = true;
-                loggedIn = await connectionManager.IsLoggedIn(hosts);
-                if (loggedIn)
-                    ShowPublish();
-                else
-                {
-                    ShowGetStarted = true;
-                    ShowSignup = true;
-                }
-            }
-            else
-                IsVisible = false;
-        }
-
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
-            RTMSetup();
+            Setup();
         }
 
         protected override void RepoChanged()
         {
             base.RepoChanged();
-            RTMSetup();
+            Setup();
         }
 
         public async void Connect()
         {
             loggedIn = await connectionManager.IsLoggedIn(hosts);
+            // we run the login on a separate UI flow because the login
+            // dialog is a modal dialog while the publish dialog is inlined in Team Explorer
             if (loggedIn)
                 ShowPublish();
             else
@@ -128,18 +113,52 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         void ShowPublish()
         {
+            // set the loading indicator while we prep the form
             IsBusy = true;
+
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
-            disposable = uiflow;
+            disposables.Add(uiflow);
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            var busyTracker = new SerialDisposable();
             creation.Subscribe(c =>
             {
                 SectionContent = c;
                 c.DataContext = this;
-                ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+
+                var v = (IView)c;
+                busyTracker.Disposable = v.IsBusy.Subscribe(x => IsBusy = x);
+                disposables.Add(v.Error.Subscribe(x =>
+                {
+                    var vsServices = ServiceProvider.GetExportedValue<IVSServices>();
+                    vsServices.ShowError(x as string);
+                }));
+            },
+            () =>
+            {
+                var vsServices = ServiceProvider.GetExportedValue<IVSServices>();
+                vsServices.ShowMessage("Repository published successfully.");
+
+                var v = SectionContent as IView;
+                // the IsPublishing flag takes way too long to fire, don't wait for it, we're done
+                if (IsBusy)
+                {
+                    // we only want to dispose things when all the events are processed (IsPublishing is the last one)
+                    busyTracker.Disposable = v.IsBusy.Subscribe(_ =>
+                    {
+                        disposables.Clear();
+                        busyTracker.Dispose();
+                    });
+                    IsBusy = false;
+                }
+                else
+                {
+                    busyTracker.Dispose();
+                    disposables.Clear();
+                }
+                SectionContent = view;
             });
             ui.Start(null);
         }
@@ -151,8 +170,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 if (!disposed)
                 {
-                    if (disposable != null)
-                        disposable.Dispose();
+                    disposables.Dispose();
                     disposed = true;
                 }
             }

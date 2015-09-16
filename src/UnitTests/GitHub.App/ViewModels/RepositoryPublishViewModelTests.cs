@@ -339,10 +339,10 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
+            var obs = Substitute.For<IObserver<Exception>>();
+            vm.PublishRepository.ThrownExceptions.Subscribe(obs);
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
-
-            vsServices.Received().ShowMessage("Repository published successfully.");
-            vsServices.DidNotReceive().ShowError(Args.String);
+            obs.DidNotReceiveWithAnyArgs().OnNext(null);
         }
 
         [Fact]
@@ -358,10 +358,11 @@ public class RepositoryPublishViewModelTests
             var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, vsServices, cm);
             vm.RepositoryName = "repo-name";
 
+            var obs = Substitute.For<IObserver<Exception>>();
+            vm.PublishRepository.ThrownExceptions.Subscribe(obs);
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
-
-            vsServices.DidNotReceive().ShowMessage(Args.String);
-            vsServices.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
+            obs.ReceivedWithAnyArgs().OnNext(null);
+            Assert.True(obs.ReceivedCalls().Any(x => ((UnhandledUserErrorException)x.GetArguments()[0]).Message == "There is already a repository named 'repo-name' for the current account."));
         }
 
         [Fact]
@@ -391,6 +392,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
+            vm.PublishRepository.ThrownExceptions.Subscribe();
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
 
             vm.SelectedConnection = conns.First(x => x != vm.SelectedConnection);
@@ -422,6 +424,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
+            vm.PublishRepository.ThrownExceptions.Subscribe();
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
 
             vm.SelectedAccount = accounts[1];
