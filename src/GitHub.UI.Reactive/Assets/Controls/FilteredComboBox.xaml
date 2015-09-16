@@ -112,6 +112,7 @@
         <Setter Property="IsEditable" Value="false"/>
         <Setter Property="Template" Value="{StaticResource FilterComboBoxTemplate}"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource GitHubComboBoxItem}" />
+        <Setter Property="TextSearch.TextPath" Value="Name" />
     </Style>
 
 </ResourceDictionary>
