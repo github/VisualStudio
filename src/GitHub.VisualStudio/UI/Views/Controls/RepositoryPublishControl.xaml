@@ -110,6 +110,7 @@
             <TextBox x:Name="description"
                      Height="52"
                      AcceptsReturn="True"
+                     TextWrapping="WrapWithOverflow"
                      Margin="0,8,0,0"
                      Background="{DynamicResource VsBrush.SearchBoxBackground}"
                      Foreground="{DynamicResource VsBrush.WindowText}" />
