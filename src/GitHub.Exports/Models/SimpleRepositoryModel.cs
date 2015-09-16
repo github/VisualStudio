@@ -1,6 +1,7 @@
 ﻿using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.UI;
+using GitHub.VisualStudio;
 using GitHub.VisualStudio.Helpers;
 using System;
 using System.Diagnostics;
@@ -26,7 +27,7 @@ namespace GitHub.Models
                 throw new ArgumentNullException("path");
             if (!Directory.Exists(path))
                 throw new ArgumentException("Path does not exist", path);
-            var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
+            var uri = VisualStudio.Services.GetRepoFromPath(path)?.GetUri();
             var name = uri?.NameWithOwner;
             if (name == null)
                 name = Path.GetDirectoryName(name);
@@ -58,7 +59,7 @@ namespace GitHub.Models
         {
             if (LocalPath == null)
                 return;
-            var uri = GitHelpers.GetRepoFromPath(LocalPath)?.GetUri();
+            var uri = VisualStudio.Services.GetRepoFromPath(LocalPath)?.GetUri();
             if (CloneUrl != uri)
                 CloneUrl = uri;
         }
