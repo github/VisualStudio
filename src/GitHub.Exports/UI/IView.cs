@@ -8,5 +8,6 @@ namespace GitHub.UI
         IObservable<object> Done { get; }
         IObservable<object> Cancel { get; }
         IObservable<bool> IsBusy { get; }
+        IObservable<object> Error { get; }
     }
 }
