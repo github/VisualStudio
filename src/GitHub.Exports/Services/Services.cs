@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using EnvDTE;
 using EnvDTE80;
 using GitHub.Services;
@@ -8,9 +7,9 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Info;
 using GitHub.Primitives;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {
@@ -141,41 +140,6 @@ namespace GitHub.VisualStudio
             if (repoPath == null)
                 return null;
             return new Repository(repoPath);
-        }
-
-        public static UriString GetUri(this Repository repo)
-        {
-            return UriString.ToUriString(GetUriFromRepository(repo)?.ToRepositoryUrl());
-        }
-
-        static UriString GetUriFromRepository(Repository repo)
-        {
-            return repo
-                ?.Network
-                .Remotes
-                .FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal))
-                ?.Url;
-        }
-
-        public static Repository GetRepoFromIGit(this IGitRepositoryInfo repoInfo)
-        {
-            var repoPath = Repository.Discover(repoInfo.RepositoryPath);
-            if (repoPath == null)
-                return null;
-            return new Repository(repoPath);
-        }
-
-        public static Repository GetRepoFromPath(string path)
-        {
-            var repoPath = Repository.Discover(path);
-            if (repoPath == null)
-                return null;
-            return new Repository(repoPath);
-        }
-
-        public static UriString GetUriFromRepository(this IGitRepositoryInfo repoInfo)
-        {
-            return repoInfo.GetRepoFromIGit()?.GetUri();
         }
     }
 }
