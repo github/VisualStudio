@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             : base(apiFactory, holder, Octicon.book)
         {
             this.browser = browser;
-            Text = "Wiki";
+            Text = Resources.WikiNavigationItemText;
             ArgbColor = Colors.BlueNavigationItem.ToInt32();
         }
 

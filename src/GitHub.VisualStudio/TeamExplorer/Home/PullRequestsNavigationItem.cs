@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             : base(apiFactory, holder, Octicon.git_pull_request)
         {
             this.browser = browser;
-            Text = "Pull Requests";
+            Text = Resources.PullRequestsNavigationItemText;
             ArgbColor = Colors.RedNavigationItem.ToInt32();
         }
 

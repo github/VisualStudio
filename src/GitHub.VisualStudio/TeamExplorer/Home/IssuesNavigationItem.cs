@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             : base(apiFactory, holder, Octicon.issue_opened)
         {
             this.browser = browser;
-            Text = "Issues";
+            Text = Resources.IssuesNavigationItemText;
             ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
         }
 

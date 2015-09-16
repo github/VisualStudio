@@ -9,6 +9,7 @@
     xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
     xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
+    xmlns:prop="clr-namespace:GitHub.VisualStudio"
     mc:Ignorable="d"
     d:DesignWidth="414"
     d:DesignHeight="440"
@@ -29,7 +30,7 @@
         <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" />
         <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,12">
             <TextBlock 
-                Text="Two-factor authentication" 
+                Text="{x:Static prop:Resources.twoFactorAuthText}" 
                 Padding="0" 
                 Margin="0,0,12,0"
                 Style="{DynamicResource GitHubH1TextBlock}"
@@ -43,8 +44,8 @@
             HorizontalAlignment="Center"
             TextWrapping="Wrap"
             Style="{DynamicResource GitHubDescriptionTextBlock}">
-            <Run x:Name="description">Open the two-factor authentication app on your device to view your authentication code.</Run>
-            <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication">Read more</Hyperlink>
+            <Run x:Name="description" Text="{x:Static prop:Resources.openTwoFactorAuthAppText}"/>
+            <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication"><TextBlock Text="{x:Static prop:Resources.learnMoreLink}"/></Hyperlink>
         </TextBlock>
         <uirx:TwoFactorInput
             x:Name="authenticationCode"
@@ -52,14 +53,14 @@
         <Grid Margin="0,12,0,0" Height="18">
             <uirx:ErrorMessageDisplay
                 x:Name="authenticationFailedLabel"
-                Message="Try entering the code again or clicking the resend button to get a new authentication code."
-                Content="Invalid authentication code" />
+                Message="{x:Static prop:Resources.authenticationFailedLabelMessage}"
+                Content="{x:Static prop:Resources.authenticationFailedLabelContent}" />
             <uirx:ErrorMessageDisplay
                 x:Name="authenticationSentLabel"
                 Icon="check"
                 IconFill="{DynamicResource GitHubAccentBrush}"
-                Message="If you do not receive the authentication code, contact support@github.com."
-                Content="Authentication code sent!" />
+                Message="{x:Static prop:Resources.authenticationSentLabelMessage}"
+                Content="{x:Static prop:Resources.authenticationSentLabelContent}" />
         </Grid>
         <StackPanel
             Orientation="Horizontal"
@@ -70,15 +71,15 @@
                 TabIndex="2" 
                 Icon="check"
                 IsDefault="True"
-                Content="Verify" />
+                Content="{x:Static prop:Resources.verifyText}" />
             <ui:OcticonLinkButton 
                 x:Name="resendCodeButton"
                 TabIndex="3"
-                ToolTip="Send the code to your registered SMS Device again"
+                ToolTip="{x:Static prop:Resources.resendCodeButtonToolTip}"
                 FontSize="12"
                 Icon="sync"
                 Margin="18,0,0,0"
-                Content="_Resend" />
+                Content="{x:Static prop:Resources.resendCodeButtonContent}" />
         </StackPanel>
     </StackPanel>
 </uirx:SimpleViewUserControl>

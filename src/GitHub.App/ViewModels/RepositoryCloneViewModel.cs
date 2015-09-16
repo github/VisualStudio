@@ -56,7 +56,7 @@ namespace GitHub.ViewModels
             this.operatingSystem = operatingSystem;
             this.vsServices = vsServices;
 
-            Title = string.Format(CultureInfo.CurrentCulture, "Clone a {0} Repository", repositoryHost.Title);
+            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
             loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
             isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
@@ -243,8 +243,7 @@ namespace GitHub.ViewModels
                 // We store this in a local variable to prevent it changing underneath us while the
                 // folder dialog is open.
                 var localBaseRepositoryPath = BaseRepositoryPath;
-                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath,
-                    "Select a containing folder for your new repository.");
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath, Resources.BrowseForDirectory);
 
                 if (!browseResult.Success)
                     return;

@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             : base(apiFactory, holder, Octicon.pulse)
         {
             this.browser = browser;
-            Text = "Pulse";
+            Text = Resources.PulseNavigationItemText;
             ArgbColor = Colors.LightBlueNavigationItem.ToInt32();
         }
 

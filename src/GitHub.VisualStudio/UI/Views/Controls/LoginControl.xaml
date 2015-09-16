@@ -7,6 +7,7 @@
              xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio"
              mc:Ignorable="d"
              d:DesignWidth="414"
              d:DesignHeight="440"
@@ -43,7 +44,7 @@
                 Margin="0,0,0,10"
                 Style="{DynamicResource GitHubH1TextBlock}"
                 IsHitTestVisible="False"
-                Text="Log in" />
+                Text="{x:Static prop:Resources.LoginLink}" />
             
             <ui:HorizontalShadowDivider />
         </StackPanel>
@@ -77,11 +78,11 @@
                 <DockPanel Style="{StaticResource TabDockPanel}">
                     <StackPanel DockPanel.Dock="Bottom" Margin="0">
                         <Border Style="{StaticResource LoginButtonBorder}">
-                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                            <ui:OcticonCircleButton x:Name="dotComLogInButton" Icon="check" Content="{x:Static prop:Resources.LoginLink}" IsDefault="True" />
                         </Border>
 
-                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                            Don’t have an account? <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing">Sign up</Hyperlink>
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0" Text="{x:Static prop:Resources.dontHaveAnAccountText}">
+                            <Hyperlink x:Name="pricingLink" ToolTip="https://github.com/pricing"><TextBlock Text="{x:Static prop:Resources.SignUpLink}"/></Hyperlink>
                         </TextBlock>
                     </StackPanel>
 
@@ -90,25 +91,23 @@
                         <StackPanel Style="{StaticResource FormFieldStackPanel}">
                             <ui:PromptTextBox
                                 x:Name="dotComUserNameOrEmail"
-                                PromptText="Username or email"
+                                PromptText="{x:Static prop:Resources.UserNameOrEmailPromptText}"
                                 Margin="0,0,0,10" />
                             
-                            <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="Password" />
+                            <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="{x:Static prop:Resources.PasswordPrompt}" />
 
                             <uirx:ErrorMessageDisplay
                                 x:Name="dotComLoginFailedMessage"
-                                Message="Check your username and password, then try again">
-                                <TextBlock TextWrapping="Wrap">
-                                    Login failed. (<Hyperlink x:Name="dotComForgotPasswordLink">forgot your password?</Hyperlink>)
+                                Message="{x:Static prop:Resources.LoginFailedMessage}">
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.LoginFailedText}">
+                                    <Hyperlink x:Name="dotComForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.ForgotPasswordLink}"/></Hyperlink>
                                 </TextBlock>
                             </uirx:ErrorMessageDisplay>
 
                             <uirx:ErrorMessageDisplay
                                 x:Name="dotComConnectionFailedMessage"
-                                Message="Please check your internet connection and try again.">
-                                <TextBlock TextWrapping="Wrap">
-                                    Could not connect to github.com
-                                </TextBlock>
+                                Message="{x:Static prop:Resources.dotComConnectionFailedMessageMessage}">
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToGitHubText}"/>
                             </uirx:ErrorMessageDisplay>
 
                             <uirx:ValidationMessage
@@ -128,11 +127,11 @@
                 <DockPanel Style="{StaticResource TabDockPanel}">
                     <StackPanel DockPanel.Dock="Bottom">
                         <Border Style="{StaticResource LoginButtonBorder}">
-                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="Log in" IsDefault="True" />
+                            <ui:OcticonCircleButton x:Name="enterpriseLogInButton" Icon="check" Content="{x:Static prop:Resources.LoginLink}" IsDefault="True" />
                         </Border>
                         
-                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0">
-                            Don’t have GitHub Enterprise? <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com">Learn more</Hyperlink>
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0" Text="{x:Static prop:Resources.dontHaveGitHubEnterpriseText}">
+                            <Hyperlink x:Name="learnMoreLink" ToolTip="enterprise.github.com"><TextBlock Text="{x:Static prop:Resources.learnMoreLink}"></TextBlock></Hyperlink>
                         </TextBlock>
                     </StackPanel>
                     
@@ -142,12 +141,12 @@
                         
                         <ui:PromptTextBox
                             x:Name="enterpriseUserNameOrEmail"
-                            PromptText="Username or email"
+                            PromptText="{x:Static prop:Resources.UserNameOrEmailPromptText}"
                             Margin="0,0,0,10" />
 
-                        <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="Password" Margin="0,0,0,10" />
+                        <ui:SecurePasswordBox x:Name="enterprisePassword" PromptText="{x:Static prop:Resources.PasswordPrompt}" Margin="0,0,0,10" />
                         
-                        <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="GitHub Enterprise server address" />
+                        <ui:PromptTextBox x:Name="enterpriseUrl"  PromptText="{x:Static prop:Resources.enterpriseUrlPromptText}" />
 
                         <uirx:ValidationMessage
                             x:Name="enterpriseUserNameOrEmailValidationMessage"
@@ -164,18 +163,16 @@
 
                         <uirx:ErrorMessageDisplay
                             x:Name="enterpriseLoginFailedMessage"
-                            Message="Check your username and password, then try again">
-                            <TextBlock TextWrapping="Wrap">
-                                Login failed (<Hyperlink x:Name="enterpriseForgotPasswordLink">forgot your password?</Hyperlink>)
+                            Message="{x:Static prop:Resources.LoginFailedMessage}">
+                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.LoginFailedText}">
+                                <Hyperlink x:Name="enterpriseForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.ForgotPasswordLink}"/></Hyperlink>
                             </TextBlock>
                         </uirx:ErrorMessageDisplay>
 
                         <uirx:ErrorMessageDisplay
                             x:Name="enterpriseConnectingFailedMessage"
-                            Message="The host isn't available or is not a GitHub Enterprise server. Check the address and try again.">
-                            <TextBlock TextWrapping="Wrap">
-                                Could not connect to the server.
-                            </TextBlock>
+                            Message="{x:Static prop:Resources.enterpriseConnectingFailedMessage}">
+                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToTheServerText}"/>
                         </uirx:ErrorMessageDisplay>
                     </StackPanel>
                 </DockPanel>
