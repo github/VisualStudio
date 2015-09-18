@@ -25,12 +25,13 @@ namespace GitHub.Models
         {
             if (path == null)
                 throw new ArgumentNullException("path");
-            if (!Directory.Exists(path))
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", path);
             var uri = VisualStudio.Services.GetRepoFromPath(path)?.GetUri();
             var name = uri?.NameWithOwner;
             if (name == null)
-                name = Path.GetDirectoryName(name);
+                name = dir.Name;
             Name = name;
             LocalPath = path;
             CloneUrl = uri;
