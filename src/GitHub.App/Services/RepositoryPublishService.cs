@@ -13,7 +13,7 @@ namespace GitHub.Services
     public class RepositoryPublishService : IRepositoryPublishService
     {
         readonly IGitClient gitClient;
-        readonly Repository activeRepository;
+        readonly IRepository activeRepository;
 
         [ImportingConstructor]
         public RepositoryPublishService(IGitClient gitClient, IVSServices services)
