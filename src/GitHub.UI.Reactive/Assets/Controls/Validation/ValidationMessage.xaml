@@ -20,7 +20,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ValidationMessage}">
-                    <Grid x:Name="grid" Visibility="Collapsed" Margin="{TemplateBinding Padding}">
+                    <Grid x:Name="grid" Visibility="Collapsed" Margin="{TemplateBinding Padding}" ToolTip="{TemplateBinding Text}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>

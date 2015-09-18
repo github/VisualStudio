@@ -126,9 +126,14 @@
     <Compile Include="Caches\ImageCache.cs" />
     <Compile Include="Extensions\AkavacheExtensions.cs" />
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
-    <Compile Include="Extensions\RepositoryModelExtensions.cs" />
     <Compile Include="Extensions\ValidationExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
     <Compile Include="Services\GitClient.cs" />
@@ -155,7 +160,6 @@
     <Compile Include="Caches\LoginCache.cs" />
     <Compile Include="Caches\SharedCache.cs" />
     <Compile Include="Factories\SqlitePersistentBlobCacheFactory.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Info\GitHubUrls.cs" />
     <Compile Include="Infrastructure\ExportWrappers.cs" />
     <Compile Include="Models\Account.cs" />
@@ -262,6 +266,12 @@
       <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
       <Name>Rothko</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

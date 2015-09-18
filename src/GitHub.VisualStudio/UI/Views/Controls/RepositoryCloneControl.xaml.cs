@@ -33,7 +33,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoading, v => v.loadingProgressBar.Visibility));
-                d(this.OneWayBind(ViewModel, vm => vm.LoadingFailed, v => v.loadingFailedMessage.Visibility));
+                d(this.OneWayBind(ViewModel, vm => vm.LoadingFailed, v => v.loadingFailedPanel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.NoRepositoriesFound, v => v.noRepositoriesMessage.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.FilteredRepositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
                 d(this.Bind(ViewModel, vm => vm.SelectedRepository, v => v.repositoryList.SelectedItem));

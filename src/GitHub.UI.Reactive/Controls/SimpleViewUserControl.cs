@@ -66,6 +66,8 @@ namespace GitHub.UI
                 if (disposed) return;
 
                 close.Dispose();
+                cancel.Dispose();
+                isBusy.Dispose();
                 disposed = true;
             }
         }

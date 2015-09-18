@@ -9,6 +9,7 @@
              xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
              KeyboardNavigation.TabNavigation="Local"
@@ -145,14 +146,14 @@
   
   <DockPanel>
     <WrapPanel Orientation="Horizontal" Margin="6,0,0,6" DockPanel.Dock="Top">
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click">Clone</Button>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Click="cloneLink_Click" Content="{x:Static prop:Resources.CloneLink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click">Create</Button>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click"
-              Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}">Sign out</Button>
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click"
-              Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}">Login</Button>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
+              Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
+              Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </WrapPanel>
  
     <ListView x:Name="repositories"
@@ -198,7 +199,9 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                   </Grid.RowDefinitions>
-                  <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">Name:</TextBlock>
+                  <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">
+                    <Run Text="{x:Static prop:Resources.nameText}"/>:
+                  </TextBlock>
                   <TextBlock Grid.Row="0" Grid.Column="1">
                     <TextBlock.Text>
                       <MultiBinding Converter="{StaticResource FormatRepositoryNameConverter}" ConverterParameter="FormatRepositoryName">
@@ -207,7 +210,9 @@
                       </MultiBinding>
                     </TextBlock.Text>
                   </TextBlock>
-                  <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">Path:</TextBlock>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">
+                    <Run Text="{x:Static prop:Resources.pathText}"/>:
+                  </TextBlock>
                   <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=LocalPath}" />
                 </Grid>
               </ToolTip>

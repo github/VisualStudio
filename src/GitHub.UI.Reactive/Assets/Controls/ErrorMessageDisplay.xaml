@@ -29,6 +29,7 @@
                                 Fill="{TemplateBinding IconFill}" />
                         </Viewbox>
                         <ContentPresenter
+                            TextElement.FontFamily="{TemplateBinding FontFamily}"
                             Grid.Column="1"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"

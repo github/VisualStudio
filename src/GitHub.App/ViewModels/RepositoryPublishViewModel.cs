@@ -47,8 +47,8 @@ namespace GitHub.ViewModels
             title = this.WhenAny(
                 x => x.SelectedHost,
                 x => x.Value != null ?
-                    string.Format(CultureInfo.CurrentCulture, "Publish repository to {0}", x.Value.Title) :
-                    "Publish repository"
+                    string.Format(CultureInfo.CurrentCulture, Resources.PublishToTitle, x.Value.Title) :
+                    Resources.PublishTitle
             )
             .ToProperty(this, x => x.Title);
 
@@ -179,14 +179,14 @@ namespace GitHub.ViewModels
                 .WhereNotNull();
 
             RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .IfNullOrEmpty("Please enter a repository name")
-                .IfTrue(x => x.Length > 100, "Repository name must be fewer than 100 characters");
+                .IfNullOrEmpty(Resources.RepositoryNameValidatorEmpty)
+                .IfTrue(x => x.Length > 100, Resources.RepositoryNameValidatorTooLong);
 
             SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
                 .Add(repoName =>
                 {
                     var parsedReference = GetSafeRepositoryName(repoName);
-                    return parsedReference != repoName ? "Will be created as " + parsedReference : null;
+                    return parsedReference != repoName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
                 });
 
             this.WhenAny(x => x.SafeRepositoryNameWarningValidator.ValidationResult, x => x.Value)

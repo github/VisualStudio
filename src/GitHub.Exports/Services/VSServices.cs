@@ -117,8 +117,16 @@ namespace GitHub.Services
                 {
                     using (var subkey = key.OpenSubKey(x))
                     {
-                        return SimpleRepositoryModel.Create(subkey?.GetValue("Path") as string);
+                        var path = subkey?.GetValue("Path") as string;
+                        if (path != null)
+                        {
+                            var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
+                            var name = uri?.NameWithOwner;
+                            if (name != null)
+                                return new SimpleRepositoryModel(name, uri, path);
+                        }
                     }
+                    return null;
                 })
                 .Where(x => x != null)
                 .ToList();

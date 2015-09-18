@@ -8,7 +8,7 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.UI;
 using GitHub.Services;
 using GitHub.Models;
-using GitHub.VisualStudio.UI;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {
