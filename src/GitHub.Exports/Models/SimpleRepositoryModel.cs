@@ -1,5 +1,6 @@
 ﻿using GitHub.Extensions;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio;
 using GitHub.VisualStudio.Helpers;
@@ -10,6 +11,8 @@ using System.IO;
 
 namespace GitHub.Models
 {
+    using VisualStudio;
+
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, INotifyPropertySource, IEquatable<SimpleRepositoryModel>
     {
@@ -28,7 +31,7 @@ namespace GitHub.Models
             var dir = new DirectoryInfo(path);
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
+            var uri = Services.IGitService.GetUri(path);
             var name = uri?.NameWithOwner;
             if (name == null)
                 name = dir.Name;
@@ -36,15 +39,6 @@ namespace GitHub.Models
             LocalPath = path;
             CloneUrl = uri;
             Icon = Octicon.repo;
-        }
-
-        public static ISimpleRepositoryModel Create(string path)
-        {
-            if (path == null)
-                return null;
-            if (!Directory.Exists(path))
-                return null;
-            return new SimpleRepositoryModel(path);
         }
 
         public void SetIcon(bool isPrivate, bool isFork)
@@ -60,7 +54,7 @@ namespace GitHub.Models
         {
             if (LocalPath == null)
                 return;
-            var uri = GitHelpers.GetRepoFromPath(LocalPath)?.GetUri();
+            var uri = Services.IGitService.GetUri(LocalPath);
             if (CloneUrl != uri)
                 CloneUrl = uri;
         }

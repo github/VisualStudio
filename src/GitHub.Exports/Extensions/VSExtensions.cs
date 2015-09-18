@@ -5,6 +5,8 @@ using System.Diagnostics;
 
 namespace GitHub.Extensions
 {
+    using VisualStudio;
+
     public static class VSExtensions
     {
         public static T TryGetService<T>(this IServiceProvider serviceProvider) where T : class
@@ -34,6 +36,14 @@ namespace GitHub.Extensions
         public static T GetService<T>(this IServiceProvider serviceProvider)
         {
             return (T)serviceProvider.GetService(typeof(T));
+        }
+
+        public static T GetExportedValue<T>(this IServiceProvider serviceProvider)
+        {
+            var ui = serviceProvider as IUIProvider;
+            if (ui != null)
+                return ui.GetService<T>();
+            return Services.ComponentModel.DefaultExportProvider.GetExportedValue<T>();
         }
 
         public static ITeamExplorerSection GetSection(this IServiceProvider serviceProvider, Guid section)

@@ -6,6 +6,8 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Extensions
 {
+    using Services;
+    using VisualStudio;
     public static class SimpleRepositoryModelExtensions
     {
         /// <summary>
@@ -15,12 +17,12 @@ namespace GitHub.Extensions
         {
             if (repo == null)
                 return null;
-            return SimpleRepositoryModel.Create(repo.RepositoryPath);
+            return new SimpleRepositoryModel(repo.RepositoryPath);
         }
 
         public static bool HasCommits(this ISimpleRepositoryModel repository)
         {
-            var repo = GitHelpers.GetRepoFromPath(repository.LocalPath);
+            var repo = Services.IGitService.GetRepo(repository.LocalPath);
             return repo?.Commits.Any() ?? false;
         }
 

@@ -1,4 +1,5 @@
 ﻿using EntryExitDecoratorInterfaces;
+using System.IO;
 
 /// <summary>
 /// This base class will get its methods called by the most-derived
@@ -7,14 +8,35 @@
 /// </summary>
 public class TestBaseClass : IEntryExitDecorator
 {
-    public void OnEntry()
+    public virtual void OnEntry()
     {
         // Ensure that every test has the InUnitTestRunner flag
         // set, so threading doesn't go nuts.
         Splat.ModeDetector.Current.SetInUnitTestRunner(true);
     }
 
-    public void OnExit()
+    public virtual void OnExit()
     {
+    }
+}
+
+public class TempFileBaseClass : TestBaseClass
+{
+    public DirectoryInfo Directory { get; set; }
+
+    public override void OnEntry()
+    {
+        var f = Path.GetTempFileName();
+        var name = Path.GetFileNameWithoutExtension(f);
+        File.Delete(f);
+        Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
+        Directory.Create();
+        base.OnEntry();
+    }
+
+    public override void OnExit()
+    {
+        Directory.Delete(true);
+        base.OnExit();
     }
 }

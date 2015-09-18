@@ -21,7 +21,7 @@ namespace GitHub.Services
         string GetLocalClonePathFromGitProvider();
         void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
         string GetActiveRepoPath();
-        LibGit2Sharp.Repository GetActiveRepo();
+        LibGit2Sharp.IRepository GetActiveRepo();
         IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
         string SetDefaultProjectPath(string path);
 
@@ -73,11 +73,12 @@ namespace GitHub.Services
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
         }
 
-        public LibGit2Sharp.Repository GetActiveRepo()
+        public LibGit2Sharp.IRepository GetActiveRepo()
         {
             var gitExt = serviceProvider.GetService<IGitExt>();
+            var gitService = serviceProvider.GetService<IGitService>();
             if (gitExt.ActiveRepositories.Count > 0)
-                return gitExt.ActiveRepositories.First().GetRepoFromIGit();
+                return gitService.GetRepo(gitExt.ActiveRepositories.First());
             return serviceProvider.GetSolution().GetRepoFromSolution();
         }
 
@@ -117,16 +118,18 @@ namespace GitHub.Services
                 {
                     using (var subkey = key.OpenSubKey(x))
                     {
-                        var path = subkey?.GetValue("Path") as string;
-                        if (path != null)
+                        try
                         {
-                            var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
-                            var name = uri?.NameWithOwner;
-                            if (name != null)
-                                return new SimpleRepositoryModel(name, uri, path);
+                            var path = subkey?.GetValue("Path") as string;
+                            if (path != null)
+                                return new SimpleRepositoryModel(path);
                         }
+                        catch (Exception ex)
+                        {
+                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from the registry '{0}'", ex));
+                        }
+                        return null;
                     }
-                    return null;
                 })
                 .Where(x => x != null)
                 .ToList();
