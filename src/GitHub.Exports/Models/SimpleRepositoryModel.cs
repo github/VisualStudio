@@ -24,10 +24,10 @@ namespace GitHub.Models
         public SimpleRepositoryModel(string path)
         {
             if (path == null)
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException(nameof(path));
             var dir = new DirectoryInfo(path);
             if (!dir.Exists)
-                throw new ArgumentException("Path does not exist", path);
+                throw new ArgumentException("Path does not exist", nameof(path));
             var uri = GitHelpers.GetRepoFromPath(path)?.GetUri();
             var name = uri?.NameWithOwner;
             if (name == null)
