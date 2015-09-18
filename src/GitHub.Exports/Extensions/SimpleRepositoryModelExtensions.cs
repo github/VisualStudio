@@ -15,9 +15,7 @@ namespace GitHub.Extensions
         {
             if (repo == null)
                 return null;
-            var uri = repo.GetUriFromRepository();
-            var name = uri?.NameWithOwner;
-            return name != null ? new SimpleRepositoryModel(name, uri, repo.RepositoryPath) : null;
+            return SimpleRepositoryModel.Create(repo.RepositoryPath);
         }
 
         public static bool HasCommits(this ISimpleRepositoryModel repository)

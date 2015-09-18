@@ -1,4 +1,5 @@
-﻿using GitHub.Primitives;
+﻿using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using NullGuard;
@@ -12,9 +13,9 @@ namespace GitHub.VisualStudio.Base
             ActiveRepo = null;
         }
 
-        IGitRepositoryInfo activeRepo;
+        ISimpleRepositoryModel activeRepo;
         [AllowNull]
-        public IGitRepositoryInfo ActiveRepo
+        public ISimpleRepositoryModel ActiveRepo
         {
             [return: AllowNull]
             get { return activeRepo; }

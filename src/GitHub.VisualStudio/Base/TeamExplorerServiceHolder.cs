@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using System.Linq;
 using System.Threading;
 using System.Globalization;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -18,8 +19,8 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        readonly Dictionary<object, Action<IGitRepositoryInfo>> activeRepoHandlers = new Dictionary<object, Action<IGitRepositoryInfo>>();
-        IGitRepositoryInfo activeRepo;
+        readonly Dictionary<object, Action<ISimpleRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ISimpleRepositoryModel>>();
+        ISimpleRepositoryModel activeRepo;
         bool activeRepoNotified = false;
 
         IServiceProvider serviceProvider;
@@ -48,35 +49,50 @@ namespace GitHub.VisualStudio.Base
                 if (serviceProvider == null)
                     return;
                 GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
-                UIContextChanged(GitUIContext?.IsActive ?? false);
+                UIContextChanged(GitUIContext?.IsActive ?? false, false);
             }
         }
 
         [AllowNull]
-        public IGitRepositoryInfo ActiveRepo
+        public ISimpleRepositoryModel ActiveRepo
         {
             [return: AllowNull] get { return activeRepo; }
             private set
             {
-                if (activeRepo.Compare(value))
+                if (activeRepo == value)
                     return;
+                if (activeRepo != null)
+                    activeRepo.PropertyChanged -= ActiveRepoPropertyChanged;
                 activeRepo = value;
+                if (activeRepo != null)
+                    activeRepo.PropertyChanged += ActiveRepoPropertyChanged;
                 NotifyActiveRepo();
             }
         }
 
-        public void Subscribe(object who, Action<IGitRepositoryInfo> handler)
+        public void Subscribe(object who, Action<ISimpleRepositoryModel> handler)
         {
+            bool notificationsExist;
+            ISimpleRepositoryModel repo;
             lock(activeRepoHandlers)
             {
-                var repo = ActiveRepo;
+                repo = ActiveRepo;
+                notificationsExist = activeRepoNotified;
                 if (!activeRepoHandlers.ContainsKey(who))
                     activeRepoHandlers.Add(who, handler);
                 else
                     activeRepoHandlers[who] = handler;
-                if (activeRepoNotified)
-                    handler(repo);
             }
+
+            // the repo url might have changed and we don't get notifications
+            // for that, so this is a good place to refresh it in case that happened
+            repo?.Refresh();
+
+            // if the active repo hasn't changed and there's notifications queued up,
+            // notify the subscriber. If the repo has changed, the set above will trigger
+            // notifications so we don't have to do it here.
+            if (repo == ActiveRepo && notificationsExist)
+                handler(repo);
         }
 
         public void Unsubscribe(object who)
@@ -100,6 +116,12 @@ namespace GitHub.VisualStudio.Base
             ServiceProvider = null;
         }
 
+        public void Refresh()
+        {
+            GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+            UIContextChanged(GitUIContext?.IsActive ?? false, true);
+        }
+
         void NotifyActiveRepo()
         {
             lock (activeRepoHandlers)
@@ -113,10 +135,10 @@ namespace GitHub.VisualStudio.Base
         void UIContextChanged(object sender, UIContextChangedEventArgs e)
         {
             ActiveRepo = null;
-            UIContextChanged(e.Activated);
+            UIContextChanged(e.Activated, false);
         }
 
-        async void UIContextChanged(bool active)
+        async void UIContextChanged(bool active, bool refresh)
         {
             Debug.Assert(ServiceProvider != null, "UIContextChanged called before service provider is set");
             if (ServiceProvider == null)
@@ -125,7 +147,7 @@ namespace GitHub.VisualStudio.Base
             if (active)
             {
                 GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
-                if (ActiveRepo == null)
+                if (ActiveRepo == null || refresh)
                     ActiveRepo = await System.Threading.Tasks.Task.Run(() =>
                     {
                         var repos = GitService?.ActiveRepositories;
@@ -140,7 +162,7 @@ namespace GitHub.VisualStudio.Base
                             if (repos == null)
                                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
                         }
-                        return repos?.FirstOrDefault();
+                        return repos?.FirstOrDefault()?.ToModel();
                     });
             }
             else
@@ -156,11 +178,16 @@ namespace GitHub.VisualStudio.Base
             if (service == null)
                 return;
 
-            var repo = service.ActiveRepositories.FirstOrDefault();
-            // this comparison is safe, the extension method supports null instances
-            if (!repo.Compare(ActiveRepo))
+            var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel();
+            if (repo != ActiveRepo)
                 // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as IGitRepositoryInfo, repo);
+                syncContext.Post(r => ActiveRepo = r as ISimpleRepositoryModel, repo);
+        }
+
+        void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "CloneUrl")
+                ActiveRepo = sender as ISimpleRepositoryModel;
         }
 
         public IGitAwareItem HomeSection

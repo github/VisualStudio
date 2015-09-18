@@ -388,7 +388,7 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class RepositoryModelDesigner : IRepositoryModel
+    public class RepositoryModelDesigner : NotificationAwareObject, IRepositoryModel
     {
         public RepositoryModelDesigner() : this("repo")
         {
@@ -416,6 +416,8 @@ namespace GitHub.SampleData
         public Octicon Icon { get; set; }
 
         public IAccount Owner { get; set; }
+
+        public void Refresh() { }
     }
 
     public class RepositoryCloneViewModelDesigner : BaseViewModelDesigner, IRepositoryCloneViewModel
