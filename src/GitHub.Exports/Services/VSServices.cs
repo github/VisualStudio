@@ -76,16 +76,15 @@ namespace GitHub.Services
         public LibGit2Sharp.IRepository GetActiveRepo()
         {
             var gitExt = serviceProvider.GetService<IGitExt>();
-            var gitService = serviceProvider.GetService<IGitService>();
-            if (gitExt.ActiveRepositories.Count > 0)
-                return gitService.GetRepo(gitExt.ActiveRepositories.First());
-            return serviceProvider.GetSolution().GetRepoFromSolution();
+            return gitExt.ActiveRepositories.Any()
+                ? serviceProvider.GetService<IGitService>().GetRepo(gitExt.ActiveRepositories.First())
+                : serviceProvider.GetSolution().GetRepoFromSolution();
         }
 
         public string GetActiveRepoPath()
         {
             var gitExt = serviceProvider.GetService<IGitExt>();
-            if (gitExt.ActiveRepositories.Count > 0)
+            if (gitExt.ActiveRepositories.Any())
                 return gitExt.ActiveRepositories.First().RepositoryPath;
             var repo = serviceProvider.GetSolution().GetRepoFromSolution();
             return repo?.Info?.Path ?? string.Empty;
