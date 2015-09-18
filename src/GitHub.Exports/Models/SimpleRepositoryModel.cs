@@ -1,18 +1,13 @@
-﻿using GitHub.Extensions;
-using GitHub.Primitives;
-using GitHub.Services;
-using GitHub.UI;
-using GitHub.VisualStudio;
-using GitHub.VisualStudio.Helpers;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using GitHub.Primitives;
+using GitHub.UI;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.Models
 {
-    using VisualStudio;
-
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, INotifyPropertySource, IEquatable<SimpleRepositoryModel>
     {
@@ -31,10 +26,8 @@ namespace GitHub.Models
             var dir = new DirectoryInfo(path);
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = Services.IGitService.GetUri(path);
-            var name = uri?.NameWithOwner;
-            if (name == null)
-                name = dir.Name;
+            var uri = VisualStudio.Services.IGitService.GetUri(path);
+            var name = uri?.NameWithOwner ?? dir.Name;
             Name = name;
             LocalPath = path;
             CloneUrl = uri;
@@ -54,15 +47,15 @@ namespace GitHub.Models
         {
             if (LocalPath == null)
                 return;
-            var uri = Services.IGitService.GetUri(LocalPath);
+            var uri = VisualStudio.Services.IGitService.GetUri(LocalPath);
             if (CloneUrl != uri)
                 CloneUrl = uri;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
         UriString cloneUrl;
         public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
-        public string LocalPath { get; private set; }
+        public string LocalPath { get; }
         Octicon icon;
         public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
 
@@ -91,13 +84,12 @@ namespace GitHub.Models
             return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
-        internal string DebuggerDisplay
-        {
-            get
-            {
-                return String.Format(CultureInfo.InvariantCulture,
-                    "{3}\tName: {0} CloneUrl: {1} LocalPath: {2}", Name, CloneUrl, LocalPath, GetHashCode());
-            }
-        }
+        internal string DebuggerDisplay => String.Format(
+            CultureInfo.InvariantCulture,
+            "{3}\tName: {0} CloneUrl: {1} LocalPath: {2}",
+            Name,
+            CloneUrl,
+            LocalPath,
+            GetHashCode());
     }
 }
