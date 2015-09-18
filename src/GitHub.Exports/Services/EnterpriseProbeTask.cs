@@ -34,7 +34,6 @@ namespace GitHub.Services
                 BaseAddress = enterpriseBaseUrl,
                 Endpoint = endPoint,
                 Timeout = TimeSpan.FromSeconds(3),
-                AllowAutoRedirect = false,
             };
             request.Headers.Add("User-Agent", productHeader.ToString());
 

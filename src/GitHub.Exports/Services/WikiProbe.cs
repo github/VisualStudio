@@ -34,7 +34,6 @@ namespace GitHub.Services
                 BaseAddress = baseUri,
                 Endpoint = new Uri(repoUri.AbsolutePath + "/wiki", UriKind.Relative),
                 Timeout = TimeSpan.FromSeconds(3),
-                AllowAutoRedirect = false,
             };
             request.Headers.Add("User-Agent", productHeader.ToString());
 
