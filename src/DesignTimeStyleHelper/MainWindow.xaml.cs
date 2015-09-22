@@ -3,7 +3,7 @@ using System.Windows;
 using GitHub.SampleData;
 using GitHub.Services;
 using GitHub.UI;
-using GitHub.VisualStudio;
+using GitHub.Extensions;
 using GitHub.Models;
 
 namespace DesignTimeStyleHelper

@@ -3,7 +3,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
-using GitHub.VisualStudio.UI;
+using GitHub.Extensions;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
 using System;

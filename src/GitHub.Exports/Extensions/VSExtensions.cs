@@ -1,7 +1,7 @@
-﻿using GitHub.Services;
-using Microsoft.TeamFoundation.Controls;
-using System;
+﻿using System;
 using System.Diagnostics;
+using GitHub.Services;
+using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.Extensions
 {
@@ -34,6 +34,14 @@ namespace GitHub.Extensions
         public static T GetService<T>(this IServiceProvider serviceProvider)
         {
             return (T)serviceProvider.GetService(typeof(T));
+        }
+
+        public static T GetExportedValue<T>(this IServiceProvider serviceProvider)
+        {
+            var ui = serviceProvider as IUIProvider;
+            return ui != null
+                ? ui.GetService<T>()
+                : VisualStudio.Services.ComponentModel.DefaultExportProvider.GetExportedValue<T>();
         }
 
         public static ITeamExplorerSection GetSection(this IServiceProvider serviceProvider, Guid section)

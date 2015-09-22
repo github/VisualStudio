@@ -14,14 +14,8 @@ namespace UnitTests
 {
     internal static class Substitutes
     {
-        public static IGitRepositoriesExt IGitRepositoriesExt
-        {
-            get
-            {
-                var ret = Substitute.For<IGitRepositoriesExt>();
-                return ret;
-            }
-        }
+        public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
+        public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
 
         public static IVSServices IVSServices
         {
@@ -89,27 +83,22 @@ namespace UnitTests
         {
             var ret = Substitute.For<IServiceProvider, IUIProvider>();
             var os = OperatingSystem;
-            var git = IGitRepositoriesExt;
             var vs = IVSServices;
             var clone = cloneService ?? new RepositoryCloneService(os, vs);
             var create = creationService ?? new RepositoryCreationService(clone);
-            var hosts = RepositoryHosts;
-            var exports = ExportFactoryProvider;
-            var connection = Connection;
-            var connectionManager = ConnectionManager;
-            var twoFactorChallengeHandler = TwoFactorChallengeHandler;
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
-            ret.GetService(typeof(IGitRepositoriesExt)).Returns(git);
+            ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
+            ret.GetService(typeof(IGitService)).Returns(IGitService);
             ret.GetService(typeof(IVSServices)).Returns(vs);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
-            ret.GetService(typeof(IRepositoryHosts)).Returns(hosts);
-            ret.GetService(typeof(IExportFactoryProvider)).Returns(exports);
-            ret.GetService(typeof(IConnection)).Returns(connection);
-            ret.GetService(typeof(IConnectionManager)).Returns(connectionManager);
+            ret.GetService(typeof(IRepositoryHosts)).Returns(RepositoryHosts);
+            ret.GetService(typeof(IExportFactoryProvider)).Returns(ExportFactoryProvider);
+            ret.GetService(typeof(IConnection)).Returns(Connection);
+            ret.GetService(typeof(IConnectionManager)).Returns(ConnectionManager);
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
-            ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(twoFactorChallengeHandler);
+            ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
             return ret;
         }
 
@@ -121,6 +110,11 @@ namespace UnitTests
         public static IVSServices GetVSServices(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IVSServices)) as IVSServices;
+        }
+
+        public static IGitService GetGitService(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IGitService)) as IGitService;
         }
 
         public static IOperatingSystem GetOperatingSystem(this IServiceProvider provider)

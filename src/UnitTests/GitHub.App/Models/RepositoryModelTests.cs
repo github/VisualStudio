@@ -1,17 +1,15 @@
 ﻿using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
+using GitHub.VisualStudio;
+using LibGit2Sharp;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnitTests;
 using Xunit;
 
-public class ComparisonTests
+public class RepositoryModelTests
 {
-    public class RepositoryModelTests : TestBaseClass
+    public class ComparisonTests : TestBaseClass
     {
         [Theory]
         [InlineData("a name", "https://github.com/github/VisualStudio", null, "a name", "https://github.com/github/VisualStudio", null)]
@@ -52,6 +50,37 @@ public class ComparisonTests
             Assert.NotEqual(a, b);
             Assert.False(a == b);
             Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+        }
+    }
+
+    public class PathConstructorTests : TempFileBaseClass
+    {
+        [Fact]
+        public void NoRemoteUrl()
+        {
+            var provider = Substitutes.ServiceProvider;
+            Services.PackageServiceProvider = provider;
+            var gitservice = Substitutes.IGitService;
+            provider.GetService(typeof(IGitService)).Returns(gitservice);
+            var repo = Substitute.For<IRepository>();
+            var path = Directory.CreateSubdirectory("repo-name");
+            gitservice.GetUri(path.FullName).Returns((UriString)null);
+            var model = new SimpleRepositoryModel(path.FullName);
+            Assert.Equal("repo-name", model.Name);
+        }
+
+        [Fact]
+        public void WithRemoteUrl()
+        {
+            var provider = Substitutes.ServiceProvider;
+            Services.PackageServiceProvider = provider;
+            var gitservice = Substitutes.IGitService;
+            provider.GetService(typeof(IGitService)).Returns(gitservice);
+            var repo = Substitute.For<IRepository>();
+            var path = Directory.CreateSubdirectory("repo-name");
+            gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
+            var model = new SimpleRepositoryModel(path.FullName);
+            Assert.Equal("user/repo-name", model.Name);
         }
     }
 

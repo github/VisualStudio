@@ -11,6 +11,7 @@ using GitHub.Models;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio
 {

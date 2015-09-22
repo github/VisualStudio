@@ -10,6 +10,7 @@ using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using NullGuard;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -56,7 +57,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        void UpdateRepo(IGitRepositoryInfo repo)
+        void UpdateRepo(ISimpleRepositoryModel repo)
         {
             ActiveRepo = repo;
             RepoChanged();

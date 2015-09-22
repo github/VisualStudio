@@ -1,7 +1,7 @@
-﻿using GitHub.Models;
-using System;
+﻿using System;
 using System.Linq;
 using System.IO;
+using GitHub.Models;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Extensions
@@ -13,16 +13,12 @@ namespace GitHub.Extensions
         /// </summary>
         public static ISimpleRepositoryModel ToModel(this IGitRepositoryInfo repo)
         {
-            if (repo == null)
-                return null;
-            var uri = repo.GetUriFromRepository();
-            var name = uri?.NameWithOwner;
-            return name != null ? new SimpleRepositoryModel(name, uri, repo.RepositoryPath) : null;
+            return repo == null ? null : new SimpleRepositoryModel(repo.RepositoryPath);
         }
 
         public static bool HasCommits(this ISimpleRepositoryModel repository)
         {
-            var repo = GitHelpers.GetRepoFromPath(repository.LocalPath);
+            var repo = VisualStudio.Services.IGitService.GetRepo(repository.LocalPath);
             return repo?.Commits.Any() ?? false;
         }
 

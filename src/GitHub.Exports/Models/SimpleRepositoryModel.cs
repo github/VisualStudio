@@ -1,9 +1,10 @@
-﻿using GitHub.Primitives;
-using GitHub.UI;
-using GitHub.VisualStudio.Helpers;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using GitHub.Primitives;
+using GitHub.UI;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.Models
 {
@@ -18,6 +19,21 @@ namespace GitHub.Models
             Icon = Octicon.repo;
         }
 
+        public SimpleRepositoryModel(string path)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists)
+                throw new ArgumentException("Path does not exist", nameof(path));
+            var uri = VisualStudio.Services.IGitService.GetUri(path);
+            var name = uri?.NameWithOwner ?? dir.Name;
+            Name = name;
+            LocalPath = path;
+            CloneUrl = uri;
+            Icon = Octicon.repo;
+        }
+
         public void SetIcon(bool isPrivate, bool isFork)
         {
             Icon = isPrivate
@@ -27,15 +43,30 @@ namespace GitHub.Models
                         : Octicon.repo;
         }
 
-        public string Name { get; private set; }
-        public UriString CloneUrl { get; private set; }
-        public string LocalPath { get; private set; }
+        public void Refresh()
+        {
+            if (LocalPath == null)
+                return;
+            var uri = VisualStudio.Services.IGitService.GetUri(LocalPath);
+            if (CloneUrl != uri)
+                CloneUrl = uri;
+        }
+
+        public string Name { get; }
+        UriString cloneUrl;
+        public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
+        public string LocalPath { get; }
         Octicon icon;
         public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
 
+        /// <summary>
+        /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
+        /// of a repository. Equals takes care of any hash collisions because of this
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
-            return (Name?.GetHashCode() ?? 0) ^ (CloneUrl?.GetHashCode() ?? 0) ^ (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
+            return (Name?.GetHashCode() ?? 0) ^ (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
         }
 
         public override bool Equals(object obj)
@@ -53,13 +84,12 @@ namespace GitHub.Models
             return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
-        internal string DebuggerDisplay
-        {
-            get
-            {
-                return String.Format(CultureInfo.InvariantCulture,
-                    "{3}\tName: {0} CloneUrl: {1} LocalPath: {2}", Name, CloneUrl, LocalPath, GetHashCode());
-            }
-        }
+        internal string DebuggerDisplay => String.Format(
+            CultureInfo.InvariantCulture,
+            "{3}\tName: {0} CloneUrl: {1} LocalPath: {2}",
+            Name,
+            CloneUrl,
+            LocalPath,
+            GetHashCode());
     }
 }
