@@ -198,5 +198,10 @@ namespace GitHub.Api
         {
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
         }
+
+        public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
+        {
+            return gitHubClient.PullRequest.GetAllForRepository(owner, name);
+        }
     }
 }

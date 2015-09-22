@@ -190,11 +190,19 @@ namespace GitHub.Services
                     {
                         string message = string.Format(
                             CultureInfo.InvariantCulture,
-                            "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
+                            "Retrieving '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
                         log.Error(message, e);
                         return Observable.Return(new IRepositoryModel[] { });
                     });
+        }
+
+        public IObservable<IPullRequestModel> GetPullRequests(IRepositoryModel repo)
+        {
+            return apiClient.GetPullRequestsForRepository(repo.Owner.Login, repo.Name)
+                .Select(PullRequestCacheItem.Create)
+                .Select(Create);
+
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
@@ -221,6 +229,18 @@ namespace GitHub.Services
                 repositoryCacheItem.Private,
                 repositoryCacheItem.Fork,
                 Create(repositoryCacheItem.Owner));
+        }
+
+        IPullRequestModel Create(PullRequestCacheItem prCacheItem)
+        {
+            return new PullRequestModel()
+            {
+                Title = prCacheItem.Title,
+                Number = prCacheItem.Number,
+                CreatedAt = prCacheItem.CreatedAt,
+                Author = Create(prCacheItem.Author),
+                CommentCount = prCacheItem.CommentCount
+            };
         }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
@@ -293,6 +313,30 @@ namespace GitHub.Services
             public string CloneUrl { get; set; }
             public bool Private { get; set; }
             public bool Fork { get; set; }
+        }
+
+        public class PullRequestCacheItem
+        {
+            public static PullRequestCacheItem Create(PullRequest pr)
+            {
+                return new PullRequestCacheItem(pr);
+            }
+
+            public PullRequestCacheItem() {}
+            public PullRequestCacheItem(PullRequest pr)
+            {
+                Title = pr.Title;
+                Number = pr.Number;
+                CommentCount = pr.Comments;
+                Author = new AccountCacheItem(pr.User);
+                CreatedAt = pr.CreatedAt;
+            }
+
+            public string Title { get; set; }
+            public int Number { get; set; }
+            public int CommentCount { get; set; }
+            public AccountCacheItem Author { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
         }
     }
 }

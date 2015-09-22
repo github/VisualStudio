@@ -1,0 +1,70 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                    xmlns:i18n="clr-namespace:GitHub.VisualStudio"
+                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
+
+  <ResourceDictionary.MergedDictionaries>
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+  <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  <ui:DurationToStringConverter x:Key="DurationToStringConverter" />
+
+  <DataTemplate x:Key="PullRequestItemTemplate">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="16" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="20" />
+      </Grid.ColumnDefinitions>
+      <Image x:Name="avatar"
+             Grid.Row="0"
+             Grid.RowSpan="2"
+             Grid.Column="0"
+             Width="16"
+             Height="16"
+             Margin="0,0,0,0"
+             RenderOptions.BitmapScalingMode="HighQuality"
+             Source="{Binding Author.Avatar}" />
+      <TextBlock x:Name="title"
+                 Grid.Row="0"
+                 Grid.Column="1"
+                 FontFamily="Segoe UI"
+                 FontSize="10"
+                 Foreground="{DynamicResource VsBrush.WindowText}"
+                 Text="{Binding Title}" />
+      <StackPanel x:Name="comment"
+                  Grid.Row="0"
+                  Grid.RowSpan="2"
+                  Grid.Column="2"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Orientation="Horizontal">
+        <ui:OcticonImage x:Name="comment_icon" Foreground="{DynamicResource VsBrush.WindowText}" Icon="comment" />
+        <TextBlock x:Name="comment_count" Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding CommentCount}" />
+        <ui:OcticonImage x:Name="comment_new"
+                         Foreground="Green"
+                         Icon="primitive_dot"
+                         Visibility="{Binding HasNewComments, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      </StackPanel>
+      <StackPanel x:Name="status"
+                  Grid.Row="1"
+                  Grid.Column="1"
+                  HorizontalAlignment="Left"
+                  Orientation="Horizontal">
+        <Button x:Name="cloneLink"
+                Command="{Binding OpenPR}"
+                Content="{Binding Number}"
+                Style="{StaticResource ActionLinkButton}" />
+        <TextBlock>
+          <Run Text="{x:Static i18n:Resources.prOpenedText}" /> <Run Text="{Binding CreatedAt, Converter={StaticResource DurationToStringConverter}}" /> <Run Text="{x:Static i18n:Resources.prOpenedByText}" /> <Run Text="{Binding Author.Login}" />
+        </TextBlock>
+      </StackPanel>
+    </Grid>
+  </DataTemplate>
+</ResourceDictionary>

@@ -276,4 +276,10 @@
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
   </data>
+  <data name="prOpenedText" xml:space="preserve">
+    <value>opened</value>
+  </data>
+  <data name="prOpenedByText" xml:space="preserve">
+    <value>by</value>
+  </data>
 </root>

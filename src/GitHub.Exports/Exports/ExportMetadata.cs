@@ -16,6 +16,7 @@ namespace GitHub.Exports {
 		Create,
 		Clone,
         Publish,
+        PullRequestList,
         End = 100,
         Finished
 	}
