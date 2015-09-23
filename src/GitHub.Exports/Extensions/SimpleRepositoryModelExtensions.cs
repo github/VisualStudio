@@ -3,6 +3,7 @@ using System.Linq;
 using System.IO;
 using GitHub.Models;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.Services;
 
 namespace GitHub.Extensions
 {
@@ -18,7 +19,7 @@ namespace GitHub.Extensions
 
         public static bool HasCommits(this ISimpleRepositoryModel repository)
         {
-            var repo = VisualStudio.Services.IGitService.GetRepo(repository.LocalPath);
+            var repo = GitService.GitServiceHelper.GetRepo(repository.LocalPath);
             return repo?.Commits.Any() ?? false;
         }
 
