@@ -5,6 +5,7 @@ using System.IO;
 using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
+using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -26,7 +27,7 @@ namespace GitHub.Models
             var dir = new DirectoryInfo(path);
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = VisualStudio.Services.IGitService.GetUri(path);
+            var uri = GitService.GitServiceHelper.GetUri(path);
             var name = uri?.NameWithOwner ?? dir.Name;
             Name = name;
             LocalPath = path;
@@ -47,7 +48,7 @@ namespace GitHub.Models
         {
             if (LocalPath == null)
                 return;
-            var uri = VisualStudio.Services.IGitService.GetUri(LocalPath);
+            var uri = GitService.GitServiceHelper.GetUri(LocalPath);
             if (CloneUrl != uri)
                 CloneUrl = uri;
         }
