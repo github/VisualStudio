@@ -4,7 +4,6 @@ using System.Linq;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using GitHub.Extensions;
 
 namespace GitHub.Services
 {
@@ -21,7 +20,6 @@ namespace GitHub.Services
         public UriString GetUri(IRepository repository)
         {
             return UriString.ToUriString(GetOriginUri(repository)?.ToRepositoryUrl());
-            
         }
 
         /// <summary>

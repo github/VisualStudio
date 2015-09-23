@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio
 
         public static IVsOutputWindow OutputWindow => GetGlobalService<SVsOutputWindow, IVsOutputWindow>();
 
-        static IVsOutputWindowPane outputWindowPane = null;
+        static IVsOutputWindowPane outputWindowPane;
         public static IVsOutputWindowPane OutputWindowPane
         {
             get
@@ -61,7 +61,7 @@ namespace GitHub.VisualStudio
                     var uiShell = GetGlobalService<SVsUIShell, IVsUIShell>();
                     // Get the frame of the output window
                     var outputWindowGuid = new Guid("{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}");
-                    IVsWindowFrame outputWindowFrame = null;
+                    IVsWindowFrame outputWindowFrame;
                     ErrorHandler.ThrowOnFailure(uiShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate, ref outputWindowGuid, out outputWindowFrame));
                     // Show the output window
                     if (outputWindowFrame != null)
@@ -78,6 +78,7 @@ namespace GitHub.VisualStudio
 
         public static DTE Dte => GetGlobalService<DTE, DTE>();
 
+        // ReSharper disable once SuspiciousTypeConversion.Global
         public static DTE2 Dte2 => Dte as DTE2;
 
         public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
