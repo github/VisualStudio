@@ -60,8 +60,7 @@ public class RepositoryModelTests
         {
             var provider = Substitutes.ServiceProvider;
             Services.PackageServiceProvider = provider;
-            var gitservice = Substitutes.IGitService;
-            provider.GetService(typeof(IGitService)).Returns(gitservice);
+            var gitservice = provider.GetGitService();
             var repo = Substitute.For<IRepository>();
             var path = Directory.CreateSubdirectory("repo-name");
             gitservice.GetUri(path.FullName).Returns((UriString)null);
@@ -74,8 +73,7 @@ public class RepositoryModelTests
         {
             var provider = Substitutes.ServiceProvider;
             Services.PackageServiceProvider = provider;
-            var gitservice = Substitutes.IGitService;
-            provider.GetService(typeof(IGitService)).Returns(gitservice);
+            var gitservice = provider.GetGitService();
             var repo = Substitute.For<IRepository>();
             var path = Directory.CreateSubdirectory("repo-name");
             gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));

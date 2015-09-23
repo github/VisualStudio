@@ -1,7 +1,6 @@
 ﻿using System;
 using EnvDTE;
 using EnvDTE80;
-using GitHub.Extensions;
 using GitHub.Info;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -9,6 +8,8 @@ using LibGit2Sharp;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell;
+using System.ComponentModel.Composition.Hosting;
 
 namespace GitHub.VisualStudio
 {
@@ -17,10 +18,11 @@ namespace GitHub.VisualStudio
         public static IServiceProvider PackageServiceProvider { get; set; }
 
         /// <summary>
-        /// Two ways of getting a service. First, trying the passed-in <paramref name="provider"/>,
-        /// then <see cref="PackageServiceProvider"/>
-        /// If the passed-in provider returns null, try PackageServiceProvider, returning the fetched value
-        /// regardless of whether it's null or not.
+        /// Three ways of getting a service. First, trying the passed-in <paramref name="provider"/>,
+        /// then <see cref="PackageServiceProvider"/>, then <see cref="T:Microsoft.VisualStudio.Shell.Package"/>
+        /// If the passed-in provider returns null, try PackageServiceProvider or Package, returning the fetched value
+        /// regardless of whether it's null or not. Package.GetGlobalService is never called if PackageServiceProvider is set.
+        /// This is on purpose, to support easy unit testing outside VS.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="Ret"></typeparam>
@@ -33,10 +35,13 @@ namespace GitHub.VisualStudio
                 ret = provider.GetService(typeof(T)) as Ret;
             if (ret != null)
                 return ret;
-            return PackageServiceProvider.GetService(typeof(T)) as Ret;
+            if (PackageServiceProvider != null)
+                return PackageServiceProvider.GetService(typeof(T)) as Ret;
+            return Package.GetGlobalService(typeof(T)) as Ret;
         }
 
         public static IComponentModel ComponentModel => GetGlobalService<SComponentModel, IComponentModel>();
+        public static ExportProvider DefaultExportProvider => ComponentModel.DefaultExportProvider;
 
         public static IVsWebBrowsingService GetWebBrowsingService(this IServiceProvider provider)
         {
@@ -45,7 +50,7 @@ namespace GitHub.VisualStudio
 
         public static IVsOutputWindow OutputWindow => GetGlobalService<SVsOutputWindow, IVsOutputWindow>();
 
-        static IVsOutputWindowPane outputWindowPane = null;
+        static IVsOutputWindowPane outputWindowPane;
         public static IVsOutputWindowPane OutputWindowPane
         {
             get
@@ -56,7 +61,7 @@ namespace GitHub.VisualStudio
                     var uiShell = GetGlobalService<SVsUIShell, IVsUIShell>();
                     // Get the frame of the output window
                     var outputWindowGuid = new Guid("{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}");
-                    IVsWindowFrame outputWindowFrame = null;
+                    IVsWindowFrame outputWindowFrame;
                     ErrorHandler.ThrowOnFailure(uiShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate, ref outputWindowGuid, out outputWindowFrame));
                     // Show the output window
                     if (outputWindowFrame != null)
@@ -73,6 +78,7 @@ namespace GitHub.VisualStudio
 
         public static DTE Dte => GetGlobalService<DTE, DTE>();
 
+        // ReSharper disable once SuspiciousTypeConversion.Global
         public static DTE2 Dte2 => Dte as DTE2;
 
         public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
@@ -92,13 +98,7 @@ namespace GitHub.VisualStudio
                 return null;
             if (solutionDir == null)
                 return null;
-            var repoPath = Repository.Discover(solutionDir);
-            if (repoPath == null)
-                return null;
-            using (var repo = new Repository(repoPath))
-            {
-                return GetUri(repo);
-            }
+            return GitService.GitServiceHelper.GetUri(solutionDir);
         }
 
         public static IRepository GetRepoFromSolution(this IVsSolution solution)
@@ -108,15 +108,7 @@ namespace GitHub.VisualStudio
                 return null;
             if (solutionDir == null)
                 return null;
-            var repoPath = Repository.Discover(solutionDir);
-            if (repoPath == null)
-                return null;
-            return new Repository(repoPath);
+            return GitService.GitServiceHelper.GetRepo(solutionDir);
         }
-        static UriString GetUri(IRepository repo)
-        {
-            return UriString.ToUriString(GitService.GetUriFromRepository(repo)?.ToRepositoryUrl());
-        }
-        public static IGitService IGitService => PackageServiceProvider.GetService<IGitService>();
     }
 }

@@ -2,10 +2,13 @@
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using Microsoft.VisualStudio.ComponentModelHost;
 using NSubstitute;
 using Rothko;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,13 +85,21 @@ namespace UnitTests
             IAvatarProvider avatarProvider = null)
         {
             var ret = Substitute.For<IServiceProvider, IUIProvider>();
+
+            var gitservice = IGitService;
+            var cm = Substitute.For<SComponentModel, IComponentModel>();
+            var cc = new CompositionContainer(CompositionOptions.IsThreadSafe | CompositionOptions.DisableSilentRejection);
+            cc.ComposeExportedValue(gitservice);
+            ((IComponentModel)cm).DefaultExportProvider.Returns(cc);
+            ret.GetService(typeof(SComponentModel)).Returns(cm);
+
             var os = OperatingSystem;
             var vs = IVSServices;
             var clone = cloneService ?? new RepositoryCloneService(os, vs);
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
-            ret.GetService(typeof(IGitService)).Returns(IGitService);
+            ret.GetService(typeof(IGitService)).Returns(gitservice);
             ret.GetService(typeof(IVSServices)).Returns(vs);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);

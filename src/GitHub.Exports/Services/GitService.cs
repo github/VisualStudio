@@ -7,8 +7,8 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IVSServices))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
+    [Export(typeof(IGitService))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitService : IGitService
     {
         /// <summary>
@@ -16,30 +16,55 @@ namespace GitHub.Services
         /// is null or no remote named origin exists, this method returns null
         /// </summary>
         /// <param name="repository">The repository to look at for the remote.</param>
-        /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
         public UriString GetUri(IRepository repository)
         {
-            return UriString.ToUriString(GetUriFromRepository(repository)?.ToRepositoryUrl());
+            return UriString.ToUriString(GetOriginUri(repository)?.ToRepositoryUrl());
         }
 
         /// <summary>
-        /// Probes for a git repository and if one is found, returns a <see cref="UriString"/> for the repository's
-        /// remote named "origin" if one is found
+        /// Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
+        public static UriString GetGitHubUri(IRepository repository)
+        {
+            return GitServiceHelper.GetUri(repository);
+        }
+
+        /// <summary>
+        /// Probes for a git repository and if one is found, returns a normalized GitHub uri <see cref="UriString"/>
+        /// for the repository's remote named "origin" if one is found
         /// </summary>
         /// <remarks>
         /// The lookup checks to see if the specified <paramref name="path"/> is a repository. If it's not, it then
         /// walks up the parent directories until it either finds a repository, or reaches the root disk.
         /// </remarks>
         /// <param name="path">The path to start probing</param>
-        /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
         public UriString GetUri(string path)
         {
             return GetUri(GetRepo(path));
         }
 
         /// <summary>
-        /// Probes for a git repository and if one is found, returns a <see cref="UriString"/> for the repository's
-        /// remote named "origin" if one is found
+        /// Probes for a git repository and if one is found, returns a normalized GitHub uri <see cref="UriString"/>
+        /// for the repository's remote named "origin" if one is found
+        /// </summary>
+        /// <remarks>
+        /// The lookup checks to see if the specified <paramref name="path"/> is a repository. If it's not, it then
+        /// walks up the parent directories until it either finds a repository, or reaches the root disk.
+        /// </remarks>
+        /// <param name="path">The path to start probing</param>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
+        public static UriString GetUriFromPath(string path)
+        {
+            return GitServiceHelper.GetUri(path);
+        }
+
+        /// <summary>
+        /// Probes for a git repository and if one is found, returns a normalized GitHub uri
+        /// <see cref="UriString"/> for the repository's remote named "origin" if one is found
         /// </summary>
         /// <remarks>
         /// The lookup checks to see if the path specified by the RepositoryPath property of the specified
@@ -47,10 +72,26 @@ namespace GitHub.Services
         /// either finds a repository, or reaches the root disk.
         /// </remarks>
         /// <param name="repoInfo">The repository information containing the path to start probing</param>
-        /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
         public UriString GetUri(IGitRepositoryInfo repoInfo)
         {
             return GetUri(GetRepo(repoInfo));
+        }
+
+        /// <summary>
+        /// Probes for a git repository and if one is found, returns a normalized GitHub uri
+        /// <see cref="UriString"/> for the repository's remote named "origin" if one is found
+        /// </summary>
+        /// <remarks>
+        /// The lookup checks to see if the path specified by the RepositoryPath property of the specified
+        /// <see cref="repoInfo"/> is a repository. If it's not, it then walks up the parent directories until it
+        /// either finds a repository, or reaches the root disk.
+        /// </remarks>
+        /// <param name="repoInfo">The repository information containing the path to start probing</param>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
+        public static UriString GetUriFromVSGit(IGitRepositoryInfo repoInfo)
+        {
+            return GitServiceHelper.GetUri(repoInfo);
         }
 
         /// <summary>
@@ -75,6 +116,22 @@ namespace GitHub.Services
         /// repository.
         /// </summary>
         /// <remarks>
+        /// The lookup checks to see if the path specified by the RepositoryPath property of the specified
+        /// <see cref="repoInfo"/> is a repository. If it's not, it then walks up the parent directories until it
+        /// either finds a repository, or reaches the root disk.
+        /// </remarks>
+        /// <param name="repoInfo">The repository information containing the path to start probing</param>
+        /// <returns>An instance of <see cref="IRepository"/> or null</returns>
+        public static IRepository GetRepoFromVSGit(IGitRepositoryInfo repoInfo)
+        {
+            return GitServiceHelper.GetRepo(repoInfo);
+        }
+
+        /// <summary>
+        /// Probes for a git repository and if one is found, returns a <see cref="IRepository"/> instance for the
+        /// repository.
+        /// </summary>
+        /// <remarks>
         /// The lookup checks to see if the specified <paramref name="path"/> is a repository. If it's not, it then
         /// walks up the parent directories until it either finds a repository, or reaches the root disk.
         /// </remarks>
@@ -86,7 +143,27 @@ namespace GitHub.Services
             return repoPath == null ? null : new Repository(repoPath);
         }
 
-        internal static UriString GetUriFromRepository(IRepository repo)
+        /// <summary>
+        /// Probes for a git repository and if one is found, returns a <see cref="IRepository"/> instance for the
+        /// repository.
+        /// </summary>
+        /// <remarks>
+        /// The lookup checks to see if the specified <paramref name="path"/> is a repository. If it's not, it then
+        /// walks up the parent directories until it either finds a repository, or reaches the root disk.
+        /// </remarks>
+        /// <param name="path">The path to start probing</param>
+        /// <returns>An instance of <see cref="IRepository"/> or null</returns>
+        public static IRepository GetRepoFromPath(string path)
+        {
+            return GitServiceHelper.GetRepo(path);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="UriString"/> representing the uri of the "origin" remote with no modifications.
+        /// </summary>
+        /// <param name="repo"></param>
+        /// <returns></returns>
+        public static UriString GetOriginUri(IRepository repo)
         {
             return repo
                 ?.Network
@@ -94,5 +171,7 @@ namespace GitHub.Services
                 .FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal))
                 ?.Url;
         }
+
+        public static IGitService GitServiceHelper => VisualStudio.Services.DefaultExportProvider.GetExportedValueOrDefault<IGitService>() ?? new GitService();
     }
 }
