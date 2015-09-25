@@ -13,13 +13,19 @@ using System.Windows.Media.Imaging;
 
 namespace GitHub.VisualStudio.UI.Views
 {
+    [ExportView(ViewType = UIViewType.PullRequestList)]
     public partial class PullRequestList : SimpleViewUserControl, IViewFor<IPullRequestListViewModel>, IView
     {
         public PullRequestList()
         {
             InitializeComponent();
 
-            //DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestListViewModel;
+            DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestListViewModel;
+            this.WhenActivated(d =>
+            {
+                d(this.OneWayBind(ViewModel, vm => vm.PullRequests, v => v.pullRequests.ItemsSource));
+                NotifyDone();
+            });
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
