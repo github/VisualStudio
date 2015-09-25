@@ -35,10 +35,9 @@
     </DrawingBrush.Drawing>
   </DrawingBrush>
 
-  <Style x:Key="VerticalSeparator" TargetType="{x:Type Separator}">
+  <Style x:Key="TitleVerticalSeparator" TargetType="{x:Type Separator}">
     <Setter Property="Control.Background" Value="{DynamicResource VsBrush.GrayText}" />
     <Setter Property="FrameworkElement.Margin" Value="3,0,3,0" />
-    <Setter Property="UIElement.Focusable" Value="False" />
     <Setter Property="Control.Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type Separator}">
@@ -47,6 +46,21 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
+  </Style>
+
+  <Style x:Key="VerticalSeparator" TargetType="{x:Type Separator}">
+    <Setter Property="Control.Background" Value="{DynamicResource VsBrush.GrayText}" />
+    <Setter Property="FrameworkElement.Margin" Value="3,0,3,0" />
+    <Setter Property="LayoutTransform">
+      <Setter.Value>
+        <RotateTransform Angle="90" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="HorizontalSeparator" TargetType="{x:Type Separator}">
+    <Setter Property="Control.Background" Value="{DynamicResource VsBrush.GrayText}" />
+    <Setter Property="FrameworkElement.Margin" Value="3,0,3,0" />
   </Style>
 
 </ResourceDictionary>

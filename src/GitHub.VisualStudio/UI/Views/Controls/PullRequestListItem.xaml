@@ -14,44 +14,54 @@
   <DataTemplate x:Key="PullRequestItemTemplate">
     <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition Height="16" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="20" />
+        <ColumnDefinition Width="10" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="10" />
       </Grid.ColumnDefinitions>
       <Image x:Name="avatar"
              Grid.Row="0"
              Grid.RowSpan="2"
              Grid.Column="0"
-             Width="16"
-             Height="16"
-             Margin="0,0,0,0"
+             Width="32"
+             Height="32"
+             Margin="3,0,3,0"
              RenderOptions.BitmapScalingMode="HighQuality"
              Source="{Binding Author.Avatar}" />
       <TextBlock x:Name="title"
                  Grid.Row="0"
                  Grid.Column="1"
                  FontFamily="Segoe UI"
-                 FontSize="10"
+                 FontSize="12"
                  Foreground="{DynamicResource VsBrush.WindowText}"
                  Text="{Binding Title}" />
-      <StackPanel x:Name="comment"
-                  Grid.Row="0"
-                  Grid.RowSpan="2"
-                  Grid.Column="2"
-                  HorizontalAlignment="Left"
-                  VerticalAlignment="Top"
-                  Orientation="Horizontal">
-        <ui:OcticonImage x:Name="comment_icon" Foreground="{DynamicResource VsBrush.WindowText}" Icon="comment" />
-        <TextBlock x:Name="comment_count" Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding CommentCount}" />
-        <ui:OcticonImage x:Name="comment_new"
-                         Foreground="Green"
-                         Icon="primitive_dot"
-                         Visibility="{Binding HasNewComments, Converter={StaticResource BooleanToVisibilityConverter}}" />
-      </StackPanel>
+      <ui:OcticonImage x:Name="comment_icon"
+                       Grid.Row="0"
+                       Grid.Column="2"
+                       Width="8"
+                       Height="8"
+                       Foreground="{DynamicResource VsBrush.WindowText}"
+                       Icon="comment" />
+      <TextBlock x:Name="comment_count"
+                 Grid.Row="0"
+                 Grid.Column="3"
+                 FontFamily="Segoe UI"
+                 FontSize="11"
+                 Foreground="{DynamicResource VsBrush.WindowText}"
+                 Text="{Binding CommentCount}" />
+      <ui:OcticonImage x:Name="comment_new"
+                       Grid.Row="0"
+                       Grid.Column="4"
+                       Width="8"
+                       Height="8"
+                       Foreground="Green"
+                       Icon="primitive_dot"
+                       Visibility="{Binding HasNewComments, Converter={StaticResource BooleanToVisibilityConverter}}" />
       <StackPanel x:Name="status"
                   Grid.Row="1"
                   Grid.Column="1"
@@ -61,7 +71,10 @@
                 Command="{Binding OpenPR}"
                 Content="{Binding Number}"
                 Style="{StaticResource ActionLinkButton}" />
-        <TextBlock>
+        <TextBlock x:Name="description"
+                   FontFamily="Segoe UI"
+                   FontSize="11"
+                   Foreground="{DynamicResource VsBrush.GrayText}">
           <Run Text="{x:Static i18n:Resources.prOpenedText}" /> <Run Text="{Binding CreatedAt, Converter={StaticResource DurationToStringConverter}}" /> <Run Text="{x:Static i18n:Resources.prOpenedByText}" /> <Run Text="{Binding Author.Login}" />
         </TextBlock>
       </StackPanel>
