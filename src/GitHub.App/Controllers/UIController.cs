@@ -24,12 +24,11 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Finish }
+        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, PullRequestList = 5, Next = 99, Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IConnectionManager connectionManager;
         readonly Lazy<ITwoFactorChallengeHandler> lazyTwoFactorChallengeHandler;
 
@@ -79,7 +78,8 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
-                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish);
+                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.PullRequestList)
+                .PermitIf(Trigger.Finish, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.Clone);
 
             machine.Configure(UIViewType.TwoFactor)
                 .SubstateOf(UIViewType.Login)
@@ -91,7 +91,8 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
-                .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish);
+                .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish)
+                .PermitIf(Trigger.Next, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.PullRequestList);
 
             machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
@@ -113,6 +114,14 @@ namespace GitHub.Controllers
                 .OnEntry(() =>
                 {
                     RunView(UIViewType.Publish);
+                })
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.End);
+
+            machine.Configure(UIViewType.PullRequestList)
+                .OnEntry(() =>
+                {
+                    RunView(UIViewType.PullRequestList);
                 })
                 .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
@@ -223,7 +232,9 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
                             .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn)
+                            .PermitIf(Trigger.PullRequestList, UIViewType.PullRequestList, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
@@ -240,12 +251,15 @@ namespace GitHub.Controllers
                     {
                         if (!loggedin && currentFlow != UIControllerFlow.Authentication)
                         {
-                            connectionAdded = (s, e) => {
+                            connectionAdded = (s, e) =>
+                            {
                                 if (e.Action == NotifyCollectionChangedAction.Add)
                                     uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
                             };
                             connectionManager.Connections.CollectionChanged += connectionAdded;
                         }
+                        else
+                            uiProvider.AddService(typeof(IConnection), connectionManager.Connections[0]);
 
                         machine.Configure(UIViewType.None)
                             .Permit(Trigger.Auth, UIViewType.Login)
@@ -254,7 +268,9 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
                             .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
-                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin)
+                            .PermitIf(Trigger.PullRequestList, UIViewType.PullRequestList, () => loggedin)
+                            .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>

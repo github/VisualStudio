@@ -20,6 +20,7 @@ namespace GitHub.UI
         Authentication = 1,
         Create = 2,
         Clone = 3,
-        Publish
+        Publish = 4,
+        PullRequestList = 5
     }
 }
