@@ -15,6 +15,7 @@ using NLog;
 using NullGuard;
 using Octokit;
 using GitHub.Primitives;
+using System.Collections.ObjectModel;
 
 namespace GitHub.Services
 {
@@ -179,8 +180,9 @@ namespace GitHub.Services
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
-                    () => apiClient.GetRepositoriesForOrganization(organization).Select(
-                        RepositoryCacheItem.Create).ToList(),
+                    () => apiClient.GetRepositoriesForOrganization(organization)
+                                   .Select(RepositoryCacheItem.Create)
+                                   .ToList(),
                         TimeSpan.FromMinutes(5),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
@@ -197,12 +199,46 @@ namespace GitHub.Services
                     });
         }
 
-        public IObservable<IPullRequestModel> GetPullRequests(IRepositoryModel repo)
+        public IObservable<IReadOnlyList<IPullRequestModel>> GetPullRequests(ISimpleRepositoryModel repo)
         {
-            return apiClient.GetPullRequestsForRepository(repo.Owner.Login, repo.Name)
-                .Select(PullRequestCacheItem.Create)
-                .Select(Create);
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name))
+                .Replay()
+                .RefCount();
 
+            // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
+            // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
+            // but also individually without duplicating information.
+            var data = keyobs
+                .SelectMany(key =>
+                    hostCache.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                    .Concat(
+                        apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                            .Select(PullRequestCacheItem.Create)
+                            .Do(pr => hostCache.InsertObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, pr.Number), pr))
+                            .SelectMany(pr => CacheIndex.AddAndSave(hostCache, key, pr.Number, pr.UpdatedAt))
+                            //.Buffer(100)
+                            //.Select(buffer => buffer.ToDictionary(pr => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, pr.Number)))
+                            //.Do(list => hostCache.InsertObjects(list))
+                            //.SelectMany(pr => CacheIndex.AddAndSave(hostCache, key, pr.Values.Select(x => x.Number), pr.Values.Select(x => x.UpdatedAt)))
+                    )
+                    .Publish()
+                    .RefCount());
+
+            return data
+                .SelectMany(index => hostCache.GetObjects<PullRequestCacheItem>(index.Keys))
+                .Select(x => new ReadOnlyCollection<IPullRequestModel>(x.Values.Select(Create).ToList()))
+                .Catch<IReadOnlyList<IPullRequestModel>, KeyNotFoundException>(
+                    // This could in theory happen if we try to call this before the user is logged in.
+                    e =>
+                    {
+                        string message = string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Retrieving '{0}' pull requests failed because user is not stored in the cache.",
+                            repo.Name);
+                        log.Error(message, e);
+                        return Observable.Return(new IPullRequestModel[] { });
+                    });
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
@@ -330,13 +366,64 @@ namespace GitHub.Services
                 CommentCount = pr.Comments;
                 Author = new AccountCacheItem(pr.User);
                 CreatedAt = pr.CreatedAt;
+                UpdatedAt = pr.UpdatedAt;
             }
 
-            public string Title { get; set; }
+            [AllowNull]
+            public string Title { [return:AllowNull] get; set; }
             public int Number { get; set; }
             public int CommentCount { get; set; }
-            public AccountCacheItem Author { get; set; }
+            [AllowNull]
+            public AccountCacheItem Author { [return:AllowNull] get; set; }
             public DateTimeOffset CreatedAt { get; set; }
+            public DateTimeOffset UpdatedAt { get; set; }
+        }
+
+        public class CacheIndex
+        {
+            public static CacheIndex Create(string key)
+            {
+                return new CacheIndex() { IndexKey = key };
+            }
+
+            public CacheIndex()
+            {
+                Keys = new List<string>();
+            }
+
+            public static IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, int key, DateTimeOffset lastUpdated)
+            {
+                return cache.GetObject<CacheIndex>(indexKey)
+                    .Do(index =>
+                    {
+                        var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, key);
+                        if (!index.Keys.Contains(k))
+                            index.Keys.Add(k);
+                        index.UpdatedAt = lastUpdated > index.UpdatedAt ? lastUpdated : index.UpdatedAt;
+                    })
+                    .SelectMany(index => cache.InsertObject(index.IndexKey, index).Select(x => index));
+            }
+
+            public static IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, IEnumerable<int> keys, IEnumerable<DateTimeOffset> lastUpdates)
+            {
+                return cache.GetObject<CacheIndex>(indexKey)
+                    .Do(index =>
+                    {
+                        foreach (var key in keys.Select(x => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, x)))
+                        {
+                            if (!index.Keys.Contains(key))
+                                index.Keys.Add(key);
+                        }
+                        foreach (var lastUpdated in lastUpdates)
+                            index.UpdatedAt = lastUpdated > index.UpdatedAt ? lastUpdated : index.UpdatedAt;
+                    })
+                    .SelectMany(index => cache.InsertObject(index.IndexKey, index).Select(x => index));
+            }
+
+            [AllowNull]
+            public string IndexKey { [return:AllowNull] get; set; }
+            public List<string> Keys { get; set; }
+            public DateTimeOffset UpdatedAt { get; set; }
         }
     }
 }

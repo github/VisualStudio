@@ -9,6 +9,9 @@ using System.Collections.ObjectModel;
 using ReactiveUI;
 using NullGuard;
 using System.ComponentModel.Composition;
+using GitHub.Services;
+using System.Reactive.Linq;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -17,20 +20,23 @@ namespace GitHub.ViewModels
     {
         [ImportingConstructor]
         PullRequestListViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost)
+            IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo)
         {}
 
-        public PullRequestListViewModel(IRepositoryHost repositoryHost)
+        public PullRequestListViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
         {
+            pullRequests = repositoryHost.ModelService.GetPullRequests(repository)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, x => x.PullRequests, initialValue: new IPullRequestModel[] { });
+
+            this.WhenAny(x => x.PullRequests, x => x.Value)
+                .Where(pr => pr.Any())
+                .Subscribe(pr => SelectedPullRequest = pr.FirstOrDefault());
         }
 
-        IReactiveDerivedList<IPullRequestModel> pullRequests;
-        public IReactiveDerivedList<IPullRequestModel> PullRequests
-        {
-            get { return pullRequests; }
-            private set { this.RaiseAndSetIfChanged(ref pullRequests, value); }
-        }
+        readonly ObservableAsPropertyHelper<IReadOnlyList<IPullRequestModel>> pullRequests;
+        public IReadOnlyList<IPullRequestModel> PullRequests => pullRequests.Value;
 
         IPullRequestModel selectedPullRequest;
         [AllowNull]

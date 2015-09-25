@@ -41,7 +41,7 @@ namespace GitHub.SampleData
             SelectedPullRequest = PullRequests[1];
         }
 
-        public IReactiveDerivedList<IPullRequestModel> PullRequests { get; set; }
+        public IReadOnlyList<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
     }
 
