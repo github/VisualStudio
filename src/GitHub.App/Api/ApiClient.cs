@@ -201,7 +201,8 @@ namespace GitHub.Api
 
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
         {
-            return gitHubClient.PullRequest.GetAllForRepository(owner, name);
+            return gitHubClient.PullRequest.GetAllForRepository(owner, name, 
+                new PullRequestRequest() { State = ItemState.All, SortProperty = PullRequestSort.Updated, SortDirection = SortDirection.Descending });
         }
     }
 }
