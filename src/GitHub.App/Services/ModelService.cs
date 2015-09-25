@@ -16,6 +16,7 @@ using NullGuard;
 using Octokit;
 using GitHub.Primitives;
 using System.Collections.ObjectModel;
+using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -199,46 +200,42 @@ namespace GitHub.Services
                     });
         }
 
-        public IObservable<IReadOnlyList<IPullRequestModel>> GetPullRequests(ISimpleRepositoryModel repo)
+        public TrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo)
         {
+            // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
+            // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
+            // but also individually without duplicating information. We store things in a custom observable collection
+            // that checks whether an item is being updated (coming from the live stream after being retrieved from cache)
+            // and replaces it instead of appending, so items get refreshed in-place as they come in.
+
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name))
                 .Replay()
                 .RefCount();
 
-            // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
-            // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
-            // but also individually without duplicating information.
-            var data = keyobs
-                .SelectMany(key =>
-                    hostCache.GetOrCreateObject(key, () => CacheIndex.Create(key))
-                    .Concat(
-                        apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-                            .Select(PullRequestCacheItem.Create)
-                            .Do(pr => hostCache.InsertObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, pr.Number), pr))
-                            .SelectMany(pr => CacheIndex.AddAndSave(hostCache, key, pr.Number, pr.UpdatedAt))
-                            //.Buffer(100)
-                            //.Select(buffer => buffer.ToDictionary(pr => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, pr.Number)))
-                            //.Do(list => hostCache.InsertObjects(list))
-                            //.SelectMany(pr => CacheIndex.AddAndSave(hostCache, key, pr.Values.Select(x => x.Number), pr.Values.Select(x => x.UpdatedAt)))
-                    )
-                    .Publish()
-                    .RefCount());
-
-            return data
+            var cache = keyobs
+                .SelectMany(key => hostCache.GetOrCreateObject(key, () => CacheIndex.Create(key)))
                 .SelectMany(index => hostCache.GetObjects<PullRequestCacheItem>(index.Keys))
-                .Select(x => new ReadOnlyCollection<IPullRequestModel>(x.Values.Select(Create).ToList()))
-                .Catch<IReadOnlyList<IPullRequestModel>, KeyNotFoundException>(
-                    // This could in theory happen if we try to call this before the user is logged in.
-                    e =>
-                    {
-                        string message = string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Retrieving '{0}' pull requests failed because user is not stored in the cache.",
-                            repo.Name);
-                        log.Error(message, e);
-                        return Observable.Return(new IPullRequestModel[] { });
-                    });
+                .Select(dict => dict.Values)
+                .Flatten()
+                .Do(pr => pr.Title = pr.Title + " Cached!")
+                .Publish()
+                .RefCount();
+
+            var live = keyobs
+                .SelectMany(key =>
+                    apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                        .Select(PullRequestCacheItem.Create)
+                        .Do(pr => hostCache.InsertObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, pr.Number), pr))
+                        .Do(pr => CacheIndex.AddAndSave(hostCache, key, pr.Number, pr.UpdatedAt)))
+                .Publish()
+                .RefCount();
+
+            var result = Observable.Merge(cache, live).Select(Create);
+
+            var obscol = new TrackingCollection<IPullRequestModel>();
+            obscol.Listen(result);
+            return obscol;
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)

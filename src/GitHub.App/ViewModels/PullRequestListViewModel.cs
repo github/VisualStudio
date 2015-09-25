@@ -26,17 +26,19 @@ namespace GitHub.ViewModels
 
         public PullRequestListViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
         {
-            pullRequests = repositoryHost.ModelService.GetPullRequests(repository)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.PullRequests, initialValue: new IPullRequestModel[] { });
+            PullRequests = repositoryHost.ModelService.GetPullRequests(repository).Subscribe();
 
             this.WhenAny(x => x.PullRequests, x => x.Value)
                 .Where(pr => pr.Any())
                 .Subscribe(pr => SelectedPullRequest = pr.FirstOrDefault());
         }
 
-        readonly ObservableAsPropertyHelper<IReadOnlyList<IPullRequestModel>> pullRequests;
-        public IReadOnlyList<IPullRequestModel> PullRequests => pullRequests.Value;
+        ObservableCollection<IPullRequestModel> pullRequests;
+        public ObservableCollection<IPullRequestModel> PullRequests
+        {
+            get { return pullRequests; }
+            private set { this.RaiseAndSetIfChanged(ref pullRequests, value); }
+        }
 
         IPullRequestModel selectedPullRequest;
         [AllowNull]

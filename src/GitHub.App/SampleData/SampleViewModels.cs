@@ -37,11 +37,11 @@ namespace GitHub.SampleData
             prs.Add(new PullRequestModel() { Number = 399, Title = "Let's try doing this differently", CreatedAt = DateTimeOffset.Now - TimeSpan.FromDays(1), Author = new AccountDesigner { Login = "shana", IsUser = true } });
             prs.Add(new PullRequestModel() { Number = 389, Title = "Build system upgrade", CommentCount = 4, HasNewComments = false, CreatedAt = DateTimeOffset.Now - TimeSpan.FromMinutes(2), Author = new AccountDesigner { Login = "haacked", IsUser = true } });
             prs.Add(new PullRequestModel() { Number = 409, Title = "Fix publish button style", CommentCount = 27, HasNewComments = true, CreatedAt = DateTimeOffset.Now - TimeSpan.FromHours(5), Author = new AccountDesigner { Login = "shana", IsUser = false } });
-            PullRequests = prs.CreateDerivedCollection(x => x, orderer: OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
+            PullRequests = prs;//.CreateDerivedCollection(x => x, orderer: OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
             SelectedPullRequest = PullRequests[1];
         }
 
-        public IReadOnlyList<IPullRequestModel> PullRequests { get; set; }
+        public ObservableCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
     }
 

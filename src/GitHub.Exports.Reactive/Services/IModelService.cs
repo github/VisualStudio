@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
+using System.Collections.ObjectModel;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.Services
 {
@@ -19,6 +21,6 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
         IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
         IObservable<Unit> InvalidateAll();
-        IObservable<IReadOnlyList<IPullRequestModel>> GetPullRequests(ISimpleRepositoryModel repo);
+        TrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo);
     }
 }

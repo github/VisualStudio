@@ -8,7 +8,7 @@ namespace GitHub.ViewModels
 {
     public interface IPullRequestListViewModel
     {
-        IReadOnlyList<IPullRequestModel> PullRequests { get; }
+        ObservableCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
     }
 }
