@@ -8,6 +8,6 @@ namespace GitHub.VisualStudio
         public const int addConnectionCommandDark = 0x111;
         public const int idGitHubToolbar = 0x1120;
         public const int showGitHubPaneCommand = 0x200;
-        public const int pullRequestCommand = 0x210;
+        public const int pullRequestCommand = 0x201;
     };
 }
