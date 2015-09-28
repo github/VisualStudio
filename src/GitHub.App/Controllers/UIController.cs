@@ -234,7 +234,7 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
                             .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn)
                             .PermitIf(Trigger.PullRequestList, UIViewType.PullRequestList, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn);
+                            .PermitIf(Trigger.PullRequestList, UIViewType.Login, () => !host.IsLoggedIn);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
@@ -270,7 +270,7 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
                             .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin)
                             .PermitIf(Trigger.PullRequestList, UIViewType.PullRequestList, () => loggedin)
-                            .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin);
+                            .PermitIf(Trigger.PullRequestList, UIViewType.Login, () => !loggedin);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
