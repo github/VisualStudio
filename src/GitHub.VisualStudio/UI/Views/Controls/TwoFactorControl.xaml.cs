@@ -6,14 +6,18 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
+    public class GenericTwoFactorControl : SimpleViewUserControl<ITwoFactorDialogViewModel, TwoFactorControl>
+    { }
+
     /// <summary>
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
-    public partial class TwoFactorControl : SimpleViewUserControl, IViewFor<ITwoFactorDialogViewModel>, IView, IDisposable
+    public partial class TwoFactorControl : GenericTwoFactorControl
     {
         public TwoFactorControl()
         {
@@ -49,31 +53,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         void SetFocus()
         {
             authenticationCode.TryFocus().Subscribe();
-        }
-
-        public ITwoFactorDialogViewModel ViewModel
-        {
-            get { return (ITwoFactorDialogViewModel)GetValue(ViewModelProperty); }
-            set { SetValue(ViewModelProperty, value); }
-        }
-
-        public static readonly DependencyProperty ViewModelProperty =
-            DependencyProperty.Register(
-                "ViewModel", 
-                typeof(ITwoFactorDialogViewModel), 
-                typeof(TwoFactorControl), 
-                new PropertyMetadata(null));
-
-        object IViewFor.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (ITwoFactorDialogViewModel)value; }
-        }
-
-        object IView.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (ITwoFactorDialogViewModel)value; }
         }
     }
 }

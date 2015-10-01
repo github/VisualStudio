@@ -7,6 +7,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using ReactiveUI;
+using System.Windows;
+using GitHub.ViewModels;
+using NullGuard;
 
 namespace GitHub.UI
 {
@@ -77,6 +80,37 @@ namespace GitHub.UI
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+    }
 
+    public class SimpleViewUserControl<TViewModel, TImplementor> : SimpleViewUserControl, IViewFor<TViewModel>, IView 
+        where TViewModel : class, IViewModel where TImplementor : class
+    {
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
+            "ViewModel", typeof(TViewModel), typeof(TImplementor), new PropertyMetadata(null));
+
+        object IViewFor.ViewModel
+        {
+            get { return ViewModel; }
+            set { ViewModel = (TViewModel)value; }
+        }
+
+        object IView.ViewModel
+        {
+            get { return ViewModel; }
+            set { ViewModel = (TViewModel)value; }
+        }
+
+        public TViewModel ViewModel
+        {
+            [return: AllowNull]
+            get { return (TViewModel)GetValue(ViewModelProperty); }
+            set { SetValue(ViewModelProperty, value); }
+        }
+
+        TViewModel IViewFor<TViewModel>.ViewModel
+        {
+            get { return ViewModel; }
+            set { ViewModel = (TViewModel)value; }
+        }
     }
 }

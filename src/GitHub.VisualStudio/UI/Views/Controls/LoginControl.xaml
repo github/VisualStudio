@@ -1,4 +1,4 @@
-﻿<uirx:SimpleViewUserControl x:Class="GitHub.VisualStudio.UI.Views.Controls.LoginControl"
+﻿<local:GenericLoginControl x:Class="GitHub.VisualStudio.UI.Views.Controls.LoginControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,6 +8,7 @@
              xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:prop="clr-namespace:GitHub.VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
              mc:Ignorable="d"
              d:DesignWidth="414"
              d:DesignHeight="440"
@@ -179,4 +180,4 @@
             </TabItem>
         </TabControl>
     </DockPanel>
-</uirx:SimpleViewUserControl>
+</local:GenericLoginControl>
