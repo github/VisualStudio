@@ -1,8 +1,9 @@
 using System.ComponentModel;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.Primitives
 {
-    public abstract class NotificationAwareObject : INotifyPropertyChanged
+    public abstract class NotificationAwareObject : INotifyPropertyChanged, INotifyPropertySource
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

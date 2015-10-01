@@ -11,7 +11,7 @@ using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerItemBase : TeamExplorerGitRepoInfo, INotifyPropertySource
+    public class TeamExplorerItemBase : TeamExplorerGitRepoInfo
     {
         readonly ISimpleApiClientFactory apiFactory;
         protected ITeamExplorerServiceHolder holder;

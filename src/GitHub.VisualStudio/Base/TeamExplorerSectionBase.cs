@@ -12,7 +12,7 @@ using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerSectionBase : TeamExplorerItemBase, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerItemBase, ITeamExplorerSection
     {
         protected IConnectionManager connectionManager;
 
