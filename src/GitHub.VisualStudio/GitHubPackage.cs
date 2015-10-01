@@ -47,9 +47,10 @@ namespace GitHub.VisualStudio
 
         protected override void Initialize()
         {
+
             base.Initialize();
 
-            AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
+            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
         }
 
         void StartFlow(UIControllerFlow controllerFlow)

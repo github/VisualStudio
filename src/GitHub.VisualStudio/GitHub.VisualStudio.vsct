@@ -64,7 +64,6 @@
       <IDSymbol name="GitHubMenu" value="0x1010"/>
       <IDSymbol name="idGitHubMenuGroup" value="0x1020"/>
       <IDSymbol name="addConnectionCommand" value="0x110"/>
-      <IDSymbol name="addConnectionCommandDark" value="0x111"/>
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->
