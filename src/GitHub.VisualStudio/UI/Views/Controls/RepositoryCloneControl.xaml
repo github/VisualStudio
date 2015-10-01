@@ -1,4 +1,4 @@
-﻿<uirx:SimpleViewUserControl x:Class="GitHub.VisualStudio.UI.Views.Controls.RepositoryCloneControl"
+﻿<local:GenericRepositoryCloneControl x:Class="GitHub.VisualStudio.UI.Views.Controls.RepositoryCloneControl"
                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -231,4 +231,4 @@
       </Grid>
     </Border>
   </DockPanel>
-</uirx:SimpleViewUserControl>
+</local:GenericRepositoryCloneControl>
