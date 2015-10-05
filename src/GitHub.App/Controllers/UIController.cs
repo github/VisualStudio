@@ -24,7 +24,13 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, PullRequestList = 5, Next = 99, Finish }
+        enum Trigger {
+            Cancel = 0,
+            Next,
+            Previous,
+            Detail,
+            Creation,
+            Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
@@ -34,7 +40,7 @@ namespace GitHub.Controllers
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly StateMachine<UIViewType, Trigger> machine;
-        Subject<UserControl> transition;
+        Subject<IView> transition;
         UIControllerFlow currentFlow;
         NotifyCollectionChangedEventHandler connectionAdded;
 
@@ -78,8 +84,9 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
-                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.PullRequestList)
-                .PermitIf(Trigger.Finish, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.Clone);
+                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish)
+                .PermitIf(Trigger.Finish, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.PullRequests)
+                ;
 
             machine.Configure(UIViewType.TwoFactor)
                 .SubstateOf(UIViewType.Login)
@@ -92,7 +99,8 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
                 .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish)
-                .PermitIf(Trigger.Next, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.PullRequestList);
+                .PermitIf(Trigger.Next, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.PullRequests)
+                ;
 
             machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
@@ -126,6 +134,30 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
+            machine.Configure(UIViewType.PullRequestDetail)
+                .OnEntry(() =>
+                {
+                    RunView(UIViewType.PullRequestCreation);
+                })
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.End);
+
+            machine.Configure(UIViewType.CommitList)
+                .OnEntry(() =>
+                {
+                    RunView(UIViewType.PullRequestList);
+                })
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.End);
+
+            machine.Configure(UIViewType.CommentList)
+                .OnEntry(() =>
+                {
+                    RunView(UIViewType.PullRequestList);
+                })
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.End);
+
             machine.Configure(UIViewType.End)
                 .OnEntry(() =>
                 {
@@ -141,12 +173,12 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.Finished);
         }
 
-        public IObservable<UserControl> SelectFlow(UIControllerFlow choice)
+        public IObservable<IView> SelectFlow(UIControllerFlow choice)
         {
             currentFlow = choice;
 
-            transition = new Subject<UserControl>();
-            transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
+            transition = new Subject<IView>();
+            transition.Subscribe(_ => {}, _ => Fire(Trigger.Next));
         
             return transition;
         }
@@ -154,7 +186,7 @@ namespace GitHub.Controllers
         void RunView(UIViewType viewType)
         {
             var view = CreateViewAndViewModel(viewType);
-            transition.OnNext(view as UserControl);
+            transition.OnNext(view);
             SetupView(viewType, view);
         }
 
@@ -225,22 +257,24 @@ namespace GitHub.Controllers
                     .Select(c => hosts.LookupHost(connection.HostAddress))
                     .Do(host =>
                     {
+                        bool loggedin = host.IsLoggedIn;
                         machine.Configure(UIViewType.None)
-                            .Permit(Trigger.Auth, UIViewType.Login)
-                            .PermitIf(Trigger.Create, UIViewType.Create, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.Create, UIViewType.Login, () => !host.IsLoggedIn)
-                            .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
-                            .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn)
-                            .PermitIf(Trigger.PullRequestList, UIViewType.PullRequestList, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.PullRequestList, UIViewType.Login, () => !host.IsLoggedIn);
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Authentication)
+                            .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Create && !loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Clone && !loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Publish && !loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.PullRequests && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.PullRequests && !loggedin)
+                            ;
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
                     {
                         Debug.WriteLine("Start ({0})", GetHashCode());
-                        Fire((Trigger)(int)currentFlow);
+                        Fire(Trigger.Next);
                     });
             }
             else
@@ -262,21 +296,22 @@ namespace GitHub.Controllers
                             uiProvider.AddService(typeof(IConnection), connectionManager.Connections[0]);
 
                         machine.Configure(UIViewType.None)
-                            .Permit(Trigger.Auth, UIViewType.Login)
-                            .PermitIf(Trigger.Create, UIViewType.Create, () => loggedin)
-                            .PermitIf(Trigger.Create, UIViewType.Login, () => !loggedin)
-                            .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
-                            .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
-                            .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
-                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin)
-                            .PermitIf(Trigger.PullRequestList, UIViewType.PullRequestList, () => loggedin)
-                            .PermitIf(Trigger.PullRequestList, UIViewType.Login, () => !loggedin);
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Authentication)
+                            .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Create && !loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Clone && !loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.Publish && !loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.PullRequestList, () => currentFlow == UIControllerFlow.PullRequests && loggedin)
+                            .PermitIf(Trigger.Next, UIViewType.Login, () => currentFlow == UIControllerFlow.PullRequests && !loggedin)
+                            ;
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
                     {
                         Debug.WriteLine("Start ({0})", GetHashCode());
-                        Fire((Trigger)(int)currentFlow);
+                        Fire(Trigger.Next);
                     });
             }
         }

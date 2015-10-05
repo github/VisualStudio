@@ -159,9 +159,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             base.Refresh();
         }
 
-        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        public override void Initialize(IServiceProvider serviceProvider)
         {
-            base.Initialize(sender, e);
+            base.Initialize(serviceProvider);
             UpdateConnection();
 
             // watch for new repos added to the local repo list

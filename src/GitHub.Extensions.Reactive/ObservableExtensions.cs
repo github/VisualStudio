@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using ReactiveUI;
+using System.ComponentModel;
 
 namespace GitHub.Extensions.Reactive
 {
@@ -193,47 +194,4 @@ namespace GitHub.Extensions.Reactive
             return source.Select(items => new ReadOnlyCollection<TResult>(new[] { firstItem }.Concat(items.Select(map)).ToList()));
         }
     }
-
-    public class TrackingCollection<T> : ObservableCollection<T>, IDisposable
-    {
-        IDisposable subscription;
-        IObservable<T> source;
-
-        public TrackingCollection()
-        {
-        }
-
-        public TrackingCollection(IObservable<T> source)
-        {
-            Listen(source);
-        }
-
-        public TrackingCollection<T> Listen(IObservable<T> obs)
-        {
-            source = obs
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Do(t =>
-                {
-                    var idx = IndexOf(t);
-                    if (idx >= 0)
-                        SetItem(idx, t);
-                    else
-                        Add(t);
-                });
-            return this;
-        }
-
-        public TrackingCollection<T> Subscribe()
-        {
-            subscription = source.Subscribe();
-            return this;
-        }
-
-        public void Dispose()
-        {
-            subscription?.Dispose();
-            GC.SuppressFinalize(this);
-        }
-    }
-
 }

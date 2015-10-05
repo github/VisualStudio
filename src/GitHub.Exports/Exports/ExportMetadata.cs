@@ -9,17 +9,22 @@ using System.Reflection;
 
 namespace GitHub.Exports {
 
-	public enum UIViewType {
+    public enum UIViewType {
         None,
-		Login,
-		TwoFactor,
-		Create,
-		Clone,
+        Login,
+        TwoFactor,
+        Create,
+        Clone,
         Publish,
         PullRequestList,
+        PullRequestDetail,
+        PullRequestCreation,
+        CommitList,
+        CommentList,
         End = 100,
-        Finished
-	}
+        Finished,
+        GitHubPane
+    }
 
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
@@ -50,7 +55,7 @@ namespace GitHub.Exports {
 
     public static class ExportViewAttributeExtensions
     {
-        public static bool IsViewType(this UserControl c, UIViewType type)
+        public static bool IsViewType(this IView c, UIViewType type)
         {
             return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
         }

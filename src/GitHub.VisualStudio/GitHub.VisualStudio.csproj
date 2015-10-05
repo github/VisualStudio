@@ -252,11 +252,11 @@
     <Compile Include="TeamExplorer\Sync\GitHubPublishSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Views\Controls\GitHubPaneControl.xaml.cs">
-      <DependentUpon>GitHubPaneControl.xaml</DependentUpon>
+    <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
+      <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\PullRequestList.xaml.cs">
-      <DependentUpon>PullRequestList.xaml</DependentUpon>
+    <Compile Include="UI\Views\PullRequestListView.xaml.cs">
+      <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
@@ -325,6 +325,7 @@
   <ItemGroup>
     <VSCTCompile Include="GitHub.VisualStudio.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +341,18 @@
     <Resource Include="Resources\default_user_avatar.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Resources\icons\refresh.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\icons\arrow_right.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\icons\arrow_left.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\icons\git_pull_request.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -355,7 +368,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\Controls\GitHubPaneControl.xaml">
+    <Page Include="UI\Views\GitHubPaneView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -363,7 +376,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Views\PullRequestList.xaml">
+    <Page Include="UI\Views\PullRequestListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

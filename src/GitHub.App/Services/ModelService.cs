@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Api;
@@ -15,8 +16,7 @@ using NLog;
 using NullGuard;
 using Octokit;
 using GitHub.Primitives;
-using System.Collections.ObjectModel;
-using ReactiveUI;
+using GitHub.Collections;
 
 namespace GitHub.Services
 {
@@ -24,17 +24,22 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
+        const string USER = "user";
+
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IApiClient apiClient;
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
 
+        readonly IObservable<AccountCacheItem> userObservable;
+
         public ModelService(IApiClient apiClient, IBlobCache hostCache, IAvatarProvider avatarProvider)
         {
             this.apiClient = apiClient;
             this.hostCache = hostCache;
             this.avatarProvider = avatarProvider;
+            userObservable = Observable.Defer(GetUser);
         }
 
         public IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates()
@@ -72,9 +77,9 @@ namespace GitHub.Services
         public IObservable<IReadOnlyList<IAccount>> GetAccounts()
         {
             return Observable.Zip(
-                GetUser(),
-                GetUserOrganizations(),
-                (user, orgs) => user.Concat(orgs))
+                userObservable,
+                GetUserOrganizations()
+            )
             .ToReadOnlyList(Create);
         }
 
@@ -95,31 +100,29 @@ namespace GitHub.Services
                 .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
         }
 
-        IObservable<IEnumerable<AccountCacheItem>> GetUser()
+        IObservable<AccountCacheItem> GetUser()
         {
-            return hostCache.GetAndRefreshObject("user",
-                () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
-                .Take(1)
-                .ToList();
+            return hostCache.GetAndRefreshObject(USER,
+                () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7));
         }
 
-        IObservable<IEnumerable<AccountCacheItem>> GetUserOrganizations()
+        IObservable<AccountCacheItem> GetUserOrganizations()
         {
             return GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
-                    () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
+                    () => apiClient.GetOrganizations().Select(AccountCacheItem.Create),
                     TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)))
-                .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
+                .Catch<AccountCacheItem, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
                         log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
-                        return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                        return Observable.Empty<AccountCacheItem>();
                     })
-                 .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
+                 .Catch<AccountCacheItem, Exception>(e =>
                  {
                      log.Error("Retrieve user organizations failed.", e);
-                     return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                     return Observable.Empty<AccountCacheItem>();
                  });
         }
 
@@ -133,7 +136,7 @@ namespace GitHub.Services
 
         public IObservable<AccountCacheItem> GetUserFromCache()
         {
-            return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
+            return userObservable;
         }
 
         public IObservable<Unit> InvalidateAll()
@@ -173,7 +176,6 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<IRepositoryModel>> GetAllRepositoriesForAllOrganizations()
         {
             return GetUserOrganizations()
-                .SelectMany(org => org.ToObservable())
                 .SelectMany(org => GetOrganizationRepositories(org.Login).Take(1));
         }
 
@@ -200,7 +202,7 @@ namespace GitHub.Services
                     });
         }
 
-        public TrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo)
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
             // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
@@ -209,33 +211,20 @@ namespace GitHub.Services
             // and replaces it instead of appending, so items get refreshed in-place as they come in.
 
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name))
-                .Replay()
-                .RefCount();
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
 
-            var cache = keyobs
-                .SelectMany(key => hostCache.GetOrCreateObject(key, () => CacheIndex.Create(key)))
-                .SelectMany(index => hostCache.GetObjects<PullRequestCacheItem>(index.Keys))
-                .Select(dict => dict.Values)
-                .Flatten()
-                .Do(pr => pr.Title = pr.Title + " Cached!")
-                .Publish()
-                .RefCount();
-
-            var live = keyobs
+            var list = Observable.Defer(() => keyobs
                 .SelectMany(key =>
-                    apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-                        .Select(PullRequestCacheItem.Create)
-                        .Do(pr => hostCache.InsertObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, pr.Number), pr))
-                        .Do(pr => CacheIndex.AddAndSave(hostCache, key, pr.Number, pr.UpdatedAt)))
-                .Publish()
-                .RefCount();
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
+                        apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                            .Select(PullRequestCacheItem.Create),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
+            return new TrackingCollection<IPullRequestModel>(list);
 
-            var result = Observable.Merge(cache, live).Select(Create);
-
-            var obscol = new TrackingCollection<IPullRequestModel>();
-            obscol.Listen(result);
-            return obscol;
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
@@ -266,19 +255,15 @@ namespace GitHub.Services
 
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
         {
-            return new PullRequestModel()
+            return new PullRequestModel(prCacheItem.Number, prCacheItem.Title, Create(prCacheItem.Author), prCacheItem.CreatedAt, prCacheItem.UpdatedAt)
             {
-                Title = prCacheItem.Title,
-                Number = prCacheItem.Number,
-                CreatedAt = prCacheItem.CreatedAt,
-                Author = Create(prCacheItem.Author),
                 CommentCount = prCacheItem.CommentCount
             };
         }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
-            return hostCache.InsertObject("user", user);
+            return hostCache.InsertObject(USER, user);
         }
 
         bool disposed;
@@ -348,7 +333,20 @@ namespace GitHub.Services
             public bool Fork { get; set; }
         }
 
-        public class PullRequestCacheItem
+        public class CacheItem
+        {
+            [AllowNull]
+            public string Key { [return:AllowNull] get; set; }
+            public DateTimeOffset Timestamp { get; set; }
+
+            public IObservable<T> Save<T>(IBlobCache cache, string key, DateTimeOffset? absoluteExpiration) where T : CacheItem
+            {
+                return cache.InsertObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, Key), this, absoluteExpiration)
+                    .Select(_ => this as T);
+            }
+        }
+
+        public class PullRequestCacheItem : CacheItem
         {
             public static PullRequestCacheItem Create(PullRequest pr)
             {
@@ -364,6 +362,9 @@ namespace GitHub.Services
                 Author = new AccountCacheItem(pr.User);
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
+
+                Key = Number.ToString(CultureInfo.InvariantCulture);
+                Timestamp = UpdatedAt;
             }
 
             [AllowNull]
@@ -388,33 +389,30 @@ namespace GitHub.Services
                 Keys = new List<string>();
             }
 
-            public static IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, int key, DateTimeOffset lastUpdated)
+            public IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, CacheItem item,
+                DateTimeOffset? absoluteExpiration = null)
             {
-                return cache.GetObject<CacheIndex>(indexKey)
-                    .Do(index =>
-                    {
-                        var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, key);
-                        if (!index.Keys.Contains(k))
-                            index.Keys.Add(k);
-                        index.UpdatedAt = lastUpdated > index.UpdatedAt ? lastUpdated : index.UpdatedAt;
-                    })
-                    .SelectMany(index => cache.InsertObject(index.IndexKey, index).Select(x => index));
+                var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", IndexKey, item.Key);
+                if (!Keys.Contains(k))
+                    Keys.Add(k);
+                UpdatedAt = DateTimeOffset.Now;
+                return cache.InsertObject(IndexKey, this, absoluteExpiration)
+                            .Select(x => this);
             }
 
-            public static IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, IEnumerable<int> keys, IEnumerable<DateTimeOffset> lastUpdates)
+            public static IObservable<CacheIndex> AddAndSaveToIndex(IBlobCache cache, string indexKey, CacheItem item,
+                DateTimeOffset? absoluteExpiration = null)
             {
                 return cache.GetObject<CacheIndex>(indexKey)
                     .Do(index =>
                     {
-                        foreach (var key in keys.Select(x => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, x)))
-                        {
-                            if (!index.Keys.Contains(key))
-                                index.Keys.Add(key);
-                        }
-                        foreach (var lastUpdated in lastUpdates)
-                            index.UpdatedAt = lastUpdated > index.UpdatedAt ? lastUpdated : index.UpdatedAt;
+                        var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, item.Key);
+                        if (!index.Keys.Contains(k))
+                            index.Keys.Add(k);
+                        index.UpdatedAt = DateTimeOffset.Now;
                     })
-                    .SelectMany(index => cache.InsertObject(index.IndexKey, index).Select(x => index));
+                    .SelectMany(index => cache.InsertObject(index.IndexKey, index, absoluteExpiration)
+                    .Select(x => index));
             }
 
             [AllowNull]
@@ -422,5 +420,81 @@ namespace GitHub.Services
             public List<string> Keys { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
         }
+    }
+
+    static class CacheIndexExtensions
+    {
+        public static IObservable<T> GetAndFetchLatestFromIndex<T>(
+            this IBlobCache blobCache,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            TimeSpan refreshInterval,
+            TimeSpan maxCacheDuration)
+                where T : ModelService.CacheItem
+        {
+            return Observable.Defer(() =>
+            {
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
+
+                try
+                {
+                    return blobCache.GetAndFetchLatestFromIndex(
+                        key,
+                        fetchFunc,
+                        createdAt => IsExpired(blobCache, createdAt, refreshInterval),
+                        absoluteExpiration);
+                }
+                catch (Exception exc)
+                {
+                    return Observable.Throw<T>(exc);
+                }
+            });
+        }
+
+        static IObservable<T> GetAndFetchLatestFromIndex<T>(this IBlobCache This,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            Func<DateTimeOffset, bool> fetchPredicate = null,
+            DateTimeOffset? absoluteExpiration = null,
+            bool shouldInvalidateOnError = false)
+                where T : ModelService.CacheItem
+        {
+            var fetch = Observable.Defer(() => This.GetOrCreateObject(key, () => ModelService.CacheIndex.Create(key))
+                .Select(x => Tuple.Create(x, fetchPredicate == null || x == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
+                .Where(predicateIsTrue => predicateIsTrue.Item2)
+                .Select(x => x.Item1)
+                .SelectMany(index =>
+                {
+                    var fetchObs = fetchFunc().Catch<T, Exception>(ex =>
+                    {
+                        var shouldInvalidate = shouldInvalidateOnError ?
+                            This.InvalidateObject<ModelService.CacheIndex>(key) :
+                            Observable.Return(Unit.Default);
+                        return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
+                    });
+
+                    return fetchObs
+                        .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
+                        .Do(x => index.AddAndSave(This, key, x, absoluteExpiration));
+                }));
+
+            var cache = Observable.Defer(() => This.GetOrCreateObject(key, () => ModelService.CacheIndex.Create(key))
+                .SelectMany(index => This.GetObjects<T>(index.Keys))
+                .SelectMany(dict => dict.Values)
+                .Do(x => (x as ModelService.PullRequestCacheItem).Title = (x as ModelService.PullRequestCacheItem).Title + " Cached!")
+                )
+                ;
+
+            return cache.Merge(fetch).Replay().RefCount();
+        }
+
+        static bool IsExpired(IBlobCache blobCache, DateTimeOffset itemCreatedAt, TimeSpan cacheDuration)
+        {
+            var now = blobCache.Scheduler.Now;
+            var elapsed = now - itemCreatedAt;
+
+            return elapsed > cacheDuration;
+        }
+
     }
 }

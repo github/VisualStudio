@@ -17,6 +17,8 @@ using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
+using System.Windows.Data;
+using System.ComponentModel;
 
 namespace GitHub.SampleData
 {
@@ -34,14 +36,14 @@ namespace GitHub.SampleData
         public PullRequestListViewModelDesigner()
         {
             var prs = new ObservableCollection<IPullRequestModel>();
-            prs.Add(new PullRequestModel() { Number = 399, Title = "Let's try doing this differently", CreatedAt = DateTimeOffset.Now - TimeSpan.FromDays(1), Author = new AccountDesigner { Login = "shana", IsUser = true } });
-            prs.Add(new PullRequestModel() { Number = 389, Title = "Build system upgrade", CommentCount = 4, HasNewComments = false, CreatedAt = DateTimeOffset.Now - TimeSpan.FromMinutes(2), Author = new AccountDesigner { Login = "haacked", IsUser = true } });
-            prs.Add(new PullRequestModel() { Number = 409, Title = "Fix publish button style", CommentCount = 27, HasNewComments = true, CreatedAt = DateTimeOffset.Now - TimeSpan.FromHours(5), Author = new AccountDesigner { Login = "shana", IsUser = false } });
-            PullRequests = prs;//.CreateDerivedCollection(x => x, orderer: OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
-            SelectedPullRequest = PullRequests[1];
+            prs.Add(new PullRequestModel(399, "Let's try doing this differently", new AccountDesigner { Login = "shana", IsUser = true }, DateTimeOffset.Now - TimeSpan.FromDays(1)));
+            prs.Add(new PullRequestModel(389, "Build system upgrade", new AccountDesigner { Login = "haacked", IsUser = true }, DateTimeOffset.Now - TimeSpan.FromMinutes(2)) { CommentCount = 4, HasNewComments = false });
+            prs.Add(new PullRequestModel(409, "Fix publish button style", new AccountDesigner { Login = "shana", IsUser = false }, DateTimeOffset.Now - TimeSpan.FromHours(5)) { CommentCount = 27, HasNewComments = true });
+            PullRequests = prs.CreateDerivedCollection(x => x);//CollectionViewSource.GetDefaultView(prs);//.CreateDerivedCollection(x => x, orderer: OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
+            SelectedPullRequest = prs[1];
         }
 
-        public ObservableCollection<IPullRequestModel> PullRequests { get; set; }
+        public IReactiveDerivedList<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
     }
 

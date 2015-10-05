@@ -105,6 +105,7 @@
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
+    <Compile Include="Helpers\ICopyable.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
     <Compile Include="Models\ISimpleRepositoryModel.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
+    <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

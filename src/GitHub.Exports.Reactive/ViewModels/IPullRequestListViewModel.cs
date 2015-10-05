@@ -3,12 +3,13 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace GitHub.ViewModels
 {
-    public interface IPullRequestListViewModel
+    public interface IPullRequestListViewModel : IViewModel
     {
-        ObservableCollection<IPullRequestModel> PullRequests { get; }
+        IReactiveDerivedList<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
     }
 }

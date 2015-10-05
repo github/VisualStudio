@@ -33,7 +33,7 @@
         </Grid>
 
         <StackPanel x:Name="container">
-          <view:PullRequestList x:Name="pullRequestList" d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=sampleData:PullRequestListViewModelDesigner}"/>
+          <view:PullRequestListView x:Name="pullRequestList" d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=sampleData:PullRequestListViewModelDesigner}"/>
         </StackPanel>
         
     </StackPanel>

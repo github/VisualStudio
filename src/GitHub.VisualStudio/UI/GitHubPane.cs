@@ -7,11 +7,13 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using GitHub.Extensions;
 using GitHub.VisualStudio.UI.Views.Controls;
-using GitHub.Exports;
 using GitHub.Models;
 using GitHub.UI;
 using System.Linq;
+using System.Reactive.Disposables;
 using GitHub.Primitives;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.UI.Views;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -30,8 +32,10 @@ namespace GitHub.VisualStudio.UI
     [Guid("6b0fdc0a-f28e-47a0-8eed-cc296beff6d2")]
     public class GitHubPane : ToolWindowPane
     {
-        IDisposable disposable;
+        GitHubPaneView View => Content as GitHubPaneView;
 
+        // this is complaining about the Content access, it's fine.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
@@ -45,6 +49,13 @@ namespace GitHub.VisualStudio.UI
             BitmapIndex = 1;
             ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
+
+            // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
+            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
+            // the object returned by the Content property.
+            var factory = this.GetExportedValue<IUIProvider>().GetService<IExportFactoryProvider>();
+            Content = factory.GetView(Exports.UIViewType.GitHubPane).Value;
+            View.DataContext = factory.GetViewModel(Exports.UIViewType.GitHubPane).Value;
         }
 
         public override void OnToolWindowCreated()
@@ -55,90 +66,9 @@ namespace GitHub.VisualStudio.UI
 
         protected override void Initialize()
         {
-            // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
-            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
-            // the object returned by the Content property.
-            Content = new GitHubPaneControl();
-            this.GetExportedValue<IUIProvider>().GetService<ITeamExplorerServiceHolder>().ServiceProvider = this;
-
-            AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand, (s, e) => MoveToPage(UIControllerFlow.PullRequestList));
-
             base.Initialize();
+            (View.ViewModel as TeamExplorerSectionBase).Initialize(this);
         }
 
-        void MoveToPage(UIControllerFlow type)
-        {
-            var uiProvider = this.GetExportedValue<IUIProvider>();
-            var factory = uiProvider.GetService<IExportFactoryProvider>();
-            var uiflow = factory.UIControllerFactory.CreateExport();
-            disposable = uiflow;
-            var ui = uiflow.Value;
-            var creation = ui.SelectFlow(type);
-            creation.Subscribe(c =>
-            {
-                ((GitHubPaneControl)Content).container.Children.Clear();
-                ((GitHubPaneControl)Content).container.Children.Add(c);
-            });
-            var activeRepo = uiProvider.GetService<ITeamExplorerServiceHolder>().ActiveRepo;
-            if (activeRepo != null)
-            {
-                var cm = uiProvider.GetService<IConnectionManager>();
-                var conn = cm.Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
-                ui.Start(conn);
-            }
-            else
-                ui.Start(null);
-        }
-
-        void AddTopLevelMenuItem(
-            Guid guid,
-            int cmdId,
-            EventHandler eventHandler)
-        {
-            var mcs = GetService(typeof(IMenuCommandService)) as IMenuCommandService;
-            Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
-            if (mcs == null)
-                return;
-            var id = new CommandID(guid, cmdId);
-            var item = new MenuCommand(eventHandler, id);
-            mcs.AddCommand(item);
-        }
-
-        void AddDynamicMenuItem(
-            Guid guid,
-            int cmdId,
-            Func<bool> canEnable,
-            Action execute)
-        {
-            var mcs = GetService(typeof(IMenuCommandService)) as IMenuCommandService;
-            Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
-            if (mcs == null)
-                return;
-            var id = new CommandID(guid, cmdId);
-            var item = new OleMenuCommand(
-                (s, e) => execute(),
-                (s, e) => { },
-                (s, e) =>
-                {
-                    ((OleMenuCommand)s).Visible = canEnable();
-                },
-                id);
-            mcs.AddCommand(item);
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    if (disposable != null)
-                        disposable.Dispose();
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
-        }
     }
 }
