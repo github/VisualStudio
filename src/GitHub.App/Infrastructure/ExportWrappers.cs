@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using Octokit.Internal;
+using System;
+using System.Net.Http;
 
 namespace GitHub.Infrastructure
 {
@@ -10,5 +12,8 @@ namespace GitHub.Infrastructure
     [Export(typeof(IHttpClient))]
     public class ExportedHttpClient : HttpClientAdapter
     {
+        public ExportedHttpClient() :
+            base(HttpMessageHandlerFactory.CreateDefault)
+        {}
     }
 }

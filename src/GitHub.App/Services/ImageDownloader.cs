@@ -30,7 +30,6 @@ namespace GitHub.Services
                 BaseAddress = new Uri(imageUri.GetLeftPart(UriPartial.Authority)),
                 Endpoint = new Uri(imageUri.PathAndQuery, UriKind.RelativeOrAbsolute),
                 Method = HttpMethod.Get,
-                AllowAutoRedirect = true
             };
 
             return HttpClient.Send(request)
