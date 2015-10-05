@@ -8,6 +8,7 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -15,6 +16,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Publish)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RepositoryPublishControl : SimpleViewUserControl, IViewFor<IRepositoryPublishViewModel>, IView
     {
         public RepositoryPublishControl()
