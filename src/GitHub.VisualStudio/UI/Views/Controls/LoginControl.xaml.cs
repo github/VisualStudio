@@ -9,6 +9,7 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {

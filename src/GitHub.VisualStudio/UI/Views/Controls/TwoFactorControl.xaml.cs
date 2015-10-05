@@ -6,6 +6,7 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
