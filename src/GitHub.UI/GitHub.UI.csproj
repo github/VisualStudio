@@ -64,6 +64,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OcticonPaths.resx</DependentUpon>
+    </Compile>
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
@@ -85,7 +90,6 @@
     </Compile>
     <Compile Include="Controls\Octicons\OcticonImage.cs" />
     <Compile Include="Controls\Octicons\OcticonPath.cs" />
-    <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs" />
     <Compile Include="Controls\TrimmedTextBlock.cs" />
     <Compile Include="Helpers\AccessKeysManagerScoping.cs" />
     <Compile Include="Controls\Buttons\OcticonButton.cs" />
@@ -187,6 +191,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\Octicons\OcticonPaths.resx">
       <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>OcticonPaths.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
