@@ -4,15 +4,12 @@ using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using GitHub.Services;
 using System.Diagnostics;
-using System.Threading;
-using GitHub.Extensions;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Api;
 using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerSectionBase : TeamExplorerItemBase, ITeamExplorerSection, INotifyPropertySource
+    public class TeamExplorerSectionBase : TeamExplorerItemBase, ITeamExplorerSection
     {
         protected IConnectionManager connectionManager;
 
@@ -52,6 +49,14 @@ namespace GitHub.VisualStudio.Base
             return null;
         }
 
+        public TeamExplorerSectionBase(ITeamExplorerServiceHolder holder)
+            : base(holder)
+        {
+            IsVisible = false;
+            IsEnabled = true;
+            IsExpanded = true;
+        }
+
         public TeamExplorerSectionBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
             : base(apiFactory, holder)
         {
@@ -60,26 +65,36 @@ namespace GitHub.VisualStudio.Base
             IsExpanded = true;
         }
 
+        public TeamExplorerSectionBase(ITeamExplorerServiceHolder holder, IConnectionManager cm) : this(holder)
+        {
+            connectionManager = cm;
+        }
+
         public TeamExplorerSectionBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
             IConnectionManager cm) : this(apiFactory, holder)
         {
             connectionManager = cm;
         }
 
-        public virtual void Cancel()
+        void ITeamExplorerSection.Cancel()
         {
         }
 
-        public virtual void Initialize(object sender, SectionInitializeEventArgs e)
+        void ITeamExplorerSection.Initialize(object sender, SectionInitializeEventArgs e)
+        {
+            Initialize(e.ServiceProvider);
+        }
+
+        public virtual void Initialize(IServiceProvider serviceProvider)
         {
 #if DEBUG
-//            VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize", DateTime.Now, GetType());
+            //            VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize", DateTime.Now, GetType());
 #endif
-            ServiceProvider = e.ServiceProvider;
+            ServiceProvider = serviceProvider;
             Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
             if (holder == null)
                 return;
-            holder.ServiceProvider = e.ServiceProvider;
+            holder.ServiceProvider = ServiceProvider;
             SubscribeToRepoChanges();
 #if DEBUG
 //            VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize DONE", DateTime.Now, GetType());

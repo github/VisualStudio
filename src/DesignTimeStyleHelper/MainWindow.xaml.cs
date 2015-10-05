@@ -17,6 +17,7 @@ namespace DesignTimeStyleHelper
         {
             InitializeComponent();
             gitHubHomeSection.DataContext = new GitHubHomeSectionDesigner();
+            pullRequestList.DataContext = new PullRequestListViewModelDesigner();
         }
 
         private void loginLink_Click(object sender, RoutedEventArgs e)

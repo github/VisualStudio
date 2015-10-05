@@ -33,6 +33,10 @@
       <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" priority="0x0500">
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
+
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" priority="0x0501">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
     </Groups>
 
     <Menus>
@@ -75,12 +79,39 @@
       </Button>
 
       <!--- Toolbar buttons -->
-      <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" priority="0x0100" type="Button">
+      <Button guid="guidGitHubToolbarCmdSet" id="backCommand" priority="0x0100" type="Button">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
+        <Icon guid="guidImages" id="arrow_left" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText></ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" priority="0x0101" type="Button">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
+        <Icon guid="guidImages" id="arrow_right" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText></ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" priority="0x0102" type="Button">
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
         <Icon guid="guidImages" id="pullrequest" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Changes</ButtonText>
+          <ButtonText></ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" priority="0x0110" type="Button">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" />
+        <Icon guid="guidImages" id="refresh" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText></ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -107,13 +138,20 @@
     
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
       <IDSymbol name="logo" value="1" />
-      <IDSymbol name="pullrequest" value="2" />
+      <IDSymbol name="arrow_left" value="2" />
+      <IDSymbol name="arrow_right" value="3" />
+      <IDSymbol name="refresh" value="4" />
+      <IDSymbol name="pullrequest" value="5" />
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
       <IDSymbol name="idGitHubToolbarMenuGroup" value="0x1110" />
+      <IDSymbol name="idGitHubToolbarMenuGroup1" value="0x1111" />
       <IDSymbol name="idGitHubToolbar" value="0x1120" />
-      <IDSymbol name="pullRequestCommand" value="0x201" />
+      <IDSymbol name="backCommand" value="0x300" />
+      <IDSymbol name="forwardCommand" value="0x301" />
+      <IDSymbol name="refreshCommand" value="0x302" />
+      <IDSymbol name="pullRequestCommand" value="0x310" />
     </GuidSymbol>
 
   </Symbols>

@@ -89,25 +89,5 @@ namespace GitHub.VisualStudio
         {
             return GetGlobalService<SVsSolution, IVsSolution>(provider);
         }
-
-        public static UriString GetRepoUrlFromSolution(IVsSolution solution)
-        {
-            string solutionDir, solutionFile, userFile;
-            if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
-                return null;
-            if (solutionDir == null)
-                return null;
-            return GitService.GitServiceHelper.GetUri(solutionDir);
-        }
-
-        public static IRepository GetRepoFromSolution(this IVsSolution solution)
-        {
-            string solutionDir, solutionFile, userFile;
-            if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
-                return null;
-            if (solutionDir == null)
-                return null;
-            return GitService.GitServiceHelper.GetRepo(solutionDir);
-        }
     }
 }

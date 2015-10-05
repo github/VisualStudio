@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Api;
 using GitHub.VisualStudio.TeamExplorer;
+using System.Windows.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -82,9 +83,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 IsVisible = false;
         }
 
-        public override void Initialize(object sender, SectionInitializeEventArgs e)
+        public override void Initialize(IServiceProvider serviceProvider)
         {
-            base.Initialize(sender, e);
+            base.Initialize(serviceProvider);
             RTMSetup();
         }
 
@@ -138,7 +139,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             creation.Subscribe(c =>
             {
                 SectionContent = c;
-                c.DataContext = this;
+                (c as UserControl).DataContext = this;
                 ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
             });
             ui.Start(null);

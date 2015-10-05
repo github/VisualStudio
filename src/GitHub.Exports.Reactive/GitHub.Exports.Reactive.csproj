@@ -84,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Caches\AccountCacheItem.cs" />
+    <Compile Include="Collections\ITrackingCollection.cs" />
+    <Compile Include="Collections\TrackingCollection.cs" />
     <Compile Include="Extensions\ConnectionManagerExtensions.cs" />
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
@@ -156,6 +159,10 @@
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
+      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
+      <Name>GitHub.Extensions.Reactive</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>

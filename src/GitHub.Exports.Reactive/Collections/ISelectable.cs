@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace GitHub.Exports
+namespace GitHub.Collections
 {
     public interface ISelectable : IReactiveNotifyPropertyChanged<IReactiveObject>
     {

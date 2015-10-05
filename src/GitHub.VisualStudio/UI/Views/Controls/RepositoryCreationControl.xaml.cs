@@ -11,14 +11,19 @@ using GitHub.UserErrors;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
+    public class GenericRepositoryCreationControl : SimpleViewUserControl<IRepositoryCreationViewModel, RepositoryCreationControl>
+    { }
+
     /// <summary>
     /// Interaction logic for CloneRepoControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
-    public partial class RepositoryCreationControl : SimpleViewUserControl, IViewFor<IRepositoryCreationViewModel>, IView
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public partial class RepositoryCreationControl : GenericRepositoryCreationControl
     {
         public RepositoryCreationControl()
         {
@@ -71,29 +76,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 if (IsVisible)
                     this.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
             };
-        }
-
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-           "ViewModel", typeof(IRepositoryCreationViewModel), typeof(RepositoryCreationControl), new PropertyMetadata(null));
-
-        object IViewFor.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (IRepositoryCreationViewModel)value; }
-        }
-
-        object IView.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (IRepositoryCreationViewModel)value; }
-        }
-
-        public IRepositoryCreationViewModel ViewModel
-        {
-            [return: AllowNull]
-            get
-            { return (IRepositoryCreationViewModel)GetValue(ViewModelProperty); }
-            set { SetValue(ViewModelProperty, value); }
         }
     }
 }

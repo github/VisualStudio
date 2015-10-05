@@ -7,9 +7,12 @@
         xmlns:local="clr-namespace:DesignTimeStyleHelper"
         xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
         xmlns:ctl="clr-namespace:GitHub.VisualStudio.UI.Views.Controls;assembly=GitHub.VisualStudio"
+        xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views;assembly=GitHub.VisualStudio"
+        xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Window.Resources>
+
+  <Window.Resources>
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="Margin" Value="10,0,0,0" />
         </Style>
@@ -25,11 +28,12 @@
                 <TextBlock><Hyperlink x:Name="createLink" Click="createLink_Click">Create</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink x:Name="publishLink" Click="publishLink_Click">Publish</Hyperlink></TextBlock>
                 <TextBlock><Hyperlink x:Name="twoFactorTester" Click="twoFactorTester_Click">Two Factor</Hyperlink></TextBlock>
+
             </WrapPanel>
         </Grid>
 
         <StackPanel x:Name="container">
-
+          <view:PullRequestListView x:Name="pullRequestList" d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=sampleData:PullRequestListViewModelDesigner}"/>
         </StackPanel>
         
     </StackPanel>

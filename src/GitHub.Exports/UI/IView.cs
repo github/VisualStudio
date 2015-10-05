@@ -2,7 +2,7 @@
 
 namespace GitHub.UI
 {
-    public interface IView
+    public interface IView : IDisposable
     {
         object ViewModel { get; set; }
         IObservable<object> Done { get; }

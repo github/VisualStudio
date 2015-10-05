@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using ReactiveUI;
+using System.ComponentModel;
 
 namespace GitHub.Extensions.Reactive
 {
