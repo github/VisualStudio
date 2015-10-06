@@ -47,7 +47,7 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Hyperlink.Resources>
-                                <Run Text="{TemplateBinding Content}" />
+                                <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}" />
                             </Hyperlink>
                     </TextBlock>
                 </ControlTemplate>
