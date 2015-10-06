@@ -4,6 +4,13 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.ComponentModel.Design;
 using System.Windows.Controls;
+using GitHub.Services;
+using GitHub.Extensions;
+using GitHub.Models;
+using GitHub.UI;
+using GitHub.VisualStudio.Base;
+using GitHub.ViewModels;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -37,7 +44,18 @@ namespace GitHub.VisualStudio.UI
             ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
 
-            Content = new UserControl();
+            var factory = this.GetExportedValue<IUIProvider>().GetService<IExportFactoryProvider>();
+            // placeholder logic to load the view until the UIController is able to do it for us
+            Content = factory.GetView(Exports.UIViewType.GitHubPane).Value;
+            (Content as UserControl).DataContext = factory.GetViewModel(Exports.UIViewType.GitHubPane).Value;
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            var vm = (Content as IView).ViewModel as IServiceProviderAware;
+            Debug.Assert(vm != null);
+            vm?.Initialize(this);
         }
     }
 }

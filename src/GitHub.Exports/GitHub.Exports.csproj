@@ -125,6 +125,7 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
+    <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Services\IUIProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
+    <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
     <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
