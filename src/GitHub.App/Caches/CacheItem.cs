@@ -12,7 +12,8 @@ namespace GitHub.Caches
         public string Key {[return: AllowNull] get; set; }
         public DateTimeOffset Timestamp { get; set; }
 
-        public IObservable<T> Save<T>(IBlobCache cache, string key, DateTimeOffset? absoluteExpiration) where T : CacheItem
+        public IObservable<T> Save<T>(IBlobCache cache, string key, DateTimeOffset? absoluteExpiration = null)
+            where T : CacheItem
         {
             var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", key, Key);
             return cache

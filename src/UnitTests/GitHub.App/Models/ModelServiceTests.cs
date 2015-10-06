@@ -12,6 +12,9 @@ using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using Xunit;
+using System.Globalization;
+using GitHub.Models;
+using GitHub.Primitives;
 
 public class ModelServiceTests
 {
@@ -389,6 +392,115 @@ public class ModelServiceTests
         }
     }
 
+    public class TheGetPullRequestsMethod : TestBaseClass
+    {
+        [Fact]
+        public async Task NonExpiredIndexReturnsCache()
+        {
+            var username = "octocat";
+            var reponame = "repo";
+
+            var cache = new InMemoryBlobCache();
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = CreateOctokitUser(username);
+            apiClient.GetUser().Returns(Observable.Return(user));
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var act = modelService.GetAccounts().ToEnumerable().First().First();
+
+            var repo = Substitute.For<ISimpleRepositoryModel>();
+            repo.Name.Returns(reponame);
+            repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
+
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
+
+            var prcache = Enumerable.Range(1, 5)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+
+            // seed the cache
+            prcache
+                .Select(item => new ModelService.PullRequestCacheItem(item))
+                .Select(item => item.Save<ModelService.PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
+                .ToList();
+
+            var prlive = Observable.Range(1, 5)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Title " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+
+            apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
+
+            await modelService.InsertUser(new AccountCacheItem(user));
+            var col = modelService.GetPullRequests(repo);
+
+            col.Subscribe();
+
+            await prlive;
+
+            Assert.Equal(prcache.Select(x =>
+                    new PullRequestModel(x.Number, x.Title, act, x.CreatedAt, x.UpdatedAt)),
+                col);
+
+            Assert.Collection(col, prcache.Select(
+                x => new Action<IPullRequestModel>(t => Assert.Equal(x.Title, t.Title))).ToArray());
+        }
+
+        [Fact]
+        public async Task ExpiredIndexReturnsLive()
+        {
+            var username = "octocat";
+            var reponame = "repo";
+
+            var cache = new InMemoryBlobCache();
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = CreateOctokitUser(username);
+            apiClient.GetUser().Returns(Observable.Return(user));
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var act = modelService.GetAccounts().ToEnumerable().First().First();
+
+            var repo = Substitute.For<ISimpleRepositoryModel>();
+            repo.Name.Returns(reponame);
+            repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
+
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
+
+            var prcache = Enumerable.Range(1, 5)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+
+            // seed the cache
+            prcache
+                .Select(item => new ModelService.PullRequestCacheItem(item))
+                .Select(item => item.Save<ModelService.PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
+                .ToList();
+
+            // expire the index
+            var indexobj = await cache.GetObject<CacheIndex>(indexKey);
+            indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(3);
+            await cache.InsertObject(indexKey, indexobj);
+
+            var prlive = Observable.Range(1, 5)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Title " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+                .DelaySubscription(TimeSpan.FromMilliseconds(10));
+
+            apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
+
+            await modelService.InsertUser(new AccountCacheItem(user));
+            var col = modelService.GetPullRequests(repo);
+
+            col.Subscribe();
+
+            await prlive;
+
+            Assert.Equal(prlive.ToEnumerable().Select(x =>
+                    new PullRequestModel(x.Number, x.Title, act, x.CreatedAt, x.UpdatedAt)),
+                col);
+
+            Assert.Collection(col, prlive.ToEnumerable().Select(
+                x => new Action<IPullRequestModel>(t => Assert.Equal(x.Title, t.Title))).ToArray());
+        }
+    }
+
     static User CreateOctokitUser(string login)
     {
         return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false);
@@ -402,5 +514,15 @@ public class ModelServiceTests
     static Repository CreateRepository(string owner, string name)
     {
         return new Repository("https://url", "https://url", "https://url", "https://url", "https://url", "https://url", "https://url", 1, CreateOctokitUser(owner), name, "fullname", "description", "https://url", "c#", false, false, 0, 0, 0, "master", 0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, new RepositoryPermissions(), null, null, null, true, false, false);
+    }
+
+    static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
+        DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount)
+    {
+        var uri = new Uri("https://url");
+        return new PullRequest(uri, uri, uri, uri, uri, uri,
+            id, state, title, "", createdAt, updatedAt,
+            null, null, null, null, user, "", false, null, null, commentCount, 0, 0, 0,
+            0);
     }
 }

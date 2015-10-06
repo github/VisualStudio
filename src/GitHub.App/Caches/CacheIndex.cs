@@ -37,7 +37,7 @@ namespace GitHub.Caches
         public static IObservable<CacheIndex> AddAndSaveToIndex(IBlobCache cache, string indexKey, CacheItem item,
             DateTimeOffset? absoluteExpiration = null)
         {
-            return cache.GetObject<CacheIndex>(indexKey)
+            return cache.GetOrCreateObject(indexKey, () => CacheIndex.Create(indexKey))
                 .Do(index =>
                 {
                     var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, item.Key);
