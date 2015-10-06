@@ -105,6 +105,7 @@
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
+    <Compile Include="Helpers\ICopyable.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\ISimpleRepositoryModel.cs" />
     <Compile Include="Models\SimpleRepositoryModel.cs" />
@@ -151,6 +152,7 @@
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
+    <Compile Include="Models\IPullRequestModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
