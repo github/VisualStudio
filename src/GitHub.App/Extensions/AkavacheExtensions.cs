@@ -172,7 +172,7 @@ namespace GitHub.Extensions
                 where T : CacheItem
         {
             var fetch = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
-                .Select(x => Tuple.Create(x, fetchPredicate == null || x == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
+                .Select(x => Tuple.Create(x, fetchPredicate == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
                 .Where(predicateIsTrue => predicateIsTrue.Item2)
                 .Select(x => x.Item1)
                 .SelectMany(index =>
