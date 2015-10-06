@@ -151,7 +151,7 @@ namespace GitHub.Services
                     hostCache.GetAndFetchLatestFromIndex(key, () =>
                         apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
                             .Select(PullRequestCacheItem.Create),
-                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromMinutes(5),
                         TimeSpan.FromDays(1))
                 )
                 .Select(Create)
