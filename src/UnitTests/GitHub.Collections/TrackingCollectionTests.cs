@@ -374,7 +374,7 @@ public class TrackingCollectionTests
         }
 
         [Fact]
-        public async void MultipleSortingAndFiltering()
+        public void MultipleSortingAndFiltering()
         {
             var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
             var count = 20;
@@ -384,8 +384,6 @@ public class TrackingCollectionTests
             var dates1 = Enumerable.Range(1, count).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
 
             var idstack1 = new Stack<int>(Enumerable.Range(1, count).OrderBy(rnd.Next));
-            //var datestack1 = new Stack<DateTimeOffset>(dates1.OrderBy(_ => rnd.Next()));
-            //var datestack1 = new Stack<DateTimeOffset>(new List<DateTimeOffset>() { dates1[0], dates1[1], dates1[2] });
             var datestack1 = new Stack<DateTimeOffset>(dates1);
             var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
 
@@ -393,8 +391,6 @@ public class TrackingCollectionTests
             var dates2 = Enumerable.Range(1, count).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
 
             var idstack2 = new Stack<int>(Enumerable.Range(1, count).OrderBy(rnd.Next));
-            //var datestack2 = new Stack<DateTimeOffset>(dates2.OrderBy(_ => rnd.Next()));
-            //var datestack2 = new Stack<DateTimeOffset>(dates2);
             var datestack2 = new Stack<DateTimeOffset>(new List<DateTimeOffset>() {
                 dates2[2],
                 dates2[0],
