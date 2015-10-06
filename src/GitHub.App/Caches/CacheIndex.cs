@@ -29,7 +29,7 @@ namespace GitHub.Caches
             var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", IndexKey, item.Key);
             if (!Keys.Contains(k))
                 Keys.Add(k);
-            UpdatedAt = DateTimeOffset.Now;
+            UpdatedAt = DateTimeOffset.UtcNow;
             return cache.InsertObject(IndexKey, this, absoluteExpiration)
                         .Select(x => this);
         }
@@ -43,7 +43,7 @@ namespace GitHub.Caches
                     var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, item.Key);
                     if (!index.Keys.Contains(k))
                         index.Keys.Add(k);
-                    index.UpdatedAt = DateTimeOffset.Now;
+                    index.UpdatedAt = DateTimeOffset.UtcNow;
                 })
                 .SelectMany(index => cache.InsertObject(index.IndexKey, index, absoluteExpiration)
                 .Select(x => index));
