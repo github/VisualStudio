@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Reactive.Linq;
 using Akavache;
+using GitHub.Caches;
+using System.Linq;
+using System.Reactive;
 
 namespace GitHub.Extensions
 {
@@ -131,6 +134,67 @@ namespace GitHub.Extensions
                 .Concat(fetch)
                 .Replay()
                 .RefCount();
+        }
+
+        public static IObservable<T> GetAndFetchLatestFromIndex<T>(
+            this IBlobCache blobCache,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            TimeSpan refreshInterval,
+            TimeSpan maxCacheDuration)
+                where T : CacheItem
+        {
+            return Observable.Defer(() =>
+            {
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
+
+                try
+                {
+                    return blobCache.GetAndFetchLatestFromIndex(
+                        key,
+                        fetchFunc,
+                        createdAt => IsExpired(blobCache, createdAt, refreshInterval),
+                        absoluteExpiration);
+                }
+                catch (Exception exc)
+                {
+                    return Observable.Throw<T>(exc);
+                }
+            });
+        }
+
+        static IObservable<T> GetAndFetchLatestFromIndex<T>(this IBlobCache This,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            Func<DateTimeOffset, bool> fetchPredicate = null,
+            DateTimeOffset? absoluteExpiration = null,
+            bool shouldInvalidateOnError = false)
+                where T : CacheItem
+        {
+            var fetch = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                .Select(x => Tuple.Create(x, fetchPredicate == null || x == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
+                .Where(predicateIsTrue => predicateIsTrue.Item2)
+                .Select(x => x.Item1)
+                .SelectMany(index =>
+                {
+                    var fetchObs = fetchFunc().Catch<T, Exception>(ex =>
+                    {
+                        var shouldInvalidate = shouldInvalidateOnError ?
+                            This.InvalidateObject<CacheIndex>(key) :
+                            Observable.Return(Unit.Default);
+                        return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
+                    });
+
+                    return fetchObs
+                        .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
+                        .Do(x => index.AddAndSave(This, key, x, absoluteExpiration));
+                }));
+
+            var cache = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                .SelectMany(index => This.GetObjects<T>(index.Keys))
+                .SelectMany(dict => dict.Values));
+
+            return cache.Merge(fetch).Replay().RefCount();
         }
 
         static bool IsExpired(IBlobCache blobCache, DateTimeOffset itemCreatedAt, TimeSpan cacheDuration)
