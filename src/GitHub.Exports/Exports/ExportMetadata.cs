@@ -7,33 +7,36 @@ using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace GitHub.Exports {
-
-	public enum UIViewType {
+namespace GitHub.Exports
+{
+    public enum UIViewType
+    {
         None,
-		Login,
-		TwoFactor,
-		Create,
-		Clone,
+        Login,
+        TwoFactor,
+        Create,
+        Clone,
         Publish,
+        PullRequestList,
+        PullRequestDetail,
+        PullRequestCreation,
         End = 100,
         Finished,
         GitHubPane,
     }
 
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ExportViewModelAttribute : ExportAttribute
     {
         public ExportViewModelAttribute() : base(typeof(IViewModel))
-        {
-        }
+        {}
 
         public UIViewType ViewType { get; set; }
     }
 
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ExportViewAttribute : ExportAttribute
     {
         public ExportViewAttribute() : base(typeof(IView))

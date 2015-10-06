@@ -277,6 +277,9 @@
     <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\PullRequestListView.xaml.cs">
+      <DependentUpon>PullRequestListView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\WindowController.xaml.cs">
       <DependentUpon>WindowController.xaml</DependentUpon>
     </Compile>
@@ -363,6 +366,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -395,6 +402,10 @@
       </SubType>
     </Page>
     <Page Include="UI\Views\GitHubPaneView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\PullRequestListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

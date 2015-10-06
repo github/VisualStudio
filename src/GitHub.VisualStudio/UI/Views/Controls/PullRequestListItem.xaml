@@ -1,0 +1,130 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                    xmlns:i18n="clr-namespace:GitHub.VisualStudio"
+                    xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
+                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
+
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+  <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  <ui:DurationToStringConverter x:Key="DurationToStringConverter" />
+
+  <DataTemplate x:Key="PullRequestItemTemplate" DataType="models:IPullRequestModel">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="11" />
+      </Grid.ColumnDefinitions>
+      <Image x:Name="avatar"
+             Grid.Row="0"
+             Grid.RowSpan="2"
+             Grid.Column="0"
+             Width="32"
+             Height="32"
+             Margin="3,0,9,0"
+             RenderOptions.BitmapScalingMode="HighQuality"
+             Source="{Binding Author.Avatar}" />
+      <TextBlock x:Name="title"
+                 Grid.Row="0"
+                 Grid.Column="1"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Center"
+                 FontFamily="Segoe UI"
+                 FontSize="14"
+                 Foreground="{DynamicResource VsBrush.WindowText}"
+                 Text="{Binding Title}" />
+      <ui:OcticonImage x:Name="comment_icon"
+                       Grid.Row="0"
+                       Grid.Column="2"
+                       Width="14"
+                       Height="14"
+                       Margin="0,0,1,0"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource VsBrush.WindowText}"
+                       Icon="comment">
+        <ui:OcticonImage.Style>
+          <Style>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommentCount}" Value="0">
+                <Setter Property="FrameworkElement.IsEnabled" Value="False" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </ui:OcticonImage.Style>
+
+      </ui:OcticonImage>
+      <TextBlock x:Name="comment_count"
+                 Grid.Row="0"
+                 Grid.Column="3"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Center"
+                 FontFamily="Segoe UI"
+                 FontSize="12"
+                 Foreground="{DynamicResource VsBrush.WindowText}"
+                 Text="{Binding CommentCount}">
+        <TextBlock.Style>
+          <Style>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommentCount}" Value="0">
+                <Setter Property="FrameworkElement.IsEnabled" Value="False" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+
+      </TextBlock>
+      <ui:OcticonImage x:Name="comment_new"
+                       Grid.Row="0"
+                       Grid.Column="4"
+                       Width="10"
+                       Height="10"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Foreground="Green"
+                       Icon="primitive_dot"
+                       Visibility="{Binding HasNewComments, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      <Grid x:Name="status"
+            Grid.Row="1"
+            Grid.Column="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Button x:Name="cloneLink"
+                Grid.Column="0"
+                Command="{Binding OpenPR}"
+                Content="{Binding Number, StringFormat={}#{0}}"
+                FontFamily="Segoe UI"
+                FontSize="11"
+                Style="{StaticResource ActionLinkButton}" />
+        <TextBlock x:Name="description"
+                   Grid.Column="1"
+                   FontFamily="Segoe UI"
+                   FontSize="11"
+                   Foreground="{DynamicResource VsBrush.GrayText}">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="{} {0} {1} {2} {3}">
+              <Binding Source="{x:Static i18n:Resources.prOpenedText}" />
+              <Binding Path="UpdatedAt" Converter="{StaticResource DurationToStringConverter}" />
+              <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
+              <Binding Path="Author.Login" />
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
+      </Grid>
+    </Grid>
+  </DataTemplate>
+</ResourceDictionary>
