@@ -1,11 +1,17 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Diagnostics;
+using GitHub.Primitives;
 using GitHub.Services;
+using LibGit2Sharp;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.Extensions
 {
-    public static class VSExtensions
+    public static class IServiceProviderExtensions
     {
         static IUIProvider cachedUIProvider = null;
 
@@ -74,6 +80,65 @@ namespace GitHub.Extensions
             if (typeof(T) == typeof(CacheType))
                 cache = (CacheType)(object)ret;
             return ret;
+        }
+
+        public static void AddTopLevelMenuItem(this IServiceProvider provider,
+            Guid guid,
+            int cmdId,
+            EventHandler eventHandler)
+        {
+            var mcs = provider.GetService(typeof(IMenuCommandService)) as IMenuCommandService;
+            Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
+            if (mcs == null)
+                return;
+            var id = new CommandID(guid, cmdId);
+            var item = new MenuCommand(eventHandler, id);
+            mcs.AddCommand(item);
+        }
+
+        public static void AddDynamicMenuItem(this IServiceProvider provider,
+            Guid guid,
+            int cmdId,
+            Func<bool> canEnable,
+            Action execute)
+        {
+            var mcs = provider.GetService(typeof(IMenuCommandService)) as IMenuCommandService;
+            Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
+            if (mcs == null)
+                return;
+            var id = new CommandID(guid, cmdId);
+            var item = new OleMenuCommand(
+                (s, e) => execute(),
+                (s, e) => { },
+                (s, e) =>
+                {
+                    ((OleMenuCommand)s).Visible = canEnable();
+                },
+                id);
+            mcs.AddCommand(item);
+        }
+    }
+
+    public static class ISolutionExtensions
+    {
+        public static UriString GetRepoUrlFromSolution(IVsSolution solution)
+        {
+            string solutionDir, solutionFile, userFile;
+            if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
+                return null;
+            if (solutionDir == null)
+                return null;
+            return GitService.GitServiceHelper.GetUri(solutionDir);
+        }
+
+        public static IRepository GetRepoFromSolution(this IVsSolution solution)
+        {
+            string solutionDir, solutionFile, userFile;
+            if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
+                return null;
+            if (solutionDir == null)
+                return null;
+            return GitService.GitServiceHelper.GetRepo(solutionDir);
         }
     }
 }
