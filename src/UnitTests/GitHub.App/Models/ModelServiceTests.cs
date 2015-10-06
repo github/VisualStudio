@@ -476,7 +476,7 @@ public class ModelServiceTests
 
             // expire the index
             var indexobj = await cache.GetObject<CacheIndex>(indexKey);
-            indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(3);
+            indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(6);
             await cache.InsertObject(indexKey, indexobj);
 
             var prlive = Observable.Range(1, 5)
