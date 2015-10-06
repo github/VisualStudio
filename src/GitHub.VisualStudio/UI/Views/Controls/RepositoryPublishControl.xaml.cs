@@ -16,6 +16,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     { }
     
     [ExportView(ViewType=UIViewType.Publish)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RepositoryPublishControl : GenericRepositoryPublishControl
     {
         public RepositoryPublishControl()

@@ -17,6 +17,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class TwoFactorControl : GenericTwoFactorControl
     {
         public TwoFactorControl()
