@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitHub.UI;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -11,7 +12,7 @@ namespace DesignTimeStyleHelper
     {
         IDisposable disposable;
 
-        public WindowController(IObservable<UserControl> controls)
+        public WindowController(IObservable<IView> controls)
         {
             InitializeComponent();
 
@@ -26,8 +27,9 @@ namespace DesignTimeStyleHelper
             base.OnClosed(e);
         }
 
-        public void Load(UserControl control)
+        public void Load(IView view)
         {
+            var control = view as UserControl;
             Container.Children.Clear();
             Container.Children.Add(control);
         }

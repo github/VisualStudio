@@ -8,7 +8,7 @@ namespace GitHub.UI
     public interface IUIController
     {
         //IObservable<object> Transition { get; }
-        IObservable<UserControl> SelectFlow(UIControllerFlow choice);
+        IObservable<IView> SelectFlow(UIControllerFlow choice);
         void Start(IConnection connection);
         void Stop();
         bool IsStopped { get; }
@@ -17,9 +17,10 @@ namespace GitHub.UI
     public enum UIControllerFlow
     {
         None = 0,
-        Authentication = 1,
-        Create = 2,
-        Clone = 3,
-        Publish
+        Authentication,
+        Create,
+        Clone,
+        Publish,
+        PullRequests
     }
 }

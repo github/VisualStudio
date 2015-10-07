@@ -138,8 +138,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             creation.Subscribe(c =>
             {
                 SectionContent = c;
-                c.DataContext = this;
-                ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+                (c as SimpleViewUserControl).DataContext = this;
+                c.IsBusy.Subscribe(x => IsBusy = x);
             });
             ui.Start(null);
         }

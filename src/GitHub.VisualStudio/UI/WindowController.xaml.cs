@@ -9,25 +9,25 @@ namespace GitHub.VisualStudio.UI
 {
     public partial class WindowController : DialogWindow
     {
-        public WindowController(IObservable<UserControl> controls)
+        public WindowController(IObservable<IView> controls)
         {
             InitializeComponent();
             controls.Subscribe(c => Load(c));
         }
 
-        public void Load(UserControl control)
+        public void Load(IView view)
         {
-            var view = control as IView;
-            if (view != null)
+            var viewModel = view.ViewModel as IViewModel;
+            if (viewModel != null)
             {
-                var viewModel = view.ViewModel as IViewModel;
-                if (viewModel != null)
-                {
-                    Title = viewModel.Title;
-                }
+                Title = viewModel.Title;
             }
-            Container.Children.Clear();
-            Container.Children.Add(control);
+            var control = view as UserControl;
+            if (control != null)
+            {
+                Container.Children.Clear();
+                Container.Children.Add(control);
+            }
         }
     }
 }

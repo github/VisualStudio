@@ -101,6 +101,8 @@
     <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />

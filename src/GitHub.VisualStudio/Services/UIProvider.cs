@@ -185,12 +185,12 @@ namespace GitHub.VisualStudio
         }
 
         UI.WindowController windowController;
-        public IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        public IObservable<IView> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             if (!Initialized)
             {
                 log.Error("ExportProvider is not initialized, cannot setup UI.");
-                return Observable.Return<UserControl>(null);
+                return Observable.Return<IView>(null);
             }
 
             StopUI();
@@ -203,7 +203,7 @@ namespace GitHub.VisualStudio
             windowController = new UI.WindowController(creation);
             windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
-            creation.Subscribe((c) => {}, () =>
+            creation.Subscribe(c => {}, () =>
             {
                 windowController.Closed -= StopUIFlowWhenWindowIsClosedByUser;
                 windowController.Close();

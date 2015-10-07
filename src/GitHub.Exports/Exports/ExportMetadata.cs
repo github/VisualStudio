@@ -17,11 +17,10 @@ namespace GitHub.Exports
         Create,
         Clone,
         Publish,
-        PullRequestList,
-        PullRequestDetail,
-        PullRequestCreation,
+        PRList,
+        PRDetail,
+        PRCreation,
         End = 100,
-        Finished,
         GitHubPane,
     }
 
@@ -54,6 +53,11 @@ namespace GitHub.Exports
     public static class ExportViewAttributeExtensions
     {
         public static bool IsViewType(this UserControl c, UIViewType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
+        }
+
+        public static bool IsViewType(this IView c, UIViewType type)
         {
             return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
         }

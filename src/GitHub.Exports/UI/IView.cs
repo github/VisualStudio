@@ -9,4 +9,14 @@ namespace GitHub.UI
         IObservable<object> Cancel { get; }
         IObservable<bool> IsBusy { get; }
     }
+
+    public interface IHasDetailView
+    {
+        IObservable<object> Open { get; }
+    }
+
+    public interface IHasCreationView
+    {
+        IObservable<object> Create { get; }
+    }
 }
