@@ -135,8 +135,7 @@ namespace GitHub.Primitives
         public Uri ToRepositoryUrl()
         {
             // we only want to process urls that represent network resources
-            if (!IsValidUri && !IsScpUri) return url;
-            if (IsValidUri && IsFileUri) return url;
+            if (!IsScpUri && (!IsValidUri || IsFileUri)) return url;
 
             var scheme = url != null && IsHypertextTransferProtocol
                 ? url.Scheme
