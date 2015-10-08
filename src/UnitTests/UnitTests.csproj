@@ -155,6 +155,7 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
+    <Compile Include="GitHub.Exports\GitServiceTests.cs" />
     <Compile Include="GitHub.Exports\VSServicesTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />

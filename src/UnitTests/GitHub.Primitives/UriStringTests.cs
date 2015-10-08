@@ -177,6 +177,27 @@ public class UriStringTests
         {
             Assert.Equal(new Uri(expected), new UriString(uriString).ToRepositoryUrl());
         }
+
+        [Theory]
+        [InlineData("asdf", null)]
+        [InlineData("", null)]
+        [InlineData("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
+        [InlineData("http://example.com/", "http://example.com/")]
+        [InlineData("http://haacked@example.com/foo/bar", "http://example.com/foo/bar")]
+        [InlineData("https://github.com/github/Windows", "https://github.com/github/Windows")]
+        [InlineData("https://github.com/github/Windows.git", "https://github.com/github/Windows")]
+        [InlineData("https://haacked@github.com/github/Windows.git", "https://github.com/github/Windows")]
+        [InlineData("http://example.com:4000/github/Windows", "http://example.com:4000/github/Windows")]
+        [InlineData("git@192.168.1.2:github/Windows.git", "https://192.168.1.2/github/Windows")]
+        [InlineData("git@example.com:org/repo.git", "https://example.com/org/repo")]
+        [InlineData("ssh://git@github.com:443/shana/cef", "https://github.com/shana/cef")]
+        [InlineData("ssh://git@example.com:23/haacked/encourage", "https://example.com:23/haacked/encourage")]
+        public void ShouldNeverThrow(string url, string expected)
+        {
+            Uri uri;
+            Uri.TryCreate(expected, UriKind.Absolute, out uri);
+            Assert.Equal(uri, new UriString(url).ToRepositoryUrl());
+        }
     }
 
     public class TheAdditionOperator

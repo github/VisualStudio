@@ -108,6 +108,7 @@ namespace GitHub.Primitives
                 Host = match.Groups["host"].Value.ToNullIfEmpty();
                 Owner = match.Groups["owner"].Value.ToNullIfEmpty();
                 RepositoryName = GetRepositoryName(match.Groups["repo"].Value);
+                IsScpUri = true;
                 return true;
             }
             return false;
@@ -123,6 +124,8 @@ namespace GitHub.Primitives
 
         public bool IsFileUri { get; private set; }
 
+        public bool IsScpUri { get; private set; }
+
         public bool IsValidUri => url != null;
 
         /// <summary>
@@ -131,7 +134,9 @@ namespace GitHub.Primitives
         /// <returns></returns>
         public Uri ToRepositoryUrl()
         {
-            if (url != null && IsFileUri) return url;
+            // we only want to process urls that represent network resources
+            if (!IsValidUri && !IsScpUri) return url;
+            if (IsValidUri && IsFileUri) return url;
 
             var scheme = url != null && IsHypertextTransferProtocol
                 ? url.Scheme
