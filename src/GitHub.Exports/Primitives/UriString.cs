@@ -131,7 +131,7 @@ namespace GitHub.Primitives
         /// <summary>
         /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A converted uri, or the existing one if we can't convert it (which might be null)</returns>
         public Uri ToRepositoryUrl()
         {
             // we only want to process urls that represent network resources
