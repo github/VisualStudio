@@ -6,6 +6,7 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -13,6 +14,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for PasswordView.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class TwoFactorControl : SimpleViewUserControl, IViewFor<ITwoFactorDialogViewModel>, IView, IDisposable
     {
         public TwoFactorControl()

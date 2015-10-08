@@ -9,6 +9,7 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -16,6 +17,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// Interaction logic for LoginControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Login)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class LoginControl : SimpleViewUserControl, IViewFor<ILoginControlViewModel>, IView
     {
         public LoginControl()

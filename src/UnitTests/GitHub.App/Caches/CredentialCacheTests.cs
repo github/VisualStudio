@@ -174,17 +174,11 @@ public class CredentialCacheTests : TestBaseClass
         {
             using (var credentialCache = new CredentialCache())
             {
-                try
-                {
-                    var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject(nameof(InvalidatesTheCredential), credential);
-                }
-                finally
-                {
-                    await credentialCache.Invalidate(nameof(InvalidatesTheCredential));
-                }
+                var credential = Tuple.Create("somebody", "somebody's secret");
+                await credentialCache.InsertObject(nameof(InvalidatesTheCredential), credential);
+                await credentialCache.Invalidate(nameof(InvalidatesTheCredential));
 
-                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get("key"));
+                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(nameof(InvalidatesTheCredential)));
             }
         }
 
