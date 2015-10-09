@@ -384,8 +384,7 @@ public class ModelServiceTests
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
             await modelService.InvalidateAll();
-
-            cache.Received().Vacuum();
+            await cache.Received().Vacuum();
         }
     }
 
