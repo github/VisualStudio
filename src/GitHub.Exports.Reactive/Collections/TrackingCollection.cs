@@ -103,6 +103,13 @@ namespace GitHub.Collections
             Listen(source);
         }
 
+        /// <summary>
+        /// Sets up an observable as source for the collection.
+        /// </summary>
+        /// <param name="obs"></param>
+        /// <returns>An observable that will return all the items that are
+        /// fed via the original observer, for further processing by user code
+        /// if desired</returns>
         public IObservable<T> Listen(IObservable<T> obs)
         {
             if (disposed)
