@@ -1,11 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
-using GitHub.Helpers;
+using GitHub.Collections;
 
 namespace GitHub.Models
 {
-    public interface IPullRequestModel : ICopyable<IPullRequestModel>, IEquatable<IPullRequestModel>
+    public interface IPullRequestModel : ICopyable<IPullRequestModel>,
+        IEquatable<IPullRequestModel>, IComparable<IPullRequestModel>
     {
         int Number { get; }
         string Title { get; }

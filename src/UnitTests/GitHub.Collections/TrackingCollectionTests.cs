@@ -1,6 +1,4 @@
-﻿using GitHub;
-using GitHub.Collections;
-using GitHub.Helpers;
+﻿using GitHub.Collections;
 using GitHub.Models;
 using NSubstitute;
 using ReactiveUI;
@@ -8,84 +6,107 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using UnitTests;
 using Xunit;
+using Xunit.Abstractions;
 
 public class TrackingCollectionTests
 {
-    public class Sorting
+    public class Sorting : TestBase
     {
+        public Sorting(ITestOutputHelper output)
+        : base(output)
+        {
+        }
+
         [Fact]
         public void SortingAscending()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
-            var list = Enumerable.Range(1, 20)
+            var list = Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x => {
                     var s = Substitute.For<IPullRequestModel>();
                     s.Number.Returns(x);
+                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == x);
                     return s;
                 })
                 .ToObservable();
             var col = new TrackingCollection<IPullRequestModel>(list);
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            col.Subscribe();
-            Assert.Collection(col, Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
         }
 
         [Fact]
         public void SortingRandomizedDescending()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
-            var list = Enumerable.Range(1, 20)
+            var list = Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x => {
                     var s = Substitute.For<IPullRequestModel>();
                     s.Number.Returns(x);
+                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == x);
                     return s;
                 })
                 .ToObservable();
             var col = new TrackingCollection<IPullRequestModel>(list);
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.Number).Compare);
-            col.Subscribe();
-            Assert.Collection(col, Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).Reverse().ToArray());
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).Reverse().ToArray());
         }
 
 
         [Fact]
         public void CollectionIsSortedWhenUpdated()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
             var list = Observable.Defer(() =>
-                Enumerable.Range(1, 20)
+                Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
-                .Select(x =>
-                {
-                    var s = Substitute.For<IPullRequestModel>();
-                    s.Number.Returns(x);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == x);
-                    s.When(c => c.CopyFrom(Arg.Any<IPullRequestModel>())).Do(c =>
-                    {
-                        var nbr = c.Arg<IPullRequestModel>().Number;
-                        var str = c.Arg<IPullRequestModel>().Title;
-                        s.Number.Returns(nbr);
-                        s.Title.Returns(str);
-                    });
-                    return s;
-                })
+                .Select(x => GetThing(x))
                 .ToObservable()
             );
-            var list1 = list.Do(s => s.Title.Returns("Cache"));
-            var list2 = list.Do(s => s.Title.Returns("Live"));
-            var col = new TrackingCollection<IPullRequestModel>(list1.Concat(list2));
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            col.Subscribe();
-            var inspectors = Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t =>
+            var list1 = list.Do(s => s.Title = "Cache");
+            var list2 = list.Do(s => s.Title = "Live");
+            var col = new TrackingCollection<Thing>(list1.Concat(list2));
+            col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare);
+
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal * 2)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
+
+            var inspectors = Enumerable.Range(1, expectedTotal).Select(x => new Action<Thing>(t =>
             {
                 Assert.Equal(x, t.Number);
                 Assert.Equal("Live", t.Title);
@@ -96,9 +117,10 @@ public class TrackingCollectionTests
         [Fact]
         public void CollectionIsSortedWhenTitleUpdated()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
-            var list1 = Observable.Defer(() => Enumerable.Range(1, 20)
-                .OrderBy(x => rnd.Next(1, 20))
+            var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
+                .OrderBy(x => rnd.Next(1, expectedTotal))
                 .Select(x =>
                 {
                     var s = Substitute.For<IPullRequestModel>();
@@ -115,8 +137,8 @@ public class TrackingCollectionTests
                 .ToObservable())
                 .Replay()
                 .RefCount();
-            var list2 = Observable.Defer(() => Enumerable.Range(1, 20)
-                .OrderBy(x => rnd.Next(1, 20))
+            var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
+                .OrderBy(x => rnd.Next(1, expectedTotal))
                 .Select(x =>
                 {
                     var s = Substitute.For<IPullRequestModel>();
@@ -137,25 +159,34 @@ public class TrackingCollectionTests
             var col = new TrackingCollection<IPullRequestModel>(list1.Concat(list2),
                 OrderedComparer<IPullRequestModel>.OrderBy(x => x.Title).Compare);
 
-            col.Subscribe();
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal*2)
+                    evt.Set();
+            }, () => { });
 
+            evt.WaitOne();
+            evt.Reset();
             Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
-            Assert.Collection(col, Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(((char)('c' + x)).ToString(), t.Title))).ToArray());
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(((char)('c' + x)).ToString(), t.Title))).ToArray());
         }
 
         [Fact]
         public void CollectionIsSortedWhenComparerUpdated()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
-            var titles1 = Enumerable.Range(1, 20).Select(x => ((char)('a' + x)).ToString()).ToList();
-            var idstack1 = new Stack<int>(Enumerable.Range(1, 20).OrderBy(rnd.Next));
+            var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
+            var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
 
-            var titles2 = Enumerable.Range(1, 20).Select(x => ((char)('c' + x)).ToString()).ToList();
-            var idstack2 = new Stack<int>(Enumerable.Range(1, 20).OrderBy(rnd.Next));
+            var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
+            var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
 
-            var list1 = Observable.Defer(() => Enumerable.Range(1, 20)
+            var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -177,7 +208,7 @@ public class TrackingCollectionTests
                 .Replay()
                 .RefCount();
 
-            var list2 = Observable.Defer(() => Enumerable.Range(1, 20)
+            var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -196,35 +227,47 @@ public class TrackingCollectionTests
 
             var col = new TrackingCollection<IPullRequestModel>(list1.Concat(list2),
                 OrderedComparer<IPullRequestModel>.OrderBy(x => x.Title).Compare);
-            col.Subscribe();
+
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal * 2)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
+
             Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
             Assert.Collection(col, titles2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).ToArray());
 
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            Assert.Collection(col, Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
         }
 
 
         [Fact]
         public void SortingInPlace()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
 
-            var titles1 = Enumerable.Range(1, 20).Select(x => ((char)('a' + x)).ToString()).ToList();
-            var dates1 = Enumerable.Range(1, 20).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
+            var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
+            var dates1 = Enumerable.Range(1, expectedTotal).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
 
-            var idstack1 = new Stack<int>(Enumerable.Range(1, 20).OrderBy(rnd.Next));
+            var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var datestack1 = new Stack<DateTimeOffset>(dates1.OrderBy(_ => rnd.Next()));
             var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
 
-            var titles2 = Enumerable.Range(1, 20).Select(x => ((char)('c' + x)).ToString()).ToList();
-            var dates2 = Enumerable.Range(1, 20).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
+            var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
+            var dates2 = Enumerable.Range(1, expectedTotal).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
 
-            var idstack2 = new Stack<int>(Enumerable.Range(1, 20).OrderBy(rnd.Next));
+            var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var datestack2 = new Stack<DateTimeOffset>(dates2.OrderBy(_ => rnd.Next()));
             var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
 
-            var list1 = Observable.Defer(() => Enumerable.Range(1, 20)
+            var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -250,7 +293,7 @@ public class TrackingCollectionTests
                 .Replay()
                 .RefCount();
 
-            var list2 = Observable.Defer(() => Enumerable.Range(1, 20)
+            var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -273,14 +316,23 @@ public class TrackingCollectionTests
             var col = new TrackingCollection<IPullRequestModel>(list1.Concat(list2),
                 OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
 
-            col.Subscribe();
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal * 2)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
 
             // it's initially sorted by date, so id list should not match
             Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
             Assert.Collection(col, dates2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.CreatedAt))).ToArray());
 
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            Assert.Collection(col, Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
 
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Title).Compare);
             Assert.Collection(col, titles2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).ToArray());
@@ -289,23 +341,24 @@ public class TrackingCollectionTests
         [Fact]
         public void MultipleSortingWithDifferentDirections()
         {
+            var expectedTotal = 20;
             var rnd = new Random();
 
-            var titles1 = Enumerable.Range(1, 20).Select(x => ((char)('a' + x)).ToString()).ToList();
-            var dates1 = Enumerable.Range(1, 20).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
+            var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
+            var dates1 = Enumerable.Range(1, expectedTotal).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
 
-            var idstack1 = new Stack<int>(Enumerable.Range(1, 20).OrderBy(rnd.Next));
+            var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var datestack1 = new Stack<DateTimeOffset>(dates1.OrderBy(_ => rnd.Next()));
             var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
 
-            var titles2 = Enumerable.Range(1, 20).Select(x => ((char)('c' + x)).ToString()).ToList();
-            var dates2 = Enumerable.Range(1, 20).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
+            var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
+            var dates2 = Enumerable.Range(1, expectedTotal).Select(x => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(x)).ToList();
 
-            var idstack2 = new Stack<int>(Enumerable.Range(1, 20).OrderBy(rnd.Next));
+            var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var datestack2 = new Stack<DateTimeOffset>(dates2.OrderBy(_ => rnd.Next()));
             var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
 
-            var list1 = Observable.Defer(() => Enumerable.Range(1, 20)
+            var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -313,25 +366,17 @@ public class TrackingCollectionTests
                     var date = datestack1.Pop();
                     var title = titlestack1.Pop();
 
-                    var s = Substitute.For<IPullRequestModel>();
-                    s.Title.Returns(title);
-                    s.CreatedAt.Returns(date);
-                    s.Number.Returns(id);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == id);
-                    s.When(c => c.CopyFrom(Arg.Any<IPullRequestModel>())).Do(c =>
-                    {
-                        var newtitle = c.Arg<IPullRequestModel>().Title;
-                        var newdate = c.Arg<IPullRequestModel>().CreatedAt;
-                        s.Title.Returns(newtitle);
-                        s.CreatedAt.Returns(newdate);
-                    });
+                    var s = new Thing();
+                    s.Title = title;
+                    s.CreatedAt = date;
+                    s.Number = id;
                     return s;
                 })
                 .ToObservable())
                 .Replay()
                 .RefCount();
 
-            var list2 = Observable.Defer(() => Enumerable.Range(1, 20)
+            var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -339,58 +384,66 @@ public class TrackingCollectionTests
                     var date = datestack2.Pop();
                     var title = titlestack2.Pop();
 
-                    var s = Substitute.For<IPullRequestModel>();
-                    s.Title.Returns(title);
-                    s.CreatedAt.Returns(date);
-                    s.Number.Returns(id);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == id);
+                    var s = new Thing();
+                    s.Title = title;
+                    s.CreatedAt = date;
+                    s.Number = id;
                     return s;
                 })
                 .ToObservable())
                 .Replay()
                 .RefCount();
 
-            var col = new TrackingCollection<IPullRequestModel>(list1.Concat(list2),
-                OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt).Compare);
+            var col = new TrackingCollection<Thing>(list1.Concat(list2),
+                OrderedComparer<Thing>.OrderByDescending(x => x.CreatedAt).Compare);
 
-            col.Subscribe();
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal * 2)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
 
             // it's initially sorted by date, so id list should not match
             Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
 
-            Assert.Collection(col, dates2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.CreatedAt))).Reverse().ToArray());
+            Assert.Collection(col, dates2.Select(x => new Action<Thing>(t => Assert.Equal(x, t.CreatedAt))).Reverse().ToArray());
 
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            Assert.Collection(col, Enumerable.Range(1, 20).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
+            col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare);
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<Thing>(t => Assert.Equal(x, t.Number))).ToArray());
 
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
-            Assert.Collection(col, dates2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.CreatedAt))).ToArray());
+            col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare);
+            Assert.Collection(col, dates2.Select(x => new Action<Thing>(t => Assert.Equal(x, t.CreatedAt))).ToArray());
 
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.Title).Compare);
-            Assert.Collection(col, titles2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).Reverse().ToArray());
+            col.SetComparer(OrderedComparer<Thing>.OrderByDescending(x => x.Title).Compare);
+            Assert.Collection(col, titles2.Select(x => new Action<Thing>(t => Assert.Equal(x, t.Title))).Reverse().ToArray());
 
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Title).Compare);
-            Assert.Collection(col, titles2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).ToArray());
+            col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Title).Compare);
+            Assert.Collection(col, titles2.Select(x => new Action<Thing>(t => Assert.Equal(x, t.Title))).ToArray());
         }
 
         [Fact]
         public void MultipleSortingAndFiltering()
         {
+            var expectedTotal = 20;
             var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
-            var count = 20;
             var rnd = new Random(214748364);
 
-            var titles1 = Enumerable.Range(1, count).Select(x => ((char)('a' + x)).ToString()).ToList();
-            var dates1 = Enumerable.Range(1, count).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
+            var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
+            var dates1 = Enumerable.Range(1, expectedTotal).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
 
-            var idstack1 = new Stack<int>(Enumerable.Range(1, count).OrderBy(rnd.Next));
+            var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var datestack1 = new Stack<DateTimeOffset>(dates1);
             var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
 
-            var titles2 = Enumerable.Range(1, count).Select(x => ((char)('c' + x)).ToString()).ToList();
-            var dates2 = Enumerable.Range(1, count).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
+            var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
+            var dates2 = Enumerable.Range(1, expectedTotal).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
 
-            var idstack2 = new Stack<int>(Enumerable.Range(1, count).OrderBy(rnd.Next));
+            var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
             var datestack2 = new Stack<DateTimeOffset>(new List<DateTimeOffset>() {
                 dates2[2],
                 dates2[0],
@@ -415,7 +468,7 @@ public class TrackingCollectionTests
             });
             var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
 
-            var list1 = Observable.Defer(() => Enumerable.Range(1, count)
+            var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -448,7 +501,7 @@ public class TrackingCollectionTests
                 .Replay()
                 .RefCount();
 
-            var list2 = Observable.Defer(() => Enumerable.Range(1, count)
+            var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
                 .OrderBy(rnd.Next)
                 .Select(x =>
                 {
@@ -484,9 +537,16 @@ public class TrackingCollectionTests
                 (item, idx, list) => idx < 5
             );
 
-            var ev = new ManualResetEvent(false);
-            col.Subscribe(() => ev.Set());
-            ev.WaitOne(); // wait until everything is processed
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expectedTotal * 2)
+                    evt.Set();
+            }, () => { });
+
+            evt.WaitOne();
+            evt.Reset();
 
             // it's initially sorted by date, so id list should not match
             Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
@@ -495,7 +555,7 @@ public class TrackingCollectionTests
                 x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.CreatedAt))).Reverse().Take(5).ToArray());
 
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            Assert.Collection(col, Enumerable.Range(1, count)
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal)
                 .Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).Take(5).ToArray());
 
             col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
