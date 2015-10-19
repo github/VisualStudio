@@ -38,7 +38,7 @@ namespace GitHub.Collections
             Insert
         }
 
-        CompositeDisposable disposables = new CompositeDisposable();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         IObservable<T> source;
         IObservable<T> sourceQueue;
         Func<T, T, int> comparer;
@@ -47,7 +47,7 @@ namespace GitHub.Collections
         int itemCount = 0;
         ConcurrentQueue<T> queue;
 
-        List<T> original = new List<T>();
+        readonly List<T> original = new List<T>();
 #if DEBUG
         public IList<T> DebugInternalList => original;
 #endif
@@ -90,7 +90,6 @@ namespace GitHub.Collections
 #endif
             this.comparer = comparer ?? new Func<T, T, int>((o, p) => Comparer<T>.Default.Compare(o, p));
             this.filter = filter;
-            original = new List<T>();
         }
 
         public TrackingCollection(IObservable<T> source,
@@ -243,25 +242,7 @@ namespace GitHub.Collections
             if (filter == null && newFilter == null)
                 return; // nothing to do
 
-            // no more filter, add all the hidden items back
-            if (filter != null && newFilter == null)
-            {
-                for (int i = 0; i < original.Count; i++)
-                {
-                    if (GetIndexFiltered(original[i]) < 0)
-                        InternalInsertItem(original[i], i);
-                }
-                original = null;
-                filter = null;
-                return;
-            }
-
-            // there was no filter before, so the Items collection has everything, grab it
-            if (filter == null)
-                original = new List<T>(Items);
-            else
-                ClearItems();
-
+            ClearItems();
             filter = newFilter;
             RecalculateFilter(original, 0, 0, original.Count);
         }
