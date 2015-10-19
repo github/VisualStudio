@@ -282,9 +282,11 @@ public class TrackingTests : TestBase
         Dump("Source list", list1);
         Assert.Equal(txtSourceList, testOutput.ToString());
 
+#if DEBUG
         testOutput.Clear();
         Dump("Sorted internal list", col.DebugInternalList);
         Assert.Equal(txtInternalList, testOutput.ToString());
+#endif
 
         testOutput.Clear();
         Dump("Filtered list", col);
@@ -366,11 +368,11 @@ public class TrackingTests : TestBase
         testOutput.Clear();
         Dump("Source list", list1);
         Assert.Equal(txtSourceList, testOutput.ToString());
-
+#if DEBUG
         testOutput.Clear();
         Dump("Sorted internal list", col.DebugInternalList);
         Assert.Equal(txtInternalList, testOutput.ToString());
-
+#endif
         testOutput.Clear();
         Dump("Filtered list", col);
         Assert.Equal(txtFilteredList, testOutput.ToString());
@@ -455,9 +457,11 @@ public class TrackingTests : TestBase
         Dump("Source list", list1);
         Assert.Equal(txtSourceList, testOutput.ToString());
 
+#if DEBUG
         testOutput.Clear();
         Dump("Sorted internal list", col.DebugInternalList);
         Assert.Equal(txtInternalList, testOutput.ToString());
+#endif
 
         testOutput.Clear();
         Dump("Filtered list", col);
@@ -874,8 +878,6 @@ public class TrackingTests : TestBase
         Add(source, GetThing(5, 5));
         evt.WaitOne();
         evt.Reset();
-        Dump(col);
-        Dump(col.DebugInternalList);
         // check that list has {0:0:13,0:0:12,0:0:11,0:0:10,0:0:5,0:0:5}
         Assert.Collection(col, new Action<Thing>[] {
             new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 13)))),
