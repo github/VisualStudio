@@ -194,17 +194,7 @@ public class TrackingCollectionTests
                 {
                     var id = idstack1.Pop();
                     var title = titlestack1.Pop();
-
-                    var s = Substitute.For<IPullRequestModel>();
-                    s.Title.Returns(title);
-                    s.Number.Returns(id);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == id);
-                    s.When(c => c.CopyFrom(Arg.Any<IPullRequestModel>())).Do(c =>
-                    {
-                        var str = c.Arg<IPullRequestModel>().Title;
-                        s.Title.Returns(str);
-                    });
-                    return s;
+                    return GetThing(id, title);
                 })
                 .ToObservable())
                 .Replay()
@@ -216,19 +206,14 @@ public class TrackingCollectionTests
                 {
                     var id = idstack2.Pop();
                     var title = titlestack2.Pop();
-
-                    var s = Substitute.For<IPullRequestModel>();
-                    s.Title.Returns(title);
-                    s.Number.Returns(id);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == id);
-                    return s;
+                    return GetThing(id, title);
                 })
                 .ToObservable())
                 .Replay()
                 .RefCount();
 
-            var col = new TrackingCollection<IPullRequestModel>(list1.Concat(list2),
-                OrderedComparer<IPullRequestModel>.OrderBy(x => x.Title).Compare);
+            var col = new TrackingCollection<Thing>(list1.Concat(list2),
+                OrderedComparer<Thing>.OrderBy(x => x.Title).Compare);
 
             var count = 0;
             var evt = new ManualResetEvent(false);
@@ -242,10 +227,10 @@ public class TrackingCollectionTests
             evt.Reset();
 
             Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
-            Assert.Collection(col, titles2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).ToArray());
+            Assert.Collection(col, titles2.Select(x => new Action<Thing>(t => Assert.Equal(x, t.Title))).ToArray());
 
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
+            col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare);
+            Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<Thing>(t => Assert.Equal(x, t.Number))).ToArray());
         }
 
 
@@ -426,151 +411,6 @@ public class TrackingCollectionTests
 
             col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Title).Compare);
             Assert.Collection(col, titles2.Select(x => new Action<Thing>(t => Assert.Equal(x, t.Title))).ToArray());
-        }
-
-        [Fact]
-        public void MultipleSortingAndFiltering()
-        {
-            var expectedTotal = 20;
-            var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
-            var rnd = new Random(214748364);
-
-            var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
-            var dates1 = Enumerable.Range(1, expectedTotal).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
-
-            var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
-            var datestack1 = new Stack<DateTimeOffset>(dates1);
-            var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
-
-            var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
-            var dates2 = Enumerable.Range(1, expectedTotal).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
-
-            var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
-            var datestack2 = new Stack<DateTimeOffset>(new List<DateTimeOffset>() {
-                dates2[2],
-                dates2[0],
-                dates2[1],
-                dates2[3],
-                dates2[5],
-                dates2[9],
-                dates2[15],
-                dates2[6],
-                dates2[7],
-                dates2[8],
-                dates2[13],
-                dates2[10],
-                dates2[16],
-                dates2[11],
-                dates2[12],
-                dates2[14],
-                dates2[17],
-                dates2[18],
-                dates2[19],
-                dates2[4],
-            });
-            var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
-
-            var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
-                .OrderBy(rnd.Next)
-                .Select(x =>
-                {
-                    var id = idstack1.Pop();
-                    var date = datestack1.Pop();
-                    var title = titlestack1.Pop();
-
-                    var s = Substitute.For<IPullRequestModel, INotifyPropertyChanged>();
-                    s.Title.Returns(title);
-                    s.CreatedAt.Returns(date);
-                    s.Number.Returns(id);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => {
-                        var sid = c.Arg<IPullRequestModel>().Number;
-                        return sid == id;
-                    }
-                    );
-                    s.When(c => (c as IPullRequestModel).CopyFrom(Arg.Any<IPullRequestModel>())).Do(c =>
-                    {
-                        var newtitle = c.Arg<IPullRequestModel>().Title;
-                        var newdate = c.Arg<IPullRequestModel>().CreatedAt;
-                        var id1 = c.Arg<IPullRequestModel>().Number;
-                        s.Title.Returns(newtitle);
-                        (s as INotifyPropertyChanged).PropertyChanged += Raise.Event<PropertyChangedEventHandler>(this, new PropertyChangedEventArgs("Title"));
-                        s.CreatedAt.Returns(newdate);
-                        (s as INotifyPropertyChanged).PropertyChanged += Raise.Event<PropertyChangedEventHandler>(this, new PropertyChangedEventArgs("CreatedAt"));
-                    });
-                    return s;
-                })
-                .ToObservable())
-                .Replay()
-                .RefCount();
-
-            var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
-                .OrderBy(rnd.Next)
-                .Select(x =>
-                {
-                    var id = idstack2.Pop();
-                    var date = datestack2.Pop();
-                    var title = titlestack2.Pop();
-
-                    var s = Substitute.For<IPullRequestModel, INotifyPropertyChanged>();
-                    s.Title.Returns(title);
-                    s.CreatedAt.Returns(date);
-                    s.Number.Returns(id);
-                    s.Equals(Arg.Any<IPullRequestModel>()).Returns(c => c.Arg<IPullRequestModel>().Number == id);
-                    s.When(c => (c as IPullRequestModel).CopyFrom(Arg.Any<IPullRequestModel>())).Do(c =>
-                    {
-                        var newtitle = c.Arg<IPullRequestModel>().Title;
-                        var newdate = c.Arg<IPullRequestModel>().CreatedAt;
-                        var id1 = c.Arg<IPullRequestModel>().Number;
-                        s.Title.Returns(newtitle);
-                        (s as INotifyPropertyChanged).PropertyChanged += Raise.Event<PropertyChangedEventHandler>(this, new PropertyChangedEventArgs("Title"));
-                        s.CreatedAt.Returns(newdate);
-                        (s as INotifyPropertyChanged).PropertyChanged += Raise.Event<PropertyChangedEventHandler>(this, new PropertyChangedEventArgs("CreatedAt"));
-                    });
-
-                    return s;
-                })
-                .ToObservable())
-                .Replay()
-                .RefCount();
-
-            var col = new TrackingCollection<IPullRequestModel>(
-                list1.Concat(list2),
-                OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt).Compare,
-                (item, idx, list) => idx < 5
-            );
-
-            var count = 0;
-            var evt = new ManualResetEvent(false);
-            col.Subscribe(t =>
-            {
-                if (++count == expectedTotal * 2)
-                    evt.Set();
-            }, () => { });
-
-            evt.WaitOne();
-            evt.Reset();
-
-            // it's initially sorted by date, so id list should not match
-            Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
-
-            Assert.Collection(col, dates2.Select(
-                x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.CreatedAt))).Reverse().Take(5).ToArray());
-
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Number).Compare);
-            Assert.Collection(col, Enumerable.Range(1, expectedTotal)
-                .Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).Take(5).ToArray());
-
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt).Compare);
-            Assert.Collection(col, dates2.Select(
-                x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.CreatedAt))).Take(5).ToArray());
-
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.Title).Compare);
-            Assert.Collection(col, titles2.Select(
-                x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).Reverse().Take(5).ToArray());
-
-            col.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.Title).Compare);
-            Assert.Collection(col, titles2.Select(
-                x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).Take(5).ToArray());
         }
     }
 }

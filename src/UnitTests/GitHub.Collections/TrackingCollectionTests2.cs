@@ -100,6 +100,27 @@ public class TestBase
             UpdatedAt = now + TimeSpan.FromMinutes(minutesu)
         };
     }
+
+    protected Thing GetThing(int id, string title)
+    {
+        return new Thing()
+        {
+            Number = id,
+            Title = title,
+        };
+    }
+
+    protected Thing GetThing(int id, int minutesc, int minutesu, string title)
+    {
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        return new Thing()
+        {
+            Number = id,
+            Title = title,
+            CreatedAt = now + TimeSpan.FromMinutes(minutesc),
+            UpdatedAt = now + TimeSpan.FromMinutes(minutesu)
+        };
+    }
 }
 
 public class TrackingTests : TestBase
@@ -2197,5 +2218,114 @@ public class TrackingTests : TestBase
         Assert.Throws<ObjectDisposedException>(() => col.Subscribe());
         Assert.Throws<ObjectDisposedException>(() => col.AddItem(GetThing(1)));
         Assert.Throws<ObjectDisposedException>(() => col.RemoveItem(GetThing(1)));
+    }
+
+    [Fact]
+    public void MultipleSortingAndFiltering()
+    {
+        var expectedTotal = 20;
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var rnd = new Random(214748364);
+
+        var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
+        var dates1 = Enumerable.Range(1, expectedTotal).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
+
+        var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
+        var datestack1 = new Stack<DateTimeOffset>(dates1);
+        var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
+
+        var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
+        var dates2 = Enumerable.Range(1, expectedTotal).Select(x => now + TimeSpan.FromMinutes(x)).ToList();
+
+        var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
+        var datestack2 = new Stack<DateTimeOffset>(new List<DateTimeOffset>() {
+                dates2[2],
+                dates2[0],
+                dates2[1],
+                dates2[3],
+                dates2[5],
+                dates2[9],
+                dates2[15],
+                dates2[6],
+                dates2[7],
+                dates2[8],
+                dates2[13],
+                dates2[10],
+                dates2[16],
+                dates2[11],
+                dates2[12],
+                dates2[14],
+                dates2[17],
+                dates2[18],
+                dates2[19],
+                dates2[4],
+            });
+        var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
+
+        var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
+            .OrderBy(rnd.Next)
+            .Select(x =>
+            {
+                var id = idstack1.Pop();
+                var date = datestack1.Pop();
+                var title = titlestack1.Pop();
+                return new Thing(id, title, date, date);
+            })
+            .ToObservable())
+            .Replay()
+            .RefCount();
+
+        var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
+            .OrderBy(rnd.Next)
+            .Select(x =>
+            {
+                var id = idstack2.Pop();
+                var date = datestack2.Pop();
+                var title = titlestack2.Pop();
+
+                return new Thing(id, title, date, date);
+            })
+            .ToObservable())
+            .Replay()
+            .RefCount();
+
+        var col = new TrackingCollection<Thing>(
+            list1.Concat(list2),
+            OrderedComparer<Thing>.OrderByDescending(x => x.CreatedAt).Compare,
+            (item, idx, list) => idx < 5
+        );
+
+        var count = 0;
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            if (++count == expectedTotal * 2)
+                evt.Set();
+        }, () => { });
+
+        evt.WaitOne();
+        evt.Reset();
+
+        // it's initially sorted by date, so id list should not match
+        Assert.NotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
+
+        Assert.Collection(col, dates2.Select(
+            x => new Action<Thing>(t => Assert.Equal(x, t.CreatedAt))).Reverse().Take(5).ToArray());
+
+        col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare);
+        Assert.Collection(col, Enumerable.Range(1, expectedTotal)
+            .Select(x => new Action<Thing>(t => Assert.Equal(x, t.Number))).Take(5).ToArray());
+
+        col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare);
+        Assert.Collection(col, dates2.Select(
+            x => new Action<Thing>(t => Assert.Equal(x, t.CreatedAt))).Take(5).ToArray());
+
+        col.SetComparer(OrderedComparer<Thing>.OrderByDescending(x => x.Title).Compare);
+        Assert.Collection(col, titles2.Select(
+            x => new Action<Thing>(t => Assert.Equal(x, t.Title))).Reverse().Take(5).ToArray());
+
+        col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Title).Compare);
+        Assert.Collection(col, titles2.Select(
+            x => new Action<Thing>(t => Assert.Equal(x, t.Title))).Take(5).ToArray());
     }
 }

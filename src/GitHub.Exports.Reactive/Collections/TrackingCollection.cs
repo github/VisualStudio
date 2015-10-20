@@ -1,5 +1,8 @@
 #if !DISABLE_REACTIVEUI
 using ReactiveUI;
+#else
+using System.Windows.Threading;
+using System.Threading;
 #endif
 using System;
 using System.Collections.Concurrent;
@@ -438,7 +441,7 @@ namespace GitHub.Collections
 
             // the move caused the object to not be visible in the live list anymore, so remove
             if (!data.IsIncluded && data.Index >= 0)
-                RemoveAndRecalculate(data.List, data.Item, filteredListChanged ? 0 : data.IndexPivot, filteredListChanged ? startPosition : start);
+                RemoveAndRecalculate(data.List, data.Item, filteredListChanged ? 0 : (data.Position < data.OldPosition ? data.IndexPivot : data.Index), filteredListChanged ? startPosition : start);
 
             // the move caused the object to become visible in the live list, insert it
             // and recalculate all the other things on the live list from the start position
