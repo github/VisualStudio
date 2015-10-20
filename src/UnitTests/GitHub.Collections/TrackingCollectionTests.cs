@@ -15,10 +15,12 @@ public class TrackingCollectionTests
 {
     public class Sorting : TestBase
     {
+#if DEBUG
         public Sorting(ITestOutputHelper output)
         : base(output)
         {
         }
+#endif
 
         [Fact]
         public void SortingAscending()
