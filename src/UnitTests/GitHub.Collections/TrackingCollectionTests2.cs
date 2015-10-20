@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if !DISABLE_REACTIVE_UI
+using ReactiveUI;
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GitHub.Collections;
@@ -7,40 +11,42 @@ using System.Reactive.Subjects;
 using Xunit;
 using Xunit.Abstractions;
 using System.Text;
-using EntryExitDecoratorInterfaces;
 using System.Threading;
-using ReactiveUI;
 using System.Collections;
+using GitHub.Tests.Helpers;
 
 public class TestBase
 {
     protected readonly ITestOutputHelper output;
     protected StringBuilder testOutput = new StringBuilder();
+
+#if DEBUG
     public TestBase(ITestOutputHelper output)
     {
         this.output = output;
     }
+#endif
 
     protected void Dump(string msg)
     {
-        output.WriteLine(msg);
+        output?.WriteLine(msg);
         testOutput.AppendLine(msg);
     }
 
     protected void Dump(object prefix, object thing)
     {
-        output.WriteLine(string.Format("{0} - {1}", prefix, thing.ToString()));
+        output?.WriteLine(string.Format("{0} - {1}", prefix, thing.ToString()));
         testOutput.AppendLine(string.Format("{0} - {1}", prefix, thing.ToString()));
     }
 
     protected void Dump(object thing)
     {
-        output.WriteLine(thing.ToString());
+        output?.WriteLine(thing.ToString());
         testOutput.AppendLine(thing.ToString());
     }
     protected void Dump(string title, IEnumerable col)
     {
-        output.WriteLine(title);
+        output?.WriteLine(title);
         testOutput.AppendLine(title);
         var i = 0;
         foreach (var l in col)
@@ -54,7 +60,7 @@ public class TestBase
 
     protected bool Compare(Thing thing1, Thing thing2)
     {
-        return Equals(thing1, thing2) && thing1.UpdatedAt == thing2.UpdatedAt;
+        return Equals(thing1, thing2) && thing1.Title == thing2.Title && thing1.CreatedAt == thing2.CreatedAt && thing1.UpdatedAt == thing2.UpdatedAt;
     }
 
     protected void Add(Subject<Thing> source, Thing item)
@@ -98,10 +104,12 @@ public class TestBase
 
 public class TrackingTests : TestBase
 {
+#if DEBUG
     public TrackingTests(ITestOutputHelper output)
         : base(output)
     {
     }
+#endif
 
     [Fact]
     public void OrderByUpdatedNoFilter()
@@ -468,7 +476,8 @@ public class TrackingTests : TestBase
         Assert.Equal(txtFilteredList, testOutput.ToString());
 
         var k = 0;
-        Assert.Collection(col, list1.Select(x => new Action<Thing>(t => {
+        Assert.Collection(col, list1.Select(x => new Action<Thing>(t =>
+        {
             Assert.Equal(list1[k++], t);
         })).ToArray());
 
@@ -518,10 +527,11 @@ public class TrackingTests : TestBase
         evt.Reset();
         Assert.Equal(total, col.Count);
 
-        //var k = 0;
-        //Assert.Collection(col, list1.Select(x => new Action<Thing>(t => {
-        //    Assert.Equal(list1[k++], t);
-        //})).ToArray());
+        var k = 0;
+        Assert.Collection(col, list1.Select(x => new Action<Thing>(t =>
+        {
+            Assert.Equal(list1[k++], t);
+        })).ToArray());
 
         count = 0;
         foreach (var l in list2)
@@ -543,15 +553,14 @@ public class TrackingTests : TestBase
     }
 
 
-    //[Fact]
+    [Fact(Skip = "Cannot run with other tests, timings go off")]
     public void ProcessingDelayPingsRegularly()
     {
         int count, total;
-        count = total = 1000;
+        count = total = 400;
 
         var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
-        var list1 = new List<Thing>(Enumerable.Range(1, count).Select(i =>
-            new Thing() { Number = i, Title = "Run 1", CreatedAt = now + TimeSpan.FromMinutes(i), UpdatedAt = now + TimeSpan.FromMinutes(count - i) })).ToList();
+        var list1 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, count - i)).ToList());
 
         var col = new TrackingCollection<Thing>(
             list1.ToObservable().Delay(TimeSpan.FromMilliseconds(10)),
@@ -559,7 +568,6 @@ public class TrackingTests : TestBase
         col.ProcessingDelay = TimeSpan.FromMilliseconds(10);
 
         var sub = new Subject<Thing>();
-
         var times = new List<DateTimeOffset>();
         sub.Subscribe(t =>
         {
@@ -568,22 +576,26 @@ public class TrackingTests : TestBase
 
         count = 0;
 
+        var evt = new ManualResetEvent(false);
         col.Subscribe(t =>
         {
-            if (count == list1.Count)
-                return;
             sub.OnNext(t);
-            count++;
-            if (count == list1.Count)
+            if (++count == list1.Count)
+            {
                 sub.OnCompleted();
+                evt.Set();
+            }
         }, () => { });
 
 
-        sub.Wait();
+        evt.WaitOne();
+        evt.Reset();
+
         Assert.Equal(total, col.Count);
 
         var k = 0;
-        Assert.Collection(col, list1.Select(x => new Action<Thing>(t => {
+        Assert.Collection(col, list1.Select(x => new Action<Thing>(t =>
+        {
             Assert.Equal(list1[k++], t);
         })).ToArray());
 
@@ -593,7 +605,7 @@ public class TrackingTests : TestBase
         for (var j = 1; j < times.Count; j++)
             totalTime += (times[j] - times[j - 1]).Ticks;
         var avg = TimeSpan.FromTicks(totalTime / times.Count).TotalMilliseconds;
-        Assert.InRange(avg, 10, 12);
+        Assert.InRange(avg, 9, 12);
         col.Dispose();
     }
 
@@ -673,7 +685,8 @@ public class TrackingTests : TestBase
         Assert.Equal(total, count);
         Assert.Equal(total, col.Count);
 
-        Assert.Collection(col, list2.Reverse<Thing>().Select(x => new Action<Thing>(t => {
+        Assert.Collection(col, list2.Reverse<Thing>().Select(x => new Action<Thing>(t =>
+        {
             Assert.Equal(x, t);
         })).ToArray());
 
@@ -732,7 +745,8 @@ public class TrackingTests : TestBase
         Assert.Equal(total, count);
         Assert.Equal(total, col.Count);
 
-        Assert.Collection(col, list2.Reverse<Thing>().Select(x => new Action<Thing>(t => {
+        Assert.Collection(col, list2.Reverse<Thing>().Select(x => new Action<Thing>(t =>
+        {
             Assert.Equal(x, t);
         })).ToArray());
 
@@ -783,7 +797,8 @@ public class TrackingTests : TestBase
         Assert.Equal(total, count);
         Assert.Equal(total, col.Count);
 
-        Assert.Collection(col, list2.Select(x => new Action<Thing>(t => {
+        Assert.Collection(col, list2.Select(x => new Action<Thing>(t =>
+        {
             Assert.Equal(x, t);
         })).ToArray());
 
@@ -1690,5 +1705,497 @@ public class TrackingTests : TestBase
         });
 
         col.Dispose();
+    }
+
+    [Fact]
+    public void ChangingItemContentRemovesItFromFilteredList()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare,
+            (item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(6));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 5;
+        Add(source, GetThing(1, 1, 1));
+        Add(source, GetThing(3, 3, 3));
+        Add(source, GetThing(5, 5, 5));
+        Add(source, GetThing(7, 7, 7));
+        Add(source, GetThing(9, 9, 9));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 5)))),
+        });
+
+        expectedCount = 6;
+        Add(source, GetThing(5, 5, 6));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+        });
+    }
+
+    [Fact]
+    public void ChangingItemContentRemovesItFromFilteredList2()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare,
+            (item, position, list) => item.UpdatedAt > now + TimeSpan.FromMinutes(2) && item.UpdatedAt < now + TimeSpan.FromMinutes(8));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 5;
+        Add(source, GetThing(1, 1, 1));
+        Add(source, GetThing(3, 3, 3));
+        Add(source, GetThing(5, 5, 5));
+        Add(source, GetThing(7, 7, 7));
+        Add(source, GetThing(9, 9, 9));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 7)))),
+        });
+
+        expectedCount = 6;
+        Add(source, GetThing(7, 7, 8));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 5)))),
+        });
+
+        expectedCount = 7;
+        Add(source, GetThing(7, 7, 7));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 7)))),
+        });
+
+        expectedCount = 8;
+        Add(source, GetThing(3, 3, 2));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 7)))),
+        });
+
+        expectedCount = 9;
+        Add(source, GetThing(3, 3, 3));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 7)))),
+        });
+
+        expectedCount = 10;
+        Add(source, GetThing(5, 5, 1));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 7)))),
+        });
+
+    }
+
+    [Fact]
+    public void ChangingFilterUpdatesCollection()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(10));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 9;
+        Add(source, GetThing(1, 1));
+        Add(source, GetThing(2, 2));
+        Add(source, GetThing(3, 3));
+        Add(source, GetThing(4, 4));
+        Add(source, GetThing(5, 5));
+        Add(source, GetThing(6, 6));
+        Add(source, GetThing(7, 7));
+        Add(source, GetThing(8, 8));
+        Add(source, GetThing(9, 9));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(2, 2)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(8, 8)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9)))),
+        });
+
+        col.SetFilter((item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(8));
+
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(2, 2)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7)))),
+        });
+    }
+
+    [Fact]
+    public void ChangingSortUpdatesCollection()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(10));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 9;
+        Add(source, GetThing(1, 1));
+        Add(source, GetThing(2, 2));
+        Add(source, GetThing(3, 3));
+        Add(source, GetThing(4, 4));
+        Add(source, GetThing(5, 5));
+        Add(source, GetThing(6, 6));
+        Add(source, GetThing(7, 7));
+        Add(source, GetThing(8, 8));
+        Add(source, GetThing(9, 9));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(2, 2)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(8, 8)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9)))),
+        });
+
+        col.SetComparer(OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare);
+
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(2, 2)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(8, 8)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9)))),
+        }.Reverse().ToArray());
+    }
+
+    [Fact]
+    public void AddingItemsToCollectionManuallyThrows()
+    {
+        var col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
+        Assert.Throws<InvalidOperationException>(() => col.Add(GetThing(1)));
+    }
+
+    [Fact]
+    public void InsertingItemsIntoCollectionManuallyThrows()
+    {
+        var col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
+        Assert.Throws<InvalidOperationException>(() => col.Insert(0, GetThing(1)));
+    }
+
+    [Fact]
+    public void MovingItemsIntoCollectionManuallyThrows()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(10));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 2;
+        Add(source, GetThing(1, 1));
+        Add(source, GetThing(2, 2));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Throws<InvalidOperationException>(() => col.Move(0, 1));
+    }
+
+    [Fact]
+    public void RemovingItemsFromCollectionManuallyThrows()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(10));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 2;
+        Add(source, GetThing(1, 1));
+        Add(source, GetThing(2, 2));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Throws<InvalidOperationException>(() => col.Remove(GetThing(1)));
+    }
+
+    [Fact]
+    public void RemovingItemsFromCollectionManuallyThrows2()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => item.UpdatedAt < now + TimeSpan.FromMinutes(10));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 2;
+        Add(source, GetThing(1, 1));
+        Add(source, GetThing(2, 2));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Throws<InvalidOperationException>(() => col.RemoveAt(0));
+    }
+
+
+    [Fact]
+    public void ChangingComparers()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare);
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 9;
+        Add(source, GetThing(1, 1, 9));
+        Add(source, GetThing(2, 2, 8));
+        Add(source, GetThing(3, 3, 7));
+        Add(source, GetThing(4, 4, 6));
+        Add(source, GetThing(5, 5, 4));
+        Add(source, GetThing(6, 6, 5));
+        Add(source, GetThing(7, 7, 3));
+        Add(source, GetThing(8, 8, 2));
+        Add(source, GetThing(9, 9, 1));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1, 9)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(2, 2, 8)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 7)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(8, 8, 2)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9, 1)))),
+        });
+
+        col.SetComparer(null);
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9, 1)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(8, 8, 2)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3, 7)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(2, 2, 8)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(1, 1, 9)))),
+        });
+    }
+
+
+    [Fact]
+    public void Removing()
+    {
+        var source = new Subject<Thing>();
+
+        var now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+        var col = new TrackingCollection<Thing>(
+            source,
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => (position > 2 && position < 5) || (position > 6 && position < 8));
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 11;
+        Add(source, GetThing(0, 0));
+        Add(source, GetThing(1, 1));
+        Add(source, GetThing(2, 2));
+        Add(source, GetThing(3, 3));
+        Add(source, GetThing(4, 4));
+        Add(source, GetThing(5, 5));
+        Add(source, GetThing(6, 6));
+        Add(source, GetThing(7, 7));
+        Add(source, GetThing(8, 8));
+        Add(source, GetThing(9, 9));
+        Add(source, GetThing(10, 10));
+        evt.WaitOne();
+        evt.Reset();
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(3, 3)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(7, 7)))),
+        });
+
+        col.RemoveItem(GetThing(2));
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(5, 5)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(8, 8)))),
+        });
+
+        col.RemoveItem(GetThing(5));
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9)))),
+        });
+
+        col.RemoveItem(GetThing(100));
+        Assert.Collection(col, new Action<Thing>[] {
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(4, 4)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(6, 6)))),
+            new Action<Thing>(t => Assert.True(Compare(t, GetThing(9, 9)))),
+        });
+    }
+
+    [Fact]
+    public void DisposingThrows()
+    {
+        var col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
+        col.Dispose();
+        Assert.Throws<ObjectDisposedException>(() => col.SetFilter(null));
+        Assert.Throws<ObjectDisposedException>(() => col.SetComparer(null));
+        Assert.Throws<ObjectDisposedException>(() => col.Subscribe());
+        Assert.Throws<ObjectDisposedException>(() => col.AddItem(GetThing(1)));
+        Assert.Throws<ObjectDisposedException>(() => col.RemoveItem(GetThing(1)));
     }
 }

@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using GitHub.Helpers;
 
 namespace GitHub.Collections
 {
     /// <summary>
-    /// TrackingCollection is a specialization of ObserableCollection that gets items from
+    /// TrackingCollection is a specialization of ObservableCollection that gets items from
     /// an observable sequence and updates its contents in such a way that two updates to
     /// the same object (as defined by an Equals call) will result in one object on
     /// the list being updated (as opposed to having two different instances of the object
@@ -15,7 +14,7 @@ namespace GitHub.Collections
     /// for T
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITrackingCollection<T> : IDisposable, IList<T>  where T : ICopyable<T>
+    public interface ITrackingCollection<T> : IDisposable, IList<T> where T : ICopyable<T>
     {
         /// <summary>
         /// Sets up an observable as source for the collection.
