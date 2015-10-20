@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Navigation;
-using ReactiveUI;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using GitHub.ViewModels;
 using NullGuard;
+using ReactiveUI;
 
 namespace GitHub.UI
 {
@@ -38,11 +35,11 @@ namespace GitHub.UI
             });
         }
 
-        public IObservable<object> Done { get { return close; } }
+        public IObservable<object> Done => close;
 
-        public IObservable<object> Cancel { get { return cancel; } }
+        public IObservable<object> Cancel => cancel;
 
-        public IObservable<bool> IsBusy{ get { return isBusy; } }
+        public IObservable<bool> IsBusy => isBusy;
 
         protected void NotifyDone()
         {
@@ -110,7 +107,7 @@ namespace GitHub.UI
         TViewModel IViewFor<TViewModel>.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (TViewModel)value; }
+            set { ViewModel = value; }
         }
     }
 }
