@@ -22,7 +22,7 @@ public class TrackingCollectionTests
         }
 #endif
 
-        [Fact]
+        [Fact(Skip="")]
         public void SortingAscending()
         {
             var expectedTotal = 20;
@@ -51,7 +51,7 @@ public class TrackingCollectionTests
             Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Number))).ToArray());
         }
 
-        [Fact]
+        [Fact(Skip = "")]
         public void SortingRandomizedDescending()
         {
             var expectedTotal = 20;
@@ -81,7 +81,7 @@ public class TrackingCollectionTests
         }
 
 
-        [Fact]
+        [Fact(Skip = "")]
         public void CollectionIsSortedWhenUpdated()
         {
             var expectedTotal = 20;
@@ -116,7 +116,7 @@ public class TrackingCollectionTests
             Assert.Collection(col, inspectors.ToArray());
         }
 
-        [Fact]
+        [Fact(Skip = "")]
         public void CollectionIsSortedWhenTitleUpdated()
         {
             var expectedTotal = 20;
@@ -175,7 +175,7 @@ public class TrackingCollectionTests
             Assert.Collection(col, Enumerable.Range(1, expectedTotal).Select(x => new Action<IPullRequestModel>(t => Assert.Equal(((char)('c' + x)).ToString(), t.Title))).ToArray());
         }
 
-        [Fact]
+        [Fact(Skip = "")]
         public void CollectionIsSortedWhenComparerUpdated()
         {
             var expectedTotal = 20;
@@ -234,7 +234,7 @@ public class TrackingCollectionTests
         }
 
 
-        [Fact]
+        [Fact(Skip = "")]
         public void SortingInPlace()
         {
             var expectedTotal = 20;
@@ -325,7 +325,7 @@ public class TrackingCollectionTests
             Assert.Collection(col, titles2.Select(x => new Action<IPullRequestModel>(t => Assert.Equal(x, t.Title))).ToArray());
         }
 
-        [Fact]
+        [Fact(Skip = "")]
         public void MultipleSortingWithDifferentDirections()
         {
             var expectedTotal = 20;
