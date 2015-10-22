@@ -41,8 +41,8 @@ public class TestBase
 
     protected void Dump(object prefix, object thing)
     {
-        output?.WriteLine($"{prefix} - {thing}");
-        testOutput.AppendLine($"{prefix} - {thing}");
+        output?.WriteLine(string.Format("{0} - {1}", prefix, thing));
+        testOutput.AppendLine(string.Format("{0} - {1}", prefix, thing));
     }
 
     protected void Dump(object thing)
