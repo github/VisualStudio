@@ -11,6 +11,13 @@ public class Thing : ICopyable<Thing>, IEquatable<Thing>, IComparable<Thing>, IN
         this.CreatedAt = date1;
         this.UpdatedAt = date2;
     }
+    public Thing(int id, string title, DateTimeOffset date)
+    {
+        this.Number = id;
+        this.Title = title;
+        this.CreatedAt = date;
+        this.UpdatedAt = date;
+    }
 
     public Thing()
     {
