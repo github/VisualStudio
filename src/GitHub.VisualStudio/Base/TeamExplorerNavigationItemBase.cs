@@ -29,6 +29,7 @@ namespace GitHub.VisualStudio.Base
             VSColorTheme.ThemeChanged += _ =>
             {
                 OnThemeChanged();
+                Invalidate();
             };
 
             holder.Subscribe(this, UpdateRepo);
