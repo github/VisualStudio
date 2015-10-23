@@ -525,7 +525,7 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
 
-        CollectionAssert.AreEqual(col, new List<Thing>() { GetThing(1, 10) });
+        CollectionAssert.AreEqual(col, new List<Thing> { GetThing(1, 10) });
 
         // testing ADD
         // add another thing with UpdatedAt=0:0:2
@@ -534,7 +534,8 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:10,0:0:2}
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(1, 10),
             GetThing(2, 2)
         });
@@ -545,7 +546,8 @@ public class TrackingTests : TestBase
         Add(source, GetThing(2, 12));
         evt.WaitOne();
         evt.Reset();
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(2, 12),
             GetThing(1, 10),
         });
@@ -556,7 +558,8 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:12,0:0:11,0:0:10}
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(2, 12),
             GetThing(3, 11),
             GetThing(1, 10),
@@ -570,7 +573,8 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:14,0:0:13,0:0:12,0:0:11,0:0:10,0:0:5}
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(5, 14),
             GetThing(6, 13),
             GetThing(2, 12),
@@ -585,7 +589,8 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:13,0:0:12,0:0:11,0:0:10,0:0:5,0:0:5}
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(6, 13),
             GetThing(2, 12),
             GetThing(3, 11),
@@ -600,7 +605,8 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:13,0:0:12,0:0:11,0:0:10,0:0:5,0:0:4}
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(2, 12),
             GetThing(3, 11),
             GetThing(1, 10),
@@ -615,7 +621,8 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:14,0:0:13,0:0:12,0:0:11,0:0:10,0:0:5}
-        CollectionAssert.AreEqual(col, new List<Thing>() {
+        CollectionAssert.AreEqual(col, new List<Thing>
+        {
             GetThing(6, 14),
             GetThing(2, 12),
             GetThing(3, 11),
@@ -1045,7 +1052,7 @@ public class TrackingTests : TestBase
         Add(source, GetThing(1, 10));
         evt.WaitOne();
         evt.Reset();
-        CollectionAssert.AreEqual(col, new List<Thing> {});
+        CollectionAssert.AreEqual(col, new List<Thing>());
 
         // testing ADD
         // add another thing with UpdatedAt=0:0:2
@@ -1054,7 +1061,7 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         // check that list has {0:0:10,0:0:2}
-        CollectionAssert.AreEqual(col, new List<Thing> { });
+        CollectionAssert.AreEqual(col, new List<Thing>());
 
         // testing MOVE
         // replace thing with UpdatedAt=0:0:2 to UpdatedAt=0:0:12
@@ -1062,7 +1069,7 @@ public class TrackingTests : TestBase
         Add(source, GetThing(2, 12));
         evt.WaitOne();
         evt.Reset();
-        CollectionAssert.AreEqual(col, new List<Thing> { });
+        CollectionAssert.AreEqual(col, new List<Thing>());
 
         // testing INSERT
         expectedCount = 4;
