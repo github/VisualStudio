@@ -428,13 +428,12 @@ namespace GitHub.Collections
 
             var filteredListChanged = false;
             var startPosition = Int32.MaxValue;
-            var endPosition = -1;
             // check if the filtered list is affected indirectly by the move (eg., if the filter involves position of items,
             // moving an item outside the bounds of the filter can affect the items being currently shown/hidden)
             if (Count > 0)
             {
                 startPosition = GetIndexUnfiltered(this[0]);
-                endPosition = GetIndexUnfiltered(this[Count - 1]);
+                var endPosition = GetIndexUnfiltered(this[Count - 1]);
                 // true if the filtered list has been indirectly affected by this objects' move
                 filteredListChanged = (!filter(this[0], startPosition, this) || !filter(this[Count - 1], endPosition, this));
             }
