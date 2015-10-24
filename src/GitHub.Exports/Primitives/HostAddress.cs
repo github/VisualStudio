@@ -98,7 +98,7 @@ namespace GitHub.Primitives
             if (ReferenceEquals(this, obj))
                 return true;
             var other = obj as HostAddress;
-            return obj != null && WebUri.IsSameHost(other.WebUri) && ApiUri.IsSameHost(other.ApiUri);
+            return other != null && WebUri.IsSameHost(other.WebUri) && ApiUri.IsSameHost(other.ApiUri);
         }
     }
 }
