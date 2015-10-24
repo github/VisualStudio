@@ -4,11 +4,27 @@
     <String Name="Resources" Value="/GitHub.VisualStudio;component/Resources/icons" />
     <Guid Name="guidImages" Value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" />
     <ID Name="logo" Value="1" />
+    <ID Name="arrow_left" Value="2" />
+    <ID Name="arrow_right" Value="3" />
+    <ID Name="refresh" Value="4" />
+    <ID Name="pullrequest" Value="5" />
   </Symbols>
 
   <Images>
     <Image Guid="$(guidImages)" ID="$(logo)">
       <Source Uri="$(Resources)/mark_github.xaml" />
+    </Image>
+    <Image Guid="$(guidImages)" ID="$(arrow_left)">
+      <Source Uri="$(Resources)/arrow_left.xaml" />
+    </Image>
+    <Image Guid="$(guidImages)" ID="$(arrow_right)">
+      <Source Uri="$(Resources)/arrow_right.xaml" />
+    </Image>
+    <Image Guid="$(guidImages)" ID="$(refresh)">
+      <Source Uri="$(Resources)/refresh.xaml" />
+    </Image>
+    <Image Guid="$(guidImages)" ID="$(pullrequest)">
+      <Source Uri="$(Resources)/git_pull_request.xaml" />
     </Image>
   </Images>
 </ImageManifest>
