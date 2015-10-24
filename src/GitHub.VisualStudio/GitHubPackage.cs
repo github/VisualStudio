@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using GitHub.VisualStudio.Base;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.PlatformUI;
-using System.Windows.Media;
-using GitHub.VisualStudio.Helpers;
-using GitHub.UI;
-using GitHub.Services;
-using GitHub.Models;
-using GitHub.VisualStudio.UI;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio;
 using GitHub.Extensions;
+using GitHub.Services;
+using GitHub.UI;
+using GitHub.VisualStudio.Base;
+using GitHub.VisualStudio.UI;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.VisualStudio
 {
@@ -56,7 +52,7 @@ namespace GitHub.VisualStudio
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
             {
                 var window = FindToolWindow(typeof(GitHubPane), 0, true);
-                if (window == null || window.Frame == null)
+                if (window?.Frame == null)
                     throw new NotSupportedException("Cannot create tool window");
 
                 var windowFrame = (IVsWindowFrame)window.Frame;
