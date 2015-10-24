@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
+using GitHub.ViewModels;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
-using GitHub.ViewModels;
-using System.Windows.Input;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -79,9 +75,9 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         public ReactiveCommand<object> CancelCommand { get; private set; }
-        public ICommand Cancel { get { return CancelCommand; } }
+        public ICommand Cancel => CancelCommand;
 
-        public bool IsShowing { get { return true; } }
+        public bool IsShowing => true;
 
         bool disposed = false;
         protected override void Dispose(bool disposing)
