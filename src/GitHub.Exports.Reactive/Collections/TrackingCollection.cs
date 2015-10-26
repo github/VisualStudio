@@ -199,20 +199,21 @@ namespace GitHub.Collections
             queue.Enqueue(item);
         }
 
-        public void RemoveItem(T item)
+        public T RemoveItem(T item)
         {
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
 
             var position = GetIndexUnfiltered(item);
             if (position < 0)
-                return;
+                return null;
 
             var data = new ActionData(TheAction.Remove, item, null, position - 1, position, original);
             data = CheckFilter(data);
             data = CalculateIndexes(data);
             data = SortedRemove(data);
             data = FilteredRemove(data);
+            return data.Item;
         }
 
         void SetAndRecalculateSort(Func<T, T, int> theComparer)
