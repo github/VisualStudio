@@ -6,7 +6,7 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
-    [TeamExplorerSection(GitHubConnectSection1Id, TeamExplorerPageIds.Connect, 11)]
+    [TeamExplorerSection(GitHubConnectSection1Id, TeamExplorerPageIds.Connect, 10)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubConnectSection1 : GitHubConnectSection
     {
