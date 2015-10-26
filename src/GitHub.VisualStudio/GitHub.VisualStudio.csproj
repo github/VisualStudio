@@ -247,6 +247,7 @@
     <Compile Include="TeamExplorer\Home\IssuesNavigationItem.cs" />
     <Compile Include="TeamExplorer\Home\WikiNavigationItem.cs" />
     <Compile Include="TeamExplorer\Home\PulseNavigationItem.cs" />
+    <Compile Include="TeamExplorer\Sync\CloneSync.cs" />
     <Compile Include="TeamExplorer\Sync\GitHubPublishSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />

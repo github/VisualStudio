@@ -276,4 +276,7 @@
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
   </data>
+  <data name="SynchronizeCloneText" xml:space="preserve">
+    <value>Synchronize Clone</value>
+  </data>
 </root>

@@ -502,6 +502,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Synchronize Clone.
+        /// </summary>
+        public static string SynchronizeCloneText {
+            get {
+                return ResourceManager.GetString("SynchronizeCloneText", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>
         public static string twoFactorAuthText {
