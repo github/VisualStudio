@@ -696,19 +696,18 @@ namespace GitHub.Collections
         /// <summary>
         /// Removes an item from the filtered list
         /// </summary>
-        int InternalRemoveItem(T item)
+        void InternalRemoveItem(T item)
         {
             int idx;
             // this only happens if the cache is lazy, which is not the case at this time
             if (!filteredIndexCache.TryGetValue(item, out idx))
             {
                 Debug.Assert(false);
-                return -1;
+                return;
             }
 
             isChanging = true;
             RemoveItem(idx);
-            return idx;
         }
 
         protected override void RemoveItem(int index)
