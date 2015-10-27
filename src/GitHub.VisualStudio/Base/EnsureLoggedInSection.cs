@@ -54,7 +54,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             bool loggedIn = await connectionManager.IsLoggedIn(hosts, add);
             if (!loggedIn)
             {
-                var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.ApiUri);
+                var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);
                 vsServices.ShowMessage(
                     msg,
                     new RelayCommand(() => StartFlow(UIControllerFlow.Authentication))
