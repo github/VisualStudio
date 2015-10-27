@@ -66,7 +66,12 @@ namespace GitHub.Api
                     }
                 }
             }
-            // it'll throw if it's private
+            // it'll throw if it's private or an enterprise instance requiring authentication
+            catch (ForbiddenException)
+            {
+                if (!HostAddress.IsGitHubDotComUri(OriginalUrl.ToRepositoryUrl()))
+                    isEnterprise = true;
+            }
             catch {}
             finally
             {
