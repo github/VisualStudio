@@ -13,8 +13,11 @@ using NSubstitute;
 using Octokit;
 using Xunit;
 using System.Globalization;
+using System.Threading;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Collections;
+using ReactiveUI;
 
 public class ModelServiceTests
 {
@@ -397,6 +400,8 @@ public class ModelServiceTests
         [Fact]
         public async Task NonExpiredIndexReturnsCache()
         {
+            var expected = 5;
+
             var username = "octocat";
             var reponame = "repo";
 
@@ -414,7 +419,7 @@ public class ModelServiceTests
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
 
-            var prcache = Enumerable.Range(1, 5)
+            var prcache = Enumerable.Range(1, expected)
                 .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
 
             // seed the cache
@@ -424,29 +429,36 @@ public class ModelServiceTests
                 .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
                 .ToList();
 
-            var prlive = Observable.Range(1, 5)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Title " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+            var prlive = Observable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+                .DelaySubscription(TimeSpan.FromMilliseconds(10));
 
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var col = modelService.GetPullRequests(repo);
+            var source = modelService.GetPullRequests(repo);
+            var col = new TrackingCollection<IPullRequestModel>(source);
 
-            col.Subscribe();
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expected)
+                    evt.Set();
+            }, () => { });
 
-            await prlive;
 
-            Assert.Equal(prcache.Select(x =>
-                    new PullRequestModel(x.Number, x.Title, act, x.CreatedAt, x.UpdatedAt)),
-                col);
+            evt.WaitOne();
+            evt.Reset();
 
-            Assert.Collection(col, prcache.Select(
-                x => new Action<IPullRequestModel>(t => Assert.Equal(x.Title, t.Title))).ToArray());
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Cache")))).ToArray());
         }
 
         [Fact]
         public async Task ExpiredIndexReturnsLive()
         {
+            var expected = 5;
+
             var username = "octocat";
             var reponame = "repo";
 
@@ -464,7 +476,7 @@ public class ModelServiceTests
 
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
 
-            var prcache = Enumerable.Range(1, 5)
+            var prcache = Enumerable.Range(1, expected)
                 .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
 
             // seed the cache
@@ -479,25 +491,29 @@ public class ModelServiceTests
             indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(6);
             await cache.InsertObject(indexKey, indexobj);
 
-            var prlive = Observable.Range(1, 5)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Title " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+            var prlive = Observable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
                 .DelaySubscription(TimeSpan.FromMilliseconds(10));
 
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var col = modelService.GetPullRequests(repo);
+            var source = modelService.GetPullRequests(repo);
+            var col = new TrackingCollection<IPullRequestModel>(source);
 
-            col.Subscribe();
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                if (++count == expected * 2)
+                    evt.Set();
+            }, () => { });
 
-            await prlive;
+            
+            evt.WaitOne();
+            evt.Reset();
 
-            Assert.Equal(prlive.ToEnumerable().Select(x =>
-                    new PullRequestModel(x.Number, x.Title, act, x.CreatedAt, x.UpdatedAt)),
-                col);
-
-            Assert.Collection(col, prlive.ToEnumerable().Select(
-                x => new Action<IPullRequestModel>(t => Assert.Equal(x.Title, t.Title))).ToArray());
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
         }
     }
 
