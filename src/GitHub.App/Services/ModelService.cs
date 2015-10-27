@@ -135,7 +135,7 @@ namespace GitHub.Services
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
 
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo)
+        public IObservable<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
             // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
@@ -146,7 +146,7 @@ namespace GitHub.Services
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
 
-            var list = Observable.Defer(() => keyobs
+            return Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.GetAndFetchLatestFromIndex(key, () =>
                         apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
@@ -156,8 +156,6 @@ namespace GitHub.Services
                 )
                 .Select(Create)
             );
-            return new TrackingCollection<IPullRequestModel>(list);
-
         }
 
         public IObservable<Unit> InvalidateAll()

@@ -18,6 +18,7 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories();
         IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
         IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
+        IObservable<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
     }
 }
