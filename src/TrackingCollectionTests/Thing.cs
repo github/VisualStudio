@@ -50,6 +50,30 @@ public class Thing : ICopyable<Thing>, IEquatable<Thing>, IComparable<Thing>, IN
         return Number;
     }
 
+    public static bool operator >(Thing lhs, Thing rhs)
+    {
+        if (ReferenceEquals(lhs, rhs))
+            return false;
+        return lhs?.CompareTo(rhs) > 0;
+    }
+
+    public static bool operator <(Thing lhs, Thing rhs)
+    {
+        if (ReferenceEquals(lhs, rhs))
+            return false;
+        return (object)lhs == null || lhs.CompareTo(rhs) < 0;
+    }
+
+    public static bool operator ==(Thing lhs, Thing rhs)
+    {
+        return Equals(lhs, rhs) && ((object)lhs == null || lhs.CompareTo(rhs) == 0);
+    }
+
+    public static bool operator !=(Thing lhs, Thing rhs)
+    {
+        return !(lhs == rhs);
+    }
+
     public int Number { get; set; }
     string title;
     public string Title
