@@ -9,6 +9,7 @@ using GitHub.VisualStudio.Base;
 using Microsoft.TeamFoundation.MVVM;
 using System.Globalization;
 using GitHub.Primitives;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -29,16 +30,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         public override void Initialize(IServiceProvider serviceProvider)
         {
             base.Initialize(serviceProvider);
-            CheckLogin();
+            CheckLogin().Forget();
         }
 
         protected override void RepoChanged()
         {
             base.RepoChanged();
-            CheckLogin();
+            CheckLogin().Forget();
         }
 
-        async void CheckLogin()
+        async Task CheckLogin()
         {
             // this is not a github repo, or it hasn't been published yet
             if (ActiveRepo == null || ActiveRepoUri == null)
@@ -61,7 +62,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var ret = uiProvider.SetupUI(controllerFlow, null);
-            ret.Subscribe(c => { }, CheckLogin);
+            ret.Subscribe(c => { }, () => CheckLogin().Forget());
             uiProvider.RunUI();
         }
     }
