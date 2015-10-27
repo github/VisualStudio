@@ -7,18 +7,20 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.UI;
 using GitHub.ViewModels;
-using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
+    public class GenericLoginControl : SimpleViewUserControl<ILoginControlViewModel, LoginControl>
+    { }
+
     /// <summary>
     /// Interaction logic for LoginControl.xaml
     /// </summary>
     [ExportView(ViewType=UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class LoginControl : SimpleViewUserControl, IViewFor<ILoginControlViewModel>, IView
+    public partial class LoginControl : GenericLoginControl
     {
         public LoginControl()
         {
@@ -111,28 +113,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 .Select(x => x == LoginMode.EnterpriseOnly)
                 .Where(x => x == true)
                 .BindTo(this, v => v.enterpriseTab.IsSelected));
-        }
-
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-            "ViewModel", typeof(ILoginControlViewModel), typeof(LoginControl), new PropertyMetadata(null));
-
-        object IViewFor.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (ILoginControlViewModel)value; }
-        }
-
-        object IView.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (ILoginControlViewModel)value; }
-        }
-
-        public ILoginControlViewModel ViewModel
-        {
-            [return: AllowNull]
-            get { return (ILoginControlViewModel)GetValue(ViewModelProperty); }
-            set { SetValue(ViewModelProperty, value); }
         }
     }
 }

@@ -110,12 +110,12 @@ namespace DesignTimeStyleHelper
             return new Mock<T>().Object;
         }
 
-        object Create(Type t)
+        static object Create(Type t)
         {
             var moq = typeof(Mock<>).MakeGenericType(t);
             var ctor = moq.GetConstructor(new Type[] { });
-            var m = ctor.Invoke(new object[] { }) as Mock;
-            return m.Object;
+            var m = ctor?.Invoke(new object[] { }) as Mock;
+            return m?.Object;
         }
 
         public ExportProvider DefaultExportProvider { get; set; }

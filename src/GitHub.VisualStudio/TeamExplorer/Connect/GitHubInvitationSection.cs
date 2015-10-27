@@ -32,12 +32,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Name = "GitHub";
             Provider = "GitHub, Inc.";
             Description = Resources.BlurbText;
-            Icon = GetDrawingForIcon(GetBrushForIcon());
+            OnThemeChanged();
+            VSColorTheme.ThemeChanged += _ =>
+            {
+                OnThemeChanged();
+            };
 
             IsVisible = cm.Connections.Count == 0;
 
             cm.Connections.CollectionChanged += (s, e) => IsVisible = cm.Connections.Count == 0;
-            VSColorTheme.ThemeChanged += OnThemeChanged;
         }
 
         public override void Connect()
@@ -57,22 +60,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             uiProvider.RunUI(controllerFlow, null);
         }
 
-        void OnThemeChanged(ThemeChangedEventArgs e)
+        void OnThemeChanged()
         {
-            Icon = GetDrawingForIcon(GetBrushForIcon());
-        }
+            try
+            {
+                var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
+                var brightness = color.GetBrightness();
+                var dark = brightness > 0.5f;
 
-        static Brush GetBrushForIcon()
-        {
-            var brush = Application.Current.TryFindResource(HeaderColors.DefaultTextBrushKey) as Brush;
-            if (brush == null)
-                brush = Brushes.Black;
-            return brush;
-        }
-
-        static DrawingBrush GetDrawingForIcon(Brush color)
-        {
-            return SharedResources.GetDrawingForIcon(Octicon.mark_github, color);
+                Icon = SharedResources.GetDrawingForIcon(Octicon.mark_github, dark ? Helpers.Colors.DarkThemeNavigationItem : Helpers.Colors.LightThemeNavigationItem, dark ? "dark" : "light");
+            }
+            catch (ArgumentNullException)
+            {
+                // This throws in the unit test runner.
+            }
         }
     }
 }

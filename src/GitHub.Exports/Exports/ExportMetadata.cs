@@ -17,8 +17,9 @@ namespace GitHub.Exports {
 		Clone,
         Publish,
         End = 100,
-        Finished
-	}
+        Finished,
+        GitHubPane,
+    }
 
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
