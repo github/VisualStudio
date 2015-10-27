@@ -73,6 +73,7 @@
       <Link>Key.snk</Link>
     </None>
     <Compile Include="GitRepoExtensions.cs" />
+    <Compile Include="LambdaComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
