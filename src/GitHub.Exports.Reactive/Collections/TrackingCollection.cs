@@ -238,12 +238,12 @@ namespace GitHub.Collections
 
         ActionData CheckFilter(ActionData data)
         {
-            data.IsIncluded = true;
+            var isIncluded = true;
             if (data.TheAction == TheAction.Remove)
-                data.IsIncluded = false;
+                isIncluded = false;
             else if (filter != null)
-                data.IsIncluded = filter(data.Item, data.Position, this);
-            return data;
+                isIncluded = filter(data.Item, data.Position, this);
+            return new ActionData(data, isIncluded);
         }
 
         int StartQueue()
@@ -366,9 +366,9 @@ namespace GitHub.Collections
 
         ActionData CalculateIndexes(ActionData data)
         {
-            data.Index = GetIndexFiltered(data.Item);
-            data.IndexPivot = GetLiveListPivot(data.Position, data.List);
-            return data;
+            var index = GetIndexFiltered(data.Item);
+            var indexPivot = GetLiveListPivot(data.Position, data.List);
+            return new ActionData(data, index, indexPivot);
         }
 
         ActionData FilteredNone(ActionData data)
@@ -866,22 +866,68 @@ namespace GitHub.Collections
             GC.SuppressFinalize(this);
         }
 
-        class ActionData : Tuple<TheAction, T, T, int, int, List<T>>
+        struct ActionData
         {
-            public TheAction TheAction => Item1;
-            public T Item => Item2;
-            public T OldItem => Item3;
-            public int Position => Item4;
-            public int OldPosition => Item5;
-            public List<T> List => Item6;
+            readonly public TheAction TheAction;
+            readonly public int Position;
+            readonly public int OldPosition;
+            readonly public int Index;
+            readonly public int IndexPivot;
+            readonly public bool IsIncluded;
+            readonly public T Item;
+            readonly public T OldItem;
+            readonly public List<T> List;
 
-            public int Index { get; set; }
-            public int IndexPivot { get; set; }
-            public bool IsIncluded { get; set; }
+            public ActionData(ActionData other, int index, int indexPivot)
+            {
+                TheAction = other.TheAction;
+                Item = other.Item;
+                OldItem = other.OldItem;
+                Position = other.Position;
+                OldPosition = other.OldPosition;
+                List = other.List;
+                Index = index;
+                IndexPivot = indexPivot;
+                IsIncluded = other.IsIncluded;
+            }
+
+            public ActionData(ActionData other, int position)
+            {
+                TheAction = other.TheAction;
+                Item = other.Item;
+                OldItem = other.OldItem;
+                Position = position;
+                OldPosition = other.OldPosition;
+                List = other.List;
+                Index = other.Index;
+                IndexPivot = other.IndexPivot;
+                IsIncluded = other.IsIncluded;
+            }
+
+            public ActionData(ActionData other, bool isIncluded)
+            {
+                TheAction = other.TheAction;
+                Item = other.Item;
+                OldItem = other.OldItem;
+                Position = other.Position;
+                OldPosition = other.OldPosition;
+                List = other.List;
+                Index = other.Index;
+                IndexPivot = other.IndexPivot;
+                IsIncluded = isIncluded;
+            }
 
             public ActionData(TheAction action, T item, T oldItem, int position, int oldPosition, List<T> list)
-                : base(action, item, oldItem, position, oldPosition, list)
             {
+                TheAction = action;
+                Item = item;
+                OldItem = oldItem;
+                Position = position;
+                OldPosition = oldPosition;
+                List = list;
+                Index = -1;
+                IndexPivot = -1;
+                IsIncluded = false;
             }
         }
     }
