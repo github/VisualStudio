@@ -1,4 +1,4 @@
-﻿<uirx:SimpleViewUserControl x:Class="GitHub.VisualStudio.UI.Views.Controls.TwoFactorControl" 
+﻿<local:GenericTwoFactorControl x:Class="GitHub.VisualStudio.UI.Views.Controls.TwoFactorControl" 
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -82,4 +82,4 @@
                 Content="{x:Static prop:Resources.resendCodeButtonContent}" />
         </StackPanel>
     </StackPanel>
-</uirx:SimpleViewUserControl>
+</local:GenericTwoFactorControl>

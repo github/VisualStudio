@@ -167,8 +167,7 @@ namespace GitHub.Services
         {
             return repo
                 ?.Network
-                .Remotes
-                .FirstOrDefault(x => x.Name.Equals("origin", StringComparison.Ordinal))
+                .Remotes["origin"]
                 ?.Url;
         }
 
