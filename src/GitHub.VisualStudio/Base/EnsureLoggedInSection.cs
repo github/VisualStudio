@@ -45,6 +45,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             if (ActiveRepo == null || ActiveRepoUri == null)
                 return;
 
+            var isgithub = await IsAGitHubRepo();
+            if (!isgithub)
+                return;
+
             vsServices.ClearNotifications();
             var add = HostAddress.Create(ActiveRepoUri);
             bool loggedIn = await connectionManager.IsLoggedIn(hosts, add);
