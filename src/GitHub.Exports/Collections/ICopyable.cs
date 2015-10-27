@@ -1,4 +1,4 @@
-﻿namespace GitHub.Helpers
+namespace GitHub.Collections
 {
     public interface ICopyable<in T>
     {
