@@ -38,7 +38,7 @@ namespace GitHub.Collections
         /// <param name="theFilter">The new filter, or null to not have any filtering</param>
         void SetFilter(Func<T, int, IList<T>, bool> filter);
         void AddItem(T item);
-        void RemoveItem(T item);
+        T RemoveItem(T item);
         event NotifyCollectionChangedEventHandler CollectionChanged;
     }
 }
