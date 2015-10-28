@@ -6,17 +6,17 @@ public class Thing : ICopyable<Thing>, IEquatable<Thing>, IComparable<Thing>, IN
 {
     public Thing(int id, string title, DateTimeOffset date1, DateTimeOffset date2)
     {
-        this.Number = id;
-        this.Title = title;
-        this.CreatedAt = date1;
-        this.UpdatedAt = date2;
+        Number = id;
+        Title = title;
+        CreatedAt = date1;
+        UpdatedAt = date2;
     }
     public Thing(int id, string title, DateTimeOffset date)
     {
-        this.Number = id;
-        this.Title = title;
-        this.CreatedAt = date;
-        this.UpdatedAt = date;
+        Number = id;
+        Title = title;
+        CreatedAt = date;
+        UpdatedAt = date;
     }
 
     public Thing()

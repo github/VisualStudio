@@ -1,8 +1,8 @@
-﻿using GitHub.Primitives;
-using NullGuard;
-using System;
-using GitHub.VisualStudio.Helpers;
+﻿using System;
 using System.Globalization;
+using GitHub.Primitives;
+using GitHub.VisualStudio.Helpers;
+using NullGuard;
 
 namespace GitHub.Models
 {
@@ -40,9 +40,7 @@ namespace GitHub.Models
 
         bool IEquatable<IPullRequestModel>.Equals([AllowNull]IPullRequestModel other)
         {
-            if (ReferenceEquals(this, other))
-                return true;
-            return other != null && Number == other.Number;
+            return ReferenceEquals(this, other) || other != null && Number == other.Number;
         }
 
         public int CompareTo([AllowNull]IPullRequestModel other)
@@ -52,16 +50,12 @@ namespace GitHub.Models
 
         public static bool operator >([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
         {
-            if (ReferenceEquals(lhs, rhs))
-                return false;
-            return lhs?.CompareTo(rhs) > 0;
+            return !ReferenceEquals(lhs, rhs) && lhs?.CompareTo(rhs) > 0;
         }
 
         public static bool operator <([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
         {
-            if (ReferenceEquals(lhs, rhs))
-                return false;
-            return (object)lhs == null || lhs.CompareTo(rhs) < 0;
+            return !ReferenceEquals(lhs, rhs) && ((object) lhs == null || lhs.CompareTo(rhs) < 0);
         }
 
         public static bool operator ==([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)

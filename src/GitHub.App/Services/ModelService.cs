@@ -11,11 +11,10 @@ using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
-using GitHub.Primitives;
-using GitHub.Collections;
 
 namespace GitHub.Services
 {

@@ -1,13 +1,9 @@
-﻿using Akavache;
-using NullGuard;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Akavache;
+using NullGuard;
 
 namespace GitHub.Caches
 {
@@ -37,7 +33,7 @@ namespace GitHub.Caches
         public static IObservable<CacheIndex> AddAndSaveToIndex(IBlobCache cache, string indexKey, CacheItem item,
             DateTimeOffset? absoluteExpiration = null)
         {
-            return cache.GetOrCreateObject(indexKey, () => CacheIndex.Create(indexKey))
+            return cache.GetOrCreateObject(indexKey, () => Create(indexKey))
                 .Do(index =>
                 {
                     var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", index.IndexKey, item.Key);
