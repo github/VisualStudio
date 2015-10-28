@@ -197,6 +197,7 @@ namespace GitHub.Extensions
                         .Finally(() =>
                         {
                             This.GetObjects<T>(index.OldKeys.Except(index.Keys))
+                                .Do(dict => This.InvalidateObjects<T>(dict.Keys))
                                 .SelectMany(dict => dict.Values)
                                 .Do(item => removedItemsCallback(item))
                                 .Subscribe();
