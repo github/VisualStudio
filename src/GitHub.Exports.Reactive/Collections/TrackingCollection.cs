@@ -74,7 +74,6 @@ namespace GitHub.Collections
             }
         }
 
-
         public TrackingCollection()
         {
             queue = new ConcurrentQueue<T>();
@@ -208,7 +207,7 @@ namespace GitHub.Collections
             if (position < 0)
                 return null;
 
-            var data = new ActionData(TheAction.Remove, item, null, position - 1, position, original);
+            var data = new ActionData(TheAction.Remove, original, item, null, position - 1, position);
             data = CheckFilter(data);
             data = CalculateIndexes(data);
             data = SortedRemove(data);
@@ -276,11 +275,11 @@ namespace GitHub.Collections
 
                 // no sorting to be done, just replacing the element in-place
                 if (comparison == 0)
-                    ret = new ActionData(TheAction.None, item, null, idx, idx, list);
+                    ret = new ActionData(TheAction.None, list, item, null, idx, idx);
                 else
                     // element has moved, save the original object, because we want to update its contents and move it
                     // but not overwrite the instance.
-                    ret = new ActionData(TheAction.Move, item, old, comparison, idx, list);
+                    ret = new ActionData(TheAction.Move, list, item, old, comparison, idx);
             }
             // the element doesn't exist yet
             // figure out whether we're larger than the last element or smaller than the first or
@@ -288,10 +287,10 @@ namespace GitHub.Collections
             else if (list.Count > 0)
             {
                 if (comparer(list[0], item) >= 0)
-                    ret = new ActionData(TheAction.Insert, item, null, 0, -1, list);
+                    ret = new ActionData(TheAction.Insert, list, item, null, 0, -1);
 
                 else if (comparer(list[list.Count - 1], item) <= 0)
-                    ret = new ActionData(TheAction.Add, item, null, list.Count, -1, list);
+                    ret = new ActionData(TheAction.Add, list, item, null, list.Count, -1);
 
                 // this happens if the original observable is not sorted, or it's sorting order doesn't
                 // match the comparer that has been set
@@ -300,11 +299,11 @@ namespace GitHub.Collections
                     idx = BinarySearch(list, item, comparer);
                     if (idx < 0)
                         idx = ~idx;
-                    ret = new ActionData(TheAction.Insert, item, null, idx, -1, list);
+                    ret = new ActionData(TheAction.Insert, list, item, null, idx, -1);
                 }
             }
             else
-                ret = new ActionData(TheAction.Add, item, null, list.Count, -1, list);
+                ret = new ActionData(TheAction.Add, list, item, null, list.Count, -1);
             return ret;
         }
 
@@ -339,7 +338,7 @@ namespace GitHub.Collections
             data.OldItem.CopyFrom(data.Item);
             var pos = FindNewPositionForItem(data.OldPosition, data.Position < 0, data.List, comparer, sortedIndexCache);
             // the old item is the one moving around
-            return new ActionData(data.TheAction, data.OldItem, null, pos, data.OldPosition, data.List);
+            return new ActionData(data, pos);
         }
 
         ActionData SortedRemove(ActionData data)
@@ -879,45 +878,41 @@ namespace GitHub.Collections
             readonly public List<T> List;
 
             public ActionData(ActionData other, int index, int indexPivot)
+                : this(other.TheAction, other.List,
+                      other.Item, other.OldItem,
+                      other.Position, other.OldPosition,
+                      index, indexPivot,
+                      other.IsIncluded)
             {
-                TheAction = other.TheAction;
-                Item = other.Item;
-                OldItem = other.OldItem;
-                Position = other.Position;
-                OldPosition = other.OldPosition;
-                List = other.List;
-                Index = index;
-                IndexPivot = indexPivot;
-                IsIncluded = other.IsIncluded;
             }
 
             public ActionData(ActionData other, int position)
+                : this(other.TheAction, other.List,
+                      other.Item, other.OldItem,
+                      position, other.OldPosition,
+                      other.Index, other.IndexPivot,
+                      other.IsIncluded)
             {
-                TheAction = other.TheAction;
-                Item = other.Item;
-                OldItem = other.OldItem;
-                Position = position;
-                OldPosition = other.OldPosition;
-                List = other.List;
-                Index = other.Index;
-                IndexPivot = other.IndexPivot;
-                IsIncluded = other.IsIncluded;
             }
 
             public ActionData(ActionData other, bool isIncluded)
+                : this(other.TheAction, other.List,
+                      other.Item, other.OldItem,
+                      other.Position, other.OldPosition,
+                      other.Index, other.IndexPivot,
+                      isIncluded)
             {
-                TheAction = other.TheAction;
-                Item = other.Item;
-                OldItem = other.OldItem;
-                Position = other.Position;
-                OldPosition = other.OldPosition;
-                List = other.List;
-                Index = other.Index;
-                IndexPivot = other.IndexPivot;
-                IsIncluded = isIncluded;
             }
 
-            public ActionData(TheAction action, T item, T oldItem, int position, int oldPosition, List<T> list)
+            public ActionData(TheAction action, List<T> list, T item, T oldItem, int position, int oldPosition)
+                : this(action, list,
+                      item, oldItem,
+                      position, oldPosition,
+                      -1, -1, false)
+            {
+            }
+
+            public ActionData(TheAction action, List<T> list, T item, T oldItem, int position, int oldPosition, int index, int indexPivot, bool isIncluded)
             {
                 TheAction = action;
                 Item = item;
@@ -925,9 +920,9 @@ namespace GitHub.Collections
                 Position = position;
                 OldPosition = oldPosition;
                 List = list;
-                Index = -1;
-                IndexPivot = -1;
-                IsIncluded = false;
+                Index = index;
+                IndexPivot = indexPivot;
+                IsIncluded = isIncluded;
             }
         }
     }

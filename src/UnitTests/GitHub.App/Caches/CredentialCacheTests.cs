@@ -8,7 +8,7 @@ using Xunit;
 
 public class CredentialCacheTests : TestBaseClass
 {
-    public class TheGetObjectMethod
+    public class TheGetObjectMethod : TestBaseClass
     {
         [Fact]
         public async Task RetrievesValueWithAlternateKeys()
@@ -65,7 +65,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInsertObjectMethod
+    public class TheInsertObjectMethod : TestBaseClass
     {
         [Fact]
         public async Task StoresCredentialForKeyAndGitKey()
@@ -110,7 +110,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInsertMethod
+    public class TheInsertMethod : TestBaseClass
     {
         [Fact]
         public async Task ThrowsInvalidOperationException()
@@ -123,7 +123,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheGetMethod
+    public class TheGetMethod : TestBaseClass
     {
         [Fact]
         public async Task RetrievesPasswordAsUnicodeBytes()
@@ -167,18 +167,18 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInvalidateMethod
+    public class TheInvalidateMethod : TestBaseClass
     {
         [Fact]
         public async Task InvalidatesTheCredential()
         {
+            const string key = "TheInvalidateMethod.InvalidatesTheCredential";
             using (var credentialCache = new CredentialCache())
             {
                 var credential = Tuple.Create("somebody", "somebody's secret");
-                await credentialCache.InsertObject(nameof(InvalidatesTheCredential), credential);
-                await credentialCache.Invalidate(nameof(InvalidatesTheCredential));
-
-                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(nameof(InvalidatesTheCredential)));
+                await credentialCache.InsertObject(key, credential);
+                await credentialCache.Invalidate(key);
+                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(key));
             }
         }
 
@@ -206,25 +206,18 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInvalidateObjectMethod
+    public class TheInvalidateObjectMethod : TestBaseClass
     {
         [Fact]
         public async Task InvalidatesTheCredential()
         {
-            const string key = nameof(InvalidatesTheCredential);
+            const string key = "TheInvalidateObjectMethod.InvalidatesTheCredential";
             using (var credentialCache = new CredentialCache())
             {
-                try
-                {
-                    var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject(key, credential);
-                }
-                finally
-                {
-                    await credentialCache.InvalidateObject<Tuple<string, string>>(key);
-
-                    await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get("unknownkey"));
-                }
+                var credential = Tuple.Create("somebody", "somebody's secret");
+                await credentialCache.InsertObject(key, credential);
+                await credentialCache.InvalidateObject<Tuple<string, string>>(key);
+                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(key));
             }
         }
 
@@ -252,7 +245,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheFlushMethod
+    public class TheFlushMethod : TestBaseClass
     {
         [Fact]
         public async Task ThrowsObjectDisposedExceptionWhenDisposed()
@@ -267,7 +260,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheDisposeMethod
+    public class TheDisposeMethod : TestBaseClass
     {
         [Fact]
         public void SignalsShutdown()
@@ -281,7 +274,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class MethodsNotImplementedOnPurpose
+    public class MethodsNotImplementedOnPurpose : TestBaseClass
     {
         [Fact]
         public void ThrowNotImplementedException()
