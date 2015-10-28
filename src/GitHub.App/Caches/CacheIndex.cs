@@ -11,7 +11,7 @@ namespace GitHub.Caches
     {
         public static CacheIndex Create(string key)
         {
-            return new CacheIndex() { IndexKey = key };
+            return new CacheIndex { IndexKey = key };
         }
 
         public CacheIndex()
