@@ -138,6 +138,29 @@ namespace GitHub.Extensions
                 .RefCount();
         }
 
+        /// <summary>
+        /// This method attempts to return a series of cached value(s) aggregated by
+        /// a <paramref name="key"/>. In the case of a
+        /// cache miss the fetchFunc will be used to provide a fresh value which
+        /// is then returned. In the case of a cache hit where the cache item is
+        /// considered stale (but not expired) as determined by <paramref name="refreshInterval"/>
+        /// the stale values will be produced first, followed by the fresh values
+        /// when the fetch func completes.
+        /// </summary>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
+        /// <param name="key">The key to look up the cache value with.</param>
+        /// <param name="fetchFunc">The fetch function.</param>
+        /// <param name="removedItemsCallback">The callback that receives items that
+        /// were a part of the cache but not of the list list of values.</param>
+        /// <param name="refreshInterval">
+        /// Cache objects with an age exceeding this value will be treated as stale
+        /// and the fetch function will be invoked to refresh it.
+        /// </param>
+        /// <param name="maxCacheDuration">
+        /// The maximum age of a cache object before the object is treated as
+        /// expired and unusable. Cache objects older than this will be treated
+        /// as a cache miss.
+        /// </param>
         public static IObservable<T> GetAndFetchLatestFromIndex<T>(
             this IBlobCache blobCache,
             string key,
