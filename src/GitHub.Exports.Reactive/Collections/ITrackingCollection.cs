@@ -39,6 +39,10 @@ namespace GitHub.Collections
         void SetFilter(Func<T, int, IList<T>, bool> filter);
         void AddItem(T item);
         void RemoveItem(T item);
+        /// <summary>
+        /// How long to delay between processing incoming items
+        /// </summary>
+        TimeSpan ProcessingDelay { get; set; }
         event NotifyCollectionChangedEventHandler CollectionChanged;
     }
 }

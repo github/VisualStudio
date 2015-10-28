@@ -437,6 +437,7 @@ public class ModelServiceTests
 
             await modelService.InsertUser(new AccountCacheItem(user));
             var col = modelService.GetPullRequests(repo);
+            col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
             var evt = new ManualResetEvent(false);
@@ -498,6 +499,7 @@ public class ModelServiceTests
 
             await modelService.InsertUser(new AccountCacheItem(user));
             var col = modelService.GetPullRequests(repo);
+            col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
             var evt = new ManualResetEvent(false);
@@ -559,6 +561,7 @@ public class ModelServiceTests
 
             await modelService.InsertUser(new AccountCacheItem(user));
             var col = modelService.GetPullRequests(repo);
+            col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
             var evt = new ManualResetEvent(false);
