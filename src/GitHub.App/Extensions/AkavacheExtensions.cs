@@ -38,7 +38,7 @@ namespace GitHub.Extensions
         {
             return Observable.Defer(() =>
             {
-                var absoluteExpiration = blobCache.Scheduler.Now.ToUniversalTime() + maxCacheDuration;
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
 
                 try
                 {
@@ -148,7 +148,7 @@ namespace GitHub.Extensions
         {
             return Observable.Defer(() =>
             {
-                var absoluteExpiration = blobCache.Scheduler.Now.ToUniversalTime() + maxCacheDuration;
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
 
                 try
                 {
@@ -201,8 +201,7 @@ namespace GitHub.Extensions
 
         static bool IsExpired(IBlobCache blobCache, DateTimeOffset itemCreatedAt, TimeSpan cacheDuration)
         {
-            var now = blobCache.Scheduler.Now.ToUniversalTime();
-            var elapsed = now - itemCreatedAt.ToUniversalTime();
+            var elapsed = blobCache.Scheduler.Now - itemCreatedAt.ToUniversalTime();
 
             return elapsed > cacheDuration;
         }
