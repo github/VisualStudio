@@ -7,7 +7,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using GitHub.Authentication;
 using GitHub.Primitives;
 using NLog;
 using NullGuard;
@@ -121,8 +120,6 @@ namespace GitHub.Api
         }
 
         public HostAddress HostAddress { get; }
-
-        public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
 
         static string GetSha256Hash(string input)
         {
