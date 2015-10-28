@@ -7,7 +7,7 @@ using Xunit;
 
 public class GraphsNavigationItemTests
 {
-    public class TheExecuteMethod
+    public class TheExecuteMethod : TestBaseClass
     {
         [Theory]
         [InlineData("https://github.com/foo/bar.git", "https://github.com/foo/bar/graphs")]

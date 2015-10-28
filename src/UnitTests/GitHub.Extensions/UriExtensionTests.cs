@@ -4,7 +4,7 @@ using Xunit;
 
 public class UriExtensionTests
 {
-    public class TheAppendMethod
+    public class TheAppendMethod : TestBaseClass
     {
         [Theory]
         [InlineData("https://github.com/foo/bar", "graphs", "https://github.com/foo/bar/graphs")]
