@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reactive.Linq;
 using Akavache;
 using NullGuard;
-using System.Reactive;
-using System.Linq;
 
 namespace GitHub.Caches
 {

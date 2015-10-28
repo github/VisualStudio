@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
+using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
@@ -15,7 +16,6 @@ using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
-using GitHub.Collections;
 
 namespace GitHub.Services
 {

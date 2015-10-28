@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Caches;
-using System.Linq;
-using System.Reactive;
 
 namespace GitHub.Extensions
 {
@@ -222,7 +222,7 @@ namespace GitHub.Extensions
                             This.GetObjects<T>(index.OldKeys.Except(index.Keys))
                                 .Do(dict => This.InvalidateObjects<T>(dict.Keys))
                                 .SelectMany(dict => dict.Values)
-                                .Do(item => removedItemsCallback(item))
+                                .Do(removedItemsCallback)
                                 .Subscribe();
                         });
                 }));
