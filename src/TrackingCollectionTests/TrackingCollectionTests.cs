@@ -14,6 +14,12 @@ using NUnit.Framework;
 [TestFixture]
 public class TrackingTests : TestBase
 {
+    [TestFixtureSetUp]
+    public void Setup()
+    {
+        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
+    }
+
     [Test]
     public void OrderByUpdatedNoFilter()
     {
