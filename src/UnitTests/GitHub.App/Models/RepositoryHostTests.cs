@@ -105,8 +105,23 @@ public class RepositoryHostTests
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            bool received1 = false, received2 = false;
             apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, false, true)
-                .Returns(Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException()));
+                .Returns(_ =>
+                {
+                    received1 = true;
+                    return Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException());
+                });
+
+            apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback,
+                Args.String,
+                true,
+                Args.Boolean)
+                .Returns(_ =>
+                {
+                    received2 = true;
+                    return Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException());
+                });
             apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
@@ -115,13 +130,8 @@ public class RepositoryHostTests
 
             await host.LogIn("aUsername", "aPassowrd");
 
-            apiClient.Received()
-                .GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, false, true);
-            apiClient.DidNotReceive().GetOrCreateApplicationAuthenticationCode(
-                Args.TwoFactorChallengCallback,
-                Args.String,
-                true,
-                Args.Boolean);
+            Assert.True(received1);
+            Assert.False(received2);
             Assert.False(host.IsLoggedIn);
             var loginInfo = await loginCache.GetLoginAsync(HostAddress.GitHubDotComHostAddress);
             Assert.Equal("", loginInfo.UserName);

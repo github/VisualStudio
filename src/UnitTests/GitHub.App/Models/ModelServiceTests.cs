@@ -381,11 +381,16 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var cache = Substitute.For<IBlobCache>();
             cache.InvalidateAll().Returns(Observable.Return(Unit.Default));
+            var received = false;
+            cache.Vacuum().Returns(x =>
+            {
+                received = true;
+                return Observable.Return(Unit.Default);
+            });
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
             await modelService.InvalidateAll();
-
-            cache.Received().Vacuum();
+            Assert.True(received);
         }
     }
 
