@@ -40,7 +40,9 @@ namespace GitHub.Models
 
         bool IEquatable<IPullRequestModel>.Equals([AllowNull]IPullRequestModel other)
         {
-            return ReferenceEquals(this, other) || other != null && Number == other.Number;
+            if (ReferenceEquals(this, other))
+                return true;
+            return other != null && Number == other.Number;
         }
 
         public int CompareTo([AllowNull]IPullRequestModel other)
@@ -50,12 +52,16 @@ namespace GitHub.Models
 
         public static bool operator >([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
         {
-            return !ReferenceEquals(lhs, rhs) && lhs?.CompareTo(rhs) > 0;
+            if (ReferenceEquals(lhs, rhs))
+                return false;
+            return lhs?.CompareTo(rhs) > 0;
         }
 
         public static bool operator <([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
         {
-            return !ReferenceEquals(lhs, rhs) && ((object) lhs == null || lhs.CompareTo(rhs) < 0);
+            if (ReferenceEquals(lhs, rhs))
+                return false;
+            return (object)lhs == null || lhs.CompareTo(rhs) < 0;
         }
 
         public static bool operator ==([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
