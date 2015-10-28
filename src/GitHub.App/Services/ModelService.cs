@@ -185,7 +185,7 @@ namespace GitHub.Services
                             "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
                             repositoryType);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] { });
+                        return Observable.Return(new IRepositoryModel[] {});
                     });
         }
 
@@ -223,7 +223,7 @@ namespace GitHub.Services
                             "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] { });
+                        return Observable.Return(new IRepositoryModel[] {});
                     });
         }
 
@@ -314,8 +314,7 @@ namespace GitHub.Services
                 return new RepositoryCacheItem(apiRepository);
             }
 
-            public RepositoryCacheItem()
-            { }
+            public RepositoryCacheItem() {}
 
             public RepositoryCacheItem(Repository apiRepository)
             {
@@ -345,7 +344,7 @@ namespace GitHub.Services
                 return new PullRequestCacheItem(pr);
             }
 
-            public PullRequestCacheItem() { }
+            public PullRequestCacheItem() {}
             public PullRequestCacheItem(PullRequest pr)
             {
                 Title = pr.Title;
