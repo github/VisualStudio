@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Reactive.Linq;
 using Akavache;
 using NullGuard;
+using System.Reactive;
+using System.Linq;
 
 namespace GitHub.Caches
 {
@@ -17,6 +19,7 @@ namespace GitHub.Caches
         public CacheIndex()
         {
             Keys = new List<string>();
+            OldKeys = new List<string>();
         }
 
         public IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, CacheItem item,
@@ -45,9 +48,21 @@ namespace GitHub.Caches
                 .Select(x => index));
         }
 
+        public IObservable<CacheIndex> Clear(IBlobCache cache, string indexKey, DateTimeOffset? absoluteExpiration = null)
+        {
+            OldKeys = Keys.ToList();
+            Keys.Clear();
+            UpdatedAt = DateTimeOffset.UtcNow;
+            return cache
+                .InvalidateObject<CacheIndex>(indexKey)
+                .SelectMany(_ => cache.InsertObject(indexKey, this, absoluteExpiration))
+                .Select(_ => this);
+        }
+
         [AllowNull]
         public string IndexKey {[return: AllowNull] get; set; }
         public List<string> Keys { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
+        public List<string> OldKeys { get; set; }
     }
 }

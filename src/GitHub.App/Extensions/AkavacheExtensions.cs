@@ -84,7 +84,7 @@ namespace GitHub.Extensions
         {
             return Observable.Defer(() =>
             {
-                var absoluteExpiration = blobCache.Scheduler.Now.ToUniversalTime() + maxCacheDuration;
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
 
                 try
                 {
@@ -142,6 +142,7 @@ namespace GitHub.Extensions
             this IBlobCache blobCache,
             string key,
             Func<IObservable<T>> fetchFunc,
+            Action<T> removedItemsCallback,
             TimeSpan refreshInterval,
             TimeSpan maxCacheDuration)
                 where T : CacheItem
@@ -155,6 +156,7 @@ namespace GitHub.Extensions
                     return blobCache.GetAndFetchLatestFromIndex(
                         key,
                         fetchFunc,
+                        removedItemsCallback,
                         createdAt => IsExpired(blobCache, createdAt, refreshInterval),
                         absoluteExpiration);
                 }
@@ -168,6 +170,7 @@ namespace GitHub.Extensions
         static IObservable<T> GetAndFetchLatestFromIndex<T>(this IBlobCache This,
             string key,
             Func<IObservable<T>> fetchFunc,
+            Action<T> removedItemsCallback,
             Func<DateTimeOffset, bool> fetchPredicate = null,
             DateTimeOffset? absoluteExpiration = null,
             bool shouldInvalidateOnError = false)
@@ -177,6 +180,7 @@ namespace GitHub.Extensions
                 .Select(x => Tuple.Create(x, fetchPredicate == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
                 .Where(predicateIsTrue => predicateIsTrue.Item2)
                 .Select(x => x.Item1)
+                .SelectMany(index => index.Clear(This, key, absoluteExpiration))
                 .SelectMany(index =>
                 {
                     var fetchObs = fetchFunc().Catch<T, Exception>(ex =>
@@ -189,7 +193,14 @@ namespace GitHub.Extensions
 
                     return fetchObs
                         .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
-                        .Do(x => index.AddAndSave(This, key, x, absoluteExpiration));
+                        .Do(x => index.AddAndSave(This, key, x, absoluteExpiration))
+                        .Finally(() =>
+                        {
+                            This.GetObjects<T>(index.OldKeys)
+                                .SelectMany(dict => dict.Values)
+                                .Do(item => removedItemsCallback(item))
+                                .Subscribe();
+                        });
                 }));
 
             var cache = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))

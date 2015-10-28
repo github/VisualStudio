@@ -436,8 +436,7 @@ public class ModelServiceTests
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var source = modelService.GetPullRequests(repo);
-            var col = new TrackingCollection<IPullRequestModel>(source);
+            var col = modelService.GetPullRequests(repo);
 
             var count = 0;
             var evt = new ManualResetEvent(false);
@@ -498,8 +497,7 @@ public class ModelServiceTests
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var source = modelService.GetPullRequests(repo);
-            var col = new TrackingCollection<IPullRequestModel>(source);
+            var col = modelService.GetPullRequests(repo);
 
             var count = 0;
             var evt = new ManualResetEvent(false);
@@ -513,6 +511,70 @@ public class ModelServiceTests
             evt.WaitOne();
             evt.Reset();
 
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
+        }
+
+        [Fact]
+        public async Task ExpiredIndexClearsItems()
+        {
+            var expected = 5;
+
+            var username = "octocat";
+            var reponame = "repo";
+
+            var cache = new InMemoryBlobCache();
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = CreateOctokitUser(username);
+            apiClient.GetUser().Returns(Observable.Return(user));
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var act = modelService.GetAccounts().ToEnumerable().First().First();
+
+            var repo = Substitute.For<ISimpleRepositoryModel>();
+            repo.Name.Returns(reponame);
+            repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
+
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
+
+            var prcache = Enumerable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+
+            // seed the cache
+            prcache
+                .Select(item => new ModelService.PullRequestCacheItem(item))
+                .Select(item => item.Save<ModelService.PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
+                .ToList();
+
+            // expire the index
+            var indexobj = await cache.GetObject<CacheIndex>(indexKey);
+            indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(6);
+            await cache.InsertObject(indexKey, indexobj);
+
+            var prlive = Observable.Range(6, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+                .DelaySubscription(TimeSpan.FromMilliseconds(10));
+
+            apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
+
+            await modelService.InsertUser(new AccountCacheItem(user));
+            var col = modelService.GetPullRequests(repo);
+
+            var count = 0;
+            var evt = new ManualResetEvent(false);
+            col.Subscribe(t =>
+            {
+                // we get all the items from the cache, all the items from the live,
+                // and all the deletions because the cache expires old items when it's refreshed
+                if (++count == expected * 3)
+                    evt.Set();
+            }, () => { });
+
+
+            evt.WaitOne();
+            evt.Reset();
+
+            Assert.Equal(5, col.Count);
             Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
         }
     }
