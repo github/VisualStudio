@@ -196,7 +196,7 @@ namespace GitHub.Extensions
                         .Do(x => index.AddAndSave(This, key, x, absoluteExpiration))
                         .Finally(() =>
                         {
-                            This.GetObjects<T>(index.OldKeys)
+                            This.GetObjects<T>(index.OldKeys.Except(index.Keys))
                                 .SelectMany(dict => dict.Values)
                                 .Do(item => removedItemsCallback(item))
                                 .Subscribe();

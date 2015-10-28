@@ -553,7 +553,7 @@ public class ModelServiceTests
             indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(6);
             await cache.InsertObject(indexKey, indexobj);
 
-            var prlive = Observable.Range(6, expected)
+            var prlive = Observable.Range(5, expected)
                 .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
                 .DelaySubscription(TimeSpan.FromMilliseconds(10));
 
@@ -567,9 +567,10 @@ public class ModelServiceTests
             var evt = new ManualResetEvent(false);
             col.Subscribe(t =>
             {
-                // we get all the items from the cache, all the items from the live,
-                // and all the deletions because the cache expires old items when it's refreshed
-                if (++count == expected * 3)
+                // we get all the items from the cache (items 1-5), all the items from the live (items 5-9),
+                // and 4 deletions (items 1-4) because the cache expired the items that were not
+                // a part of the live data
+                if (++count == 14)
                     evt.Set();
             }, () => { });
 
@@ -578,7 +579,13 @@ public class ModelServiceTests
             evt.Reset();
 
             Assert.Equal(5, col.Count);
-            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
+            Assert.Collection(col, 
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(5, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(6, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(7, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(8, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(9, t.Number); }
+            );
         }
     }
 
