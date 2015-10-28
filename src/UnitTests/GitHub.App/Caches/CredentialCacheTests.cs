@@ -172,7 +172,7 @@ public class CredentialCacheTests : TestBaseClass
         [Fact]
         public async Task InvalidatesTheCredential()
         {
-            const string key = nameof(InvalidatesTheCredential);
+            const string key = "TheInvalidateMethod.InvalidatesTheCredential";
             using (var credentialCache = new CredentialCache())
             {
                 var credential = Tuple.Create("somebody", "somebody's secret");
@@ -211,7 +211,7 @@ public class CredentialCacheTests : TestBaseClass
         [Fact]
         public async Task InvalidatesTheCredential()
         {
-            const string key = nameof(InvalidatesTheCredential);
+            const string key = "TheInvalidateObjectMethod.InvalidatesTheCredential";
             using (var credentialCache = new CredentialCache())
             {
                 var credential = Tuple.Create("somebody", "somebody's secret");
