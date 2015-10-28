@@ -21,7 +21,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -43,7 +42,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -73,7 +71,6 @@ public class SimpleApiClientTests
             wikiProbe.ProbeAsync(repository)
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -94,7 +91,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -123,7 +119,6 @@ public class SimpleApiClientTests
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -144,7 +139,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),

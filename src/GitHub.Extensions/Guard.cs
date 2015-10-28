@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullGuard;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -8,6 +9,19 @@ namespace GitHub.Extensions
 {
     public static class Guard
     {
+        public static void ArgumentNotNull([AllowNull]object value, string name)
+        {
+            if (value != null) return;
+            string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
+#if DEBUG
+            if (!InUnitTestRunner())
+            {
+                Debug.Fail(message);
+            }
+#endif
+            throw new ArgumentNullException(name, message);
+        }
+
         public static void ArgumentNonNegative(int value, string name)
         {
             if (value > -1) return;
@@ -78,29 +92,7 @@ namespace GitHub.Extensions
         // Borrowed from Splat.
         static bool InUnitTestRunner()
         {
-            var testAssemblies = new[] {
-                "CSUNIT",
-                "NUNIT",
-                "XUNIT",
-                "MBUNIT",
-                "PEX.",
-                "NBEHAVE",
-            };
-
-            try
-            {
-                return SearchForAssembly(testAssemblies);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        static bool SearchForAssembly(IEnumerable<string> assemblyList)
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Any(x => assemblyList.Any(name => x.FullName.ToUpperInvariant().Contains(name)));
+            return Splat.ModeDetector.InUnitTestRunner();
         }
     }
 }
