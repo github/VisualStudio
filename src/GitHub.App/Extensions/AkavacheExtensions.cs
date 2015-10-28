@@ -17,6 +17,7 @@ namespace GitHub.Extensions
         /// the stale value will be produced first, followed by the fresh value
         /// when the fetch func completes.
         /// </summary>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
         /// <param name="key">The key to look up the cache value with.</param>
         /// <param name="fetchFunc">The fetch function.</param>
         /// <param name="refreshInterval">
@@ -62,6 +63,7 @@ namespace GitHub.Extensions
         /// the stale value will be produced first, followed by the fresh value
         /// when the fetch func completes.
         /// </summary>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
         /// <param name="key">The key to look up the cache value with.</param>
         /// <param name="fetchFunc">The fetch function.</param>
         /// <param name="refreshInterval">
