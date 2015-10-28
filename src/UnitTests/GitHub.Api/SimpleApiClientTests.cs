@@ -9,6 +9,15 @@ using Xunit;
 
 public class SimpleApiClientTests
 {
+    public class TheCtor : TestBaseClass
+    {
+        public void Throws()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SimpleApiClient(null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new SimpleApiClient("https://github.com/github/visualstudio", null, null, null));
+        }
+    }
+
     public class TheGetRepositoryMethod
     {
         [Fact]
