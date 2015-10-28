@@ -172,13 +172,13 @@ public class CredentialCacheTests : TestBaseClass
         [Fact]
         public async Task InvalidatesTheCredential()
         {
+            const string key = nameof(InvalidatesTheCredential);
             using (var credentialCache = new CredentialCache())
             {
                 var credential = Tuple.Create("somebody", "somebody's secret");
-                await credentialCache.InsertObject(nameof(InvalidatesTheCredential), credential);
-                await credentialCache.Invalidate(nameof(InvalidatesTheCredential));
-
-                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(nameof(InvalidatesTheCredential)));
+                await credentialCache.InsertObject(key, credential);
+                await credentialCache.Invalidate(key);
+                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(key));
             }
         }
 
@@ -214,17 +214,10 @@ public class CredentialCacheTests : TestBaseClass
             const string key = nameof(InvalidatesTheCredential);
             using (var credentialCache = new CredentialCache())
             {
-                try
-                {
-                    var credential = Tuple.Create("somebody", "somebody's secret");
-                    await credentialCache.InsertObject(key, credential);
-                }
-                finally
-                {
-                    await credentialCache.InvalidateObject<Tuple<string, string>>(key);
-
-                    await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get("unknownkey"));
-                }
+                var credential = Tuple.Create("somebody", "somebody's secret");
+                await credentialCache.InsertObject(key, credential);
+                await credentialCache.InvalidateObject<Tuple<string, string>>(key);
+                await Assert.ThrowsAsync<KeyNotFoundException>(async () => await credentialCache.Get(key));
             }
         }
 
