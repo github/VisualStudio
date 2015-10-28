@@ -8,7 +8,7 @@ using Xunit;
 
 public class CredentialCacheTests : TestBaseClass
 {
-    public class TheGetObjectMethod
+    public class TheGetObjectMethod : TestBaseClass
     {
         [Fact]
         public async Task RetrievesValueWithAlternateKeys()
@@ -65,7 +65,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInsertObjectMethod
+    public class TheInsertObjectMethod : TestBaseClass
     {
         [Fact]
         public async Task StoresCredentialForKeyAndGitKey()
@@ -110,7 +110,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInsertMethod
+    public class TheInsertMethod : TestBaseClass
     {
         [Fact]
         public async Task ThrowsInvalidOperationException()
@@ -123,7 +123,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheGetMethod
+    public class TheGetMethod : TestBaseClass
     {
         [Fact]
         public async Task RetrievesPasswordAsUnicodeBytes()
@@ -167,7 +167,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInvalidateMethod
+    public class TheInvalidateMethod : TestBaseClass
     {
         [Fact]
         public async Task InvalidatesTheCredential()
@@ -206,7 +206,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheInvalidateObjectMethod
+    public class TheInvalidateObjectMethod : TestBaseClass
     {
         [Fact]
         public async Task InvalidatesTheCredential()
@@ -245,7 +245,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheFlushMethod
+    public class TheFlushMethod : TestBaseClass
     {
         [Fact]
         public async Task ThrowsObjectDisposedExceptionWhenDisposed()
@@ -260,7 +260,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class TheDisposeMethod
+    public class TheDisposeMethod : TestBaseClass
     {
         [Fact]
         public void SignalsShutdown()
@@ -274,7 +274,7 @@ public class CredentialCacheTests : TestBaseClass
         }
     }
 
-    public class MethodsNotImplementedOnPurpose
+    public class MethodsNotImplementedOnPurpose : TestBaseClass
     {
         [Fact]
         public void ThrowNotImplementedException()
