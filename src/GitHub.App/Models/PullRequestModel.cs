@@ -6,7 +6,7 @@ using NullGuard;
 
 namespace GitHub.Models
 {
-    public class PullRequestModel : NotificationAwareObject, IPullRequestModel
+    public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel
     {
         public PullRequestModel(int number, string title, IAccount author, DateTimeOffset createdAt, DateTimeOffset? updatedAt = null)
         {
