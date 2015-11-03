@@ -146,7 +146,7 @@ namespace GitHub.Services
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
 
-            TrackingCollection<IPullRequestModel> col = null;
+            var col = new TrackingCollection<IPullRequestModel>();
 
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
@@ -160,7 +160,7 @@ namespace GitHub.Services
                 .Select(Create)
             );
 
-            col = new TrackingCollection<IPullRequestModel>(source);
+            col.Listen(source);
             return col;
         }
 

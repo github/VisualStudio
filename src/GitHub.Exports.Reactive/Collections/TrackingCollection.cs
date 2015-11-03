@@ -98,7 +98,6 @@ namespace GitHub.Collections
             IScheduler scheduler = null)
             : this(comparer, filter, scheduler)
         {
-            this.source = source;
             Listen(source);
         }
 
