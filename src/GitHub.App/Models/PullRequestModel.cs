@@ -19,6 +19,8 @@ namespace GitHub.Models
 
         public void CopyFrom(IPullRequestModel other)
         {
+            if (Number != other.Number)
+                throw new ArgumentException("Instance to copy from must match", nameof(other));
             Title = other.Title;
             UpdatedAt = other.UpdatedAt;
             CommentCount = other.CommentCount;
