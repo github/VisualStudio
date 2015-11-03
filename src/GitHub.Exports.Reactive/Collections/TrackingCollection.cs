@@ -73,16 +73,12 @@ namespace GitHub.Collections
             }
         }
 
-        public TrackingCollection()
+        public TrackingCollection(Func<T, T, int> comparer = null, Func<T, int, IList<T>, bool> filter = null, IScheduler scheduler = null)
         {
             queue = new ConcurrentQueue<ActionData>();
             ProcessingDelay = TimeSpan.FromMilliseconds(10);
             fuzziness = TimeSpan.FromMilliseconds(1);
-        }
 
-        public TrackingCollection(Func<T, T, int> comparer = null, Func<T, int, IList<T>, bool> filter = null, IScheduler scheduler = null)
-            : this()
-        {
 #if DISABLE_REACTIVEUI
             this.scheduler = GetScheduler(scheduler);
 #else
