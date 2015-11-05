@@ -8,13 +8,14 @@ using System.Reactive.Linq;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
+using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
+using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
-using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -134,6 +135,35 @@ namespace GitHub.Services
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
 
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo)
+        {
+            // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
+            // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
+            // but also individually without duplicating information. We store things in a custom observable collection
+            // that checks whether an item is being updated (coming from the live stream after being retrieved from cache)
+            // and replaces it instead of appending, so items get refreshed in-place as they come in.
+
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
+
+            var col = new TrackingCollection<IPullRequestModel>();
+
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
+                        apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                                 .Select(PullRequestCacheItem.Create),
+                        item => col.RemoveItem(Create(item)),
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
+
+            col.Listen(source);
+            return col;
+        }
+
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
@@ -155,7 +185,7 @@ namespace GitHub.Services
                             "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
                             repositoryType);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] { });
+                        return Observable.Return(new IRepositoryModel[] {});
                     });
         }
 
@@ -193,7 +223,7 @@ namespace GitHub.Services
                             "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] { });
+                        return Observable.Return(new IRepositoryModel[] {});
                     });
         }
 
@@ -221,6 +251,19 @@ namespace GitHub.Services
                 repositoryCacheItem.Private,
                 repositoryCacheItem.Fork,
                 Create(repositoryCacheItem.Owner));
+        }
+
+        IPullRequestModel Create(PullRequestCacheItem prCacheItem)
+        {
+            return new PullRequestModel(
+                prCacheItem.Number,
+                prCacheItem.Title,
+                Create(prCacheItem.Author),
+                prCacheItem.CreatedAt,
+                prCacheItem.UpdatedAt)
+            {
+                CommentCount = prCacheItem.CommentCount
+            };
         }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
@@ -271,8 +314,7 @@ namespace GitHub.Services
                 return new RepositoryCacheItem(apiRepository);
             }
 
-            public RepositoryCacheItem()
-            {}
+            public RepositoryCacheItem() {}
 
             public RepositoryCacheItem(Repository apiRepository)
             {
@@ -293,6 +335,37 @@ namespace GitHub.Services
             public string CloneUrl { get; set; }
             public bool Private { get; set; }
             public bool Fork { get; set; }
+        }
+
+        public class PullRequestCacheItem : CacheItem
+        {
+            public static PullRequestCacheItem Create(PullRequest pr)
+            {
+                return new PullRequestCacheItem(pr);
+            }
+
+            public PullRequestCacheItem() {}
+            public PullRequestCacheItem(PullRequest pr)
+            {
+                Title = pr.Title;
+                Number = pr.Number;
+                CommentCount = pr.Comments;
+                Author = new AccountCacheItem(pr.User);
+                CreatedAt = pr.CreatedAt;
+                UpdatedAt = pr.UpdatedAt;
+
+                Key = Number.ToString(CultureInfo.InvariantCulture);
+                Timestamp = UpdatedAt;
+            }
+
+            [AllowNull]
+            public string Title {[return: AllowNull] get; set; }
+            public int Number { get; set; }
+            public int CommentCount { get; set; }
+            [AllowNull]
+            public AccountCacheItem Author {[return: AllowNull] get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
+            public DateTimeOffset UpdatedAt { get; set; }
         }
     }
 }

@@ -38,7 +38,11 @@ namespace GitHub.Collections
         /// <param name="theFilter">The new filter, or null to not have any filtering</param>
         void SetFilter(Func<T, int, IList<T>, bool> filter);
         void AddItem(T item);
-        T RemoveItem(T item);
+        void RemoveItem(T item);
+        /// <summary>
+        /// How long to delay between processing incoming items
+        /// </summary>
+        TimeSpan ProcessingDelay { get; set; }
         event NotifyCollectionChangedEventHandler CollectionChanged;
     }
 }
