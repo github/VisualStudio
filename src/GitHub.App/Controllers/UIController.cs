@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
-using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -22,6 +21,7 @@ using System.Collections.Generic;
 namespace GitHub.Controllers
 {
     [Export(typeof(IUIController))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class UIController : IUIController, IDisposable
     {
         enum Trigger
@@ -43,7 +43,7 @@ namespace GitHub.Controllers
 
         // holds state machines for each of the individual ui flows
         // does not load UI, merely tracks valid transitions
-        readonly static Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>> machines;
+        readonly Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>> machines;
         readonly Dictionary<UIControllerFlow, Dictionary<UIViewType, UIPair>> uiObjects;
 
         // loads UI for each state corresponding to a view type
@@ -65,13 +65,6 @@ namespace GitHub.Controllers
         NotifyCollectionChangedEventHandler connectionAdded;
 
         bool stopping;
-
-
-        static UIController()
-        {
-            machines = new Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>>();
-            ConfigureStates();
-        }
 
         [ImportingConstructor]
         public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
@@ -99,8 +92,10 @@ namespace GitHub.Controllers
                 }
             }
 #endif
-            uiStateMachine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            machines = new Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>>();
+            ConfigureStates();
 
+            uiStateMachine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             ConfigureUIHandlingStates();
         }
 
@@ -177,7 +172,7 @@ namespace GitHub.Controllers
             uiStateMachine.Configure(UIViewType.End)
                 .OnEntry(() =>
                 {
-                    Dictionary<UIViewType, UIPair> list = GetObjectsForFlow(activeFlow);
+                    var list = GetObjectsForFlow(activeFlow);
                     foreach (var i in list.Values)
                         i.ClearHandlers();
 
@@ -194,7 +189,7 @@ namespace GitHub.Controllers
                 // clear all the views and viewmodels created by a subflow
                 .OnExit(() =>
                 {
-                    Dictionary<UIViewType, UIPair> list = GetObjectsForFlow(activeFlow);
+                    var list = GetObjectsForFlow(activeFlow);
                     foreach (var i in list.Values)
                         i.Dispose();
                     list.Clear();
@@ -231,7 +226,7 @@ namespace GitHub.Controllers
         /// Configure all the logical state transitions for each of the
         /// ui flows we support.
         /// </summary>
-        static void ConfigureStates()
+        void ConfigureStates()
         {
             StateMachine<UIViewType, Trigger> logic;
 
