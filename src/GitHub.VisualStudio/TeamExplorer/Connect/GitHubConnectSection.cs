@@ -199,6 +199,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     else
                         HandleClonedRepo(newrepo);
 
+                    isCreating = isCloning = false;
                     var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
                     newrepo.SetIcon(repo.Private, repo.Fork);
                 }
