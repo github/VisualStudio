@@ -8,6 +8,7 @@
                                   xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                                  Background="Transparent"
                                   DataContext="{Binding ViewModel}"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
