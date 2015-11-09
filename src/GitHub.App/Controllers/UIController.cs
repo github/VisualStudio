@@ -494,6 +494,10 @@ namespace GitHub.Controllers
 
         public bool IsStopped => uiStateMachine.IsInState(UIViewType.None) || stopping;
 
+        /// <summary>
+        /// This class holds ExportLifetimeContexts (i.e., Lazy Disposable containers) for IView and IViewModel objects
+        /// A view type (login, clone, etc) is composed of a pair of view and viewmodel, which this class represents.
+        /// </summary>
         class UIPair : IDisposable
         {
             ExportLifetimeContext<IView> view;
@@ -505,6 +509,10 @@ namespace GitHub.Controllers
             public IView View => view.Value;
             public IViewModel ViewModel => viewModel?.Value;
 
+            /// <param name="type">The UIViewType</param>
+            /// <param name="v">The IView</param>
+            /// <param name="vm">The IViewModel. Might be null because the 2fa view shares the same viewmodel as the login dialog, so it's
+            /// set manually in the view outside of this</param>
             public UIPair(UIViewType type, ExportLifetimeContext<IView> v, [AllowNull]ExportLifetimeContext<IViewModel> vm)
             {
                 viewType = type;
@@ -513,6 +521,11 @@ namespace GitHub.Controllers
                 handlers = new CompositeDisposable();
             }
 
+            /// <summary>
+            /// Register disposable event handlers or observable subscriptions so they get cleared
+            /// when the View/Viewmodel get disposed/destroyed
+            /// </summary>
+            /// <param name="disposable"></param>
             public void AddHandler(IDisposable disposable)
             {
                 handlers.Add(disposable);
