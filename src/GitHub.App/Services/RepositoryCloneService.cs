@@ -15,7 +15,7 @@ namespace GitHub.Services
     /// by Team Explorer.
     /// </summary>
     [Export(typeof(IRepositoryCloneService))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
