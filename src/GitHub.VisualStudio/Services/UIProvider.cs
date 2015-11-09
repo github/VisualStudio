@@ -153,9 +153,12 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            var batch = new CompositionBatch();
             string contract = AttributedModelServices.GetContractName(t);
+            if (tempParts.ContainsKey(contract))
+                RemoveService(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+
+            var batch = new CompositionBatch();
             var part = batch.AddExportedValue(contract, instance);
             Debug.Assert(part != null, "Adding an exported value must return a non-null part");
             tempParts.Add(contract, part);
