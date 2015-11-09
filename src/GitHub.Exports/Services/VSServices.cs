@@ -43,7 +43,7 @@ namespace GitHub.Services
         readonly IServiceProvider serviceProvider;
 
         [ImportingConstructor]
-        public VSServices(IServiceProvider serviceProvider)
+        public VSServices(IUIProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
