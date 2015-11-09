@@ -71,7 +71,7 @@ namespace GitHub.Api
                 }
             }
             // it'll throw if it's private or an enterprise instance requiring authentication
-            catch (ForbiddenException)
+            catch (ApiException)
             {
                 if (!HostAddress.IsGitHubDotComUri(OriginalUrl.ToRepositoryUrl()))
                     isEnterprise = true;
