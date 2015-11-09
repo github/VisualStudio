@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
+using GitHub.Caches;
 
 namespace GitHub.Extensions
 {
@@ -14,6 +17,7 @@ namespace GitHub.Extensions
         /// the stale value will be produced first, followed by the fresh value
         /// when the fetch func completes.
         /// </summary>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
         /// <param name="key">The key to look up the cache value with.</param>
         /// <param name="fetchFunc">The fetch function.</param>
         /// <param name="refreshInterval">
@@ -59,6 +63,7 @@ namespace GitHub.Extensions
         /// the stale value will be produced first, followed by the fresh value
         /// when the fetch func completes.
         /// </summary>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
         /// <param name="key">The key to look up the cache value with.</param>
         /// <param name="fetchFunc">The fetch function.</param>
         /// <param name="refreshInterval">
@@ -133,10 +138,105 @@ namespace GitHub.Extensions
                 .RefCount();
         }
 
+        /// <summary>
+        /// This method attempts to return a series of cached value(s) aggregated by
+        /// a <paramref name="key"/>. In the case of a
+        /// cache miss the fetchFunc will be used to provide a fresh value which
+        /// is then returned. In the case of a cache hit where the cache item is
+        /// considered stale (but not expired) as determined by <paramref name="refreshInterval"/>
+        /// the stale values will be produced first, followed by the fresh values
+        /// when the fetch func completes.
+        /// </summary>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
+        /// <param name="key">The key to look up the cache value with.</param>
+        /// <param name="fetchFunc">The fetch function.</param>
+        /// <param name="removedItemsCallback">The callback that receives items that
+        /// were a part of the cache but not of the list list of values.</param>
+        /// <param name="refreshInterval">
+        /// Cache objects with an age exceeding this value will be treated as stale
+        /// and the fetch function will be invoked to refresh it.
+        /// </param>
+        /// <param name="maxCacheDuration">
+        /// The maximum age of a cache object before the object is treated as
+        /// expired and unusable. Cache objects older than this will be treated
+        /// as a cache miss.
+        /// </param>
+        public static IObservable<T> GetAndFetchLatestFromIndex<T>(
+            this IBlobCache blobCache,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            Action<T> removedItemsCallback,
+            TimeSpan refreshInterval,
+            TimeSpan maxCacheDuration)
+                where T : CacheItem
+        {
+            return Observable.Defer(() =>
+            {
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
+
+                try
+                {
+                    return blobCache.GetAndFetchLatestFromIndex(
+                        key,
+                        fetchFunc,
+                        removedItemsCallback,
+                        createdAt => IsExpired(blobCache, createdAt, refreshInterval),
+                        absoluteExpiration);
+                }
+                catch (Exception exc)
+                {
+                    return Observable.Throw<T>(exc);
+                }
+            });
+        }
+
+        static IObservable<T> GetAndFetchLatestFromIndex<T>(this IBlobCache This,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            Action<T> removedItemsCallback,
+            Func<DateTimeOffset, bool> fetchPredicate = null,
+            DateTimeOffset? absoluteExpiration = null,
+            bool shouldInvalidateOnError = false)
+                where T : CacheItem
+        {
+            var fetch = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                .Select(x => Tuple.Create(x, fetchPredicate == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
+                .Where(predicateIsTrue => predicateIsTrue.Item2)
+                .Select(x => x.Item1)
+                .SelectMany(index => index.Clear(This, key, absoluteExpiration))
+                .SelectMany(index =>
+                {
+                    var fetchObs = fetchFunc().Catch<T, Exception>(ex =>
+                    {
+                        var shouldInvalidate = shouldInvalidateOnError ?
+                            This.InvalidateObject<CacheIndex>(key) :
+                            Observable.Return(Unit.Default);
+                        return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
+                    });
+
+                    return fetchObs
+                        .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
+                        .Do(x => index.AddAndSave(This, key, x, absoluteExpiration))
+                        .Finally(() =>
+                        {
+                            This.GetObjects<T>(index.OldKeys.Except(index.Keys))
+                                .Do(dict => This.InvalidateObjects<T>(dict.Keys))
+                                .SelectMany(dict => dict.Values)
+                                .Do(removedItemsCallback)
+                                .Subscribe();
+                        });
+                }));
+
+            var cache = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                .SelectMany(index => This.GetObjects<T>(index.Keys))
+                .SelectMany(dict => dict.Values));
+
+            return cache.Merge(fetch).Replay().RefCount();
+        }
+
         static bool IsExpired(IBlobCache blobCache, DateTimeOffset itemCreatedAt, TimeSpan cacheDuration)
         {
-            var now = blobCache.Scheduler.Now;
-            var elapsed = now - itemCreatedAt;
+            var elapsed = blobCache.Scheduler.Now - itemCreatedAt.ToUniversalTime();
 
             return elapsed > cacheDuration;
         }

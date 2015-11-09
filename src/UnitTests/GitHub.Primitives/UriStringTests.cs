@@ -5,7 +5,7 @@ using Xunit;
 
 public class UriStringTests
 {
-    public class TheConstructor
+    public class TheConstructor : TestBaseClass
     {
         [Theory]
         [InlineData("http://192.168.1.3/foo/bar.git", "192.168.1.3", "foo", "bar")]
@@ -107,7 +107,7 @@ public class UriStringTests
         }
     }
 
-    public class TheNameWithOwnerProperty
+    public class TheNameWithOwnerProperty : TestBaseClass
     {
         [Theory]
         [InlineData("http://192.168.1.3/foo/bar.git", "foo/bar")]
@@ -125,7 +125,7 @@ public class UriStringTests
         }
     }
 
-    public class TheCombineMethod
+    public class TheCombineMethod : TestBaseClass
     {
         [Theory]
         [InlineData("http://example.com", "foo/bar", @"http://example.com/foo/bar")]
@@ -146,7 +146,7 @@ public class UriStringTests
         }
     }
 
-    public class TheIsValidUriProperty
+    public class TheIsValidUriProperty : TestBaseClass
     {
         [Theory]
         [InlineData("http://example.com/", true)]
@@ -159,7 +159,7 @@ public class UriStringTests
         }
     }
 
-    public class TheToRepositoryUrlMethod
+    public class TheToRepositoryUrlMethod : TestBaseClass
     {
         [Theory]
         [InlineData("file:///C:/dev/exp/foo", "file:///C:/dev/exp/foo")]
@@ -200,7 +200,7 @@ public class UriStringTests
         }
     }
 
-    public class TheAdditionOperator
+    public class TheAdditionOperator : TestBaseClass
     {
         [Theory]
         [InlineData("http://example.com", "foo/bar", @"http://example.com/foo/bar")]
@@ -223,7 +223,7 @@ public class UriStringTests
         }
     }
 
-    public class ImplicitConversionToString
+    public class ImplicitConversionToString : TestBaseClass
     {
         [Fact]
         public void ConvertsBackToString()
@@ -243,7 +243,7 @@ public class UriStringTests
         }
     }
 
-    public class ImplicitConversionFromString
+    public class ImplicitConversionFromString : TestBaseClass
     {
         [Fact]
         public void ConvertsToCloneUri()
@@ -260,7 +260,7 @@ public class UriStringTests
         }
     }
 
-    public class TheIsHypertextTransferProtocolProperty
+    public class TheIsHypertextTransferProtocolProperty : TestBaseClass
     {
         [Theory]
         [InlineData("http://example.com", true)]
@@ -277,7 +277,7 @@ public class UriStringTests
         }
     }
 
-    public class TheEqualsMethod
+    public class TheEqualsMethod : TestBaseClass
     {
         [Theory]
         [InlineData("https://github.com/foo/bar", "https://github.com/foo/bar", true)]

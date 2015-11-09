@@ -13,6 +13,7 @@ public class SimpleApiClientFactoryTests
         [Fact]
         public void CreatesNewInstanceOfSimpleApiClient()
         {
+            const string url = "https://github.com/github/CreatesNewInstanceOfSimpleApiClient";
             var program = new Program();
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
@@ -21,11 +22,11 @@ public class SimpleApiClientFactoryTests
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
-            var client = factory.Create("https://github.com/github/visualstudio");
+            var client = factory.Create(url);
 
-            Assert.Equal("https://github.com/github/visualstudio", client.OriginalUrl);
+            Assert.Equal(url, client.OriginalUrl);
             Assert.Equal(HostAddress.GitHubDotComHostAddress, client.HostAddress);
-            Assert.Same(client, factory.Create("https://github.com/github/visualstudio")); // Tests caching.
+            Assert.Same(client, factory.Create(url)); // Tests caching.
         }
     }
 
@@ -34,6 +35,7 @@ public class SimpleApiClientFactoryTests
         [Fact]
         public void RemovesClientFromCache()
         {
+            const string url = "https://github.com/github/RemovesClientFromCache";
             var program = new Program();
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
@@ -42,10 +44,10 @@ public class SimpleApiClientFactoryTests
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
                 new Lazy<IWikiProbe>(() => wikiProbe));
 
-            var client = factory.Create("https://github.com/github/visualstudio");
+            var client = factory.Create(url);
             factory.ClearFromCache(client);
 
-            Assert.NotSame(client, factory.Create("https://github.com/github/visualstudio"));
+            Assert.NotSame(client, factory.Create(url));
         }
     }
 }

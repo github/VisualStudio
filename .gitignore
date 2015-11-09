@@ -234,4 +234,5 @@ AkavacheSqliteLinkerOverride.cs
 NuGetBuild
 WiX.Toolset.DummyFile.txt
 nunit-UnitTests.xml
+nunit-TrackingCollectionTests.xml
 GitHubVS.sln.DotSettings
