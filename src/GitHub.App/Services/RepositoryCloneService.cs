@@ -30,7 +30,7 @@ namespace GitHub.Services
             this.operatingSystem = operatingSystem;
             this.vsservices = vsservices;
 
-            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserDocumentsPathForApplication());
+            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
