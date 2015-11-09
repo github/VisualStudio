@@ -82,6 +82,15 @@
         - [ ] Progress bar appears above Synchronization title
         - [ ] Team Explorer view changes to Home page
         - [ ] Notification appears: "Repository published successfully"
+        - [ ] Publish a private repo and verify on .com that it's private 
+- [ ] **Project section (Home button)*** 
+    - [ ] Click on "Home" icon 
+        - [ ] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
+        - [ ] Verify Pulse button navigates to Pulse page on Github.com
+        - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
+        - [ ] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
+        - [ ] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
+        
         
 # Connect page when logged in to TFS
    - [ ] **Connect to a TFS project**
