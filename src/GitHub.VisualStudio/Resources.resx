@@ -276,6 +276,9 @@
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
   </data>
+  <data name="NotLoggedInMessage" xml:space="preserve">
+    <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
+  </data>
   <data name="prOpenedText" xml:space="preserve">
     <value>opened</value>
   </data>

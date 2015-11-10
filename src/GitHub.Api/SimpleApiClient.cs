@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
+using GitHub.Extensions;
 
 namespace GitHub.Api
 {
@@ -23,10 +24,13 @@ namespace GitHub.Api
         bool? isEnterprise;
         bool? hasWiki;
 
-        public SimpleApiClient(HostAddress hostAddress, UriString repoUrl, IGitHubClient githubClient,
+        public SimpleApiClient(UriString repoUrl, IGitHubClient githubClient,
             Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
         {
-            HostAddress = hostAddress;
+            Guard.ArgumentNotNull(repoUrl, nameof(repoUrl));
+            Guard.ArgumentNotNull(githubClient, nameof(githubClient));
+
+            HostAddress = HostAddress.Create(repoUrl);
             OriginalUrl = repoUrl;
             client = githubClient;
             this.enterpriseProbe = enterpriseProbe;
@@ -48,7 +52,7 @@ namespace GitHub.Api
             await sem.WaitAsync();
             try
             {
-                if (owner == null && OriginalUrl != null)
+                if (owner == null)
                 {
                     var ownerLogin = OriginalUrl.Owner;
                     var repositoryName = OriginalUrl.RepositoryName;
@@ -66,7 +70,12 @@ namespace GitHub.Api
                     }
                 }
             }
-            // it'll throw if it's private
+            // it'll throw if it's private or an enterprise instance requiring authentication
+            catch (ApiException)
+            {
+                if (!HostAddress.IsGitHubDotComUri(OriginalUrl.ToRepositoryUrl()))
+                    isEnterprise = true;
+            }
             catch {}
             finally
             {

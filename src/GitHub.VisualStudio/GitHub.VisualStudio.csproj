@@ -247,7 +247,9 @@
     <Compile Include="TeamExplorer\Home\IssuesNavigationItem.cs" />
     <Compile Include="TeamExplorer\Home\WikiNavigationItem.cs" />
     <Compile Include="TeamExplorer\Home\PulseNavigationItem.cs" />
+    <Compile Include="TeamExplorer\Sync\EnsureLoggedInSectionSync.cs" />
     <Compile Include="TeamExplorer\Sync\GitHubPublishSection.cs" />
+    <Compile Include="Base\EnsureLoggedInSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
