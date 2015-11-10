@@ -15,7 +15,7 @@ namespace GitHub.Services
     /// by Team Explorer.
     /// </summary>
     [Export(typeof(IRepositoryCloneService))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
@@ -30,7 +30,7 @@ namespace GitHub.Services
             this.operatingSystem = operatingSystem;
             this.vsservices = vsservices;
 
-            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserDocumentsPathForApplication());
+            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
         public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
