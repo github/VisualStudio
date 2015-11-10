@@ -72,12 +72,13 @@ namespace GitHub.VisualStudio.Base
 
             SimpleApiClient = apiFactory.Create(uri);
 
-            if (!HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl()))
+            var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
+            if (!isdotcom)
             {
                 var repo = await SimpleApiClient.GetRepository();
-                return repo.FullName == ActiveRepoName && SimpleApiClient.IsEnterprise();
+                return (repo.FullName == ActiveRepoName || repo.Id == 0) && SimpleApiClient.IsEnterprise();
             }
-            return true;
+            return isdotcom;
         }
 
         bool isEnabled;

@@ -385,6 +385,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are not logged in to {0}, so certain git operations may fail. [Login now]({1}).
+        /// </summary>
+        public static string NotLoggedInMessage {
+            get {
+                return ResourceManager.GetString("NotLoggedInMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         public static string openTwoFactorAuthAppText {

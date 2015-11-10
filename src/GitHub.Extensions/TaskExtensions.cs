@@ -20,5 +20,8 @@ namespace GitHub.Extensions
                 return default(T);
             }
         }
+        public static void Forget(this Task task)
+        {
+        }
     }
 }
