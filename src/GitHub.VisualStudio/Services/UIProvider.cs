@@ -22,9 +22,8 @@ using System.Windows.Controls;
 namespace GitHub.VisualStudio
 {
     [Export(typeof(IUIProvider))]
-    [Export(typeof(IServiceProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class UIProvider : IServiceProvider, IUIProvider, IDisposable
+    public class UIProvider : IUIProvider, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         CompositeDisposable disposables = new CompositeDisposable();

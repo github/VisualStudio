@@ -1,7 +1,6 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using GitHub.Extensions;
+﻿using System.ComponentModel.Composition;
 using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.ViewModels
 {
@@ -10,7 +9,7 @@ namespace GitHub.ViewModels
     public class ConnectionRepositoryHostMap : IConnectionRepositoryHostMap
     {
         [ImportingConstructor]
-        public ConnectionRepositoryHostMap(IServiceProvider provider, IRepositoryHosts hosts)
+        public ConnectionRepositoryHostMap(IUIProvider provider, IRepositoryHosts hosts)
             : this(provider.GetService<IConnection>(), hosts)
         {
         }

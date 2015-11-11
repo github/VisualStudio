@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Reflection;
 using ReactiveUI;
 using NullGuard;
+using GitHub.Services;
 
 namespace GitHub.Validation
 {
@@ -22,7 +23,7 @@ namespace GitHub.Validation
         readonly Dictionary<string, bool> enabledProperties = new Dictionary<string, bool>();
         bool validationEnabled = true;
 
-        public ReactiveValidatableObject([AllowNull]IServiceProvider serviceProvider)
+        public ReactiveValidatableObject([AllowNull]IUIProvider serviceProvider)
         {
             validatedProperties = typeValidatorsMap.GetOrAdd(GetType(), GetValidatedProperties);
             this.serviceProvider = serviceProvider; // This is allowed to be null.

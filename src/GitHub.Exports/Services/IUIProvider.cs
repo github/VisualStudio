@@ -6,11 +6,10 @@ using System.Windows.Controls;
 
 namespace GitHub.Services
 {
-    public interface IUIProvider
+    public interface IUIProvider : IServiceProvider
     {
         ExportProvider ExportProvider { get; }
         IServiceProvider GitServiceProvider { get; set; }
-        object GetService(Type t);
         T GetService<T>();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         Ret GetService<T, Ret>() where Ret : class;
