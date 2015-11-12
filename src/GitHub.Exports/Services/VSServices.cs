@@ -13,6 +13,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace GitHub.Services
 {
@@ -147,35 +148,47 @@ namespace GitHub.Services
         const string MRUKeyPath = "MRUSettingsLocalProjectLocationEntries";
         public string SetDefaultProjectPath(string path)
         {
-            string old;
-            using (var newProjectKey = Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true))
+            var old = String.Empty;
+            try
             {
-                using (var mruKey = newProjectKey?.OpenSubKey(MRUKeyPath, true))
+                var newProjectKey = Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true) ??
+                                    Registry.CurrentUser.CreateSubKey(NewProjectDialogKeyPath);
+                Debug.Assert(newProjectKey != null, string.Format(CultureInfo.CurrentCulture, "Could not open or create registry key '{0}'", NewProjectDialogKeyPath));
+
+                using (newProjectKey)
                 {
-                    if (mruKey == null)
-                        return String.Empty;
+                    var mruKey = newProjectKey.OpenSubKey(MRUKeyPath, true) ??
+                                 Registry.CurrentUser.CreateSubKey(MRUKeyPath);
+                    Debug.Assert(mruKey != null, string.Format(CultureInfo.CurrentCulture, "Could not open or create registry key '{0}'", MRUKeyPath));
 
-                    // is this already the default path? bail
-                    old = (string)mruKey.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-                    if (String.Equals(path.TrimEnd('\\'), old.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase))
-                        return old;
-
-                    // grab the existing list of recent paths, throwing away the last one
-                    var numEntries = (int)mruKey.GetValue("MaximumEntries", 5);
-                    var entries = new List<string>(numEntries);
-                    for (int i = 0; i < numEntries - 1; i++)
+                    using (mruKey)
                     {
-                        var val = (string)mruKey.GetValue("Value" + i, String.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-                        if (!String.IsNullOrEmpty(val))
-                            entries.Add(val);
-                    }
+                        // is this already the default path? bail
+                        old = (string)mruKey.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                        if (String.Equals(path.TrimEnd('\\'), old.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase))
+                            return old;
 
-                    newProjectKey.SetValue("LastUsedNewProjectPath", path);
-                    mruKey.SetValue("Value0", path);
-                    // bump list of recent paths one entry down
-                    for (int i = 0; i < entries.Count; i++)
-                        mruKey.SetValue("Value" + (i+1), entries[i]);
+                        // grab the existing list of recent paths, throwing away the last one
+                        var numEntries = (int)mruKey.GetValue("MaximumEntries", 5);
+                        var entries = new List<string>(numEntries);
+                        for (int i = 0; i < numEntries - 1; i++)
+                        {
+                            var val = (string)mruKey.GetValue("Value" + i, String.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                            if (!String.IsNullOrEmpty(val))
+                                entries.Add(val);
+                        }
+
+                        newProjectKey.SetValue("LastUsedNewProjectPath", path);
+                        mruKey.SetValue("Value0", path);
+                        // bump list of recent paths one entry down
+                        for (int i = 0; i < entries.Count; i++)
+                            mruKey.SetValue("Value" + (i + 1), entries[i]);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error setting the create project path in the registry '{0}'", ex));
             }
             return old;
         }
