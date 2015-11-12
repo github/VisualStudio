@@ -262,7 +262,8 @@ namespace GitHub.Services
                 prCacheItem.CreatedAt,
                 prCacheItem.UpdatedAt)
             {
-                CommentCount = prCacheItem.CommentCount
+                CommentCount = prCacheItem.CommentCount,
+                IsOpen = prCacheItem.IsOpen
             };
         }
 
