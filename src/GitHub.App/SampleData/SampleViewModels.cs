@@ -32,27 +32,6 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class GitHubPaneViewModelDesigner_PRList : BaseViewModelDesigner, IGitHubPaneViewModel
-    {
-        public GitHubPaneViewModelDesigner_PRList()
-        {            
-            var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "GitHub.VisualStudio");
-            var t = asm?.GetType("GitHub.VisualStudio.UI.Views.PullRequestListView");
-            IView inst = null;
-            if (t != null)
-            {
-                inst = (IView)Activator.CreateInstance(t);
-                inst.ViewModel = new PullRequestListViewModelDesigner();
-            }
-            Control = inst;
-        }
-
-        public string ActiveRepoName { get { return "Repo Name"; } }
-
-        public IView Control { get; set; }
-    }
-
-    [ExcludeFromCodeCoverage]
     public class PullRequestListViewModelDesigner : BaseViewModelDesigner, IPullRequestListViewModel
     {
         public PullRequestListViewModelDesigner()
