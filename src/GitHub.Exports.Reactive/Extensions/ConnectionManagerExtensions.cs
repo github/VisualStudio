@@ -3,6 +3,7 @@ using GitHub.Models;
 using System;
 using ReactiveUI;
 using GitHub.Primitives;
+using System.Linq;
 
 namespace GitHub.Extensions
 {
@@ -27,8 +28,7 @@ namespace GitHub.Extensions
 
         public static IObservable<IConnection> LookupConnection(this IConnectionManager cm, ISimpleRepositoryModel repository)
         {
-            return cm.Connections.ToObservable()
-                    .Where(c => c.HostAddress.Equals(HostAddress.Create(repository.CloneUrl)));
+            return Observable.Return(cm.Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(repository.CloneUrl))));
         }
     }
 }

@@ -38,8 +38,6 @@ namespace GitHub.VisualStudio.UI.Views
             DataContextChanged += (s, e) => ViewModel = e.NewValue as GitHubPaneViewModel;
             this.WhenActivated(d =>
             {
-                //d(this.OneWayBind(ViewModel, vm => vm.Controls, v => v.container.ItemsSource));
-                //d(this.OneWayBind(ViewModel, vm => vm.Control, v => v.container.ItemsSource));
             });
         }
     }
@@ -49,8 +47,8 @@ namespace GitHub.VisualStudio.UI.Views
     public class GitHubPaneViewModel : TeamExplorerSectionBase, IGitHubPaneViewModel
     {
         CompositeDisposable disposables = new CompositeDisposable();
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         IUIController uiController;
+        WindowController windowController;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         bool loggedIn;
@@ -96,39 +94,47 @@ namespace GitHub.VisualStudio.UI.Views
         {
             if (uiController != null)
             {
+                windowController?.Close();
                 uiController.Stop();
                 disposables.Clear();
                 uiController = null;
             }
 
-            WindowController windowController = null;
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
             disposables.Add(uiflow);
             uiController = uiflow.Value;
-            var creation = uiController.SelectFlow(controllerFlow);
+            var creation = uiController.SelectFlow(controllerFlow).Publish().RefCount();
+
+            // if the flow is authentication, we need to show the login dialog. and we can't
+            // block the main thread on the subscriber, it'll block other handlers, so we're doing
+            // this on a separate thread and posting the dialog to the main thread
             creation
+                .Where(c => uiController.CurrentFlow == UIControllerFlow.Authentication)
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Subscribe(c =>
                 {
-                    if (uiController.CurrentFlow == UIControllerFlow.Authentication)
+                    // nothing to do, we already have a dialog
+                    if (windowController != null)
+                        return;
+                    syncContext.Post(_ =>
                     {
-                        syncContext.Post(_ =>
-                        {
-                            windowController = new WindowController(creation);
-                            windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                            Control = c;
-                            windowController.ShowModal();
-                        }, null);
-                    }
-                    else
-                    {
-                        syncContext.Post(_ =>
-                        {
-                            Control = c;
-                        }, null);
-                    }
+                        windowController = new WindowController(creation,
+                            __ => uiController.CurrentFlow == UIControllerFlow.Authentication,
+                            ___ => uiController.CurrentFlow != UIControllerFlow.Authentication);
+                        windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                        windowController.Load(c);
+                        windowController.ShowModal();
+                        windowController = null;
+                    }, null);
+                });
+
+            creation
+                .Where(c => uiController.CurrentFlow != UIControllerFlow.Authentication)
+                .Subscribe(c =>
+                {
+                    Control = c;
                 });
 
             var connection = await connectionManager.LookupConnection(ActiveRepo);
