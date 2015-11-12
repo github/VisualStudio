@@ -21,7 +21,8 @@ namespace GitHub.VisualStudio.Helpers
             "GitHub.Extensions.Reactive",
             "GitHub.UI",
             "GitHub.UI.Reactive",
-            "GitHub.VisualStudio"
+            "GitHub.VisualStudio",
+            "System.Windows.Interactivity"
         };
 
         static SharedDictionaryManager()

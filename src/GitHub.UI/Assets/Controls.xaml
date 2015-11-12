@@ -12,6 +12,7 @@
         <ResourceDictionary Source="Controls/LightModalViewTabControl.xaml" />
         <ResourceDictionary Source="Controls/ScrollViewerWithShadow.xaml" />
         <ResourceDictionary Source="Controls/LightListBox.xaml" />
+        <ResourceDictionary Source="Controls/GitHubActionLink.xaml" />
         <ResourceDictionary Source="../Controls/Octicons/OcticonImage.xaml" />
     </ResourceDictionary.MergedDictionaries>
 

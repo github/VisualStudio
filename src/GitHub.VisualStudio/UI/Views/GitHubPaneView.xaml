@@ -73,22 +73,28 @@
   </UserControl.Resources>
 
   <DockPanel>
-    <StackPanel Margin="6,9,9,5" DockPanel.Dock="Top" Orientation="Horizontal">
+    <StackPanel Margin="6,9,9,5"
+                DockPanel.Dock="Top"
+                Orientation="Horizontal">
       <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"
                  Foreground="{DynamicResource VsBrush.CommandBarTextActive}"
                  Text="{x:Static prop:Resources.PullRequestsNavigationItemText}" />
-      <Separator Margin="5,-2,5,0" Foreground="{DynamicResource VsBrush.CommandBarTextInactive}" Style="{StaticResource TitleVerticalSeparator}" />
+      <Separator Margin="5,-2,5,0"
+                 Foreground="{DynamicResource VsBrush.CommandBarTextInactive}"
+                 Style="{StaticResource TitleVerticalSeparator}" />
       <TextBlock Margin="0,-5,0,0"
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource VsBrush.CommandBarTextInactive}"
                  Text="{Binding ActiveRepo.Name}" />
     </StackPanel>
 
-    <Separator Margin="0,0,0,9" DockPanel.Dock="Top" Style="{StaticResource PaneHorizontalSeparator}" />
+    <Separator Margin="0,0,0,9"
+               DockPanel.Dock="Top"
+               Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <UserControl x:Name="container" Content="{Binding Control}"/>
+    <UserControl x:Name="container" Content="{Binding Control}" />
 
   </DockPanel>
 </view:GenericGitHubPaneView>

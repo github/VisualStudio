@@ -12,6 +12,57 @@
   <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
   <ui:DurationToStringConverter x:Key="DurationToStringConverter" />
 
+  <Style x:Key="PRLink" TargetType="{x:Type Button}">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Foreground" Value="{DynamicResource VsBrush.ControlLinkText}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <TextBlock>
+            <Hyperlink Foreground="{TemplateBinding Foreground}">
+              <Hyperlink.Resources>
+                <Style TargetType="{x:Type Hyperlink}">
+                  <Style.Triggers>
+                    <MultiTrigger>
+                      <MultiTrigger.Conditions>
+                        <Condition Property="UIElement.IsMouseOver" Value="false" />
+                        <Condition Property="IsEnabled" Value="true" />
+                      </MultiTrigger.Conditions>
+                      <MultiTrigger.Setters>
+                        <Setter Property="TextDecorations" Value="None" />
+                        <Setter Property="FrameworkElement.Cursor" Value="None" />
+                      </MultiTrigger.Setters>
+                    </MultiTrigger>
+                    <MultiTrigger>
+                      <MultiTrigger.Conditions>
+                        <Condition Property="IsMouseOver" Value="true" />
+                        <Condition Property="IsEnabled" Value="true" />
+                      </MultiTrigger.Conditions>
+                      <MultiTrigger.Setters>
+                        <Setter Property="TextDecorations" Value="Underline" />
+                        <Setter Property="FrameworkElement.Cursor" Value="Hand" />
+                      </MultiTrigger.Setters>
+                    </MultiTrigger>
+                    <MultiTrigger>
+                      <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="false" />
+                      </MultiTrigger.Conditions>
+                      <MultiTrigger.Setters>
+                        <Setter Property="TextDecorations" Value="None" />
+                      </MultiTrigger.Setters>
+                    </MultiTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Hyperlink.Resources>
+              <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, StringFormat=#{0}}" />
+            </Hyperlink>
+          </TextBlock>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <DataTemplate x:Key="PullRequestItemTemplate" DataType="models:IPullRequestModel">
     <Grid>
       <Grid.RowDefinitions>
@@ -31,7 +82,7 @@
              Grid.Column="0"
              Width="32"
              Height="32"
-             Margin="3,0,9,0"
+             Margin="0,0,9,0"
              RenderOptions.BitmapScalingMode="HighQuality"
              Source="{Binding Author.Avatar}" />
       <TextBlock x:Name="title"
@@ -42,7 +93,8 @@
                  FontFamily="Segoe UI"
                  FontSize="14"
                  Foreground="{DynamicResource VsBrush.WindowText}"
-                 Text="{Binding Title}" />
+                 Text="{Binding Title}"
+                 TextWrapping="WrapWithOverflow" />
       <ui:OcticonImage x:Name="comment_icon"
                        Grid.Row="0"
                        Grid.Column="2"
@@ -93,7 +145,8 @@
                        VerticalAlignment="Center"
                        Foreground="Green"
                        Icon="primitive_dot"
-                       Visibility="{Binding HasNewComments, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                       Visibility="{Binding HasNewComments,
+                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
       <Grid x:Name="status"
             Grid.Row="1"
             Grid.Column="1"
@@ -106,10 +159,10 @@
         <Button x:Name="cloneLink"
                 Grid.Column="0"
                 Command="{Binding OpenPR}"
-                Content="{Binding Number, StringFormat={}#{0}}"
+                Content="{Binding Number}"
                 FontFamily="Segoe UI"
                 FontSize="11"
-                Style="{StaticResource ActionLinkButton}" />
+                Style="{StaticResource PRLink}" />
         <TextBlock x:Name="description"
                    Grid.Column="1"
                    FontFamily="Segoe UI"
@@ -118,7 +171,7 @@
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2} {3}">
               <Binding Source="{x:Static i18n:Resources.prOpenedText}" />
-              <Binding Path="UpdatedAt" Converter="{StaticResource DurationToStringConverter}" />
+              <Binding Converter="{StaticResource DurationToStringConverter}" Path="UpdatedAt" />
               <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
               <Binding Path="Author.Login" />
             </MultiBinding>
