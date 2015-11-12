@@ -13,6 +13,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace GitHub.Services
 {
@@ -150,15 +151,15 @@ namespace GitHub.Services
             var old = String.Empty;
             try
             {
-                var newProjectKey = Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true);
-                if (newProjectKey == null)
-                    newProjectKey = Registry.CurrentUser.CreateSubKey(NewProjectDialogKeyPath);
+                var newProjectKey = Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true) ??
+                                    Registry.CurrentUser.CreateSubKey(NewProjectDialogKeyPath);
+                Debug.Assert(newProjectKey != null, string.Format(CultureInfo.CurrentCulture, "Could not open or create registry key '{0}'", NewProjectDialogKeyPath));
 
                 using (newProjectKey)
                 {
-                    var mruKey = newProjectKey.OpenSubKey(MRUKeyPath, true);
-                    if (mruKey == null)
-                        mruKey = Registry.CurrentUser.CreateSubKey(MRUKeyPath);
+                    var mruKey = newProjectKey.OpenSubKey(MRUKeyPath, true) ??
+                                 Registry.CurrentUser.CreateSubKey(MRUKeyPath);
+                    Debug.Assert(mruKey != null, string.Format(CultureInfo.CurrentCulture, "Could not open or create registry key '{0}'", MRUKeyPath));
 
                     using (mruKey)
                     {
