@@ -353,7 +353,7 @@ namespace GitHub.Services
                 Author = new AccountCacheItem(pr.User);
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
-
+                IsOpen = pr.State == ItemState.Open;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
             }
@@ -366,6 +366,7 @@ namespace GitHub.Services
             public AccountCacheItem Author {[return: AllowNull] get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
+            public bool IsOpen { get; set; }
         }
     }
 }

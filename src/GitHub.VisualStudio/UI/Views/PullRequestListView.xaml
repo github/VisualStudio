@@ -27,7 +27,7 @@
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/UI/Views/Controls/PullRequestListItem.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/UI/Views/Controls/PullRequestListItem.xaml" />
       </ResourceDictionary.MergedDictionaries>
       <ui:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
 
@@ -80,7 +80,8 @@
               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
               VirtualizingPanel.ScrollUnit="Pixel"
               VirtualizingPanel.VirtualizationMode="Recycling"
-              Visibility="{Binding PullRequests, Converter={StaticResource HasItemsVisibilityConverter}}" />
+              />
+              <!-- Visibility="{Binding PullRequests, Converter={StaticResource HasItemsVisibilityConverter}}" / -->
 
   </Grid>
 </local:GenericPullRequestListView>

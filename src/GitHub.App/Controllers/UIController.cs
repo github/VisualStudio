@@ -93,7 +93,7 @@ namespace GitHub.Controllers
             }
 #endif
             machines = new Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>>();
-            ConfigureStates();
+            ConfigureLogicStates();
 
             uiStateMachine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             ConfigureUIHandlingStates();
@@ -211,30 +211,27 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Finish, UIViewType.None);
         }
 
-        Dictionary<UIViewType, UIPair> GetObjectsForFlow(UIControllerFlow flow)
-        {
-            Dictionary<UIViewType, UIPair> list;
-            if (!uiObjects.TryGetValue(flow, out list))
-            {
-                list = new Dictionary<UIViewType, UIPair>();
-                uiObjects.Add(flow, list);
-            }
-            return list;
-        }
-
         /// <summary>
         /// Configure all the logical state transitions for each of the
         /// ui flows we support.
         /// </summary>
-        void ConfigureStates()
+        void ConfigureLogicStates()
         {
             StateMachine<UIViewType, Trigger> logic;
+
+            // no selected flow
+            logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.Configure(UIViewType.None)
+                .Ignore(Trigger.Next)
+                .Ignore(Trigger.Finish);
+            machines.Add(UIControllerFlow.None, logic);
 
             // authentication flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Login)
-                .Permit(Trigger.Cancel, UIViewType.End);
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.Login)
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -274,7 +271,8 @@ namespace GitHub.Controllers
             // publish flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
-                .Permit(Trigger.Next, UIViewType.Publish);
+                .Permit(Trigger.Next, UIViewType.Publish)
+                .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.Publish)
                 .Permit(Trigger.Next, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -316,7 +314,7 @@ namespace GitHub.Controllers
 
         public void Stop()
         {
-            Debug.WriteLine("Stop ({0})", GetHashCode());
+            Debug.WriteLine("Stopping {0} ({1})", activeFlow, GetHashCode());
             stopping = true;
             Fire(Trigger.Finish);
         }
@@ -360,7 +358,7 @@ namespace GitHub.Controllers
             {
                 pair.AddHandler(view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => Fire(Trigger.Next)));
+                    .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Next) ? Trigger.Next : Trigger.Finish)));
 
                 var cv = view as IHasCreationView;
                 if (cv != null)
@@ -374,7 +372,9 @@ namespace GitHub.Controllers
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(_ => Fire(Trigger.Detail)));
             }
-            pair.AddHandler(view.Cancel.Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
+            pair.AddHandler(view.Cancel
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
         }
 
         IView CreateViewAndViewModel(UIViewType viewType)
@@ -408,9 +408,24 @@ namespace GitHub.Controllers
             return list[viewType].View;
         }
 
+
+        /// <summary>
+        /// Returns the view/viewmodel pair for a given flow
+        /// </summary>
+        Dictionary<UIViewType, UIPair> GetObjectsForFlow(UIControllerFlow flow)
+        {
+            Dictionary<UIViewType, UIPair> list;
+            if (!uiObjects.TryGetValue(flow, out list))
+            {
+                list = new Dictionary<UIViewType, UIPair>();
+                uiObjects.Add(flow, list);
+            }
+            return list;
+        }
+
         void Fire(Trigger next)
         {
-            Debug.WriteLine("Firing {0} ({1})", next, GetHashCode());
+            Debug.WriteLine("Firing {0} from {1} ({2})", next, uiStateMachine.State, GetHashCode());
             uiStateMachine.Fire(next);
         }
 
@@ -421,8 +436,8 @@ namespace GitHub.Controllers
 
         UIViewType Go(Trigger trigger, UIControllerFlow flow)
         {
-            Debug.WriteLine("Firing {0} for flow {1} ({2})", trigger, flow, GetHashCode());
             var m = machines[flow];
+            Debug.WriteLine("Firing {0} from {1} for flow {2} ({3})", trigger, m.State, flow, GetHashCode());
             m.Fire(trigger);
             return m.State;
         }
@@ -493,6 +508,7 @@ namespace GitHub.Controllers
         }
 
         public bool IsStopped => uiStateMachine.IsInState(UIViewType.None) || stopping;
+        public UIControllerFlow CurrentFlow => activeFlow;
 
         /// <summary>
         /// This class holds ExportLifetimeContexts (i.e., Lazy Disposable containers) for IView and IViewModel objects

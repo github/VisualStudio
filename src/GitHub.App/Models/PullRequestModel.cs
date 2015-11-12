@@ -25,6 +25,7 @@ namespace GitHub.Models
             UpdatedAt = other.UpdatedAt;
             CommentCount = other.CommentCount;
             HasNewComments = other.HasNewComments;
+            IsOpen = other.IsOpen;
         }
 
         public override bool Equals([AllowNull]object obj)
@@ -85,6 +86,13 @@ namespace GitHub.Models
             set { title = value; this.RaisePropertyChange(); }
         }
 
+        bool isOpen;
+        public bool IsOpen
+        {
+            get { return isOpen; }
+            set { isOpen = value; this.RaisePropertyChange(); }
+        }
+
         int commentCount;
         public int CommentCount
         {
@@ -102,7 +110,6 @@ namespace GitHub.Models
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
-
 
         [return: AllowNull] // nullguard thinks a string.Format can return null. sigh.
         public override string ToString()

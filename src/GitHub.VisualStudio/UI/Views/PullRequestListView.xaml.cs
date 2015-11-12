@@ -30,7 +30,6 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.PullRequests, v => v.pullRequests.ItemsSource));
-                NotifyDone();
             });
         }
 

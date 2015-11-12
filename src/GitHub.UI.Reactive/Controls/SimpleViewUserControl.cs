@@ -85,18 +85,23 @@ namespace GitHub.UI
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
             "ViewModel", typeof(TViewModel), typeof(TImplementor), new PropertyMetadata(null));
 
+        [AllowNull]
         object IViewFor.ViewModel
         {
+            [return:AllowNull]
             get { return ViewModel; }
             set { ViewModel = (TViewModel)value; }
         }
 
+        [AllowNull]
         object IView.ViewModel
         {
+            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = (TViewModel)value; }
         }
 
+        [AllowNull]
         public TViewModel ViewModel
         {
             [return: AllowNull]
@@ -104,8 +109,10 @@ namespace GitHub.UI
             set { SetValue(ViewModelProperty, value); }
         }
 
+        [AllowNull]
         TViewModel IViewFor<TViewModel>.ViewModel
         {
+            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = value; }
         }

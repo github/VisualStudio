@@ -676,8 +676,16 @@ namespace GitHub.Collections
 
         protected override void InsertItem(int index, T item)
         {
+#if DEBUG
+            if (Splat.ModeDetector.InDesignMode() && !isChanging)
+            {
+                base.InsertItem(index, item);
+                return;
+            }
+#endif
+
             if (!isChanging)
-                throw new InvalidOperationException("Collection cannot be changed manually.");
+                throw new InvalidOperationException("Items cannot be manually inserted into the collection.");
             isChanging = false;
 
             filteredIndexCache.Add(item, index);
@@ -704,6 +712,14 @@ namespace GitHub.Collections
 
         protected override void RemoveItem(int index)
         {
+#if DEBUG
+            if (Splat.ModeDetector.InDesignMode() && !isChanging)
+            {
+                base.RemoveItem(index);
+                return;
+            }
+#endif
+
             if (!isChanging)
                 throw new InvalidOperationException("Items cannot be removed from the collection except via RemoveItem(T).");
             isChanging = false;
@@ -724,8 +740,16 @@ namespace GitHub.Collections
 
         protected override void MoveItem(int oldIndex, int newIndex)
         {
+#if DEBUG
+            if (Splat.ModeDetector.InDesignMode() && !isChanging)
+            {
+                base.MoveItem(oldIndex, newIndex);
+                return;
+            }
+#endif
+
             if (!isChanging)
-                throw new InvalidOperationException("Collection cannot be changed manually.");
+                throw new InvalidOperationException("Items cannot be manually moved in the collection.");
             isChanging = false;
 
             if (oldIndex != newIndex)

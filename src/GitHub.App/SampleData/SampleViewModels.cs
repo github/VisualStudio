@@ -19,6 +19,7 @@ using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using GitHub.Collections;
 using System.Reactive.Linq;
+using System.Linq;
 
 namespace GitHub.SampleData
 {
@@ -28,6 +29,27 @@ namespace GitHub.SampleData
         public ICommand Cancel { get; set; }
         public bool IsShowing { get; set; }
         public string Title { get; set; }
+    }
+
+    [ExcludeFromCodeCoverage]
+    public class GitHubPaneViewModelDesigner_PRList : BaseViewModelDesigner, IGitHubPaneViewModel
+    {
+        public GitHubPaneViewModelDesigner_PRList()
+        {            
+            var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "GitHub.VisualStudio");
+            var t = asm?.GetType("GitHub.VisualStudio.UI.Views.PullRequestListView");
+            IView inst = null;
+            if (t != null)
+            {
+                inst = (IView)Activator.CreateInstance(t);
+                inst.ViewModel = new PullRequestListViewModelDesigner();
+            }
+            Control = inst;
+        }
+
+        public string ActiveRepoName { get { return "Repo Name"; } }
+
+        public IView Control { get; set; }
     }
 
     [ExcludeFromCodeCoverage]

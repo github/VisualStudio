@@ -30,8 +30,11 @@ namespace GitHub.ViewModels
 
         public PullRequestListViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
         {
+            CancelCommand = ReactiveCommand.Create();
+
             var list = repositoryHost.ModelService.GetPullRequests(repository);
-            list.SetComparer(OrderedComparer<IPullRequestModel>.OrderBy(x => x.UpdatedAt).Compare);
+            list.SetComparer(OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare);
+            list.SetFilter((pr, index, l) => pr.IsOpen);
             PullRequests = list;
             list.Subscribe();
         }

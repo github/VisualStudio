@@ -24,5 +24,11 @@ namespace GitHub.Extensions
                     .Select(c => hosts.LookupHost(c.HostAddress))
                     .Any(h => h.IsLoggedIn);
         }
+
+        public static IObservable<IConnection> LookupConnection(this IConnectionManager cm, ISimpleRepositoryModel repository)
+        {
+            return cm.Connections.ToObservable()
+                    .Where(c => c.HostAddress.Equals(HostAddress.Create(repository.CloneUrl)));
+        }
     }
 }

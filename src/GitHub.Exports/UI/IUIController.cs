@@ -12,6 +12,7 @@ namespace GitHub.UI
         void Start(IConnection connection);
         void Stop();
         bool IsStopped { get; }
+        UIControllerFlow CurrentFlow { get; }
     }
 
     public enum UIControllerFlow

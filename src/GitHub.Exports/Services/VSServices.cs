@@ -243,5 +243,5 @@ namespace GitHub.Services
                     Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
             }
         }
-    }
+   }
 }

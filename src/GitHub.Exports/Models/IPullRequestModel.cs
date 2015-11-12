@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Windows.Media.Imaging;
 using GitHub.Collections;
 
 namespace GitHub.Models
@@ -11,6 +9,7 @@ namespace GitHub.Models
         int Number { get; }
         string Title { get; }
         int CommentCount { get; }
+        bool IsOpen { get; }
         bool HasNewComments { get; }
         DateTimeOffset CreatedAt { get; }
         DateTimeOffset UpdatedAt { get; }
