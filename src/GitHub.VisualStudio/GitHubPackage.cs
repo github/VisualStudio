@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Octokit;
+using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.VisualStudio
 {
@@ -57,29 +58,28 @@ namespace GitHub.VisualStudio
                 (s, e) =>
                 {
                     // All this code should get moved somewhere else, not sure where though, any pointers?!
-                    var highlightedText = GetHighlightedText();
-
-                    var repoHosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
-                    var connMgr = ServiceProvider.GetExportedValue<IConnectionManager>();
-
-                    // If the user is logged in, go ahead and create the gist
-                    connMgr
-                        .IsLoggedIn(repoHosts)
-                        .Where(isLoggedIn => isLoggedIn)
-                        .Subscribe(async _ =>
+                    IsUserLoggedIn().ContinueWith(async isLoggedIn =>
+                    {
+                        // Log in the user if they are not already logged in.
+                        if (!isLoggedIn.Result)
                         {
-                            // It may be useful to return the created gist if we support an "Open Gist in GitHub" checkbox feature 
-                            // that will auto open the newly created Gist if checked.
-                            var createdGist = await
-                                CreateGist("NameWillBeEnteredInThePopup", "DescriptionWillBeEnteredInThePopup", true,
-                                    highlightedText);
-                        });
+                            // Can we use the Authentication UIControllerFlow here and wait for a successful authentication before proceeding?
+                        }
 
-                    // If the user is not logged in, we need to log them in before we can create the gist. Can we use the existing login workflow here somehow?
-                    connMgr
-                        .IsLoggedIn(repoHosts)
-                        .Where(isLoggedIn => !isLoggedIn)
-                        .Subscribe(_ => { });
+                        var highlightedText = GetHighlightedText();
+
+                        // TODO Show a popup with 
+                        //  - TextBox to name the gist
+                        //  - TextBox to give the gist a description
+                        //  - Checkbox for public gist
+                        //  - Not sure about this one, but may be nice to open the newly created gist in GitHub checkbox
+                        //  - Not sure if we really need to re-display the selected text as it should still be selected in the text editor.
+
+                        // It may be useful to return the created gist if we support an "Open Gist in GitHub" checkbox feature 
+                        // that will auto open the newly created Gist if checked.
+                        var createdGist = await CreateGist("NameWillBeEnteredInThePopup",
+                            "DescriptionWillBeEnteredInThePopup", true, highlightedText);
+                    });
                 });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
@@ -117,11 +117,17 @@ namespace GitHub.VisualStudio
             return highlightedText;
         }
 
+        async Task<bool> IsUserLoggedIn()
+        {
+            var repoHosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
+            var connMgr = ServiceProvider.GetExportedValue<IConnectionManager>();
+
+            return await connMgr.IsLoggedIn(repoHosts);
+        }
+
         async Task<Gist> CreateGist(string name, string description, bool isPublic, string content)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
-            Guard.ArgumentNotEmptyString(description, nameof(description));
-            Guard.ArgumentNotEmptyString(content, nameof(content));
 
             var newGist = new NewGist
             {
