@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -8,6 +11,8 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TextManager.Interop;
+using Octokit;
 
 namespace GitHub.VisualStudio
 {
@@ -47,8 +52,36 @@ namespace GitHub.VisualStudio
 
         protected override void Initialize()
         {
-
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
+            ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand,
+                (s, e) =>
+                {
+                    // All this code should get moved somewhere else, not sure where though, any pointers?!
+                    var highlightedText = GetHighlightedText();
+
+                    var repoHosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
+                    var connMgr = ServiceProvider.GetExportedValue<IConnectionManager>();
+
+                    // If the user is logged in, go ahead and create the gist
+                    connMgr
+                        .IsLoggedIn(repoHosts)
+                        .Where(isLoggedIn => isLoggedIn)
+                        .Subscribe(async _ =>
+                        {
+                            // It may be useful to return the created gist if we support an "Open Gist in GitHub" checkbox feature 
+                            // that will auto open the newly created Gist if checked.
+                            var createdGist = await
+                                CreateGist("NameWillBeEnteredInThePopup", "DescriptionWillBeEnteredInThePopup", true,
+                                    highlightedText);
+                        });
+
+                    // If the user is not logged in, we need to log them in before we can create the gist. Can we use the existing login workflow here somehow?
+                    connMgr
+                        .IsLoggedIn(repoHosts)
+                        .Where(isLoggedIn => !isLoggedIn)
+                        .Subscribe(_ => { });
+                });
+
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
             {
                 var window = FindToolWindow(typeof(GitHubPane), 0, true);
@@ -65,6 +98,40 @@ namespace GitHub.VisualStudio
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.RunUI(controllerFlow, null);
+        }
+
+        string GetHighlightedText()
+        {
+            var textManager = (IVsTextManager)ServiceProvider.GetService(typeof(SVsTextManager));
+            if (textManager == null)
+                return string.Empty;
+
+            IVsTextView activeView;
+            if (textManager.GetActiveView(1, null, out activeView) != VSConstants.S_OK)
+                return string.Empty;
+
+            string highlightedText;
+            if (activeView.GetSelectedText(out highlightedText) != VSConstants.S_OK)
+                return string.Empty;
+
+            return highlightedText;
+        }
+
+        async Task<Gist> CreateGist(string name, string description, bool isPublic, string content)
+        {
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+            Guard.ArgumentNotEmptyString(description, nameof(description));
+            Guard.ArgumentNotEmptyString(content, nameof(content));
+
+            var newGist = new NewGist
+            {
+                Description = description,
+                Public = isPublic
+            };
+            newGist.Files.Add(name, content);
+
+            var githubClient = ServiceProvider.GetExportedValue<IGitHubClient>();
+            return await githubClient.Gist.Create(newGist);
         }
     }
 }
