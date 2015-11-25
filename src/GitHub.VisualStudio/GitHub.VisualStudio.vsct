@@ -37,6 +37,10 @@
       <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" priority="0x0501">
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
+
+      <Group guid="guidCreateGistCommandPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+      </Group>
     </Groups>
 
     <Menus>
@@ -114,6 +118,13 @@
           <ButtonText></ButtonText>
         </Strings>
       </Button>
+
+        <Button guid="guidCreateGistCommandPackageCmdSet" id="CreateGistCommandId" priority="0x0100" type="Button">
+            <Parent guid="guidCreateGistCommandPackageCmdSet" id="MyMenuGroup" />
+            <Strings>
+                <ButtonText>Create Gist</ButtonText>
+            </Strings>
+        </Button>
     </Buttons>
 
   </Commands>
@@ -133,6 +144,12 @@
     <!-- This is the Manage Connections menu -->
     <GuidSymbol name="guidManageConnections" value="{0A014553-A0AA-46DD-8D6B-B8E3178CA435}">
       <IDSymbol name="idManageConnections" value="0x1009"/>
+    </GuidSymbol>
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidCreateGistCommandPackageCmdSet" value="{D265E7EB-F3FC-411D-B4DC-1C6AD9264C4B}">
+        <IDSymbol name="MyMenuGroup" value="0x1020" />
+        <IDSymbol name="CreateGistCommandId" value="0x0400" />
     </GuidSymbol>
     
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
