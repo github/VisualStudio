@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Reactive.Linq;
+using System.Diagnostics;
+using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -11,9 +10,6 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TextManager.Interop;
-using Octokit;
-using IConnection = GitHub.Models.IConnection;
 
 namespace GitHub.VisualStudio
 {
@@ -57,29 +53,7 @@ namespace GitHub.VisualStudio
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand,
                 (s, e) =>
                 {
-                    // All this code should get moved somewhere else, not sure where though, any pointers?!
-                    IsUserLoggedIn().ContinueWith(async isLoggedIn =>
-                    {
-                        // Log in the user if they are not already logged in.
-                        if (!isLoggedIn.Result)
-                        {
-                            // Can we use the Authentication UIControllerFlow here and wait for a successful authentication before proceeding?
-                        }
-
-                        var highlightedText = GetHighlightedText();
-
-                        // TODO Show a popup with 
-                        //  - TextBox to name the gist
-                        //  - TextBox to give the gist a description
-                        //  - Checkbox for public gist
-                        //  - Not sure about this one, but may be nice to open the newly created gist in GitHub checkbox
-                        //  - Not sure if we really need to re-display the selected text as it should still be selected in the text editor.
-
-                        // It may be useful to return the created gist if we support an "Open Gist in GitHub" checkbox feature 
-                        // that will auto open the newly created Gist if checked.
-                        var createdGist = await CreateGist("NameWillBeEnteredInThePopup",
-                            "DescriptionWillBeEnteredInThePopup", true, highlightedText);
-                    });
+                    TestCreateGist().Forget();
                 });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
@@ -100,44 +74,14 @@ namespace GitHub.VisualStudio
             uiProvider.RunUI(controllerFlow, null);
         }
 
-        string GetHighlightedText()
+        async System.Threading.Tasks.Task TestCreateGist()
         {
-            var textManager = (IVsTextManager)ServiceProvider.GetService(typeof(SVsTextManager));
-            if (textManager == null)
-                return string.Empty;
+            var selectedTextProvider = ServiceProvider.GetExportedValue<ISelectedTextProvider>();
+            var highlightedText = selectedTextProvider.GetSelectedText().ToTask().Result;
 
-            IVsTextView activeView;
-            if (textManager.GetActiveView(1, null, out activeView) != VSConstants.S_OK)
-                return string.Empty;
-
-            string highlightedText;
-            if (activeView.GetSelectedText(out highlightedText) != VSConstants.S_OK)
-                return string.Empty;
-
-            return highlightedText;
-        }
-
-        async Task<bool> IsUserLoggedIn()
-        {
-            var repoHosts = ServiceProvider.GetExportedValue<IRepositoryHosts>();
-            var connMgr = ServiceProvider.GetExportedValue<IConnectionManager>();
-
-            return await connMgr.IsLoggedIn(repoHosts);
-        }
-
-        async Task<Gist> CreateGist(string name, string description, bool isPublic, string content)
-        {
-            Guard.ArgumentNotEmptyString(name, nameof(name));
-
-            var newGist = new NewGist
-            {
-                Description = description,
-                Public = isPublic
-            };
-            newGist.Files.Add(name, content);
-
-            var githubClient = ServiceProvider.GetExportedValue<IGitHubClient>();
-            return await githubClient.Gist.Create(newGist);
+            var gistCreator = ServiceProvider.GetExportedValue<IGistCreator>();
+            var createdGist = await gistCreator.CreateGist("NameWillBeEnteredInThePopup", true, highlightedText);
+            Debug.Assert(createdGist != null, "temporary for testing");
         }
     }
 }
