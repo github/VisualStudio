@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
+using GitHub.Factories;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -10,6 +14,7 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Octokit;
 
 namespace GitHub.VisualStudio
 {
@@ -53,7 +58,7 @@ namespace GitHub.VisualStudio
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand,
                 (s, e) =>
                 {
-                    TestCreateGist().Forget();
+                    TestCreateGist();
                 });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
@@ -74,14 +79,18 @@ namespace GitHub.VisualStudio
             uiProvider.RunUI(controllerFlow, null);
         }
 
-        async System.Threading.Tasks.Task TestCreateGist()
+        void TestCreateGist()
         {
             var selectedTextProvider = ServiceProvider.GetExportedValue<ISelectedTextProvider>();
             var highlightedText = selectedTextProvider.GetSelectedText().ToTask().Result;
 
-            var gistCreator = ServiceProvider.GetExportedValue<IGistCreator>();
-            var createdGist = await gistCreator.CreateGist("NameWillBeEnteredInThePopup", true, highlightedText);
-            Debug.Assert(createdGist != null, "temporary for testing");
+            var apiClient = ServiceProvider.GetExportedValue<IApiClientFactory>().Create(HostAddress.GitHubDotComHostAddress);
+            apiClient.CreateGist("NameWillBeEnteredInThePopup", true, highlightedText)
+                .Catch<Gist, Octokit.NotFoundException>(_ => Observable.Return<Gist>(null) )
+                .Subscribe(createdGist =>
+                {
+
+                });
         }
     }
 }
