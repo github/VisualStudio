@@ -139,7 +139,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\AvatarProvider.cs" />
-    <Compile Include="Services\GistCreator.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
     <Compile Include="Services\GitClient.cs" />
     <Compile Include="Services\ModelService.cs" />

@@ -112,7 +112,6 @@
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\GitService.cs" />
-    <Compile Include="Services\IGistCreator.cs" />
     <Compile Include="Services\IGitService.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\Logger.cs" />
