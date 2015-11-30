@@ -55,10 +55,9 @@ namespace GitHub.VisualStudio
         protected override void Initialize()
         {
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand,
-                (s, e) =>
+            ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand, (s, e) =>
                 {
-                    TestCreateGist();
+                    ServiceProvider.GetExportedValue<IGistCreator>().CreateFromSelectedText().Forget();
                 });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
@@ -77,20 +76,6 @@ namespace GitHub.VisualStudio
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.RunUI(controllerFlow, null);
-        }
-
-        void TestCreateGist()
-        {
-            var selectedTextProvider = ServiceProvider.GetExportedValue<ISelectedTextProvider>();
-            var highlightedText = selectedTextProvider.GetSelectedText().ToTask().Result;
-
-            var apiClient = ServiceProvider.GetExportedValue<IApiClientFactory>().Create(HostAddress.GitHubDotComHostAddress);
-            apiClient.CreateGist("NameWillBeEnteredInThePopup", true, highlightedText)
-                .Catch<Gist, Octokit.NotFoundException>(_ => Observable.Return<Gist>(null) )
-                .Subscribe(createdGist =>
-                {
-
-                });
         }
     }
 }
