@@ -1,4 +1,6 @@
-﻿using ReactiveUI;
+﻿using System.Reactive;
+using Octokit;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -7,11 +9,11 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the command to create a new public gist.
         /// </summary>
-        ReactiveCommand<object> CreatePublicCommand { get; }
+        IReactiveCommand<Unit> CreatePublicGist { get; }
         /// <summary>
         /// Gets the command to create a new private gist.
         /// </summary>
-        ReactiveCommand<object> CreatePrivateCommand { get; }
+        IReactiveCommand<Unit> CreatePrivateGist { get; }
         /// <summary>
         /// Gets the optional description used in the gist description field .
         /// </summary>
