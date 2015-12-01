@@ -1,10 +1,5 @@
 ﻿using GitHub.Exports;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -19,8 +14,8 @@ namespace GitHub.ViewModels
             Title = Resources.CreateGistTitle;
         }
 
-        public ReactiveCommand<object> CreateCommand { get; }
-        public bool IsPublic { get; }
+        public ReactiveCommand<object> CreatePublicCommand { get; }
+        public ReactiveCommand<object> CreatePrivateCommand { get; }
         public string Description { get; }
         public string Content { get; }
         public string FileName { get; }

@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     public interface IGistCreationViewModel : IViewModel
     {
         /// <summary>
-        /// Gets the command to create a new gist.
+        /// Gets the command to create a new public gist.
         /// </summary>
-        ReactiveCommand<object> CreateCommand { get; }
+        ReactiveCommand<object> CreatePublicCommand { get; }
         /// <summary>
-        /// Gets the command to cancel the creation of a gist.
+        /// Gets the command to create a new private gist.
         /// </summary>
-        ReactiveCommand<object> CancelCommand { get; }
-        /// <summary>
-        /// Gets true if the gist should be public.
-        /// </summary>
-        bool IsPublic { get; }
+        ReactiveCommand<object> CreatePrivateCommand { get; }
         /// <summary>
         /// Gets the optional description used in the gist description field .
         /// </summary>

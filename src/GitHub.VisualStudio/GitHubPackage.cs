@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -57,7 +56,6 @@ namespace GitHub.VisualStudio
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand, (s, e) =>
                 {
-                    // This is where the Create Gist view will be run.
                     var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
                     uiProvider.RunUI(UIControllerFlow.Gist, null);
                 });
