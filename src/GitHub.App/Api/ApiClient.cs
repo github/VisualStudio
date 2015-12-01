@@ -52,18 +52,8 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
-        public IObservable<Gist> CreateGist(string fileName, bool isPublic, string content = "", string description = "")
+        public IObservable<Gist> CreateGist(NewGist newGist)
         {
-            // No good reason to guard against optional content and description.
-            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
-
-            var newGist = new NewGist
-            {
-                Description = description,
-                Public = isPublic
-            };
-            newGist.Files.Add(fileName, content);
-
             return gitHubClient.Gist.Create(newGist);
         }
 
