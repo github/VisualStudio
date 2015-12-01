@@ -58,6 +58,8 @@ namespace GitHub.VisualStudio
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand, (s, e) =>
                 {
                     // This is where the Create Gist view will be run.
+                    var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+                    uiProvider.RunUI(UIControllerFlow.Gist, null);
                 });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>

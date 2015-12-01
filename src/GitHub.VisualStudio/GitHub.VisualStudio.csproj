@@ -252,6 +252,9 @@
     <Compile Include="Base\EnsureLoggedInSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
+      <DependentUpon>GistCreationControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
     </Compile>
@@ -362,6 +365,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
