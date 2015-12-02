@@ -38,11 +38,12 @@
   - [ ] **Select a repository and click Clone**
       - [ ] Clone dialog disappears
       - [ ] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
-      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully."
+      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed. 
       - [ ] Repository shows up in the "Local Git Repositories" list
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
       - [ ] Team Explorer view changes to Home page
       - [ ] GitHub header and repo information is shown
+      - [ ] Click Clone in "Local Git Repositories" List and copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
   - [ ] **Click on Create action link**
     - [ ] Create dialog appears
     - [ ] Cursor is on the Name field
