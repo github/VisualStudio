@@ -38,9 +38,9 @@ namespace GitHub.ViewModels
             CreatePrivateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, _ => OnCreateGist(false));
         }
 
-        private IObservable<Unit> OnCreateGist(bool isPublic)
+        private IObservable<Gist> OnCreateGist(bool isPublic)
         {
-            selectedTextProvider.GetSelectedText().Select(async selectedText =>
+            return selectedTextProvider.GetSelectedText().Select(selectedText =>
             {
                 var newGist = new NewGist
                 {
@@ -48,14 +48,12 @@ namespace GitHub.ViewModels
                     Public = isPublic
                 };
                 newGist.Files.Add(FileName, selectedText);
-                await apiClient.CreateGist(newGist);
-            });
-
-            return Observable.Return(Unit.Default);
+                return apiClient.CreateGist(newGist);
+            }).SelectMany(gists => gists);
         }
 
-        public IReactiveCommand<Unit> CreatePublicGist { get; }
-        public IReactiveCommand<Unit> CreatePrivateGist { get; }
+        public IReactiveCommand<Gist> CreatePublicGist { get; }
+        public IReactiveCommand<Gist> CreatePrivateGist { get; }
         public string Description { get; }
         public string Content { get; }
         public string FileName { get; }

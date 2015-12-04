@@ -22,33 +22,23 @@ namespace GitHub.Services
 
         public IObservable<string> GetSelectedText()
         {
-            return Observable.Create<string>(observer =>
+            return Observable.Defer(() =>
             {
                 var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
                 if (textManager == null)
-                {
-                    observer.OnError(new InvalidOperationException("cannot get SVsTextManager service"));
-                    return Disposable.Empty;
-                }
+                    return Observable.Return(string.Empty);
 
                 IVsTextView activeView;
                 if (textManager.GetActiveView(1, null, out activeView) != VSConstants.S_OK)
-                {
-                    observer.OnError(new InvalidOperationException("no active view in focus"));
-                    return Disposable.Empty;
-                }
+                    return Observable.Return(string.Empty);
 
                 // Maybe we should log here that no text was actually highlighted?
                 string highlightedText;
                 if (activeView.GetSelectedText(out highlightedText) != VSConstants.S_OK)
                     highlightedText = string.Empty;
 
-                observer.OnNext(highlightedText);
-                observer.OnCompleted();
-                return Disposable.Empty;
+                return Observable.Return(highlightedText);
             });
-
-            
         }
     }
 }
