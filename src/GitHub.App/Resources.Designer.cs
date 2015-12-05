@@ -79,7 +79,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create Gist.
+        ///   Looks up a localized string similar to Create a GitHub Gist.
         /// </summary>
         public static string CreateGistTitle {
             get {

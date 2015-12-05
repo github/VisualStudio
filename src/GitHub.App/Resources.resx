@@ -124,7 +124,7 @@
     <value>Clone a {0} Repository</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
-    <value>Create Gist</value>
+    <value>Create a GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
     <value>Create a {0} Repository</value>
