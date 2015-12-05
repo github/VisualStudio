@@ -6,24 +6,28 @@ namespace GitHub.ViewModels
     public interface IGistCreationViewModel : IViewModel
     {
         /// <summary>
-        /// Gets the command to create a new public gist.
+        /// Gets the command to create a new gist.
         /// </summary>
-        IReactiveCommand<Gist> CreatePublicGist { get; }
+        IReactiveCommand<Gist> CreateGist { get; }
+
         /// <summary>
-        /// Gets the command to create a new private gist.
+        /// True if the gist should be private.
         /// </summary>
-        IReactiveCommand<Gist> CreatePrivateGist { get; }
+        bool IsPrivate { get; set; }
+
         /// <summary>
-        /// Gets the optional description used in the gist description field .
+        /// Gets or sets the optional description used in the gist description field.
         /// </summary>
-        string Description { get; }
+        string Description { get; set; }
+
         /// <summary>
-        /// Gets the main content of the gist.
+        /// Gets or sets the main content of the gist.
         /// </summary>
-        string Content { get; }
+        string Content { get; set; }
+
         /// <summary>
-        /// Gets the gist filename including extension.
+        /// Gets or sets the file name of the gist (should include extension).
         /// </summary>
-        string FileName { get; }
+        string FileName { get; set; }
     }
 }

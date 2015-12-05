@@ -12,6 +12,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Octokit;
 using ReactiveUI;
+using NullGuard;
 
 namespace GitHub.ViewModels
 {
@@ -31,31 +32,59 @@ namespace GitHub.ViewModels
 
             var canCreateGist = this.WhenAny(
                 x => x.FileName,
-                x => x.Content,
-                (x, y) => x.Value.IsNotNullOrEmpty() && y.Value.IsNotNullOrEmpty());
+                fileName => !string.IsNullOrEmpty(fileName.Value));
 
-            CreatePublicGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, _ => OnCreateGist(true));
-            CreatePrivateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, _ => OnCreateGist(false));
+            CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
         }
 
-        private IObservable<Gist> OnCreateGist(bool isPublic)
+        private IObservable<Gist> OnCreateGist(object _)
         {
             return selectedTextProvider.GetSelectedText().Select(selectedText =>
             {
                 var newGist = new NewGist
                 {
                     Description = Description,
-                    Public = isPublic
+                    Public = !IsPrivate
                 };
                 newGist.Files.Add(FileName, selectedText);
                 return apiClient.CreateGist(newGist);
             }).SelectMany(gists => gists);
         }
 
-        public IReactiveCommand<Gist> CreatePublicGist { get; }
-        public IReactiveCommand<Gist> CreatePrivateGist { get; }
-        public string Description { get; }
-        public string Content { get; }
-        public string FileName { get; }
+        public IReactiveCommand<Gist> CreateGist { get; }
+
+        bool isPrivate;
+        public bool IsPrivate
+        {
+            get { return isPrivate; }
+            set { this.RaiseAndSetIfChanged(ref isPrivate, value); }
+        }
+
+        string description;
+        [AllowNull]
+        public string Description
+        {
+            [return: AllowNull]
+            get { return description; }
+            set { this.RaiseAndSetIfChanged(ref description, value); }
+        }
+
+        string content;
+        [AllowNull]
+        public string Content
+        {
+            [return: AllowNull]
+            get { return content; }
+            set { this.RaiseAndSetIfChanged(ref content, value); }
+        }
+
+        string fileName;
+        [AllowNull]
+        public string FileName
+        {
+            [return: AllowNull]
+            get { return fileName; }
+            set { this.RaiseAndSetIfChanged(ref fileName, value); }
+        }
     }
 }
