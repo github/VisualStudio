@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using LibGit2Sharp;
+using System.Collections.Generic;
 
 namespace GitHub.Services
 {
@@ -11,6 +12,14 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
+        readonly IGitHubCredentialProvider credentialProvider;
+
+        [ImportingConstructor]
+        public GitClient(IGitHubCredentialProvider credentialProvider)
+        {
+            this.credentialProvider = credentialProvider;
+        }
+
         public IObservable<Unit> Push(IRepository repository, string branchName, string remoteName)
         {
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
@@ -21,7 +30,11 @@ namespace GitHub.Services
                 if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
                     var remote = repository.Network.Remotes[remoteName];
-                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName);
+                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName,
+                        new PushOptions()
+                        {
+                            CredentialsProvider = credentialProvider.HandleCredentials
+                        });
                 }
                 return Observable.Return(Unit.Default);
             });
@@ -34,7 +47,10 @@ namespace GitHub.Services
             return Observable.Defer(() =>
             {
                 var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote);
+                repository.Network.Fetch(remote, new FetchOptions()
+                {
+                    CredentialsProvider = credentialProvider.HandleCredentials
+                });
                 return Observable.Return(Unit.Default);
             });
         }
