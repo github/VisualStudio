@@ -34,15 +34,15 @@ namespace GitHub.Authentication.CredentialManagement
         public Credential() : this(null, (string)null)
         {}
 
-        public Credential([AllowNull]string username = null,
+        public Credential(
+            [AllowNull]string username = null,
             [AllowNull]SecureString password = null,
-            [AllowNull]string target = null,
-            [AllowNull]CredentialType type = CredentialType.Generic)
+            [AllowNull]string target = null)
         {
             Username = username;
             SecurePassword = password;
             Target = target;
-            Type = type;
+            Type = CredentialType.Generic;
             PersistenceType = PersistenceType.LocalComputer;
             _lastWriteTime = DateTime.MinValue;
         }
@@ -50,13 +50,12 @@ namespace GitHub.Authentication.CredentialManagement
         public Credential(
             [AllowNull]string username = null,
             [AllowNull]string password = null,
-            [AllowNull]string target = null,
-            [AllowNull]CredentialType type = CredentialType.Generic)
+            [AllowNull]string target = null)
         {
             Username = username;
             Password = password;
             Target = target;
-            Type = type;
+            Type = CredentialType.Generic;
             PersistenceType = PersistenceType.Session;
             _lastWriteTime = DateTime.MinValue;
         }
