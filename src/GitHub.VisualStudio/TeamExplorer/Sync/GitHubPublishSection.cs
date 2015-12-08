@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             view.DataContext = this;
         }
 
-        async void RTMSetup()
+        async void Setup()
         {
             if (ActiveRepo != null && ActiveRepoUri == null)
             {
@@ -64,34 +64,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 IsVisible = false;
         }
 
-        async void PreRTMSetup()
-        {
-            if (ActiveRepo != null && ActiveRepoUri == null)
-            {
-                IsVisible = true;
-                loggedIn = await connectionManager.IsLoggedIn(hosts);
-                if (loggedIn)
-                    ShowPublish();
-                else
-                {
-                    ShowGetStarted = true;
-                    ShowSignup = true;
-                }
-            }
-            else
-                IsVisible = false;
-        }
-
         public override void Initialize(IServiceProvider serviceProvider)
         {
             base.Initialize(serviceProvider);
-            RTMSetup();
+            Setup();
         }
 
         protected override void RepoChanged()
         {
             base.RepoChanged();
-            RTMSetup();
+            Setup();
         }
 
         public async void Connect()
@@ -135,6 +117,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             disposable = uiflow;
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            ui.ListenToCompletionState().Subscribe(done =>
+            {
+                if (done)
+                {
+                    IsVisible = false;
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                }
+            });
+
             creation.Subscribe(c =>
             {
                 SectionContent = c;
