@@ -1,15 +1,11 @@
 ﻿using System;
 using GitHub.Exports;
 using System.ComponentModel.Composition;
-using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
-using GitHub.Extensions;
-using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
 using GitHub.Services;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Octokit;
 using ReactiveUI;
 using NullGuard;
@@ -29,6 +25,10 @@ namespace GitHub.ViewModels
             Title = Resources.CreateGistTitle;
             this.selectedTextProvider = selectedTextProvider;
             this.apiClient = apiClientFactory.Create(HostAddress.GitHubDotComHostAddress);
+
+            // Since the filename is required, go ahead and give it something default so the user is not forced to 
+            // add a custom name if they do not want to
+            FileName = Resources.DefaultGistFileName;
 
             var canCreateGist = this.WhenAny(
                 x => x.FileName,

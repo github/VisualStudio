@@ -97,6 +97,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GistFromVisualStudio.md.
+        /// </summary>
+        public static string DefaultGistFileName {
+            get {
+                return ResourceManager.GetString("DefaultGistFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter an Enterprise URL.
         /// </summary>
         public static string EnterpriseUrlValidatorEmpty {
