@@ -122,7 +122,7 @@
         <Button guid="guidCreateGistCommandPackageCmdSet" id="CreateGistCommandId" priority="0x0100" type="Button">
             <Parent guid="guidCreateGistCommandPackageCmdSet" id="MyMenuGroup" />
             <Strings>
-                <ButtonText>Create Gist</ButtonText>
+                <ButtonText>Create a GitHub Gist</ButtonText>
             </Strings>
         </Button>
     </Buttons>
