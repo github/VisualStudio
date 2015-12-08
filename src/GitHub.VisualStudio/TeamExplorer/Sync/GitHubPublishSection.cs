@@ -119,11 +119,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
             ui.ListenToCompletionState().Subscribe(done =>
             {
-                if (done)
-                {
-                    IsVisible = false;
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-                }
+                IsVisible = false;
+                ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             });
 
             creation.Subscribe(c =>

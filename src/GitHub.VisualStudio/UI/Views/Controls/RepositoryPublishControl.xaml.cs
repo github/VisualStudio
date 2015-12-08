@@ -46,9 +46,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                 ViewModel.PublishRepository.Subscribe(state =>
                 {
-                    if (state == ProgressState.Fail)
-                        NotifyCancel();
-                    else
+                    if (state == ProgressState.Success)
                         NotifyDone();
                 });
 

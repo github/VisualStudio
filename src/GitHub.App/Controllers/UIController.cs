@@ -150,9 +150,9 @@ namespace GitHub.Controllers
         void End(bool success)
         {
             uiProvider.RemoveService(typeof(IConnection));
+            transition.OnCompleted();
             completion.OnNext(success);
             completion.OnCompleted();
-            transition.OnCompleted();
         }
 
         void RunView(UIViewType viewType)
