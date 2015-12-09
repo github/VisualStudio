@@ -11,14 +11,12 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
-        readonly IGitHubCredentialProvider credentialProvider;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
 
         [ImportingConstructor]
         public GitClient(IGitHubCredentialProvider credentialProvider)
         {
-            this.credentialProvider = credentialProvider;
             pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
         }
