@@ -29,17 +29,22 @@ namespace GitHub.Services
         public Credentials HandleCredentials([AllowNull]string url, [AllowNull]string username, SupportedCredentialTypes types)
         {
             if (url == null)
-                return new DefaultCredentials();
+                return null; // wondering if we should return DefaultCredentials instead
 
             var host = HostAddress.Create(url);
             return secureCache.GetObject<Tuple<string, SecureString>>("login:" + host.CredentialCacheKeyHost)
-                .Select(x => new SecureUsernamePasswordCredentials()
-                {
-                    Username = x.Item1,
-                    Password = x.Item2
-                } as Credentials)
-                .Catch(Observable.Return(new DefaultCredentials()))
+                .Select(CreateCredentials)
+                .Catch(Observable.Return<Credentials>(null))
                 .Wait();
+        }
+
+        static Credentials CreateCredentials(Tuple<string, SecureString> data)
+        {
+            return new SecureUsernamePasswordCredentials
+            {
+                Username = data.Item1,
+                Password = data.Item2
+            };
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using LibGit2Sharp;
-using System.Collections.Generic;
 
 namespace GitHub.Services
 {
@@ -13,11 +12,15 @@ namespace GitHub.Services
     public class GitClient : IGitClient
     {
         readonly IGitHubCredentialProvider credentialProvider;
+        readonly PushOptions pushOptions;
+        readonly FetchOptions fetchOptions;
 
         [ImportingConstructor]
         public GitClient(IGitHubCredentialProvider credentialProvider)
         {
             this.credentialProvider = credentialProvider;
+            pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
+            fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
         }
 
         public IObservable<Unit> Push(IRepository repository, string branchName, string remoteName)
@@ -30,11 +33,7 @@ namespace GitHub.Services
                 if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
                     var remote = repository.Network.Remotes[remoteName];
-                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName,
-                        new PushOptions()
-                        {
-                            CredentialsProvider = credentialProvider.HandleCredentials
-                        });
+                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
                 }
                 return Observable.Return(Unit.Default);
             });
@@ -47,10 +46,7 @@ namespace GitHub.Services
             return Observable.Defer(() =>
             {
                 var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, new FetchOptions()
-                {
-                    CredentialsProvider = credentialProvider.HandleCredentials
-                });
+                repository.Network.Fetch(remote, fetchOptions);
                 return Observable.Return(Unit.Default);
             });
         }
