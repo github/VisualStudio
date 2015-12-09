@@ -23,7 +23,7 @@ public class GitClientTests
 
             await gitClient.Push(repository, "master", "origin");
 
-            repository.Network.Received().Push(origin,"HEAD", @"refs/heads/master");
+            repository.Network.Received().Push(origin,"HEAD", @"refs/heads/master", Arg.Any<PushOptions>());
         }
 
         [Fact]

@@ -216,7 +216,7 @@
     <ProjectReference Include="..\..\submodules\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
       <Project>{EE6ED99F-CB12-4683-B055-D28FC7357A34}</Project>
       <Name>LibGit2Sharp</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\DesignTimeStyleHelper\DesignTimeStyleHelper.csproj">
       <Project>{b1f5c227-456f-437d-bd5f-4c11b7a8d1a0}</Project>
