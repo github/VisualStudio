@@ -52,9 +52,6 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
-    <Reference Include="LibGit2Sharp, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\LibGit2Sharp.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\lib\\Microsoft.TeamFoundation.Controls.dll</HintPath>
       <Private>False</Private>
@@ -158,6 +155,11 @@
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
+      <Project>{EE6ED99F-CB12-4683-B055-D28FC7357A34}</Project>
+      <Name>LibGit2Sharp</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
