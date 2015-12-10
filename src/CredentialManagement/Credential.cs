@@ -35,8 +35,8 @@ namespace GitHub.Authentication.CredentialManagement
         {}
 
         public Credential(
-            [AllowNull]string username = null,
-            [AllowNull]SecureString password = null,
+            [AllowNull]string username,
+            [AllowNull]SecureString password,
             [AllowNull]string target = null)
         {
             Username = username;
@@ -48,8 +48,8 @@ namespace GitHub.Authentication.CredentialManagement
         }
 
         public Credential(
-            [AllowNull]string username = null,
-            [AllowNull]string password = null,
+            [AllowNull]string username,
+            [AllowNull]string password,
             [AllowNull]string target = null)
         {
             Username = username;
