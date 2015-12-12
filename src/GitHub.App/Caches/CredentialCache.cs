@@ -8,6 +8,7 @@ using System.Text;
 using Akavache;
 using GitHub.Helpers;
 using GitHub.Authentication.CredentialManagement;
+using System.Security;
 
 namespace GitHub.Caches
 {
@@ -32,7 +33,6 @@ namespace GitHub.Caches
             using (var credential = new Credential())
             {
                 credential.Target = keyHost;
-                credential.Type = CredentialType.Generic;
                 if (credential.Load())
                     return Observable.Return(Encoding.Unicode.GetBytes(credential.Password));
             }
@@ -79,15 +79,33 @@ namespace GitHub.Caches
             throw new NotImplementedException();
         }
 
-        // TODO: Use SecureString
         public IObservable<Unit> InsertObject<T>(string key, T value, DateTimeOffset? absoluteExpiration = default(DateTimeOffset?))
         {
             if (disposed) return ExceptionHelper.ObservableThrowObjectDisposedException<Unit>("CredentialCache");
 
-            var values = value as Tuple<string, string>;
-            if (values == null)
-                return ExceptionHelper.ObservableThrowInvalidOperationException<Unit>(key);
+            if (value is Tuple<string, string>)
+                return InsertTuple(key, value as Tuple<string, string>);
+            if (value is Tuple<string, SecureString>)
+                return InsertTuple(key, value as Tuple<string, SecureString>);
 
+            return ExceptionHelper.ObservableThrowInvalidOperationException<Unit>(key);
+        }
+
+        static IObservable<Unit> InsertTuple(string key, Tuple<string, string> values)
+        {
+            var keyGit = GetKeyGit(key);
+            if (!SaveKey(keyGit, values.Item1, values.Item2))
+                return ExceptionHelper.ObservableThrowInvalidOperationException<Unit>(keyGit);
+
+            var keyHost = GetKeyHost(key);
+            if (!SaveKey(keyHost, values.Item1, values.Item2))
+                return ExceptionHelper.ObservableThrowInvalidOperationException<Unit>(keyGit);
+
+            return Observable.Return(Unit.Default);
+        }
+
+        static IObservable<Unit> InsertTuple(string key, Tuple<string, SecureString> values)
+        {
             var keyGit = GetKeyGit(key);
             if (!SaveKey(keyGit, values.Item1, values.Item2))
                 return ExceptionHelper.ObservableThrowInvalidOperationException<Unit>(keyGit);
@@ -103,6 +121,8 @@ namespace GitHub.Caches
         {
             if (typeof(T) == typeof(Tuple<string, string>))
                 return (IObservable<T>) GetTuple(key);
+            if (typeof(T) == typeof(Tuple<string, SecureString>))
+                return (IObservable<T>)GetSecureTuple(key);
             return ExceptionHelper.ObservableThrowInvalidOperationException<T>(key);
         }
 
@@ -115,6 +135,17 @@ namespace GitHub.Caches
             return ret != null
                 ? Observable.Return(ret)
                 : ExceptionHelper.ObservableThrowKeyNotFoundException<Tuple<string, string>>(keyHost);
+        }
+
+        IObservable<Tuple<string, SecureString>> GetSecureTuple(string key)
+        {
+            if (disposed) return ExceptionHelper.ObservableThrowObjectDisposedException<Tuple<string, SecureString>>("CredentialCache");
+
+            var keyHost = GetKeyHost(key);
+            var ret = GetSecureKey(keyHost);
+            return ret != null
+                ? Observable.Return(ret)
+                : ExceptionHelper.ObservableThrowKeyNotFoundException<Tuple<string, SecureString>>(keyHost);
         }
 
         public IObservable<IEnumerable<T>> GetAllObjects<T>()
@@ -188,8 +219,14 @@ namespace GitHub.Caches
         {
             using (var credential = new Credential(user, pwd, key))
             {
-                credential.Type = CredentialType.Generic;
-                credential.PersistenceType = PersistenceType.LocalComputer;
+                return credential.Save();
+            }
+        }
+
+        static bool SaveKey(string key, string user, SecureString pwd)
+        {
+            using (var credential = new Credential(user, pwd, key))
+            {
                 return credential.Save();
             }
         }
@@ -199,9 +236,19 @@ namespace GitHub.Caches
             using (var credential = new Credential())
             {
                 credential.Target = key;
-                credential.Type = CredentialType.Generic;
                 return credential.Load()
                     ? new Tuple<string, string>(credential.Username, credential.Password)
+                    : null;
+            }
+        }
+
+        static Tuple<string, SecureString> GetSecureKey(string key)
+        {
+            using (var credential = new Credential())
+            {
+                credential.Target = key;
+                return credential.Load()
+                    ? new Tuple<string, SecureString>(credential.Username, credential.SecurePassword)
                     : null;
             }
         }
