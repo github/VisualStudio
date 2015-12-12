@@ -51,9 +51,6 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LibGit2Sharp, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\LibGit2Sharp.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
       <Private>False</Private>
@@ -139,6 +136,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\AvatarProvider.cs" />
+    <Compile Include="Services\GitHubCredentialProvider.cs" />
+    <Compile Include="Services\IGitHubCredentialProvider.cs" />
     <Compile Include="Services\ImageDownloader.cs" />
     <Compile Include="Services\GitClient.cs" />
     <Compile Include="Services\ModelService.cs" />
@@ -242,6 +241,11 @@
     <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
       <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
       <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
+      <Project>{EE6ED99F-CB12-4683-B055-D28FC7357A34}</Project>
+      <Name>LibGit2Sharp</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
       <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>

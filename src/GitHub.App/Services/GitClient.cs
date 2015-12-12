@@ -11,6 +11,16 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
+        readonly PushOptions pushOptions;
+        readonly FetchOptions fetchOptions;
+
+        [ImportingConstructor]
+        public GitClient(IGitHubCredentialProvider credentialProvider)
+        {
+            pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
+            fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
+        }
+
         public IObservable<Unit> Push(IRepository repository, string branchName, string remoteName)
         {
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
@@ -21,7 +31,7 @@ namespace GitHub.Services
                 if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
                     var remote = repository.Network.Remotes[remoteName];
-                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName);
+                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
                 }
                 return Observable.Return(Unit.Default);
             });
@@ -34,7 +44,7 @@ namespace GitHub.Services
             return Observable.Defer(() =>
             {
                 var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote);
+                repository.Network.Fetch(remote, fetchOptions);
                 return Observable.Return(Unit.Default);
             });
         }
