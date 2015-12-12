@@ -97,7 +97,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GistFromVisualStudio.md.
+        ///   Looks up a localized string similar to GistFromVisualStudio.cs.
         /// </summary>
         public static string DefaultGistFileName {
             get {

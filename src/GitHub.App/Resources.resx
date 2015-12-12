@@ -130,7 +130,7 @@
     <value>Create a {0} Repository</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
-    <value>GistFromVisualStudio.md</value>
+    <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
     <value>Please enter an Enterprise URL</value>
