@@ -20,7 +20,7 @@ namespace GitHub.ViewModels
         readonly IApiClient apiClient;
 
         [ImportingConstructor]
-        GistCreationViewModel(ISelectedTextProvider selectedTextProvider, IApiClientFactory apiClientFactory)
+        public GistCreationViewModel(ISelectedTextProvider selectedTextProvider, IApiClientFactory apiClientFactory)
         {
             Title = Resources.CreateGistTitle;
             this.selectedTextProvider = selectedTextProvider;
@@ -30,7 +30,7 @@ namespace GitHub.ViewModels
             // add a custom name if they do not want to
             FileName = Resources.DefaultGistFileName;
 
-            var canCreateGist = this.WhenAny(
+            var canCreateGist = this.WhenAny( 
                 x => x.FileName,
                 fileName => !string.IsNullOrEmpty(fileName.Value));
 
@@ -67,15 +67,6 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
-        }
-
-        string content;
-        [AllowNull]
-        public string Content
-        {
-            [return: AllowNull]
-            get { return content; }
-            set { this.RaiseAndSetIfChanged(ref content, value); }
         }
 
         string fileName;

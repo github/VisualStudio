@@ -21,11 +21,6 @@ namespace GitHub.ViewModels
         string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the main content of the gist.
-        /// </summary>
-        string Content { get; set; }
-
-        /// <summary>
         /// Gets or sets the file name of the gist (should include extension).
         /// </summary>
         string FileName { get; set; }
