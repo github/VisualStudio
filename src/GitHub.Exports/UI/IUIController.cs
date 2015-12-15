@@ -7,8 +7,13 @@ namespace GitHub.UI
 {
     public interface IUIController
     {
-        //IObservable<object> Transition { get; }
         IObservable<UserControl> SelectFlow(UIControllerFlow choice);
+        /// <summary>
+        /// Allows listening to the completion state of the ui flow - whether
+        /// it was completed because it was cancelled or whether it succeeded.
+        /// </summary>
+        /// <returns>true for success, false for cancel</returns>
+        IObservable<bool> ListenToCompletionState();
         void Start(IConnection connection);
         void Stop();
         bool IsStopped { get; }
