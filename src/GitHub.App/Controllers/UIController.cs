@@ -143,7 +143,8 @@ namespace GitHub.Controllers
         /// <returns>true for success, false for cancel</returns>
         public IObservable<bool> ListenToCompletionState()
         {
-            completion = new Subject<bool>();
+            if (completion == null)
+                completion = new Subject<bool>();
             return completion;
         }
 
