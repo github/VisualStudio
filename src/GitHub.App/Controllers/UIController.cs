@@ -151,8 +151,9 @@ namespace GitHub.Controllers
         {
             uiProvider.RemoveService(typeof(IConnection));
             transition.OnCompleted();
-            completion.OnNext(success);
-            completion.OnCompleted();
+            completion?.OnNext(success);
+            completion?.OnCompleted();
+            completion = null;
         }
 
         void RunView(UIViewType viewType)
@@ -294,6 +295,7 @@ namespace GitHub.Controllers
                 Debug.WriteLine("Disposing ({0})", GetHashCode());
                 disposables.Dispose();
                 transition?.Dispose();
+                completion?.Dispose();
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
                 connectionAdded = null;
