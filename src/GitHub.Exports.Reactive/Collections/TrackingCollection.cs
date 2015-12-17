@@ -13,6 +13,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace GitHub.Collections
 {
@@ -47,6 +48,7 @@ namespace GitHub.Collections
         Func<T, int, IList<T>, bool> filter;
         readonly IScheduler scheduler;
         ConcurrentQueue<ActionData> queue;
+        IDisposable sourceQueueDisposable;
 
         readonly List<T> original = new List<T>();
 #if DEBUG
@@ -73,6 +75,9 @@ namespace GitHub.Collections
             }
         }
 
+        BehaviorSubject<TrackingCollectionState> currentState;
+        public IObservable<TrackingCollectionState> CurrentState { get { return currentState; } }
+
         public TrackingCollection(Func<T, T, int> comparer = null, Func<T, int, IList<T>, bool> filter = null, IScheduler scheduler = null)
         {
             queue = new ConcurrentQueue<ActionData>();
@@ -86,6 +91,9 @@ namespace GitHub.Collections
 #endif
             this.comparer = comparer ?? Comparer<T>.Default.Compare;
             this.filter = filter;
+
+            currentState = new BehaviorSubject<TrackingCollectionState>(TrackingCollectionState.Idle);
+            SetupQueue();
         }
 
         public TrackingCollection(IObservable<T> source,
@@ -97,23 +105,10 @@ namespace GitHub.Collections
             Listen(source);
         }
 
-        /// <summary>
-        /// Sets up an observable as source for the collection.
-        /// </summary>
-        /// <param name="obs"></param>
-        /// <returns>An observable that will return all the items that are
-        /// fed via the original observer, for further processing by user code
-        /// if desired</returns>
-        public IObservable<T> Listen(IObservable<T> obs)
+        void SetupQueue()
         {
-            if (disposed)
-                throw new ObjectDisposedException("TrackingCollection");
-
-            sourceQueue = obs
-                .Do(data => queue.Enqueue(new ActionData(data)));
-
             source = Observable
-                .Generate(StartQueue(),
+                .Generate(0,
                     i => !disposed,
                     i => i + 1,
                     i => GetFromQueue(),
@@ -141,7 +136,23 @@ namespace GitHub.Collections
                 .Select(data => data.Item)
                 .Publish()
                 .RefCount();
+        }
 
+        /// <summary>
+        /// Sets up an observable as source for the collection.
+        /// </summary>
+        /// <param name="obs"></param>
+        /// <returns>An observable that will return all the items that are
+        /// fed via the original observer, for further processing by user code
+        /// if desired</returns>
+        public IObservable<T> Listen(IObservable<T> obs)
+        {
+            if (disposed)
+                throw new ObjectDisposedException("TrackingCollection");
+
+            sourceQueue = obs
+                .Do(data => queue.Enqueue(new ActionData(data)));
+            StartQueue();
             return source;
         }
 
@@ -203,6 +214,17 @@ namespace GitHub.Collections
             queue.Enqueue(new ActionData(TheAction.Remove, item));
         }
 
+        /// <summary>
+        /// For cases where the collection might get disposed while loading
+        /// code might still be running in other threads.
+        /// </summary>
+        public void SafeRemoveItem(T item)
+        {
+            if (disposed)
+                return;
+            queue.Enqueue(new ActionData(TheAction.Remove, item));
+        }
+
         void SetAndRecalculateSort(Func<T, T, int> theComparer)
         {
             comparer = theComparer ?? Comparer<T>.Default.Compare;
@@ -235,8 +257,17 @@ namespace GitHub.Collections
 
         int StartQueue()
         {
-            disposables.Add(sourceQueue.Subscribe());
+            if (sourceQueueDisposable != null)
+                disposables.Remove(sourceQueueDisposable);
+            currentState.OnNext(TrackingCollectionState.Loading);
+            sourceQueueDisposable = sourceQueue.Subscribe(_ => { }, RaiseCompleted);
+            disposables.Add(sourceQueueDisposable);
             return 0;
+        }
+
+        void RaiseCompleted()
+        {
+            currentState.OnNext(TrackingCollectionState.Done);
         }
 
         ActionData GetFromQueue()
@@ -846,6 +877,7 @@ namespace GitHub.Collections
                 if (!disposed)
                 {
                     disposed = true;
+                    currentState.OnCompleted();
                     queue = null;
                     disposables.Dispose();
                 }
