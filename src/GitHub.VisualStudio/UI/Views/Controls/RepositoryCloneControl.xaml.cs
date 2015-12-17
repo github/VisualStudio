@@ -40,7 +40,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoading, v => v.loadingProgressBar.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.LoadingFailed, v => v.loadingFailedPanel.Visibility));
                 d(this.OneWayBind(ViewModel, vm => vm.NoRepositoriesFound, v => v.noRepositoriesMessage.Visibility));
-                d(this.OneWayBind(ViewModel, vm => vm.FilteredRepositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
+                d(this.OneWayBind(ViewModel, vm => vm.Repositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
                 d(this.Bind(ViewModel, vm => vm.SelectedRepository, v => v.repositoryList.SelectedItem));
                 d(this.Bind(ViewModel, vm => vm.BaseRepositoryPath, v => v.clonePath.Text));
                 d(this.OneWayBind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
@@ -48,8 +48,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
                 d(this.OneWayBind(ViewModel, vm => vm.FilterTextIsEnabled, v => v.filterText.IsEnabled));
                 d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
+                d(this.BindCommand(ViewModel, vm => vm.RefreshCommand, v => v.refreshButton));
                 d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
-                d(ViewModel.LoadRepositoriesCommand.ExecuteAsync().Subscribe());
+                //d(ViewModel.LoadRepositoriesCommand.ExecuteAsync().Subscribe());
                 ViewModel.CloneCommand.Subscribe(_ => NotifyDone());
             });
             IsVisibleChanged += (s, e) =>

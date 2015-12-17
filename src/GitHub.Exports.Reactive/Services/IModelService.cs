@@ -16,7 +16,7 @@ namespace GitHub.Services
         IObservable<AccountCacheItem> GetUserFromCache();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
-        IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories();
+        ITrackingCollection<IRepositoryModel> GetRepositories(bool forceRefresh = false);
         IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
         IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo);

@@ -122,12 +122,27 @@ namespace GitHub.Services
                  });
         }
 
-        public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
+        public ITrackingCollection<IRepositoryModel> GetRepositories(bool forceRefresh = false)
         {
-            return GetUserRepositories(RepositoryType.Owner)
-                .Take(1)
-                .Concat(GetUserRepositories(RepositoryType.Member).Take(1))
-                .Concat(GetAllRepositoriesForAllOrganizations());
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|repos", user.Login));
+
+            var col = new TrackingCollection<IRepositoryModel>();
+
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
+                        apiClient.GetUserRepositories(RepositoryType.All)
+                                 .Select(RepositoryCacheItem.Create),
+                        item => col.SafeRemoveItem(Create(item)),
+                        forceRefresh ? TimeSpan.Zero : TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
+
+            col.Listen(source);
+            return col;
         }
 
         public IObservable<AccountCacheItem> GetUserFromCache()
@@ -307,7 +322,7 @@ namespace GitHub.Services
             public string Name { get; set; }
         }
 
-        public class RepositoryCacheItem
+        public class RepositoryCacheItem : CacheItem
         {
             public static RepositoryCacheItem Create(Repository apiRepository)
             {
@@ -323,6 +338,11 @@ namespace GitHub.Services
                 CloneUrl = apiRepository.CloneUrl;
                 Private = apiRepository.Private;
                 Fork = apiRepository.Fork;
+                CreatedAt = apiRepository.CreatedAt;
+                UpdatedAt = apiRepository.UpdatedAt;
+
+                Key = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner.Login, Name);
+                Timestamp = apiRepository.UpdatedAt;
             }
 
             public string Name { get; set; }
@@ -335,6 +355,8 @@ namespace GitHub.Services
             public string CloneUrl { get; set; }
             public bool Private { get; set; }
             public bool Fork { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
+            public DateTimeOffset UpdatedAt { get; set; }
         }
 
         public class PullRequestCacheItem : CacheItem

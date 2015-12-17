@@ -47,11 +47,19 @@
                 Value="0" />
       </Style>
     </DockPanel.Resources>
-    
-    <ui:FilterTextBox x:Name="filterText"
-                      DockPanel.Dock="Top"
-                      PromptText="{x:Static prop:Resources.filterTextPromptText}"
-                      Margin="10" />
+
+    <WrapPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+      <ui:OcticonCircleButton Margin="0,0,6,0"
+                              x:Name="refreshButton"
+                              HorizontalAlignment="Left"
+                              Icon="refresh">
+      </ui:OcticonCircleButton>
+
+      <ui:FilterTextBox x:Name="filterText"
+                        DockPanel.Dock="Top"
+                        PromptText="{x:Static prop:Resources.filterTextPromptText}"
+                        Margin="10" />
+    </WrapPanel>
 
     <ui:GitHubProgressBar x:Name="loadingProgressBar"
                           DockPanel.Dock="Top"
