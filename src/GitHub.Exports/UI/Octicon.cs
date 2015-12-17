@@ -144,6 +144,7 @@ namespace GitHub.UI
         question,
         quote,
         radio_tower,
+        refresh,
         repo_clone,
         repo_force_push,
         repo_forked,
