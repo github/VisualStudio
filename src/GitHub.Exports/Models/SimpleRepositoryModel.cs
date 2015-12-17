@@ -10,7 +10,7 @@ using GitHub.Services;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, INotifyPropertySource, IEquatable<SimpleRepositoryModel>
+    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, INotifyPropertySource
     {
         public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
         {
@@ -61,6 +61,16 @@ namespace GitHub.Models
         public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
 
         /// <summary>
+        /// Implementation
+        /// </summary>
+        /// <param name="other"></param>
+        public void CopyFrom(ISimpleRepositoryModel other)
+        {
+            if (!Equals(other))
+                throw new ArgumentException("Instance to copy from doesn't match this instance. this:(" + this + ") other:(" + other + ")", nameof(other));
+        }
+
+        /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
         /// of a repository. Equals takes care of any hash collisions because of this
         /// </summary>
@@ -78,11 +88,40 @@ namespace GitHub.Models
             return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
-        bool IEquatable<SimpleRepositoryModel>.Equals(SimpleRepositoryModel other)
+        bool IEquatable<ISimpleRepositoryModel>.Equals(ISimpleRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        public int CompareTo(ISimpleRepositoryModel other)
+        {
+            return string.Compare(Name, other.Name, StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        public static bool operator >(SimpleRepositoryModel lhs, SimpleRepositoryModel rhs)
+        {
+            if (ReferenceEquals(lhs, rhs))
+                return false;
+            return lhs?.CompareTo(rhs) > 0;
+        }
+
+        public static bool operator <(SimpleRepositoryModel lhs, SimpleRepositoryModel rhs)
+        {
+            if (ReferenceEquals(lhs, rhs))
+                return false;
+            return (object)lhs == null || lhs.CompareTo(rhs) < 0;
+        }
+
+        public static bool operator ==(SimpleRepositoryModel lhs, SimpleRepositoryModel rhs)
+        {
+            return Equals(lhs, rhs) && ((object)lhs == null || lhs.CompareTo(rhs) == 0);
+        }
+
+        public static bool operator !=(SimpleRepositoryModel lhs, SimpleRepositoryModel rhs)
+        {
+            return !(lhs == rhs);
         }
 
         internal string DebuggerDisplay => String.Format(

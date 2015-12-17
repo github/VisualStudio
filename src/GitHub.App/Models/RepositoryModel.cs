@@ -17,7 +17,7 @@ namespace GitHub.Models
         public IAccount Owner { get; private set; }
         public override int GetHashCode()
         {
-            return (Owner?.GetHashCode() ?? 0) ^ base.GetHashCode();
+            return (Owner?.Login.GetHashCode() ?? 0) ^ base.GetHashCode();
         }
 
         public override bool Equals([AllowNull]object obj)
@@ -25,14 +25,14 @@ namespace GitHub.Models
             if (ReferenceEquals(this, obj))
                 return true;
             var other = obj as RepositoryModel;
-            return other != null && Equals(Owner, other.Owner) && base.Equals(obj);
+            return other != null && String.Equals(Owner?.Login, other.Owner?.Login) && base.Equals(obj);
         }
 
         bool IEquatable<RepositoryModel>.Equals([AllowNull]RepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return other != null && Equals(Owner, other.Owner) && base.Equals(other as SimpleRepositoryModel);
+            return other != null && String.Equals(Owner?.Login, other.Owner?.Login) && base.Equals(other as SimpleRepositoryModel);
         }
 
         internal string DebuggerDisplay
