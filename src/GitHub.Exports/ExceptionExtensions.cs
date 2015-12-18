@@ -3,7 +3,7 @@ using Octokit;
 
 namespace GitHub.Extensions
 {
-    public static class ExceptionExtensions
+    public static class ApiExceptionExtensions
     {
         const string GithubHeader = "X-GitHub-Request-Id";
         public static bool IsGitHubApiException(this Exception ex)
