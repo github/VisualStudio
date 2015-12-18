@@ -98,7 +98,8 @@ namespace GitHub.Services
         {
             return hostCache.GetAndRefreshObject("user",
                 () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
-                .Take(1)
+                .PublishLast()
+                .RefCount()
                 .ToList();
         }
 
@@ -107,7 +108,7 @@ namespace GitHub.Services
             return GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
-                    TimeSpan.FromMinutes(5), TimeSpan.FromDays(7)))
+                    TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
                 .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
@@ -125,8 +126,12 @@ namespace GitHub.Services
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
         {
             return GetUserRepositories(RepositoryType.Owner)
-                .Take(1)
-                .Concat(GetUserRepositories(RepositoryType.Member).Take(1))
+                .PublishLast()
+                .RefCount()
+                .Concat(GetUserRepositories(RepositoryType.Member)
+                    .PublishLast()
+                    .RefCount()
+                )
                 .Concat(GetAllRepositoriesForAllOrganizations());
         }
 
@@ -174,7 +179,7 @@ namespace GitHub.Services
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
                     () => GetUserRepositoriesFromApi(repositoryType),
-                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
                 .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
@@ -202,7 +207,10 @@ namespace GitHub.Services
         {
             return GetUserOrganizations()
                 .SelectMany(org => org.ToObservable())
-                .SelectMany(org => GetOrganizationRepositories(org.Login).Take(1));
+                .SelectMany(org => GetOrganizationRepositories(org.Login)
+                    .PublishLast()
+                    .RefCount()
+                );
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
@@ -211,7 +219,7 @@ namespace GitHub.Services
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
                     () => apiClient.GetRepositoriesForOrganization(organization).Select(
                         RepositoryCacheItem.Create).ToList(),
-                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
                 .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
