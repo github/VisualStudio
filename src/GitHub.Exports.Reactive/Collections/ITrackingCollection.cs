@@ -1,9 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Reactive;
 
 namespace GitHub.Collections
 {
+    public enum TrackingCollectionState
+    {
+        /// <summary>
+        /// Not started
+        /// </summary>
+        Idle,
+        /// <summary>
+        /// Loading
+        /// </summary>
+        Loading,
+        /// <summary>
+        /// Loading completed successfully
+        /// </summary>
+        Done,
+        /// <summary>
+        ///  Loading failed
+        /// </summary>
+        Failed
+    }
+
     /// <summary>
     /// TrackingCollection is a specialization of ObservableCollection that gets items from
     /// an observable sequence and updates its contents in such a way that two updates to
@@ -44,5 +65,7 @@ namespace GitHub.Collections
         /// </summary>
         TimeSpan ProcessingDelay { get; set; }
         event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        IObservable<TrackingCollectionState> CurrentState { get; }
     }
 }

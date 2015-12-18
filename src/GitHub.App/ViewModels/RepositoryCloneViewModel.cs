@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.Exports;
@@ -15,12 +16,13 @@ using NLog;
 using NullGuard;
 using ReactiveUI;
 using Rothko;
+using GitHub.Collections;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
@@ -28,13 +30,14 @@ namespace GitHub.ViewModels
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
         readonly IVSServices vsServices;
-        readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
+        //readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        readonly ObservableAsPropertyHelper<bool> isLoading;
         readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         string baseRepositoryPath;
         bool loadingFailed;
+        bool isLoading;
 
         [ImportingConstructor]
         RepositoryCloneViewModel(
@@ -57,27 +60,17 @@ namespace GitHub.ViewModels
             this.vsServices = vsServices;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
-            Repositories = new ReactiveList<IRepositoryModel>();
-            loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
-            isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
-                .CombineLatest(loadRepositoriesCommand.IsExecuting, (failed, loading) => !failed && loading)
-                .ToProperty(this, x => x.IsLoading);
-            loadRepositoriesCommand.Subscribe(Repositories.AddRange);
-            filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
-                .ToProperty(this, x => x.FilterTextIsEnabled);
-            noRepositoriesFound = this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
-                , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
+
+            SetupCollection();
+
+            noRepositoriesFound = this.WhenAny(x => x.FilterTextIsEnabled, v => !v.Value)
                 .ToProperty(this, x => x.NoRepositoriesFound);
 
-            var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
+            this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
-                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler);
-
-            FilteredRepositories = Repositories.CreateDerivedCollection(
-                x => x,
-                filter: FilterRepository,
-                signalReset: filterResetSignal
-            );
+                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler)
+                .Do(filter => Repositories.SetFilter((r, index, l) => FilterRepository(r)))
+                .Subscribe();
 
             BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
 
@@ -88,23 +81,39 @@ namespace GitHub.ViewModels
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
             CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
 
+            var canRefresh = this.WhenAny(x => x.IsLoading, v => !v.Value);
+            RefreshCommand = ReactiveCommand.CreateAsyncObservable(canRefresh, _ => SetupCollection(true));
+
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
                 .Subscribe();
             BaseRepositoryPath = cloneService.DefaultClonePath;
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
+        IObservable<Unit> SetupCollection(bool forceRefresh = false)
         {
-            return repositoryHost.ModelService.GetRepositories()
-                .Catch<IReadOnlyList<IRepositoryModel>, Exception>(ex =>
-                {
-                    log.Error("Error while loading repositories", ex);
-                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
-                        .Select(_ => new IRepositoryModel[] { });
-                });
+            disposables.Clear();
+
+            IsLoading = LoadingFailed = FilterTextIsEnabled = false;
+
+            Repositories = repositoryHost.ModelService.GetRepositories(forceRefresh);
+            disposables.Add(Repositories);
+
+            Repositories.CurrentState
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Select(s => IsLoading = s == TrackingCollectionState.Loading)
+                .Subscribe();
+
+            Repositories.CurrentState
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Select(s => LoadingFailed = s == TrackingCollectionState.Failed)
+                .Subscribe();
+
+            disposables.Add(Repositories.Subscribe(_ => FilterTextIsEnabled = FilterTextIsEnabled || Repositories.Count > 0, () => { }));
+
+            return Observable.Return(Unit.Default);
         }
-       
+
         bool FilterRepository(IRepositoryModel repo)
         {
             if (string.IsNullOrWhiteSpace(FilterText))
@@ -148,25 +157,19 @@ namespace GitHub.ViewModels
         /// Fires off the cloning process
         /// </summary>
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
+        /// <summary>
+        /// Refreshes the list of repositories from the server
+        /// </summary>
+        public IReactiveCommand<Unit> RefreshCommand { get; private set; }
 
-        IReactiveList<IRepositoryModel> repositories;
+        ITrackingCollection<IRepositoryModel> repositories;
         /// <summary>
         /// List of repositories as returned by the server
         /// </summary>
-        public IReactiveList<IRepositoryModel> Repositories
+        public ITrackingCollection<IRepositoryModel> Repositories
         {
             get { return repositories; }
             private set { this.RaiseAndSetIfChanged(ref repositories, value); }
-        }
-
-        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
-        /// <summary>
-        /// List of repositories as filtered by user
-        /// </summary>
-        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
-        {
-            get { return filteredRepositories; }
-            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
         }
 
         IRepositoryModel selectedRepository;
@@ -181,11 +184,14 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
         }
 
-        readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
+        bool filterTextIsEnabled;
         /// <summary>
         /// True if there are repositories (otherwise no point in filtering)
         /// </summary>
-        public bool FilterTextIsEnabled { get { return filterTextIsEnabled.Value; } }
+        public bool FilterTextIsEnabled {
+            get { return filterTextIsEnabled; }
+            set { this.RaiseAndSetIfChanged(ref filterTextIsEnabled, value); }
+        }
 
         string filterText;
         /// <summary>
@@ -201,13 +207,14 @@ namespace GitHub.ViewModels
 
         public bool IsLoading
         {
-            get { return isLoading.Value; }
+            get { return isLoading; }
+            set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
-        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
-        {
-            get { return loadRepositoriesCommand; }
-        }
+        //public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
+        //{
+        //    get { return loadRepositoriesCommand; }
+        //}
 
         public bool LoadingFailed
         {
@@ -263,5 +270,25 @@ namespace GitHub.ViewModels
                 }
             }, RxApp.MainThreadScheduler);
         }
+
+        bool disposed = false;
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!disposed)
+                {
+                    disposed = true;
+                    disposables.Dispose();
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
     }
 }

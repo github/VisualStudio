@@ -17,6 +17,8 @@ using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
+using GitHub.Collections;
+using System.Reactive.Linq;
 
 namespace GitHub.SampleData
 {
@@ -388,72 +390,50 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class RepositoryModelDesigner : NotificationAwareObject, IRepositoryModel
+    public class RepositoryModelDesigner : RepositoryModel
     {
         public RepositoryModelDesigner() : this("repo")
         {
         }
 
-        public RepositoryModelDesigner(string name) : this("repo", "github")
+        public RepositoryModelDesigner(string name) : this(name, "github")
         {
-            Name = name;
         }
 
         public RepositoryModelDesigner(string name, string owner)
-        {
-            Name = name;
-            Owner = new AccountDesigner { Login = owner };
-        }
-
-        public void SetIcon(bool isPrivate, bool isFork)
+            : base(name, "https://github.com/"+owner+"/"+name, false, false, new AccountDesigner { Login = owner })
         {
         }
-
-        public string Name { get; set; }
-        public UriString CloneUrl { get; set; }
-        public string LocalPath { get; set; }
-
-        public Octicon Icon { get; set; }
-
-        public IAccount Owner { get; set; }
-
-        public void Refresh() { }
     }
 
     public class RepositoryCloneViewModelDesigner : BaseViewModelDesigner, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
-            var repositories = new ReactiveList<IRepositoryModel>
-            {
-                new RepositoryModelDesigner("encourage", "haacked"),
-                new RepositoryModelDesigner("haacked.com", "haacked"),
-                new RepositoryModelDesigner("octokit.net", "octokit"),
-                new RepositoryModelDesigner("octokit.rb", "octokit"),
-                new RepositoryModelDesigner("octokit.objc", "octokit"),
-                new RepositoryModelDesigner("windows", "github"),
-                new RepositoryModelDesigner("mac", "github"),
-                new RepositoryModelDesigner("github", "github")
-            };
-
             BrowseForDirectory = ReactiveCommand.Create();
 
-            FilteredRepositories = repositories.CreateDerivedCollection(
-                x => x
-            );
+            Repositories = new TrackingCollection<IRepositoryModel>(
+                new List<IRepositoryModel>
+                {
+                    new RepositoryModelDesigner("encourage", "haacked"),
+                    new RepositoryModelDesigner("haacked.com", "haacked"),
+                    new RepositoryModelDesigner("octokit.net", "octokit"),
+                    new RepositoryModelDesigner("octokit.rb", "octokit"),
+                    new RepositoryModelDesigner("octokit.objc", "octokit"),
+                    new RepositoryModelDesigner("windows", "github"),
+                    new RepositoryModelDesigner("mac", "github"),
+                    new RepositoryModelDesigner("github", "github")
+                }.ToObservable());
 
             BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
         }
 
-        public IReactiveCommand<Unit> CloneCommand
-        {
-            get;
-            private set;
-        }
+        public IReactiveCommand<Unit> CloneCommand { get; private set; }
+        public IReactiveCommand<Unit> RefreshCommand { get; private set; }
 
         public IRepositoryModel SelectedRepository { get; set; }
 
-        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
+        public ITrackingCollection<IRepositoryModel> Repositories
         {
             get;
             private set;

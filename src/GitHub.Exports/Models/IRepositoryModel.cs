@@ -1,5 +1,4 @@
-﻿using GitHub.Primitives;
-using GitHub.UI;
+﻿using System;
 
 namespace GitHub.Models
 {
