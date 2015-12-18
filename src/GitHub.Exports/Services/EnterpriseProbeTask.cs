@@ -41,9 +41,7 @@ namespace GitHub.Services
             var ret = await httpClient
                     .Send(request, CancellationToken.None)
                     .Catch(ex => {
-                        var apiex = ex as ApiException;
-                        if (apiex != null)
-                            success = apiex.HttpResponse?.Headers.ContainsKey("X-GitHub-Request-Id") ?? false;
+                        success = ex.IsGitHubApiException();
                         return null;
                     });
 

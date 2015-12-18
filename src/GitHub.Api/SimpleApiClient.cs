@@ -74,7 +74,7 @@ namespace GitHub.Api
             catch (ApiException apiex)
             {
                 if (!HostAddress.IsGitHubDotComUri(OriginalUrl.ToRepositoryUrl()))
-                    isEnterprise = apiex.HttpResponse?.Headers.ContainsKey("X-GitHub-Request-Id");
+                    isEnterprise = apiex.IsGitHubApiException();
             }
             catch {}
             finally
