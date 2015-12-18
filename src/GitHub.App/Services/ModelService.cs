@@ -98,8 +98,7 @@ namespace GitHub.Services
         {
             return hostCache.GetAndRefreshObject("user",
                 () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
-                .PublishLast()
-                .RefCount()
+                .TakeLast(1)
                 .ToList();
         }
 
@@ -126,12 +125,8 @@ namespace GitHub.Services
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
         {
             return GetUserRepositories(RepositoryType.Owner)
-                .PublishLast()
-                .RefCount()
-                .Concat(GetUserRepositories(RepositoryType.Member)
-                    .PublishLast()
-                    .RefCount()
-                )
+                .TakeLast(1)
+                .Concat(GetUserRepositories(RepositoryType.Member).TakeLast(1))
                 .Concat(GetAllRepositoriesForAllOrganizations());
         }
 
@@ -207,10 +202,7 @@ namespace GitHub.Services
         {
             return GetUserOrganizations()
                 .SelectMany(org => org.ToObservable())
-                .SelectMany(org => GetOrganizationRepositories(org.Login)
-                    .PublishLast()
-                    .RefCount()
-                );
+                .SelectMany(org => GetOrganizationRepositories(org.Login).TakeLast(1));
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
