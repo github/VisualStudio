@@ -37,12 +37,18 @@ namespace GitHub.Services
             };
             request.Headers.Add("User-Agent", productHeader.ToString());
 
+            var success = false;
             var ret = await httpClient
                     .Send(request, CancellationToken.None)
-                    .Catch(ex => null);
+                    .Catch(ex => {
+                        var apiex = ex as ApiException;
+                        if (apiex != null)
+                            success = apiex.HttpResponse?.Headers.ContainsKey("X-GitHub-Request-Id") ?? false;
+                        return null;
+                    });
 
             if (ret == null)
-                return EnterpriseProbeResult.Failed;
+                return success ? EnterpriseProbeResult.Ok : EnterpriseProbeResult.Failed;
             else if (ret.StatusCode == HttpStatusCode.OK)
                 return EnterpriseProbeResult.Ok;
             return EnterpriseProbeResult.NotFound;
