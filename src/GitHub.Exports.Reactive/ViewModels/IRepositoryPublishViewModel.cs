@@ -11,7 +11,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Command that creates the repository.
         /// </summary>
-        IReactiveCommand<Unit> PublishRepository { get; }
+        IReactiveCommand<ProgressState> PublishRepository { get; }
 
         /// <summary>
         /// True when publishing is in progress.
@@ -33,4 +33,13 @@ namespace GitHub.ViewModels
         /// </summary>
         string DefaultRepositoryName { get; }
     }
+
+    public enum ProgressState
+    {
+        Idle,
+        Running,
+        Success,
+        Fail
+    }
+
 }

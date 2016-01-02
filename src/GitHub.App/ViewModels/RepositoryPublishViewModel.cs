@@ -117,7 +117,7 @@ namespace GitHub.ViewModels
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
         public bool IsPublishing { get { return isPublishing.Value; } }
 
-        public IReactiveCommand<Unit> PublishRepository { get; private set; }
+        public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
         public ReactiveList<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
@@ -145,21 +145,24 @@ namespace GitHub.ViewModels
             get { return isHostComboBoxVisible.Value; }
         }
 
-        ReactiveCommand<Unit> InitializePublishRepositoryCommand()
+        ReactiveCommand<ProgressState> InitializePublishRepositoryCommand()
         {
             var canCreate = this.WhenAny(x => x.RepositoryNameValidator.ValidationResult.IsValid, x => x.Value);
             return ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
         }
 
-        private IObservable<Unit> OnPublishRepository(object arg)
+        IObservable<ProgressState> OnPublishRepository(object arg)
         {
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
-                .SelectUnit()
-                .Do(_ => vsServices.ShowMessage("Repository published successfully."))
-                .Catch<Unit, Exception>(ex =>
+                .Select(_ =>
+                {
+                    vsServices.ShowMessage("Repository published successfully.");
+                    return ProgressState.Success;
+                })
+                .Catch<ProgressState, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
                     {
@@ -167,7 +170,7 @@ namespace GitHub.ViewModels
                         var error = new PublishRepositoryUserError(ex.Message);
                         vsServices.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
                     }
-                    return Observable.Return(Unit.Default);
+                    return Observable.Return(ProgressState.Fail);
                 });
         }
 
