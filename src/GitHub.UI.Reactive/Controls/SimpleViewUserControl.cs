@@ -43,18 +43,27 @@ namespace GitHub.UI
 
         protected void NotifyDone()
         {
+            if (disposed)
+                return;
+
             close.OnNext(null);
             close.OnCompleted();
         }
 
         protected void NotifyCancel()
         {
+            if (disposed)
+                return;
+
             cancel.OnNext(null);
             cancel.OnCompleted();
         }
 
         protected void NotifyIsBusy(bool busy)
         {
+            if (disposed)
+                return;
+
             isBusy.OnNext(busy);
         }
 

@@ -44,7 +44,11 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.description.IsEnabled, x => x == false));
                 d(this.OneWayBind(ViewModel, vm => vm.IsPublishing, v => v.accountsComboBox.IsEnabled, x => x == false));
 
-                ViewModel.PublishRepository.Subscribe(_ => NotifyDone());
+                ViewModel.PublishRepository.Subscribe(state =>
+                {
+                    if (state == ProgressState.Success)
+                        NotifyDone();
+                });
 
                 d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value)
                 .Subscribe(x => NotifyIsBusy(x)));

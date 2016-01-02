@@ -36,6 +36,7 @@ namespace GitHub.Controllers
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly StateMachine<UIViewType, Trigger> machine;
         Subject<UserControl> transition;
+        Subject<bool> completion;
         UIControllerFlow currentFlow;
         NotifyCollectionChangedEventHandler connectionAdded;
 
@@ -128,17 +129,10 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Next, UIViewType.End);
 
             machine.Configure(UIViewType.End)
-                .OnEntry(() =>
-                {
-                    uiProvider.RemoveService(typeof(IConnection));
-                    transition.OnCompleted();
-                })
+                .OnEntryFrom(Trigger.Cancel, () => End(false))
+                .OnEntryFrom(Trigger.Next, () => End(true))
                 .Permit(Trigger.Next, UIViewType.Finished);
 
-            // it might be useful later to check which triggered
-            // made us enter here (Cancel or Next) and set a final
-            // result accordingly, which is why UIViewType.End only
-            // allows a Next trigger
             machine.Configure(UIViewType.Finished);
         }
 
@@ -150,6 +144,27 @@ namespace GitHub.Controllers
             transition.Subscribe(_ => { }, _ => Fire(Trigger.Next));
         
             return transition;
+        }
+
+        /// <summary>
+        /// Allows listening to the completion state of the ui flow - whether
+        /// it was completed because it was cancelled or whether it succeeded.
+        /// </summary>
+        /// <returns>true for success, false for cancel</returns>
+        public IObservable<bool> ListenToCompletionState()
+        {
+            if (completion == null)
+                completion = new Subject<bool>();
+            return completion;
+        }
+
+        void End(bool success)
+        {
+            uiProvider.RemoveService(typeof(IConnection));
+            transition.OnCompleted();
+            completion?.OnNext(success);
+            completion?.OnCompleted();
+            completion = null;
         }
 
         void RunView(UIViewType viewType)
@@ -295,6 +310,7 @@ namespace GitHub.Controllers
                 Debug.WriteLine("Disposing ({0})", GetHashCode());
                 disposables.Dispose();
                 transition?.Dispose();
+                completion?.Dispose();
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
                 connectionAdded = null;

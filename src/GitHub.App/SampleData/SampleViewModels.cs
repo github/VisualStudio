@@ -249,7 +249,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IReactiveCommand<Unit> PublishRepository
+        public IReactiveCommand<ProgressState> PublishRepository
         {
             get;
             private set;

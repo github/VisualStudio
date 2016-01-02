@@ -339,7 +339,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Success));
 
             vsServices.Received().ShowMessage("Repository published successfully.");
             vsServices.DidNotReceive().ShowError(Args.String);
@@ -358,7 +358,7 @@ public class RepositoryPublishViewModelTests
             var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, vsServices, cm);
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
             vsServices.DidNotReceive().ShowMessage(Args.String);
             vsServices.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
@@ -391,7 +391,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
             vm.SelectedConnection = conns.First(x => x != vm.SelectedConnection);
 
@@ -422,7 +422,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
             vm.SelectedAccount = accounts[1];
 
