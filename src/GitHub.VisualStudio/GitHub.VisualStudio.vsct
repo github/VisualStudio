@@ -38,7 +38,7 @@
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
 
-      <Group guid="guidCreateGistCommandPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+      <Group guid="guidCreateGistCommandPackageCmdSet" id="GistContextMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
       </Group>
     </Groups>
@@ -120,7 +120,7 @@
       </Button>
 
         <Button guid="guidCreateGistCommandPackageCmdSet" id="CreateGistCommandId" priority="0x0100" type="Button">
-            <Parent guid="guidCreateGistCommandPackageCmdSet" id="MyMenuGroup" />
+            <Parent guid="guidCreateGistCommandPackageCmdSet" id="GistContextMenuGroup" />
             <Strings>
                 <ButtonText>Create a GitHub Gist</ButtonText>
             </Strings>
@@ -148,7 +148,7 @@
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidCreateGistCommandPackageCmdSet" value="{D265E7EB-F3FC-411D-B4DC-1C6AD9264C4B}">
-        <IDSymbol name="MyMenuGroup" value="0x1020" />
+        <IDSymbol name="GistContextMenuGroup" value="0x1020" />
         <IDSymbol name="CreateGistCommandId" value="0x0400" />
     </GuidSymbol>
     
