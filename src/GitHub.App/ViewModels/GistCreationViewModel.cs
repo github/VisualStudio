@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Factories;
+using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
@@ -19,12 +20,19 @@ namespace GitHub.ViewModels
         readonly ISelectedTextProvider selectedTextProvider;
         readonly IApiClient apiClient;
 
-        [ImportingConstructor]
-        public GistCreationViewModel(ISelectedTextProvider selectedTextProvider, IApiClientFactory apiClientFactory)
+      [ImportingConstructor]
+      GistCreationViewModel(
+        IConnectionRepositoryHostMap connectionRepositoryHostMap,
+        ISelectedTextProvider selectedTextProvider)
+        : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider)
+      {
+      }
+
+        public GistCreationViewModel(IRepositoryHost repositoryHost, ISelectedTextProvider selectedTextProvider)
         {
             Title = Resources.CreateGistTitle;
             this.selectedTextProvider = selectedTextProvider;
-            this.apiClient = apiClientFactory.Create(HostAddress.GitHubDotComHostAddress);
+            this.apiClient = repositoryHost.ApiClient;
 
             // Since the filename is required, go ahead and give it something default so the user is not forced to 
             // add a custom name if they do not want to

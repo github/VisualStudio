@@ -11,16 +11,17 @@ using Octokit;
 using UnitTests;
 using Xunit;
 using System.Reactive.Linq;
+using GitHub.Models;
 
 public class GistCreationViewModelTests
 {
-    static IGistCreationViewModel CreateViewModel(string selectedText = null)
+    static IGistCreationViewModel CreateViewModel(string selectedText = null )
     {
         var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
         selectedTextProvider.GetSelectedText().Returns(Observable.Return(selectedText));
-        var apiClientFactory = Substitute.For<IApiClientFactory>();
+        var repositoryHost = Substitutes.ServiceProvider.GetRepositoryHosts().GitHubHost;
 
-        return new GistCreationViewModel(selectedTextProvider, apiClientFactory);
+        return new GistCreationViewModel(repositoryHost, selectedTextProvider);
     }
 
     public class TheCreateGistCommand : TestBaseClass
@@ -32,16 +33,17 @@ public class GistCreationViewModelTests
         {
             var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
             selectedTextProvider.GetSelectedText().Returns(Observable.Return(selectedText));
-            var apiClientFactory = Substitute.For<IApiClientFactory>();
-            var apiClient = apiClientFactory.Create(Args.HostAddress);
+            var repositoryHost = Substitutes.ServiceProvider.GetRepositoryHosts().GitHubHost;
 
-            var vm = new GistCreationViewModel(selectedTextProvider, apiClientFactory);
-            vm.FileName = fileName;
-            vm.IsPrivate = isPrivate;
+            var vm = new GistCreationViewModel(repositoryHost, selectedTextProvider)
+            {
+                FileName = fileName,
+                IsPrivate = isPrivate
+            };
 
             vm.CreateGist.Execute(null);
 
-            apiClient
+            repositoryHost.ApiClient
                 .Received()
                 .CreateGist(
                     Arg.Is<NewGist>(g => g.Public == !isPrivate

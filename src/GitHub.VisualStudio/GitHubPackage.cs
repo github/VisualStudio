@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
+using System.Linq;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
-using GitHub.Factories;
+using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
@@ -13,7 +11,6 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Octokit;
 
 namespace GitHub.VisualStudio
 {
@@ -55,10 +52,21 @@ namespace GitHub.VisualStudio
         {
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand, (s, e) =>
+            {
+                var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+                var connections = ServiceProvider.GetExportedValue<IConnectionManager>().Connections;
+
+                // activeRepo can be null if we choose to create a gist in a non github project.
+                IConnection connection = null;
+                if (activeRepo != null)
                 {
-                    var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-                    uiProvider.RunUI(UIControllerFlow.Gist, null);
-                });
+                    var activeHostAddress = HostAddress.Create(activeRepo.CloneUrl);
+                    connection = connections
+                        .FirstOrDefault(c => c.HostAddress.Equals(activeHostAddress));
+                }
+
+                StartFlow(UIControllerFlow.Gist, connection);
+            });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
             {
@@ -72,10 +80,10 @@ namespace GitHub.VisualStudio
             base.Initialize();
         }
 
-        void StartFlow(UIControllerFlow controllerFlow)
+        void StartFlow(UIControllerFlow controllerFlow, IConnection connection = null)
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
+            uiProvider.RunUI(controllerFlow, connection);
         }
     }
 }
