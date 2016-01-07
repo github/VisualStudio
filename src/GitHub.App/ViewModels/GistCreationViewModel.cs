@@ -1,11 +1,9 @@
 ﻿using System;
 using GitHub.Exports;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 using GitHub.Api;
-using GitHub.Factories;
+using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
 using ReactiveUI;
@@ -17,7 +15,6 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
-        readonly ISelectedTextProvider selectedTextProvider;
         readonly IApiClient apiClient;
 
       [ImportingConstructor]
@@ -31,32 +28,30 @@ namespace GitHub.ViewModels
         public GistCreationViewModel(IRepositoryHost repositoryHost, ISelectedTextProvider selectedTextProvider)
         {
             Title = Resources.CreateGistTitle;
-            this.selectedTextProvider = selectedTextProvider;
             this.apiClient = repositoryHost.ApiClient;
 
             // Since the filename is required, go ahead and give it something default so the user is not forced to 
             // add a custom name if they do not want to
             FileName = Resources.DefaultGistFileName;
+            selectedText = selectedTextProvider.GetSelectedText().ToProperty(this, x => x.SelectedText);
 
             var canCreateGist = this.WhenAny( 
                 x => x.FileName,
-                fileName => !string.IsNullOrEmpty(fileName.Value));
+                x => x.SelectedText,
+                (fileName, selectedText) => fileName.Value.IsNotNullOrEmptyOrWhiteSpace() && selectedText.Value.IsNotNullOrEmptyOrWhiteSpace());
 
             CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
         }
 
-        private IObservable<Gist> OnCreateGist(object _)
+        IObservable<Gist> OnCreateGist(object _)
         {
-            return selectedTextProvider.GetSelectedText().Select(selectedText =>
+            var newGist = new NewGist
             {
-                var newGist = new NewGist
-                {
-                    Description = Description,
-                    Public = !IsPrivate
-                };
-                newGist.Files.Add(FileName, selectedText);
-                return apiClient.CreateGist(newGist);
-            }).SelectMany(gists => gists);
+                Description = Description,
+                Public = !IsPrivate
+            };
+            newGist.Files.Add(FileName, SelectedText);
+            return apiClient.CreateGist(newGist);
         }
 
         public IReactiveCommand<Gist> CreateGist { get; }
@@ -76,6 +71,13 @@ namespace GitHub.ViewModels
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
+
+        readonly ObservableAsPropertyHelper<string> selectedText;
+        public string SelectedText
+        {
+            [return: AllowNull]
+            get { return selectedText.Value; }
+        } 
 
         string fileName;
         [AllowNull]
