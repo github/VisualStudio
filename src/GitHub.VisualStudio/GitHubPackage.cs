@@ -56,14 +56,9 @@ namespace GitHub.VisualStudio
                 var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
                 var connections = ServiceProvider.GetExportedValue<IConnectionManager>().Connections;
 
-                // activeRepo can be null if we choose to create a gist in a non github project.
-                IConnection connection = null;
-                if (activeRepo != null)
-                {
-                    var activeHostAddress = HostAddress.Create(activeRepo.CloneUrl);
-                    connection = connections
-                        .FirstOrDefault(c => c.HostAddress.Equals(activeHostAddress));
-                }
+                // activeRepo can be null if we choose to create a gist from a non github project.
+                var connection  = connections
+                    .FirstOrDefault(c => activeRepo != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
 
                 StartFlow(UIControllerFlow.Gist, connection);
             });
