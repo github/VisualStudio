@@ -98,6 +98,7 @@
     </None>
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
+    <Compile Include="Extensions\VSExtensions.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
     <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
@@ -123,7 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
-    <Compile Include="Extensions\VSExtensions.cs" />
+    <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
