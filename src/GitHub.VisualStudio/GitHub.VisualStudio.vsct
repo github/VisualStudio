@@ -37,6 +37,10 @@
       <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" priority="0x0501">
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
+
+      <Group guid="guidContextMenuSet" id="idContextMenuGroup">
+      </Group>
+
     </Groups>
 
     <Menus>
@@ -46,6 +50,7 @@
           <CommandName>Window Toolbar</CommandName>
         </Strings>
       </Menu>
+
     </Menus>
     
     <!--Buttons section. -->
@@ -117,7 +122,25 @@
     </Buttons>
 
   </Commands>
-  
+
+  <CommandPlacements>
+    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+      <Parent guid="GUID_XAML_EDITOR" id="ID_XAML_CTXT"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+      <Parent guid="GUID_HTML_EDITOR" id="ID_HTML_CTXT"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+      <Parent guid="GUID_HTML_EDITOR" id="ID_JS_CTXT"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+    </CommandPlacement>
+  </CommandPlacements>
+    
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidGitHubPkg" value="{c3d3dc68-c977-411f-b3e8-03b0dccf7dfc}" />
@@ -151,6 +174,19 @@
       <IDSymbol name="forwardCommand" value="0x301" />
       <IDSymbol name="refreshCommand" value="0x302" />
       <IDSymbol name="pullRequestCommand" value="0x310" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">
+      <IDSymbol name="idContextMenuGroup" value="0x1010" />
+    </GuidSymbol>
+
+    <GuidSymbol name="GUID_XAML_EDITOR" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">
+      <IDSymbol name="ID_XAML_CTXT" value="259"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="GUID_HTML_EDITOR" value="{D7E8C5E1-BDB8-11D0-9C88-0000F8040A53}">
+      <IDSymbol name="ID_HTML_CTXT" value="51"/>
+      <IDSymbol name="ID_JS_CTXT" value="52"/>
     </GuidSymbol>
 
   </Symbols>
