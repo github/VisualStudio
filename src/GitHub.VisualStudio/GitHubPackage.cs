@@ -45,6 +45,8 @@ namespace GitHub.VisualStudio
 
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals")]
         protected override void Initialize()
         {
 
@@ -57,6 +59,15 @@ namespace GitHub.VisualStudio
 
                 var windowFrame = (IVsWindowFrame)window.Frame;
                 ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            });
+
+            ServiceProvider.AddTopLevelMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.getLinkCommand, (s, e) =>
+            {
+                var ap = ServiceProvider.GetExportedValue<IActiveDocument>();
+                var name = ap.Name;
+                var line = ap.Line;
+                System.Windows.Forms.MessageBox.Show(name + " : " + line);
+                
             });
             base.Initialize();
         }
