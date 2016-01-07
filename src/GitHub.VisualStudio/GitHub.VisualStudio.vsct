@@ -122,8 +122,10 @@
 
       <Button guid="guidContextMenuSet" id="getLinkCommand" priority="0x0100" type="Button">
         <Parent guid="guidContextMenuSet" id="idContextMenuGroup"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Get Link</ButtonText>
+          <ButtonText>Open in Browser</ButtonText>
         </Strings>
       </Button>
 

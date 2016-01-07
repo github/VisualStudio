@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
 using GitHub.Services;
@@ -60,16 +61,39 @@ namespace GitHub.VisualStudio
                 var windowFrame = (IVsWindowFrame)window.Frame;
                 ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });
-
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.getLinkCommand, (s, e) =>
-            {
-                var ap = ServiceProvider.GetExportedValue<IActiveDocument>();
-                var name = ap.Name;
-                var line = ap.Line;
-                System.Windows.Forms.MessageBox.Show(name + " : " + line);
-                
-            });
+            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.getLinkCommand,
+                IsValidGithubRepo, 
+                OpenRepoInBrowser);
+            
             base.Initialize();
+        }
+
+        private bool IsValidGithubRepo()
+        {
+            return !string.IsNullOrEmpty(ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo?.CloneUrl?.RepositoryName);
+        }
+
+        private void OpenRepoInBrowser()
+        {
+            var activeDocument = ServiceProvider.GetExportedValue<IActiveDocument>();
+            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+
+            var currentCommitSha = activeRepo.CurrentSha();
+            var lineTag = "L" + activeDocument.AnchorLine;
+
+            if (activeDocument.AnchorLine != activeDocument.EndLine)
+            {
+                lineTag += "-L" + activeDocument.EndLine;
+            }
+
+            var outputUri = string.Format(CultureInfo.CurrentCulture, "{0}/blob/{1}{2}#L{3}",
+                activeRepo.CloneUrl,
+                currentCommitSha,
+                activeDocument.Name.Replace(activeRepo.LocalPath, "").Replace("\\", "/"),
+                lineTag);
+
+            var vsBrowserProvider = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+            vsBrowserProvider.OpenUrl(new Uri(outputUri));
         }
 
         void StartFlow(UIControllerFlow controllerFlow)
