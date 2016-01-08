@@ -2,6 +2,7 @@
 // MUST match guids.h
 using Microsoft.TeamFoundation.Controls;
 using System;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio
 {

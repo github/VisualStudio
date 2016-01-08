@@ -41,9 +41,6 @@
       <Group guid="guidContextMenuSet" id="idContextMenuGroup">
       </Group>
 
-      <Group guid="guidCreateGistCommandPackageCmdSet" id="GistContextMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
-      </Group>
     </Groups>
 
     <Menus>
@@ -123,12 +120,12 @@
         </Strings>
       </Button>
 
-        <Button guid="guidCreateGistCommandPackageCmdSet" id="CreateGistCommandId" priority="0x0100" type="Button">
-            <Parent guid="guidCreateGistCommandPackageCmdSet" id="GistContextMenuGroup" />
-            <Strings>
-                <ButtonText>Create a GitHub Gist</ButtonText>
-            </Strings>
-        </Button>
+      <Button guid="guidContextMenuSet" id="CreateGistCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidContextMenuSet" id="idContextMenuGroup" />
+        <Strings>
+          <ButtonText>Create a GitHub Gist</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
   </Commands>
@@ -167,12 +164,6 @@
     <GuidSymbol name="guidManageConnections" value="{0A014553-A0AA-46DD-8D6B-B8E3178CA435}">
       <IDSymbol name="idManageConnections" value="0x1009"/>
     </GuidSymbol>
-
-    <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidCreateGistCommandPackageCmdSet" value="{D265E7EB-F3FC-411D-B4DC-1C6AD9264C4B}">
-        <IDSymbol name="GistContextMenuGroup" value="0x1020" />
-        <IDSymbol name="CreateGistCommandId" value="0x0400" />
-    </GuidSymbol>
     
     <GuidSymbol name="guidImages" value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" >
       <IDSymbol name="logo" value="1" />
@@ -194,6 +185,7 @@
 
     <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">
       <IDSymbol name="idContextMenuGroup" value="0x1010" />
+      <IDSymbol name="CreateGistCommandId" value="0x0400" />
     </GuidSymbol>
 
     <GuidSymbol name="GUID_XAML_EDITOR" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">

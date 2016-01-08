@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
@@ -51,7 +52,7 @@ namespace GitHub.VisualStudio
         protected override void Initialize()
         {
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidCreateGistCommandPackageCmdSet, PkgCmdIDList.createGistCommand, (s, e) =>
+            ServiceProvider.AddTopLevelMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, (s, e) =>
             {
                 var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
                 var connections = ServiceProvider.GetExportedValue<IConnectionManager>().Connections;
