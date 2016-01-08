@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -29,12 +28,12 @@ namespace GitHub.Services
                     return Observable.Return(string.Empty);
 
                 IVsTextView activeView;
-                if (textManager.GetActiveView(1, null, out activeView) != VSConstants.S_OK)
+                if (ErrorHandler.Failed(textManager.GetActiveView(1, null, out activeView)))
                     return Observable.Return(string.Empty);
 
                 // Maybe we should log here that no text was actually highlighted?
                 string highlightedText;
-                if (activeView.GetSelectedText(out highlightedText) != VSConstants.S_OK)
+                if (ErrorHandler.Failed(activeView.GetSelectedText(out highlightedText)))
                     highlightedText = string.Empty;
 
                 return Observable.Return(highlightedText);
