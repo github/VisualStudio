@@ -14,6 +14,8 @@ namespace GitHub.VisualStudio
 
         public static readonly Guid guidGitHubCmdSet = new Guid(guidGitHubCmdSetString);
         public static readonly Guid guidGitHubToolbarCmdSet = new Guid(guidGitHubToolbarCmdSetString);
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Already used in https://github.com/github/VisualStudio/pull/156")]
         public static readonly Guid guidContextMenuSet = new Guid(guidContextMenuSetString);
     }
 
