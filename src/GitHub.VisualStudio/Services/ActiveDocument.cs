@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Windows.Media.TextFormatting;
 
 namespace GitHub.VisualStudio
 {
@@ -28,7 +27,8 @@ namespace GitHub.VisualStudio
 
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
             Debug.Assert(textManager != null, "No SVsTextManager service available");
-
+            if (textManager == null)
+                return;
             IVsTextView view;
             int anchorLine, anchorCol, endLine, endCol;
             if (ErrorHandler.Succeeded(textManager.GetActiveView(0, null, out view)) &&

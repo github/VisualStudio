@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -64,33 +65,46 @@ namespace GitHub.VisualStudio
             ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.getLinkCommand,
                 IsValidGithubRepo, 
                 OpenRepoInBrowser);
-            
+            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.copyLinkCommand,
+                IsValidGithubRepo,
+                CopyRepoLinkToClipboard);
+
             base.Initialize();
+        }
+
+        private void CopyRepoLinkToClipboard()
+        {
+            if (!IsValidGithubRepo()) return;
+
+            var activeDocument = ServiceProvider.GetExportedValue<IActiveDocument>();
+            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+            var outputUri = activeRepo?.BrowserUrl(activeDocument);
+
+            if (string.IsNullOrEmpty(outputUri)) return;
+
+            System.Windows.Clipboard.SetText(outputUri);
         }
 
         private bool IsValidGithubRepo()
         {
-            return !string.IsNullOrEmpty(ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo?.CloneUrl?.RepositoryName);
+            var cloneUrl = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo?.CloneUrl;
+
+            if (string.IsNullOrEmpty(cloneUrl))
+                return false;
+
+            return cloneUrl.Host == "github.com";
         }
 
         private void OpenRepoInBrowser()
         {
+            if (!IsValidGithubRepo()) return;
+
             var activeDocument = ServiceProvider.GetExportedValue<IActiveDocument>();
             var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
 
-            var currentCommitSha = activeRepo.CurrentSha();
-            var lineTag = "L" + activeDocument.AnchorLine;
+            var outputUri = activeRepo?.BrowserUrl(activeDocument);
 
-            if (activeDocument.AnchorLine != activeDocument.EndLine)
-            {
-                lineTag += "-L" + activeDocument.EndLine;
-            }
-
-            var outputUri = string.Format(CultureInfo.CurrentCulture, "{0}/blob/{1}{2}#L{3}",
-                activeRepo.CloneUrl,
-                currentCommitSha,
-                activeDocument.Name.Replace(activeRepo.LocalPath, "").Replace("\\", "/"),
-                lineTag);
+            if (string.IsNullOrEmpty(outputUri)) return;
 
             var vsBrowserProvider = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
             vsBrowserProvider.OpenUrl(new Uri(outputUri));

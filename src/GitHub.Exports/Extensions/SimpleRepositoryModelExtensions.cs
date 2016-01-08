@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.IO;
 using GitHub.Models;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Services;
+using GitHub.VisualStudio;
 
 namespace GitHub.Extensions
 {
@@ -33,9 +35,43 @@ namespace GitHub.Extensions
 
         public static string CurrentSha(this ISimpleRepositoryModel repository)
         {
+            if (repository == null)
+                return null;
+
             var repo = GitService.GitServiceHelper.GetRepo(repository.LocalPath);
-            var firstCommit = repo.Commits.ElementAt(0);
-            return firstCommit.Sha;
+
+            if (repo == null)
+                return null;
+
+            return !repo.Commits.Any() ? null : repo.Commits.ElementAt(0).Sha;
+        }
+
+        public static string BrowserUrl(this ISimpleRepositoryModel repository, IActiveDocument activeDocument)
+        {
+            if (repository == null || activeDocument == null)
+                return null;
+
+            var currentCommitSha = repository.CurrentSha();
+            var currentCloneUrl = repository.CloneUrl;
+            var localPath = repository.LocalPath;
+            var lineTag = "L" + activeDocument.AnchorLine;
+
+            if (string.IsNullOrEmpty(currentCommitSha) || string.IsNullOrEmpty(currentCloneUrl) ||
+                string.IsNullOrEmpty(localPath))
+                return null;
+
+            if (activeDocument.AnchorLine != activeDocument.EndLine)
+            {
+                lineTag += "-L" + activeDocument.EndLine;
+            }
+
+            var outputUri = string.Format(CultureInfo.CurrentCulture, "{0}/blob/{1}{2}#{3}",
+                currentCloneUrl,
+                currentCommitSha,
+                activeDocument.Name.Replace(localPath, "").Replace("\\", "/"),
+                lineTag);
+
+            return outputUri;
         }
     }
 }

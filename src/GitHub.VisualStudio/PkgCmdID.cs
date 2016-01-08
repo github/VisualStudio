@@ -12,5 +12,6 @@ namespace GitHub.VisualStudio
         public const int refreshCommand = 0x302;
         public const int pullRequestCommand = 0x310;
         public const int getLinkCommand = 0x100;
+        public const int copyLinkCommand = 0x101;
     };
 }
