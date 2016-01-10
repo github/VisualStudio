@@ -2,6 +2,7 @@
 // MUST match guids.h
 using Microsoft.TeamFoundation.Controls;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.VisualStudio
 {
@@ -14,6 +15,7 @@ namespace GitHub.VisualStudio
 
         public static readonly Guid guidGitHubCmdSet = new Guid(guidGitHubCmdSetString);
         public static readonly Guid guidGitHubToolbarCmdSet = new Guid(guidGitHubToolbarCmdSetString);
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Already used in https://github.com/github/VisualStudio/pull/156")]
         public static readonly Guid guidContextMenuSet = new Guid(guidContextMenuSetString);
     }
 
