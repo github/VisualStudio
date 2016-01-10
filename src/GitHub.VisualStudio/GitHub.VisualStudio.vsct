@@ -129,11 +129,11 @@
     </CommandPlacement>
 
     <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
-      <Parent guid="GUID_HTML_EDITOR" id="ID_HTML_CTXT"/>
+        <Parent guid="GUID_HTML_EDITOR" id="ID_HTML_CTXT"/>
     </CommandPlacement>
 
     <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
-      <Parent guid="GUID_HTML_EDITOR" id="ID_JS_CTXT"/>
+        <Parent guid="GUID_JSON_EDITOR" id="ID_JSON_CTXT"/>
     </CommandPlacement>
 
     <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
@@ -184,9 +184,12 @@
       <IDSymbol name="ID_XAML_CTXT" value="259"/>
     </GuidSymbol>
 
-    <GuidSymbol name="GUID_HTML_EDITOR" value="{D7E8C5E1-BDB8-11D0-9C88-0000F8040A53}">
-      <IDSymbol name="ID_HTML_CTXT" value="51"/>
-      <IDSymbol name="ID_JS_CTXT" value="52"/>
+    <GuidSymbol name="GUID_HTML_EDITOR" value="{78F03954-2FB8-4087-8CE7-59D71710B3BB}">
+      <IDSymbol name="ID_HTML_CTXT" value="1"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="GUID_JSON_EDITOR" value="{F718CA06-CF4F-4A0C-9106-E79E9EE5E7CD}">
+      <IDSymbol name="ID_JSON_CTXT" value="3"/>
     </GuidSymbol>
 
   </Symbols>
