@@ -3,6 +3,9 @@
     public interface IActiveDocument
     {
         string Name { get; }
-        int Line { get; }
+        int AnchorLine { get; }
+        int AnchorColumn { get; }
+        int EndLine { get; }
+        int EndColumn { get; }
     }
 }
