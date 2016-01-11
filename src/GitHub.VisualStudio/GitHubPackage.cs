@@ -52,14 +52,13 @@ namespace GitHub.VisualStudio
         protected override void Initialize()
         {
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, (s, e) =>
+            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, CanAddCreateGistItem, () =>
             {
                 var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
                 var connections = ServiceProvider.GetExportedValue<IConnectionManager>().Connections;
 
-                // activeRepo can be null if we choose to create a gist from a non github project.
-                var connection  = connections
-                    .FirstOrDefault(c => activeRepo != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
+                var connection = connections
+                    .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
 
                 StartFlow(UIControllerFlow.Gist, connection);
             });
@@ -74,6 +73,13 @@ namespace GitHub.VisualStudio
                 ErrorHandler.ThrowOnFailure(windowFrame.Show());
             });
             base.Initialize();
+        }
+
+        bool CanAddCreateGistItem()
+        {
+            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+            var canAdd = activeRepo?.CloneUrl?.RepositoryName != null;
+            return canAdd;
         }
 
         void StartFlow(UIControllerFlow controllerFlow, IConnection connection = null)
