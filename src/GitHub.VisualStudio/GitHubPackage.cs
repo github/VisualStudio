@@ -44,32 +44,26 @@ namespace GitHub.VisualStudio
         public GitHubPackage(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
-
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals")]
         protected override void Initialize()
         {
+            base.Initialize();
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
-            {
-                var window = FindToolWindow(typeof(GitHubPane), 0, true);
-                if (window?.Frame == null)
-                    throw new NotSupportedException("Cannot create tool window");
+			var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
+            foreach (var menu in menus.Menus)
+                ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
-                var windowFrame = (IVsWindowFrame)window.Frame;
-                ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            });
+            foreach (var menu in menus.DynamicMenus)
+                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
             ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.getLinkCommand,
                 IsValidGithubRepo, 
                 OpenRepoInBrowser);
             ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.copyLinkCommand,
                 IsValidGithubRepo,
                 CopyRepoLinkToClipboard);
-
-            base.Initialize();
         }
 
         private void CopyRepoLinkToClipboard()
@@ -110,10 +104,5 @@ namespace GitHub.VisualStudio
             vsBrowserProvider.OpenUrl(new Uri(outputUri));
         }
 
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
-        }
     }
 }
