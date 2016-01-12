@@ -121,6 +121,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.End)
                 .OnEntryFrom(Trigger.Cancel, () => End(false))
                 .OnEntryFrom(Trigger.Next, () => End(true))
+                .OnEntryFrom(Trigger.Finish, () => End(true))
                 .Permit(Trigger.Next, UIViewType.Finished);
 
             machine.Configure(UIViewType.Finished);
