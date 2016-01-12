@@ -7,8 +7,8 @@ using NSubstitute;
 using UnitTests;
 using Xunit;
 using GitHub.Primitives;
-using System.Linq;
 
+[Collection("PackageServiceProvider global data tests")]
 public class SimpleRepositoryModelExtensionTests : TempFileBaseClass
 {
     void SetupRepository(string sha)
