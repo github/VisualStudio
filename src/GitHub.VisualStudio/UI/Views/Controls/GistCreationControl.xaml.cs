@@ -1,20 +1,15 @@
 ﻿using System.ComponentModel.Composition;
 using GitHub.Exports;
-using GitHub.Extensions;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using System;
-using System.Reactive.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
     public class GenericGistCreationControl : SimpleViewUserControl<IGistCreationViewModel, GistCreationControl>
     { }
 
-    /// <summary>
-    /// Interaction logic for GistCreationControl.xaml
-    /// </summary>
     [ExportView(ViewType=UIViewType.Gist)]
     [PartCreationPolicy(CreationPolicy.NonShared)] 
     public partial class GistCreationControl
@@ -29,6 +24,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.FileName, v => v.fileNameTextBox.Text));
                 d(this.Bind(ViewModel, vm => vm.IsPrivate, v => v.makePrivate.IsChecked));
                 d(this.BindCommand(ViewModel, vm => vm.CreateGist, v => v.createGistButton));
+
+                d(this.Bind(ViewModel, vm => vm.Account, v => v.accountStackPanel.DataContext));
 
                 ViewModel.CreateGist.Subscribe(_ => NotifyDone());
             });

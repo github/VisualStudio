@@ -66,6 +66,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35" />
                     <RowDefinition Height="35" />
+                    <RowDefinition Height="35" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static prop:Resources.fileNameText}"/>
@@ -74,10 +75,20 @@
                 <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.descriptionText}"/>
                 <ui:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1"/>
 
+                <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
+                    <Image
+                        Source="{Binding Avatar}"
+                        Width="16"
+                        Height="16"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding Login}" VerticalAlignment="Center"/>
+                </StackPanel>
+
                 <CheckBox 
                     x:Name="makePrivate"
                     Grid.Column="1"
-                    Grid.Row="2"
+                    Grid.Row="3"
                     Content="{x:Static prop:Resources.makePrivateGist}"
                     Style="{DynamicResource BlueRoundedCheckBox}"
                     Padding="8,0,0,0" />

@@ -1,4 +1,5 @@
-﻿using Octokit;
+﻿using GitHub.Models;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -24,5 +25,10 @@ namespace GitHub.ViewModels
         /// Gets or sets the file name of the gist (should include extension).
         /// </summary>
         string FileName { get; set; }
+
+        /// <summary>
+        /// The account or organization that will be the owner of the created gist.
+        /// </summary>
+        IAccount Account { get; set; }
     }
 }
