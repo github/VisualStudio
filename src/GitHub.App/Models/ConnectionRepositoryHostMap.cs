@@ -10,7 +10,7 @@ namespace GitHub.ViewModels
     {
         [ImportingConstructor]
         public ConnectionRepositoryHostMap(IUIProvider provider, IRepositoryHosts hosts)
-            : this(provider.GetService<IConnection>(), hosts)
+            : this(provider.TryGetService<IConnection>(), hosts)
         {
         }
 
