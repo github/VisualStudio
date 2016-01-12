@@ -152,6 +152,7 @@ namespace GitHub.Controllers
         {
             uiProvider.RemoveService(typeof(IConnection));
             transition.OnCompleted();
+            completion?.OnNext(success);
             completion?.OnCompleted();
             completion = null;
         }
@@ -291,15 +292,19 @@ namespace GitHub.Controllers
             if (disposing)
             {
                 if (disposed) return;
+                disposed = true;
 
-                Debug.WriteLine("Disposing ({0})", GetHashCode());
-                disposables.Dispose();
-                transition?.Dispose();
-                completion?.Dispose();
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
                 connectionAdded = null;
-                disposed = true;
+
+                var tr = transition;
+                var cmp = completion;
+                transition = null;
+                completion = null;
+                disposables.Dispose();
+                tr?.Dispose();
+                cmp?.Dispose();
             }
         }
 
