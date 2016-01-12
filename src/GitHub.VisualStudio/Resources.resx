@@ -279,4 +279,10 @@
   <data name="NotLoggedInMessage" xml:space="preserve">
     <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
   </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>File Name</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>Private Gist</value>
+  </data>
 </root>

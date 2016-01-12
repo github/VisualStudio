@@ -224,6 +224,7 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
+    <Compile Include="Services\SelectedTextProvider.cs" />
     <Compile Include="Services\SharedResources.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
@@ -252,6 +253,9 @@
     <Compile Include="Base\EnsureLoggedInSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
+      <DependentUpon>GistCreationControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
       <DependentUpon>RepositoryCloneControl.xaml</DependentUpon>
     </Compile>
@@ -362,6 +366,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

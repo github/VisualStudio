@@ -9,6 +9,7 @@ namespace GitHub.Api
     {
         HostAddress HostAddress { get; }
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
+        IObservable<Gist> CreateGist(NewGist newGist);
         IObservable<User> GetUser();
         IObservable<Organization> GetOrganizations();
         /// <summary>

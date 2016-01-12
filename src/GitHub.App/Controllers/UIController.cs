@@ -24,7 +24,7 @@ namespace GitHub.Controllers
     [Export(typeof(IUIController))]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Next, Finish }
+        enum Trigger { Cancel = 0, Auth = 1, Create = 2, Clone = 3, Publish = 4, Gist = 5, Next, Finish }
 
         readonly IExportFactoryProvider factory;
         readonly IUIProvider uiProvider;
@@ -80,7 +80,8 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Finish, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Finish, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Finish, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
-                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish);
+                .PermitIf(Trigger.Finish, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish)
+                .PermitIf(Trigger.Finish, UIViewType.Gist, () => currentFlow == UIControllerFlow.Gist);
 
             machine.Configure(UIViewType.TwoFactor)
                 .SubstateOf(UIViewType.Login)
@@ -92,7 +93,8 @@ namespace GitHub.Controllers
                 .PermitIf(Trigger.Next, UIViewType.End, () => currentFlow == UIControllerFlow.Authentication)
                 .PermitIf(Trigger.Next, UIViewType.Create, () => currentFlow == UIControllerFlow.Create)
                 .PermitIf(Trigger.Next, UIViewType.Clone, () => currentFlow == UIControllerFlow.Clone)
-                .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish);
+                .PermitIf(Trigger.Next, UIViewType.Publish, () => currentFlow == UIControllerFlow.Publish)
+                .PermitIf(Trigger.Next, UIViewType.Gist, () => currentFlow == UIControllerFlow.Gist);
 
             machine.Configure(UIViewType.Create)
                 .OnEntry(() =>
@@ -114,6 +116,14 @@ namespace GitHub.Controllers
                 .OnEntry(() =>
                 {
                     RunView(UIViewType.Publish);
+                })
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.End);
+
+            machine.Configure(UIViewType.Gist)
+                .OnEntry(() =>
+                {
+                    RunView(UIViewType.Gist);
                 })
                 .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
@@ -239,7 +249,9 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Clone, UIViewType.Clone, () => host.IsLoggedIn)
                             .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
-                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn);
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn)
+                            .PermitIf(Trigger.Gist, UIViewType.Gist, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Gist, UIViewType.Login, () => !host.IsLoggedIn);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
@@ -270,7 +282,9 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Clone, UIViewType.Clone, () => loggedin)
                             .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
-                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
+                            .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin)
+                            .PermitIf(Trigger.Gist, UIViewType.Gist, () => loggedin)
+                            .PermitIf(Trigger.Gist, UIViewType.Login, () => !loggedin);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>

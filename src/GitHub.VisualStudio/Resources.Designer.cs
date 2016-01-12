@@ -214,6 +214,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Name.
+        /// </summary>
+        public static string fileNameText {
+            get {
+                return ResourceManager.GetString("fileNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -363,6 +372,15 @@ namespace GitHub.VisualStudio {
         public static string makePrivateContent {
             get {
                 return ResourceManager.GetString("makePrivateContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Private Gist.
+        /// </summary>
+        public static string makePrivateGist {
+            get {
+                return ResourceManager.GetString("makePrivateGist", resourceCulture);
             }
         }
         
