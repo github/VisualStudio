@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
@@ -52,11 +53,25 @@ namespace GitHub.VisualStudio
         protected override void Initialize()
         {
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, CanAddCreateGistItem, () =>
+            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, IsTextSelected, () =>
             {
                 var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+                // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
+                if (activeRepo == null)
+                {
+                    var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+                    var path = vsservices?.GetActiveRepoPath() ?? string.Empty;
+                    try
+                    {
+                        activeRepo = !string.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
+                    }
+                    catch (Exception ex)
+                    {
+                        VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
+                    }
+                }
+                
                 var connections = ServiceProvider.GetExportedValue<IConnectionManager>().Connections;
-
                 var connection = connections
                     .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
 
@@ -75,11 +90,10 @@ namespace GitHub.VisualStudio
             base.Initialize();
         }
 
-        bool CanAddCreateGistItem()
+        bool IsTextSelected()
         {
-            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
-            var canAdd = activeRepo?.CloneUrl?.RepositoryName != null;
-            return canAdd;
+            var selectedText = ServiceProvider.GetExportedValue<ISelectedTextProvider>();
+            return selectedText.GetSelectedText().IsNotNullOrEmptyOrWhiteSpace();
         }
 
         void StartFlow(UIControllerFlow controllerFlow, IConnection connection = null)

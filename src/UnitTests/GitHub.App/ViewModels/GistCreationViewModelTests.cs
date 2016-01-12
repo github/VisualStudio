@@ -15,10 +15,10 @@ using GitHub.Models;
 
 public class GistCreationViewModelTests
 {
-    static IGistCreationViewModel CreateViewModel(string selectedText = null )
+    static IGistCreationViewModel CreateViewModel(string selectedText = "" )
     {
         var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
-        selectedTextProvider.GetSelectedText().Returns(Observable.Return(selectedText));
+        selectedTextProvider.GetSelectedText().Returns(selectedText);
         var repositoryHost = Substitutes.ServiceProvider.GetRepositoryHosts().GitHubHost;
 
         return new GistCreationViewModel(repositoryHost, selectedTextProvider);
@@ -32,7 +32,7 @@ public class GistCreationViewModelTests
         public void CreatesAGistUsingTheApiClient(string selectedText, string fileName, bool isPrivate)
         {
             var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
-            selectedTextProvider.GetSelectedText().Returns(Observable.Return(selectedText));
+            selectedTextProvider.GetSelectedText().Returns(selectedText);
             var repositoryHost = Substitutes.ServiceProvider.GetRepositoryHosts().GitHubHost;
 
             var vm = new GistCreationViewModel(repositoryHost, selectedTextProvider)

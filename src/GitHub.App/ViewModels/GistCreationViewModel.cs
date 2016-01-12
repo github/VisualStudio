@@ -33,7 +33,7 @@ namespace GitHub.ViewModels
             // Since the filename is required, go ahead and give it something default so the user is not forced to 
             // add a custom name if they do not want to
             FileName = Resources.DefaultGistFileName;
-            selectedText = selectedTextProvider.GetSelectedText().ToProperty(this, x => x.SelectedText);
+            SelectedText = selectedTextProvider.GetSelectedText();
 
             var canCreateGist = this.WhenAny( 
                 x => x.FileName,
@@ -72,11 +72,13 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
 
-        readonly ObservableAsPropertyHelper<string> selectedText;
+        string selectedText;
+        [AllowNull]
         public string SelectedText
         {
             [return: AllowNull]
-            get { return selectedText.Value; }
+            get { return selectedText; }
+            set { this.RaiseAndSetIfChanged(ref selectedText, value); }
         } 
 
         string fileName;
