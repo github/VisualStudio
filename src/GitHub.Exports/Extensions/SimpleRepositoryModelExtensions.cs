@@ -6,6 +6,9 @@ using GitHub.Models;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Services;
 using GitHub.VisualStudio;
+using GitHub.Primitives;
+using System.Text;
+using System.Diagnostics;
 
 namespace GitHub.Extensions
 {
@@ -35,43 +38,55 @@ namespace GitHub.Extensions
 
         public static string CurrentSha(this ISimpleRepositoryModel repository)
         {
-            if (repository == null)
-                return null;
-
             var repo = GitService.GitServiceHelper.GetRepo(repository.LocalPath);
-
-            if (repo == null)
-                return null;
-
-            return !repo.Commits.Any() ? null : repo.Commits.ElementAt(0).Sha;
+            return repo.Commits.FirstOrDefault()?.Sha;
         }
 
-        public static string BrowserUrl(this ISimpleRepositoryModel repository, IActiveDocument activeDocument)
+        public static Uri GenerateUrl(this ISimpleRepositoryModel repository, string path = null,
+            int startLine = -1, int endLine = -1)
         {
-            if (repository == null || activeDocument == null)
+            var cloneUrl = repository.CloneUrl;
+            if (cloneUrl == null)
                 return null;
 
-            var currentCommitSha = repository.CurrentSha();
-            var currentCloneUrl = repository.CloneUrl;
-            var localPath = repository.LocalPath;
-            var lineTag = "L" + activeDocument.AnchorLine;
-
-            if (string.IsNullOrEmpty(currentCommitSha) || string.IsNullOrEmpty(currentCloneUrl) ||
-                string.IsNullOrEmpty(localPath))
-                return null;
-
-            if (activeDocument.AnchorLine != activeDocument.EndLine)
+            if (path != null && Path.IsPathRooted(path))
             {
-                lineTag += "-L" + activeDocument.EndLine;
+                // if the path root doesn't match the repository local path, then ignore it
+                if (repository.LocalPath == null ||
+                    !path.StartsWith(repository.LocalPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.Assert(false, String.Format(CultureInfo.CurrentCulture, "GenerateUrl: path {0} doesn't match repository {1}", path, repository.LocalPath));
+                    path = null;
+                }
+                else
+                    path = path.Substring(repository.LocalPath.Length + 1);
             }
 
-            var outputUri = string.Format(CultureInfo.CurrentCulture, "{0}/blob/{1}{2}#{3}",
-                currentCloneUrl,
-                currentCommitSha,
-                activeDocument.Name.Replace(localPath, "").Replace("\\", "/"),
-                lineTag);
+            var commitSha = repository.CurrentSha();
+            var uri = GenerateUrl(cloneUrl.ToRepositoryUrl().AbsoluteUri, commitSha, path, startLine, endLine);
+            return new UriString(uri).ToUri();
+        }
 
-            return outputUri;
+        static string GenerateUrl(string basePath, string sha, string path, int startLine = -1, int endLine = -1)
+        {
+            var sb = new StringBuilder(basePath);
+            if (sha == null)
+                return sb.ToString();
+
+            if (String.IsNullOrEmpty(path))
+            {
+                sb.AppendFormat("/commit/{0}", sha);
+                return sb.ToString();
+            }
+
+            sb.AppendFormat("/blob/{0}/{1}", sha, path.Replace(@"\", "/"));
+            if (startLine < 0)
+                return sb.ToString();
+            sb.AppendFormat("#L{0}", startLine);
+            if (endLine < 0)
+                return sb.ToString();
+            sb.AppendFormat("-L{0}", endLine);
+            return sb.ToString();
         }
     }
 }

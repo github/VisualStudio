@@ -46,63 +46,17 @@ namespace GitHub.VisualStudio
         {
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals")]
+
         protected override void Initialize()
         {
             base.Initialize();
 
-			var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
+            var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
             foreach (var menu in menus.Menus)
                 ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
             foreach (var menu in menus.DynamicMenus)
                 ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
-            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.getLinkCommand,
-                IsValidGithubRepo, 
-                OpenRepoInBrowser);
-            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.copyLinkCommand,
-                IsValidGithubRepo,
-                CopyRepoLinkToClipboard);
         }
-
-        private void CopyRepoLinkToClipboard()
-        {
-            if (!IsValidGithubRepo()) return;
-
-            var activeDocument = ServiceProvider.GetExportedValue<IActiveDocument>();
-            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
-            var outputUri = activeRepo?.BrowserUrl(activeDocument);
-
-            if (string.IsNullOrEmpty(outputUri)) return;
-
-            System.Windows.Clipboard.SetText(outputUri);
-        }
-
-        private bool IsValidGithubRepo()
-        {
-            var cloneUrl = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo?.CloneUrl;
-
-            if (string.IsNullOrEmpty(cloneUrl))
-                return false;
-
-            return cloneUrl.Host == "github.com";
-        }
-
-        private void OpenRepoInBrowser()
-        {
-            if (!IsValidGithubRepo()) return;
-
-            var activeDocument = ServiceProvider.GetExportedValue<IActiveDocument>();
-            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
-
-            var outputUri = activeRepo?.BrowserUrl(activeDocument);
-
-            if (string.IsNullOrEmpty(outputUri)) return;
-
-            var vsBrowserProvider = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
-            vsBrowserProvider.OpenUrl(new Uri(outputUri));
-        }
-
     }
 }
