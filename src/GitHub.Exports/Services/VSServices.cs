@@ -124,9 +124,10 @@ namespace GitHub.Services
                             if (path != null)
                                 return new SimpleRepositoryModel(path);
                         }
-                        catch (Exception ex)
+                        // no sense spamming the log, the registry might have ton of stale things we don't care about
+                        catch (Exception)
                         {
-                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from the registry '{0}'", ex));
+                            //VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from the registry '{0}'", ex));
                         }
                         return null;
                     }

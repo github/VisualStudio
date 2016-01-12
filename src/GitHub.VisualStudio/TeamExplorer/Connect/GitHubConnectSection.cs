@@ -17,6 +17,7 @@ using Microsoft.TeamFoundation.MVVM;
 using Microsoft.VisualStudio;
 using NullGuard;
 using ReactiveUI;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -148,7 +149,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     IsVisible = true;
                     LoggedIn = true;
                     if (ServiceProvider != null)
-                        RefreshRepositories();
+                        RefreshRepositories().Forget();
                 }
             }
         }
@@ -271,9 +272,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 #endif
         }
 
-        void RefreshRepositories()
+        async Task RefreshRepositories()
         {
-            connectionManager.RefreshRepositories();
+            await connectionManager.RefreshRepositories();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
@@ -362,7 +363,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             readonly Stateless.StateMachine<SectionState, string> machine;
             readonly ITeamExplorerSection section;
 
-            public SectionStateTracker(ITeamExplorerSection section, Action onRefreshed)
+            public SectionStateTracker(ITeamExplorerSection section, Func<Task> onRefreshed)
             {
                 this.section = section;
                 machine = new Stateless.StateMachine<SectionState, string>(SectionState.Idle);
@@ -377,7 +378,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     .Ignore("Title")
                     .PermitIf("IsBusy", SectionState.Idle, () => !this.section.IsBusy)
                     .IgnoreIf("IsBusy", () => this.section.IsBusy)
-                    .OnExit(onRefreshed);
+                    .OnExit(() => onRefreshed());
 
                 section.PropertyChanged += TrackState;
             }
