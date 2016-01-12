@@ -12,11 +12,11 @@ namespace GitHub.VisualStudio
         /// <summary>
         /// Registered via AddTopLevelMenuItem
         /// </summary>
-        IEnumerable<IMenuHandler> Menus { get; set; }
+        IReadOnlyCollection<IMenuHandler> Menus { get; }
 
         /// <summary>
         /// Registered via AddDynamicMenuItem
         /// </summary>
-        IEnumerable<IDynamicMenuHandler> DynamicMenus { get; set; }
+        IReadOnlyCollection<IDynamicMenuHandler> DynamicMenus { get; }
     }
 }
