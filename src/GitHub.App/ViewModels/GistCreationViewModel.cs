@@ -45,8 +45,7 @@ namespace GitHub.ViewModels
 
             var canCreateGist = this.WhenAny( 
                 x => x.FileName,
-                x => x.SelectedText,
-                (fileName, selectedText) => fileName.Value.IsNotNullOrEmptyOrWhiteSpace() && selectedText.Value.IsNotNullOrEmptyOrWhiteSpace());
+                fileName => fileName.Value.IsNotNullOrEmptyOrWhiteSpace());
 
             CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
         }
