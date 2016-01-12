@@ -117,10 +117,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             disposable = uiflow;
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
-            ui.ListenToCompletionState().Subscribe(done =>
+            bool success = false;
+            ui.ListenToCompletionState().Subscribe(s => success = s, () =>
             {
+                // there's no real cancel button in the publish form, but if support a back button there, then we want to hide the form
                 IsVisible = false;
-                ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                if (success)
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             });
 
             creation.Subscribe(c =>
