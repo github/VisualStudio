@@ -224,6 +224,7 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
+    <Compile Include="Services\SelectedTextProvider.cs" />
     <Compile Include="Services\SharedResources.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />

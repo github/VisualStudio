@@ -10,7 +10,7 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the currently selected text.
         /// </summary>
-        /// <returns></returns>
-        IObservable<string> GetSelectedText();
+        /// <returns>The selected text in the active editor, or an empty string if no text is selected.</returns>
+        string GetSelectedText();
     }
 }

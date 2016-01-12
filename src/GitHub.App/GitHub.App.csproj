@@ -183,7 +183,6 @@
     <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
     <Compile Include="Services\RepositoryPublishService.cs" />
-    <Compile Include="Services\SelectedTextProvider.cs" />
     <Compile Include="Services\SerializedObjectProvider.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />
     <Compile Include="Controllers\UIController.cs" />
