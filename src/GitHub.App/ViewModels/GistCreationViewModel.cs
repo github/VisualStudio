@@ -41,7 +41,7 @@ namespace GitHub.ViewModels
             SelectedText = selectedTextProvider.GetSelectedText();
 
             // This class is only instantiated after we are logged into to a github account, so we should be safe to grab the first one here as the defaut.
-            repositoryHost.ModelService.GetAccounts().Take(1).Subscribe(accounts => Account = accounts.First());
+            repositoryHost.ModelService.GetAccounts().ObserveOn(RxApp.MainThreadScheduler).Subscribe(accounts => Account = accounts.First());
 
             var canCreateGist = this.WhenAny( 
                 x => x.FileName,
