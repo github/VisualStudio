@@ -152,7 +152,6 @@ namespace GitHub.Controllers
         {
             uiProvider.RemoveService(typeof(IConnection));
             transition.OnCompleted();
-            completion?.OnNext(success);
             completion?.OnCompleted();
             completion = null;
         }
