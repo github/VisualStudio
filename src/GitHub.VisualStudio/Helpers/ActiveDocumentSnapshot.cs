@@ -7,23 +7,19 @@ using System.Diagnostics;
 
 namespace GitHub.VisualStudio
 {
-    [Export(typeof(IActiveDocument))]
+    [Export(typeof(IActiveDocumentSnapshot))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    class ActiveDocument : IActiveDocument
+    class ActiveDocumentSnapshot : IActiveDocumentSnapshot
     {
         public string Name { get; private set; }
-        public string ShortName { get; private set; }
-        public int AnchorLine { get; private set; }
-        public int AnchorColumn { get; private set; }
+        public int StartLine { get; private set; }
         public int EndLine { get; private set; }
-        public int EndColumn { get; private set; }
 
         [ImportingConstructor]
-        public ActiveDocument([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public ActiveDocumentSnapshot([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
-            AnchorLine = AnchorColumn = EndLine = EndColumn = -1;
+            StartLine = EndLine = -1;
             Name = Services.Dte2?.ActiveDocument?.FullName;
-            ShortName = Services.Dte2?.ActiveDocument?.Name;
 
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
             Debug.Assert(textManager != null, "No SVsTextManager service available");
@@ -34,10 +30,8 @@ namespace GitHub.VisualStudio
             if (ErrorHandler.Succeeded(textManager.GetActiveView(0, null, out view)) &&
                 ErrorHandler.Succeeded(view.GetSelection(out anchorLine, out anchorCol, out endLine, out endCol)))
             {
-                AnchorLine = anchorLine + 1;
-                AnchorColumn = anchorCol + 1;
+                StartLine = anchorLine + 1;
                 EndLine = endLine + 1;
-                EndColumn = endCol + 1;
             }
         }
     }
