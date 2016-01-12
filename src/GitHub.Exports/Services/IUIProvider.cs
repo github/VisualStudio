@@ -18,6 +18,7 @@ namespace GitHub.Services
         T TryGetService<T>() where T : class;
 
         void AddService(Type t, object instance);
+        void AddService<T>(T instance);
         void RemoveService(Type t);
 
         IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
