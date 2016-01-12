@@ -124,6 +124,8 @@
         <Parent guid="guidContextMenuSet" id="idContextMenuGroup" />
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Create a GitHub Gist</ButtonText>
         </Strings>
