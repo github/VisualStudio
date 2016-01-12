@@ -120,7 +120,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidContextMenuSet" id="getLinkCommand" priority="0x0100" type="Button">
+      <Button guid="guidContextMenuSet" id="openLinkCommand" priority="0x0100" type="Button">
         <Parent guid="guidContextMenuSet" id="idContextMenuGroup"/>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -196,7 +196,7 @@
 
     <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">
       <IDSymbol name="idContextMenuGroup" value="0x1010" />
-      <IDSymbol name="getLinkCommand" value="0x100" />
+      <IDSymbol name="openLinkCommand" value="0x100" />
       <IDSymbol name="copyLinkCommand" value="0x101"/>
     </GuidSymbol>
 
