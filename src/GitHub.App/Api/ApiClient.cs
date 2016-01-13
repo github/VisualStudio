@@ -25,9 +25,9 @@ namespace GitHub.Api
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
         // The old scopes must be used by older versions of Enterprise that don't support the new scopes:
-        readonly string[] oldAuthorizationScopes = { "user", "repo" };
+        readonly string[] oldAuthorizationScopes = { "user", "repo", "gist" };
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
-        readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
+        readonly string[] newAuthorizationScopes = { "user", "repo", "gist", "write:public_key" };
         readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
         readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
@@ -50,6 +50,11 @@ namespace GitHub.Api
             var client = gitHubClient.Repository;
 
             return (isUser ? client.Create(repository) : client.Create(login, repository));
+        }
+
+        public IObservable<Gist> CreateGist(NewGist newGist)
+        {
+            return gitHubClient.Gist.Create(newGist);
         }
 
         public IObservable<User> GetUser()

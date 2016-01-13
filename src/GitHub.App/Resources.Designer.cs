@@ -79,11 +79,29 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create a GitHub Gist.
+        /// </summary>
+        public static string CreateGistTitle {
+            get {
+                return ResourceManager.GetString("CreateGistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create a {0} Repository.
         /// </summary>
         public static string CreateTitle {
             get {
                 return ResourceManager.GetString("CreateTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GistFromVisualStudio.cs.
+        /// </summary>
+        public static string DefaultGistFileName {
+            get {
+                return ResourceManager.GetString("DefaultGistFileName", resourceCulture);
             }
         }
         
