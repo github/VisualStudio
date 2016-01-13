@@ -47,11 +47,21 @@ namespace GitHub.VisualStudio
         public GitHubPackage(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
-
         }
+
 
         protected override void Initialize()
         {
+            base.Initialize();
+
+            var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
+            foreach (var menu in menus.Menus)
+                ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
+
+            foreach (var menu in menus.DynamicMenus)
+                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+
+/*
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
             ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, IsTextSelected, () =>
             {
@@ -100,6 +110,7 @@ namespace GitHub.VisualStudio
         {
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.RunUI(controllerFlow, connection);
+*/
         }
     }
 }
