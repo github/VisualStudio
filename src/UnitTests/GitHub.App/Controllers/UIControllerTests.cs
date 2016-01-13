@@ -13,6 +13,7 @@ using GitHub.ViewModels;
 using ReactiveUI;
 using System.Collections.Generic;
 using GitHub.Authentication;
+using System.Collections.ObjectModel;
 
 public class UIControllerTests
 {
@@ -55,8 +56,7 @@ public class UIControllerTests
             var loginView = factory.GetView(GitHub.Exports.UIViewType.Login);
             loginView.Value.Cancel.Returns(Observable.Empty<object>());
             var cm = provider.GetConnectionManager();
-            var cons = new System.Collections.ObjectModel.ObservableCollection<IConnection>();
-            cm.Connections.Returns(cons);
+            cm.Connections.Returns(new ObservableCollection<IConnection>());
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
             {
@@ -82,6 +82,7 @@ public class UIControllerTests
             var connection = provider.GetConnection();
             connection.Login().Returns(Observable.Return(connection));
             var cm = provider.GetConnectionManager();
+            cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
             var host = hosts.GitHubHost;
             hosts.LookupHost(connection.HostAddress).Returns(host);
             host.IsLoggedIn.Returns(true);
@@ -97,6 +98,35 @@ public class UIControllerTests
                                     Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
                                 });
                 uiController.Start(connection);
+            }
+        }
+
+        [STAFact]
+        public void CloneDialogLoggedInWithoutConnection()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var connection = provider.GetConnection();
+            connection.Login().Returns(Observable.Return(connection));
+            var cm = provider.GetConnectionManager();
+            cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(connection.HostAddress).Returns(host);
+            host.IsLoggedIn.Returns(true);
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
+            {
+                var list = new List<IView>();
+                uiController.SelectFlow(UIControllerFlow.Clone)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.Equal(1, list.Count);
+                                    Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
+                                    ((IUIProvider)provider).Received().AddService(connection);
+                                });
+                uiController.Start(null);
             }
         }
     }
