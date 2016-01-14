@@ -49,7 +49,6 @@ namespace GitHub.VisualStudio
         {
         }
 
-
         protected override void Initialize()
         {
             base.Initialize();
@@ -60,57 +59,6 @@ namespace GitHub.VisualStudio
 
             foreach (var menu in menus.DynamicMenus)
                 ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
-
-/*
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddDynamicMenuItem(GuidList.guidContextMenuSet, PkgCmdIDList.createGistCommand, IsTextSelected, () =>
-            {
-                var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
-                // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
-                if (activeRepo == null)
-                {
-                    var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-                    var path = vsservices?.GetActiveRepoPath() ?? string.Empty;
-                    try
-                    {
-                        activeRepo = !string.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
-                    }
-                    catch (Exception ex)
-                    {
-                        VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from '{0}'. {1}", path, ex));
-                    }
-                }
-                
-                var connections = ServiceProvider.GetExportedValue<IConnectionManager>().Connections;
-                var connection = connections
-                    .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
-
-                StartFlow(UIControllerFlow.Gist, connection);
-            });
-
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
-            {
-                var window = FindToolWindow(typeof(GitHubPane), 0, true);
-                if (window?.Frame == null)
-                    throw new NotSupportedException("Cannot create tool window");
-
-                var windowFrame = (IVsWindowFrame)window.Frame;
-                ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            });
-            base.Initialize();
-        }
-
-        bool IsTextSelected()
-        {
-            var selectedText = ServiceProvider.GetExportedValue<ISelectedTextProvider>();
-            return selectedText.GetSelectedText().IsNotNullOrEmptyOrWhiteSpace();
-        }
-
-        void StartFlow(UIControllerFlow controllerFlow, IConnection connection = null)
-        {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, connection);
-*/
         }
     }
 }

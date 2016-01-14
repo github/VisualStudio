@@ -212,6 +212,7 @@
     <Compile Include="Base\TeamExplorerServiceHolder.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
+    <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Menus\ShowGitHubPane.cs" />
     <Compile Include="Menus\AddConnection.cs" />
     <Compile Include="Base\MenuBase.cs" />
