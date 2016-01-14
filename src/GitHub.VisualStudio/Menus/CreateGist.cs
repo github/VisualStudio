@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.Menus
         {
             var stp = selectedTextProvider.Value;
             Debug.Assert(stp != null, "Could not get an instance of ISelectedTextProvider");
-            return stp?.GetSelectedText().IsNotNullOrEmpty() ?? false;
+            return !String.IsNullOrWhiteSpace(stp?.GetSelectedText());
         }
 
         public void Activate()
