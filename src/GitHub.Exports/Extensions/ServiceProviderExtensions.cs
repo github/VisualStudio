@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.Extensions
 {
@@ -15,6 +16,11 @@ namespace GitHub.Extensions
     {
         static IUIProvider cachedUIProvider = null;
 
+        /// <summary>
+        /// Safe variant of GetService that doesn't throw exceptions if the service is
+        /// not found.
+        /// </summary>
+        /// <returns>The service, or null if not found</returns>
         public static object TryGetService(this IServiceProvider serviceProvider, Type type)
         {
             if (cachedUIProvider != null && type == typeof(IUIProvider))
@@ -24,6 +30,20 @@ namespace GitHub.Extensions
             return ui != null
                 ? ui.TryGetService(type)
                 : GetServiceAndCache(serviceProvider, type, ref cachedUIProvider);
+        }
+
+        /// <summary>
+        /// Calls <see cref="TryGetService(IServiceProvider, Type)" with type <typeparamref name="Ret"/>
+        /// and returns the service obtained cast to type <typeparamref name="T"/>. Use this for services
+        /// like <code>GetService(typeof(SVsTextManager) as IVsTextManager</code>
+        /// Does not throw exceptions
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public static Ret GetService<T, Ret>(this IServiceProvider provider)
+            where Ret : class
+            where T : class
+        {
+            return provider.TryGetService(typeof(T)) as Ret;
         }
         public static T GetExportedValue<T>(this IServiceProvider serviceProvider) where T : class
         {
@@ -36,11 +56,21 @@ namespace GitHub.Extensions
                 : GetExportedValueAndCache<T, IUIProvider>(ref cachedUIProvider);
         }
 
+        /// <summary>
+        /// Safe generic variant that calls <see cref="TryGetService(IServiceProvider, Type)"/>
+        /// so it doesn't throw exceptions if the service is not found
+        /// </summary>
+        /// <returns>The service, or null if not found</returns>
         public static T TryGetService<T>(this IServiceProvider serviceProvider) where T : class
         {
             return serviceProvider.TryGetService(typeof(T)) as T;
         }
 
+        /// <summary>
+        /// Safe generic variant of GetService that doesn't throw exceptions if the service
+        /// is not found (calls <see cref="TryGetService(IServiceProvider, Type)"/>)
+        /// </summary>
+        /// <returns>The service, or null if not found</returns>
         public static T GetService<T>(this IServiceProvider serviceProvider) where T : class
         {
             return serviceProvider.TryGetService(typeof(T)) as T;
