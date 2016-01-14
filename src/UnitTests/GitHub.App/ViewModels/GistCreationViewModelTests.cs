@@ -12,16 +12,22 @@ using UnitTests;
 using Xunit;
 using System.Reactive.Linq;
 using GitHub.Models;
+using ReactiveUI;
 
 public class GistCreationViewModelTests
 {
-    static IGistCreationViewModel CreateViewModel(string selectedText = "" )
+    static IGistCreationViewModel CreateViewModel(IServiceProvider provider, string selectedText = "", string fileName = "", bool isPrivate = false)
     {
         var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
         selectedTextProvider.GetSelectedText().Returns(selectedText);
-        var repositoryHost = Substitutes.ServiceProvider.GetRepositoryHosts().GitHubHost;
-
-        return new GistCreationViewModel(repositoryHost, selectedTextProvider);
+        var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
+        var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
+        repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
+        return new GistCreationViewModel(repositoryHost, selectedTextProvider)
+        {
+            FileName = fileName,
+            IsPrivate = isPrivate
+        };
     }
 
     public class TheCreateGistCommand : TestBaseClass
@@ -31,16 +37,9 @@ public class GistCreationViewModelTests
         [InlineData("Console.WriteLine", "Gist.cs", false)]
         public void CreatesAGistUsingTheApiClient(string selectedText, string fileName, bool isPrivate)
         {
-            var selectedTextProvider = Substitute.For<ISelectedTextProvider>();
-            selectedTextProvider.GetSelectedText().Returns(selectedText);
-            var repositoryHost = Substitutes.ServiceProvider.GetRepositoryHosts().GitHubHost;
-
-            var vm = new GistCreationViewModel(repositoryHost, selectedTextProvider)
-            {
-                FileName = fileName,
-                IsPrivate = isPrivate
-            };
-
+            var provider = Substitutes.ServiceProvider;
+            var vm = CreateViewModel(provider, selectedText, fileName, isPrivate);
+            var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
             vm.CreateGist.Execute(null);
 
             repositoryHost.ApiClient
@@ -57,8 +56,8 @@ public class GistCreationViewModelTests
         [InlineData("Gist.cs", true)]
         public void CannotCreateGistIfFileNameIsMissing(string fileName, bool expected)
         {
-            var vm = CreateViewModel();
-            vm.FileName = fileName;
+            var provider = Substitutes.ServiceProvider;
+            var vm = CreateViewModel(provider, fileName: fileName);
 
             var actual = vm.CreateGist.CanExecute(null);
             Assert.Equal(expected, actual);
