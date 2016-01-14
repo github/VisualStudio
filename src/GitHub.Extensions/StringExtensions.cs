@@ -36,16 +36,6 @@ namespace GitHub.Extensions
             return string.IsNullOrEmpty(s);
         }
 
-        public static bool IsNotNullOrEmptyOrWhiteSpace([AllowNull]this string s)
-        {
-            return !s.IsNullOrEmptyOrWhiteSpace();
-        }
-
-        public static bool IsNullOrEmptyOrWhiteSpace([AllowNull] this string s)
-        {
-            return string.IsNullOrEmpty(s) || string.IsNullOrWhiteSpace(s);
-        }
-
         [return: AllowNull]
         public static string ToNullIfEmpty([AllowNull]this string s)
         {
