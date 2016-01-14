@@ -29,6 +29,6 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The account or organization that will be the owner of the created gist.
         /// </summary>
-        IAccount Account { get; set; }
+        IAccount Account { get; }
     }
 }

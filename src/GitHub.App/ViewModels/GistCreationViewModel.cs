@@ -21,6 +21,7 @@ namespace GitHub.ViewModels
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
         readonly IApiClient apiClient;
+        readonly ObservableAsPropertyHelper<IAccount> account;
 
         [ImportingConstructor]
         GistCreationViewModel(
@@ -41,7 +42,11 @@ namespace GitHub.ViewModels
             SelectedText = selectedTextProvider.GetSelectedText();
 
             // This class is only instantiated after we are logged into to a github account, so we should be safe to grab the first one here as the defaut.
-            repositoryHost.ModelService.GetAccounts().ObserveOn(RxApp.MainThreadScheduler).Subscribe(accounts => Account = accounts.First());
+            account = repositoryHost.ModelService.GetAccounts()
+                .FirstAsync()
+                .Select(a => a.First())
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, vm => vm.Account);
 
             var canCreateGist = this.WhenAny( 
                 x => x.FileName,
@@ -62,15 +67,7 @@ namespace GitHub.ViewModels
         }
 
         public IReactiveCommand<Gist> CreateGist { get; }
-
-        IAccount account;
-        [AllowNull]
-        public IAccount Account
-        {
-            [return: AllowNull]
-            get { return account; }
-            set { this.RaiseAndSetIfChanged(ref account, value); }
-        }
+        public IAccount Account { get { return account.Value; } }
 
         bool isPrivate;
         public bool IsPrivate
