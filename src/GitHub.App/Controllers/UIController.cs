@@ -18,6 +18,7 @@ using NullGuard;
 using ReactiveUI;
 using Stateless;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace GitHub.Controllers
 {
@@ -237,7 +238,11 @@ namespace GitHub.Controllers
         {
             if (connection != null)
             {
-                uiProvider.AddService(typeof(IConnection), connection);
+                if (currentFlow != UIControllerFlow.Authentication)
+                    uiProvider.AddService(connection);
+                else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
+                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
+
                 connection.Login()
                     .Select(c => hosts.LookupHost(connection.HostAddress))
                     .Do(host =>
@@ -266,13 +271,21 @@ namespace GitHub.Controllers
                     .IsLoggedIn(hosts)
                     .Do(loggedin =>
                     {
-                        if (!loggedin && currentFlow != UIControllerFlow.Authentication)
+                        if (currentFlow != UIControllerFlow.Authentication)
                         {
-                            connectionAdded = (s, e) => {
-                                if (e.Action == NotifyCollectionChangedAction.Add)
-                                    uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
-                            };
-                            connectionManager.Connections.CollectionChanged += connectionAdded;
+                            if (loggedin) // register the first available connection so the viewmodel can use it
+                                uiProvider.AddService(connectionManager.Connections.First(c => hosts.LookupHost(c.HostAddress).IsLoggedIn));
+                            else
+                            {
+                                // a connection will be added to the list when auth is done, register it so the next
+                                // viewmodel can use it
+                                connectionAdded = (s, e) =>
+                                {
+                                    if (e.Action == NotifyCollectionChangedAction.Add)
+                                        uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
+                                };
+                                connectionManager.Connections.CollectionChanged += connectionAdded;
+                            }
                         }
 
                         machine.Configure(UIViewType.None)

@@ -144,6 +144,11 @@ namespace GitHub.VisualStudio
             return GetService<T>() as Ret;
         }
 
+        public void AddService<T>(T instance)
+        {
+            AddService(typeof(T), instance);
+        }
+
         public void AddService(Type t, object instance)
         {
             if (!Initialized)
