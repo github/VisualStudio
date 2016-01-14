@@ -10,12 +10,8 @@ namespace GitHub.Services
     {
         ExportProvider ExportProvider { get; }
         IServiceProvider GitServiceProvider { get; set; }
-        T GetService<T>();
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        Ret GetService<T, Ret>() where Ret : class;
 
         object TryGetService(Type t);
-        T TryGetService<T>() where T : class;
 
         void AddService(Type t, object instance);
         void AddService<T>(T instance);
