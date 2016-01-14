@@ -1,14 +1,15 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Services;
+using GitHub.Extensions;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace GitHub.VisualStudio.Services
+namespace GitHub.VisualStudio
 {
     [Export(typeof(ISelectedTextProvider))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class SelectedTextProvider : ISelectedTextProvider
     {
         readonly IServiceProvider serviceProvider;
@@ -21,19 +22,16 @@ namespace GitHub.VisualStudio.Services
 
         public string GetSelectedText()
         {
-            var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
-            if (textManager == null)
-                return string.Empty;
-
-            IVsTextView activeView;
-            if (ErrorHandler.Failed(textManager.GetActiveView(1, null, out activeView)))
-                return string.Empty;
-
+            IVsTextManager textManager = serviceProvider.GetService<SVsTextManager, IVsTextManager>();
             string selectedText;
-            if (ErrorHandler.Failed(activeView.GetSelectedText(out selectedText)))
-                selectedText = string.Empty;
+            IVsTextView activeView;
 
-            return selectedText;
+            if (textManager != null &&
+                ErrorHandler.Succeeded(textManager.GetActiveView(1, null, out activeView)) &&
+                ErrorHandler.Succeeded(activeView.GetSelectedText(out selectedText)))
+                return selectedText;
+
+            return string.Empty;
         }
     }
 }
