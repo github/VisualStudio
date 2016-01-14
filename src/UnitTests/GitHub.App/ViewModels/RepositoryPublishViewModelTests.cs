@@ -6,9 +6,6 @@ using NSubstitute;
 using ReactiveUI;
 using Xunit;
 using UnitTests;
-using Microsoft.Reactive.Testing;
-using ReactiveUI.Testing;
-using System.Reactive;
 using System.Threading.Tasks;
 using System;
 using GitHub.Primitives;
@@ -29,14 +26,14 @@ public class RepositoryPublishViewModelTests
         public static IRepositoryPublishViewModel GetViewModel(
             IRepositoryHosts hosts = null,
             IRepositoryPublishService service = null,
-            IVSServices vsServices = null,
+            INotificationService notificationService = null,
             IConnectionManager connectionManager = null)
         {
             hosts = hosts ?? Substitutes.RepositoryHosts;
             service = service ?? Substitute.For<IRepositoryPublishService>();
-            vsServices = vsServices ?? Substitute.For<IVSServices>();
+            notificationService = notificationService ?? Substitute.For<INotificationService>();
             connectionManager = connectionManager ?? Substitutes.ConnectionManager;
-            return new RepositoryPublishViewModel(hosts, service, vsServices, connectionManager);
+            return new RepositoryPublishViewModel(hosts, service, notificationService, connectionManager);
         }
 
         public static void SetupConnections(IRepositoryHosts hosts, IConnectionManager cm,
@@ -62,7 +59,7 @@ public class RepositoryPublishViewModelTests
         public static IRepositoryPublishViewModel SetupConnectionsAndViewModel(
             IRepositoryHosts hosts = null,
             IRepositoryPublishService service = null,
-            IVSServices vs = null,
+            INotificationService notificationService = null,
             IConnectionManager cm = null,
             string uri = GitHubUrls.GitHub)
         {
@@ -74,7 +71,7 @@ public class RepositoryPublishViewModelTests
             SetupConnections(hosts, cm, adds, conns, hsts, uri);
             hsts[0].ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
-            return GetViewModel(hosts, service, vs, cm);
+            return GetViewModel(hosts, service, notificationService, cm);
         }
 
         public static string[] GetArgs(params string[] args)
@@ -305,20 +302,20 @@ public class RepositoryPublishViewModelTests
         {
             var cm = Substitutes.ConnectionManager;
             var hosts = Substitute.For<IRepositoryHosts>();
-            var vsServices = Substitute.For<IVSServices>();
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, vs: vsServices, cm: cm);
+            var notificationService = Substitute.For<INotificationService>();
+            var vm = Helpers.SetupConnectionsAndViewModel(hosts, notificationService: notificationService, cm: cm);
 
-            vsServices.DidNotReceive().ShowWarning(Args.String);
+            notificationService.DidNotReceive().ShowWarning(Args.String);
 
             vm.RepositoryName = "this is bad";
             Assert.Equal("this-is-bad", vm.SafeRepositoryName);
 
-            vsServices.Received().ShowWarning("Will be created as this-is-bad");
-            vsServices.DidNotReceive().ClearNotifications();
+            notificationService.Received().ShowWarning("Will be created as this-is-bad");
+            notificationService.DidNotReceive().ClearNotifications();
 
             vm.RepositoryName = "this";
 
-            vsServices.Received().ClearNotifications();
+            notificationService.Received().ClearNotifications();
         }
     }
 
@@ -329,20 +326,20 @@ public class RepositoryPublishViewModelTests
         {
             var cm = Substitutes.ConnectionManager;
             var hosts = Substitute.For<IRepositoryHosts>();
-            var vsServices = Substitute.For<IVSServices>();
+            var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Return(new Octokit.Repository()));
 
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, vsServices, cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, notificationService, cm);
 
             vm.RepositoryName = "repo-name";
 
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Success));
 
-            vsServices.Received().ShowMessage("Repository published successfully.");
-            vsServices.DidNotReceive().ShowError(Args.String);
+            notificationService.Received().ShowMessage("Repository published successfully.");
+            notificationService.DidNotReceive().ShowError(Args.String);
         }
 
         [Fact]
@@ -350,18 +347,18 @@ public class RepositoryPublishViewModelTests
         {
             var cm = Substitutes.ConnectionManager;
             var hosts = Substitute.For<IRepositoryHosts>();
-            var vsServices = Substitute.For<IVSServices>();
+            var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
-            var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, vsServices, cm);
+            var vm = Helpers.SetupConnectionsAndViewModel(hosts, repositoryPublishService, notificationService, cm);
             vm.RepositoryName = "repo-name";
 
             await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
 
-            vsServices.DidNotReceive().ShowMessage(Args.String);
-            vsServices.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
+            notificationService.DidNotReceive().ShowMessage(Args.String);
+            notificationService.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
         }
 
         [Fact]
@@ -382,12 +379,12 @@ public class RepositoryPublishViewModelTests
 
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
 
-            var vsServices = Substitute.For<IVSServices>();
+            var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
-            var vm = Helpers.GetViewModel(hosts, repositoryPublishService, vsServices, cm);
+            var vm = Helpers.GetViewModel(hosts, repositoryPublishService, notificationService, cm);
 
             vm.RepositoryName = "repo-name";
 
@@ -395,7 +392,7 @@ public class RepositoryPublishViewModelTests
 
             vm.SelectedConnection = conns.First(x => x != vm.SelectedConnection);
 
-            vsServices.Received().ClearNotifications();
+            notificationService.Received().ClearNotifications();
         }
 
         [Fact]
@@ -413,12 +410,12 @@ public class RepositoryPublishViewModelTests
 
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
 
-            var vsServices = Substitute.For<IVSServices>();
+            var notificationService = Substitute.For<INotificationService>();
 
             var repositoryPublishService = Substitute.For<IRepositoryPublishService>();
             repositoryPublishService.PublishRepository(Args.NewRepository, Args.Account, Args.ApiClient)
                 .Returns(Observable.Throw<Octokit.Repository>(new Octokit.RepositoryExistsException("repo-name", new Octokit.ApiValidationException())));
-            var vm = Helpers.GetViewModel(hosts, repositoryPublishService, vsServices, cm);
+            var vm = Helpers.GetViewModel(hosts, repositoryPublishService, notificationService, cm);
 
             vm.RepositoryName = "repo-name";
 
@@ -426,7 +423,7 @@ public class RepositoryPublishViewModelTests
 
             vm.SelectedAccount = accounts[1];
 
-            vsServices.Received().ClearNotifications();
+            notificationService.Received().ClearNotifications();
         }
     }
 }

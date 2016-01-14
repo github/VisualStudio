@@ -16,15 +16,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
     public class EnsureLoggedInSection : TeamExplorerSectionBase
     {
         readonly IRepositoryHosts hosts;
-        readonly IVSServices vsServices;
+        readonly ITeamExplorerServices teServices;
 
         public EnsureLoggedInSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IVSServices vsServices)
+            IConnectionManager cm, IRepositoryHosts hosts, ITeamExplorerServices teServices)
             : base(apiFactory, holder, cm)
         {
             IsVisible = false;
             this.hosts = hosts;
-            this.vsServices = vsServices;
+            this.teServices = teServices;
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -49,13 +49,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             if (!isgithub)
                 return;
 
-            vsServices.ClearNotifications();
+            teServices.ClearNotifications();
             var add = HostAddress.Create(ActiveRepoUri);
             bool loggedIn = await connectionManager.IsLoggedIn(hosts, add);
             if (!loggedIn)
             {
                 var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);
-                vsServices.ShowMessage(
+                teServices.ShowMessage(
                     msg,
                     new RelayCommand(() => StartFlow(UIControllerFlow.Authentication))
                 );

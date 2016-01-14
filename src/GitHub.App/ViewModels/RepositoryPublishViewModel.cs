@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Exports;
 using GitHub.Extensions;
@@ -27,7 +26,7 @@ namespace GitHub.ViewModels
 
         readonly IRepositoryHosts hosts;
         readonly IRepositoryPublishService repositoryPublishService;
-        readonly IVSServices vsServices;
+        readonly INotificationService notificationService;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
@@ -38,10 +37,10 @@ namespace GitHub.ViewModels
         public RepositoryPublishViewModel(
             IRepositoryHosts hosts,
             IRepositoryPublishService repositoryPublishService,
-            IVSServices vsServices,
+            INotificationService notificationService,
             IConnectionManager connectionManager)
         {
-            this.vsServices = vsServices;
+            this.notificationService = notificationService;
             this.hosts = hosts;
 
             title = this.WhenAny(
@@ -159,7 +158,7 @@ namespace GitHub.ViewModels
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
                 .Select(_ =>
                 {
-                    vsServices.ShowMessage("Repository published successfully.");
+                    notificationService.ShowMessage("Repository published successfully.");
                     return ProgressState.Success;
                 })
                 .Catch<ProgressState, Exception>(ex =>
@@ -168,7 +167,7 @@ namespace GitHub.ViewModels
                     {
                         log.Error(ex);
                         var error = new PublishRepositoryUserError(ex.Message);
-                        vsServices.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
+                        notificationService.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
                     }
                     return Observable.Return(ProgressState.Fail);
                 });
@@ -199,11 +198,11 @@ namespace GitHub.ViewModels
                 {
                     if (!string.IsNullOrEmpty(message))
                     {
-                        vsServices.ShowWarning(message);
+                        notificationService.ShowWarning(message);
                     }
                     else
                     {
-                        vsServices.ClearNotifications();
+                        notificationService.ClearNotifications();
                     }
                 });
         }

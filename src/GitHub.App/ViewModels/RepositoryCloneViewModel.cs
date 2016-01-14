@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
-        readonly IVSServices vsServices;
+        readonly INotificationService notificationService;
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<bool> isLoading;
@@ -41,20 +41,20 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
             IOperatingSystem operatingSystem,
-            IVSServices vsServices)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, vsServices)
+            INotificationService notificationService)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService)
         { }
         
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem,
-            IVSServices vsServices)
+            INotificationService notificationService)
         {
             this.repositoryHost = repositoryHost;
             this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
-            this.vsServices = vsServices;
+            this.notificationService = notificationService;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
@@ -129,7 +129,7 @@ namespace GitHub.ViewModels
             {
                 var repository = SelectedRepository;
                 Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                vsServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
+                notificationService.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
                 return Observable.Return(Unit.Default);
             });
         }

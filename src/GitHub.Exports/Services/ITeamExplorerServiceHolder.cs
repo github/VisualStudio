@@ -1,6 +1,5 @@
 ﻿using System;
 using GitHub.Primitives;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Models;
 
 namespace GitHub.Services
