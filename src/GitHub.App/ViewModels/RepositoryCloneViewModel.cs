@@ -120,6 +120,11 @@ namespace GitHub.ViewModels
             {
                 var repository = SelectedRepository;
                 Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
+                if (repository == null)
+                {
+                    notificationService.ShowError(Resources.RepositoryCloneFailedNoSelectedRepo);
+                    return Observable.Return(Unit.Default);
+                }
                 // The following is a noop if the directory already exists.
                 operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath);
