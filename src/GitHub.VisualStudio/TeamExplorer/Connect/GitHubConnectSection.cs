@@ -326,22 +326,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             var notifications = ServiceProvider.GetExportedValue<INotificationDispatcher>();
             var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
-            var messages = Observable.Merge(
-                notifications.Listen()
-                    .Where(n => n.Type == Notification.NotificationType.Message)
-                    .Do(m => teServices.ShowMessage(m.Message)),
-                notifications.Listen()
-                    .Where(n => n.Type == Notification.NotificationType.MessageCommand)
-                    .Do(m => teServices.ShowMessage(m.Message, m.Command)),
-                notifications.Listen()
-                    .Where(n => n.Type == Notification.NotificationType.Warning)
-                    .Do(m => teServices.ShowWarning(m.Message)),
-                notifications.Listen()
-                    .Where(n => n.Type == Notification.NotificationType.Error)
-                    .Do(m => teServices.ShowError(m.Message))
-                )
-                .Subscribe();
-
+            notifications.AddListener(teServices);
 
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
@@ -355,7 +340,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             });
             uiProvider.RunUI();
 
-            messages.Dispose();
+            notifications.RemoveListener();
         }
 
         bool disposed;

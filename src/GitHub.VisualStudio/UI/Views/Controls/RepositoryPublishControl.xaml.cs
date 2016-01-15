@@ -9,6 +9,8 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
+using GitHub.Extensions.Reactive;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -19,7 +21,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RepositoryPublishControl : GenericRepositoryPublishControl
     {
-        public RepositoryPublishControl()
+        [ImportingConstructor]
+        public RepositoryPublishControl(ITeamExplorerServices teServices)
         {
             InitializeComponent();
 
@@ -51,7 +54,18 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 });
 
                 d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value)
-                .Subscribe(x => NotifyIsBusy(x)));
+                    .Subscribe(x => NotifyIsBusy(x)));
+
+                d(this.WhenAny(x => x.ViewModel.SafeRepositoryNameWarningValidator.ValidationResult, x => x.Value)
+                    .WhereNotNull()
+                    .Select(result => result?.Message)
+                    .Subscribe(message =>
+                    {
+                        if (!string.IsNullOrEmpty(message))
+                            teServices.ShowWarning(message);
+                        else
+                            teServices.ClearNotifications();
+                    }));
 
                 nameText.Text = ViewModel.DefaultRepositoryName;
             });
