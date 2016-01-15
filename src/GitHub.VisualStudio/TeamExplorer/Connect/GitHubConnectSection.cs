@@ -324,11 +324,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
             var ret = uiProvider.SetupUI(controllerFlow, SectionConnection);
-            ret.Subscribe(c =>
+            ret.Subscribe(_ => {}, () =>
             {
-                if (c.IsViewType(UIViewType.Clone))
+                if (controllerFlow == UIControllerFlow.Clone)
                     isCloning = true;
-                else if (c.IsViewType(UIViewType.Create))
+                else if (controllerFlow == UIControllerFlow.Create)
                     isCreating = true;
             });
             uiProvider.RunUI();
