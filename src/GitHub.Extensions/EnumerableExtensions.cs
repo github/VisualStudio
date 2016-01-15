@@ -21,5 +21,14 @@ namespace GitHub
 
     }
 
+    public static class StackExtensions
+    {
+        public static T TryPeek<T>(this Stack<T> stack) where T : class
+        {
+            if (stack.Count > 0)
+                return stack.Peek();
+            return default(T);
+        }
+    }
 }
 

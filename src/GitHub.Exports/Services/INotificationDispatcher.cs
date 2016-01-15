@@ -27,5 +27,8 @@ namespace GitHub.Services
     public interface INotificationDispatcher : INotificationService
     {
         IObservable<Notification> Listen();
+        void AddListener(INotificationService notificationHandler);
+        void RemoveListener();
+        void RemoveListener(INotificationService notificationHandler);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -12,10 +13,12 @@ namespace GitHub.Services
     public sealed class NotificationDispatcher : INotificationDispatcher, IDisposable
     {
         Subject<Notification> notifications;
+        Stack<INotificationService> notificationHandlers;
 
         public NotificationDispatcher()
         {
             notifications = new Subject<Notification>();
+            notificationHandlers = new Stack<INotificationService>();
         }
 
         public IObservable<Notification> Listen()
@@ -23,28 +26,53 @@ namespace GitHub.Services
             return notifications;
         }
 
+        public void AddListener(INotificationService handler)
+        {
+            notificationHandlers.Push(handler);
+        }
+
+        public void RemoveListener()
+        {
+            notificationHandlers.Pop();
+        }
+
+        public void RemoveListener(INotificationService handler)
+        {
+            Stack<INotificationService> handlers = new Stack<INotificationService>();
+            while(notificationHandlers.TryPeek() != handler)
+                handlers.Push(notificationHandlers.Pop());
+            if (notificationHandlers.Count > 0)
+                notificationHandlers.Pop();
+            while (handlers.Count > 0)
+                notificationHandlers.Push(handlers.Pop());
+        }
+
         public void ShowMessage(string message)
         {
             notifications.OnNext(new Notification(message, Notification.NotificationType.Message));
+            var handler = notificationHandlers.TryPeek();
+            handler?.ShowMessage(message);
         }
 
         public void ShowMessage(string message, ICommand command)
         {
             notifications.OnNext(new Notification(message, Notification.NotificationType.Message, command));
+            var handler = notificationHandlers.TryPeek();
+            handler?.ShowMessage(message, command);
         }
 
         public void ShowWarning(string message)
         {
             notifications.OnNext(new Notification(message, Notification.NotificationType.Warning));
+            var handler = notificationHandlers.TryPeek();
+            handler.ShowWarning(message);
         }
 
         public void ShowError(string message)
         {
             notifications.OnNext(new Notification(message, Notification.NotificationType.Error));
-        }
-
-        public void ClearNotifications()
-        {
+            var handler = notificationHandlers.TryPeek();
+            handler?.ShowError(message);
         }
 
         bool disposed; // To detect redundant calls

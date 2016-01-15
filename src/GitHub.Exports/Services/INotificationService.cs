@@ -8,6 +8,5 @@ namespace GitHub.Services
         void ShowMessage(string message, ICommand command);
         void ShowWarning(string message);
         void ShowError(string message);
-        void ClearNotifications();
     }
 }
