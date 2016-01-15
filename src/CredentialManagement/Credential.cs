@@ -56,7 +56,7 @@ namespace GitHub.Authentication.CredentialManagement
             Password = password;
             Target = target;
             Type = CredentialType.Generic;
-            PersistenceType = PersistenceType.Session;
+            PersistenceType = PersistenceType.LocalComputer;
             _lastWriteTime = DateTime.MinValue;
         }
 
