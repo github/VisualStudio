@@ -18,7 +18,7 @@ namespace GitHub.Validation
     {
         public ValidateIfAttribute(string dependentPropertyName)
         {
-            Guard.ArgumentNotEmptyString(dependentPropertyName, nameof(dependentPropertyName));
+            Guard.ArgumentNotEmptyString(dependentPropertyName, "dependentPropertyName");
 
             DependentPropertyName = dependentPropertyName;
         }

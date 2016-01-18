@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -62,7 +63,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigatePricing, v => v.pricingLink.Command));
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowLogInFailedError, v => v.dotComLoginFailedMessage.Visibility));
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.LoginFailedMessage, v => v.dotComLoginFailedMessage.Message));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowConnectingToHostFailed, v => v.dotComConnectionFailedMessage.Visibility));
         }
 
@@ -86,7 +86,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateLearnMore, v => v.learnMoreLink.Command));
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowLogInFailedError, v => v.enterpriseLoginFailedMessage.Visibility));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.LoginFailedMessage, v => v.enterpriseLoginFailedMessage.Message));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowConnectingToHostFailed, v => v.enterpriseConnectingFailedMessage.Visibility));
         }
 

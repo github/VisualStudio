@@ -110,7 +110,7 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
+                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", e);
                         return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                     })
                  .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>

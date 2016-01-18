@@ -272,7 +272,8 @@ namespace GitHub.Controllers
 
                 Debug.WriteLine("Disposing ({0})", GetHashCode());
                 disposables.Dispose();
-                transition?.Dispose();
+                if (transition != null)
+                    transition.Dispose();
                 disposed = true;
             }
         }

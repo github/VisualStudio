@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
+using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Extensions;
+using GitHub.Primitives;
 using GitHub.Services;
-using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using NullGuard;
+using GitHub.Extensions;
+using System.Threading;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using GitHub.UI;
+using Microsoft.VisualStudio.PlatformUI;
+using System.Drawing;
 
 namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2, INotifyPropertySource
     {
-        readonly Octicon octicon;
+        Octicon octicon;
 
         public TeamExplorerNavigationItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
             : base(apiFactory, holder)
@@ -42,18 +45,11 @@ namespace GitHub.VisualStudio.Base
 
         void OnThemeChanged()
         {
-            try
-            {
-                var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-                var brightness = color.GetBrightness();
-                var dark = brightness > 0.5f;
+            var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
+            var brightness = color.GetBrightness();
+            var dark = brightness > 0.5f;
 
-                Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
-            }
-            catch (ArgumentNullException)
-            {
-                // This throws in the unit test runner.
-            }
+            Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
         }
 
         void UpdateRepo(IGitRepositoryInfo repo)
@@ -67,13 +63,17 @@ namespace GitHub.VisualStudio.Base
         {
             var uri = ActiveRepoUri;
             Debug.Assert(uri != null, "OpenInBrowser: uri should never be null");
-#if !DEBUG
             if (uri == null)
                 return;
-#endif
-            var browseUrl = uri.ToRepositoryUrl().Append(endpoint);
 
-            OpenInBrowser(browser, browseUrl);
+            var https = uri.ToHttps();
+            if (https == null)
+                return;
+
+            if (!Uri.TryCreate(https.ToString() + "/" + endpoint, UriKind.Absolute, out uri))
+                return;
+
+            OpenInBrowser(browser, uri);
         }
 
         void Unsubscribe()

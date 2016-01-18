@@ -91,7 +91,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         protected override void RepoChanged()
         {
             base.RepoChanged();
-            RTMSetup();
+            // replace this with RTMSetup() when the time comes
+            PreRTMSetup();
         }
 
         public async void Connect()

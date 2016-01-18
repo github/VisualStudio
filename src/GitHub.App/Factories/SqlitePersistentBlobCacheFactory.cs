@@ -14,7 +14,7 @@ namespace GitHub.Factories
 
         public IBlobCache CreateBlobCache(string path)
         {
-            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentNotEmptyString(path, "path");
 
             try
             {
