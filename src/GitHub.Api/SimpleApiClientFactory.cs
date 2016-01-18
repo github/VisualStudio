@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace GitHub.Api
 {
@@ -16,7 +17,7 @@ namespace GitHub.Api
         readonly Lazy<IEnterpriseProbeTask> lazyEnterpriseProbe;
         readonly Lazy<IWikiProbe> lazyWikiProbe;
 
-        static readonly Dictionary<Uri, ISimpleApiClient> cache = new Dictionary<Uri, ISimpleApiClient>();
+        static readonly ConcurrentDictionary<UriString, ISimpleApiClient> cache = new ConcurrentDictionary<UriString, ISimpleApiClient>();
 
         [ImportingConstructor]
         public SimpleApiClientFactory(IProgram program, Lazy<IEnterpriseProbeTask> enterpriseProbe, Lazy<IWikiProbe> wikiProbe)
@@ -26,31 +27,18 @@ namespace GitHub.Api
             lazyWikiProbe = wikiProbe;
         }
 
-        public ISimpleApiClient Create(Uri repoUrl)
+        public ISimpleApiClient Create(UriString repositoryUrl)
         {
-            var contains = cache.ContainsKey(repoUrl);
-            if (contains)
-                return cache[repoUrl];
-
-            lock (cache)
-            {
-                if (!cache.ContainsKey(repoUrl))
-                {
-                    var hostAddress = HostAddress.Create(repoUrl);
-                    var apiBaseUri = hostAddress.ApiUri;
-                    cache.Add(repoUrl, new SimpleApiClient(hostAddress, repoUrl, new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), apiBaseUri), lazyEnterpriseProbe, lazyWikiProbe));
-                }
-                return cache[repoUrl];
-            }
+            var hostAddress = HostAddress.Create(repositoryUrl);
+            return cache.GetOrAdd(repositoryUrl, new SimpleApiClient(hostAddress, repositoryUrl,
+                new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), hostAddress.ApiUri),
+                lazyEnterpriseProbe, lazyWikiProbe));
         }
 
         public void ClearFromCache(ISimpleApiClient client)
         {
-            lock (cache)
-            {
-                if (cache.ContainsKey(client.OriginalUrl))
-                    cache.Remove(client.OriginalUrl);
-            }
+            ISimpleApiClient c;
+            cache.TryRemove(client.OriginalUrl, out c);
         }
     }
 }

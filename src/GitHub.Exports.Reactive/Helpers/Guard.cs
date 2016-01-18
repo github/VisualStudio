@@ -10,7 +10,8 @@ namespace GitHub
         /// <summary>
         /// Validates that the string is not empty.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">The string to check.</param>
+        /// <param name="name">The name of the argument</param>
         public static void ArgumentNotEmptyString(string value, string name)
         {
             // We already know the value is not null because of NullGuard.Fody.

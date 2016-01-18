@@ -138,10 +138,9 @@
       <Name>Akavache_Net45</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
-      <Project>{ee6ed99f-cb12-4683-b055-d28fc7357a34}</Project>
-      <Name>LibGit2Sharp</Name>
-    </ProjectReference>
+    <Reference Include="LibGit2Sharp, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\LibGit2Sharp.dll</HintPath>
+    </Reference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>

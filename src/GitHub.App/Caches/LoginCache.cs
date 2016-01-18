@@ -37,8 +37,8 @@ namespace GitHub.Caches
 
         public IObservable<Unit> SaveLogin(string user, string password, HostAddress hostAddress)
         {
-            Guard.ArgumentNotEmptyString(user, "user");
-            Guard.ArgumentNotEmptyString(password, "password");
+            Guard.ArgumentNotEmptyString(user, nameof(user));
+            Guard.ArgumentNotEmptyString(password, nameof(password));
 
             return cache.Secure.SaveLogin(user, password, hostAddress.CredentialCacheKeyHost);
         }
@@ -78,7 +78,6 @@ namespace GitHub.Caches
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

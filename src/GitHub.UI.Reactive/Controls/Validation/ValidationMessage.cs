@@ -125,9 +125,9 @@ namespace GitHub.UI
 
             var bindingExpression = ValidatesControl.GetBindingExpression(TextBox.TagProperty);
             if (bindingExpression == null) return;
-            var validationError = new ValidationError(
-                new ExceptionValidationRule(),
-                BindingOperations.GetBindingExpression(ValidatesControl, TextBox.TagProperty));
+            var opExpression = BindingOperations.GetBindingExpression(ValidatesControl, TextBox.TagProperty);
+            if (opExpression == null) return;
+            var validationError = new ValidationError(new ExceptionValidationRule(), opExpression);
 
             if (showError)
             {

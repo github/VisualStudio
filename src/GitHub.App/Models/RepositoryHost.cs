@@ -28,7 +28,7 @@ namespace GitHub.Models
         readonly ILoginCache loginCache;
 
         bool isLoggedIn;
-        bool isEnterprise;
+        readonly bool isEnterprise;
 
         public RepositoryHost(
             IApiClient apiClient,
@@ -86,8 +86,8 @@ namespace GitHub.Models
 
         public IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password)
         {
-            Guard.ArgumentNotEmptyString(usernameOrEmail, "usernameOrEmail");
-            Guard.ArgumentNotEmptyString(password, "password");
+            Guard.ArgumentNotEmptyString(usernameOrEmail, nameof(usernameOrEmail));
+            Guard.ArgumentNotEmptyString(password, nameof(password));
 
             // If we need to retry on fallback, we'll store the 2FA token 
             // from the first request to re-use:
@@ -104,7 +104,7 @@ namespace GitHub.Models
             // in multiple places in the chain below:
             var saveAuthorizationToken = new Func<ApplicationAuthorization, IObservable<Unit>>(authorization =>
             {
-                var token = authorization != null ? authorization.Token : null;
+                var token = authorization?.Token;
                 if (string.IsNullOrWhiteSpace(token))
                     return Observable.Return(Unit.Default);
 

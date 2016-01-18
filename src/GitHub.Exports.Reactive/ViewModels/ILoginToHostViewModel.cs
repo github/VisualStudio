@@ -60,6 +60,11 @@ namespace GitHub.ViewModels
         bool ShowLogInFailedError { get; }
 
         /// <summary>
+        /// The message to show if login failed.
+        /// </summary>
+        string LoginFailedMessage { get; }
+
+        /// <summary>
         /// Gets a command which, when invoked, resets all properties 
         /// and validators.
         /// </summary>
