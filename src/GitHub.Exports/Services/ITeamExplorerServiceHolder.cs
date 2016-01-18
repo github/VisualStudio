@@ -1,6 +1,5 @@
-﻿using System;
-using GitHub.Primitives;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+﻿using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using System;
 
 namespace GitHub.Services
 {
@@ -47,11 +46,7 @@ namespace GitHub.Services
     public interface IGitAwareItem
     {
         IGitRepositoryInfo ActiveRepo { get; }
-
-        /// <summary>
-        /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.
-        /// </summary>
-        UriString ActiveRepoUri { get; }
+        Uri ActiveRepoUri { get; }
         string ActiveRepoName { get; }
     }
 }

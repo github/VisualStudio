@@ -16,7 +16,7 @@ namespace GitHub.Caches
         public IScheduler Scheduler { get; protected set; }
 
         readonly AsyncSubject<Unit> shutdown = new AsyncSubject<Unit>();
-        public IObservable<Unit> Shutdown => shutdown;
+        public IObservable<Unit> Shutdown { get { return shutdown; } }
 
         public IObservable<Unit> Flush()
         {
@@ -84,7 +84,7 @@ namespace GitHub.Caches
         {
             if (disposed) return ExceptionHelper.ObservableThrowObjectDisposedException<Unit>("CredentialCache");
 
-            var values = value as Tuple<string, string>;
+            Tuple<string, string> values = value as Tuple<string, string>;
             if (values == null)
                 return ExceptionHelper.ObservableThrowInvalidOperationException<Unit>(key);
 
@@ -112,9 +112,9 @@ namespace GitHub.Caches
 
             var keyHost = GetKeyHost(key);
             var ret = GetKey(keyHost);
-            return ret != null
-                ? Observable.Return(ret)
-                : ExceptionHelper.ObservableThrowKeyNotFoundException<Tuple<string, string>>(keyHost);
+            if (ret != null)
+                return Observable.Return(ret);
+            return ExceptionHelper.ObservableThrowKeyNotFoundException<Tuple<string, string>>(keyHost);
         }
 
         public IObservable<IEnumerable<T>> GetAllObjects<T>()
@@ -180,7 +180,9 @@ namespace GitHub.Caches
             using (var credential = new Credential())
             {
                 credential.Target = key;
-                return credential.Load() && credential.Delete();
+                if (!credential.Load())
+                    return false;
+                return credential.Delete();
             }
         }
 
@@ -200,9 +202,9 @@ namespace GitHub.Caches
             {
                 credential.Target = key;
                 credential.Type = CredentialType.Generic;
-                return credential.Load()
-                    ? new Tuple<string, string>(credential.Username, credential.Password)
-                    : null;
+                if (credential.Load())
+                    return new Tuple<string, string>(credential.Username, credential.Password);
+                return null;
             }
         }
 

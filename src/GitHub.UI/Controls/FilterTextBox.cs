@@ -22,6 +22,8 @@ namespace GitHub.UI
             set { SetValue(PromptTextProperty, value); }
         }
 
+        public ICommand ClearCommand { get; private set; }
+
         public FilterTextBox()
         {
             // http://stackoverflow.com/a/661224/2114
@@ -64,9 +66,11 @@ namespace GitHub.UI
 
         static TextBox FindTextBoxInAncestors(DependencyObject current)
         {
+            TextBox tb;
+
             while (current != null)
             {
-                var tb = current as TextBox;
+                tb = current as TextBox;
                 if (tb != null)
                     return tb;
 

@@ -46,7 +46,7 @@ namespace GitHub.Api
 
         public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
         {
-            Guard.ArgumentNotEmptyString(login, nameof(login));
+            Guard.ArgumentNotEmptyString(login, "login");
 
             var client = gitHubClient.Repository;
 

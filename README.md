@@ -5,8 +5,6 @@ Most of the extension UI lives in the Team Explorer pane, which is available fro
 
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
-[![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 ## Build requirements
 
 * Visual Studio 2015
@@ -17,11 +15,9 @@ Official builds of this extension are available at [the official website](https:
 Clone the repository and its submodules in a git GUI client or via the command line:
 
 ```
-git clone https://github.com/github/VisualStudio
+git clone git@github.com:github/VisualStudio
 cd VisualStudio
-git submodule init
-git submodule deinit script
-git submodule update
+git submodule update --init
 ```
 
 Open the `GitHubVS.sln` solution with Visual Studio 2015.
@@ -32,7 +28,7 @@ To be able to use the GitHub API, you'll need to:
 
 ## Contributing
 
-Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
+Visit the [Contributor Guidelines](CONTRIBUTING.md) for details.
 
 ## Copyright
 

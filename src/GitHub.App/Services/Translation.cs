@@ -67,9 +67,12 @@ namespace GitHub.Services
             string exceptionMessage = exception.Message;
 
             var apiException = exception as ApiValidationException;
-            var error = apiException?.ApiError?.Errors?.FirstOrDefault();
-            if (error != null)
-                exceptionMessage = error.Message ?? exceptionMessage;
+            if (apiException != null && apiException.ApiError != null && apiException.ApiError.Errors != null)
+            {
+                var error = apiException.ApiError.Errors.FirstOrDefault();
+                if (error != null)
+                    exceptionMessage = error.Message ?? exceptionMessage;
+            }
 
             if (Original == exceptionMessage) return new Tuple<Translation, string>(this, null);
 

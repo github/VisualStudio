@@ -32,7 +32,7 @@ namespace GitHub.Services
             string directory,
             IApiClient apiClient)
         {
-            Guard.ArgumentNotEmptyString(directory, nameof(directory));
+            Guard.ArgumentNotEmptyString(directory, "directory");
 
             return apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
                 .Select(repository => cloneService.CloneRepository(repository.CloneUrl, repository.Name, directory))

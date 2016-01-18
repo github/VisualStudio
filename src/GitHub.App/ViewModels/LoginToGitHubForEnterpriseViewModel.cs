@@ -21,7 +21,7 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public LoginToGitHubForEnterpriseViewModel(IRepositoryHosts hosts, IVisualStudioBrowser browser) : base(hosts, browser)
         {
-            EnterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
+            enterpriseUrlValidator = ReactivePropertyValidator.For(this, x => x.EnterpriseUrl)
                 .IfNullOrEmpty("Please enter an Enterprise URL")
                 .IfNotUri("Please enter a valid Enterprise URL")
                 .IfGitHubDotComHost("Not an Enterprise server. Please enter an Enterprise URL");
@@ -55,13 +55,24 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref enterpriseUrl, value); }
         }
 
-        public ReactivePropertyValidator EnterpriseUrlValidator { get; }
+        readonly ReactivePropertyValidator enterpriseUrlValidator;
+        public ReactivePropertyValidator EnterpriseUrlValidator
+        {
+            get { return enterpriseUrlValidator; }
+        }
 
-        protected override Uri BaseUri => new Uri(EnterpriseUrl);
+        protected override Uri BaseUri
+        {
+            get
+            {
+                return new Uri(EnterpriseUrl);
+            }
+        }
 
         public IReactiveCommand<Unit> NavigateLearnMore
         {
             get;
+            private set;
         }
 
         protected override async Task ResetValidation()

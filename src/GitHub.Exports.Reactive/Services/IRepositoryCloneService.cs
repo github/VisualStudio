@@ -19,7 +19,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="cloneUrl">The url of the repository to clone.</param>
         /// <param name="repositoryName">The name of the repository to clone.</param>
-        /// <param name="repositoryPath">The directory that will contain the repository directory.</param>
+        /// <param name="repositoryParentDirectory">The directory that will contain the repository directory.</param>
         /// <returns></returns>
         IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath);
     }

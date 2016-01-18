@@ -180,6 +180,9 @@ namespace GitHub.Extensions.Reactive
         /// <summary>
         /// Aggregates the items in the observable sequence into a readonly list.
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static IObservable<IReadOnlyList<TResult>> ToReadOnlyList<T, TResult>(this IObservable<IEnumerable<T>> source, Func<T, TResult> map)
         {
             return source.Select(items => new ReadOnlyCollection<TResult>(items.Select(map).ToList()));
@@ -188,6 +191,9 @@ namespace GitHub.Extensions.Reactive
         /// <summary>
         /// Aggregates the items in the observable sequence into a readonly list.
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public static IObservable<IReadOnlyList<TResult>> ToReadOnlyList<T, TResult>(this IObservable<IEnumerable<T>> source, Func<T, TResult> map, TResult firstItem)
         {
             return source.Select(items => new ReadOnlyCollection<TResult>(new[] { firstItem }.Concat(items.Select(map)).ToList()));
