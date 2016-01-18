@@ -67,7 +67,12 @@ namespace GitHub.ViewModels
         }
 
         public IReactiveCommand<Gist> CreateGist { get; }
-        public IAccount Account { get { return account.Value; } }
+
+        public IAccount Account
+        {
+            [return: AllowNull]
+            get { return account.Value; }
+        }
 
         bool isPrivate;
         public bool IsPrivate
