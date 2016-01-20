@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullGuard;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +24,7 @@ namespace GitHub
 
     public static class StackExtensions
     {
+        [return: AllowNull]
         public static T TryPeek<T>(this Stack<T> stack) where T : class
         {
             if (stack.Count > 0)
