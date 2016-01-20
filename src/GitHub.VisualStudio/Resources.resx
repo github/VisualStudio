@@ -279,4 +279,7 @@
   <data name="NotLoggedInMessage" xml:space="preserve">
     <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
   </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Repository created successfully.</value>
+  </data>
 </root>
