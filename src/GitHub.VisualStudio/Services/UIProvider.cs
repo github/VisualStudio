@@ -31,7 +31,6 @@ namespace GitHub.VisualStudio
         CompositionContainer tempContainer;
         readonly Dictionary<string, ComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
-        IUIController currentUI;
         readonly Version currentVersion;
         bool initializingLogging = false;
 
@@ -202,9 +201,9 @@ namespace GitHub.VisualStudio
 
             var factory = GetService<IExportFactoryProvider>();
             currentUIFlow = factory.UIControllerFactory.CreateExport();
-            currentUI = currentUIFlow.Value;
             var disposable = currentUIFlow;
-            var creation = currentUI.SelectFlow(controllerFlow);
+            var ui = currentUIFlow.Value;
+            var creation = ui.SelectFlow(controllerFlow);
             windowController = new UI.WindowController(creation);
             windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
@@ -217,14 +216,21 @@ namespace GitHub.VisualStudio
                 else
                     StopUI();
             });
-            currentUI.Start(connection);
+            ui.Start(connection);
             return creation;
         }
 
         public IObservable<bool> ListenToCompletionState()
         {
-            Debug.Assert(currentUI != null, "Cannot call ListenToCompletionState without calling SetupUI first");
-            return currentUI?.ListenToCompletionState();
+            var ui = currentUIFlow?.Value;
+            if (ui == null)
+            {
+                log.Error("UIProvider:ListenToCompletionState:Cannot call ListenToCompletionState without calling SetupUI first");
+#if DEBUG
+                throw new InvalidOperationException("Cannot call ListenToCompletionState without calling SetupUI first");
+#endif
+            }
+            return ui?.ListenToCompletionState() ?? Observable.Return(false);
         }
 
         public void RunUI()
@@ -279,7 +285,6 @@ namespace GitHub.VisualStudio
             }
 
             StopUI(currentUIFlow);
-            currentUI = null;
             currentUIFlow = null;
         }
 

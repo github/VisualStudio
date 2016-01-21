@@ -156,7 +156,6 @@ namespace GitHub.Controllers
             completion?.OnNext(success);
             completion?.OnCompleted();
             transition.OnCompleted();
-            completion = null;
         }
 
         void RunView(UIViewType viewType)
