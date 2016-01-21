@@ -31,6 +31,7 @@ namespace GitHub.VisualStudio
         CompositionContainer tempContainer;
         readonly Dictionary<string, ComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
+        IUIController currentUI;
         readonly Version currentVersion;
         bool initializingLogging = false;
 
@@ -201,9 +202,9 @@ namespace GitHub.VisualStudio
 
             var factory = GetService<IExportFactoryProvider>();
             currentUIFlow = factory.UIControllerFactory.CreateExport();
+            currentUI = currentUIFlow.Value;
             var disposable = currentUIFlow;
-            var ui = currentUIFlow.Value;
-            var creation = ui.SelectFlow(controllerFlow);
+            var creation = currentUI.SelectFlow(controllerFlow);
             windowController = new UI.WindowController(creation);
             windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
@@ -216,8 +217,14 @@ namespace GitHub.VisualStudio
                 else
                     StopUI();
             });
-            ui.Start(connection);
+            currentUI.Start(connection);
             return creation;
+        }
+
+        public IObservable<bool> ListenToCompletionState()
+        {
+            Debug.Assert(currentUI != null, "Cannot call ListenToCompletionState without calling SetupUI first");
+            return currentUI?.ListenToCompletionState();
         }
 
         public void RunUI()
@@ -272,6 +279,7 @@ namespace GitHub.VisualStudio
             }
 
             StopUI(currentUIFlow);
+            currentUI = null;
             currentUIFlow = null;
         }
 
