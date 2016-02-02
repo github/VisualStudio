@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using GitHub.Exports;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using GitHub.Api;
-using GitHub.Extensions;
-using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using Octokit;
@@ -36,9 +32,7 @@ namespace GitHub.ViewModels
             Title = Resources.CreateGistTitle;
             apiClient = repositoryHost.ApiClient;
 
-            // Since the filename is required, go ahead and give it something default so the user is not forced to 
-            // add a custom name if they do not want to
-            FileName = Resources.DefaultGistFileName;
+            FileName = VisualStudio.Services.GetFileNameFromActiveDocument() ?? Resources.DefaultGistFileName;
             SelectedText = selectedTextProvider.GetSelectedText();
 
             // This class is only instantiated after we are logged into to a github account, so we should be safe to grab the first one here as the defaut.
