@@ -220,6 +220,19 @@ namespace GitHub.VisualStudio
             return creation;
         }
 
+        public IObservable<bool> ListenToCompletionState()
+        {
+            var ui = currentUIFlow?.Value;
+            if (ui == null)
+            {
+                log.Error("UIProvider:ListenToCompletionState:Cannot call ListenToCompletionState without calling SetupUI first");
+#if DEBUG
+                throw new InvalidOperationException("Cannot call ListenToCompletionState without calling SetupUI first");
+#endif
+            }
+            return ui?.ListenToCompletionState() ?? Observable.Return(false);
+        }
+
         public void RunUI()
         {
             if (!Initialized)

@@ -118,19 +118,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
             bool success = false;
-            ui.ListenToCompletionState().Subscribe(s => success = s, () =>
-            {
-                // there's no real cancel button in the publish form, but if support a back button there, then we want to hide the form
-                IsVisible = false;
-                if (success)
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-            });
+            ui.ListenToCompletionState().Subscribe(s => success = s);
 
             creation.Subscribe(c =>
             {
                 SectionContent = c;
                 c.DataContext = this;
                 ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+            },
+            () =>
+            {
+                // there's no real cancel button in the publish form, but if support a back button there, then we want to hide the form
+                IsVisible = false;
+                if (success)
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             });
             ui.Start(null);
         }
@@ -142,9 +143,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 if (!disposed)
                 {
-                    if (disposable != null)
-                        disposable.Dispose();
                     disposed = true;
+                    disposable?.Dispose();
                 }
             }
             base.Dispose(disposing);
