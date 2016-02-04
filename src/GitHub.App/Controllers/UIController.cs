@@ -268,13 +268,15 @@ namespace GitHub.Controllers
             else
             {
                 connectionManager
-                    .IsLoggedIn(hosts)
-                    .Do(loggedin =>
+                    .GetLoggedInConnections(hosts)
+                    .FirstOrDefaultAsync()
+                    .Select(c =>
                     {
+                        bool loggedin = c != null;
                         if (currentFlow != UIControllerFlow.Authentication)
                         {
                             if (loggedin) // register the first available connection so the viewmodel can use it
-                                uiProvider.AddService(connectionManager.Connections.First(c => hosts.LookupHost(c.HostAddress).IsLoggedIn));
+                                uiProvider.AddService(c);
                             else
                             {
                                 // a connection will be added to the list when auth is done, register it so the next
@@ -298,6 +300,8 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin)
                             .PermitIf(Trigger.Gist, UIViewType.Gist, () => loggedin)
                             .PermitIf(Trigger.Gist, UIViewType.Login, () => !loggedin);
+
+                        return loggedin;
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>

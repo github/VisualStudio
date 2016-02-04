@@ -285,4 +285,7 @@
   <data name="makePrivateGist" xml:space="preserve">
     <value>Private Gist</value>
   </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Repository created successfully.</value>
+  </data>
 </root>

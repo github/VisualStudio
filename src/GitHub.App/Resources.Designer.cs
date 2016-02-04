@@ -187,6 +187,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No selected repository..
+        /// </summary>
+        public static string RepositoryCloneFailedNoSelectedRepo {
+            get {
+                return ResourceManager.GetString("RepositoryCloneFailedNoSelectedRepo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Repository &apos;{0}/{1}&apos; already exists..
         /// </summary>
         public static string RepositoryCreationFailedAlreadyExists {

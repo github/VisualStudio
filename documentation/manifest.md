@@ -110,3 +110,6 @@
       - [ ] Login button is disabled
 - [ ] **Login to an enterprise instance**
       - [ ] Team Explorer Connect page shows two github connections - one titled GitHub, another with the enterprise url
+- [ ] **Login with 2FA on**
+      - [ ] Login GitHub with 2FA turned on
+      - [ ] Resend works

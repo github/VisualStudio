@@ -159,6 +159,9 @@
   <data name="PublishToTitle" xml:space="preserve">
     <value>Publish repository to {0}</value>
   </data>
+  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
+    <value>No selected repository.</value>
+  </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
     <value>Repository '{0}/{1}' already exists.</value>
   </data>
