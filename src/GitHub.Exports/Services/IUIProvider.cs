@@ -20,5 +20,6 @@ namespace GitHub.Services
         IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
         void RunUI();
         void RunUI(UIControllerFlow controllerFlow, IConnection connection);
+        IObservable<bool> ListenToCompletionState();
     }
 }
