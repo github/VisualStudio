@@ -304,6 +304,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Link copied to clipboard.
+        /// </summary>
+        public static string LinkCopiedToClipboardMessage {
+            get {
+                return ResourceManager.GetString("LinkCopiedToClipboardMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some or all repositories may not have loaded. Close the dialog and try again..
         /// </summary>
         public static string loadingFailedMessageContent {

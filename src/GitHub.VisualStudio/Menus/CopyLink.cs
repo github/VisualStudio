@@ -2,6 +2,8 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Windows;
+using GitHub.Extensions;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -27,6 +29,8 @@ namespace GitHub.VisualStudio.Menus
             if (link == null)
                 return;
             Clipboard.SetText(link.AbsoluteUri);
+            var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
+            ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
         }
 
         public bool CanShow()

@@ -282,4 +282,7 @@
   <data name="RepositoryPublishedMessage" xml:space="preserve">
     <value>Repository created successfully.</value>
   </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>Link copied to clipboard</value>
+  </data>
 </root>

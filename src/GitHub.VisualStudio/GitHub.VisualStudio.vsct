@@ -122,19 +122,23 @@
 
       <Button guid="guidContextMenuSet" id="openLinkCommand" priority="0x0100" type="Button">
         <Parent guid="guidContextMenuSet" id="idContextMenuGroup"/>
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open in Browser</ButtonText>
+          <ButtonText>Open on GitHub</ButtonText>
         </Strings>
       </Button>
 
       <Button guid="guidContextMenuSet" id="copyLinkCommand" priority="0x0101" type="Button">
         <Parent guid="guidContextMenuSet" id="idContextMenuGroup"/>
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Copy Link to Clipboard</ButtonText>
+          <ButtonText>Copy link to clipboard</ButtonText>
         </Strings>
       </Button>
     </Buttons>
