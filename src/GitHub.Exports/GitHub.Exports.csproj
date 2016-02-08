@@ -117,11 +117,13 @@
     <Compile Include="Services\IMenuHandler.cs" />
     <Compile Include="Services\IMenuProvider.cs" />
     <Compile Include="Services\INotificationDispatcher.cs" />
+    <Compile Include="Services\IStatusBarNotificationService.cs" />
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Services.cs" />
+    <Compile Include="Services\StatusBarNotificationService.cs" />
     <Compile Include="Services\TeamExplorerServices.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Models\IConnection.cs" />
