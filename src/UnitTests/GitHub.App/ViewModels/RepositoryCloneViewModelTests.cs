@@ -30,7 +30,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
 
             await vm.LoadRepositoriesCommand.ExecuteAsync();
 
@@ -51,7 +51,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
 
             Assert.False(vm.IsLoading);
 
@@ -80,7 +80,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
 
             vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
 
@@ -103,7 +103,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
 
             Assert.True(vm.NoRepositoriesFound);
         }
@@ -119,7 +119,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
             vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
 
             repoSubject.OnNext(new[] { Substitute.For<IRepositoryModel>() });
@@ -143,7 +143,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
             vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
 
             repoSubject.OnError(new InvalidOperationException());
@@ -162,7 +162,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
             vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
 
             repoSubject.OnCompleted();
@@ -184,7 +184,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
             vm.LoadRepositoriesCommand.ExecuteAsync().Subscribe();
 
             Assert.False(vm.LoadingFailed);
@@ -207,7 +207,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
             Assert.False(vm.CloneCommand.CanExecute(null));
 
             vm.BaseRepositoryPath = @"c:\fake\path";
@@ -225,7 +225,7 @@ public class RepositoryCloneViewModelTests
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IVSServices>());
+                Substitute.For<INotificationService>());
             vm.BaseRepositoryPath = @"c:|fake\path";
             Assert.False(vm.CloneCommand.CanExecute(null));
 
@@ -241,12 +241,12 @@ public class RepositoryCloneViewModelTests
             var cloneService = Substitute.For<IRepositoryCloneService>();
             cloneService.CloneRepository(Args.String, Args.String, Args.String)
                 .Returns(Observable.Throw<Unit>(new InvalidOperationException("Oh my! That was bad.")));
-            var vsServices = Substitute.For<IVSServices>();
+            var notificationService = Substitute.For<INotificationService>();
             var vm = new RepositoryCloneViewModel(
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
-                vsServices);
+                notificationService);
             vm.BaseRepositoryPath = @"c:\fake";
             var repository = Substitute.For<IRepositoryModel>();
             repository.Name.Returns("octokit");
@@ -254,7 +254,7 @@ public class RepositoryCloneViewModelTests
 
             await vm.CloneCommand.ExecuteAsync(null);
 
-            vsServices.Received().ShowError(@"Failed to clone the repository 'octokit'
+            notificationService.Received().ShowError(@"Failed to clone the repository 'octokit'
 Email support@github.com if you continue to have problems.");
         }
     }

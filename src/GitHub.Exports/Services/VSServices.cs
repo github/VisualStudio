@@ -26,12 +26,6 @@ namespace GitHub.Services
         IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
         string SetDefaultProjectPath(string path);
 
-        void ShowMessage(string message);
-        void ShowMessage(string message, ICommand command);
-        void ShowWarning(string message);
-        void ShowError(string message);
-        void ClearNotifications();
-
         void ActivityLogMessage(string message);
         void ActivityLogWarning(string message);
         void ActivityLogError(string message);
@@ -124,9 +118,9 @@ namespace GitHub.Services
                             if (path != null)
                                 return new SimpleRepositoryModel(path);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from the registry '{0}'", ex));
+                            // no sense spamming the log, the registry might have ton of stale things we don't care about
                         }
                         return null;
                     }
@@ -191,36 +185,6 @@ namespace GitHub.Services
                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error setting the create project path in the registry '{0}'", ex));
             }
             return old;
-        }
-
-        public void ShowMessage(string message)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
-        }
-
-        public void ShowMessage(string message, ICommand command)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
-        }
-
-        public void ShowWarning(string message)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
-        }
-
-        public void ShowError(string message)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
-        }
-
-        public void ClearNotifications()
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ClearNotifications();
         }
 
         public void ActivityLogMessage(string message)

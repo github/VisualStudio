@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Exports;
 using GitHub.Extensions;
@@ -17,6 +18,7 @@ using Microsoft.TeamFoundation.MVVM;
 using Microsoft.VisualStudio;
 using NullGuard;
 using ReactiveUI;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -148,7 +150,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     IsVisible = true;
                     LoggedIn = true;
                     if (ServiceProvider != null)
-                        RefreshRepositories();
+                        RefreshRepositories().Forget();
                 }
             }
         }
@@ -238,9 +240,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void ShowNotification(ISimpleRepositoryModel newrepo, string msg)
         {
-            var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-            vsservices.ClearNotifications();
-            vsservices.ShowMessage(
+            var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
+            
+            teServices.ClearNotifications();
+            teServices.ShowMessage(
                 msg,
                 new RelayCommand(o =>
                 {
@@ -252,7 +255,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     */
                     var prefix = str.Substring(0, 2);
                     if (prefix == "u:")
-                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                        OpenInBrowser(ServiceProvider.GetExportedValue<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
                     else if (prefix == "o:")
                     {
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
@@ -260,6 +263,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     }
                     else if (prefix == "c:")
                     {
+                        var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
                         vsservices.SetDefaultProjectPath(newrepo.LocalPath);
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
                             ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
@@ -271,9 +275,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 #endif
         }
 
-        void RefreshRepositories()
+        async Task RefreshRepositories()
         {
-            connectionManager.RefreshRepositories();
+            await connectionManager.RefreshRepositories();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
@@ -320,17 +324,27 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
+            var notifications = ServiceProvider.GetExportedValue<INotificationDispatcher>();
+            var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
+            notifications.AddListener(teServices);
+
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
-            var ret = uiProvider.SetupUI(controllerFlow, SectionConnection);
-            ret.Subscribe(c =>
-            {
-                if (c.IsViewType(UIViewType.Clone))
-                    isCloning = true;
-                else if (c.IsViewType(UIViewType.Create))
-                    isCreating = true;
-            });
+            uiProvider.SetupUI(controllerFlow, SectionConnection);
+            uiProvider.ListenToCompletionState()
+                .Subscribe(success =>
+                {
+                    if (success)
+                    {
+                        if (controllerFlow == UIControllerFlow.Clone)
+                            isCloning = true;
+                        else if (controllerFlow == UIControllerFlow.Create)
+                            isCreating = true;
+                    }
+                });
             uiProvider.RunUI();
+
+            notifications.RemoveListener();
         }
 
         bool disposed;
@@ -362,7 +376,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             readonly Stateless.StateMachine<SectionState, string> machine;
             readonly ITeamExplorerSection section;
 
-            public SectionStateTracker(ITeamExplorerSection section, Action onRefreshed)
+            public SectionStateTracker(ITeamExplorerSection section, Func<Task> onRefreshed)
             {
                 this.section = section;
                 machine = new Stateless.StateMachine<SectionState, string>(SectionState.Idle);
@@ -377,7 +391,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     .Ignore("Title")
                     .PermitIf("IsBusy", SectionState.Idle, () => !this.section.IsBusy)
                     .IgnoreIf("IsBusy", () => this.section.IsBusy)
-                    .OnExit(onRefreshed);
+                    .OnExit(() => onRefreshed());
 
                 section.PropertyChanged += TrackState;
             }

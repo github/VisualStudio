@@ -9,6 +9,8 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
+using GitHub.Extensions.Reactive;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -19,7 +21,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RepositoryPublishControl : GenericRepositoryPublishControl
     {
-        public RepositoryPublishControl()
+        [ImportingConstructor]
+        public RepositoryPublishControl(ITeamExplorerServices teServices, INotificationDispatcher notifications)
         {
             InitializeComponent();
 
@@ -30,7 +33,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.SelectedConnection, v => v.hostsComboBox.SelectedItem));
 
                 d(this.Bind(ViewModel, vm => vm.RepositoryName, v => v.nameText.Text));
-                
+
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.description.Text));
                 d(this.Bind(ViewModel, vm => vm.KeepPrivate, v => v.makePrivate.IsChecked));
                 d(this.OneWayBind(ViewModel, vm => vm.CanKeepPrivate, v => v.makePrivate.IsEnabled));
@@ -47,11 +50,30 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 ViewModel.PublishRepository.Subscribe(state =>
                 {
                     if (state == ProgressState.Success)
+                    {
+                        teServices.ShowMessage(VisualStudio.Resources.RepositoryPublishedMessage);
                         NotifyDone();
+                    }
                 });
 
                 d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value)
-                .Subscribe(x => NotifyIsBusy(x)));
+                    .Subscribe(x => NotifyIsBusy(x)));
+
+
+                d(notifications.Listen()
+                    .Where(n => n.Type == Notification.NotificationType.Error)
+                    .Subscribe(n => teServices.ShowError(n.Message)));
+
+                d(this.WhenAny(x => x.ViewModel.SafeRepositoryNameWarningValidator.ValidationResult, x => x.Value)
+                    .WhereNotNull()
+                    .Select(result => result?.Message)
+                    .Subscribe(message =>
+                    {
+                        if (!String.IsNullOrEmpty(message))
+                            teServices.ShowWarning(message);
+                        else
+                            teServices.ClearNotifications();
+                    }));
 
                 nameText.Text = ViewModel.DefaultRepositoryName;
             });

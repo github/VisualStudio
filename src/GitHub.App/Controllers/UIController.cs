@@ -18,6 +18,7 @@ using NullGuard;
 using ReactiveUI;
 using Stateless;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace GitHub.Controllers
 {
@@ -121,6 +122,7 @@ namespace GitHub.Controllers
             machine.Configure(UIViewType.End)
                 .OnEntryFrom(Trigger.Cancel, () => End(false))
                 .OnEntryFrom(Trigger.Next, () => End(true))
+                .OnEntryFrom(Trigger.Finish, () => End(true))
                 .Permit(Trigger.Next, UIViewType.Finished);
 
             machine.Configure(UIViewType.Finished);
@@ -151,10 +153,9 @@ namespace GitHub.Controllers
         void End(bool success)
         {
             uiProvider.RemoveService(typeof(IConnection));
-            transition.OnCompleted();
             completion?.OnNext(success);
             completion?.OnCompleted();
-            completion = null;
+            transition.OnCompleted();
         }
 
         void RunView(UIViewType viewType)
@@ -226,7 +227,11 @@ namespace GitHub.Controllers
         {
             if (connection != null)
             {
-                uiProvider.AddService(typeof(IConnection), connection);
+                if (currentFlow != UIControllerFlow.Authentication)
+                    uiProvider.AddService(connection);
+                else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
+                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
+
                 connection.Login()
                     .Select(c => hosts.LookupHost(connection.HostAddress))
                     .Do(host =>
@@ -250,16 +255,26 @@ namespace GitHub.Controllers
             else
             {
                 connectionManager
-                    .IsLoggedIn(hosts)
-                    .Do(loggedin =>
+                    .GetLoggedInConnections(hosts)
+                    .FirstOrDefaultAsync()
+                    .Select(c =>
                     {
-                        if (!loggedin && currentFlow != UIControllerFlow.Authentication)
+                        bool loggedin = c != null;
+                        if (currentFlow != UIControllerFlow.Authentication)
                         {
-                            connectionAdded = (s, e) => {
-                                if (e.Action == NotifyCollectionChangedAction.Add)
-                                    uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
-                            };
-                            connectionManager.Connections.CollectionChanged += connectionAdded;
+                            if (loggedin) // register the first available connection so the viewmodel can use it
+                                uiProvider.AddService(c);
+                            else
+                            {
+                                // a connection will be added to the list when auth is done, register it so the next
+                                // viewmodel can use it
+                                connectionAdded = (s, e) =>
+                                {
+                                    if (e.Action == NotifyCollectionChangedAction.Add)
+                                        uiProvider.AddService(typeof(IConnection), e.NewItems[0]);
+                                };
+                                connectionManager.Connections.CollectionChanged += connectionAdded;
+                            }
                         }
 
                         machine.Configure(UIViewType.None)
@@ -270,6 +285,8 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Clone, UIViewType.Login, () => !loggedin)
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => loggedin)
                             .PermitIf(Trigger.Publish, UIViewType.Login, () => !loggedin);
+
+                        return loggedin;
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
@@ -292,15 +309,19 @@ namespace GitHub.Controllers
             if (disposing)
             {
                 if (disposed) return;
+                disposed = true;
 
-                Debug.WriteLine("Disposing ({0})", GetHashCode());
-                disposables.Dispose();
-                transition?.Dispose();
-                completion?.Dispose();
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
                 connectionAdded = null;
-                disposed = true;
+
+                var tr = transition;
+                var cmp = completion;
+                transition = null;
+                completion = null;
+                disposables.Dispose();
+                tr?.Dispose();
+                cmp?.Dispose();
             }
         }
 

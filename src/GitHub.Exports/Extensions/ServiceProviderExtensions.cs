@@ -15,50 +15,35 @@ namespace GitHub.Extensions
     {
         static IUIProvider cachedUIProvider = null;
 
-        public static T TryGetService<T>(this IServiceProvider serviceProvider) where T : class
-        {
-            return serviceProvider.TryGetService(typeof(T)) as T;
-        }
-
         public static object TryGetService(this IServiceProvider serviceProvider, Type type)
         {
             if (cachedUIProvider != null && type == typeof(IUIProvider))
                 return cachedUIProvider;
 
             var ui = serviceProvider as IUIProvider;
-            if (ui != null)
-                return ui.TryGetService(type);
-            else
-            {
-                try
-                {
-                    return GetServiceAndCache(serviceProvider, type, ref cachedUIProvider);
-                }
-                catch (Exception ex)
-                {
-                    Debug.Print(ex.ToString());
-                }
-                return null;
-            }
+            return ui != null
+                ? ui.TryGetService(type)
+                : GetServiceAndCache(serviceProvider, type, ref cachedUIProvider);
         }
-
-        public static T GetService<T>(this IServiceProvider serviceProvider)
-        {
-            if (cachedUIProvider != null && typeof(T) == typeof(IUIProvider))
-                return (T)cachedUIProvider;
-
-            return (T)GetServiceAndCache(serviceProvider, typeof(T), ref cachedUIProvider);
-        }
-
-        public static T GetExportedValue<T>(this IServiceProvider serviceProvider)
+        public static T GetExportedValue<T>(this IServiceProvider serviceProvider) where T : class
         {
             if (cachedUIProvider != null && typeof(T) == typeof(IUIProvider))
                 return (T)cachedUIProvider;
 
             var ui = serviceProvider as IUIProvider;
             return ui != null
-                ? ui.GetService<T>()
+                ? ui.TryGetService(typeof(T)) as T
                 : GetExportedValueAndCache<T, IUIProvider>(ref cachedUIProvider);
+        }
+
+        public static T TryGetService<T>(this IServiceProvider serviceProvider) where T : class
+        {
+            return serviceProvider.TryGetService(typeof(T)) as T;
+        }
+
+        public static T GetService<T>(this IServiceProvider serviceProvider) where T : class
+        {
+            return serviceProvider.TryGetService(typeof(T)) as T;
         }
 
         public static ITeamExplorerSection GetSection(this IServiceProvider serviceProvider, Guid section)
@@ -68,18 +53,27 @@ namespace GitHub.Extensions
 
         static object GetServiceAndCache<CacheType>(IServiceProvider provider, Type type, ref CacheType cache)
         {
-            var ret = provider.GetService(type);
-            if (type == typeof(CacheType))
+            object ret = null;
+            try
+            {
+                ret = provider.GetService(type);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                VisualStudio.VsOutputLogger.WriteLine("GetServiceAndCache: Could not obtain instance of '{0}'", type);
+            }
+            if (ret != null && type == typeof(CacheType))
                 cache = (CacheType)ret;
             return ret;
         }
 
-        static T GetExportedValueAndCache<T, CacheType>(ref CacheType cache)
+        static T GetExportedValueAndCache<T, CacheType>(ref CacheType cache) where T : class
         {
-            var ret = VisualStudio.Services.ComponentModel.DefaultExportProvider.GetExportedValue<T>();
-            if (typeof(T) == typeof(CacheType))
-                cache = (CacheType)(object)ret;
-            return ret;
+            object ret = VisualStudio.Services.ComponentModel.DefaultExportProvider.GetExportedValueOrDefault<T>();
+            if (ret != null && typeof(T) == typeof(CacheType))
+                cache = (CacheType)ret;
+            return ret as T;
         }
 
         public static void AddTopLevelMenuItem(this IServiceProvider provider,
