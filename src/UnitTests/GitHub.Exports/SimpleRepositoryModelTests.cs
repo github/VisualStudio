@@ -40,6 +40,7 @@ public class SimpleRepositoryModelTests : TempFileBaseClass
     [InlineData(true, "https://github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, 2, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
     [InlineData(true, "https://github.com/foo/bar", "", @"src\dir\file1.cs", -1, 2, "https://github.com/foo/bar")]
     [InlineData(true, null, "123123", @"src\dir\file1.cs", 1, 2, null)]
+    [InlineData(false, "git@github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
     public void GenerateUrl(bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
     {
         SetupRepository(sha);

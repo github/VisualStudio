@@ -64,15 +64,18 @@ namespace GitHub.Models
         /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
         public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
         {
-            var sha = HeadSha;
-            if (CloneUrl == null || String.IsNullOrEmpty(sha))
+            if (CloneUrl == null)
                 return null;
+
+            var sha = HeadSha;
+            // this also incidentally checks whether the repo has a valid LocalPath
+            if (String.IsNullOrEmpty(sha))
+                return CloneUrl.ToRepositoryUrl().AbsoluteUri;
 
             if (path != null && Path.IsPathRooted(path))
             {
                 // if the path root doesn't match the repository local path, then ignore it
-                if (LocalPath == null ||
-                    !path.StartsWith(LocalPath, StringComparison.OrdinalIgnoreCase))
+                if (!path.StartsWith(LocalPath, StringComparison.OrdinalIgnoreCase))
                 {
                     Debug.Assert(false, String.Format(CultureInfo.CurrentCulture, "GenerateUrl: path {0} doesn't match repository {1}", path, LocalPath));
                     path = null;
@@ -81,7 +84,7 @@ namespace GitHub.Models
                     path = path.Substring(LocalPath.Length + 1);
             }
 
-            return new UriString(GenerateUrl(cloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
+            return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
         }
 
         const string CommitFormat = "{0}/commit/{1}";
