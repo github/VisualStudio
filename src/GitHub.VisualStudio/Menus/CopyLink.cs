@@ -9,7 +9,7 @@ namespace GitHub.VisualStudio.Menus
 {
     [Export(typeof(IDynamicMenuHandler))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class CopyLink: LinkMenuBase, IDynamicMenuHandler
+    public class CopyLink : LinkMenuBase, IDynamicMenuHandler
     {
         [ImportingConstructor]
         public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
