@@ -27,10 +27,10 @@ public class Converters
     [InlineData(0, 0, 0, 30, "1 month ago")]
     [InlineData(0, 0, 0, 59, "1 month ago")]
     [InlineData(0, 0, 0, 60, "2 months ago")]
-    [InlineData(0, 0, 0, 355, "11 months ago")]
-    [InlineData(0, 0, 0, 356, "1 year ago")]
-    [InlineData(0, 0, 0, 356*2-1, "1 year ago")]
-    [InlineData(0, 0, 0, 356*2, "2 years ago")]
+    [InlineData(0, 0, 0, 364, "11 months ago")]
+    [InlineData(0, 0, 0, 365, "1 year ago")]
+    [InlineData(0, 0, 0, 365*2-1, "1 year ago")]
+    [InlineData(0, 0, 0, 365*2, "2 years ago")]
     public void TimespanConversion(int sec, int min, int hou, int day, string expected)
     {
         var ts = new TimeSpan(day, hou, min, sec);
