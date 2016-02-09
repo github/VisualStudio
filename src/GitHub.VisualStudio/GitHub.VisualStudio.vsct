@@ -38,7 +38,11 @@
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
 
-      <Group guid="guidContextMenuSet" id="idContextMenuGroup">
+      <Group guid="guidContextMenuSet" id="idGitHubContextMenuGroup">
+      </Group>
+
+      <Group guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup" priority="0x0000">
+        <Parent guid="guidContextMenuSet" id="idGitHubContextMenu"/>
       </Group>
 
     </Groups>
@@ -48,6 +52,14 @@
         <Strings>
           <ButtonText>WindowToolBar</ButtonText>
           <CommandName>Window Toolbar</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidContextMenuSet" id="idGitHubContextMenu" priority="0x200" type="Menu">
+        <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
+        <Strings>
+          <ButtonText>GitHub</ButtonText>
+          <CommandName>GitHub</CommandName>
         </Strings>
       </Menu>
 
@@ -121,8 +133,8 @@
       </Button>
 
       <Button guid="guidContextMenuSet" id="openLinkCommand" priority="0x0100" type="Button">
-        <Parent guid="guidContextMenuSet" id="idContextMenuGroup"/>
-        <Icon guid="guidImages" id="logo" />
+        <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+        <Icon guid="guidImages" id="link_external" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -132,8 +144,8 @@
       </Button>
 
       <Button guid="guidContextMenuSet" id="copyLinkCommand" priority="0x0101" type="Button">
-        <Parent guid="guidContextMenuSet" id="idContextMenuGroup"/>
-        <Icon guid="guidImages" id="logo" />
+        <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+        <Icon guid="guidImages" id="clippy" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -146,19 +158,19 @@
   </Commands>
 
   <CommandPlacements>
-    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
       <Parent guid="GUID_XAML_EDITOR" id="ID_XAML_CTXT"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
       <Parent guid="GUID_HTML_EDITOR" id="ID_HTML_CTXT"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
       <Parent guid="GUID_JSON_EDITOR" id="ID_JSON_CTXT"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idContextMenuGroup" priority="0x1000">
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
     </CommandPlacement>
   </CommandPlacements>
@@ -186,6 +198,8 @@
       <IDSymbol name="arrow_right" value="3" />
       <IDSymbol name="refresh" value="4" />
       <IDSymbol name="pullrequest" value="5" />
+      <IDSymbol name="link_external" value="6"/>
+      <IDSymbol name="clippy" value="7"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
@@ -199,7 +213,9 @@
     </GuidSymbol>
 
     <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">
-      <IDSymbol name="idContextMenuGroup" value="0x1010" />
+      <IDSymbol name="idGitHubContextMenu" value="0x1000" />
+      <IDSymbol name="idGitHubContextMenuGroup" value="0x1001" />
+      <IDSymbol name="idGitHubContextSubMenuGroup" value="0x1002" />
       <IDSymbol name="openLinkCommand" value="0x100" />
       <IDSymbol name="copyLinkCommand" value="0x101"/>
     </GuidSymbol>
