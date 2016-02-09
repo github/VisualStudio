@@ -28,9 +28,17 @@ namespace GitHub.VisualStudio.Menus
             var link = GenerateLink();
             if (link == null)
                 return;
-            Clipboard.SetText(link.AbsoluteUri);
-            var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
-            ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
+            try
+            {
+                Clipboard.SetText(link);
+                var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
+                ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
+            }
+            catch
+            {
+                var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
+                ns?.ShowMessage(Resources.Error_FailedToCopyToClipboard);
+            }
         }
 
         public bool CanShow()

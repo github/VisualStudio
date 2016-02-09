@@ -28,7 +28,7 @@ namespace GitHub.VisualStudio.Menus
             if (link == null)
                 return;
             var browser = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
-            browser?.OpenUrl(link);
+            browser?.OpenUrl(link.ToUri());
         }
 
         public bool CanShow()

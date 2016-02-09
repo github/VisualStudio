@@ -1,4 +1,5 @@
 ﻿using GitHub.Extensions;
+using GitHub.Primitives;
 using System;
 
 namespace GitHub.VisualStudio.Menus
@@ -10,7 +11,7 @@ namespace GitHub.VisualStudio.Menus
         {
         }
 
-        protected Uri GenerateLink()
+        protected UriString GenerateLink()
         {
             var repo = ActiveRepo;
             var activeDocument = ServiceProvider.GetExportedValue<IActiveDocumentSnapshot>();

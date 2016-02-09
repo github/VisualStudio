@@ -156,7 +156,7 @@
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
     <Compile Include="GitHub.Exports\GitServiceTests.cs" />
     <Compile Include="GitHub.Exports\VSServicesTests.cs" />
-    <Compile Include="GitHub.Extensions\SimpleRepositoryModelExtensionTests.cs" />
+    <Compile Include="GitHub.Exports\SimpleRepositoryModelTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />

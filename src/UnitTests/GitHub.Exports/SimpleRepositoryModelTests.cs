@@ -1,5 +1,4 @@
 ﻿using System;
-using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.VisualStudio;
 using LibGit2Sharp;
@@ -9,7 +8,7 @@ using Xunit;
 using GitHub.Primitives;
 
 [Collection("PackageServiceProvider global data tests")]
-public class SimpleRepositoryModelExtensionTests : TempFileBaseClass
+public class SimpleRepositoryModelTests : TempFileBaseClass
 {
     void SetupRepository(string sha)
     {

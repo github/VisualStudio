@@ -285,4 +285,7 @@
   <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
     <value>Link copied to clipboard</value>
   </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>Could not copy to the clipboard. Please try again.</value>
+  </data>
 </root>
