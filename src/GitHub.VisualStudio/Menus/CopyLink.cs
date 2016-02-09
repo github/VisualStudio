@@ -17,8 +17,8 @@ namespace GitHub.VisualStudio.Menus
         {
         }
 
-        public Guid Guid { get { return GuidList.guidContextMenuSet; } }
-        public int CmdId { get { return PkgCmdIDList.copyLinkCommand; } }
+        public Guid Guid => GuidList.guidContextMenuSet;
+        public int CmdId => PkgCmdIDList.copyLinkCommand;
 
         public void Activate()
         {

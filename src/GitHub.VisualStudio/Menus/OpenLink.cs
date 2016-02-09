@@ -3,7 +3,6 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Composition;
-using System.Windows;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -17,8 +16,8 @@ namespace GitHub.VisualStudio.Menus
         {
         }
 
-        public Guid Guid { get { return GuidList.guidContextMenuSet; } }
-        public int CmdId { get { return PkgCmdIDList.openLinkCommand; } }
+        public Guid Guid => GuidList.guidContextMenuSet;
+        public int CmdId => PkgCmdIDList.openLinkCommand;
 
         public void Activate()
         {

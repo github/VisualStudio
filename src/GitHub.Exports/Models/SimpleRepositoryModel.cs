@@ -10,7 +10,7 @@ using GitHub.Services;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, INotifyPropertySource, IEquatable<SimpleRepositoryModel>
+    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, IEquatable<SimpleRepositoryModel>
     {
         public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
         {

@@ -1,9 +1,5 @@
 ﻿using GitHub.Extensions;
-using GitHub.Models;
-using GitHub.Services;
-using Microsoft.VisualStudio.Shell;
 using System;
-using System.Globalization;
 
 namespace GitHub.VisualStudio.Menus
 {

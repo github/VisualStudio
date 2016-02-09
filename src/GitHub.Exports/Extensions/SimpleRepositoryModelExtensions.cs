@@ -5,7 +5,6 @@ using System.IO;
 using GitHub.Models;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Services;
-using GitHub.VisualStudio;
 using GitHub.Primitives;
 using System.Text;
 using System.Diagnostics;
