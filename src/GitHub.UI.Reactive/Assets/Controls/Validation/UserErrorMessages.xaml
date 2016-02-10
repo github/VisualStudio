@@ -25,7 +25,7 @@
                             HorizontalAlignment="Right"
                             Width="16"
                             Height="16">
-                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="1024" Fill="{TemplateBinding Fill}" />
+                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="16" Fill="{TemplateBinding Fill}" />
                         </Viewbox>
                         <ContentControl Grid.Column="1" Content="{Binding}">
                             <ContentControl.Resources>
