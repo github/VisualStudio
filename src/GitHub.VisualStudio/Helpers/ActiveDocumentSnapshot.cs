@@ -9,7 +9,7 @@ namespace GitHub.VisualStudio
 {
     [Export(typeof(IActiveDocumentSnapshot))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    class ActiveDocumentSnapshot : IActiveDocumentSnapshot
+    public class ActiveDocumentSnapshot : IActiveDocumentSnapshot
     {
         public string Name { get; private set; }
         public int StartLine { get; private set; }
