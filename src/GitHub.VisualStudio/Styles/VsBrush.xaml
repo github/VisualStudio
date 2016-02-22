@@ -1,0 +1,13 @@
+<ResourceDictionary 
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+  <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="{DynamicResource VsBrush.ToolWindowText}" />
+  <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="{DynamicResource VsBrush.ToolWindowBackground}" />
+  <SolidColorBrush x:Key="GitHubVsGrayText" Color="{DynamicResource VsBrush.GrayText}" />
+  <SolidColorBrush x:Key="GitHubVsCommandBarHover" Color="{DynamicResource VsBrush.CommandBarHover}" />
+  <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="{DynamicResource VsBrush.CommandBarSelectedBorder}" />
+  <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="{DynamicResource VsBrush.SearchBoxBackground}" />
+  <SolidColorBrush x:Key="GitHubVsWindowText" Color="{DynamicResource VsBrush.WindowText}" />
+</ResourceDictionary>

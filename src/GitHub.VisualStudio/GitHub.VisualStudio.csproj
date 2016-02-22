@@ -376,6 +376,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Styles\ThemeDesignTime.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Styles\ThemeLight.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -386,6 +390,10 @@
     </Page>
     <Page Include="SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\VsBrush.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
       <SubType>Designer</SubType>

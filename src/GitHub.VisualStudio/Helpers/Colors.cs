@@ -34,17 +34,25 @@ namespace GitHub.VisualStudio.Helpers
 
         public static string DetectTheme()
         {
-            var color = VSColorTheme.GetThemedColor(EnvironmentColors.AccentMediumColorKey);
-            var cc = color.ToColor();
-            if (cc == AccentMediumBlueTheme)
-                return "Blue";
-            if (cc == AccentMediumLightTheme)
-                return "Light";
-            if (cc == AccentMediumDarkTheme)
+            try
+            {
+                var color = VSColorTheme.GetThemedColor(EnvironmentColors.AccentMediumColorKey);
+                var cc = color.ToColor();
+                if (cc == AccentMediumBlueTheme)
+                    return "Blue";
+                if (cc == AccentMediumLightTheme)
+                    return "Light";
+                if (cc == AccentMediumDarkTheme)
+                    return "Dark";
+                var brightness = color.GetBrightness();
+                var dark = brightness > 0.5f;
+                return dark ? "Dark" : "Light";
+            }
+            // this throws in design time and when running outside of VS
+            catch (ArgumentNullException)
+            {
                 return "Dark";
-            var brightness = color.GetBrightness();
-            var dark = brightness > 0.5f;
-            return dark ? "Dark" : "Light";
+            }
         }
     }
 }

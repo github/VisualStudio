@@ -43,16 +43,9 @@ namespace GitHub.VisualStudio.Base
 
         void OnThemeChanged()
         {
-            try
-            {
-                var theme = Colors.DetectTheme();
-                var dark = theme == "Dark";
-                Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
-            }
-            catch (ArgumentNullException)
-            {
-                // This throws in the unit test runner.
-            }
+            var theme = Colors.DetectTheme();
+            var dark = theme == "Dark";
+            Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
         }
 
         void UpdateRepo(ISimpleRepositoryModel repo)
