@@ -64,11 +64,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             try
             {
-                var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-                var brightness = color.GetBrightness();
-                var dark = brightness > 0.5f;
-
-                Icon = SharedResources.GetDrawingForIcon(Octicon.mark_github, dark ? Helpers.Colors.DarkThemeNavigationItem : Helpers.Colors.LightThemeNavigationItem, dark ? "dark" : "light");
+                var theme = Helpers.Colors.DetectTheme();
+                var dark = theme == "Dark";
+                Icon = SharedResources.GetDrawingForIcon(Octicon.mark_github, dark ? Colors.White : Helpers.Colors.LightThemeNavigationItem, theme);
             }
             catch (ArgumentNullException)
             {

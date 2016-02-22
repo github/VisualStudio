@@ -27,7 +27,6 @@ namespace GitHub.VisualStudio
                 Drawing = new GeometryDrawing()
                 {
                     Brush = colorBrush,
-                    Pen = new Pen(colorBrush, 1.0).FreezeThis(),
                     Geometry = OcticonPath.GetGeometryForIcon(icon).FreezeThis()
                 }
                 .FreezeThis(),
