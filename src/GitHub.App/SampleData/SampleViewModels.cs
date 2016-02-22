@@ -409,6 +409,11 @@ namespace GitHub.SampleData
         {
         }
 
+        public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        {
+            return null;
+        }
+
         public string Name { get; set; }
         public UriString CloneUrl { get; set; }
         public string LocalPath { get; set; }

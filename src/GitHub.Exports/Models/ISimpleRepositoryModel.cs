@@ -18,5 +18,6 @@ namespace GitHub.Models
         /// Updates the url information based on the local path
         /// </summary>
         void Refresh();
+        UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1);
     }
 }

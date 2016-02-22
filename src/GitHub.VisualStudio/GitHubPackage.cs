@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;

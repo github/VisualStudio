@@ -212,8 +212,12 @@
     <Compile Include="Base\TeamExplorerServiceHolder.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
+    <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
+    <Compile Include="Menus\OpenLink.cs" />
+    <Compile Include="Menus\LinkMenuBase.cs" />
     <Compile Include="Menus\ShowGitHubPane.cs" />
     <Compile Include="Menus\AddConnection.cs" />
+    <Compile Include="Menus\CopyLink.cs" />
     <Compile Include="Base\MenuBase.cs" />
     <Compile Include="Menus\MenuProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -340,6 +344,14 @@
     <Resource Include="Resources\default_user_avatar.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Resources\icons\clippy.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\icons\link_external.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\icons\refresh.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -359,6 +371,18 @@
     <Page Include="Resources\icons\mark_github.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\ThemeBlue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\ThemeLight.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\ThemeDark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>

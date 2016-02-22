@@ -2,14 +2,14 @@
 using System;
 using System.ComponentModel.Composition;
 
-namespace GitHub.VisualStudio
+namespace GitHub.VisualStudio.Menus
 {
     [Export(typeof(IMenuHandler))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ShowGitHubPane: MenuBase, IMenuHandler
     {
-        public Guid Guid { get { return GuidList.guidGitHubCmdSet; } }
-        public int CmdId { get { return PkgCmdIDList.showGitHubPaneCommand; } }
+        public Guid Guid => GuidList.guidGitHubCmdSet;
+        public int CmdId => PkgCmdIDList.showGitHubPaneCommand;
 
         public void Activate()
         {

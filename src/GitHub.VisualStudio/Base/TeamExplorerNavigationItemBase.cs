@@ -45,11 +45,9 @@ namespace GitHub.VisualStudio.Base
         {
             try
             {
-                var color = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
-                var brightness = color.GetBrightness();
-                var dark = brightness > 0.5f;
-
-                Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, dark ? "dark" : "light");
+                var theme = Colors.DetectTheme();
+                var dark = theme == "Dark";
+                Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
             }
             catch (ArgumentNullException)
             {

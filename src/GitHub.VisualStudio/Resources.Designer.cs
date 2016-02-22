@@ -214,6 +214,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not copy to the clipboard. Please try again..
+        /// </summary>
+        public static string Error_FailedToCopyToClipboard {
+            get {
+                return ResourceManager.GetString("Error_FailedToCopyToClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -300,6 +309,15 @@ namespace GitHub.VisualStudio {
         public static string licenseListText {
             get {
                 return ResourceManager.GetString("licenseListText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Link copied to clipboard.
+        /// </summary>
+        public static string LinkCopiedToClipboardMessage {
+            get {
+                return ResourceManager.GetString("LinkCopiedToClipboardMessage", resourceCulture);
             }
         }
         
