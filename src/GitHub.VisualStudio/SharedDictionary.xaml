@@ -11,11 +11,11 @@
 
   <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}" />
   <Style x:Key="VSStyledCheckBox" BasedOn="{StaticResource VsCheckBoxStyleKey}" TargetType="{x:Type CheckBox}">
-    <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
-    <Setter Property="Background" Value="{DynamicResource VsBrush.ToolWindowBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+    <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
     <Style.Triggers>
       <Trigger Property="UIElement.IsMouseOver" Value="true">
-        <Setter Property="Background" Value="{DynamicResource VsBrush.ToolWindowBackground}" />
+        <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
       </Trigger>
     </Style.Triggers>
   </Style>

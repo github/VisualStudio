@@ -3,11 +3,11 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
-  <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="{DynamicResource VsBrush.ToolWindowText}" />
-  <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="{DynamicResource VsBrush.ToolWindowBackground}" />
-  <SolidColorBrush x:Key="GitHubVsGrayText" Color="{DynamicResource VsBrush.GrayText}" />
-  <SolidColorBrush x:Key="GitHubVsCommandBarHover" Color="{DynamicResource VsBrush.CommandBarHover}" />
-  <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="{DynamicResource VsBrush.CommandBarSelectedBorder}" />
-  <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="{DynamicResource VsBrush.SearchBoxBackground}" />
-  <SolidColorBrush x:Key="GitHubVsWindowText" Color="{DynamicResource VsBrush.WindowText}" />
+  <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="{DynamicResource VsColor.ToolWindowText}" />
+  <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="{DynamicResource VsColor.ToolWindowBackground}" />
+  <SolidColorBrush x:Key="GitHubVsGrayText" Color="{DynamicResource VsColor.GrayText}" />
+  <SolidColorBrush x:Key="GitHubVsCommandBarHover" Color="{DynamicResource VsColor.CommandBarHover}" />
+  <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="{DynamicResource VsColor.CommandBarSelectedBorder}" />
+  <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="{DynamicResource VsColor.SearchBoxBackground}" />
+  <SolidColorBrush x:Key="GitHubVsWindowText" Color="{DynamicResource VsColor.WindowText}" />
 </ResourceDictionary>

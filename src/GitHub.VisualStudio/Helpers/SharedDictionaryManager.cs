@@ -58,11 +58,11 @@ namespace GitHub.VisualStudio.Helpers
             return null;
         }
 
-        #region ResourceDictionaryImplementation
+#region ResourceDictionaryImplementation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         string currentTheme;
 
-#if !DEBUG
+#if !XAML_DESIGNER
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
         static string baseThemeUri = "pack://application:,,,/GitHub.VisualStudio;component/Styles/";
 
@@ -75,7 +75,7 @@ namespace GitHub.VisualStudio.Helpers
             {
                 if (value.ToString() == "pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml")
                 {
-                    else if (!themed)
+                    if (!themed)
                     {
                         themed = true;
                         VSColorTheme.ThemeChanged += OnThemeChange;
@@ -109,6 +109,6 @@ namespace GitHub.VisualStudio.Helpers
             Source = uri;
         }
 #endif
-        #endregion
+#endregion
     }
 }
