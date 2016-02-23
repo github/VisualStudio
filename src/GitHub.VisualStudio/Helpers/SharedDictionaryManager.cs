@@ -6,6 +6,7 @@ using System.Reflection;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.PlatformUI;
+using System.ComponentModel;
 
 namespace GitHub.VisualStudio.Helpers
 {
@@ -58,18 +59,21 @@ namespace GitHub.VisualStudio.Helpers
         }
 
 #region ResourceDictionaryImplementation
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        string currentTheme;
+
+#if !XAML_DESIGNER
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
         static string baseThemeUri = "pack://application:,,,/GitHub.VisualStudio;component/Styles/";
 
         Uri sourceUri;
-        string currentTheme;
         bool themed = false;
         public new Uri Source
         {
             get { return sourceUri; }
             set
             {
-                if (value.ToString() == "Theme.xaml")
+                if (value.ToString() == "pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml")
                 {
                     if (!themed)
                     {
@@ -78,7 +82,7 @@ namespace GitHub.VisualStudio.Helpers
                     }
                     value = new Uri(baseThemeUri + "Theme" + currentTheme + ".xaml");
                 }
-                
+
                 sourceUri = value;
                 ResourceDictionary ret;
                 if (resourceDicts.TryGetValue(value, out ret))
@@ -104,6 +108,7 @@ namespace GitHub.VisualStudio.Helpers
             currentTheme = Colors.DetectTheme();
             Source = uri;
         }
-        #endregion
+#endif
+#endregion
     }
 }

@@ -13,7 +13,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
              KeyboardNavigation.TabNavigation="Local"
-             DataContext="{Binding ViewModel}">
+             DataContext="{Binding ViewModel}"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             >
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
@@ -35,7 +37,7 @@
 
 
       <Style x:Key="RepoNameStyle" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
         <Setter Property="Margin" Value="0,0,6,3" />
         <Setter Property="Text">
           <Setter.Value>
@@ -62,19 +64,19 @@
         <Setter Property="Margin" Value="0,0,3,3" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis"  />
         <Setter Property="TextWrapping" Value="NoWrap"  />
-        <Setter Property="Foreground" Value="{DynamicResource VsBrush.GrayText}" />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubVsGrayText}" />
         <Style.Triggers>
           <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
               <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True"/>
             </MultiDataTrigger.Conditions>
-            <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
           </MultiDataTrigger>
           <MultiDataTrigger>
             <MultiDataTrigger.Conditions>
               <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}, Path=IsMouseOver}" Value="true" />
             </MultiDataTrigger.Conditions>
-            <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
           </MultiDataTrigger>
           <DataTrigger Value="True">
             <DataTrigger.Binding>
@@ -83,7 +85,7 @@
                 <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
               </MultiBinding>
             </DataTrigger.Binding>
-            <Setter Property="Foreground" Value="{DynamicResource VsBrush.ToolWindowText}" />
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
           </DataTrigger>
         </Style.Triggers>
 
@@ -118,14 +120,14 @@
                   <MultiTrigger.Conditions>
                     <Condition Property="IsMouseOver" Value="True"/>
                   </MultiTrigger.Conditions>
-                  <Setter Property="Background" Value="{DynamicResource VsBrush.CommandBarHover}" />
+                  <Setter Property="Background" Value="{DynamicResource GitHubVsCommandBarHover}" />
                 </MultiTrigger>
                 <MultiTrigger>
                   <MultiTrigger.Conditions>
                     <Condition Property="Selector.IsSelectionActive" Value="True"/>
                     <Condition Property="IsSelected" Value="True"/>
                   </MultiTrigger.Conditions>
-                  <Setter Property="Background" Value="{DynamicResource VsBrush.CommandBarSelectedBorder}" />
+                  <Setter Property="Background" Value="{DynamicResource GitHubVsCommandBarSelectedBorder}" />
                 </MultiTrigger>
                 <MultiTrigger>
                   <MultiTrigger.Conditions>
@@ -183,7 +185,7 @@
               <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <ui:OcticonImage Grid.Column="0" Margin="11,1,6,1" Width="16" Height="16"
-                             Foreground="{DynamicResource VsBrush.ToolWindowText}"
+                             Foreground="{DynamicResource GitHubVsToolWindowText}"
                              Icon="{Binding Path=Icon}"/>
             <TextBlock       Grid.Column="1" Style="{StaticResource RepoNameStyle}" />
             <Separator       Grid.Column="2" Margin="0,0,6,3" Style="{StaticResource VerticalSeparator}" />
