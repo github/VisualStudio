@@ -8,8 +8,8 @@
       <ui:OcticonImage.Resources>
         <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
+            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
             <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-            <cache:SharedDictionaryManager Source="Theme.xaml" />
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
       </ui:OcticonImage.Resources>

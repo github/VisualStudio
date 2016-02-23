@@ -62,16 +62,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void OnThemeChanged()
         {
-            try
-            {
-                var theme = Helpers.Colors.DetectTheme();
-                var dark = theme == "Dark";
-                Icon = SharedResources.GetDrawingForIcon(Octicon.mark_github, dark ? Colors.White : Helpers.Colors.LightThemeNavigationItem, theme);
-            }
-            catch (ArgumentNullException)
-            {
-                // This throws in the unit test runner.
-            }
+            var theme = Helpers.Colors.DetectTheme();
+            var dark = theme == "Dark";
+            Icon = SharedResources.GetDrawingForIcon(Octicon.mark_github, dark ? Colors.White : Helpers.Colors.LightThemeNavigationItem, theme);
         }
     }
 }

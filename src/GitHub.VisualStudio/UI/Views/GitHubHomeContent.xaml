@@ -11,8 +11,9 @@
              d:DesignHeight="48"
              Height="48"
              d:DesignWidth="300"
-             Background="Transparent"
-             DataContext="{Binding ViewModel}">
+             DataContext="{Binding ViewModel}"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+>
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
@@ -24,6 +25,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Label">
@@ -46,11 +48,11 @@
                 VerticalAlignment="Center" 
                 Margin="0,0,8,0"
                 Icon="{Binding Path=Icon}"
-                Foreground="{DynamicResource VsBrush.ToolWindowText}" />
+                Foreground="{DynamicResource GitHubVsToolWindowText}" />
 
             <StackPanel Orientation="Vertical" Margin="0" Grid.Column="1">
-                <Label Content="{Binding Path=RepoName}"  Foreground="{DynamicResource VsBrush.ToolWindowText}"/>
-                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource VsBrush.GrayText}" />
+                <Label Content="{Binding Path=RepoName}"  Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource GitHubVsGrayText}" />
             </StackPanel>
         </Grid>
     </StackPanel>

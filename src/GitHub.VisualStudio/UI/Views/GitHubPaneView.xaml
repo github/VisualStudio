@@ -8,8 +8,8 @@
                             xmlns:prop="clr-namespace:GitHub.VisualStudio"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
-                            Background="White"
-                            Foreground="{DynamicResource VsBrush.WindowText}"
+                            Background="{DynamicResource GitHubVsToolWindowBackground}"
+                            Foreground="{DynamicResource GitHubVsToolWindowText}"
                             d:DesignHeight="300"
                             d:DesignWidth="300"
                             mc:Ignorable="d">
@@ -20,14 +20,8 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
-      <Color x:Key="GitHubPaneTitleColor">#FF1B293E</Color>
-      <SolidColorBrush x:Key="GitHubPaneTitleBrush" opts:Freeze="true" Color="{StaticResource GitHubPaneTitleColor}" />
-
-      <Color x:Key="GitHubPaneSubTitleColor">#BBBBBB</Color>
-      <SolidColorBrush x:Key="GitHubPaneSubTitleBrush" opts:Freeze="true" Color="{StaticResource GitHubPaneSubTitleColor}" />
-
       <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">
-        <Setter Property="Background" Value="{DynamicResource VsBrush.CommandBarGradientMiddle}" />
+        <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
         <Setter Property="Height" Value="2" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
@@ -50,18 +44,21 @@
       <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"
-                 Foreground="{StaticResource GitHubPaneTitleBrush}"
+                 Foreground="{DynamicResource GitHubPaneTitleBrush}"
                  Text="{x:Static prop:Resources.PullRequestsNavigationItemText}" />
-      <Separator Margin="5,-2,5,0" Foreground="{StaticResource GitHubPaneSubTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
+      <Separator Margin="5,-2,5,0" Foreground="{DynamicResource GitHubPaneTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
       <TextBlock Margin="0,-5,0,0"
                  VerticalAlignment="Center"
-                 Foreground="{DynamicResource VsBrush.GrayText}"
+                 Foreground="{DynamicResource GitHubVsGrayText}"
                  Text="{Binding ActiveRepo.Name}" />
     </StackPanel>
 
     <Separator Margin="0,0,0,9" DockPanel.Dock="Top" Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <ListBox x:Name="container" Margin="6,0,6,9" ItemsSource="{Binding Panels}">
+    <ListBox x:Name="container"
+             Margin="6,0,6,9"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             ItemsSource="{Binding Panels}">
       <ListBox.ItemContainerStyle>
         <Style TargetType="{x:Type ListBoxItem}">
           <Setter Property="DockPanel.Dock" Value="{Binding Dock}" />
