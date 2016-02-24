@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
 using SettingsStore = GitHub.Helpers.SettingsStore;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace GitHub.Services
 {
@@ -75,7 +76,10 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
+                Debug.Fail(String.Format(CultureInfo.InvariantCulture, "PackageSettings: Unable to load settings. {0}", ex));
+#if !DEBUG
                 VsOutputLogger.WriteLine("PackageSettings: Unable to load settings. {0}", ex);
+#endif
             }
         }
 
@@ -90,7 +94,10 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine("PackageSettings: Unable to load settings. {0}", ex);
+                Debug.Fail(String.Format(CultureInfo.InvariantCulture, "PackageSettings: Unable to save settings. {0}", ex));
+#if !DEBUG
+                VsOutputLogger.WriteLine("PackageSettings: Unable to save settings. {0}", ex);
+#endif
             }
         }
     }
