@@ -102,6 +102,7 @@
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
     <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
+    <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
@@ -116,11 +117,13 @@
     <Compile Include="Services\IMenuHandler.cs" />
     <Compile Include="Services\IMenuProvider.cs" />
     <Compile Include="Services\INotificationDispatcher.cs" />
+    <Compile Include="Services\IPackageSettings.cs" />
     <Compile Include="Services\IStatusBarNotificationService.cs" />
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\Logger.cs" />
+    <Compile Include="Services\PackageSettings.cs" />
     <Compile Include="Services\Services.cs" />
     <Compile Include="Services\StatusBarNotificationService.cs" />
     <Compile Include="Services\TeamExplorerServices.cs" />

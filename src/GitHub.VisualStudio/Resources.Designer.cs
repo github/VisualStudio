@@ -421,6 +421,24 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
+        /// </summary>
+        public static string Options_MetricsLabel {
+            get {
+                return ResourceManager.GetString("Options_MetricsLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Privacy.
+        /// </summary>
+        public static string Options_PrivacyTitle {
+            get {
+                return ResourceManager.GetString("Options_PrivacyTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to or.
         /// </summary>
         public static string orText {
