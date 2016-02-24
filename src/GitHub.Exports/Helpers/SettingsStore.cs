@@ -1,5 +1,6 @@
 using System.IO;
 using Microsoft.VisualStudio.Settings;
+using GitHub.Extensions;
 
 namespace GitHub.Helpers
 {
@@ -9,6 +10,9 @@ namespace GitHub.Helpers
         readonly string root;
         public SettingsStore(WritableSettingsStore store, string root)
         {
+            Guard.ArgumentNotNull(store, nameof(store));
+            Guard.ArgumentNotNull(root, nameof(root));
+            Guard.ArgumentNotEmptyString(root, nameof(root));
             this.store = store;
             this.root = root;
         }
@@ -30,6 +34,9 @@ namespace GitHub.Helpers
         /// <returns></returns>
         public object Read(string subpath, string property, object defaultValue)
         {
+            Guard.ArgumentNotNull(property, nameof(property));
+            Guard.ArgumentNotEmptyString(property, nameof(property));
+
             var collection = subpath != null ? Path.Combine(root, subpath) : root;
             store.CreateCollection(collection);
 
@@ -53,6 +60,9 @@ namespace GitHub.Helpers
 
         public void Write(string subpath, string property, object value)
         {
+            Guard.ArgumentNotNull(property, nameof(property));
+            Guard.ArgumentNotEmptyString(property, nameof(property));
+
             var collection = subpath != null ? Path.Combine(root, subpath) : root;
             store.CreateCollection(collection);
 
