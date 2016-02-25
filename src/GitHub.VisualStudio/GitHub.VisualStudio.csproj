@@ -249,6 +249,12 @@
     </Compile>
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\SharedResources.cs" />
+    <Compile Include="Settings\PackageSettings.cs" />
+    <Compile Include="Settings\PackageSettingsGen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PackageSettingsGen.tt</DependentUpon>
+    </Compile>
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -339,8 +345,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Settings\PackageSettingsGen.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
+      <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
+    </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="..\common\settings.json">
+      <Link>Properties\settings.json</Link>
     </None>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
@@ -588,6 +602,9 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

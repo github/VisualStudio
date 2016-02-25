@@ -4,7 +4,7 @@ using GitHub.Extensions;
 
 namespace GitHub.Helpers
 {
-    internal class SettingsStore
+    public class SettingsStore
     {
         readonly WritableSettingsStore store;
         readonly string root;

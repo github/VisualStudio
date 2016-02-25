@@ -95,6 +95,9 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
+    <None Include="..\common\settings.json">
+      <Link>Properties\settings.json</Link>
+    </None>
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
@@ -117,13 +120,11 @@
     <Compile Include="Services\IMenuHandler.cs" />
     <Compile Include="Services\IMenuProvider.cs" />
     <Compile Include="Services\INotificationDispatcher.cs" />
-    <Compile Include="Services\IPackageSettings.cs" />
     <Compile Include="Services\IStatusBarNotificationService.cs" />
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\Logger.cs" />
-    <Compile Include="Services\PackageSettings.cs" />
     <Compile Include="Services\Services.cs" />
     <Compile Include="Services\StatusBarNotificationService.cs" />
     <Compile Include="Services\TeamExplorerServices.cs" />
@@ -137,6 +138,11 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
+    <Compile Include="Settings\IPackageSettings.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IPackageSettings.tt</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
@@ -180,6 +186,15 @@
       <Name>GitHub.Extensions</Name>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Settings\IPackageSettings.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IPackageSettings.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
