@@ -1,9 +1,9 @@
 ﻿{
-	"settings": [
-		{
-			"name": "CollectMetrics",
-			"type": "bool",
-			"default": 'true'
-		}
-	]
+    "settings": [
+    {
+        "name": "CollectMetrics",
+        "type": "bool",
+        "default": 'true'
+    }
+    ]
 }
