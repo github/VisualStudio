@@ -238,3 +238,5 @@ WiX.Toolset.DummyFile.txt
 nunit-UnitTests.xml
 nunit-TrackingCollectionTests.xml
 GitHubVS.sln.DotSettings
+src/GitHub.Exports/Settings/IPackageSettings.cs
+src/GitHub.VisualStudio/Settings/PackageSettingsGen.cs
