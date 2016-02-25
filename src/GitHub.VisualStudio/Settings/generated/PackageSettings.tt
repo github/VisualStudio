@@ -7,12 +7,12 @@
 <#@ import namespace="Newtonsoft.Json.Linq" #>
 <#@ output extension=".cs" #>
 <#
-var file = this.Host.ResolvePath(@"..\..\common\settings.json");
+var file = this.Host.ResolvePath(@"..\..\..\common\settings.json");
 var json = JObject.Parse(File.ReadAllText(file));
 #>
 // This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
 /* settings.json content:
-<#@ include file="..\..\common\settings.json" #>
+<#@ include file="..\..\..\common\settings.json" #>
 */
 
 using GitHub.Settings;

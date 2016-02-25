@@ -250,10 +250,10 @@
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\SharedResources.cs" />
     <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="Settings\PackageSettingsGen.cs">
+    <Compile Include="Settings\generated\PackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>PackageSettingsGen.tt</DependentUpon>
+      <DependentUpon>PackageSettings.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
@@ -345,9 +345,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Settings\PackageSettingsGen.tt">
+    <Content Include="Settings\generated\PackageSettings.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
     </Content>
     <None Include="packages.config">

@@ -138,7 +138,7 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
-    <Compile Include="Settings\IPackageSettings.cs">
+    <Compile Include="Settings\generated\IPackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IPackageSettings.tt</DependentUpon>
@@ -188,7 +188,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Settings\IPackageSettings.tt">
+    <Content Include="Settings\generated\IPackageSettings.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>IPackageSettings.cs</LastGenOutput>
     </Content>
@@ -199,7 +199,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\src\common\t4.targets" />
   <Import Project="$(SolutionDir)\lib\Microsoft.TextTemplating.targets" />
-
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
