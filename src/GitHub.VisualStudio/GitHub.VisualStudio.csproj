@@ -241,15 +241,15 @@
     <Compile Include="Base\TeamExplorerNavigationItemBase.cs" />
     <Compile Include="Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\Browser.cs" />
-    <Compile Include="Helpers\Colors.cs" />
-    <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Settings\Colors.cs" />
+    <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
-    <Compile Include="Services\OptionsPage.cs">
+    <Compile Include="Settings\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\SharedResources.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Settings\Settings.cs" />
     <Compile Include="Base\PackageBase.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -276,7 +276,7 @@
     <Compile Include="Base\EnsureLoggedInSection.cs" />
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Options\OptionsControl.xaml.cs">
+    <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Views\Controls\RepositoryCloneControl.xaml.cs">
@@ -416,7 +416,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Options\OptionsControl.xaml">
+    <Page Include="UI\Settings\OptionsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>

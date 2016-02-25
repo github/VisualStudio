@@ -1,13 +1,9 @@
-﻿using GitHub.Services;
+﻿using GitHub.Settings;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace GitHub.VisualStudio
