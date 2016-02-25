@@ -30,27 +30,27 @@ foreach (var j in json["settings"].Children()) {
 }
 #>
 
-		void LoadSettings()
-		{
+        void LoadSettings()
+        {
 <#
 foreach (var j in json.Children().Children().Children()) {
 #>
-			<#= j["name"] #> = (<#= j["type"] #>)settingsStore.Read("<#= j["name"] #>", <#= j["default"] #>);
+            <#= j["name"] #> = (<#= j["type"] #>)settingsStore.Read("<#= j["name"] #>", <#= j["default"] #>);
 <#
 }
 #>
-		}
+        }
 
-		void SaveSettings()
-		{
+        void SaveSettings()
+        {
 <#
 foreach (var j in json.Children().Children().Children()) {
 #>
-			settingsStore.Write("<#= j["name"] #>", <#= j["name"] #>);
+            settingsStore.Write("<#= j["name"] #>", <#= j["name"] #>);
 <#
 }
 #>
-		}
+        }
 
-	}
+    }
 }
