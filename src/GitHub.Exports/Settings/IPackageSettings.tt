@@ -4,21 +4,24 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.IO" #>
-<#@ assembly name="$(SolutionDir)\build\$(Configuration)\Newtonsoft.Json.Dll" #>
+<#@ assembly name="$(PackageDir)\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll" #>
 <#@ import namespace="Newtonsoft.Json.Linq" #>
 <#@ output extension=".cs" #>
 <#
 var file = this.Host.ResolvePath(@"..\..\common\settings.json");
 var json = JObject.Parse(File.ReadAllText(file));
 #>
-// This is an automatically generated file, based on settings.json and IPackageSettings.tt
+// This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
+/* settings.json content:
+<#@ include file="..\..\common\settings.json" #>
+*/
 namespace GitHub.Settings
 {
     public interface IPackageSettings
     {
         void Save();
 <#
-foreach (var j in json.Children().Children().Children()) {
+foreach (var j in json["settings"].Children()) {
 #>
         <#= j["type"] #> <#= j["name"] #> { get; set; }
 <#

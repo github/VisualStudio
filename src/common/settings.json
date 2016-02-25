@@ -3,7 +3,7 @@
 		{
 			"name": "CollectMetrics",
 			"type": "bool",
-			"default": "true"
+			"default": 'true'
 		}
 	]
 }
