@@ -38,11 +38,12 @@
   - [ ] **Select a repository and click Clone**
       - [ ] Clone dialog disappears
       - [ ] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
-      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully."
+      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed. 
       - [ ] Repository shows up in the "Local Git Repositories" list
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
       - [ ] Team Explorer view changes to Home page
       - [ ] GitHub header and repo information is shown
+      - [ ] Click Clone in "Local Git Repositories" List and copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
   - [ ] **Click on Create action link**
     - [ ] Create dialog appears
     - [ ] Cursor is on the Name field
@@ -82,6 +83,15 @@
         - [ ] Progress bar appears above Synchronization title
         - [ ] Team Explorer view changes to Home page
         - [ ] Notification appears: "Repository published successfully"
+        - [ ] Publish a private repo and verify on .com that it's private 
+- [ ] **Project section (Home button)*** 
+    - [ ] Click on "Home" icon 
+        - [ ] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
+        - [ ] Verify Pulse button navigates to Pulse page on Github.com
+        - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
+        - [ ] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
+        - [ ] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
+        
         
 # Connect page when logged in to TFS
    - [ ] **Connect to a TFS project**
@@ -100,3 +110,6 @@
       - [ ] Login button is disabled
 - [ ] **Login to an enterprise instance**
       - [ ] Team Explorer Connect page shows two github connections - one titled GitHub, another with the enterprise url
+- [ ] **Login with 2FA on**
+      - [ ] Login GitHub with 2FA turned on
+      - [ ] Resend works

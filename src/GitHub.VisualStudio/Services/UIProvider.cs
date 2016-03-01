@@ -22,9 +22,8 @@ using System.Windows.Controls;
 namespace GitHub.VisualStudio
 {
     [Export(typeof(IUIProvider))]
-    [Export(typeof(IServiceProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class UIProvider : IServiceProvider, IUIProvider, IDisposable
+    public class UIProvider : IUIProvider, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         CompositeDisposable disposables = new CompositeDisposable();
@@ -145,6 +144,11 @@ namespace GitHub.VisualStudio
             return GetService<T>() as Ret;
         }
 
+        public void AddService<T>(T instance)
+        {
+            AddService(typeof(T), instance);
+        }
+
         public void AddService(Type t, object instance)
         {
             if (!Initialized)
@@ -217,6 +221,19 @@ namespace GitHub.VisualStudio
             });
             ui.Start(connection);
             return creation;
+        }
+
+        public IObservable<bool> ListenToCompletionState()
+        {
+            var ui = currentUIFlow?.Value;
+            if (ui == null)
+            {
+                log.Error("UIProvider:ListenToCompletionState:Cannot call ListenToCompletionState without calling SetupUI first");
+#if DEBUG
+                throw new InvalidOperationException("Cannot call ListenToCompletionState without calling SetupUI first");
+#endif
+            }
+            return ui?.ListenToCompletionState() ?? Observable.Return(false);
         }
 
         public void RunUI()

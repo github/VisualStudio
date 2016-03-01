@@ -5,6 +5,8 @@ using System.Windows;
 using System.Reflection;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.PlatformUI;
+using System.ComponentModel;
 
 namespace GitHub.VisualStudio.Helpers
 {
@@ -30,6 +32,11 @@ namespace GitHub.VisualStudio.Helpers
             AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
         }
 
+        public SharedDictionaryManager()
+        {
+            currentTheme = Colors.DetectTheme();
+        }
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
         static Assembly LoadAssemblyFromRunDir(object sender, ResolveEventArgs e)
         {
@@ -53,25 +60,56 @@ namespace GitHub.VisualStudio.Helpers
         }
 
 #region ResourceDictionaryImplementation
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        string currentTheme;
+
+#if !XAML_DESIGNER
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
+        static string baseThemeUri = "pack://application:,,,/GitHub.VisualStudio;component/Styles/";
 
         Uri sourceUri;
+        bool themed = false;
         public new Uri Source
         {
             get { return sourceUri; }
             set
             {
+                if (value.ToString() == "pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml")
+                {
+                    if (!themed)
+                    {
+                        themed = true;
+                        VSColorTheme.ThemeChanged += OnThemeChange;
+                    }
+                    value = new Uri(baseThemeUri + "Theme" + currentTheme + ".xaml");
+                }
+
                 sourceUri = value;
                 ResourceDictionary ret;
                 if (resourceDicts.TryGetValue(value, out ret))
                 {
-                    MergedDictionaries.Add(ret);
-                    return;
+                    if (ret != this)
+                    {
+                        MergedDictionaries.Add(ret);
+                        return;
+                    }
                 }
                 base.Source = value;
-                resourceDicts.Add(value, this);
+                if (ret == null)
+                    resourceDicts.Add(value, this);
             }
         }
+
+        void OnThemeChange(ThemeChangedEventArgs e)
+        {
+            var uri = new Uri(baseThemeUri + "Theme" + currentTheme + ".xaml");
+            ResourceDictionary ret;
+            if (resourceDicts.TryGetValue(uri, out ret))
+                MergedDictionaries.Remove(ret);
+            currentTheme = Colors.DetectTheme();
+            Source = uri;
+        }
+#endif
 #endregion
     }
 }

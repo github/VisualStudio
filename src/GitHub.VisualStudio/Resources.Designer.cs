@@ -214,6 +214,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not copy to the clipboard. Please try again..
+        /// </summary>
+        public static string Error_FailedToCopyToClipboard {
+            get {
+                return ResourceManager.GetString("Error_FailedToCopyToClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -300,6 +309,15 @@ namespace GitHub.VisualStudio {
         public static string licenseListText {
             get {
                 return ResourceManager.GetString("licenseListText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Link copied to clipboard.
+        /// </summary>
+        public static string LinkCopiedToClipboardMessage {
+            get {
+                return ResourceManager.GetString("LinkCopiedToClipboardMessage", resourceCulture);
             }
         }
         
@@ -403,6 +421,24 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
+        /// </summary>
+        public static string Options_MetricsLabel {
+            get {
+                return ResourceManager.GetString("Options_MetricsLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Privacy.
+        /// </summary>
+        public static string Options_PrivacyTitle {
+            get {
+                return ResourceManager.GetString("Options_PrivacyTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to or.
         /// </summary>
         public static string orText {
@@ -489,6 +525,15 @@ namespace GitHub.VisualStudio {
         public static string RepoNameText {
             get {
                 return ResourceManager.GetString("RepoNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repository created successfully..
+        /// </summary>
+        public static string RepositoryPublishedMessage {
+            get {
+                return ResourceManager.GetString("RepositoryPublishedMessage", resourceCulture);
             }
         }
         

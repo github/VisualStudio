@@ -267,7 +267,7 @@ namespace GitHub.Controllers
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.Create, logic);
-
+            // made us enter here (Cancel or Next) and set a final
             // publish flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
@@ -279,8 +279,8 @@ namespace GitHub.Controllers
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.Publish, logic);
-
-            // pr flow
+            // result accordingly, which is why UIViewType.End only
+            // allows a Next trigger
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.PRList)
@@ -310,6 +310,13 @@ namespace GitHub.Controllers
             transition.Subscribe(_ => {}, _ => Fire(Trigger.Next));
         
             return transition;
+
+        /// <summary>
+        /// Allows listening to the completion state of the ui flow - whether
+        /// it was completed because it was cancelled or whether it succeeded.
+        /// </summary>
+        /// <returns>true for success, false for cancel</returns>
+
         }
 
         public void Stop()
@@ -449,6 +456,7 @@ namespace GitHub.Controllers
             if (connection != null)
             {
                 uiProvider.AddService(typeof(IConnection), connection);
+
                 connection.Login()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
@@ -465,14 +473,16 @@ namespace GitHub.Controllers
                     {
                         if (!loggedIn && mainFlow != UIControllerFlow.Authentication)
                         {
+                                // a connection will be added to the list when auth is done, register it so the next
+                                // viewmodel can use it
                             connectionAdded = (s, e) => {
                                 if (e.Action == NotifyCollectionChangedAction.Add)
                                 {
                                     connection = (IConnection)e.NewItems[0];
                                     uiProvider.AddService(typeof(IConnection), connection);
                                 }
-                            };
-                            connectionManager.Connections.CollectionChanged += connectionAdded;
+                                };
+                                connectionManager.Connections.CollectionChanged += connectionAdded;
                         }
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -497,6 +507,7 @@ namespace GitHub.Controllers
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
                 connectionAdded = null;
+
                 disposed = true;
             }
         }

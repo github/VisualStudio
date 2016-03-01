@@ -8,6 +8,7 @@ using System.Text;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Primitives;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
@@ -126,9 +127,9 @@ namespace GitHub.VisualStudio
             Connections.Remove(connection);
         }
 
-        public void RefreshRepositories()
+        public async Task RefreshRepositories()
         {
-            var list = vsServices.GetKnownRepositories();
+            var list = await Task.Run(() => vsServices.GetKnownRepositories());
             list.GroupBy(r => Connections.FirstOrDefault(c => r.CloneUrl != null && c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
                 .Where(g => g.Key != null)
                 .ForEach(g =>

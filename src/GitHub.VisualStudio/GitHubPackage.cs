@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -33,6 +35,7 @@ namespace GitHub.VisualStudio
     //[ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
+    [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : PackageBase
     {
         public GitHubPackage()
@@ -42,29 +45,19 @@ namespace GitHub.VisualStudio
         public GitHubPackage(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
-
         }
+
 
         protected override void Initialize()
         {
-
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand, (s, e) => StartFlow(UIControllerFlow.Authentication));
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubCmdSet, PkgCmdIDList.showGitHubPaneCommand, (s, e) =>
-            {
-                var window = FindToolWindow(typeof(GitHubPane), 0, true);
-                if (window?.Frame == null)
-                    throw new NotSupportedException("Cannot create tool window");
-
-                var windowFrame = (IVsWindowFrame)window.Frame;
-                ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            });
             base.Initialize();
-        }
 
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
+            var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
+            foreach (var menu in menus.Menus)
+                ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
+
+            foreach (var menu in menus.DynamicMenus)
+                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
         }
     }
 }

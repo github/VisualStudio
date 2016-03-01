@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             view.DataContext = this;
         }
 
-        async void RTMSetup()
+        async void Setup()
         {
             if (ActiveRepo != null && ActiveRepoUri == null)
             {
@@ -64,34 +64,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 IsVisible = false;
         }
 
-        async void PreRTMSetup()
-        {
-            if (ActiveRepo != null && ActiveRepoUri == null)
-            {
-                IsVisible = true;
-                loggedIn = await connectionManager.IsLoggedIn(hosts);
-                if (loggedIn)
-                    ShowPublish();
-                else
-                {
-                    ShowGetStarted = true;
-                    ShowSignup = true;
-                }
-            }
-            else
-                IsVisible = false;
-        }
-
         public override void Initialize(IServiceProvider serviceProvider)
         {
             base.Initialize(serviceProvider);
-            RTMSetup();
+            Setup();
         }
 
         protected override void RepoChanged()
         {
             base.RepoChanged();
-            RTMSetup();
+            Setup();
         }
 
         public async void Connect()
@@ -135,11 +117,21 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             disposable = uiflow;
             var ui = uiflow.Value;
             var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            bool success = false;
+            ui.ListenToCompletionState().Subscribe(s => success = s);
+
             creation.Subscribe(c =>
             {
                 SectionContent = c;
-                (c as SimpleViewUserControl).DataContext = this;
+                c.DataContext = this;
                 c.IsBusy.Subscribe(x => IsBusy = x);
+            },
+            () =>
+            {
+                // there's no real cancel button in the publish form, but if support a back button there, then we want to hide the form
+                IsVisible = false;
+                if (success)
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             });
             ui.Start(null);
         }
@@ -151,9 +143,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 if (!disposed)
                 {
-                    if (disposable != null)
-                        disposable.Dispose();
                     disposed = true;
+                    disposable?.Dispose();
                 }
             }
             base.Dispose(disposing);

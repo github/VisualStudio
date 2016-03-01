@@ -279,6 +279,21 @@
   <data name="NotLoggedInMessage" xml:space="preserve">
     <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
   </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Repository created successfully.</value>
+  </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>Link copied to clipboard</value>
+  </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>Could not copy to the clipboard. Please try again.</value>
+  </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>Help us improve by sending anonymous usage data</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
   <data name="prOpenedText" xml:space="preserve">
     <value>opened</value>
   </data>

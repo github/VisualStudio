@@ -81,6 +81,8 @@ namespace GitHub.VisualStudio
         // ReSharper disable once SuspiciousTypeConversion.Global
         public static DTE2 Dte2 => Dte as DTE2;
 
+        public static IVsUIShell UIShell => GetGlobalService<SVsUIShell, IVsUIShell>();
+
         public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
         {
             return GetGlobalService<SVsActivityLog, IVsActivityLog>(provider);

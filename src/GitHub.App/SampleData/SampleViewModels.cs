@@ -268,7 +268,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IReactiveCommand<Unit> PublishRepository
+        public IReactiveCommand<ProgressState> PublishRepository
         {
             get;
             private set;
@@ -426,6 +426,11 @@ namespace GitHub.SampleData
 
         public void SetIcon(bool isPrivate, bool isFork)
         {
+        }
+
+        public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        {
+            return null;
         }
 
         public string Name { get; set; }

@@ -11,6 +11,7 @@ using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.ViewModels;
 using System.Diagnostics;
+using Microsoft.VisualStudio;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -26,9 +27,11 @@ namespace GitHub.VisualStudio.UI
     /// implementation of the IVsUIElementPane interface.
     /// </para>
     /// </remarks>
-    [Guid("6b0fdc0a-f28e-47a0-8eed-cc296beff6d2")]
+    [Guid(GitHubPaneGuid)]
     public class GitHubPane : ToolWindowPane
     {
+        const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
         {
@@ -56,6 +59,23 @@ namespace GitHub.VisualStudio.UI
             var vm = (Content as IView).ViewModel as IServiceProviderAware;
             Debug.Assert(vm != null);
             vm?.Initialize(this);
+        }
+
+        public static bool Activate()
+        {
+            var windowGuid = new Guid(GitHubPaneGuid);
+            IVsWindowFrame frame;
+            if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate, ref windowGuid, out frame)))
+            {
+                VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + GitHubPaneGuid + "'");
+                return false;
+            }
+            if (ErrorHandler.Failed(frame.Show()))
+            {
+                VsOutputLogger.WriteLine("Unable to show GitHubPane '" + GitHubPaneGuid + "'");
+                return false;
+            }
+            return true;
         }
     }
 }

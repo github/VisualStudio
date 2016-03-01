@@ -13,8 +13,7 @@ namespace GitHub.Extensions
         {
             return cm.Connections.ToObservable()
                     .SelectMany(c => c.Login())
-                    .Select(c => hosts.LookupHost(c.HostAddress))
-                    .Any(h => h.IsLoggedIn);
+                    .Any(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
         }
 
         public static IObservable<bool> IsLoggedIn(this IConnectionManager cm, IRepositoryHosts hosts, HostAddress address)
@@ -22,8 +21,14 @@ namespace GitHub.Extensions
             return cm.Connections.ToObservable()
                     .Where(c => c.HostAddress.Equals(address))
                     .SelectMany(c => c.Login())
-                    .Select(c => hosts.LookupHost(c.HostAddress))
-                    .Any(h => h.IsLoggedIn);
+                    .Any(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
+        }
+
+        public static IObservable<IConnection> GetLoggedInConnections(this IConnectionManager cm, IRepositoryHosts hosts)
+        {
+            return cm.Connections.ToObservable()
+                    .SelectMany(c => c.Login())
+                    .Where(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
         }
 
         public static IObservable<IConnection> LookupConnection(this IConnectionManager cm, ISimpleRepositoryModel repository)
