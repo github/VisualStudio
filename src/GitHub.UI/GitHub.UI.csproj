@@ -144,10 +144,6 @@
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Assets\Controls\GitHubActionLink.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Assets\Controls\GitHubLinkButton.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

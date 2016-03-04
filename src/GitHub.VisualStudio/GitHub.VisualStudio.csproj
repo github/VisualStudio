@@ -438,9 +438,13 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
-    <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
+    <Page Include="Styles\ActionLinkButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\GitHubActionLink.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
       <SubType>Designer</SubType>
