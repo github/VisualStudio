@@ -6,62 +6,11 @@
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
-    <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml"/>
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
   </ResourceDictionary.MergedDictionaries>
   <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
   <ui:DurationToStringConverter x:Key="DurationToStringConverter" />
-
-  <Style x:Key="PRLink" TargetType="{x:Type Button}">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Focusable" Value="True" />
-    <Setter Property="Foreground" Value="{DynamicResource VsBrush.ControlLinkText}" />
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="Button">
-          <TextBlock>
-            <Hyperlink Foreground="{TemplateBinding Foreground}">
-              <Hyperlink.Resources>
-                <Style TargetType="{x:Type Hyperlink}">
-                  <Style.Triggers>
-                    <MultiTrigger>
-                      <MultiTrigger.Conditions>
-                        <Condition Property="UIElement.IsMouseOver" Value="false" />
-                        <Condition Property="IsEnabled" Value="true" />
-                      </MultiTrigger.Conditions>
-                      <MultiTrigger.Setters>
-                        <Setter Property="TextDecorations" Value="None" />
-                        <Setter Property="FrameworkElement.Cursor" Value="None" />
-                      </MultiTrigger.Setters>
-                    </MultiTrigger>
-                    <MultiTrigger>
-                      <MultiTrigger.Conditions>
-                        <Condition Property="IsMouseOver" Value="true" />
-                        <Condition Property="IsEnabled" Value="true" />
-                      </MultiTrigger.Conditions>
-                      <MultiTrigger.Setters>
-                        <Setter Property="TextDecorations" Value="Underline" />
-                        <Setter Property="FrameworkElement.Cursor" Value="Hand" />
-                      </MultiTrigger.Setters>
-                    </MultiTrigger>
-                    <MultiTrigger>
-                      <MultiTrigger.Conditions>
-                        <Condition Property="IsEnabled" Value="false" />
-                      </MultiTrigger.Conditions>
-                      <MultiTrigger.Setters>
-                        <Setter Property="TextDecorations" Value="None" />
-                      </MultiTrigger.Setters>
-                    </MultiTrigger>
-                  </Style.Triggers>
-                </Style>
-              </Hyperlink.Resources>
-              <Run Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, StringFormat=#{0}}" />
-            </Hyperlink>
-          </TextBlock>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
 
   <DataTemplate x:Key="PullRequestItemTemplate" DataType="models:IPullRequestModel">
     <Grid>
@@ -92,7 +41,7 @@
                  VerticalAlignment="Center"
                  FontFamily="Segoe UI"
                  FontSize="14"
-                 Foreground="{DynamicResource VsBrush.WindowText}"
+                 Foreground="{DynamicResource GitHubVsToolWindowText}"
                  Text="{Binding Title}"
                  TextWrapping="WrapWithOverflow" />
       <ui:OcticonImage x:Name="comment_icon"
@@ -103,7 +52,7 @@
                        Margin="0,0,1,0"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
-                       Foreground="{DynamicResource VsBrush.WindowText}"
+                       Foreground="{DynamicResource GitHubVsToolWindowText}"
                        Icon="comment">
         <ui:OcticonImage.Style>
           <Style>
@@ -123,7 +72,7 @@
                  VerticalAlignment="Center"
                  FontFamily="Segoe UI"
                  FontSize="12"
-                 Foreground="{DynamicResource VsBrush.WindowText}"
+                 Foreground="{DynamicResource GitHubVsToolWindowText}"
                  Text="{Binding CommentCount}">
         <TextBlock.Style>
           <Style>
@@ -162,12 +111,12 @@
                 Content="{Binding Number}"
                 FontFamily="Segoe UI"
                 FontSize="11"
-                Style="{StaticResource PRLink}" />
+                Style="{StaticResource HashtagActionLink}" />
         <TextBlock x:Name="description"
                    Grid.Column="1"
                    FontFamily="Segoe UI"
                    FontSize="11"
-                   Foreground="{DynamicResource VsBrush.GrayText}">
+                   Foreground="{DynamicResource GitHubVsGrayText}">
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2} {3}">
               <Binding Source="{x:Static i18n:Resources.prOpenedText}" />

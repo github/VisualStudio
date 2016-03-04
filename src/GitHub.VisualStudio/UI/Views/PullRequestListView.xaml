@@ -9,7 +9,7 @@
                                   xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-                                  Background="Transparent"
+                                  Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
@@ -18,7 +18,7 @@
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
-        <sampleData:PullRequestListViewModelDesigner/>
+        <sampleData:PullRequestListViewModelDesigner />
       </Binding.Source>
     </Binding>
   </d:DesignProperties.DataContext>
@@ -26,23 +26,24 @@
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml"/>
-        <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
-        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/UI/Views/Controls/PullRequestListItem.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/UI/Views/Controls/PullRequestListItem.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
       </ResourceDictionary.MergedDictionaries>
-      <ui:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter"/>
+      <ui:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
 
       <Style x:Key="PullRequestListItemContainerStyle" TargetType="{x:Type ListViewItem}">
-        <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="1"/>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="1" />
 
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
 
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
 
         <Setter Property="Template">
           <Setter.Value>
@@ -51,7 +52,7 @@
                       Background="{TemplateBinding Background}"
                       BorderThickness="{TemplateBinding BorderThickness}"
                       Padding="{TemplateBinding Padding}">
-                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
               </Border>
             </ControlTemplate>
           </Setter.Value>
@@ -65,8 +66,8 @@
 
     <Grid Margin="0,0,0,4" DockPanel.Dock="Top">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
 
@@ -74,50 +75,50 @@
 
         <ui:GitHubActionLink Content="State" HasDropDown="True">
           <i:Interaction.Behaviors>
-            <ui:DropDownActionLinkBehaviour/>
+            <ui:DropDownActionLinkBehaviour />
           </i:Interaction.Behaviors>
           <ui:GitHubActionLink.ContextMenu>
             <ContextMenu>
-              <MenuItem Header="Open"/>
-              <MenuItem Header="Closed"/>
-              <MenuItem Header="All"/>
+              <MenuItem Header="Open" />
+              <MenuItem Header="Closed" />
+              <MenuItem Header="All" />
             </ContextMenu>
           </ui:GitHubActionLink.ContextMenu>
         </ui:GitHubActionLink>
 
-        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}"/>
+        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink Content="Assignee" HasDropDown="True">
           <i:Interaction.Behaviors>
-            <ui:DropDownActionLinkBehaviour/>
+            <ui:DropDownActionLinkBehaviour />
           </i:Interaction.Behaviors>
           <ui:GitHubActionLink.ContextMenu>
             <ContextMenu>
-              <MenuItem Header="Open"/>
-              <MenuItem Header="Closed"/>
-              <MenuItem Header="All"/>
+              <MenuItem Header="Open" />
+              <MenuItem Header="Closed" />
+              <MenuItem Header="All" />
             </ContextMenu>
           </ui:GitHubActionLink.ContextMenu>
         </ui:GitHubActionLink>
 
-        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}"/>
+        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink Content="Author" HasDropDown="True">
           <i:Interaction.Behaviors>
-            <ui:DropDownActionLinkBehaviour/>
+            <ui:DropDownActionLinkBehaviour />
           </i:Interaction.Behaviors>
           <ui:GitHubActionLink.ContextMenu>
             <ContextMenu>
-              <MenuItem Header="Open"/>
-              <MenuItem Header="Closed"/>
-              <MenuItem Header="All"/>
+              <MenuItem Header="Open" />
+              <MenuItem Header="Closed" />
+              <MenuItem Header="All" />
             </ContextMenu>
           </ui:GitHubActionLink.ContextMenu>
         </ui:GitHubActionLink>
 
       </WrapPanel>
 
-      <ui:GitHubActionLink Grid.Column="1" HorizontalAlignment="Right" Content="Create New"/>
+      <ui:GitHubActionLink Grid.Column="1" HorizontalAlignment="Right" Content="Create New" />
 
     </Grid>
 
@@ -139,7 +140,7 @@
               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
               VirtualizingPanel.ScrollUnit="Pixel"
               VirtualizingPanel.VirtualizationMode="Recycling"
-              Visibility="{Binding PullRequests, Converter={StaticResource HasItemsVisibilityConverter}}"/>
+              Visibility="{Binding PullRequests, Converter={StaticResource HasItemsVisibilityConverter}}" />
 
   </DockPanel>
 </local:GenericPullRequestListView>
