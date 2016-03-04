@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
-using System.Windows.Controls;
 using GitHub.Controllers;
 using GitHub.Models;
 using GitHub.Services;
@@ -12,10 +11,8 @@ using UnitTests;
 using GitHub.ViewModels;
 using ReactiveUI;
 using System.Collections.Generic;
-using GitHub.Authentication;
 using System.Reactive.Subjects;
 using GitHub.Primitives;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -107,7 +104,7 @@ public class UIControllerTests
             var cm = provider.GetConnectionManager();
             cm.Connections.Returns(new ObservableCollection<IConnection>());
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
                 var list = new List<IView>();
                 uiController.SelectFlow(UIControllerFlow.Clone)
@@ -136,7 +133,7 @@ public class UIControllerTests
             hosts.LookupHost(connection.HostAddress).Returns(host);
             host.IsLoggedIn.Returns(true);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
                 var list = new List<IView>();
                 uiController.SelectFlow(UIControllerFlow.Clone)
@@ -157,7 +154,7 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new System.Collections.ObjectModel.ObservableCollection<IConnection>();
+            var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
@@ -225,7 +222,7 @@ public class UIControllerTests
             hosts.LookupHost(connection.HostAddress).Returns(host);
             host.IsLoggedIn.Returns(true);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
                 var list = new List<IView>();
                 uiController.SelectFlow(UIControllerFlow.Clone)
@@ -248,7 +245,7 @@ public class UIControllerTests
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
-            var cons = new System.Collections.ObjectModel.ObservableCollection<IConnection>();
+            var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))

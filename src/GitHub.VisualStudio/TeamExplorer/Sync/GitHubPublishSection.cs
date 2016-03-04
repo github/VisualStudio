@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Api;
 using GitHub.VisualStudio.TeamExplorer;
+using System.Windows.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -123,7 +124,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             creation.Subscribe(c =>
             {
                 SectionContent = c;
-                c.DataContext = this;
+                ((UserControl)c).DataContext = this;
                 c.IsBusy.Subscribe(x => IsBusy = x);
             },
             () =>
