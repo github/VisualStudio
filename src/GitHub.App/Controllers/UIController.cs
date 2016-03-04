@@ -64,6 +64,8 @@ namespace GitHub.Controllers
         UIControllerFlow activeFlow;
         NotifyCollectionChangedEventHandler connectionAdded;
 
+        Subject<bool> completion;
+
         bool stopping;
 
         [ImportingConstructor]
@@ -128,22 +130,26 @@ namespace GitHub.Controllers
             uiStateMachine.Configure(UIViewType.Clone)
                 .OnEntry(() => RunView(UIViewType.Clone))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.Create)
                 .OnEntry(() => RunView(UIViewType.Create))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.Publish)
                 .OnEntry(() => RunView(UIViewType.Publish))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.PRList)
                 .OnEntry(() => RunView(UIViewType.PRList))
                 .PermitDynamic(Trigger.Detail, () => Go(Trigger.Detail))
                 .PermitDynamic(Trigger.Creation, () => Go(Trigger.Creation))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.PRDetail)
@@ -161,6 +167,7 @@ namespace GitHub.Controllers
             uiStateMachine.Configure(UIViewType.Login)
                 .OnEntry(() => RunView(UIViewType.Login))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.TwoFactor)
@@ -170,22 +177,9 @@ namespace GitHub.Controllers
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.End)
-                .OnEntry(() =>
-                {
-                    var list = GetObjectsForFlow(activeFlow);
-                    foreach (var i in list.Values)
-                        i.ClearHandlers();
-
-                    if (activeFlow == mainFlow)
-                        transition.OnCompleted();
-
-                    // if we're stopping the controller and the active flow wasn't the main one
-                    // we need to stop the main flow
-                    else if (stopping)
-                        Fire(Trigger.Finish);
-                    else
-                        Fire(Trigger.Next);
-                })
+                .OnEntryFrom(Trigger.Cancel, () => End(false))
+                .OnEntryFrom(Trigger.Next, () => End(true))
+                .OnEntryFrom(Trigger.Finish, () => End(true))
                 // clear all the views and viewmodels created by a subflow
                 .OnExit(() =>
                 {
@@ -230,10 +224,10 @@ namespace GitHub.Controllers
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Login)
-                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.Login)
                 .Permit(Trigger.Next, UIViewType.TwoFactor)
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.TwoFactor)
                 .Permit(Trigger.Next, UIViewType.End)
@@ -251,6 +245,7 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.Clone)
                 .Permit(Trigger.Next, UIViewType.End)
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
@@ -263,11 +258,12 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.Create)
                 .Permit(Trigger.Next, UIViewType.End)
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.Create, logic);
-            // made us enter here (Cancel or Next) and set a final
+
             // publish flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
@@ -275,12 +271,13 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.Publish)
                 .Permit(Trigger.Next, UIViewType.End)
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.Publish, logic);
-            // result accordingly, which is why UIViewType.End only
-            // allows a Next trigger
+
+            // pr flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.PRList)
@@ -288,6 +285,7 @@ namespace GitHub.Controllers
             logic.Configure(UIViewType.PRList)
                 .Permit(Trigger.Detail, UIViewType.PRDetail)
                 .Permit(Trigger.Creation, UIViewType.PRCreation)
+                .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
             logic.Configure(UIViewType.PRDetail)
                 .Permit(Trigger.Next, UIViewType.PRList)
@@ -310,12 +308,39 @@ namespace GitHub.Controllers
             transition.Subscribe(_ => {}, _ => Fire(Trigger.Next));
         
             return transition;
+        }
 
         /// <summary>
         /// Allows listening to the completion state of the ui flow - whether
         /// it was completed because it was cancelled or whether it succeeded.
         /// </summary>
         /// <returns>true for success, false for cancel</returns>
+        public IObservable<bool> ListenToCompletionState()
+        {
+            if (completion == null)
+                completion = new Subject<bool>();
+            return completion;
+        }
+
+        void End(bool success)
+        {
+            var list = GetObjectsForFlow(activeFlow);
+            foreach (var i in list.Values)
+                i.ClearHandlers();
+
+            if (activeFlow == mainFlow)
+            {
+                uiProvider.RemoveService(typeof(IConnection));
+                completion?.OnNext(success);
+                completion?.OnCompleted();
+                transition.OnCompleted();
+            }
+            // if we're stopping the controller and the active flow wasn't the main one
+            // we need to stop the main flow
+            else if (stopping)
+                Fire(Trigger.Finish);
+            else
+                Fire(Trigger.Next);
 
         }
 
@@ -455,7 +480,10 @@ namespace GitHub.Controllers
             connection = conn;
             if (connection != null)
             {
-                uiProvider.AddService(typeof(IConnection), connection);
+                if (mainFlow != UIControllerFlow.Authentication)
+                    uiProvider.AddService(connection);
+                else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
+                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
                 connection.Login()
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -468,22 +496,34 @@ namespace GitHub.Controllers
             else
             {
                 connectionManager
-                    .IsLoggedIn(hosts)
-                    .Do(loggedIn =>
+                    .GetLoggedInConnections(hosts)
+                    .FirstOrDefaultAsync()
+                    .Select(c =>
                     {
-                        if (!loggedIn && mainFlow != UIControllerFlow.Authentication)
+                        bool loggedin = c != null;
+                        if (mainFlow != UIControllerFlow.Authentication)
                         {
+                            if (loggedin) // register the first available connection so the viewmodel can use it
+                            {
+                                connection = c;
+                                uiProvider.AddService(c);
+                            }
+                            else
+                            {
                                 // a connection will be added to the list when auth is done, register it so the next
                                 // viewmodel can use it
-                            connectionAdded = (s, e) => {
-                                if (e.Action == NotifyCollectionChangedAction.Add)
+                                connectionAdded = (s, e) =>
                                 {
-                                    connection = (IConnection)e.NewItems[0];
-                                    uiProvider.AddService(typeof(IConnection), connection);
-                                }
+                                    if (e.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        connection = e.NewItems[0] as IConnection;
+                                        uiProvider.AddService(typeof(IConnection), connection);
+                                    }
                                 };
                                 connectionManager.Connections.CollectionChanged += connectionAdded;
+                            }
                         }
+                        return loggedin;
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
@@ -500,15 +540,21 @@ namespace GitHub.Controllers
             if (disposing)
             {
                 if (disposed) return;
+                disposed = true;
 
                 Debug.WriteLine("Disposing ({0})", GetHashCode());
-                disposables.Dispose();
-                transition?.Dispose();
+
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
                 connectionAdded = null;
 
-                disposed = true;
+                var tr = transition;
+                var cmp = completion;
+                transition = null;
+                completion = null;
+                disposables.Dispose();
+                tr?.Dispose();
+                cmp?.Dispose();
             }
         }
 
