@@ -88,6 +88,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 (s, e) => { });
+
+            StartFlow(UIControllerFlow.PullRequests).Forget();
         }
 
         async Task StartFlow(UIControllerFlow controllerFlow)
@@ -123,7 +125,7 @@ namespace GitHub.VisualStudio.UI.Views
                         windowController = new WindowController(creation,
                             __ => uiController.CurrentFlow == UIControllerFlow.Authentication,
                             ___ => uiController.CurrentFlow != UIControllerFlow.Authentication);
-                        windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                        windowController.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                         windowController.Load(c);
                         windowController.ShowModal();
                         windowController = null;
