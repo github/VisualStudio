@@ -14,6 +14,12 @@ namespace GitHub.VisualStudio.UI
         Func<IView, bool> shouldLoad;
         Func<IView, bool> shouldStop;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="controls">Observable that provides controls to host in this window</param>
+        /// <param name="shouldLoad">If set, this condition will be checked before loading each control</param>
+        /// <param name="shouldStop">If set, this condition will be checked to determine when to close this window</param>
         public WindowController(IObservable<IView> controls,
             Func<IView, bool> shouldLoad = null,
             Func<IView, bool> shouldStop = null)
