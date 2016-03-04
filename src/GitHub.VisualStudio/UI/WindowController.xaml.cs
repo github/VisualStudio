@@ -74,8 +74,8 @@ namespace GitHub.VisualStudio.UI
             {
                 if (!disposed)
                 {
-                    Stop();
                     disposed = true;
+                    Stop();
                 }
             }
         }
