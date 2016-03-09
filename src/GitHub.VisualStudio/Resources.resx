@@ -288,4 +288,10 @@
   <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
     <value>Could not copy to the clipboard. Please try again.</value>
   </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>Help us improve by sending anonymous usage data</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
 </root>

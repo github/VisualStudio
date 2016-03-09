@@ -95,6 +95,9 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
+    <None Include="..\common\settings.json">
+      <Link>Properties\settings.json</Link>
+    </None>
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
@@ -102,6 +105,7 @@
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
     <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
+    <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
@@ -134,6 +138,11 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
+    <Compile Include="Settings\generated\IPackageSettings.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IPackageSettings.tt</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
@@ -178,7 +187,18 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Settings\generated\IPackageSettings.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IPackageSettings.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\src\common\t4.targets" />
+  <Import Project="$(SolutionDir)\lib\Microsoft.TextTemplating.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
