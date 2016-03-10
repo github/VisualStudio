@@ -13,5 +13,9 @@ namespace GitHub.ViewModels
 
         public string Title {[return: AllowNull] get; protected set; }
         public bool IsShowing { get { return isShowing?.Value ?? true; } }
+
+        public virtual void Initialize([AllowNull] object data)
+        {
+        }
     }
 }

@@ -20,6 +20,9 @@ using System.Collections.Generic;
 
 namespace GitHub.Controllers
 {
+    using System.Globalization;
+    using StateMachineType = StateMachine<UIViewType, UIController.Trigger>;
+
     /*
         This class creates views and associated viewmodels for each UI we have,
         and controls the UI logic graph. It uses various state machines to define
@@ -86,7 +89,7 @@ namespace GitHub.Controllers
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class UIController : IUIController, IDisposable
     {
-        enum Trigger
+        internal enum Trigger
         {
             Cancel = 0,
             Next,
@@ -111,7 +114,8 @@ namespace GitHub.Controllers
         // loads UI for each state corresponding to a view type
         // queries the individual ui flow (stored in machines) for the next state
         // for a given transition trigger
-        readonly StateMachine<UIViewType, Trigger> uiStateMachine;
+        readonly StateMachineType uiStateMachine;
+        readonly Dictionary<Trigger, StateMachineType.TriggerWithParameters<object>> triggers;
 
         Subject<IView> transition;
 
@@ -159,7 +163,8 @@ namespace GitHub.Controllers
             machines = new Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>>();
             ConfigureLogicStates();
 
-            uiStateMachine = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            uiStateMachine = new StateMachineType(UIViewType.None);
+            triggers = new Dictionary<Trigger, StateMachineType.TriggerWithParameters<object>>();
             ConfigureUIHandlingStates();
         }
 
@@ -214,8 +219,9 @@ namespace GitHub.Controllers
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
+            triggers.Add(Trigger.Detail, uiStateMachine.SetTriggerParameters<object>(Trigger.Detail));
             uiStateMachine.Configure(UIViewType.PRDetail)
-                .OnEntry(() => RunView(UIViewType.PRDetail))
+                .OnEntryFrom(triggers[Trigger.Detail], arg => RunView(UIViewType.PRDetail, arg))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
@@ -413,7 +419,7 @@ namespace GitHub.Controllers
             Fire(Trigger.Finish);
         }
 
-        void RunView(UIViewType viewType)
+        void RunView(UIViewType viewType, object arg = null)
         {
             var view = CreateViewAndViewModel(viewType);
             transition.OnNext(view);
@@ -422,13 +428,15 @@ namespace GitHub.Controllers
             if (IsStopped)
                 return;
 
-            SetupView(viewType, view);
+            SetupView(viewType, view, arg);
         }
 
-        void SetupView(UIViewType viewType, IView view)
+        void SetupView(UIViewType viewType, IView view, object arg = null)
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
+            pair.ViewModel.Initialize(arg);
+
             // we're setting up the login dialog, we need to setup the 2fa as
             // well to continue the flow if it's needed, since the
             // authenticationresult callback won't happen until
@@ -464,7 +472,7 @@ namespace GitHub.Controllers
                 if (dv != null)
                     pair.AddHandler(dv.Open
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(_ => Fire(Trigger.Detail)));
+                        .Subscribe(x => Fire(Trigger.Detail, x)));
             }
             pair.AddHandler(view.Cancel
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -517,10 +525,17 @@ namespace GitHub.Controllers
             return list;
         }
 
-        void Fire(Trigger next)
+        void Fire(Trigger next, object arg = null)
         {
             Debug.WriteLine("Firing {0} from {1} ({2})", next, uiStateMachine.State, GetHashCode());
-            uiStateMachine.Fire(next);
+            if (arg != null && triggers.ContainsKey(next))
+                uiStateMachine.Fire(triggers[next], arg);
+            else
+            {
+                Debug.Assert(arg == null, String.Format(CultureInfo.InvariantCulture, "Argument {0} passed to Fire {1}, but there's no trigger that takes an argument. Did you forget to configure the trigger parameters?", arg, next));
+                uiStateMachine.Fire(next);
+            }
+                
         }
 
         UIViewType Go(Trigger trigger)
