@@ -1,10 +1,6 @@
 ﻿using GitHub.Collections;
 using GitHub.Models;
-using ReactiveUI;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
@@ -12,5 +8,6 @@ namespace GitHub.ViewModels
     {
         ITrackingCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
+        ICommand OpenPullRequest { get; }
     }
 }

@@ -15,6 +15,7 @@ using GitHub.Extensions.Reactive;
 using System.Windows.Data;
 using System.ComponentModel;
 using GitHub.Collections;
+using System.Windows.Input;
 
 namespace GitHub.ViewModels
 {
@@ -22,6 +23,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel
     {
+        readonly ReactiveCommand<object> openPullRequestCommand;
+
         [ImportingConstructor]
         PullRequestListViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice)
@@ -31,6 +34,11 @@ namespace GitHub.ViewModels
         public PullRequestListViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
         {
             CancelCommand = ReactiveCommand.Create();
+            openPullRequestCommand = ReactiveCommand.Create();
+            openPullRequestCommand.Subscribe(_ =>
+            {
+                VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>().OpenUrl(repositoryHost.Address.WebUri);
+            });
 
             var list = repositoryHost.ModelService.GetPullRequests(repository);
             list.SetComparer(OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare);
@@ -54,6 +62,11 @@ namespace GitHub.ViewModels
             get
             { return selectedPullRequest; }
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
+        }
+
+        public ICommand OpenPullRequest
+        {
+            get { return openPullRequestCommand; }
         }
     }
 }

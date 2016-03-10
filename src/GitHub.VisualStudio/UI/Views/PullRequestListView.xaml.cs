@@ -9,6 +9,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.TeamFoundation.MVVM;
+using GitHub.Services;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -27,19 +29,31 @@ namespace GitHub.VisualStudio.UI.Views
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestListViewModel;
+            OpenPR = new RelayCommand(x =>
+            {
+                var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+                var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+                var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + x);
+                browser.OpenUrl(url);
+
+                // Replace with this when we're ready to hook up the detail view
+                //NotifyOpen(x);
+            });
+            CreatePR = new RelayCommand(x => NotifyCreate());
+
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.PullRequests, v => v.pullRequests.ItemsSource));
             });
         }
 
-
         public IObservable<object> Open { get { return open; } }
         public IObservable<object> Create { get { return create; } }
-
-        protected void NotifyOpen()
+        public ICommand OpenPR { get; set; }
+        public ICommand CreatePR { get; set; }
+        protected void NotifyOpen(object id)
         {
-            open.OnNext(null);
+            open.OnNext(id);
             open.OnCompleted();
         }
 

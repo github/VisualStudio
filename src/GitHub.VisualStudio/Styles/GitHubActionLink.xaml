@@ -12,7 +12,9 @@
       <Setter.Value>
         <ControlTemplate TargetType="Button">
           <TextBlock>
-            <Hyperlink Foreground="{TemplateBinding Foreground}">
+            <Hyperlink Command="{TemplateBinding Command}"
+                       CommandParameter="{TemplateBinding CommandParameter}"
+                       Foreground="{TemplateBinding Foreground}">
               <Hyperlink.Resources>
                 <Style TargetType="{x:Type Hyperlink}">
                   <Style.Triggers>

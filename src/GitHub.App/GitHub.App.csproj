@@ -134,6 +134,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestListViewModelDesigner.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\GitHubCredentialProvider.cs" />
     <Compile Include="Services\IGitHubCredentialProvider.cs" />
@@ -191,6 +194,8 @@
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
+    <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
