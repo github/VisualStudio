@@ -58,24 +58,24 @@
           </Setter.Value>
         </Setter>
       </Style>
-      
+
       <Style x:Key="MenuItemBaseStyle" TargetType="MenuItem">
         <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="true">
-                <Setter Property="Background" Value="#0a99f3" />
-                <Setter Property="Foreground" Value="White"/>
-            </Trigger>
+          <Trigger Property="IsMouseOver" Value="true">
+            <Setter Property="Background" Value="#0a99f3" />
+            <Setter Property="Foreground" Value="White" />
+          </Trigger>
         </Style.Triggers>
         <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type MenuItem}">
-                    <Grid Background="{TemplateBinding Background}">
-                        <MenuItem Header="{TemplateBinding Header}" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type MenuItem}">
+              <Grid Background="{TemplateBinding Background}">
+                <MenuItem Header="{TemplateBinding Header}" />
+              </Grid>
+            </ControlTemplate>
+          </Setter.Value>
         </Setter>
-    </Style>
+      </Style>
     </ResourceDictionary>
 
   </UserControl.Resources>
@@ -97,9 +97,9 @@
           </i:Interaction.Behaviors>
           <ui:GitHubActionLink.ContextMenu>
             <ContextMenu>
-              <MenuItem Header="Open" />
-              <MenuItem Header="Closed" />
-              <MenuItem Header="All" />
+              <MenuItem Header="Open" Style="{StaticResource MenuItemBaseStyle}" />
+              <MenuItem Header="Closed" Style="{StaticResource MenuItemBaseStyle}" />
+              <MenuItem Header="All" Style="{StaticResource MenuItemBaseStyle}" />
             </ContextMenu>
           </ui:GitHubActionLink.ContextMenu>
         </ui:GitHubActionLink>
@@ -136,7 +136,10 @@
 
       </WrapPanel>
 
-      <ui:GitHubActionLink Grid.Column="1" HorizontalAlignment="Right" Content="Create New" Command="{Binding CreatePR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"/>
+      <ui:GitHubActionLink Grid.Column="1"
+                           HorizontalAlignment="Right"
+                           Command="{Binding CreatePR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+                           Content="Create New" />
 
     </Grid>
 
