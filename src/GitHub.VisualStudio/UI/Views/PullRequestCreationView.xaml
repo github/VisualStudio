@@ -28,5 +28,8 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </UserControl.Resources>
-  <Grid />
+  <StackPanel Orientation="Vertical">
+    <Label Content="{Binding Name}" />
+    <ListView ItemsSource="{Binding Users}"></ListView>
+  </StackPanel>
 </local:GenericPullRequestCreationView>
