@@ -29,7 +29,28 @@
     </ResourceDictionary>
   </UserControl.Resources>
   <StackPanel Orientation="Vertical">
-    <Label Content="{Binding Name}" />
-    <ListView ItemsSource="{Binding Users}"></ListView>
+    <StackPanel Margin="12,0" Orientation="Horizontal">
+        <TextBlock VerticalAlignment="Center">From</TextBlock>
+        <Label Content="{Binding Name}" />
+        <TextBlock VerticalAlignment="Center">into</TextBlock>
+        <Label Content="master" />
+    </StackPanel>
+
+    <Label Margin="6,0" Content="Title" />
+    <TextBox />
+    <Label Margin="6,0" Content="Description" />
+    <TextBox MinLines="8"/>
+    <Grid Margin="12" HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0"/> 
+        <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1"/> 
+    </Grid>
+    <!--
+        <ListView ItemsSource="{Binding Users}"></ListView>
+    -->
   </StackPanel>
 </local:GenericPullRequestCreationView>
