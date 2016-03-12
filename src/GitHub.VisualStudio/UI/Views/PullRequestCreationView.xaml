@@ -8,7 +8,7 @@
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
-                                      d:DesignHeight="300"
+                                      d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       mc:Ignorable="d">
 
@@ -53,8 +53,12 @@
             <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0"/>
             <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource PrimaryActionButtonStyle}"/>
         </Grid>
-        <!--
-        <ListView ItemsSource="{Binding Users}"></ListView>
-    -->
-    </StackPanel>
+
+        <TabControl>
+            <TabItem Header="Commits">
+                <ListView ItemsSource="{Binding Users}"></ListView>
+            </TabItem>
+            <TabItem Header="Files Changed"></TabItem>
+        </TabControl>
+</StackPanel>
 </local:GenericPullRequestCreationView>
