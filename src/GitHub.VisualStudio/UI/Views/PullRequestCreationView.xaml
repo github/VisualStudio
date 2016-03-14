@@ -56,8 +56,31 @@
 
         <ui:PromptTextBox PromptText="Title" />
         <ui:PromptTextBox Margin="12,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" />
+        <Grid Margin="12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <Grid Margin="12" HorizontalAlignment="Stretch">
+            <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" />
+            <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <i:Interaction.Behaviors>
+                  <ui:DropDownActionLinkBehaviour />
+                </i:Interaction.Behaviors>
+
+                <ui:GitHubActionLink.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Haacked" />
+                        <MenuItem Header="not-Haacked" />
+                    </ContextMenu>                
+                </ui:GitHubActionLink.ContextMenu>
+            </ui:GitHubActionLink>
+
+            <ui:GitHubActionLink Grid.Column="2" Content="Clear Assignee" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Margin="12,6,12,12" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
