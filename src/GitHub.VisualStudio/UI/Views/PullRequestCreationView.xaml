@@ -30,10 +30,6 @@
                 <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="PrimaryActionButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource GitHubButton}">
-                <Setter Property="Background" Value="#FF71C360" />
-                <Setter Property="Foreground" Value="#FFFFFFFF" />
-            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
@@ -42,14 +38,14 @@
             <Label Content="fix-everything" />
             <TextBlock VerticalAlignment="Center">into</TextBlock>
             <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
-              <i:Interaction.Behaviors>
-                <ui:DropDownActionLinkBehaviour />
-              </i:Interaction.Behaviors>
+                <i:Interaction.Behaviors>
+                    <ui:DropDownActionLinkBehaviour />
+                </i:Interaction.Behaviors>
                 <ui:GitHubActionLink.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="master" />
                         <MenuItem Header="not-master" />
-                    </ContextMenu>                
+                    </ContextMenu>
                 </ui:GitHubActionLink.ContextMenu>
             </ui:GitHubActionLink>
         </StackPanel>
@@ -66,14 +62,14 @@
             <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" />
             <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <i:Interaction.Behaviors>
-                  <ui:DropDownActionLinkBehaviour />
+                    <ui:DropDownActionLinkBehaviour />
                 </i:Interaction.Behaviors>
 
                 <ui:GitHubActionLink.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Haacked" />
                         <MenuItem Header="not-Haacked" />
-                    </ContextMenu>                
+                    </ContextMenu>
                 </ui:GitHubActionLink.ContextMenu>
             </ui:GitHubActionLink>
 
@@ -87,7 +83,7 @@
             </Grid.ColumnDefinitions>
 
             <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0"/>
-            <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource PrimaryActionButtonStyle}"/>
+            <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource GitHubPrimaryActionButton}" />
         </Grid>
 
         <TabControl>
@@ -105,8 +101,8 @@
                         </Grid.RowDefinitions>
 
                         <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                        <TextBlock Margin="5,0,0,0" Text="Super duper long commit name" FontSize="14" Grid.Column="1" Grid.Row="0" /> 
-                        <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" /> 
+                        <TextBlock Margin="5,0,0,0" Text="Super duper long commit name" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                        <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" />
                     </Grid>
                 </StackPanel>
             </TabItem>
@@ -159,5 +155,5 @@
                 </StackPanel>
             </TabItem>
         </TabControl>
-</StackPanel>
+    </StackPanel>
 </local:GenericPullRequestCreationView>
