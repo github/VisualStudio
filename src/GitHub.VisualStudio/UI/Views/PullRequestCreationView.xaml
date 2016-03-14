@@ -88,7 +88,54 @@
                     </Grid>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Files Changed"></TabItem>
+            <TabItem Header="Files Changed">
+                <StackPanel Orientation="Vertical">
+                    <Grid Margin="10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ui:OcticonImage
+                            Grid.Column="0"
+                            Height="16"
+                            Width="16"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Icon="file_text" />
+
+                        <Label Grid.Column="1" Content="src\start.cs" />
+                        <StackPanel Orientation="Horizontal" Grid.Column="2">
+                            <TextBlock VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Grid.Column="3">
+                            <Border
+                                Height="6" Width="6" 
+                                BorderThickness="1"
+                                Background="#FF6CC644" />
+                            <Border
+                                Height="6" Width="6" 
+                                BorderThickness="1"
+                                Background="#FF6CC644" />
+                            <Border
+                                Height="6" Width="6" 
+                                BorderThickness="1"
+                                Background="#FFBD2C00" />
+                            <Border
+                                Height="6" Width="6" 
+                                BorderThickness="1"
+                                Background="#FFBD2C00" />
+                            <Border
+                                Height="6" Width="6" 
+                                BorderThickness="1"
+                                Background="#FFCCCCCC" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </TabItem>
         </TabControl>
 </StackPanel>
 </local:GenericPullRequestCreationView>
