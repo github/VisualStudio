@@ -54,10 +54,9 @@
             </ui:GitHubActionLink>
         </StackPanel>
 
-        <Label Margin="6,0" Content="Title" />
-        <TextBox />
-        <Label Margin="6,0" Content="Description" />
-        <TextBox MinLines="8"/>
+        <ui:PromptTextBox PromptText="Title" />
+        <ui:PromptTextBox Margin="12,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" />
+
         <Grid Margin="12" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
