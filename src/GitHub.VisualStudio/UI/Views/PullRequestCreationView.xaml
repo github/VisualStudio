@@ -35,9 +35,9 @@
     <StackPanel Orientation="Vertical">
         <StackPanel Margin="12,0" Orientation="Horizontal">
             <TextBlock VerticalAlignment="Center">From</TextBlock>
-            <Label Content="{Binding Name}" />
+            <Label Content="{Binding CurrentBranchName}" />
             <TextBlock VerticalAlignment="Center">into</TextBlock>
-            <Label Content="master" />
+            <Button Style="{StaticResource ActionLinkButton}" Content="master" Margin="6,0,0,0" VerticalAlignment="Center"/>
         </StackPanel>
 
         <Label Margin="6,0" Content="Title" />

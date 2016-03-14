@@ -9,7 +9,7 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            Name = "Bla bla bla";
+            CurrentBranchName = "fix-everything";
             Users = new List<string>()
             {
                 "haacked",
@@ -17,7 +17,7 @@ namespace GitHub.SampleData
             };
         }
 
-        public string Name { get; set; }
+        public string CurrentBranchName  { get; set; }
         public List<string> Users { get; set; }
     }
 }
