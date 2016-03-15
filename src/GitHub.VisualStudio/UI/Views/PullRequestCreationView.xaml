@@ -133,128 +133,510 @@
 
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel Orientation="Vertical">
-        <StackPanel Margin="12,0" Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center">From</TextBlock>
-            <Label Content="fix-everything" />
-            <TextBlock VerticalAlignment="Center">into</TextBlock>
-            <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
-                <i:Interaction.Behaviors>
-                    <ui:DropDownActionLinkBehaviour />
-                </i:Interaction.Behaviors>
-                <ui:GitHubActionLink.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="master" />
-                        <MenuItem Header="not-master" />
-                    </ContextMenu>
-                </ui:GitHubActionLink.ContextMenu>
-            </ui:GitHubActionLink>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+                
+            <StackPanel Margin="12,0" Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center">From</TextBlock>
+                <Label Content="fix-everything" />
+                <TextBlock VerticalAlignment="Center">into</TextBlock>
+                <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <i:Interaction.Behaviors>
+                        <ui:DropDownActionLinkBehaviour />
+                    </i:Interaction.Behaviors>
+                    <ui:GitHubActionLink.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="master" />
+                            <MenuItem Header="not-master" />
+                        </ContextMenu>
+                    </ui:GitHubActionLink.ContextMenu>
+                </ui:GitHubActionLink>
+            </StackPanel>
+
+            <ui:PromptTextBox PromptText="Title" />
+            <ui:PromptTextBox Margin="12,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" />
+            <Grid Margin="12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" />
+                <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <i:Interaction.Behaviors>
+                        <ui:DropDownActionLinkBehaviour />
+                    </i:Interaction.Behaviors>
+
+                    <ui:GitHubActionLink.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Haacked" />
+                            <MenuItem Header="not-Haacked" />
+                        </ContextMenu>
+                    </ui:GitHubActionLink.ContextMenu>
+                </ui:GitHubActionLink>
+
+                <ui:GitHubActionLink Grid.Column="2" Content="Clear Assignee" VerticalAlignment="Center" />
+            </Grid>
+
+            <Grid Margin="12,6,12,12" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0"/>
+                <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource GitHubPrimaryActionButton}" />
+            </Grid>
         </StackPanel>
 
-        <ui:PromptTextBox PromptText="Title" />
-        <ui:PromptTextBox Margin="12,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" />
-        <Grid Margin="12,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" />
-            <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
-                <i:Interaction.Behaviors>
-                    <ui:DropDownActionLinkBehaviour />
-                </i:Interaction.Behaviors>
-
-                <ui:GitHubActionLink.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Haacked" />
-                        <MenuItem Header="not-Haacked" />
-                    </ContextMenu>
-                </ui:GitHubActionLink.ContextMenu>
-            </ui:GitHubActionLink>
-
-            <ui:GitHubActionLink Grid.Column="2" Content="Clear Assignee" VerticalAlignment="Center" />
-        </Grid>
-
-        <Grid Margin="12,6,12,12" HorizontalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0"/>
-            <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource GitHubPrimaryActionButton}" />
-        </Grid>
-
-        <TabControl Style="{DynamicResource GitHubPRDetailsTabControl}" BorderThickness="0,1,0,0">
+        <TabControl  Grid.Row="1" Style="{DynamicResource GitHubPRDetailsTabControl}" BorderThickness="0,1,0,0">
             <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
-                <StackPanel Orientation="Vertical">
-                    <Grid Margin="10,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                        <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                        <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
-                        <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" Foreground="#FF777777"/>
-                    </Grid>
-                </StackPanel>
+                            <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                            <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                            <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" Foreground="#FF777777"/>
+                        </Grid>
+                        <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                            <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                            <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" Foreground="#FF777777"/>
+                        </Grid>
+                        <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                            <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                            <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" Foreground="#FF777777"/>
+                        </Grid>
+                        <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                            <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                            <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" Foreground="#FF777777"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
             <TabItem Header="Files Changed" Style="{DynamicResource GitHubPRDetailsTabItem}">
-                <StackPanel Orientation="Vertical">
-                    <Grid Margin="10,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
 
-                        <ui:OcticonImage
-                            Grid.Column="0"
-                            Height="16"
-                            Width="16"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Icon="file_text" />
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
 
-                        <Label Grid.Column="1" Content="src\start.cs" />
-                        <StackPanel Orientation="Horizontal" Grid.Column="2">
-                            <TextBlock VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
-                            <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Grid.Column="3">
-                            <Border
-                                Height="6" Width="6" 
-                                BorderThickness="1"
-                                Background="#FF6CC644" />
-                            <Border
-                                Height="6" Width="6" 
-                                BorderThickness="1"
-                                Background="#FF6CC644" />
-                            <Border
-                                Height="6" Width="6" 
-                                BorderThickness="1"
-                                Background="#FFBD2C00" />
-                            <Border
-                                Height="6" Width="6" 
-                                BorderThickness="1"
-                                Background="#FFBD2C00" />
-                            <Border
-                                Height="6" Width="6" 
-                                BorderThickness="1"
-                                Background="#FFCCCCCC" />
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
-    </StackPanel>
+    </Grid>
 </local:GenericPullRequestCreationView>
