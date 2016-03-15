@@ -104,7 +104,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type TabItem}">
-                            <Border Name="Border" BorderThickness="1,1,1,0" CornerRadius="2,2,0,0"
+                            <Border Name="Border" BorderThickness="0,0,0,1" BorderBrush="#FFD0D7E4" CornerRadius="2,2,0,0"
                                     Padding="10,3">
                                 <TextBlock
                                     x:Name="ContentSite"
@@ -118,6 +118,7 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter TargetName="Border" Property="BorderBrush" Value="#ffD0D7E4" /> 
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" /> 
                                 </Trigger>
 
                                 <Trigger Property="IsMouseOver" Value="True">
