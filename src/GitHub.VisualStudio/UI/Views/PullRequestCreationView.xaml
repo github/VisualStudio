@@ -101,7 +101,7 @@
                         </Grid.RowDefinitions>
 
                         <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                        <TextBlock Margin="5,0,0,0" Text="Super duper long commit name" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                        <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
                         <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" />
                     </Grid>
                 </StackPanel>
