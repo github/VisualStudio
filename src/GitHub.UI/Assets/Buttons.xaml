@@ -26,8 +26,8 @@
                 <GradientStop Color="#FFDDDDE6" Offset="1" />
             </LinearGradientBrush>
             <LinearGradientBrush x:Key="GitHubButtonBackgroundPressedGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="#FFE8E8E8" Offset="0" />
-                <GradientStop Color="#FFE8E8E8" Offset="1" />
+                <GradientStop Color="#FFCFCFDB" Offset="0" />
+                <GradientStop Color="#FFCFCFDB" Offset="1" />
             </LinearGradientBrush>
             <LinearGradientBrush x:Key="GitHubButtonBackgroundDisabledGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
                 <GradientStop Color="#FFFCFCFC" Offset="0" />
@@ -232,7 +232,7 @@
         </Setter>
     </Style>
 
-    <!-- ActionButton -->
+    <!-- PrimaryActionButton -->
     <Style x:Key="GitHubPrimaryActionButton" TargetType="{x:Type Button}">
         <Style.Resources>
             <LinearGradientBrush x:Key="GitHubButtonBackgroundGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
@@ -320,7 +320,7 @@
                             Background="#FF71BD1E"
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                         <Border x:Name="PressedBorder" BorderBrush="{StaticResource GitHubButtonBorderPressedBrush}"
-                    Background="{StaticResource GitHubButtonBackgroundPressedGradientBrush}"
+                    Background="#FF55A532"
                     BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                         <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
                             Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
@@ -341,5 +341,5 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <!-- End ActionButton -->
+    <!-- End PrimaryActionButton -->
 </ResourceDictionary>
