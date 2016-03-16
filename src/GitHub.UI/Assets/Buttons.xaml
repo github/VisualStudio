@@ -17,28 +17,16 @@
     <!-- Button -->
     <Style x:Key="GitHubButton" TargetType="{x:Type Button}">
         <Style.Resources>
-            <LinearGradientBrush x:Key="GitHubButtonBackgroundGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="#FFECECF1" Offset="0" />
-                <GradientStop Color="#FFECECF1" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GitHubButtonBackgroundMouseOverGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="#FFDDDDE6" Offset="0" />
-                <GradientStop Color="#FFDDDDE6" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GitHubButtonBackgroundPressedGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="#FFCFCFDB" Offset="0" />
-                <GradientStop Color="#FFCFCFDB" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GitHubButtonBackgroundDisabledGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="#FFFCFCFC" Offset="0" />
-                <GradientStop Color="#FFEBEBEB" Offset="1" />
-            </LinearGradientBrush>
+            <SolidColorBrush x:Key="GitHubButtonBackgroundBrush" Color="#FFECECF1" />
+            <SolidColorBrush x:Key="GitHubButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
+            <SolidColorBrush x:Key="GitHubButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
+            <SolidColorBrush x:Key="GitHubButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
             <SolidColorBrush x:Key="GitHubButtonForegroundBrush" Color="#FF666666" />
             <SolidColorBrush x:Key="GitHubButtonBorderBrush" Color="#FFCACACA" />
             <SolidColorBrush x:Key="GitHubButtonBorderMouseOverBrush" Color="#FFCACACA" />
             <SolidColorBrush x:Key="GitHubButtonBorderPressedBrush" Color="#FFBFBFBF" />
         </Style.Resources>
-        <Setter Property="Background" Value="{DynamicResource GitHubButtonBackgroundGradientBrush}" />
+        <Setter Property="Background" Value="{DynamicResource GitHubButtonBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource GitHubButtonBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
@@ -96,13 +84,13 @@
                     BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
                     Background="{TemplateBinding Background}" />
                         <Rectangle x:Name="DisabledVisualElement"
-                       Fill="{StaticResource GitHubButtonBackgroundDisabledGradientBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                       Fill="{StaticResource GitHubButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
                        Opacity="0" />
                         <Border x:Name="MouseOverBorder" BorderBrush="{StaticResource GitHubButtonBorderMouseOverBrush}"
-                    Background="{StaticResource GitHubButtonBackgroundMouseOverGradientBrush}"
+                    Background="{StaticResource GitHubButtonBackgroundMouseOverBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                         <Border x:Name="PressedBorder" BorderBrush="{StaticResource GitHubButtonBorderPressedBrush}"
-                    Background="{StaticResource GitHubButtonBackgroundPressedGradientBrush}"
+                    Background="{StaticResource GitHubButtonBackgroundPressedBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                         <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
                     Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
@@ -235,7 +223,7 @@
     <!-- PrimaryActionButton -->
     <Style x:Key="GitHubPrimaryActionButton" TargetType="{x:Type Button}">
         <Style.Resources>
-            <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledGradientBrush" Color="#FFFCFCFC" />
+            <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
             <SolidColorBrush x:Key="GitHubPrimaryButtonBorderPressedBrush" Color="#FFBFBFBF" />
             <SolidColorBrush x:Key="GitHubPrimaryButtonBackground" Color="#FF7ED321" />
             <SolidColorBrush x:Key="GitHubPrimaryButtonBorder" Color="#FF71C254" />
@@ -299,7 +287,7 @@
                     BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
                     Background="{TemplateBinding Background}" />
                         <Rectangle x:Name="DisabledVisualElement"
-                       Fill="{StaticResource GitHubPrimaryButtonBackgroundDisabledGradientBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                       Fill="{StaticResource GitHubPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
                        Opacity="0" />
                         <Border x:Name="MouseOverBorder" BorderBrush="#FF6ba157"
                             Background="#FF71BD1E"
