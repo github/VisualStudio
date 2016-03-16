@@ -143,7 +143,7 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Margin="10,0" Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Text="From" />
-                <Label Content="fix-everything" />
+                <Label Content="{Binding CurrentBranchName}" />
                 <TextBlock VerticalAlignment="Center" Text="into" />
                 <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
                     <i:Interaction.Behaviors>
@@ -168,7 +168,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" />
-                <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <ui:GitHubActionLink Grid.Column="1" Content="{Binding SelectedAssignee}" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
                     </i:Interaction.Behaviors>
@@ -176,7 +176,7 @@
                     <ui:GitHubActionLink.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Haacked" />
-                            <MenuItem Header="not-Haacked" />
+                            <MenuItem Header="NotHaacked" />
                         </ContextMenu>
                     </ui:GitHubActionLink.ContextMenu>
                 </ui:GitHubActionLink>
