@@ -17,7 +17,7 @@ namespace GitHub.SampleData
             };
         }
 
-        public string CurrentBranchName  { get; set; }
+        public string CurrentBranchName { get; set; }
         public List<string> Users { get; set; }
     }
 }
