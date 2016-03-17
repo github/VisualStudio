@@ -30,13 +30,11 @@
                 <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
             <Style x:Key="GitHubPRDetailsTabControl" TargetType="{x:Type TabControl}">
                 <Setter Property="Padding" Value="2"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Background" Value="{StaticResource TabItem.Selected.Background}"/>
+                <Setter Property="Background" Value="{DynamicResource TabItem.Selected.Background}"/>
                 <Setter Property="BorderBrush" Value="#FFD0D7E4"/>
                 <Setter Property="BorderThickness" Value="0,1,0,0"/>
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
