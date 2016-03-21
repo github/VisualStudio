@@ -129,6 +129,63 @@
                 </Setter>
             </Style>
 
+    <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
+        <Setter Property="Background" Value="{DynamicResource GitHubVsSearchBoxBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsSearchBoxBorder}"/>
+        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="AllowDrop" Value="true"/>
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:PromptTextBox}">
+                    <Grid>
+                        <Border x:Name="Bd" CornerRadius="2" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <Border CornerRadius="0" BorderBrush="Black" BorderThickness="0,1,0,0" Margin="2,-2,2,0" Opacity="0.4">
+                                <Border.Effect>
+                                    <DropShadowEffect Direction="270" ShadowDepth="0" BlurRadius="4" Opacity="1" />
+                                </Border.Effect>
+                            </Border>
+                        </Border>
+
+                        <Grid Margin="1,0,0,0">
+                            <ScrollViewer x:Name="PART_ContentHost" Padding="{TemplateBinding Padding}" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" VerticalAlignment="Top" Margin="0"/>
+                            <Label x:Name="PromptLabel" HorizontalAlignment="Left"
+                                 Foreground="{DynamicResource GitHubVsGrayText}"
+                                 FontSize="{TemplateBinding FontSize}" Margin="2,0,0,0" Padding="{TemplateBinding Padding}" Opacity="0"
+                                 Target="{Binding ElementName=Bd}"
+                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Focusable="False" IsHitTestVisible="False"
+                                 VerticalAlignment="Top">
+                                <TextBlock Text="{TemplateBinding PromptText}" TextTrimming="CharacterEllipsis" />
+                            </Label>
+                        </Grid>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubTextBoxMouseOverBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding Text.Length, RelativeSource={RelativeSource Self}}" Value="0">
+                            <Setter Property="Opacity" TargetName="PromptLabel" Value="0.7" />
+                            <Setter Property="Foreground" Value="Transparent" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -140,9 +197,9 @@
 
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Margin="10,0" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="From" />
-                <Label Content="{Binding CurrentBranchName}" />
-                <TextBlock VerticalAlignment="Center" Text="into" />
+                <TextBlock VerticalAlignment="Center" Text="From" Foreground="{DynamicResource GitHubVsGrayText}" />
+                <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                <TextBlock VerticalAlignment="Center" Text="into" Foreground="{DynamicResource GitHubVsGrayText}" />
                 <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
@@ -156,8 +213,8 @@
                 </ui:GitHubActionLink>
             </StackPanel>
 
-            <ui:PromptTextBox Margin="10,5" PromptText="Title" />
-            <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" />
+            <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}" />
+            <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" />
             <Grid Margin="10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -165,7 +222,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" />
+                <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
                 <ui:GitHubActionLink Grid.Column="1" Content="{Binding SelectedAssignee}" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
