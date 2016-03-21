@@ -193,6 +193,7 @@
             </Grid>
         </StackPanel>
 
+        <!--
         <TabControl Grid.Row="1" Style="{DynamicResource GitHubPRDetailsTabControl}" BorderThickness="0,1,0,0">
             <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -268,5 +269,6 @@
                 </ScrollViewer>
             </TabItem>
         </TabControl>
+        -->
     </Grid>
 </local:GenericPullRequestCreationView>

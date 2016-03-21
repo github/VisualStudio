@@ -8,6 +8,7 @@
   </ResourceDictionary.MergedDictionaries>
   
   <!-- Design time colors taken from the VS dark theme
+  -->
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FF252526" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF999999" />
@@ -15,9 +16,8 @@
   <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="#FF3399FF" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FF333337" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FFF1F1F1" />
-  -->
 
-  <!-- Design time colors taken from the VS light theme -->
+  <!-- Design time colors taken from the VS light theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF1E1E1E" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FFF5F5F5" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF717171" />
@@ -25,7 +25,8 @@
   <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="#FF3399FF" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FFFCFCFC" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF1E1E1E" />
-  
+   -->
+
   <!-- Design time colors taken from the VS blue theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF000000" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FFFFFFFF" />
