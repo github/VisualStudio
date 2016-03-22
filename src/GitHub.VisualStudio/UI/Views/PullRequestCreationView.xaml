@@ -30,6 +30,7 @@
                 <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
             <Style x:Key="GitHubPRDetailsTabControl" TargetType="{x:Type TabControl}">
                 <Setter Property="Padding" Value="2"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -186,6 +187,106 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- Button -->
+    <Style x:Key="GitHubVsButton" TargetType="{x:Type Button}">
+        <Style.Resources>
+            <SolidColorBrush x:Key="GitHubButtonBackgroundBrush" Color="#FFECECF1" />
+            <SolidColorBrush x:Key="GitHubButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
+            <SolidColorBrush x:Key="GitHubButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
+            <SolidColorBrush x:Key="GitHubButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
+            <SolidColorBrush x:Key="GitHubButtonForegroundBrush" Color="#FF666666" />
+            <SolidColorBrush x:Key="GitHubButtonBorderBrush" Color="#FFCACACA" />
+            <SolidColorBrush x:Key="GitHubButtonBorderMouseOverBrush" Color="#FFCACACA" />
+            <SolidColorBrush x:Key="GitHubButtonBorderPressedBrush" Color="#FFBFBFBF" />
+        </Style.Resources>
+        <Setter Property="Background" Value="{DynamicResource GitHubButtonBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GitHubButtonBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="12,5" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="MinWidth" Value="76" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="ToolTipService.ShowDuration" Value="30000" />
+        <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                   Storyboard.TargetName="MouseOverBorder">
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                   Storyboard.TargetName="PressedBorder">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                   Storyboard.TargetName="DisabledVisualElement">
+                                            <SplineDoubleKeyFrame KeyTime="0" Value="0.5" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                   Storyboard.TargetName="contentPresenter">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.5" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused" />
+                                <VisualState x:Name="Unfocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Background" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
+                    Background="{TemplateBinding Background}" />
+                        <Rectangle x:Name="DisabledVisualElement"
+                       Fill="{StaticResource GitHubButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                       Opacity="0" />
+                        <Border x:Name="MouseOverBorder" BorderBrush="{StaticResource GitHubButtonBorderMouseOverBrush}"
+                    Background="{StaticResource GitHubButtonBackgroundMouseOverBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                        <Border x:Name="PressedBorder" BorderBrush="{StaticResource GitHubButtonBorderPressedBrush}"
+                    Background="{StaticResource GitHubButtonBackgroundPressedBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                        <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
+                    Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                        <ContentPresenter x:Name="contentPresenter"
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsDefaulted" Value="True">
+                            <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- End Button -->
+
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -245,7 +346,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0"/>
+                <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0" Style="{DynamicResource GitHubVsButton}"/>
                 <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource GitHubPrimaryActionButton}" />
             </Grid>
         </StackPanel>
