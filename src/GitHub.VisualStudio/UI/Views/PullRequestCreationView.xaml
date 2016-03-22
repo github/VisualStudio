@@ -190,16 +190,6 @@
 
     <!-- Button -->
     <Style x:Key="GitHubVsButton" TargetType="{x:Type Button}">
-        <Style.Resources>
-            <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FFECECF1" />
-            <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
-            <SolidColorBrush x:Key="GitHubVsButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
-            <SolidColorBrush x:Key="GitHubVsButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
-            <SolidColorBrush x:Key="GitHubVsButtonForegroundBrush" Color="#FF666666" />
-            <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FFCACACA" />
-            <SolidColorBrush x:Key="GitHubVsButtonBorderMouseOverBrush" Color="#FFCACACA" />
-            <SolidColorBrush x:Key="GitHubVsButtonBorderPressedBrush" Color="#FFBFBFBF" />
-        </Style.Resources>
         <Setter Property="Background" Value="{DynamicResource GitHubVsButtonBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsButtonBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource GitHubVsButtonForegroundBrush}" />
