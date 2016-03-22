@@ -19,4 +19,12 @@
   <Color x:Key="GitHubPaneTitleColor">#FF1B293E</Color>
   <SolidColorBrush x:Key="GitHubPaneTitleBrush" Color="{StaticResource GitHubPaneTitleColor}" />
 
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FFECECF1" />
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
+  <SolidColorBrush x:Key="GitHubVsButtonForegroundBrush" Color="#FF666666" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FFCACACA" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderMouseOverBrush" Color="#FFCACACA" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderPressedBrush" Color="#FFBFBFBF" />
 </ResourceDictionary>
