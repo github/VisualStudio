@@ -7,8 +7,7 @@
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDark.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- Design time colors taken from the VS dark theme
-  -->
+  <!-- Design time colors taken from the VS dark theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FF252526" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF999999" />
@@ -17,8 +16,10 @@
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FF333337" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FFF1F1F1" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBorder" Color="#FF333337" />
+  -->
 
   <!-- Design time colors taken from the VS light theme
+  -->
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF1E1E1E" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FFF5F5F5" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF717171" />
@@ -27,7 +28,15 @@
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FFFCFCFC" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF1E1E1E" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBorder" Color="#FFFCFCFC" />
-   -->
+
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FFECECF1" />
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
+  <SolidColorBrush x:Key="GitHubVsButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
+  <SolidColorBrush x:Key="GitHubVsButtonForegroundBrush" Color="#FF666666" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FFCACACA" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderMouseOverBrush" Color="#FFCACACA" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderPressedBrush" Color="#FFBFBFBF" />
 
   <!-- Design time colors taken from the VS blue theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF000000" />
