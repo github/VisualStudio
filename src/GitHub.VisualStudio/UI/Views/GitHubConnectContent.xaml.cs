@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             var item = values[0] as ISimpleRepositoryModel;
             var context = values[1] as IGitAwareItem;
-            return item != null && context != null && context.ActiveRepoUri == item.CloneUrl;
+            return context?.ActiveRepoUri == item?.CloneUrl && context?.ActiveRepo?.LocalPath == item?.LocalPath;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
