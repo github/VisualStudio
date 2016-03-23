@@ -131,9 +131,9 @@
             </Style>
 
     <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
-        <Setter Property="Background" Value="{DynamicResource GitHubVsSearchBoxBackground}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsSearchBoxBorder}"/>
+        <Setter Property="Background" Value="{DynamicResource GitHubVsTextBoxBackground}"/>
         <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsTextBoxBorder}"/>
         <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -145,7 +145,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ui:PromptTextBox}">
                     <Grid>
-                        <Border x:Name="Bd" CornerRadius="2" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                        <Border x:Name="Bd" CornerRadius="0" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
                             <Border CornerRadius="0" BorderBrush="Black" BorderThickness="0,1,0,0" Margin="2,-2,2,0" Opacity="0.4">
                                 <Border.Effect>
                                     <DropShadowEffect Direction="270" ShadowDepth="0" BlurRadius="4" Opacity="1" />
@@ -171,7 +171,7 @@
                             <Setter Property="Opacity" Value="0.5" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubTextBoxMouseOverBorderBrush}" />
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubVsTextBoxBorder}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
                             <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
