@@ -31,6 +31,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!--
             <Style x:Key="GitHubPRDetailsTabControl" TargetType="{x:Type TabControl}">
                 <Setter Property="Padding" Value="2"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -129,6 +130,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            -->
 
     <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
         <Setter Property="Background" Value="{DynamicResource GitHubVsTextBoxBackground}"/>
