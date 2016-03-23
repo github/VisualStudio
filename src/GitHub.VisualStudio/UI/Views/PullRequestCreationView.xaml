@@ -394,8 +394,8 @@
                 </ui:GitHubActionLink>
             </StackPanel>
 
-            <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}" />
-            <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" />
+            <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{StaticResource GitHubVsPromptTextBox}" />
+            <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{StaticResource GitHubVsPromptTextBox}" />
             <Grid Margin="10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -426,8 +426,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0" Style="{DynamicResource GitHubVsButton}"/>
-                <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{DynamicResource GitHubVsPrimaryActionButton}" />
+                <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0" Style="{StaticResource GitHubVsButton}"/>
+                <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{StaticResource GitHubVsPrimaryActionButton}" />
             </Grid>
         </StackPanel>
 
