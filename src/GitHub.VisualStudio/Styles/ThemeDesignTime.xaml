@@ -15,14 +15,15 @@
   <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="#FF3399FF" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FF333337" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FFF1F1F1" />
-  <SolidColorBrush x:Key="GitHubVsSearchBoxBorder" Color="#FF333337" />
+  <SolidColorBrush x:Key="GitHubVsTextBoxBorder" Color="#FF3F3F46" />
+  <SolidColorBrush x:Key="GitHubVsTextBoxBackground" Color="#FF2D2D30" />
 
   <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FF3F404B" />
   <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FF4B4C59" />
   <SolidColorBrush x:Key="GitHubVsButtonBackgroundPressedBrush" Color="#FF2F3038" />
   <SolidColorBrush x:Key="GitHubVsButtonBackgroundDisabledBrush" Color="#FF3F404B" Opacity="0.3" />
   <SolidColorBrush x:Key="GitHubVsButtonForegroundBrush" Color="#FFF1F1F1" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FF464646" />
+  <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FF3F3F46" />
   <SolidColorBrush x:Key="GitHubVsButtonBorderMouseOverBrush" Color="#FF595959" />
   <SolidColorBrush x:Key="GitHubVsButtonBorderPressedBrush" Color="#FF2F3038" />
 
@@ -45,7 +46,8 @@
   <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="#FF3399FF" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FFFCFCFC" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF1E1E1E" />
-  <SolidColorBrush x:Key="GitHubVsSearchBoxBorder" Color="#FFFCFCFC" />
+  <SolidColorBrush x:Key="GitHubVsTextBoxBorder" Color="#FFCCCEBD" />
+  <SolidColorBrush x:Key="GitHubVsTextBoxBackground" Color="#FFEEEEF2" />
 
   <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FFECECF1" />
   <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
@@ -73,6 +75,7 @@
   <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="#FFE5C365" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF000000" />
-  <SolidColorBrush x:Key="GitHubVsSearchBoxBorder" Color="#FF8591A2" />
+  <SolidColorBrush x:Key="GitHubVsTextBoxBorder" Color="#FF8591A2" />
+  <SolidColorBrush x:Key="GitHubVsTextBoxBackground" Color="#FFFFFFFF" />
   -->
 </ResourceDictionary>
