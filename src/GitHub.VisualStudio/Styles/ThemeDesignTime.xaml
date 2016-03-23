@@ -3,9 +3,9 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDark.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDark.xaml" />
+  </ResourceDictionary.MergedDictionaries>
 
   <!-- Design time colors taken from the VS dark theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FFFFFFFF" />
