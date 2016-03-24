@@ -7,6 +7,7 @@ using System.Diagnostics;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.ViewModels;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -112,6 +113,11 @@ namespace GitHub.VisualStudio.Base
 
         public virtual void SaveContext(object sender, SectionSaveContextEventArgs e)
         {
+        }
+
+        protected ITeamExplorerSection GetSection(Guid section)
+        {
+            return ServiceProvider.GetService<ITeamExplorerPage>()?.GetSection(section);
         }
 
         void SubscribeToRepoChanges()

@@ -15,6 +15,7 @@ namespace GitHub.Services
         Ret GetService<T, Ret>() where Ret : class;
 
         object TryGetService(Type t);
+        object TryGetService(string typename);
         T TryGetService<T>() where T : class;
 
         void AddService(Type t, object instance);

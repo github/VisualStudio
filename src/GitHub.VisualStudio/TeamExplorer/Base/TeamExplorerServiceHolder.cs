@@ -244,4 +244,15 @@ namespace GitHub.VisualStudio.Base
             }
         }
     }
+
+    static class IGitRepositoryInfoExtensions
+    {
+        /// <summary>
+        /// Create a SimpleRepositoryModel from a VS git repo object
+        /// </summary>
+        public static ISimpleRepositoryModel ToModel(this IGitRepositoryInfo repo)
+        {
+            return repo == null ? null : new SimpleRepositoryModel(repo.RepositoryPath);
+        }
+    }
 }

@@ -18,6 +18,7 @@ using NLog;
 using System.Reactive.Linq;
 using GitHub.Infrastructure;
 using System.Windows.Controls;
+using System.Reflection;
 
 namespace GitHub.VisualStudio
 {
@@ -115,6 +116,13 @@ namespace GitHub.VisualStudio
             }
 
             return null;
+        }
+
+        [return: AllowNull]
+        public object TryGetService(string typename)
+        {
+            var type = Type.GetType(typename, false, true);
+            return TryGetService(type);
         }
 
         public object GetService(Type serviceType)

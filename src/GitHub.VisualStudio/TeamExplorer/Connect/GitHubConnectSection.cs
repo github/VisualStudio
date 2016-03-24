@@ -128,7 +128,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
                 if (sectionIndex == 0 && ServiceProvider != null)
                 {
-                    var section = ServiceProvider.GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
+                    var section = GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
                     IsVisible = !(section?.IsVisible ?? true); // only show this when the invitation section is hidden. When in doubt, don't show it.
                     if (section != null)
                         section.PropertyChanged += (s, p) =>
@@ -167,7 +167,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             UpdateConnection();
 
             // watch for new repos added to the local repo list
-            var section = ServiceProvider.GetSection(TeamExplorerConnectionsSectionId);
+            var section = GetSection(TeamExplorerConnectionsSectionId);
             if (section != null)
                 sectionTracker = new SectionStateTracker(section, RefreshRepositories);
         }

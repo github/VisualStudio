@@ -1,13 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using GitHub.Primitives;
 using GitHub.Services;
-using LibGit2Sharp;
-using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.Extensions
 {
@@ -44,11 +39,6 @@ namespace GitHub.Extensions
         public static T GetService<T>(this IServiceProvider serviceProvider) where T : class
         {
             return serviceProvider.TryGetService(typeof(T)) as T;
-        }
-
-        public static ITeamExplorerSection GetSection(this IServiceProvider serviceProvider, Guid section)
-        {
-            return serviceProvider?.GetService<ITeamExplorerPage>()?.GetSection(section);
         }
 
         static object GetServiceAndCache<CacheType>(IServiceProvider provider, Type type, ref CacheType cache)

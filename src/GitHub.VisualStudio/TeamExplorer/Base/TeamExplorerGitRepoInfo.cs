@@ -2,7 +2,6 @@
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using NullGuard;
 
 namespace GitHub.VisualStudio.Base
