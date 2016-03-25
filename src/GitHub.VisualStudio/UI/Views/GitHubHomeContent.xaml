@@ -9,7 +9,7 @@
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="48"
-             Height="48"
+             Height="auto"
              d:DesignWidth="300"
              DataContext="{Binding ViewModel}"
              Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -34,28 +34,26 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Hidden">
-        <StackPanel Margin="8,0">
-            <Grid Margin="0,6,-4,6">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition ColumnDefinition.Width="Auto" />
-                    <ColumnDefinition ColumnDefinition.Width="*" />
-                </Grid.ColumnDefinitions>
-    
-            <ui:OcticonImage
-                    x:Name="repositoryIcon"
-                    Height="32"
-                    Width="32"
-                    VerticalAlignment="Center" 
-                    Margin="0,0,8,0"
-                    Icon="{Binding Path=Icon}"
-                    Foreground="{DynamicResource GitHubVsToolWindowText}" />
-    
-                <StackPanel Orientation="Vertical" Margin="0" Grid.Column="1">
-                    <Label Content="{Binding Path=RepoName}"  Foreground="{DynamicResource GitHubVsToolWindowText}"/>
-                    <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource GitHubVsGrayText}" />
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-    </ScrollViewer>    
+    <StackPanel Margin="8,0">
+        <Grid Margin="0,6,-4,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition ColumnDefinition.Width="Auto" />
+                <ColumnDefinition ColumnDefinition.Width="*" />
+            </Grid.ColumnDefinitions>
+
+        <ui:OcticonImage
+                x:Name="repositoryIcon"
+                Height="32"
+                Width="32"
+                VerticalAlignment="Center" 
+                Margin="0,0,8,0"
+                Icon="{Binding Path=Icon}"
+                Foreground="{DynamicResource GitHubVsToolWindowText}" />
+
+            <StackPanel Orientation="Vertical" Margin="0" Grid.Column="1">
+                <Label Content="{Binding Path=RepoName}"  Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource GitHubVsGrayText}" />
+            </StackPanel>
+        </Grid>
+    </StackPanel>
 </UserControl>
