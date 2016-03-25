@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
@@ -10,6 +11,7 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Octokit;
 
 namespace GitHub.VisualStudio
 {
@@ -58,6 +60,17 @@ namespace GitHub.VisualStudio
 
             foreach (var menu in menus.DynamicMenus)
                 ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+        }
+    }
+
+    [Export(typeof(IGitHubClient))]
+    public class GHClient : GitHubClient
+    {
+        [ImportingConstructor]
+        public GHClient(IProgram program)
+            : base(program.ProductHeader)
+        {
+
         }
     }
 }

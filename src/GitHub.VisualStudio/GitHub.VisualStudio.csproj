@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
   <PropertyGroup>
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+    <MinimumVisualStudioVersion>$(MSBuildToolsVersion)</MinimumVisualStudioVersion>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">$(MSBuildToolsVersion)</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -26,7 +26,7 @@
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -100,26 +100,6 @@
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.TeamFoundation.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Client.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\\Microsoft.TeamFoundation.Controls.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Git.Provider, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -222,66 +202,39 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="TeamExplorer\Base\TeamExplorerGitRepoInfo.cs" />
-    <Compile Include="TeamExplorer\Base\TeamExplorerInvitationBase.cs" />
-    <Compile Include="TeamExplorer\Base\TeamExplorerServiceHolder.cs" />
+    <Compile Include="Base\MenuBase.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />
-    <Compile Include="Helpers\SharedDictionaryManager.cs" />
+    <Compile Include="..\common\SharedDictionaryManager.cs">
+      <Link>Helpers\SharedDictionaryManager.cs</Link>
+    </Compile>
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Menus\OpenLink.cs" />
     <Compile Include="Menus\LinkMenuBase.cs" />
     <Compile Include="Menus\ShowGitHubPane.cs" />
     <Compile Include="Menus\AddConnection.cs" />
     <Compile Include="Menus\CopyLink.cs" />
-    <Compile Include="TeamExplorer\Base\MenuBase.cs" />
     <Compile Include="Menus\MenuProvider.cs" />
+    <Compile Include="Base\PackageBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TeamExplorer\Base\TeamExplorerBase.cs" />
-    <Compile Include="TeamExplorer\Base\TeamExplorerItemBase.cs" />
-    <Compile Include="TeamExplorer\Base\TeamExplorerNavigationItemBase.cs" />
-    <Compile Include="TeamExplorer\Base\TeamExplorerSectionBase.cs" />
     <Compile Include="Helpers\Browser.cs" />
-    <Compile Include="Services\TeamExplorerServices.cs" />
-    <Compile Include="Settings\Colors.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
-    <Compile Include="Settings\OptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Services\Program.cs" />
-    <Compile Include="Services\SharedResources.cs" />
     <Compile Include="Settings\PackageSettings.cs" />
     <Compile Include="Settings\generated\PackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>PackageSettings.tt</DependentUpon>
     </Compile>
-    <Compile Include="Settings\Settings.cs" />
-    <Compile Include="TeamExplorer\Base\PackageBase.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+    <Compile Include="Settings\OptionsPage.cs">
+      <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Services\Program.cs" />
+    <Compile Include="Settings\Settings.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="SimpleJson.cs" />
-    <Compile Include="TeamExplorer\Connect\GitHubConnectSection1.cs" />
-    <Compile Include="TeamExplorer\Connect\GitHubConnectSection0.cs" />
-    <Compile Include="TeamExplorer\Connect\GitHubConnectSection.cs" />
-    <Compile Include="TeamExplorer\Connect\GitHubInvitationSection.cs" />
-    <Compile Include="TeamExplorer\Home\GitHubHomeSection.cs" />
-    <Compile Include="TeamExplorer\Home\GraphsNavigationItem.cs" />
-    <Compile Include="TeamExplorer\Home\PullRequestsNavigationItem.cs" />
-    <Compile Include="TeamExplorer\Home\IssuesNavigationItem.cs" />
-    <Compile Include="TeamExplorer\Home\WikiNavigationItem.cs" />
-    <Compile Include="TeamExplorer\Home\PulseNavigationItem.cs" />
-    <Compile Include="TeamExplorer\Sync\EnsureLoggedInSectionSync.cs" />
-    <Compile Include="TeamExplorer\Sync\GitHubPublishSection.cs" />
-    <Compile Include="TeamExplorer\Base\EnsureLoggedInSection.cs" />
-    <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\GitHubPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
@@ -298,15 +251,6 @@
     <Compile Include="UI\Views\Controls\RepositoryPublishControl.xaml.cs">
       <DependentUpon>RepositoryPublishControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubConnectContent.xaml.cs">
-      <DependentUpon>GitHubConnectContent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\GitHubInvitationContent.xaml.cs">
-      <DependentUpon>GitHubInvitationContent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Views\GitHubHomeContent.xaml.cs">
-      <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Views\Controls\TwoFactorControl.xaml.cs">
       <DependentUpon>TwoFactorControl.xaml</DependentUpon>
     </Compile>
@@ -318,11 +262,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
@@ -349,6 +288,7 @@
     <Content Include="Settings\generated\PackageSettings.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
+      <LastGenOutput>PackageSettings1.cs</LastGenOutput>
     </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -454,16 +394,6 @@
     <Page Include="UI\Views\Controls\RepositoryPublishControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\GitHubConnectContent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\GitHubInvitationContent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\GitHubHomeContent.xaml">
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\Controls\TwoFactorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -581,6 +511,20 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
+      <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
+      <Name>GitHub.TeamFoundation.14</Name>
+      <Private>False</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bGetCopyToOutputDirectoryItems%3bDebugSymbolsProjectOutputGroup%3bBuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
+      <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
+      <Name>GitHub.TeamFoundation.15</Name>
+      <Private>False</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bGetCopyToOutputDirectoryItems%3bDebugSymbolsProjectOutputGroup%3bBuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
@@ -598,6 +542,13 @@
     <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
       <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
       <Name>Rothko</Name>
+      <Private>False</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
+      <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
+      <Name>GitHub.VisualStudio.UI</Name>
       <Private>False</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
