@@ -9,7 +9,7 @@
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="48"
-             Height="48"
+             Height="auto"
              d:DesignWidth="300"
              DataContext="{Binding ViewModel}"
              Background="{DynamicResource GitHubVsToolWindowBackground}"
