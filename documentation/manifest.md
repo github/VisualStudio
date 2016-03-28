@@ -91,8 +91,16 @@
         - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
         - [ ] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
         - [ ] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
-        
-        
+- [ ] **Creating Multiple Repositories**
+    - [ ] Go to Team Explorer Connect page (logged in)
+    - [ ] Create additional repository
+    - [ ] Publish new repository
+    - [ ] Verify remote information present in repository settings
+- [ ] **Validate Publish Repository Error**
+    - [ ] Remove remote settings from repository
+    - [ ] Go to Sync page and publish repository
+    - [ ] Go to Team Explorer Connect page (logged in)
+    - [ ] Click GitHub > Create
 # Connect page when logged in to TFS
    - [ ] **Connect to a TFS project**
     - [ ] Login to GitHub
