@@ -29,8 +29,7 @@ namespace GitHub.VisualStudio.Helpers
             "GitHub.VisualStudio.UI"
         };
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        static int VSVersion;
+        readonly static int VSVersion;
         static SharedDictionaryManager()
         {
             AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
