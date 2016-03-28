@@ -112,10 +112,10 @@
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Services\IVSServices.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Services.cs" />
     <Compile Include="Services\StatusBarNotificationService.cs" />
-    <Compile Include="Services\VSServices.cs" />
     <Compile Include="Models\IConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\common\SolutionInfo.cs">

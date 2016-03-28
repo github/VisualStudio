@@ -11,23 +11,11 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using System.Diagnostics;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Services
 {
-    public interface IVSServices
-    {
-        string GetLocalClonePathFromGitProvider();
-        void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
-        string GetActiveRepoPath();
-        LibGit2Sharp.IRepository GetActiveRepo();
-        IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
-        string SetDefaultProjectPath(string path);
-
-        void ActivityLogMessage(string message);
-        void ActivityLogWarning(string message);
-        void ActivityLogError(string message);
-    }
-
     [Export(typeof(IVSServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
@@ -61,29 +49,22 @@ namespace GitHub.Services
 
         public void Clone(string cloneUrl, string clonePath, bool recurseSubmodules)
         {
-            var gitExt = serviceProvider.TryGetService("Microsoft.TeamFoundation.Git.Controls.Extensibility.IGitRepositoriesExt, Microsoft.TeamFoundation.Git.Controls");
-            var cloneOptionsType = Type.GetType("Microsoft.TeamFoundation.Git.Controls.Extensibility.CloneOptions, Microsoft.TeamFoundation.Git.Controls");
-            var cloneMethod = gitExt.GetType().GetMethod("Clone", new Type[] { typeof(string), typeof(string), cloneOptionsType });
-            cloneMethod.Invoke(gitExt, new object[] { cloneUrl, clonePath, recurseSubmodules ? 1 : 0 });
+            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
+            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
         }
 
-        object GetRepoFromVS()
+        IGitRepositoryInfo GetRepoFromVS()
         {
-            var gitExt = serviceProvider.TryGetService("Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt, Microsoft.TeamFoundation.Git.Provider");
-            var prop = gitExt?.GetType().GetProperty("ActiveRepositories");
-            var activeRepositories = prop?.GetValue(gitExt) as IEnumerable;
-            var e = activeRepositories?.GetEnumerator();
-            if (e?.MoveNext() ?? false)
-                return e.Current;
-            return null;
+            var gitExt = serviceProvider.GetService<IGitExt>();
+            return gitExt.ActiveRepositories.FirstOrDefault();
         }
 
         public LibGit2Sharp.IRepository GetActiveRepo()
         {
             var repo = GetRepoFromVS();
-            if (repo != null)
-                return serviceProvider.GetService<IGitService>().GetRepo(repo.GetType().GetProperty("RepositoryPath").GetValue(repo) as string);
-            return serviceProvider.GetSolution().GetRepoFromSolution();
+            return repo != null
+                ? serviceProvider.GetService<IGitService>().GetRepo(repo.RepositoryPath)
+                : serviceProvider.GetSolution().GetRepoFromSolution();
         }
 
         public string GetActiveRepoPath()
@@ -91,7 +72,7 @@ namespace GitHub.Services
             string ret = null;
             var repo = GetRepoFromVS();
             if (repo != null)
-                ret = repo.GetType().GetProperty("RepositoryPath")?.GetValue(repo) as string;
+                ret = repo.RepositoryPath;
             if (ret == null)
                 ret = serviceProvider.GetSolution().GetRepoFromSolution()?.Info?.Path;
             return ret ?? String.Empty;
