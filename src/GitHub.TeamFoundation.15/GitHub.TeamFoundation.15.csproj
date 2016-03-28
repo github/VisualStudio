@@ -100,9 +100,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\GitHub.TeamFoundation.14\Constants.cs">
-      <Link>Constants.cs</Link>
-    </Compile>
     <Compile Include="..\GitHub.TeamFoundation.14\Settings.cs">
       <Link>Settings.cs</Link>
     </Compile>
@@ -163,6 +160,7 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Services\VSServices.cs">
       <Link>Services\VSServices.cs</Link>
     </Compile>
+    <Compile Include="RegistryHelper.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>

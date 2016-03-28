@@ -19,6 +19,7 @@ using Microsoft.VisualStudio;
 using NullGuard;
 using ReactiveUI;
 using System.Threading.Tasks;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {

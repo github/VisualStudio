@@ -1,6 +1,6 @@
-﻿namespace GitHub.VisualStudio.Helpers
+﻿namespace GitHub.VisualStudio.UI
 {
-    internal static class Constants
+    public static class Constants
     {
         public const string NoAngleBracketsErrorMessage = "Failed to parse signature - Neither `name` nor `email` should contain angle brackets chars.";
         public const int MaxRepositoryNameLength = 100;

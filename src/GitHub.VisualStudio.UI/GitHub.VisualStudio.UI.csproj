@@ -78,6 +78,7 @@
     <Compile Include="Base\TeamExplorerGitRepoInfo.cs" />
     <Compile Include="Base\TeamExplorerItemBase.cs" />
     <Compile Include="Colors.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
       <AutoGen>True</AutoGen>

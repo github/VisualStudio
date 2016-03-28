@@ -100,7 +100,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
+    <Compile Include="RegistryHelper.cs" />
     <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\EnsureLoggedInSection.cs" />
