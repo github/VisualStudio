@@ -10,6 +10,6 @@
   <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="{DynamicResource VsColor.CommandBarSelectedBorder}" />
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="{DynamicResource VsColor.SearchBoxBackground}" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="{DynamicResource VsColor.WindowText}" />
-  <SolidColorBrush x:Key="GitHubVsTextBoxBorder" Color="{DynamicResource VsColor.BrandedUIBorder}" />
-  <SolidColorBrush x:Key="GitHubVsTextBoxBackground" Color="{DynamicResource VsColor.BrandedUIBackground}" />
+  <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="{DynamicResource VsColor.BrandedUIBorder}" />
+  <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="{DynamicResource VsColor.BrandedUIBackground}" />
 </ResourceDictionary>
