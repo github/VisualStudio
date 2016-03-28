@@ -133,9 +133,9 @@
             -->
 
             <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
-                <Setter Property="Background" Value="{DynamicResource GitHubVsTextBoxBackground}"/>
+                <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}"/>
                 <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsTextBoxBorder}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}"/>
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -173,7 +173,7 @@
                                     <Setter Property="Opacity" Value="0.5" />
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubVsTextBoxBorder}" />
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
                                 </Trigger>
                                 <Trigger Property="IsKeyboardFocusWithin" Value="True">
                                     <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
