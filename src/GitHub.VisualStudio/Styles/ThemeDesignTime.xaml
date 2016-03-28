@@ -18,23 +18,6 @@
   <SolidColorBrush x:Key="GitHubVsTextBoxBorder" Color="#FF3F3F46" />
   <SolidColorBrush x:Key="GitHubVsTextBoxBackground" Color="#FF2D2D30" />
 
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FF3F404B" />
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FF4B4C59" />
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundPressedBrush" Color="#FF2F3038" />
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundDisabledBrush" Color="#FF3F404B" Opacity="0.3" />
-  <SolidColorBrush x:Key="GitHubVsButtonForegroundBrush" Color="#FFF1F1F1" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FF3F3F46" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderMouseOverBrush" Color="#FF595959" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderPressedBrush" Color="#FF2F3038" />
-
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundBrush" Color="#FF709946" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundDisabledBrush" Color="#FF709946" Opacity="0.3" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundMouseOverBrush" Color="#FF82b352" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundPressedBrush" Color="#FF82b352" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonForegroundBrush" Color="#FFFFFFFF" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBorderBrush" Color="#FF7BA84D" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBorderMouseOverBrush" Color="#FF95CC5E" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBorderPressedBrush" Color="#FF7BA84D" />
   -->
 
   <!-- Design time colors taken from the VS light theme
@@ -48,24 +31,6 @@
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF1E1E1E" />
   <SolidColorBrush x:Key="GitHubVsTextBoxBorder" Color="#FFCCCEBD" />
   <SolidColorBrush x:Key="GitHubVsTextBoxBackground" Color="#FFEEEEF2" />
-
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundBrush" Color="#FFECECF1" />
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
-  <SolidColorBrush x:Key="GitHubVsButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
-  <SolidColorBrush x:Key="GitHubVsButtonForegroundBrush" Color="#FF666666" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderBrush" Color="#FFCACACA" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderMouseOverBrush" Color="#FFCACACA" />
-  <SolidColorBrush x:Key="GitHubVsButtonBorderPressedBrush" Color="#FFBFBFBF" />
-
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundBrush" Color="#FF8BD26B" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundDisabledBrush" Color="#FF8BD26B" Opacity="0.3" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundMouseOverBrush" Color="#FF90D96F" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBackgroundPressedBrush" Color="#FF7FBF62" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonForegroundBrush" Color="#FFFFFFFF" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBorderBrush" Color="#FF599942" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBorderMouseOverBrush" Color="#FF68B34D" />
-  <SolidColorBrush x:Key="GitHubVsPrimaryButtonBorderPressedBrush" Color="#FF599942" />
 
   <!-- Design time colors taken from the VS blue theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF000000" />
