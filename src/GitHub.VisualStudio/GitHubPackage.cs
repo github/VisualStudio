@@ -36,7 +36,9 @@ namespace GitHub.VisualStudio
     [ProvideMenuResource("Menus.ctmenu", 1)]
     //[ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
+#if DEBUG || XAML_DESIGNER
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
+#endif
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : PackageBase
     {
