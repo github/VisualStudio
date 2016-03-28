@@ -23,6 +23,14 @@ namespace GitHub.Services
     {
         readonly IUIProvider serviceProvider;
 
+        /// <summary>
+        /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
+        /// that instances of this type cannot be created if the TeamFoundation dlls are not available
+        /// (otherwise we'll have multiple instances of IVSServices exports, and that would be Bad(tm))
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        IGitExt gitExtService;
+
         [ImportingConstructor]
         public VSServices(IUIProvider serviceProvider)
         {
@@ -56,8 +64,8 @@ namespace GitHub.Services
 
         IGitRepositoryInfo GetRepoFromVS()
         {
-            var gitExt = serviceProvider.GetService<IGitExt>();
-            return gitExt.ActiveRepositories.FirstOrDefault();
+            gitExtService = serviceProvider.GetService<IGitExt>();
+            return gitExtService.ActiveRepositories.FirstOrDefault();
         }
 
         public LibGit2Sharp.IRepository GetActiveRepo()
