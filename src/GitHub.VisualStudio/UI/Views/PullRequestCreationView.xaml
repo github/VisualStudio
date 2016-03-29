@@ -192,9 +192,9 @@
 
             <!-- Button -->
             <Style x:Key="GitHubVsButton" TargetType="{x:Type Button}">
-                <Setter Property="Background" Value="{DynamicResource GitHubVsButtonBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsButtonBorderBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsButtonForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource GitHubButtonBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubButtonBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
                 <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
                 <Setter Property="FontSize" Value="12" />
                 <Setter Property="Padding" Value="12,5" />
@@ -250,13 +250,13 @@
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
                             Background="{TemplateBinding Background}" />
                                 <Rectangle x:Name="DisabledVisualElement"
-                               Fill="{DynamicResource GitHubVsButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                               Fill="{DynamicResource GitHubButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
                                Opacity="0" />
-                                <Border x:Name="MouseOverBorder" BorderBrush="{DynamicResource GitHubVsButtonBorderMouseOverBrush}"
-                            Background="{DynamicResource GitHubVsButtonBackgroundMouseOverBrush}"
+                                <Border x:Name="MouseOverBorder" BorderBrush="{DynamicResource GitHubButtonBorderMouseOverBrush}"
+                            Background="{DynamicResource GitHubButtonBackgroundMouseOverBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubVsButtonBorderPressedBrush}"
-                            Background="{DynamicResource GitHubVsButtonBackgroundPressedBrush}"
+                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubButtonBorderPressedBrush}"
+                            Background="{DynamicResource GitHubButtonBackgroundPressedBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                                 <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
                             Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
@@ -281,9 +281,9 @@
 
             <!-- PrimaryActionButton -->
             <Style x:Key="GitHubVsPrimaryActionButton" TargetType="{x:Type Button}">
-                <Setter Property="Background" Value="{DynamicResource GitHubVsPrimaryButtonBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsPrimaryButtonBorderBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsPrimaryButtonForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource GitHubPrimaryButtonBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundBrush}" />
                 <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
                 <Setter Property="FontSize" Value="12" />
                 <Setter Property="Padding" Value="12,5" />
@@ -339,12 +339,12 @@
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
                             Background="{TemplateBinding Background}" />
                                 <Rectangle x:Name="DisabledVisualElement"
-                               Fill="{DynamicResource GitHubVsPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                               Fill="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
                                Opacity="0" />
                                 <Border x:Name="MouseOverBorder" BorderBrush="#FF6ba157"
                                     Background="#FF71BD1E"
                                     BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubVsPrimaryButtonBorderPressedBrush}"
+                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderPressedBrush}"
                             Background="#FF55A532"
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                                 <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
