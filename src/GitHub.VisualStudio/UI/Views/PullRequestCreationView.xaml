@@ -8,8 +8,8 @@
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                  DataContext="{Binding ViewModel}"
+                                      Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                      DataContext="{Binding ViewModel}"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       mc:Ignorable="d">

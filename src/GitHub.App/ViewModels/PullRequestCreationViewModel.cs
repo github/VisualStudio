@@ -1,4 +1,5 @@
 ﻿using GitHub.Exports;
+using GitHub.Models;
 using NullGuard;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,13 @@ using System.Threading.Tasks;
 
 namespace GitHub.ViewModels
 {
+    //Add properties to interface first
+    //Ex would be login tab view model
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
+       public IReadOnlyList<IBranch> Branches { get; }
+
     }
 }

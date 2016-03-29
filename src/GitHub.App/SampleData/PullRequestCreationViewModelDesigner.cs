@@ -1,6 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using GitHub.ViewModels;
 using System.Collections.Generic;
+using ReactiveUI;
+using GitHub.Models;
+using System;
+using System.Windows.Media.Imaging;
+using GitHub.Services;
 
 namespace GitHub.SampleData
 {
@@ -9,27 +14,45 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            Branches = new List<string>()
+            //TODO:Make String into an IBranch
+            Branches = new ReactiveList<IBranch>
             {
-                "don/stub-ui",
-                "feature/pr/views",
-                "release-1.0.17.0"
+               new Branch {Name = "don/stub-ui"},
+               new Branch {Name = "feature/pr/views"},
+               new Branch {Name = "release-1.0.17.0"}
             };
 
-            CurrentBranchName = "fix-everything";
-            SelectedAssignee = "Haacked (Phil Haack)";
-            TargetBranchName = "master";
-            Users = new List<string>()
+           
+            CurrentBranch = new Branch {Name = "fix-everything" };
+
+            SelectedAssignee = new AccountDesigner { Login = "Haacked (Phil Haack)" }; //IAcct
+
+            TargetBranch = new Branch { Name = "master" }; //IBranch
+
+            //IAcct
+            Users = new ReactiveList<IAccount>
             {
-                "Haacked (Phil Haack)",
-                "shana (Andreia Gaita)"
+                new AccountDesigner {Login = "Haacked (Phil Haack)" },
+                new AccountDesigner {Login = "shana(Andreia Gaita)" }            
             };
         }
 
-        public string CurrentBranchName { get; set; }
-        public string SelectedAssignee { get; set; }
-        public string TargetBranchName { get; set; }
-        public List<string> Branches { get; set; }
-        public List<string> Users { get; set; }
+
+        public IReadOnlyList<IBranch> Branches
+        {
+            get;
+            private set;
+        }
+
+        public IReadOnlyList<IAccount> Users
+        {
+            get;
+            private set;
+        }
+
+        public IAccount SelectedAssignee { get; set; }
+        public IBranch TargetBranch { get; set; }
+        public IBranch CurrentBranch { get; set; }
+
     }
 }
