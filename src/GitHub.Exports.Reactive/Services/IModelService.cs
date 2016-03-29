@@ -13,6 +13,7 @@ namespace GitHub.Services
     /// </summary>
     public interface IModelService : IDisposable
     {
+        //IBranch here
         IObservable<AccountCacheItem> GetUserFromCache();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
@@ -21,5 +22,6 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
+        IObservable<IReadOnlyList<IBranch>> GetBranches();
     }
 }

@@ -169,6 +169,16 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
+
+        public IObservable<IReadOnlyList<IBranch>> GetBranches()
+        {
+            //Get the user
+            //get the selected repo
+            //get all the repos branches
+            return null;
+        }
+
+
         IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>

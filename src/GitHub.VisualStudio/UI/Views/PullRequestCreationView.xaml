@@ -9,8 +9,8 @@
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                  DataContext="{Binding ViewModel}"
+                                      Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                      DataContext="{Binding ViewModel}"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       mc:Ignorable="d">
@@ -379,16 +379,15 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Margin="10,0" Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Text="From" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                <Label Content="{Binding CurrentBranch.Name}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
                 <TextBlock VerticalAlignment="Center" Text="into" Foreground="{DynamicResource GitHubVsGrayText}" />
                 <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
                     </i:Interaction.Behaviors>
                     <ui:GitHubActionLink.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="master" />
-                            <MenuItem Header="not-master" />
+                        <ContextMenu ItemsSource="{Binding Branches}" >
+                          
                         </ContextMenu>
                     </ui:GitHubActionLink.ContextMenu>
                 </ui:GitHubActionLink>
@@ -404,7 +403,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <ui:GitHubActionLink Grid.Column="1" Content="{Binding SelectedAssignee}" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <ui:GitHubActionLink Grid.Column="1" Content="{Binding SelectedAssignee.Login}" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
                     </i:Interaction.Behaviors>
