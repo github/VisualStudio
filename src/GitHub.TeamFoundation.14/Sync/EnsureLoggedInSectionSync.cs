@@ -6,8 +6,10 @@ using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
-    [TeamExplorerSection(SyncLoginSectionId, TeamExplorerPageIds.GitCommits, 10)]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
+    // TODO: The IsAGitHubRepo() is somehow giving false positives, need to fix that
+    // before reactivating this, it's annoying users.
+    //[TeamExplorerSection(SyncLoginSectionId, TeamExplorerPageIds.GitCommits, 10)]
+    //[PartCreationPolicy(CreationPolicy.NonShared)]
     public class EnsureLoggedInSectionSync : EnsureLoggedInSection
     {
         public const string SyncLoginSectionId = "C5975729-3CF1-47B4-AE92-C2934906CDDA";
