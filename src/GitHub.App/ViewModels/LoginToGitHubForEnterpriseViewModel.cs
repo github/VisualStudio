@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Info;
 using GitHub.Models;
