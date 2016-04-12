@@ -7,10 +7,11 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
+using GitHub.ViewModels;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerItemBase : TeamExplorerGitRepoInfo
+    public class TeamExplorerItemBase : TeamExplorerGitRepoInfo, IServiceProviderAware
     {
         readonly ISimpleApiClientFactory apiFactory;
         protected ITeamExplorerServiceHolder holder;
