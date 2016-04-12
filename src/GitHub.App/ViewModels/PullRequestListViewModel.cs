@@ -40,11 +40,18 @@ namespace GitHub.ViewModels
                 VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>().OpenUrl(repositoryHost.Address.WebUri);
             });
 
+            PullRequests = 
+                repository.CloneUrl != null ? LoadPullRequests(repositoryHost, repository) :
+                new TrackingCollection<IPullRequestModel>(Observable.Empty<IPullRequestModel>());
+            PullRequests.Subscribe();
+        }
+
+        static ITrackingCollection<IPullRequestModel> LoadPullRequests(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
+        {
             var list = repositoryHost.ModelService.GetPullRequests(repository);
             list.SetComparer(OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare);
             list.SetFilter((pr, index, l) => pr.IsOpen);
-            PullRequests = list;
-            list.Subscribe();
+            return list;
         }
 
         ITrackingCollection<IPullRequestModel> pullRequests;
