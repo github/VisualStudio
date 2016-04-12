@@ -187,9 +187,9 @@
     </CommandPlacement>
 
     <!-- Show GitHub pane command -->
-    <!-- CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100">
+    <CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-    </CommandPlacement -->
+    </CommandPlacement>
 
     <!-- Add Connection (Team Explorer) command -->
     <CommandPlacement guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100">
