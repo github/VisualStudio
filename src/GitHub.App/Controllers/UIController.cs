@@ -398,7 +398,7 @@ namespace GitHub.Controllers
 
             if (activeFlow == mainFlow)
             {
-                uiProvider.RemoveService(typeof(IConnection));
+            	uiProvider.RemoveService(typeof(IConnection), this);
                 completion?.OnNext(success);
                 completion?.OnCompleted();
                 transition.OnCompleted();
@@ -558,7 +558,7 @@ namespace GitHub.Controllers
             if (connection != null)
             {
                 if (mainFlow != UIControllerFlow.Authentication)
-                    uiProvider.AddService(connection);
+                    uiProvider.AddService(this, connection);
                 else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
                     Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
 
@@ -583,7 +583,7 @@ namespace GitHub.Controllers
                             if (loggedin) // register the first available connection so the viewmodel can use it
                             {
                                 connection = c;
-                                uiProvider.AddService(c);
+                                uiProvider.AddService(this, c);
                             }
                             else
                             {
@@ -594,7 +594,8 @@ namespace GitHub.Controllers
                                     if (e.Action == NotifyCollectionChangedAction.Add)
                                     {
                                         connection = e.NewItems[0] as IConnection;
-                                        uiProvider.AddService(typeof(IConnection), connection);
+										if (connection != null)
+	                                        uiProvider.AddService(typeof(IConnection), this, connection);
                                     }
                                 };
                                 connectionManager.Connections.CollectionChanged += connectionAdded;

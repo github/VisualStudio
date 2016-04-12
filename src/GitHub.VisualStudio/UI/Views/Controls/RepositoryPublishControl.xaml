@@ -10,7 +10,7 @@
              xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:converters="clr-namespace:GitHub.VisualStudio.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:prop="clr-namespace:GitHub.VisualStudio"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              mc:Ignorable="d" 
              d:DesignHeight="440"
              d:DesignWidth="414"

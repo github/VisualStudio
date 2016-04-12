@@ -1,17 +1,12 @@
 ﻿using GitHub.Authentication;
 using GitHub.Models;
 using GitHub.Services;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio.ComponentModelHost;
 using NSubstitute;
 using Rothko;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTests
 {
@@ -33,7 +28,7 @@ namespace UnitTests
         }
 
 
-        public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
+       // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
         public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
 
         public static IVSServices IVSServices
@@ -114,7 +109,7 @@ namespace UnitTests
             var clone = cloneService ?? new RepositoryCloneService(os, vs);
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
-            ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
+            //ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
             ret.GetService(typeof(IGitService)).Returns(gitservice);
             ret.GetService(typeof(IVSServices)).Returns(vs);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
@@ -129,10 +124,10 @@ namespace UnitTests
             return ret;
         }
 
-        public static IGitRepositoriesExt GetGitExt(this IServiceProvider provider)
-        {
-            return provider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
-        }
+        //public static IGitRepositoriesExt GetGitExt(this IServiceProvider provider)
+        //{
+        //    return provider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
+        //}
 
         public static IVSServices GetVSServices(this IServiceProvider provider)
         {

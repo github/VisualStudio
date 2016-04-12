@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GitHub {
+namespace GitHub.App {
     using System;
     
     
@@ -22,7 +22,7 @@ namespace GitHub {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,10 +36,10 @@ namespace GitHub {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GitHub.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GitHub.App.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace GitHub {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Select a containing folder for your new repository..
         /// </summary>
-        public static string BrowseForDirectory {
+        internal static string BrowseForDirectory {
             get {
                 return ResourceManager.GetString("BrowseForDirectory", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Clone a {0} Repository.
         /// </summary>
-        public static string CloneTitle {
+        internal static string CloneTitle {
             get {
                 return ResourceManager.GetString("CloneTitle", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Create a {0} Repository.
         /// </summary>
-        public static string CreateTitle {
+        internal static string CreateTitle {
             get {
                 return ResourceManager.GetString("CreateTitle", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Please enter an Enterprise URL.
         /// </summary>
-        public static string EnterpriseUrlValidatorEmpty {
+        internal static string EnterpriseUrlValidatorEmpty {
             get {
                 return ResourceManager.GetString("EnterpriseUrlValidatorEmpty", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a valid Enterprise URL.
         /// </summary>
-        public static string EnterpriseUrlValidatorInvalid {
+        internal static string EnterpriseUrlValidatorInvalid {
             get {
                 return ResourceManager.GetString("EnterpriseUrlValidatorInvalid", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Not an Enterprise server. Please enter an Enterprise URL.
         /// </summary>
-        public static string EnterpriseUrlValidatorNotAGitHubHost {
+        internal static string EnterpriseUrlValidatorNotAGitHubHost {
             get {
                 return ResourceManager.GetString("EnterpriseUrlValidatorNotAGitHubHost", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to log in..
         /// </summary>
-        public static string LoginFailedForbiddenMessage {
+        internal static string LoginFailedForbiddenMessage {
             get {
                 return ResourceManager.GetString("LoginFailedForbiddenMessage", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Check your username and password, then try again.
         /// </summary>
-        public static string LoginFailedMessage {
+        internal static string LoginFailedMessage {
             get {
                 return ResourceManager.GetString("LoginFailedMessage", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Connect To GitHub.
         /// </summary>
-        public static string LoginTitle {
+        internal static string LoginTitle {
             get {
                 return ResourceManager.GetString("LoginTitle", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Please enter your password.
         /// </summary>
-        public static string PasswordValidatorEmpty {
+        internal static string PasswordValidatorEmpty {
             get {
                 return ResourceManager.GetString("PasswordValidatorEmpty", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Publish repository.
         /// </summary>
-        public static string PublishTitle {
+        internal static string PublishTitle {
             get {
                 return ResourceManager.GetString("PublishTitle", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Publish repository to {0}.
         /// </summary>
-        public static string PublishToTitle {
+        internal static string PublishToTitle {
             get {
                 return ResourceManager.GetString("PublishToTitle", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to No selected repository..
         /// </summary>
-        public static string RepositoryCloneFailedNoSelectedRepo {
+        internal static string RepositoryCloneFailedNoSelectedRepo {
             get {
                 return ResourceManager.GetString("RepositoryCloneFailedNoSelectedRepo", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Repository &apos;{0}/{1}&apos; already exists..
         /// </summary>
-        public static string RepositoryCreationFailedAlreadyExists {
+        internal static string RepositoryCreationFailedAlreadyExists {
             get {
                 return ResourceManager.GetString("RepositoryCreationFailedAlreadyExists", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Change the repository name or select a different account and try again..
         /// </summary>
-        public static string RepositoryCreationFailedAlreadyExistsMessage {
+        internal static string RepositoryCreationFailedAlreadyExistsMessage {
             get {
                 return ResourceManager.GetString("RepositoryCreationFailedAlreadyExistsMessage", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Exceeded private repositories quota..
         /// </summary>
-        public static string RepositoryCreationFailedQuota {
+        internal static string RepositoryCreationFailedQuota {
             get {
                 return ResourceManager.GetString("RepositoryCreationFailedQuota", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Repository with same name already exists at this location.
         /// </summary>
-        public static string RepositoryNameValidatorAlreadyExists {
+        internal static string RepositoryNameValidatorAlreadyExists {
             get {
                 return ResourceManager.GetString("RepositoryNameValidatorAlreadyExists", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Please enter a repository name.
         /// </summary>
-        public static string RepositoryNameValidatorEmpty {
+        internal static string RepositoryNameValidatorEmpty {
             get {
                 return ResourceManager.GetString("RepositoryNameValidatorEmpty", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Repository name must be fewer than 100 characters.
         /// </summary>
-        public static string RepositoryNameValidatorTooLong {
+        internal static string RepositoryNameValidatorTooLong {
             get {
                 return ResourceManager.GetString("RepositoryNameValidatorTooLong", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Will be created as {0}.
         /// </summary>
-        public static string SafeRepositoryNameWarning {
+        internal static string SafeRepositoryNameWarning {
             get {
                 return ResourceManager.GetString("SafeRepositoryNameWarning", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
-        public static string TwoFactorApp {
+        internal static string TwoFactorApp {
             get {
                 return ResourceManager.GetString("TwoFactorApp", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to We sent you a message via SMS with your authentication code..
         /// </summary>
-        public static string TwoFactorSms {
+        internal static string TwoFactorSms {
             get {
                 return ResourceManager.GetString("TwoFactorSms", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Two-Factor authentication required.
         /// </summary>
-        public static string TwoFactorTitle {
+        internal static string TwoFactorTitle {
             get {
                 return ResourceManager.GetString("TwoFactorTitle", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Enter a login authentication code here.
         /// </summary>
-        public static string TwoFactorUnknown {
+        internal static string TwoFactorUnknown {
             get {
                 return ResourceManager.GetString("TwoFactorUnknown", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Please enter your username or email address.
         /// </summary>
-        public static string UsernameOrEmailValidatorEmpty {
+        internal static string UsernameOrEmailValidatorEmpty {
             get {
                 return ResourceManager.GetString("UsernameOrEmailValidatorEmpty", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace GitHub {
         /// <summary>
         ///   Looks up a localized string similar to Username or email address must not have spaces.
         /// </summary>
-        public static string UsernameOrEmailValidatorSpaces {
+        internal static string UsernameOrEmailValidatorSpaces {
             get {
                 return ResourceManager.GetString("UsernameOrEmailValidatorSpaces", resourceCulture);
             }

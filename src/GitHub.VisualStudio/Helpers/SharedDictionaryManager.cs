@@ -24,12 +24,16 @@ namespace GitHub.VisualStudio.Helpers
             "GitHub.UI",
             "GitHub.UI.Reactive",
             "GitHub.VisualStudio",
-            "System.Windows.Interactivity"
+            "GitHub.TeamFoundation.14",
+            "GitHub.TeamFoundation.15"
         };
 
+        static int VSVersion;
         static SharedDictionaryManager()
         {
             AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
+            var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.FullName.StartsWith("Microsoft.TeamFoundation", StringComparison.Ordinal));
+            VSVersion = asm?.GetName().Version.Major ?? 14;
         }
 
         public SharedDictionaryManager()
@@ -45,6 +49,8 @@ namespace GitHub.VisualStudio.Helpers
                 var name = new AssemblyName(e.Name);
                 if (!ourAssemblies.Contains(name.Name))
                     return null;
+                //if (name.Name.Equals("GitHub.TeamFoundation", StringComparison.Ordinal))
+                //    name = new AssemblyName("GitHub.TeamFoundation." + VSVersion);
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var filename = Path.Combine(path, name.Name + ".dll");
                 if (!File.Exists(filename))

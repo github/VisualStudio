@@ -22,7 +22,7 @@ namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GitHubPaneViewModel : TeamExplorerSectionBase, IGitHubPaneViewModel
+    public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
         CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
@@ -34,12 +34,14 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IRepositoryHosts hosts;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly SynchronizationContext syncContext;
+        readonly IConnectionManager connectionManager;
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ITeamExplorerServiceHolder holder, IConnectionManager cm,
             IRepositoryHosts hosts)
-            : base(holder, cm)
+            : base(holder)
         {
+            this.connectionManager = cm;
             this.hosts = hosts;
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
@@ -123,6 +125,14 @@ namespace GitHub.VisualStudio.UI.Views
 
             var connection = await connectionManager.LookupConnection(ActiveRepo);
             uiController.Start(connection);
+        }
+
+        string title;
+        [AllowNull]
+        public string Title
+        {
+            get { return title; }
+            set { title = value; this.RaisePropertyChange(); }
         }
 
         IView control;

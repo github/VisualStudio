@@ -231,7 +231,7 @@ public class UIControllerTests
                                 {
                                     Assert.Equal(1, list.Count);
                                     Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
-                                    ((IUIProvider)provider).Received().AddService(connection);
+                                    ((IUIProvider)provider).Received().AddService(uiController, connection);
                                 });
                 uiController.Start(null);
             }

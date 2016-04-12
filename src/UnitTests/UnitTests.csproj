@@ -10,10 +10,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UnitTests</RootNamespace>
     <AssemblyName>UnitTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,6 +34,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.TeamFoundation.Client">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Common">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Controls">
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Client">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Controls">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Provider, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
+    </Reference>
     <Reference Include="EntryExitDecoratorInterfaces, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EntryExitDecorator.Fody.0.3.0\lib\net45\EntryExitDecoratorInterfaces.dll</HintPath>
       <Private>True</Private>
@@ -40,17 +65,6 @@
     <Reference Include="Microsoft.Reactive.Testing, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-Testing.2.2.5-custom\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Controls, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Git.Controls, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.TeamFoundation.Git.Provider">
-      <HintPath>..\..\lib\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -155,7 +169,7 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
     <Compile Include="GitHub.Exports\GitServiceTests.cs" />
-    <Compile Include="GitHub.Exports\VSServicesTests.cs" />
+    <None Include="GitHub.Exports\VSServicesTests.cs" />
     <Compile Include="GitHub.Exports\SimpleRepositoryModelTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
@@ -249,6 +263,10 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
+      <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
+      <Name>GitHub.TeamFoundation.14</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}</Project>
       <Name>GitHub.UI.Reactive</Name>
@@ -257,12 +275,17 @@
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
+      <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
+      <Name>GitHub.VisualStudio.UI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
       <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
       <Name>GitHub.VisualStudio</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

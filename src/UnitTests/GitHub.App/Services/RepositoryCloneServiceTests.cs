@@ -1,10 +1,6 @@
-﻿using System;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Services;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using NSubstitute;
-using Rothko;
 using Xunit;
 using UnitTests;
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;

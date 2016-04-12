@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
+using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Models;
