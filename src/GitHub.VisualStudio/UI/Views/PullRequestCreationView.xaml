@@ -424,54 +424,6 @@
                                         <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
-
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
-                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
-                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
-                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
-                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
-                                    </Grid>
-                                </ListBoxItem>
                             </ListBox>
                         </Grid>
                     </Border>
@@ -488,18 +440,139 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <i:Interaction.Behaviors>
-                        <ui:DropDownActionLinkBehaviour />
-                    </i:Interaction.Behaviors>
+                <ui:GitHubActionLink x:Name="assigneePopupButton" Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left" Click="assigneePopupButton_Click" />
 
-                    <ui:GitHubActionLink.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Haacked" />
-                            <MenuItem Header="NotHaacked" />
-                        </ContextMenu>
-                    </ui:GitHubActionLink.ContextMenu>
-                </ui:GitHubActionLink>
+                <Popup
+                    x:Name="assigneePopup"
+                    AllowsTransparency="True"
+                    StaysOpen="False"
+                    PlacementTarget="{Binding ElementName=assigneePopupButton}"
+                    Placement="Bottom">
+                    <Border Margin="10" BorderThickness="1" BorderBrush="#FF959595">
+                        <Border.Effect>
+                            <DropShadowEffect Direction="315" ShadowDepth="5" BlurRadius="5" Opacity="0.25" />
+                        </Border.Effect>
+
+                        <Grid
+                            MinWidth="150"
+                            MaxWidth="300"
+                            Background="#FFF6F6F6">
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ui:FilterTextBox
+                                x:Name="filterAssignee"
+                                Grid.Row="0"
+                                BorderBrush="#FFCCCEDC"
+                                Margin="5"
+                                Height="25"
+                                PromptText="Filter people" />
+                            <Separator Grid.Row="1" Margin="0" BorderBrush="#FFD7D9E3" />
+
+                            <ListBox 
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                BorderThickness="0"
+                                Background="Transparent" Grid.Row="2" MaxHeight="100">
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image
+                                            VerticalAlignment="Top"
+                                            Grid.Column="0"
+                                            Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Phil Haack</TextBlock>
+                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image
+                                            VerticalAlignment="Top"
+                                            Grid.Column="0"
+                                            Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
+                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image
+                                            VerticalAlignment="Top"
+                                            Grid.Column="0"
+                                            Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Brendan Forster</TextBlock>
+                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image
+                                            VerticalAlignment="Top"
+                                            Grid.Column="0"
+                                            Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Jasmine Greenaway</TextBlock>
+                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Image
+                                            VerticalAlignment="Top"
+                                            Grid.Column="0"
+                                            Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
+                                    </Grid>
+                                </ListBoxItem>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Popup>
 
                 <ui:GitHubActionLink Grid.Column="2" Content="Clear assignee" HorizontalAlignment="Right"  VerticalAlignment="Center" />
             </Grid>
