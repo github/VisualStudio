@@ -23,5 +23,10 @@ namespace GitHub.VisualStudio.UI.Views
             {
             });
         }
+
+        private void branchSelectionButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            branchPopup.IsOpen = true;
+        }
     }
 }

@@ -381,17 +381,101 @@
                 <TextBlock VerticalAlignment="Center" Text="From" Foreground="{DynamicResource GitHubVsGrayText}" />
                 <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
                 <TextBlock VerticalAlignment="Center" Text="into" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <ui:GitHubActionLink Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center">
-                    <i:Interaction.Behaviors>
-                        <ui:DropDownActionLinkBehaviour />
-                    </i:Interaction.Behaviors>
-                    <ui:GitHubActionLink.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="master" />
-                            <MenuItem Header="not-master" />
-                        </ContextMenu>
-                    </ui:GitHubActionLink.ContextMenu>
-                </ui:GitHubActionLink>
+                <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
+
+                <Popup
+                    x:Name="branchPopup"
+                    AllowsTransparency="True"
+                    StaysOpen="False"
+                    PlacementTarget="{Binding ElementName=branchSelectionButton}"
+                    Placement="Bottom">
+                    <Border Margin="10" BorderThickness="1" BorderBrush="#FF959595">
+                        <Border.Effect>
+                            <DropShadowEffect Direction="315" ShadowDepth="5" BlurRadius="5" Opacity="0.25" />
+                        </Border.Effect>
+
+                        <Grid Width="200"
+                            Background="#FFF6F6F6">
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ui:FilterTextBox
+                                x:Name="filterBranch"
+                                Grid.Row="0"
+                                BorderBrush="#FFCCCEDC"
+                                Margin="5"
+                                Height="25"
+                                PromptText="Filter branches" />
+                            <Separator Grid.Row="1" Margin="0" BorderBrush="#FFD7D9E3" />
+
+                            <ListBox BorderThickness="0" Background="Transparent" Grid.Row="2" MaxHeight="100">
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">master</TextBlock>
+                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
+                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
+                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
+                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">fix-everything</TextBlock>
+                                        <TextBlock Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right">Mar 1</TextBlock>
+                                    </Grid>
+                                </ListBoxItem>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Popup>
             </StackPanel>
 
             <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{StaticResource GitHubVsPromptTextBox}" />
@@ -400,11 +484,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <ui:GitHubActionLink Grid.Column="1" Content="{Binding SelectedAssignee}" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <ui:GitHubActionLink Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
                     </i:Interaction.Behaviors>
@@ -417,7 +501,7 @@
                     </ui:GitHubActionLink.ContextMenu>
                 </ui:GitHubActionLink>
 
-                <ui:GitHubActionLink Grid.Column="2" Content="Clear Assignee" VerticalAlignment="Center" />
+                <ui:GitHubActionLink Grid.Column="2" Content="Clear assignee" HorizontalAlignment="Right"  VerticalAlignment="Center" />
             </Grid>
 
             <Grid Margin="10,5,10,10" HorizontalAlignment="Stretch">
