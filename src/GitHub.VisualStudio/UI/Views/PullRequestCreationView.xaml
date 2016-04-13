@@ -45,6 +45,7 @@
             <Style x:Key="GitHubComboBoxContainer"
                    TargetType="{x:Type Grid}">
                 <Setter Property="Background" Value="#FFF6F6F6" />
+
                 <Style.Resources>
                     <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
                         <Setter Property="BorderBrush" Value="#FFD7D9E3" />
@@ -55,6 +56,17 @@
                         <Setter Property="BorderBrush" Value="#FFCCCEDC" />
                         <Setter Property="Margin" Value="5" />
                         <Setter Property="Height" Value="25" />
+                    </Style>
+
+                    <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource {x:Type ListBox}}">
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="MaxHeight" Value="100" />
+                    </Style>
+
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <Setter Property="Padding" Value="3" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
                 </Style.Resources>
             </Style>
@@ -434,8 +446,8 @@
                                 PromptText="Filter branches" />
                             <Separator Grid.Row="1" Margin="0" BorderBrush="#FFD7D9E3" />
 
-                            <ListBox BorderThickness="0" Background="Transparent" Grid.Row="2" MaxHeight="100">
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                            <ListBox Grid.Row="2">
+                                <ListBoxItem>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -446,7 +458,8 @@
                                         <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+
+                                <ListBoxItem>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
