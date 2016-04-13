@@ -49,7 +49,6 @@
                 <Style.Resources>
                     <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
                         <Setter Property="BorderBrush" Value="#FFD7D9E3" />
-                        <Setter Property="Margin" Value="5" />
                     </Style>
 
                     <Style TargetType="{x:Type ui:FilterTextBox}" BasedOn="{StaticResource {x:Type ui:FilterTextBox}}">
@@ -59,6 +58,7 @@
                     </Style>
 
                     <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource {x:Type ListBox}}">
+                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
                         <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="MaxHeight" Value="100" />
@@ -494,15 +494,10 @@
                     StaysOpen="False"
                     PlacementTarget="{Binding ElementName=assigneePopupButton}"
                     Placement="Bottom">
-                    <Border Margin="10" BorderThickness="1" BorderBrush="#FF959595">
-                        <Border.Effect>
-                            <DropShadowEffect Direction="315" ShadowDepth="5" BlurRadius="5" Opacity="0.25" />
-                        </Border.Effect>
-
-                        <Grid
+                    <Border Style="{DynamicResource GitHubComboBoxBorder}">
+                        <Grid Style="{DynamicResource GitHubComboBoxContainer}"
                             MinWidth="150"
-                            MaxWidth="300"
-                            Background="#FFF6F6F6">
+                            MaxWidth="300" >
                             
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
@@ -513,17 +508,11 @@
                             <ui:FilterTextBox
                                 x:Name="filterAssignee"
                                 Grid.Row="0"
-                                BorderBrush="#FFCCCEDC"
-                                Margin="5"
-                                Height="25"
                                 PromptText="Filter people" />
-                            <Separator Grid.Row="1" Margin="0" BorderBrush="#FFD7D9E3" />
+                            <Separator Grid.Row="1" />
 
-                            <ListBox 
-                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                BorderThickness="0"
-                                Background="Transparent" Grid.Row="2" MaxHeight="100">
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                            <ListBox Grid.Row="2">
+                                <ListBoxItem>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="16" />
@@ -542,7 +531,7 @@
                                     </Grid>
                                 </ListBoxItem>
 
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                <ListBoxItem>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="16" />
@@ -561,7 +550,7 @@
                                     </Grid>
                                 </ListBoxItem>
 
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                <ListBoxItem>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="16" />
@@ -580,7 +569,7 @@
                                     </Grid>
                                 </ListBoxItem>
 
-                                <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                <ListBoxItem>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="16" />
