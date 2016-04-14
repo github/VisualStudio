@@ -33,8 +33,14 @@ namespace GitHub.Primitives
         {
             var handler = CanExecuteChanged;
             handler?.Invoke(this, EventArgs.Empty);
-            execute(parameter);
-            handler?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                execute(parameter);
+            }
+            finally
+            {
+                handler?.Invoke(this, EventArgs.Empty);
+            }
         }
     }
 }
