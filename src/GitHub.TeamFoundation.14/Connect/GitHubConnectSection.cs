@@ -18,6 +18,7 @@ using NullGuard;
 using ReactiveUI;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -244,7 +245,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             teServices.ClearNotifications();
             teServices.ShowMessage(
                 msg,
-                new RelayCommand(null, o =>
+                new RelayCommand(o =>
                 {
                     var str = o.ToString();
                     /* the prefix is the action to perform:

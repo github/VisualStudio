@@ -5,11 +5,10 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows.Controls;
 using System.Windows.Input;
 using GitHub.Services;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -28,7 +27,7 @@ namespace GitHub.VisualStudio.UI.Views
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestListViewModel;
-            OpenPR = new RelayCommand(null, x =>
+            OpenPR = new RelayCommand(x =>
             {
                 var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
                 var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
@@ -38,7 +37,7 @@ namespace GitHub.VisualStudio.UI.Views
                 // Replace with this when we're ready to hook up the detail view
                 //NotifyOpen(x);
             });
-            CreatePR = new RelayCommand(null, x => NotifyCreate());
+            CreatePR = new RelayCommand(x => NotifyCreate());
 
             this.WhenActivated(d =>
             {
