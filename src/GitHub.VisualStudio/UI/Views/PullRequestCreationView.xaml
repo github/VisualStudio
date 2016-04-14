@@ -466,8 +466,7 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0">master</TextBlock>
-                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right" />
+                                        <TextBlock Grid.Column="0">not-master</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
                             </ListBox>
@@ -481,12 +480,19 @@
             <Grid Margin="10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <ui:GitHubActionLink x:Name="assigneePopupButton" Grid.Column="1" Content="Haacked" HasDropDown="True" VerticalAlignment="Center" HorizontalAlignment="Left" Click="assigneePopupButton_Click" />
+                <ui:GitHubActionLink
+                    x:Name="assigneePopupButton" 
+                    Grid.Column="1"
+                    Content="Haacked (Phil Haack)"
+                    HasDropDown="True"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Click="assigneePopupButton_Click" />
 
                 <Popup
                     x:Name="assigneePopup"
@@ -546,7 +552,6 @@
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
                                         <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
                                         <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
-                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
 
@@ -565,7 +570,6 @@
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
                                         <TextBlock Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
                                         <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Brendan Forster</TextBlock>
-                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
 
@@ -584,7 +588,6 @@
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
                                         <TextBlock Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
                                         <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Jasmine Greenaway</TextBlock>
-                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
 
