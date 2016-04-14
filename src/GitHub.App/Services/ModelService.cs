@@ -177,11 +177,26 @@ namespace GitHub.Services
         }
 
 
-        public IObservable<IReadOnlyList<IBranch>> GetBranches()
+        public IObservable<IReadOnlyList<IBranch>> GetBranches(ISimpleRepositoryModel repo)
         {
-            //Get the user
-            //get the selected repo
-            //get all the repos branches
+
+            var keyobs = GetUserFromCache()
+            .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
+
+            var col = new TrackingCollection<IBranch>();
+
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
+                        apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                                 .Select(BranchCacheItem.Create),
+                        item => col.RemoveItem(Create(item)),
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
+
             return null;
         }
 
@@ -247,6 +262,11 @@ namespace GitHub.Services
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
         {
             return new LicenseItem(licenseCacheItem.Key, licenseCacheItem.Name);
+        }
+
+        Models.Branch Create(BranchCacheItem branchCacheItem)
+        {
+            return new Models.Branch(branchCacheItem.Name);
         }
 
         Models.Account Create(AccountCacheItem accountCacheItem)
@@ -317,6 +337,16 @@ namespace GitHub.Services
             public string Name { get; set; }
         }
 
+        public class BranchCacheItem
+        {
+            public static BranchCacheItem Create(Octokit.Branch apiBranch)
+            {
+                return new BranchCacheItem { Name = apiBranch.Name };
+            }
+
+            public string Name { get; set; }
+        }
+
         public class RepositoryCacheItem
         {
             public static RepositoryCacheItem Create(Repository apiRepository)
@@ -382,4 +412,6 @@ namespace GitHub.Services
             public bool IsOpen { get; set; }
         }
     }
+   
 }
+

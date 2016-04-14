@@ -205,5 +205,10 @@ namespace GitHub.Api
                     SortDirection = SortDirection.Descending
                 });
         }
+
+        public IObservable<Branch> GetBranchesForRepository(string owner, string name)
+        {
+            return gitHubClient.Repository.GetAllBranches(owner, name);
+        }
     }
 }
