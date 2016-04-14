@@ -467,6 +467,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0">not-master</TextBlock>
+                                        <TextBlock Grid.Column="1" Opacity="0.3" HorizontalAlignment="Right">March 1</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
                             </ListBox>
