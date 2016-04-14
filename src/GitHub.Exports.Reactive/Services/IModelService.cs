@@ -23,6 +23,6 @@ namespace GitHub.Services
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection = null);
         IObservable<Unit> InvalidateAll();
-        IObservable<IReadOnlyList<IBranch>> GetBranches();
+        IObservable<IReadOnlyList<IBranch>> GetBranches(ISimpleRepositoryModel repo);
     }
 }
