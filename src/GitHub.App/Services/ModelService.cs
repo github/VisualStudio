@@ -169,31 +169,6 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
-
-        public IObservable<IReadOnlyList<IBranch>> GetBranches(ISimpleRepositoryModel repo)
-        {
-
-            var keyobs = GetUserFromCache()
-            .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
-
-            var col = new TrackingCollection<IBranch>();
-
-            var source = Observable.Defer(() => keyobs
-                .SelectMany(key =>
-                    hostCache.GetAndFetchLatestFromIndex(key, () =>
-                        apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-                                 .Select(BranchCacheItem.Create),
-                        item => col.RemoveItem(Create(item)),
-                        TimeSpan.FromMinutes(5),
-                        TimeSpan.FromDays(1))
-                )
-                .Select(Create)
-            );
-
-            return null;
-        }
-
-
         IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
@@ -251,6 +226,30 @@ namespace GitHub.Services
                         return Observable.Return(new IRepositoryModel[] {});
                     });
         }
+
+        public IObservable<IReadOnlyList<IBranch>> GetBranches(ISimpleRepositoryModel repo)
+        {
+
+            //var keyobs = GetUserFromCache()
+            //.Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
+
+            //var col = new TrackingCollection<IBranch>();
+
+            //var source = Observable.Defer(() => keyobs
+            //    .SelectMany(key =>
+            //        hostCache.GetAndFetchLatestFromIndex(key, () =>
+            //            apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+            //                     .Select(BranchCacheItem.Create),
+            //            item => col.RemoveItem(Create(item)),
+            //            TimeSpan.FromMinutes(5),
+            //            TimeSpan.FromDays(1))
+            //    )
+            //    .Select(Create)
+            //);
+
+            return Observable.Empty<IReadOnlyList<IBranch>>();
+        }
+
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
         {

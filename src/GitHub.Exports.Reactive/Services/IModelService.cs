@@ -22,6 +22,6 @@ namespace GitHub.Services
         IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
-        IObservable<IReadOnlyList<IBranch>> GetBranches();
+        IObservable<IReadOnlyList<IBranch>> GetBranches(ISimpleRepositoryModel repo);
     }
 }
