@@ -17,7 +17,25 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
+        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
+        {
+
+        }
+
        public IReadOnlyList<IBranch> Branches { get; }
 
+        public IBranch CurrentBranch { get; private set; }
+
+        public IAccount SelectedAssignee {get; private set;}
+
+        public IBranch TargetBranch { get; private set; }
+
+        public IReadOnlyList<IAccount> Users
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
