@@ -17,13 +17,13 @@ namespace GitHub.SampleData
             //TODO:Make String into an IBranch
             Branches = new ReactiveList<IBranch>
             {
-               new Branch {Name = "don/stub-ui"},
-               new Branch {Name = "feature/pr/views"},
-               new Branch {Name = "release-1.0.17.0"}
+               new Branch { Name = "don/stub-ui" },
+               new Branch { Name = "feature/pr/views" },
+               new Branch { Name = "release-1.0.17.0" }
             };
 
            
-            CurrentBranch = new Branch {Name = "fix-everything" };
+            CurrentBranch = new Branch { Name = "fix-everything" };
 
             SelectedAssignee = new AccountDesigner { Login = "Haacked (Phil Haack)" }; //IAcct
 
@@ -32,13 +32,13 @@ namespace GitHub.SampleData
             //IAcct
             Users = new ReactiveList<IAccount>
             {
-                new AccountDesigner {Login = "Haacked (Phil Haack)" },
-                new AccountDesigner {Login = "shana(Andreia Gaita)" }            
+                new AccountDesigner { Login = "Haacked (Phil Haack)" },
+                new AccountDesigner { Login = "shana(Andreia Gaita)" }            
             };
         }
 
 
-        public IReadOnlyList<IBranch> Branches
+        public IReactiveList<IBranch> Branches
         {
             get;
             private set;

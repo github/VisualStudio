@@ -249,9 +249,9 @@ namespace GitHub.Services
 
             return Observable.Return(new ReactiveUI.ReactiveList<IBranch>
             {
-               new Models.Branch {Name = "don/stub-ui"},
-               new Models.Branch {Name = "feature/pr/views"},
-               new Models.Branch {Name = "release-1.0.17.0"}
+               new Models.Branch { Name = "don/stub-ui" },
+               new Models.Branch { Name = "feature/pr/views" },
+               new Models.Branch { Name = "release-1.0.17.0" }
             });
 
         }
