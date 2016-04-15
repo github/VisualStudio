@@ -1,11 +1,15 @@
 ﻿using GitHub.Exports;
 using GitHub.Models;
+using GitHub.Services;
+using NLog;
 using NullGuard;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,12 +21,27 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        readonly IReactiveCommand<IReadOnlyList<IBranch>> loadBranchesCommand;
+        readonly ObservableAsPropertyHelper<bool> isLoading;
+        private bool IsLoading;
+
+
+
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
         {
-
+            Branches = new ReactiveList<IBranch>();
+            loadBranchesCommand = ReactiveCommand.CreateAsyncObservable(loadBranches);
+            isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
+                .CombineLatest(loadBranchesCommand.IsExecuting, (failed, loading) => !failed && loading)
+                .ToProperty(this, x => x.IsLoading);
+            loadBranchesCommand.Subscribe(Branches.AddRange);
+           
         }
 
-       public IReadOnlyList<IBranch> Branches { get; }
+        IReadOnlyList<IRepositoryModel> branches;
+
+        public IReactiveList<IBranch> Branches { get; }
 
         public IBranch CurrentBranch { get; private set; }
 
@@ -37,5 +56,27 @@ namespace GitHub.ViewModels
                 throw new NotImplementedException();
             }
         }
+
+        public bool LoadingFailed
+        {
+            get { return loadingFailed; }
+            private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
+        }
+
+        readonly IBranch repositoryHost;
+        private bool loadingFailed;
+
+        IObservable<IReadOnlyList<IBranch>> loadBranches(ISimpleRepositoryModel repository)
+        {
+            //TODO:Need a Branch host, like RepositoryHost?
+            return new ModelService.GetBranches(repository)
+                .Catch<IReadOnlyList<IBranch>, Exception>(ex =>
+                {
+                    log.Error("Error while loading repositories", ex);
+                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
+                        .Select(_ => new IBranch[] { });
+                });
+        }
+
     }
 }
