@@ -48,10 +48,7 @@
 
                 <Style.Resources>
                     <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
-                        <!--
-                        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
-                        -->
-                        <Setter Property="Background" Value="Red" />
+                        <Setter Property="Background" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
                         <Setter Property="Margin" Value="0" />
                     </Style>
 
@@ -459,7 +456,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0">master</TextBlock>
-                                        <ui:OcticonImage Icon="check" Grid.Column="1" HorizontalAlignment="Right" />
+                                        <ui:OcticonImage Icon="check" Grid.Column="1" HorizontalAlignment="Right" Opacity="0.3" />
                                     </Grid>
                                 </ListBoxItem>
 
@@ -538,7 +535,7 @@
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
                                         <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
                                         <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Phil Haack</TextBlock>
-                                        <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" />
+                                        <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" Opacity="0.3" />
                                     </Grid>
                                 </ListBoxItem>
 
