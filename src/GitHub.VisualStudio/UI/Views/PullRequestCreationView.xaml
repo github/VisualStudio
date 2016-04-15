@@ -47,6 +47,10 @@
                 <Setter Property="Background" Value="{DynamicResource GitHubVsComboBoxPopupBackgroundBegin}" />
 
                 <Style.Resources>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+                    </Style>
+                    
                     <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
                         <Setter Property="Background" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
                         <Setter Property="Margin" Value="0" />
@@ -533,8 +537,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Phil Haack</TextBlock>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Phil Haack</TextBlock>
                                         <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" Opacity="0.3" />
                                     </Grid>
                                 </ListBoxItem>
@@ -552,8 +556,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
 
@@ -570,8 +574,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Brendan Forster</TextBlock>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Brendan Forster</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
 
@@ -588,8 +592,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Jasmine Greenaway</TextBlock>
+                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
+                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Jasmine Greenaway</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
 
