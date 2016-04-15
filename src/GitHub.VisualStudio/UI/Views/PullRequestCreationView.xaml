@@ -34,7 +34,7 @@
             <Style x:Key="GitHubComboBoxBorder" TargetType="{x:Type Border}">
                 <Setter Property="Margin" Value="10" />
                 <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="BorderBrush" Value="#FF959595" />
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
                 <Setter Property="Effect">
                     <Setter.Value>
                         <DropShadowEffect Direction="315" ShadowDepth="5" BlurRadius="5" Opacity="0.25" />
@@ -44,15 +44,19 @@
 
             <Style x:Key="GitHubComboBoxContainer"
                    TargetType="{x:Type Grid}">
-                <Setter Property="Background" Value="#FFF6F6F6" />
+                <Setter Property="Background" Value="{DynamicResource GitHubVsComboBoxPopupBackgroundBegin}" />
 
                 <Style.Resources>
                     <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
-                        <Setter Property="BorderBrush" Value="#FFD7D9E3" />
+                        <!--
+                        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
+                        -->
+                        <Setter Property="Background" Value="Red" />
+                        <Setter Property="Margin" Value="0" />
                     </Style>
 
                     <Style TargetType="{x:Type ui:FilterTextBox}" BasedOn="{StaticResource {x:Type ui:FilterTextBox}}">
-                        <Setter Property="BorderBrush" Value="#FFCCCEDC" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
                         <Setter Property="Margin" Value="5" />
                         <Setter Property="Height" Value="25" />
                     </Style>
@@ -444,7 +448,7 @@
                                 x:Name="filterBranch"
                                 Grid.Row="0"
                                 PromptText="Filter branches" />
-                            <Separator Grid.Row="1" Margin="0" BorderBrush="#FFD7D9E3" />
+                            <Separator Grid.Row="1" Margin="0" />
 
                             <ListBox Grid.Row="2">
                                 <ListBoxItem>
@@ -455,7 +459,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0">master</TextBlock>
-                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="1" HorizontalAlignment="Right" />
+                                        <ui:OcticonImage Icon="check" Grid.Column="1" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
 
@@ -504,7 +508,7 @@
                     <Border Style="{DynamicResource GitHubComboBoxBorder}">
                         <Grid Style="{DynamicResource GitHubComboBoxContainer}"
                             MinWidth="150"
-                            MaxWidth="300" >
+                            MaxWidth="300">
                             
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
@@ -532,9 +536,9 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
-                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Phil Haack</TextBlock>
-                                        <ui:OcticonImage Icon="check" Opacity="0.3" Grid.Column="3" HorizontalAlignment="Right" />
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Phil Haack</TextBlock>
+                                        <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" />
                                     </Grid>
                                 </ListBoxItem>
 
@@ -551,8 +555,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
-                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
 
@@ -569,8 +573,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
-                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Brendan Forster</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Brendan Forster</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
 
@@ -587,8 +591,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
-                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Jasmine Greenaway</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Jasmine Greenaway</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
 
@@ -604,8 +608,8 @@
                                             VerticalAlignment="Top"
                                             Grid.Column="0"
                                             Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                        <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
-                                        <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Grid.Column="2" Margin="5,0,0,0" Opacity="0.5">Andreia Gaita</TextBlock>
                                     </Grid>
                                 </ListBoxItem>
                             </ListBox>
