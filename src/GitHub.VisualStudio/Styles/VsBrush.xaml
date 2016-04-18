@@ -12,6 +12,6 @@
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="{DynamicResource VsColor.WindowText}" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="{DynamicResource VsColor.BrandedUIBorder}" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="{DynamicResource VsColor.BrandedUIBackground}" />
-  <SolidColorBrush x:Key="GitHubVsComboBoxPopupBackgroundBegin" Color="{DynamicResource VsColor.ComboBoxPopupBackgroundBegin}" />
   <SolidColorBrush x:Key="GitHubVsComboBoxPopupBorder" Color="{DynamicResource VsColor.ComboBoxPopupBorder}" />
+  <SolidColorBrush x:Key="GitHubVsMenu" Color="{DynamicResource VsColor.Menu}" />
 </ResourceDictionary>
