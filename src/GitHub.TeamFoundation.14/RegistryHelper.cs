@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.VisualStudio;
 using Microsoft.Win32;
+using System.IO;
 
 namespace GitHub.TeamFoundation
 {
@@ -30,7 +31,7 @@ namespace GitHub.TeamFoundation
                         try
                         {
                             var path = subkey?.GetValue("Path") as string;
-                            if (path != null)
+                            if (path != null && Directory.Exists(path))
                                 return new SimpleRepositoryModel(path);
                         }
                         catch (Exception)
