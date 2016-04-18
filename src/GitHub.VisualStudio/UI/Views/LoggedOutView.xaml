@@ -1,0 +1,34 @@
+﻿<local:GenericLoggedOutView x:Class="GitHub.VisualStudio.UI.Views.LoggedOutView"
+                            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                            xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                            xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
+                            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                            xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                            DataContext="{Binding ViewModel}"
+                            d:DesignHeight="300"
+                            d:DesignWidth="300"
+                            mc:Ignorable="d">
+  <d:DesignProperties.DataContext>
+    <Binding>
+      <Binding.Source>
+        <sampleData:LoggedOutViewModelDesigner />
+      </Binding.Source>
+    </Binding>
+  </d:DesignProperties.DataContext>
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <DockPanel>
+    <Label Content="Logged Out" />
+  </DockPanel>
+</local:GenericLoggedOutView>

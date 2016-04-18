@@ -23,6 +23,7 @@ namespace GitHub.Exports
         PRCreation,
         End = 100,
         GitHubPane,
+        LoggedOut
     }
 
     public enum MenuType

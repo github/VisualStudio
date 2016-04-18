@@ -259,7 +259,11 @@
     <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\LoggedOutViewModel.cs" />
     <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
+    <Compile Include="UI\Views\LoggedOutView.xaml.cs">
+      <DependentUpon>LoggedOutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\PullRequestCreationView.xaml.cs">
       <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
     </Compile>
@@ -421,6 +425,10 @@
       </SubType>
     </Page>
     <Page Include="UI\Views\GitHubPaneView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\LoggedOutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
