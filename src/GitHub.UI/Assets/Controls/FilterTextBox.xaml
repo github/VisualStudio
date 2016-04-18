@@ -63,7 +63,7 @@
                                  VerticalAlignment="Top">
                                 <TextBlock 
                                     Text="{TemplateBinding PromptText}" 
-                                    Opacity="0.3"
+                                    Opacity="0.5"
                                     TextTrimming="CharacterEllipsis" />
                             </Label>
                         </Grid>
