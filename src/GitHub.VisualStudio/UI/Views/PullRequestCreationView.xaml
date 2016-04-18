@@ -42,8 +42,7 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="GitHubComboBoxContainer"
-                   TargetType="{x:Type Grid}">
+            <Style x:Key="GitHubComboBoxContainer" TargetType="{x:Type Grid}">
                 <Setter Property="Background" Value="{DynamicResource GitHubVsComboBoxPopupBackgroundBegin}" />
 
                 <Style.Resources>
@@ -453,6 +452,7 @@
                             <ui:FilterTextBox
                                 x:Name="filterBranch"
                                 Grid.Row="0"
+                                Foreground="{DynamicResource GitHubVsWindowText}"
                                 PromptText="Filter branches" />
                             <Separator Grid.Row="1" Margin="0" />
 
