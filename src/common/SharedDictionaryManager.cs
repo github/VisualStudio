@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.Helpers
             "GitHub.UI",
             "GitHub.UI.Reactive",
             "GitHub.VisualStudio",
-            "GitHub.TeamFoundation",
+            "System.Windows.Interactivity",
             "GitHub.TeamFoundation.14",
             "GitHub.TeamFoundation.15",
             "GitHub.VisualStudio.UI"
