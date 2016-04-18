@@ -61,11 +61,6 @@
                                  IsHitTestVisible="False"
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Top">
-                                <Label.Style>
-                                    <Style TargetType="{x:Type Label}">
-                                        <Setter Property="Foreground" Value="{DynamicResource GitHubForegroundBrush}" />
-                                    </Style>
-                                </Label.Style>
                                 <TextBlock 
                                     Text="{TemplateBinding PromptText}" 
                                     Opacity="0.3"
