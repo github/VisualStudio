@@ -251,25 +251,43 @@ namespace GitHub.Controllers
                 // clear all the views and viewmodels created by a subflow
                 .OnExit(() =>
                 {
-                    var list = GetObjectsForFlow(activeFlow);
-                    foreach (var i in list.Values)
-                        i.Dispose();
-                    list.Clear();
+                    // it's important to have the stopping flag set before we do this
+                    if (activeFlow == mainFlow)
+                    {
+                        completion?.OnNext(Success.Value);
+                        completion?.OnCompleted();
+                    }
 
-                    var loggedIn = connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
-                    activeFlow = loggedIn ? mainFlow : UIControllerFlow.Authentication;
+                    DisposeFlow(activeFlow);
+
+                    if (activeFlow == mainFlow)
+                    {
+                        uiProvider.RemoveService(typeof(IConnection), this);
+                        transition.OnCompleted();
+                    }
+                    else
+                        activeFlow = stopping || LoggedIn ? mainFlow : UIControllerFlow.Authentication;
                 })
                 .PermitDynamic(Trigger.Next, () =>
+                {
+                    // sets the state to None for the current flow
+                    var state = Go(Trigger.Next);
+
+                    if (activeFlow != mainFlow)
                     {
-                        var state = Go(Trigger.Next);
-                        if (activeFlow != mainFlow)
+                        if (stopping)
                         {
-                            var loggedIn = connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
-                            state = Go(Trigger.Next, loggedIn ? mainFlow : UIControllerFlow.Authentication);
+                            // triggering the End state again so that it can clear up the main flow and really end
+                            state = Go(Trigger.Finish, mainFlow);
                         }
-                        return state;
+                        else
+                        {
+                            // sets the state to the first UI of the main flow or the auth flow, depending on whether you're logged in
+                            state = Go(Trigger.Next, LoggedIn ? mainFlow : UIControllerFlow.Authentication);
+                        }
                     }
-                )
+                    return state;
+                })
                 .Permit(Trigger.Finish, UIViewType.None);
         }
 
@@ -390,42 +408,63 @@ namespace GitHub.Controllers
             return completion;
         }
 
+        /// <summary>
+        /// End state for a flow has been called. Clear handlers related to that flow
+        /// and call completion handlers if this means the controller is being stopped.
+        /// Handlers registered via `ListenToCompletionState` might need to access the
+        /// view/viewmodel objects, so those can only be disposed when we're leaving
+        /// the End state, not here.
+        /// </summary>
+        /// <param name="success"></param>
         void End(bool success)
         {
-            var list = GetObjectsForFlow(activeFlow);
+            if (!Success.HasValue)
+                Success = success;
+
+            ShutdownFlow(activeFlow);
+
+            // if the auth was cancelled, we need to stop everything, otherwise we'll go into a loop
+            if (activeFlow == mainFlow || (activeFlow == UIControllerFlow.Authentication && !Success.Value))
+                stopping = true;
+
+            Fire(Trigger.Next);
+        }
+
+        void ShutdownFlow(UIControllerFlow flow)
+        {
+            var list = GetObjectsForFlow(flow);
             foreach (var i in list.Values)
                 i.ClearHandlers();
+        }
 
-            if (activeFlow == mainFlow)
-            {
-            	uiProvider.RemoveService(typeof(IConnection), this);
-                completion?.OnNext(success);
-                completion?.OnCompleted();
-                transition.OnCompleted();
-            }
-            // if we're stopping the controller and the active flow wasn't the main one
-            // we need to stop the main flow
-            else if (stopping)
-                Fire(Trigger.Finish);
-            else
-                Fire(Trigger.Next);
-
+        void DisposeFlow(UIControllerFlow flow)
+        {
+            var list = GetObjectsForFlow(flow);
+            foreach (var i in list.Values)
+                i.Dispose();
+            list.Clear();
         }
 
         public void Stop()
         {
-            Debug.WriteLine("Stopping {0} ({1})", activeFlow, GetHashCode());
+            Debug.WriteLine("Stopping {0} ({1})", activeFlow + (activeFlow != mainFlow ? " and " + mainFlow : ""), GetHashCode());
             stopping = true;
             Fire(Trigger.Finish);
         }
 
         void RunView(UIViewType viewType, object arg = null)
         {
-            var view = CreateViewAndViewModel(viewType);
+            bool firstTime = CreateViewAndViewModel(viewType);
+            var view = GetObjectsForFlow(activeFlow)[viewType].View;
             transition.OnNext(view);
 
             // controller might have been stopped in the OnNext above
             if (IsStopped)
+                return;
+
+            // if it's not the first time we've shown this view, no need
+            // to set it up
+            if (!firstTime)
                 return;
 
             SetupView(viewType, view, arg);
@@ -435,7 +474,12 @@ namespace GitHub.Controllers
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
+
             pair.ViewModel.Initialize(arg);
+
+            // 2FA is set up when login is set up, so nothing to do
+            if (viewType == UIViewType.TwoFactor)
+                return;
 
             // we're setting up the login dialog, we need to setup the 2fa as
             // well to continue the flow if it's needed, since the
@@ -444,19 +488,20 @@ namespace GitHub.Controllers
             if (viewType == UIViewType.Login)
             {
                 var pair2fa = list[UIViewType.TwoFactor];
-                var twofa = pair2fa.ViewModel;
-                pair2fa.AddHandler(twofa.WhenAny(x => x.IsShowing, x => x.Value)
+                pair2fa.AddHandler(pair2fa.ViewModel.WhenAny(x => x.IsShowing, x => x.Value)
                     .Where(x => x)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next)));
+
+                pair2fa.AddHandler(pair2fa.View.Cancel
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
 
                 pair.AddHandler(view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Finish)));
             }
-
-            // the 2fa dialog is special, it's setup when the login view is setup (see above)
-            else if (viewType != UIViewType.TwoFactor)
+            else
             {
                 pair.AddHandler(view.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -474,12 +519,19 @@ namespace GitHub.Controllers
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => Fire(Trigger.Detail, x)));
             }
+
             pair.AddHandler(view.Cancel
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
         }
 
-        IView CreateViewAndViewModel(UIViewType viewType)
+        /// <summary>
+        /// Creates View/ViewModel instances for the specified <paramref name="viewType"/> if they
+        /// haven't been created yet in the current flow
+        /// </summary>
+        /// <param name="viewType"></param>
+        /// <returns>true if the View/ViewModel didn't exist and had to be created</returns>
+        bool CreateViewAndViewModel(UIViewType viewType)
         {
             var list = GetObjectsForFlow(activeFlow);
             if (viewType == UIViewType.Login)
@@ -505,9 +557,10 @@ namespace GitHub.Controllers
                 var d = new UIPair(viewType, factory.GetView(viewType), factory.GetViewModel(viewType));
                 d.View.ViewModel = d.ViewModel;
                 list.Add(viewType, d);
+                return true;
             }
 
-            return list[viewType].View;
+            return false;
         }
 
 
@@ -594,8 +647,8 @@ namespace GitHub.Controllers
                                     if (e.Action == NotifyCollectionChangedAction.Add)
                                     {
                                         connection = e.NewItems[0] as IConnection;
-										if (connection != null)
-	                                        uiProvider.AddService(typeof(IConnection), this, connection);
+                                        if (connection != null)
+                                            uiProvider.AddService(typeof(IConnection), this, connection);
                                     }
                                 };
                                 connectionManager.Connections.CollectionChanged += connectionAdded;
@@ -644,6 +697,8 @@ namespace GitHub.Controllers
 
         public bool IsStopped => uiStateMachine.IsInState(UIViewType.None) || stopping;
         public UIControllerFlow CurrentFlow => activeFlow;
+        bool LoggedIn => connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
+        bool? Success { get; set; }
 
         /// <summary>
         /// This class holds ExportLifetimeContexts (i.e., Lazy Disposable containers) for IView and IViewModel objects

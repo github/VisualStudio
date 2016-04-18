@@ -59,8 +59,7 @@ namespace GitHub.ViewModels
         public IPullRequestModel SelectedPullRequest
         {
             [return: AllowNull]
-            get
-            { return selectedPullRequest; }
+            get { return selectedPullRequest; }
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
         }
 
