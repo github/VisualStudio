@@ -51,7 +51,7 @@
                                 Margin="0"/>
                             <Label x:Name="PromptLabel"
                                  FontSize="{TemplateBinding FontSize}" 
-                                 Foreground="{DynamicResource GitHubForegroundBrush}"
+                                 Foreground="{TemplateBinding Foreground}"
                                  Margin="2,0,0,0" 
                                  Padding="{TemplateBinding Padding}"
                                  Opacity="0"
@@ -63,6 +63,7 @@
                                  VerticalAlignment="Top">
                                 <TextBlock 
                                     Text="{TemplateBinding PromptText}" 
+                                    Opacity="0.3"
                                     TextTrimming="CharacterEllipsis" />
                             </Label>
                         </Grid>
