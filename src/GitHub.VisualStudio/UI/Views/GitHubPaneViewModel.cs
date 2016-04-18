@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using GitHub.Api;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -17,6 +18,7 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using ReactiveUI;
+using GitHub.App.Factories;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -37,9 +39,9 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IConnectionManager connectionManager;
 
         [ImportingConstructor]
-        public GitHubPaneViewModel(ITeamExplorerServiceHolder holder, IConnectionManager cm,
-            IRepositoryHosts hosts)
-            : base(holder)
+        public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+            IConnectionManager cm, IRepositoryHosts hosts)
+            : base(apiFactory, holder)
         {
             this.connectionManager = cm;
             this.hosts = hosts;
@@ -51,13 +53,10 @@ namespace GitHub.VisualStudio.UI.Views
         {
             base.Initialize(serviceProvider);
 
-            var disp = ServiceProvider.GetExportedValue<IUIProvider>().GetService<IExportFactoryProvider>().UIControllerFactory.CreateExport();
-            disposables.Add(disp);
-            uiController = disp.Value;
-
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
-                (s, e) => {
-                    StartFlow(UIControllerFlow.PullRequests).Forget();
+                async (s, e) => {
+                    var connection = await connectionManager.LookupConnection(ActiveRepo);
+                    StartFlow(UIControllerFlow.PullRequests, connection);
                 });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
@@ -68,23 +67,40 @@ namespace GitHub.VisualStudio.UI.Views
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 (s, e) => { });
-
-            StartFlow(UIControllerFlow.PullRequests).Forget();
         }
 
         void IViewModel.Initialize([AllowNull] object data)
         {
         }
 
-        async Task StartFlow(UIControllerFlow controllerFlow)
+        protected async override void RepoChanged()
+        {
+            base.RepoChanged();
+
+            IsGitHubRepo = await IsAGitHubRepo();
+            if (!IsGitHubRepo)
+                return;
+                
+            var connection = await connectionManager.LookupConnection(ActiveRepo);
+            IsLoggedIn = await connection.IsLoggedIn(hosts);
+
+            if (IsLoggedIn)
+                StartFlow(UIControllerFlow.PullRequests, connection);
+            else
+            {
+                //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                //Control = c.View;
+            }
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn)
         {
             if (uiController != null)
-            {
-                windowController?.Close();
-                uiController.Stop();
-                disposables.Clear();
-                uiController = null;
-            }
+                Stop();
+
+            if (conn == null)
+                return;
 
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
@@ -123,8 +139,15 @@ namespace GitHub.VisualStudio.UI.Views
                     Control = c;
                 });
 
-            var connection = await connectionManager.LookupConnection(ActiveRepo);
-            uiController.Start(connection);
+            uiController.Start(conn);
+        }
+
+        void Stop()
+        {
+            windowController?.Close();
+            uiController.Stop();
+            disposables.Clear();
+            uiController = null;
         }
 
         string title;
@@ -141,6 +164,21 @@ namespace GitHub.VisualStudio.UI.Views
             [return: AllowNull] get { return control; }
             set { control = value; this.RaisePropertyChange(); }
         }
+
+        bool isLoggedIn;
+        public bool IsLoggedIn
+        {
+            get { return isLoggedIn; }
+            set { isLoggedIn = value;  this.RaisePropertyChange(); }
+        }
+
+        bool isGitHubRepo;
+        public bool IsGitHubRepo
+        {
+            get { return isGitHubRepo; }
+            set { isGitHubRepo = value; this.RaisePropertyChange(); }
+        }
+
 
         public ReactiveCommand<object> CancelCommand { get; private set; }
         public ICommand Cancel => CancelCommand;

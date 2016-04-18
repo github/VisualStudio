@@ -103,6 +103,7 @@ namespace GitHub.VisualStudio.Base
             if (uri == null)
                 return false;
 
+            Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
             SimpleApiClient = apiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
