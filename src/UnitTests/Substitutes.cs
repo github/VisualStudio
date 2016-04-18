@@ -1,4 +1,5 @@
-﻿using GitHub.Authentication;
+﻿using GitHub.App.Factories;
+using GitHub.Authentication;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -54,6 +55,7 @@ namespace UnitTests
         }
 
         public static IExportFactoryProvider ExportFactoryProvider { get { return Substitute.For<IExportFactoryProvider>(); } }
+        public static IUIFactory UIFactory { get { return Substitute.For<IUIFactory>(); } }
 
         public static IRepositoryCreationService RepositoryCreationService { get { return Substitute.For<IRepositoryCreationService>(); } }
         public static IRepositoryCloneService RepositoryCloneService { get { return Substitute.For<IRepositoryCloneService>(); } }
@@ -117,6 +119,7 @@ namespace UnitTests
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
             ret.GetService(typeof(IRepositoryHosts)).Returns(RepositoryHosts);
             ret.GetService(typeof(IExportFactoryProvider)).Returns(ExportFactoryProvider);
+            ret.GetService(typeof(IUIFactory)).Returns(UIFactory);
             ret.GetService(typeof(IConnection)).Returns(Connection);
             ret.GetService(typeof(IConnectionManager)).Returns(ConnectionManager);
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
@@ -162,6 +165,10 @@ namespace UnitTests
         public static IExportFactoryProvider GetExportFactoryProvider(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
+        }
+        public static IUIFactory GetUIFactory(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IUIFactory)) as IUIFactory;
         }
 
         public static IConnection GetConnection(this IServiceProvider provider)

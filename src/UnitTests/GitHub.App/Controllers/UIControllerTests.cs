@@ -15,6 +15,7 @@ using System.Reactive.Subjects;
 using GitHub.Primitives;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using GitHub.App.Factories;
 
 public class UIControllerTests
 {
@@ -25,7 +26,7 @@ public class UIControllerTests
         {
             var uiProvider = Substitute.For<IUIProvider>();
             var hosts = Substitute.For<IRepositoryHosts>();
-            var factory = Substitute.For<IExportFactoryProvider>();
+            var factory = Substitute.For<IUIFactory>();
             var cm = Substitutes.ConnectionManager;
             var uiController = new UIController(uiProvider, hosts, factory, cm);
 
@@ -69,7 +70,7 @@ public class UIControllerTests
             (obj as INotifyPropertyChanged).PropertyChanged += Raise.Event<PropertyChangedEventHandler>(new PropertyChangedEventArgs(prop));
         }
 
-        protected IExportFactoryProvider SetupFactory(IServiceProvider provider)
+        protected IUIFactory SetupFactory(IServiceProvider provider)
         {
             var factory = provider.GetExportFactoryProvider();
             SetupViewModel<ILoginControlViewModel>(factory, GitHub.Exports.UIViewType.Login);
@@ -90,7 +91,7 @@ public class UIControllerTests
             SetupView<IPullRequestDetailViewModel>(factory, GitHub.Exports.UIViewType.PRDetail);
             SetupView<IPullRequestCreationViewModel>(factory, GitHub.Exports.UIViewType.PRCreation);
 
-            return factory;
+            return new UIFactory(factory);
         }
 
         protected IConnection SetupConnection(IServiceProvider provider, IRepositoryHosts hosts,
@@ -304,16 +305,16 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-                            vm.Value.IsShowing.Returns(true);
-                            RaisePropertyChange(vm.Value, "IsShowing");
+                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                            vm.IsShowing.Returns(true);
+                            RaisePropertyChange(vm, "IsShowing");
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
                             // login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
                             // continue by triggering done on login view
-                            var v = factory.GetView(GitHub.Exports.UIViewType.Login).Value;
+                            var v = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
                             TriggerDone(v);
                             break;
                         case 3:
@@ -349,31 +350,31 @@ public class UIControllerTests
                     {
                         case 1: {
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-                            vm.Value.IsShowing.Returns(true);
-                            RaisePropertyChange(vm.Value, "IsShowing");
+                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                            vm.IsShowing.Returns(true);
+                            RaisePropertyChange(vm, "IsShowing");
                             break;
                         }
                         case 2: {
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-                            vm.Value.IsShowing.Returns(false);
-                            RaisePropertyChange(vm.Value, "IsShowing");
+                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                            vm.IsShowing.Returns(false);
+                            RaisePropertyChange(vm, "IsShowing");
                             TriggerCancel(uc);
                             break;
                         }
                         case 3: {
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-                            vm.Value.IsShowing.Returns(true);
-                            RaisePropertyChange(vm.Value, "IsShowing");
+                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                            vm.IsShowing.Returns(true);
+                            RaisePropertyChange(vm, "IsShowing");
                             break;
                         }
                         case 4: {
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
                             // login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-                            var v = factory.GetView(GitHub.Exports.UIViewType.Login).Value;
+                            var v = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
                             TriggerDone(v);
                             break;
                         }

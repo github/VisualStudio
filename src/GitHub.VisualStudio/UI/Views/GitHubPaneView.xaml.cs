@@ -1,11 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
-using System.Windows.Markup;
-using System.Windows.Controls;
 
 namespace GitHub.VisualStudio.UI.Views
 {

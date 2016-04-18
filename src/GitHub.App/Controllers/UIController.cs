@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 namespace GitHub.Controllers
 {
+    using App.Factories;
     using System.Globalization;
     using StateMachineType = StateMachine<UIViewType, UIController.Trigger>;
 
@@ -98,7 +99,7 @@ namespace GitHub.Controllers
             Finish
         }
 
-        readonly IExportFactoryProvider factory;
+        readonly IUIFactory factory;
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
@@ -109,7 +110,7 @@ namespace GitHub.Controllers
         // holds state machines for each of the individual ui flows
         // does not load UI, merely tracks valid transitions
         readonly Dictionary<UIControllerFlow, StateMachine<UIViewType, Trigger>> machines;
-        readonly Dictionary<UIControllerFlow, Dictionary<UIViewType, UIPair>> uiObjects;
+        readonly Dictionary<UIControllerFlow, Dictionary<UIViewType, IUIPair>> uiObjects;
 
         // loads UI for each state corresponding to a view type
         // queries the individual ui flow (stored in machines) for the next state
@@ -135,14 +136,14 @@ namespace GitHub.Controllers
         bool stopping;
 
         [ImportingConstructor]
-        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IExportFactoryProvider factory,
+        public UIController(IUIProvider uiProvider, IRepositoryHosts hosts, IUIFactory factory,
             IConnectionManager connectionManager)
         {
             this.factory = factory;
             this.uiProvider = uiProvider;
             this.hosts = hosts;
             this.connectionManager = connectionManager;
-            uiObjects = new Dictionary<UIControllerFlow, Dictionary<UIViewType, UIPair>>();
+            uiObjects = new Dictionary<UIControllerFlow, Dictionary<UIViewType, IUIPair>>();
 
 #if DEBUG
             if (Application.Current != null && !Splat.ModeDetector.InUnitTestRunner())
@@ -264,6 +265,7 @@ namespace GitHub.Controllers
                     {
                         uiProvider.RemoveService(typeof(IConnection), this);
                         transition.OnCompleted();
+                        Reset();
                     }
                     else
                         activeFlow = stopping || LoggedIn ? mainFlow : UIControllerFlow.Authentication;
@@ -447,6 +449,9 @@ namespace GitHub.Controllers
 
         public void Stop()
         {
+            if (stopping || transition == null)
+                return;
+
             Debug.WriteLine("Stopping {0} ({1})", activeFlow + (activeFlow != mainFlow ? " and " + mainFlow : ""), GetHashCode());
             stopping = true;
             Fire(Trigger.Finish);
@@ -538,7 +543,7 @@ namespace GitHub.Controllers
             {
                 if (!list.ContainsKey(viewType))
                 {
-                    var d = new UIPair(UIViewType.TwoFactor, factory.GetView(UIViewType.TwoFactor), factory.GetViewModel(UIViewType.TwoFactor));
+                    var d = factory.CreateViewAndViewModel(UIViewType.TwoFactor);
                     list.Add(UIViewType.TwoFactor, d);
                 }
             }
@@ -554,7 +559,7 @@ namespace GitHub.Controllers
 
             if (!list.ContainsKey(viewType))
             {
-                var d = new UIPair(viewType, factory.GetView(viewType), factory.GetViewModel(viewType));
+                var d = factory.CreateViewAndViewModel(viewType);
                 d.View.ViewModel = d.ViewModel;
                 list.Add(viewType, d);
                 return true;
@@ -567,12 +572,12 @@ namespace GitHub.Controllers
         /// <summary>
         /// Returns the view/viewmodel pair for a given flow
         /// </summary>
-        Dictionary<UIViewType, UIPair> GetObjectsForFlow(UIControllerFlow flow)
+        Dictionary<UIViewType, IUIPair> GetObjectsForFlow(UIControllerFlow flow)
         {
-            Dictionary<UIViewType, UIPair> list;
+            Dictionary<UIViewType, IUIPair> list;
             if (!uiObjects.TryGetValue(flow, out list))
             {
-                list = new Dictionary<UIViewType, UIPair>();
+                list = new Dictionary<UIViewType, IUIPair>();
                 uiObjects.Add(flow, list);
             }
             return list;
@@ -602,6 +607,23 @@ namespace GitHub.Controllers
             Debug.WriteLine("Firing {0} from {1} for flow {2} ({3})", trigger, m.State, flow, GetHashCode());
             m.Fire(trigger);
             return m.State;
+        }
+
+        void Reset()
+        {
+            if (connectionAdded != null)
+                connectionManager.Connections.CollectionChanged -= connectionAdded;
+            connectionAdded = null;
+            
+            var tr = transition;
+            var cmp = completion;
+            transition = null;
+            completion = null;
+            disposables.Clear();
+            tr?.Dispose();
+            cmp?.Dispose();
+            stopping = false;
+            connection = null;
         }
 
         IConnection connection;
@@ -699,69 +721,5 @@ namespace GitHub.Controllers
         public UIControllerFlow CurrentFlow => activeFlow;
         bool LoggedIn => connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
         bool? Success { get; set; }
-
-        /// <summary>
-        /// This class holds ExportLifetimeContexts (i.e., Lazy Disposable containers) for IView and IViewModel objects
-        /// A view type (login, clone, etc) is composed of a pair of view and viewmodel, which this class represents.
-        /// </summary>
-        class UIPair : IDisposable
-        {
-            ExportLifetimeContext<IView> view;
-            ExportLifetimeContext<IViewModel> viewModel;
-            CompositeDisposable handlers = new CompositeDisposable();
-            UIViewType viewType;
-
-            public UIViewType ViewType => viewType;
-            public IView View => view.Value;
-            public IViewModel ViewModel => viewModel?.Value;
-
-            /// <param name="type">The UIViewType</param>
-            /// <param name="v">The IView</param>
-            /// <param name="vm">The IViewModel. Might be null because the 2fa view shares the same viewmodel as the login dialog, so it's
-            /// set manually in the view outside of this</param>
-            public UIPair(UIViewType type, ExportLifetimeContext<IView> v, [AllowNull]ExportLifetimeContext<IViewModel> vm)
-            {
-                viewType = type;
-                view = v;
-                viewModel = vm;
-                handlers = new CompositeDisposable();
-            }
-
-            /// <summary>
-            /// Register disposable event handlers or observable subscriptions so they get cleared
-            /// when the View/Viewmodel get disposed/destroyed
-            /// </summary>
-            /// <param name="disposable"></param>
-            public void AddHandler(IDisposable disposable)
-            {
-                handlers.Add(disposable);
-            }
-
-            public void ClearHandlers()
-            {
-                handlers.Dispose();
-            }
-
-            bool disposed = false;
-            void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    if (disposed) return;
-                    if (!handlers.IsDisposed)
-                        handlers.Dispose();
-                    view?.Dispose();
-                    view = null;
-                    viewModel?.Dispose();
-                    viewModel = null;
-                    disposed = true;
-                }
-            }
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-        }
     }
 }
