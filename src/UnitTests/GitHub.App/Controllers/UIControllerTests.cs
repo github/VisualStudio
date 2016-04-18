@@ -469,7 +469,7 @@ public class UIControllerTests
     public class PublishFlow : UIControllerTestBase
     {
         [Fact]
-        public void Flow()
+        public void FlowWithConnection()
         {
             var provider = Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
@@ -477,9 +477,10 @@ public class UIControllerTests
             var cm = provider.GetConnectionManager();
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
+            var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
 
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+            cons.Add(connection);
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
@@ -491,6 +492,43 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
+                            ((IUIProvider)provider).Received().AddService(uiController, connection);
+                            TriggerDone(uc);
+                            break;
+                    }
+                });
+
+                uiController.Start(connection);
+                Assert.Equal(1, count);
+                Assert.True(uiController.IsStopped);
+            }
+        }
+
+        [Fact]
+        public void FlowWithoutConnection()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var cm = provider.GetConnectionManager();
+            var cons = new ObservableCollection<IConnection>();
+            cm.Connections.Returns(cons);
+            var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
+
+            // simulate being logged in
+            cons.Add(connection);
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            {
+                var count = 0;
+                var flow = uiController.SelectFlow(UIControllerFlow.Publish);
+                flow.Subscribe(uc =>
+                {
+                    switch (++count)
+                    {
+                        case 1:
+                            Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
+                            ((IUIProvider)provider).Received().AddService(uiController, connection);
                             TriggerDone(uc);
                             break;
                     }
@@ -639,328 +677,4 @@ public class UIControllerTests
             }
         }
     }
-    //public class CloneFlow : UIControllerTestBase
-    //{
-    //    [Fact]
-    //    public void ShowingCloneDialogWhenLoggedInShowsCloneDialog()
-    //    {
-    //        var provider = Substitutes.GetFullyMockedServiceProvider();
-    //        var hosts = provider.GetRepositoryHosts();
-    //        var factory = SetupFactory(provider);
-    //        var connection = provider.GetConnection();
-    //        connection.Login().Returns(Observable.Return(connection));
-    //        var cm = provider.GetConnectionManager();
-    //        cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
-    //        var host = hosts.GitHubHost;
-    //        hosts.LookupHost(connection.HostAddress).Returns(host);
-    //        host.IsLoggedIn.Returns(true);
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var list = new List<IView>();
-    //            uiController.SelectFlow(UIControllerFlow.Clone)
-    //                .Subscribe(uc => list.Add(uc as IView),
-    //                            () =>
-    //                            {
-    //                                Assert.Equal(1, list.Count);
-    //                                Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(list[0]);
-    //                            });
-    //            uiController.Start(connection);
-    //        }
-    //    }
-
-    //    [Fact]
-    //    public void PullRequestFlowWhenLoggedOut()
-    //    {
-    //        var provider = Substitutes.GetFullyMockedServiceProvider();
-    //        var hosts = provider.GetRepositoryHosts();
-    //        var factory = SetupFactory(provider);
-    //        var cm = provider.GetConnectionManager();
-    //        var cons = new ObservableCollection<IConnection>();
-    //        cm.Connections.Returns(cons);
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var count = 0;
-    //            var list = new List<IView>();
-    //            var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
-    //            flow.Subscribe(uc =>
-    //                {
-    //                    switch (++count)
-    //                    {
-    //                        case 1:
-    //                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                            vm.Value.IsShowing.Returns(true);
-    //                            RaisePropertyChange(vm.Value, "IsShowing");
-    //                            break;
-    //                        case 2:
-    //                            Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-    //                            var con = Substitutes.Connection;
-    //                            var host = Substitute.For<IRepositoryHost>();
-    //                            host.IsLoggedIn.Returns(true);
-    //                            con.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
-    //                            hosts.LookupHost(Args.HostAddress).Returns(host);
-    //                            cons.Add(con);
-    //                            var v = factory.GetView(GitHub.Exports.UIViewType.Login).Value;
-    //                            ((ReplaySubject<object>)v.Done).OnNext(null);
-    //                            break;
-    //                        case 3:
-    //                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-    //                            ((ReplaySubject<object>)(uc as IHasDetailView).Open).OnNext(1);
-    //                            break;
-    //                        case 4:
-    //                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-    //                            ((ReplaySubject<object>)(uc as IView).Cancel).OnNext(null);
-    //                            break;
-    //                        case 5:
-    //                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-    //                            ((ReplaySubject<object>)(uc as IHasCreationView).Create).OnNext(null);
-    //                            break;
-    //                        case 6:
-    //                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
-    //                            uiController.Stop();
-    //                            break;
-    //                    }
-    //                });
-
-    //            uiController.Start(null);
-    //            Assert.Equal(6, count);
-    //            Assert.True(uiController.IsStopped);
-    //        }
-    //    }
-
-    //    [Fact]
-    //    public void CloneDialogLoggedInWithoutConnection()
-    //    {
-    //        var provider = Substitutes.GetFullyMockedServiceProvider();
-    //        var hosts = provider.GetRepositoryHosts();
-    //        var factory = SetupFactory(provider);
-    //        var cm = provider.GetConnectionManager();
-
-    //        // simulate being logged in
-    //        var host = hosts.GitHubHost;
-    //        var connection = SetupConnection(provider, hosts, host);
-    //        cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var count = 0;
-    //            uiController.SelectFlow(UIControllerFlow.Clone)
-    //                .Subscribe(uc =>
-    //                    {
-    //                        switch (++count)
-    //                        {
-    //                            case 1:
-    //                                Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
-    //                                ((IUIProvider)provider).Received().AddService(uiController, connection);
-    //                                uiController.Stop();
-    //                                break;
-    //                        }
-    //                    });
-    //            uiController.Start(null);
-    //            Assert.Equal(1, count);
-    //            Assert.True(uiController.IsStopped);
-    //        }
-    //    }
-
-    //    [Fact]
-    //    public void GoingBackAndForthOnTheLoginFlow()
-    //    {
-    //        var provider = Substitutes.GetFullyMockedServiceProvider();
-    //        var hosts = provider.GetRepositoryHosts();
-    //        var factory = SetupFactory(provider);
-    //        var cm = provider.GetConnectionManager();
-    //        var cons = new ObservableCollection<IConnection>();
-    //        cm.Connections.Returns(cons);
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var count = 0;
-    //            var list = new List<IView>();
-    //            var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
-    //            flow.Subscribe(uc =>
-    //            {
-    //                switch (++count)
-    //                {
-    //                    case 1:
-    //                    {
-    //                        Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                        var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                        vm.Value.IsShowing.Returns(true);
-    //                        RaisePropertyChange(vm.Value, "IsShowing");
-    //                    }
-    //                    break;
-    //                    case 2:
-    //                    {
-    //                        Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-    //                        var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                        vm.Value.IsShowing.Returns(false);
-    //                        RaisePropertyChange(vm.Value, "IsShowing");
-    //                        ((ReplaySubject<object>)(uc as IView).Cancel).OnNext(null);
-    //                    }
-    //                    break;
-    //                    case 3:
-    //                    {
-    //                        Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                        var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                        vm.Value.IsShowing.Returns(true);
-    //                        RaisePropertyChange(vm.Value, "IsShowing");
-    //                    }
-    //                    break;
-    //                    case 4:
-    //                    {
-    //                        Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-    //                        uiController.Stop();
-    //                    }
-    //                    break;
-    //                }
-    //            });
-
-    //            uiController.Start(null);
-    //            Assert.Equal(4, count);
-    //            Assert.True(uiController.IsStopped);
-    //        }
-    //    }
-
-    //    [Fact]
-    //    public void CancelingLoginStopsTheController()
-    //    {
-    //        var provider = Substitutes.GetFullyMockedServiceProvider();
-    //        var hosts = provider.GetRepositoryHosts();
-    //        var factory = SetupFactory(provider);
-    //        var cm = provider.GetConnectionManager();
-    //        var cons = new ObservableCollection<IConnection>();
-    //        cm.Connections.Returns(cons);
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var count = 0;
-    //            var list = new List<IView>();
-    //            var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
-    //            flow.Subscribe(uc =>
-    //            {
-    //                switch (++count)
-    //                {
-    //                    case 1:
-    //                        {
-    //                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                            vm.Value.IsShowing.Returns(true);
-    //                            RaisePropertyChange(vm.Value, "IsShowing");
-    //                        }
-    //                        break;
-    //                    case 2:
-    //                        {
-    //                            Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-    //                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                            vm.Value.IsShowing.Returns(false);
-    //                            RaisePropertyChange(vm.Value, "IsShowing");
-    //                            ((ReplaySubject<object>)(uc as IView).Cancel).OnNext(null);
-    //                        }
-    //                        break;
-    //                    case 3:
-    //                        {
-    //                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                            ((ReplaySubject<object>)(uc as IView).Cancel).OnNext(null);
-    //                        }
-    //                        break;
-    //                }
-    //            });
-
-    //            uiController.Start(null);
-    //            Assert.Equal(3, count);
-    //            Assert.True(uiController.IsStopped);
-    //        }
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var count = 0;
-    //            var list = new List<IView>();
-    //            var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
-    //            flow.Subscribe(uc =>
-    //            {
-    //                switch (++count)
-    //                {
-    //                    case 1:
-    //                        {
-    //                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                            vm.Value.IsShowing.Returns(true);
-    //                            RaisePropertyChange(vm.Value, "IsShowing");
-    //                        }
-    //                        break;
-    //                    case 2:
-    //                        {
-    //                            Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-    //                            var vm = factory.GetViewModel(GitHub.Exports.UIViewType.TwoFactor);
-    //                            vm.Value.IsShowing.Returns(false);
-    //                            RaisePropertyChange(vm.Value, "IsShowing");
-    //                            ((ReplaySubject<object>)(uc as IView).Cancel).OnNext(null);
-    //                        }
-    //                        break;
-    //                    case 3:
-    //                        {
-    //                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-    //                            ((ReplaySubject<object>)(uc as IView).Cancel).OnNext(null);
-    //                        }
-    //                        break;
-    //                }
-    //            });
-
-    //            uiController.Start(null);
-    //            Assert.Equal(3, count);
-    //            Assert.True(uiController.IsStopped);
-    //        }
-    //    }
-
-    //    [Fact]
-    //    public void PullRequestFlowBackAndForth()
-    //    {
-    //        var provider = Substitutes.GetFullyMockedServiceProvider();
-    //        var hosts = provider.GetRepositoryHosts();
-    //        var factory = SetupFactory(provider);
-    //        var connection = provider.GetConnection();
-    //        connection.Login().Returns(Observable.Return(connection));
-    //        var cm = provider.GetConnectionManager();
-    //        cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
-    //        var host = hosts.GitHubHost;
-    //        hosts.LookupHost(connection.HostAddress).Returns(host);
-    //        host.IsLoggedIn.Returns(true);
-
-    //        using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-    //        {
-    //            var count = 0;
-    //            var list = new List<IView>();
-    //            var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
-    //            flow.Subscribe(uc =>
-    //            {
-    //                switch (++count)
-    //                {
-    //                    case 1:
-    //                        Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-    //                        ((ReplaySubject<object>)(uc as IHasDetailView).Open).OnNext(1);
-    //                        break;
-    //                    case 2:
-    //                        Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-    //                        ((ReplaySubject<object>)(uc as IView).Done).OnNext(null);
-    //                        break;
-    //                    case 3:
-    //                        Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-    //                        ((ReplaySubject<object>)(uc as IHasDetailView).Open).OnNext(1);
-    //                        break;
-    //                    case 4:
-    //                        Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-    //                        uiController.Stop();
-    //                        break;
-    //                }
-    //            });
-
-    //            uiController.Start(null);
-    //            Assert.Equal(4, count);
-    //            Assert.True(uiController.IsStopped);
-    //        }
-    //    }
-
-    //}
 }
