@@ -61,6 +61,7 @@
 
                     <Style TargetType="{x:Type ui:FilterTextBox}" BasedOn="{StaticResource {x:Type ui:FilterTextBox}}">
                         <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsComboBoxPopupBorder}" />
+                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
                         <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}" />
                         <Setter Property="Margin" Value="5" />
                         <Setter Property="Height" Value="25" />
@@ -452,7 +453,6 @@
                             <ui:FilterTextBox
                                 x:Name="filterBranch"
                                 Grid.Row="0"
-                                Foreground="{DynamicResource GitHubVsWindowText}"
                                 PromptText="Filter branches" />
                             <Separator Grid.Row="1" Margin="0" />
 

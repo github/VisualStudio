@@ -123,7 +123,6 @@
                         </Trigger>
                         <DataTrigger Binding="{Binding Text.Length, RelativeSource={RelativeSource Self}}" Value="0">
                             <Setter Property="Opacity" TargetName="PromptLabel" Value="0.7" />
-                            <Setter Property="Foreground" Value="Transparent" />
                             <Setter Property="Visibility" TargetName="clearButton" Value="Collapsed" />
                         </DataTrigger>
                     </ControlTemplate.Triggers>
