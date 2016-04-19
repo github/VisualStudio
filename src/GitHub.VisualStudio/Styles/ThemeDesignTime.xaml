@@ -16,8 +16,6 @@
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FF333337" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FFF1F1F1" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="#FF3F3F46" />
-  <SolidColorBrush x:Key="GitHubVsComboBoxPopupBorder" Color="#FF333337" />
-  <SolidColorBrush x:Key="GitHubVsMenu" Color="#FF1B1B1C" />
   -->
 
   <!-- Design time colors taken from the VS light theme
@@ -30,8 +28,6 @@
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF1E1E1E" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="#FFCCCEBD" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="#FFEEEEF2" />
-  <SolidColorBrush x:Key="GitHubVsComboBoxPopupBorder" Color="#FFCCCEDB" />
-  <SolidColorBrush x:Key="GitHubVsMenu" Color="#FFF6F6F6" />
   -->
 
   <!-- Design time colors taken from the VS blue theme
@@ -45,6 +41,4 @@
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF000000" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="#FF8591A2" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="#FFFFFFFF" />
-  <SolidColorBrush x:Key="GitHubVsComboBoxPopupBorder" Color="#FFCCCEDB" />
-  <SolidColorBrush x:Key="GitHubVsMenu" Color="#FFF6F6F6" />
 </ResourceDictionary>
