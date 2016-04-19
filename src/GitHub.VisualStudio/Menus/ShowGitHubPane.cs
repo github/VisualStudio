@@ -1,10 +1,11 @@
-﻿using GitHub.VisualStudio.UI;
+﻿using GitHub.Exports;
+using GitHub.VisualStudio.UI;
 using System;
 using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.Menus
 {
-    [Export(typeof(IMenuHandler))]
+    [ExportMenu(MenuType = MenuType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ShowGitHubPane: MenuBase, IMenuHandler
     {
