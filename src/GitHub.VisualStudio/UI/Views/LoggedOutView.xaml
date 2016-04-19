@@ -6,6 +6,7 @@
                             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                            xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                             DataContext="{Binding ViewModel}"
                             d:DesignHeight="300"
                             d:DesignWidth="300"
@@ -29,6 +30,37 @@
   </UserControl.Resources>
 
   <DockPanel>
-    <Label Content="Logged Out" />
+    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+        <ui:OcticonImage Icon="mark_github"
+            Foreground="{DynamicResource GitHubVsWindowText}"
+            Margin="0,5"
+            Width="48"
+            Height="48" />
+        <Label
+            HorizontalAlignment="Center"
+            FontSize="16"
+            Content="Connect to GitHub" />
+        <TextBlock
+            TextWrapping="Wrap"
+            TextAlignment="Center"
+            HorizontalAlignment="Center"
+            Text="Powerful collaboration, code review, and code management for open source and private projects." />
+        <StackPanel
+            Margin="0,5"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <TextBlock
+                Margin="5,0"
+                HorizontalAlignment="Center">
+                <Hyperlink>Connect...</Hyperlink>
+            </TextBlock>
+
+            <TextBlock
+                Margin="5,0"
+                HorizontalAlignment="Center">
+                <Hyperlink>Sign up</Hyperlink>
+            </TextBlock>
+        </StackPanel>
+    </StackPanel>
   </DockPanel>
 </local:GenericLoggedOutView>
