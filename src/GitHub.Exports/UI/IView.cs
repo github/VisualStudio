@@ -12,11 +12,11 @@ namespace GitHub.UI
 
     public interface IHasDetailView
     {
-        IObservable<object> Open { get; }
+        IObservable<ViewWithData> Open { get; }
     }
 
     public interface IHasCreationView
     {
-        IObservable<object> Create { get; }
+        IObservable<ViewWithData> Create { get; }
     }
 }

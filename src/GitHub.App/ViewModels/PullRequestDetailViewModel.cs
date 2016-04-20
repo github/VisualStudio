@@ -1,4 +1,5 @@
 ﻿using GitHub.Exports;
+using GitHub.UI;
 using NullGuard;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class PullRequestDetailViewModel : BaseViewModel, IPullRequestDetailViewModel
     {
-        public override void Initialize([AllowNull] object data)
+        public override void Initialize([AllowNull] ViewWithData data)
         {
-            System.Windows.MessageBox.Show(String.Format(CultureInfo.InvariantCulture, "{0}", data));
+            System.Windows.MessageBox.Show(String.Format(CultureInfo.InvariantCulture, "{0}", data.Data));
         }
     }
 }

@@ -28,7 +28,7 @@ namespace GitHub.SampleData
         public bool IsShowing { get; set; }
         public string Title { get; set; }
 
-        public void Initialize(object data)
+        public void Initialize(ViewWithData data)
         { }
     }
 

@@ -1,7 +1,6 @@
-﻿using GitHub.Models;
+﻿using GitHub.Exports;
+using GitHub.Models;
 using System;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace GitHub.UI
 {
@@ -28,5 +27,11 @@ namespace GitHub.UI
         Clone,
         Publish,
         PullRequests
+
+    public class ViewWithData
+    {
+        public UIControllerFlow Flow;
+        public UIViewType ViewType;
+        public object Data;
     }
 }

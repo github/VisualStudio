@@ -17,6 +17,7 @@ using ReactiveUI;
 using Stateless;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GitHub.Controllers
 {
@@ -118,7 +119,7 @@ namespace GitHub.Controllers
         // queries the individual ui flow (stored in machines) for the next state
         // for a given transition trigger
         readonly StateMachineType uiStateMachine;
-        readonly Dictionary<Trigger, StateMachineType.TriggerWithParameters<object>> triggers;
+        readonly Dictionary<Trigger, StateMachineType.TriggerWithParameters<ViewWithData>> triggers;
 
         Subject<IView> transition;
 
@@ -167,7 +168,7 @@ namespace GitHub.Controllers
             ConfigureLogicStates();
 
             uiStateMachine = new StateMachineType(UIViewType.None);
-            triggers = new Dictionary<Trigger, StateMachineType.TriggerWithParameters<object>>();
+            triggers = new Dictionary<Trigger, StateMachineType.TriggerWithParameters<ViewWithData>>();
             ConfigureUIHandlingStates();
         }
 
@@ -303,7 +304,7 @@ namespace GitHub.Controllers
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
-            triggers.Add(Trigger.PRDetail, uiStateMachine.SetTriggerParameters<object>(Trigger.PRDetail));
+            triggers.Add(Trigger.PRDetail, uiStateMachine.SetTriggerParameters<ViewWithData>(Trigger.PRDetail));
             uiStateMachine.Configure(UIViewType.PRDetail)
                 .OnEntryFrom(triggers[Trigger.PRDetail], arg => RunView(UIViewType.PRDetail, arg))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
@@ -519,7 +520,7 @@ namespace GitHub.Controllers
             Fire(Trigger.Finish);
         }
 
-        void RunView(UIViewType viewType, object arg = null)
+        void RunView(UIViewType viewType, ViewWithData arg = null)
         {
             bool firstTime = CreateViewAndViewModel(viewType);
             var view = GetObjectsForFlow(activeFlow)[viewType].View;
@@ -537,7 +538,7 @@ namespace GitHub.Controllers
             SetupView(viewType, view, arg);
         }
 
-        void SetupView(UIViewType viewType, IView view, object arg = null)
+        void SetupView(UIViewType viewType, IView view, ViewWithData arg = null)
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
@@ -645,7 +646,7 @@ namespace GitHub.Controllers
             return list;
         }
 
-        void Fire(Trigger next, object arg = null)
+        void Fire(Trigger next, ViewWithData arg = null)
         {
             Debug.WriteLine("Firing {0} from {1} ({2})", next, uiStateMachine.State, GetHashCode());
             if (arg != null && triggers.ContainsKey(next))

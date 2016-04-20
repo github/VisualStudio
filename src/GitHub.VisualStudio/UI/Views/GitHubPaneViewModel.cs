@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.UI.Views
                 (s, e) => { });
         }
 
-        void IViewModel.Initialize([AllowNull] object data)
+        public void Initialize([AllowNull] ViewWithData data)
         {
         }
 
