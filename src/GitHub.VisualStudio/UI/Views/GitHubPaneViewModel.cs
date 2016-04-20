@@ -73,9 +73,12 @@ namespace GitHub.VisualStudio.UI.Views
         {
         }
 
-        protected async override void RepoChanged()
+        protected async override void RepoChanged(bool changed)
         {
-            base.RepoChanged();
+            base.RepoChanged(changed);
+
+            if (!changed)
+                return;
 
             IsGitHubRepo = await IsAGitHubRepo();
             if (!IsGitHubRepo)
