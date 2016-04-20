@@ -17,6 +17,7 @@ namespace GitHub.UI
         void Stop();
         bool IsStopped { get; }
         UIControllerFlow CurrentFlow { get; }
+        void Jump(ViewWithData where);
     }
 
     public enum UIControllerFlow
@@ -26,7 +27,9 @@ namespace GitHub.UI
         Create,
         Clone,
         Publish,
-        PullRequests
+        PullRequests,
+        Home
+    }
 
     public class ViewWithData
     {

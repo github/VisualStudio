@@ -11,7 +11,6 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using Stateless;
@@ -135,7 +134,8 @@ namespace GitHub.Controllers
         NotifyCollectionChangedEventHandler connectionAdded;
 
         Subject<bool> completion;
-
+        IConnection connection;
+        ViewWithData requestedTarget;
         bool stopping;
 
         [ImportingConstructor]
@@ -251,6 +251,26 @@ namespace GitHub.Controllers
                         Debug.WriteLine("Start ({0})", GetHashCode());
                         Fire(Trigger.Next);
                     });
+            }
+        }
+
+        public void Jump(ViewWithData where)
+        {
+            Debug.Assert(where.Flow == mainFlow, "Jump called for flow " + where.Flow + " but this is " + mainFlow);
+            if (where.Flow != mainFlow)
+                return;
+
+            if (uiStateMachine.IsInState(where.ViewType))
+            {
+                var objs = GetObjectsForFlow(activeFlow);
+                var pair = objs[where.ViewType];
+                pair.ViewModel.Initialize(where);
+            }
+            else
+            {
+                requestedTarget = where;
+                if (activeFlow == where.Flow)
+                    Fire(Trigger.Next, where);
             }
         }
 
@@ -452,21 +472,26 @@ namespace GitHub.Controllers
             // pr flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
-                .Permit(Trigger.Next, UIViewType.PRList)
+                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
+
             logic.Configure(UIViewType.PRList)
-                .Permit(Trigger.Detail, UIViewType.PRDetail)
-                .Permit(Trigger.Creation, UIViewType.PRCreation)
+                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
+                .Permit(Trigger.PRDetail, UIViewType.PRDetail)
+                .Permit(Trigger.PRCreation, UIViewType.PRCreation)
                 .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
+
             logic.Configure(UIViewType.PRDetail)
-                .Permit(Trigger.Next, UIViewType.PRList)
+                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
                 .Permit(Trigger.Cancel, UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
+
             logic.Configure(UIViewType.PRCreation)
-                .Permit(Trigger.Next, UIViewType.PRList)
+                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
                 .Permit(Trigger.Cancel, UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
+
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.PullRequests, logic);
@@ -522,6 +547,12 @@ namespace GitHub.Controllers
 
         void RunView(UIViewType viewType, ViewWithData arg = null)
         {
+            if (requestedTarget?.ViewType == viewType)
+            {
+                arg = requestedTarget;
+                requestedTarget = null;
+            }
+
             bool firstTime = CreateViewAndViewModel(viewType);
             var view = GetObjectsForFlow(activeFlow)[viewType].View;
             transition.OnNext(view);
@@ -652,11 +683,7 @@ namespace GitHub.Controllers
             if (arg != null && triggers.ContainsKey(next))
                 uiStateMachine.Fire(triggers[next], arg);
             else
-            {
-                Debug.Assert(arg == null, String.Format(CultureInfo.InvariantCulture, "Argument {0} passed to Fire {1}, but there's no trigger that takes an argument. Did you forget to configure the trigger parameters?", arg, next));
                 uiStateMachine.Fire(next);
-            }
-                
         }
 
         UIViewType Go(Trigger trigger)
