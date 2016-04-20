@@ -55,34 +55,25 @@ namespace GitHub.VisualStudio.UI.Views
             base.Initialize(serviceProvider);
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
-                async (s, e) => {
-                    var connection = await connectionManager.LookupConnection(ActiveRepo);
-                    StartFlow(UIControllerFlow.PullRequests, connection);
-                });
+                (s, e) => Reload(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList }));
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
-                (s, e) => { });
+            ServiceProvider.AddDynamicMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+                () => uiController != null,
+                () => { });
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
-                (s, e) => { });
+            ServiceProvider.AddDynamicMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+                () => uiController != null,
+                () => { });
 
             ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
-                (s, e) => { });
+                // pull requests is currently the default ui flow
+                (s, e) => Reload(new ViewWithData { Flow = uiController?.CurrentFlow ?? UIControllerFlow.PullRequests }));
         }
 
-        public async void Initialize([AllowNull] ViewWithData data)
+        public void Initialize([AllowNull] ViewWithData data)
         {
             Title = "GitHub";
-            if (!isGitHubRepo || !IsLoggedIn)
-                return;
-
-            if (uiController == null)
-            {
-                var connection = await connectionManager.LookupConnection(ActiveRepo);
-                StartFlow(data.Flow, connection, data);
-            }
-            else
-                uiController.Jump(data);
+            Reload(data);
         }
 
         protected async override void RepoChanged(bool changed)
@@ -95,12 +86,34 @@ namespace GitHub.VisualStudio.UI.Views
             IsGitHubRepo = await IsAGitHubRepo();
             if (!IsGitHubRepo)
                 return;
-                
+
+            Reload();
+        }
+
+        async void Reload([AllowNull] ViewWithData data = null)
+        {
+            if (!IsGitHubRepo)
+            {
+                if (uiController != null)
+                {
+                    Stop();
+                    var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                    var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                    Control = c.View;
+                }
+                return;
+            }
+
             var connection = await connectionManager.LookupConnection(ActiveRepo);
             IsLoggedIn = await connection.IsLoggedIn(hosts);
 
             if (IsLoggedIn)
-                StartFlow(UIControllerFlow.PullRequests, connection);
+            {
+                if (uiController == null || (data != null && data.Flow != uiController.CurrentFlow))
+                    StartFlow(data?.Flow ?? UIControllerFlow.PullRequests, connection, data);
+                else
+                    uiController.Jump(data);
+            }
             else
             {
                 //var factory = ServiceProvider.GetExportedValue<IUIFactory>();

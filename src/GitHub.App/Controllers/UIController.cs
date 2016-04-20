@@ -472,23 +472,43 @@ namespace GitHub.Controllers
             // pr flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
             logic.Configure(UIViewType.None)
-                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
+                // allows jumping to a specific view
+                .PermitDynamic(Trigger.Next, () => 
+                    requestedTarget == null || requestedTarget.ViewType == UIViewType.None
+                        ? UIViewType.PRList
+                        : requestedTarget.ViewType)
                 .Permit(Trigger.Finish, UIViewType.End);
 
             logic.Configure(UIViewType.PRList)
-                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
+                // allows jumping to a specific view or reload the current view
+                .PermitDynamic(Trigger.Next, () =>
+                    requestedTarget == null || requestedTarget.ViewType == UIViewType.None
+                        ? UIViewType.PRList
+                        : requestedTarget.ViewType)
                 .Permit(Trigger.PRDetail, UIViewType.PRDetail)
                 .Permit(Trigger.PRCreation, UIViewType.PRCreation)
                 .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Finish, UIViewType.End);
 
             logic.Configure(UIViewType.PRDetail)
-                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
+                // allows jumping to a specific view or reload the current view
+                .PermitDynamic(Trigger.Next, () =>
+                    requestedTarget == null
+                        ? UIViewType.PRList
+                        : requestedTarget.ViewType == UIViewType.None
+                            ? UIViewType.PRDetail 
+                            : requestedTarget.ViewType)
                 .Permit(Trigger.Cancel, UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
 
             logic.Configure(UIViewType.PRCreation)
-                .PermitDynamic(Trigger.Next, () => requestedTarget?.ViewType ?? UIViewType.PRList)
+                // allows jumping to a specific view or reload the current view
+                .PermitDynamic(Trigger.Next, () =>
+                    requestedTarget == null
+                        ? UIViewType.PRList
+                        : requestedTarget.ViewType == UIViewType.None
+                            ? UIViewType.PRDetail
+                            : requestedTarget.ViewType)
                 .Permit(Trigger.Cancel, UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
 
