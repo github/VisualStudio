@@ -13,6 +13,7 @@ using GitHub.ViewModels;
 using System.Diagnostics;
 using Microsoft.VisualStudio;
 using GitHub.App.Factories;
+using NullGuard;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -74,21 +75,34 @@ namespace GitHub.VisualStudio.UI
             vm?.Initialize(this);
         }
 
-        public static bool Activate()
+        public void ShowView(ViewWithData data)
+        {
+            ViewModel?.Initialize(data);
+        }
+
+        [return: AllowNull]
+        public static GitHubPane Activate()
         {
             var windowGuid = new Guid(GitHubPaneGuid);
             IVsWindowFrame frame;
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate, ref windowGuid, out frame)))
             {
                 VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + GitHubPaneGuid + "'");
-                return false;
+                return null;
             }
             if (ErrorHandler.Failed(frame.Show()))
             {
                 VsOutputLogger.WriteLine("Unable to show GitHubPane '" + GitHubPaneGuid + "'");
-                return false;
+                return null;
             }
-            return true;
+
+            object docView = null;
+            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
+                VsOutputLogger.WriteLine("Unable to grab instance of GitHubPane '" + GitHubPaneGuid + "'");
+                return null;
+            }
+            return docView as GitHubPane;
         }
     }
 }
