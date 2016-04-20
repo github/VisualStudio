@@ -122,8 +122,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             bool success = false;
             ui.ListenToCompletionState().Subscribe(s => success = s);
 
-            creation.Subscribe(c =>
+            creation.Subscribe(data =>
             {
+                var c = data.View;
                 SectionContent = c;
                 ((UserControl)c).DataContext = this;
                 c.IsBusy.Subscribe(x => IsBusy = x);

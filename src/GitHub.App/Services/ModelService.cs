@@ -153,7 +153,12 @@ namespace GitHub.Services
                     hostCache.GetAndFetchLatestFromIndex(key, () =>
                         apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
                                  .Select(PullRequestCacheItem.Create),
-                        item => col.RemoveItem(Create(item)),
+                        item =>
+                        {
+                            // this could blow up due to the collection being disposed somewhere else
+                            try { col.RemoveItem(Create(item)); }
+                            catch (ObjectDisposedException) { }
+                        },
                         TimeSpan.FromMinutes(5),
                         TimeSpan.FromDays(1))
                 )

@@ -17,8 +17,6 @@ using NullGuard;
 using NLog;
 using System.Reactive.Linq;
 using GitHub.Infrastructure;
-using System.Windows.Controls;
-using System.Reflection;
 
 namespace GitHub.VisualStudio
 {
@@ -214,12 +212,12 @@ namespace GitHub.VisualStudio
         }
 
         UI.WindowController windowController;
-        public IObservable<IView> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             if (!Initialized)
             {
                 log.Error("ExportProvider is not initialized, cannot setup UI.");
-                return Observable.Return<IView>(null);
+                return Observable.Empty<LoadData>();
             }
 
             StopUI();

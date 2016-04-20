@@ -131,8 +131,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -165,8 +166,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -196,8 +198,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -231,8 +234,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -262,8 +266,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -299,8 +304,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -344,8 +350,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1: {
@@ -412,8 +419,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -449,8 +457,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Create);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -487,8 +496,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Publish);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -523,8 +533,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Publish);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -567,8 +578,9 @@ public class UIControllerTests
                     {
                         success = s;
                     });
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -645,8 +657,9 @@ public class UIControllerTests
                         Assert.Equal(4, count);
                         count++;
                     });
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
