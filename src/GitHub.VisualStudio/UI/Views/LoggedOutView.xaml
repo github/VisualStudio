@@ -30,16 +30,17 @@
   </UserControl.Resources>
 
   <DockPanel>
-    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+    <StackPanel Margin="10" Orientation="Vertical">
         <ui:OcticonImage Icon="mark_github"
             Foreground="{DynamicResource GitHubVsWindowText}"
             Margin="0,5"
             Width="48"
             Height="48" />
         <Label
+            Foreground="{DynamicResource GitHubVsWindowText}"
             HorizontalAlignment="Center"
             FontSize="16"
-            Content="Connect to GitHub" />
+            Content="Log into GitHub" />
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
@@ -50,13 +51,13 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <TextBlock
-                Margin="5,0"
+                Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink>Connect...</Hyperlink>
+                <Hyperlink>Log in</Hyperlink>
             </TextBlock>
 
             <TextBlock
-                Margin="5,0"
+                Margin="10,0"
                 HorizontalAlignment="Center">
                 <Hyperlink>Sign up</Hyperlink>
             </TextBlock>
