@@ -40,7 +40,7 @@
             Foreground="{DynamicResource GitHubVsWindowText}"
             HorizontalAlignment="Center"
             FontSize="16"
-            Content="Log into GitHub" />
+            Content="Sign in to GitHub" />
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
@@ -53,13 +53,13 @@
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink>Log in</Hyperlink>
+                <Hyperlink>Sign in</Hyperlink>
             </TextBlock>
 
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink>Sign up</Hyperlink>
+                <Hyperlink>Create an account</Hyperlink>
             </TextBlock>
         </StackPanel>
     </StackPanel>
