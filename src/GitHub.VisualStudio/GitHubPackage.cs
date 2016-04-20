@@ -59,7 +59,7 @@ namespace GitHub.VisualStudio
                 ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
             foreach (var menu in menus.DynamicMenus)
-                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
         }
     }
 
