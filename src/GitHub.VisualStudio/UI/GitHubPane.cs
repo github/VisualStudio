@@ -33,6 +33,17 @@ namespace GitHub.VisualStudio.UI
     {
         const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
 
+        IView View
+        {
+            get { return Content as IView; }
+            set { Content = value; }
+        }
+        IViewModel ViewModel
+        {
+            get { return (Content as UserControl).DataContext as IViewModel; }
+            set { (Content as UserControl).DataContext = value; }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
         {
@@ -51,8 +62,8 @@ namespace GitHub.VisualStudio.UI
             var factory = this.GetExportedValue<IUIFactory>();
             var d = factory.CreateViewAndViewModel(Exports.UIViewType.GitHubPane);
             // placeholder logic to load the view until the UIController is able to do it for us
-            Content = d.View;
-            (Content as UserControl).DataContext = d.ViewModel;
+            View = d.View;
+            ViewModel = d.ViewModel;
         }
 
         protected override void Initialize()
