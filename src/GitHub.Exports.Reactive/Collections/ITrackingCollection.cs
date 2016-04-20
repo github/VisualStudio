@@ -31,12 +31,12 @@ namespace GitHub.Collections
         /// collection to be resorted and refiltered.
         /// </summary>
         /// <param name="theComparer">The comparer method for sorting, or null if not sorting</param>
-        void SetComparer(Func<T, T, int> comparer);
+        Func<T, T, int> Comparer { get; set; }
         /// <summary>
         /// Set a new filter. This will cause the collection to be filtered
         /// </summary>
         /// <param name="theFilter">The new filter, or null to not have any filtering</param>
-        void SetFilter(Func<T, int, IList<T>, bool> filter);
+        Func<T, int, IList<T>, bool> Filter { get; set; }
         void AddItem(T item);
         void RemoveItem(T item);
         /// <summary>

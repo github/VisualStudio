@@ -150,23 +150,37 @@ namespace GitHub.Collections
         /// collection to be resorted and refiltered.
         /// </summary>
         /// <param name="theComparer">The comparer method for sorting, or null if not sorting</param>
-        public void SetComparer(Func<T, T, int> theComparer)
+        public Func<T, T, int> Comparer
         {
-            if (disposed)
-                throw new ObjectDisposedException("TrackingCollection");
-            SetAndRecalculateSort(theComparer);
-            SetAndRecalculateFilter(filter);
+            get
+            {
+                return comparer;
+            }
+            set
+            {
+                if (disposed)
+                    throw new ObjectDisposedException("TrackingCollection");
+                SetAndRecalculateSort(value);
+                Filter = filter;
+            }
         }
 
         /// <summary>
         /// Set a new filter. This will cause the collection to be filtered
         /// </summary>
         /// <param name="theFilter">The new filter, or null to not have any filtering</param>
-        public void SetFilter(Func<T, int, IList<T>, bool> theFilter)
+        public Func<T, int, IList<T>, bool> Filter
         {
-            if (disposed)
-                throw new ObjectDisposedException("TrackingCollection");
-            SetAndRecalculateFilter(theFilter);
+            get
+            {
+                return filter;
+            }
+            set
+            {
+                if (disposed)
+                    throw new ObjectDisposedException("TrackingCollection");
+                SetAndRecalculateFilter(value);
+            }
         }
 
         public IDisposable Subscribe()
