@@ -27,7 +27,8 @@ namespace GitHub.Exports
 
     public enum MenuType
     {
-        GitHubPane
+        GitHubPane,
+        OpenPullRequests
     }
 
     [MetadataAttribute]
