@@ -59,7 +59,7 @@
                DockPanel.Dock="Top"
                Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <UserControl x:Name="container" Content="{Binding Control}" />
+    <UserControl x:Name="container" Content="{Binding Control}" DockPanel.Dock="Top" />
 
   </DockPanel>
 </view:GenericGitHubPaneView>
