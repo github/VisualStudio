@@ -47,6 +47,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.hosts = hosts;
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
+            Title = "GitHub";
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -71,6 +72,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         public async void Initialize([AllowNull] ViewWithData data)
         {
+            Title = "GitHub";
             if (!isGitHubRepo || !IsLoggedIn)
                 return;
 
