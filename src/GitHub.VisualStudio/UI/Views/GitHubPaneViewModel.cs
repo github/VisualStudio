@@ -69,8 +69,18 @@ namespace GitHub.VisualStudio.UI.Views
                 (s, e) => { });
         }
 
-        public void Initialize([AllowNull] ViewWithData data)
+        public async void Initialize([AllowNull] ViewWithData data)
         {
+            if (!isGitHubRepo || !IsLoggedIn)
+                return;
+
+            if (uiController == null)
+            {
+                var connection = await connectionManager.LookupConnection(ActiveRepo);
+                StartFlow(data.Flow, connection, data);
+            }
+            else
+                uiController.Jump(data);
         }
 
         protected async override void RepoChanged(bool changed)
@@ -97,7 +107,7 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn)
+        void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
         {
             if (uiController != null)
                 Stop();
@@ -105,6 +115,16 @@ namespace GitHub.VisualStudio.UI.Views
             if (conn == null)
                 return;
 
+            switch (controllerFlow)
+            {
+                case UIControllerFlow.PullRequests:
+                    Title = Resources.PullRequestsNavigationItemText;
+                    break;
+                default:
+                    Title = "GitHub";
+                    break;
+            }
+            
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
@@ -142,6 +162,8 @@ namespace GitHub.VisualStudio.UI.Views
                     Control = c;
                 });
 
+            if (data != null)
+                uiController.Jump(data);
             uiController.Start(conn);
         }
 
