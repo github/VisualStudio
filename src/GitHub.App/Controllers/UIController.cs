@@ -92,10 +92,12 @@ namespace GitHub.Controllers
     {
         internal enum Trigger
         {
-            Cancel = 0,
+            None,
+            Cancel,
             Next,
-            Detail,
-            Creation,
+            PRList,
+            PRDetail,
+            PRCreation,
             Finish
         }
 
@@ -169,6 +171,88 @@ namespace GitHub.Controllers
             ConfigureUIHandlingStates();
         }
 
+        public IObservable<IView> SelectFlow(UIControllerFlow choice)
+        {
+            mainFlow = choice;
+
+            transition = new Subject<IView>();
+            transition.Subscribe(_ => {}, _ => Fire(Trigger.Next));
+        
+            return transition;
+        }
+
+        /// <summary>
+        /// Allows listening to the completion state of the ui flow - whether
+        /// it was completed because it was cancelled or whether it succeeded.
+        /// </summary>
+        /// <returns>true for success, false for cancel</returns>
+        public IObservable<bool> ListenToCompletionState()
+        {
+            if (completion == null)
+                completion = new Subject<bool>();
+            return completion;
+        }
+
+        public void Start([AllowNull] IConnection conn)
+        {
+            connection = conn;
+            if (connection != null)
+            {
+                if (mainFlow != UIControllerFlow.Authentication)
+                    uiProvider.AddService(this, connection);
+                else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
+                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
+
+                connection.Login()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire(Trigger.Next);
+                    });
+            }
+            else
+            {
+                connectionManager
+                    .GetLoggedInConnections(hosts)
+                    .FirstOrDefaultAsync()
+                    .Select(c =>
+                    {
+                        bool loggedin = c != null;
+                        if (mainFlow != UIControllerFlow.Authentication)
+                        {
+                            if (loggedin) // register the first available connection so the viewmodel can use it
+                            {
+                                connection = c;
+                                uiProvider.AddService(this, c);
+                            }
+                            else
+                            {
+                                // a connection will be added to the list when auth is done, register it so the next
+                                // viewmodel can use it
+                                connectionAdded = (s, e) =>
+                                {
+                                    if (e.Action == NotifyCollectionChangedAction.Add)
+                                    {
+                                        connection = e.NewItems[0] as IConnection;
+                                        if (connection != null)
+                                            uiProvider.AddService(typeof(IConnection), this, connection);
+                                    }
+                                };
+                                connectionManager.Connections.CollectionChanged += connectionAdded;
+                            }
+                        }
+                        return loggedin;
+                    })
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => { }, () =>
+                    {
+                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        Fire(Trigger.Next);
+                    });
+            }
+        }
+
         /// <summary>
         /// Configures the UI that gets loaded when entering a certain state and which state
         /// to go to for each trigger. Which state to go to depends on which ui flow state machine
@@ -191,8 +275,7 @@ namespace GitHub.Controllers
                         var loggedIn = connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
                         activeFlow = loggedIn ? mainFlow : UIControllerFlow.Authentication;
                         return Go(Trigger.Next);
-                    }
-                )
+                    })
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
             uiStateMachine.Configure(UIViewType.Clone)
@@ -215,14 +298,14 @@ namespace GitHub.Controllers
 
             uiStateMachine.Configure(UIViewType.PRList)
                 .OnEntry(() => RunView(UIViewType.PRList))
-                .PermitDynamic(Trigger.Detail, () => Go(Trigger.Detail))
-                .PermitDynamic(Trigger.Creation, () => Go(Trigger.Creation))
+                .PermitDynamic(Trigger.PRDetail, () => Go(Trigger.PRDetail))
+                .PermitDynamic(Trigger.PRCreation, () => Go(Trigger.PRCreation))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
-            triggers.Add(Trigger.Detail, uiStateMachine.SetTriggerParameters<object>(Trigger.Detail));
+            triggers.Add(Trigger.PRDetail, uiStateMachine.SetTriggerParameters<object>(Trigger.PRDetail));
             uiStateMachine.Configure(UIViewType.PRDetail)
-                .OnEntryFrom(triggers[Trigger.Detail], arg => RunView(UIViewType.PRDetail, arg))
+                .OnEntryFrom(triggers[Trigger.PRDetail], arg => RunView(UIViewType.PRDetail, arg))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
@@ -388,27 +471,6 @@ namespace GitHub.Controllers
             machines.Add(UIControllerFlow.PullRequests, logic);
         }
 
-        public IObservable<IView> SelectFlow(UIControllerFlow choice)
-        {
-            mainFlow = choice;
-
-            transition = new Subject<IView>();
-            transition.Subscribe(_ => {}, _ => Fire(Trigger.Next));
-        
-            return transition;
-        }
-
-        /// <summary>
-        /// Allows listening to the completion state of the ui flow - whether
-        /// it was completed because it was cancelled or whether it succeeded.
-        /// </summary>
-        /// <returns>true for success, false for cancel</returns>
-        public IObservable<bool> ListenToCompletionState()
-        {
-            if (completion == null)
-                completion = new Subject<bool>();
-            return completion;
-        }
 
         /// <summary>
         /// End state for a flow has been called. Clear handlers related to that flow
@@ -516,13 +578,13 @@ namespace GitHub.Controllers
                 if (cv != null)
                     pair.AddHandler(cv.Create
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(_ => Fire(Trigger.Creation)));
+                        .Subscribe(_ => Fire(Trigger.PRCreation)));
 
                 var dv = view as IHasDetailView;
                 if (dv != null)
                     pair.AddHandler(dv.Open
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(x => Fire(Trigger.Detail, x)));
+                        .Subscribe(x => Fire(Trigger.PRDetail, x)));
             }
 
             pair.AddHandler(view.Cancel
@@ -624,67 +686,6 @@ namespace GitHub.Controllers
             cmp?.Dispose();
             stopping = false;
             connection = null;
-        }
-
-        IConnection connection;
-        public void Start([AllowNull] IConnection conn)
-        {
-            connection = conn;
-            if (connection != null)
-            {
-                if (mainFlow != UIControllerFlow.Authentication)
-                    uiProvider.AddService(this, connection);
-                else // sanity check: it makes zero sense to pass a connection in when calling the auth flow
-                    Debug.Assert(false, "Calling the auth flow with a connection makes no sense!");
-
-                connection.Login()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => { }, () =>
-                    {
-                        Debug.WriteLine("Start ({0})", GetHashCode());
-                        Fire(Trigger.Next);
-                    });
-            }
-            else
-            {
-                connectionManager
-                    .GetLoggedInConnections(hosts)
-                    .FirstOrDefaultAsync()
-                    .Select(c =>
-                    {
-                        bool loggedin = c != null;
-                        if (mainFlow != UIControllerFlow.Authentication)
-                        {
-                            if (loggedin) // register the first available connection so the viewmodel can use it
-                            {
-                                connection = c;
-                                uiProvider.AddService(this, c);
-                            }
-                            else
-                            {
-                                // a connection will be added to the list when auth is done, register it so the next
-                                // viewmodel can use it
-                                connectionAdded = (s, e) =>
-                                {
-                                    if (e.Action == NotifyCollectionChangedAction.Add)
-                                    {
-                                        connection = e.NewItems[0] as IConnection;
-                                        if (connection != null)
-                                            uiProvider.AddService(typeof(IConnection), this, connection);
-                                    }
-                                };
-                                connectionManager.Connections.CollectionChanged += connectionAdded;
-                            }
-                        }
-                        return loggedin;
-                    })
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => { }, () =>
-                    {
-                        Debug.WriteLine("Start ({0})", GetHashCode());
-                        Fire(Trigger.Next);
-                    });
-            }
         }
 
         bool disposed; // To detect redundant calls
