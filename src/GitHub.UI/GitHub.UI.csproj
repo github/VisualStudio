@@ -85,6 +85,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>OcticonPaths.resx</DependentUpon>
     </Compile>
+    <Compile Include="Converters\DefaultValueConverter.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
