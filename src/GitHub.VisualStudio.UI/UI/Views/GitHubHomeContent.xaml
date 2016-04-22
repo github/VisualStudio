@@ -1,59 +1,55 @@
 ﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubHomeContent"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
-             mc:Ignorable="d"
-             d:DesignHeight="48"
-             Height="48"
-             d:DesignWidth="300"
-             DataContext="{Binding ViewModel}"
+             Width="Auto"
+             Height="auto"
              Background="{DynamicResource GitHubVsToolWindowBackground}"
->
-    <d:DesignProperties.DataContext>
-        <Binding>
-            <Binding.Source>
-                <sampleData:GitHubHomeSectionDesigner />
-            </Binding.Source>
-        </Binding>
-    </d:DesignProperties.DataContext>
+             DataContext="{Binding ViewModel}"
+             d:DesignHeight="48"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+  <d:DesignProperties.DataContext>
+    <Binding>
+      <Binding.Source>
+        <sampleData:GitHubHomeSectionDesigner />
+      </Binding.Source>
+    </Binding>
+  </d:DesignProperties.DataContext>
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="Label">
-                <Setter Property="Padding" Value="0" />
-            </Style>
-        </ResourceDictionary>
-    </UserControl.Resources>
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
 
-    <StackPanel Margin="8,0">
-        <Grid Margin="0,6,-4,6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition ColumnDefinition.Width="Auto" />
-                <ColumnDefinition ColumnDefinition.Width="*" />
-            </Grid.ColumnDefinitions>
 
-        <ui:OcticonImage
-                x:Name="repositoryIcon"
-                Height="32"
-                Width="32"
-                VerticalAlignment="Center" 
-                Margin="0,0,8,0"
-                Icon="{Binding Path=Icon}"
-                Foreground="{DynamicResource GitHubVsToolWindowText}" />
+  <DockPanel Margin="4,6,4,6">
+    <ui:OcticonImage x:Name="repositoryIcon"
+                     Width="32"
+                     Height="32"
+                     Margin="0,0,8,0"
+                     VerticalAlignment="Center"
+                     DockPanel.Dock="Left"
+                     Foreground="{DynamicResource GitHubVsToolWindowText}"
+                     Icon="{Binding Path=Icon}" />
 
-            <StackPanel Orientation="Vertical" Margin="0" Grid.Column="1">
-                <Label Content="{Binding Path=RepoName}"  Foreground="{DynamicResource GitHubVsToolWindowText}"/>
-                <Label Content="{Binding Path=RepoUrl}" Foreground="{DynamicResource GitHubVsGrayText}" />
-            </StackPanel>
-        </Grid>
-    </StackPanel>
+    <TextBlock DockPanel.Dock="Top"
+               Foreground="{DynamicResource GitHubVsToolWindowText}"
+               Padding="0"
+               Text="{Binding Path=RepoName}"
+               TextTrimming="CharacterEllipsis"
+               Margin="0,-2,0,0" />
+    <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
+               Padding="0"
+               Text="{Binding Path=RepoUrl}"
+               TextTrimming="CharacterEllipsis" />
+  </DockPanel>
 </UserControl>
