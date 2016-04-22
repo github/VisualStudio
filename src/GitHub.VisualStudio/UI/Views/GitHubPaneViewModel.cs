@@ -58,7 +58,7 @@ namespace GitHub.VisualStudio.UI.Views
                 (s, e) => Reload(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList }));
 
             back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
-                () => currentNavItem > 0,
+                () => !disabled && currentNavItem > 0,
                 () => {
                     DisableButtons();
                     Reload(navStack[--currentNavItem], true);
@@ -66,7 +66,7 @@ namespace GitHub.VisualStudio.UI.Views
                 true);
 
             forward = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
-                () => currentNavItem < navStack.Count - 1,
+                () => !disabled && currentNavItem < navStack.Count - 1,
                 () => {
                     DisableButtons();
                     Reload(navStack[++currentNavItem], true);
@@ -74,7 +74,7 @@ namespace GitHub.VisualStudio.UI.Views
                 true);
 
             refresh = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
-                () => navStack.Count > 0,
+                () => !disabled && navStack.Count > 0,
                 () => {
                     DisableButtons();
                     Reload();
@@ -224,10 +224,12 @@ namespace GitHub.VisualStudio.UI.Views
             back.Enabled = currentNavItem > 0;
             forward.Enabled = currentNavItem < navStack.Count - 1;
             refresh.Enabled = navStack.Count > 0;
+            disabled = false;
         }
 
         void DisableButtons()
         {
+            disabled = true;
             back.Enabled = false;
             forward.Enabled = false;
             refresh.Enabled = false;
@@ -279,6 +281,8 @@ namespace GitHub.VisualStudio.UI.Views
         public bool IsShowing => true;
 
         bool disposed = false;
+        private bool disabled;
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
