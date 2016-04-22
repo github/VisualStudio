@@ -264,6 +264,7 @@ namespace GitHub.Services
                 prCacheItem.Number,
                 prCacheItem.Title,
                 Create(prCacheItem.Author),
+                prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
                 prCacheItem.CreatedAt,
                 prCacheItem.UpdatedAt)
             {
@@ -357,6 +358,7 @@ namespace GitHub.Services
                 Number = pr.Number;
                 CommentCount = pr.Comments;
                 Author = new AccountCacheItem(pr.User);
+                Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
                 IsOpen = pr.State == ItemState.Open;
@@ -370,6 +372,8 @@ namespace GitHub.Services
             public int CommentCount { get; set; }
             [AllowNull]
             public AccountCacheItem Author {[return: AllowNull] get; set; }
+            [AllowNull]
+            public AccountCacheItem Assignee { [return: AllowNull] get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public bool IsOpen { get; set; }
