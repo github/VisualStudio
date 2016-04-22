@@ -33,9 +33,7 @@ namespace GitHub.App.Factories
         /// <returns>true if the View/ViewModel didn't exist and had to be created</returns>
         public IUIPair CreateViewAndViewModel(UIViewType viewType)
         {
-            var d = new UIPair(viewType, factory.GetView(viewType), factory.GetViewModel(viewType));
-            d.View.ViewModel = d.ViewModel;
-            return d;
+            return new UIPair(viewType, factory.GetView(viewType), factory.GetViewModel(viewType));
         }
     }
 

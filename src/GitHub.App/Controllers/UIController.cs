@@ -688,13 +688,13 @@ namespace GitHub.Controllers
             {
                 var d = list[viewType];
                 if (d.View.ViewModel == null)
-                    d.View.ViewModel = d.ViewModel;
+                    d.View.DataContext = d.ViewModel;
             }
 
             if (!list.ContainsKey(viewType))
             {
                 var d = factory.CreateViewAndViewModel(viewType);
-                d.View.ViewModel = d.ViewModel;
+                d.View.DataContext = d.ViewModel;
                 list.Add(viewType, d);
                 return true;
             }

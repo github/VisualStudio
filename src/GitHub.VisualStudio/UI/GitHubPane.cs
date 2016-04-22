@@ -39,11 +39,6 @@ namespace GitHub.VisualStudio.UI
             get { return Content as IView; }
             set { Content = value; }
         }
-        IViewModel ViewModel
-        {
-            get { return (Content as UserControl).DataContext as IViewModel; }
-            set { (Content as UserControl).DataContext = value; }
-        }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
@@ -64,20 +59,20 @@ namespace GitHub.VisualStudio.UI
             var d = factory.CreateViewAndViewModel(Exports.UIViewType.GitHubPane);
             // placeholder logic to load the view until the UIController is able to do it for us
             View = d.View;
-            ViewModel = d.ViewModel;
+            View.DataContext = d.ViewModel;
         }
 
         protected override void Initialize()
         {
             base.Initialize();
-            var vm = (Content as IView).ViewModel as IServiceProviderAware;
+            var vm = View.ViewModel as IServiceProviderAware;
             Debug.Assert(vm != null);
             vm?.Initialize(this);
         }
 
         public void ShowView(ViewWithData data)
         {
-            ViewModel?.Initialize(data);
+            View.ViewModel?.Initialize(data);
         }
 
         [return: AllowNull]
