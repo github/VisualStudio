@@ -22,7 +22,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel
+    public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
     {
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
@@ -172,9 +172,30 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
         }
 
+        IAccount emptyUser = new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>());
         public IAccount EmptyUser
         {
-            get { return new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>()); }
+            get { return emptyUser; }
+        }
+
+
+        bool disposed;
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                pullRequests.Dispose();
+                trackingAuthors.Dispose();
+                trackingAssignees.Dispose();
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 
