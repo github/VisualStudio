@@ -88,6 +88,7 @@ namespace GitHub.Collections
             this.filter = filter;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public TrackingCollection(IObservable<T> source,
             Func<T, T, int> comparer = null,
             Func<T, int, IList<T>, bool> filter = null,
@@ -108,6 +109,10 @@ namespace GitHub.Collections
         {
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
+
+            disposables.Clear();
+            while (!queue.IsEmpty)
+                GetFromQueue();
 
             sourceQueue = obs
                 .Do(data => queue.Enqueue(new ActionData(data)));
