@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Extensions;
@@ -18,6 +17,7 @@ using ReactiveUI;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 
 namespace GitHub.SampleData
 {
@@ -326,68 +326,6 @@ namespace GitHub.SampleData
         public IObservable<Unit> LogOut()
         {
             throw new NotImplementedException();
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public sealed class AccountDesigner : IAccount
-    {
-        public AccountDesigner()
-        {
-            Login = "octocat";
-            IsUser = true;
-        }
-
-        public BitmapSource Avatar
-        {
-            get
-            {
-                return IsUser
-                    ? AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")
-                    : AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
-            }
-        }
-
-        public bool HasMaximumPrivateRepositories
-        {
-            get;
-            set;
-        }
-
-        public bool IsEnterprise
-        {
-            get;
-            set;
-        }
-
-        public bool IsOnFreePlan
-        {
-            get;
-            set;
-        }
-
-        public bool IsUser
-        {
-            get;
-            set;
-        }
-
-        public string Login
-        {
-            get;
-            set;
-        }
-
-        public int OwnedPrivateRepos
-        {
-            get;
-            set;
-        }
-
-        public long PrivateReposInPlan
-        {
-            get;
-            set;
         }
     }
 
