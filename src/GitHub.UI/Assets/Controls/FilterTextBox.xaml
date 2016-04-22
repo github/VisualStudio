@@ -40,7 +40,7 @@
                             </Border>
                         </Border>
 
-                        <Grid Margin="1,0,0,0">
+                        <Grid Margin="1,1,0,0">
                             <ScrollViewer
                                 x:Name="PART_ContentHost"
                                 Padding="{TemplateBinding Padding}"
