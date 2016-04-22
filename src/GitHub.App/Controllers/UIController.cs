@@ -22,6 +22,7 @@ namespace GitHub.Controllers
 {
     using App.Factories;
     using System.Globalization;
+    using System.Windows.Controls;
     using StateMachineType = StateMachine<UIViewType, UIController.Trigger>;
 
     /*
@@ -260,18 +261,9 @@ namespace GitHub.Controllers
             if (where.Flow != mainFlow)
                 return;
 
-            if (uiStateMachine.IsInState(where.ViewType))
-            {
-                var objs = GetObjectsForFlow(activeFlow);
-                var pair = objs[where.ViewType];
-                pair.ViewModel.Initialize(where);
-            }
-            else
-            {
-                requestedTarget = where;
-                if (activeFlow == where.Flow)
-                    Fire(Trigger.Next, where);
-            }
+            requestedTarget = where;
+            if (activeFlow == where.Flow)
+                Fire(Trigger.Next, where);
         }
 
         public void Stop()
@@ -588,7 +580,7 @@ namespace GitHub.Controllers
                 requestedTarget = null;
             }
 
-            bool firstTime = CreateViewAndViewModel(viewType);
+            bool firstTime = CreateViewAndViewModel(viewType, arg);
             var view = GetObjectsForFlow(activeFlow)[viewType].View;
             transition.OnNext(new LoadData
             {
@@ -606,15 +598,13 @@ namespace GitHub.Controllers
             if (!firstTime)
                 return;
 
-            SetupView(viewType, view, arg);
+            SetupView(viewType, view);
         }
 
-        void SetupView(UIViewType viewType, IView view, ViewWithData arg = null)
+        void SetupView(UIViewType viewType, IView view)
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
-
-            pair.ViewModel.Initialize(arg);
 
             // 2FA is set up when login is set up, so nothing to do
             if (viewType == UIViewType.TwoFactor)
@@ -670,7 +660,7 @@ namespace GitHub.Controllers
         /// </summary>
         /// <param name="viewType"></param>
         /// <returns>true if the View/ViewModel didn't exist and had to be created</returns>
-        bool CreateViewAndViewModel(UIViewType viewType)
+        bool CreateViewAndViewModel(UIViewType viewType, [AllowNull]ViewWithData data = null)
         {
             var list = GetObjectsForFlow(activeFlow);
             if (viewType == UIViewType.Login)
@@ -688,12 +678,16 @@ namespace GitHub.Controllers
             {
                 var d = list[viewType];
                 if (d.View.ViewModel == null)
+                {
+                    d.ViewModel.Initialize(data);
                     d.View.DataContext = d.ViewModel;
+                }
             }
 
             if (!list.ContainsKey(viewType))
             {
                 var d = factory.CreateViewAndViewModel(viewType);
+                d.ViewModel.Initialize(data);
                 d.View.DataContext = d.ViewModel;
                 list.Add(viewType, d);
                 return true;
