@@ -385,7 +385,11 @@
                     <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
                 </StackPanel>
 
-                <ui:OcticonImage Grid.Column="1" Icon="check" Foreground="Green" HorizontalAlignment="Right"/>
+                <!--
+                <ui:OcticonImage Grid.Column="1" Icon="check" Foreground="{DynamicResource GitHubPrimaryGreenBrush}" HorizontalAlignment="Right"VerticalAlignment="Center" />
+                -->
+                <ui:OcticonImage Grid.Column="1" Icon="alert" Foreground="{DynamicResource GitHubPrimaryOrangeBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+
                 <Popup
                     x:Name="branchPopup"
                     AllowsTransparency="True"

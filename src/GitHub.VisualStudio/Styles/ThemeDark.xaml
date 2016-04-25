@@ -24,6 +24,9 @@
   <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
   -->
 
+  <SolidColorBrush x:Key="GitHubPrimaryGreenBrush" Color="#FF6CC644" />
+  <SolidColorBrush x:Key="GitHubPrimaryOrangeBrush" Color="#FFC9510C" />
+
   <SolidColorBrush x:Key="GitHubButtonBackgroundBrush" Color="#FF3F404B" />
   <SolidColorBrush x:Key="GitHubButtonBackgroundMouseOverBrush" Color="#FF4B4C59" />
   <SolidColorBrush x:Key="GitHubButtonBackgroundPressedBrush" Color="#FF2F3038" />
