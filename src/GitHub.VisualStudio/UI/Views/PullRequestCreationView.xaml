@@ -372,12 +372,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <StackPanel Margin="10,0" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="From" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
-                <TextBlock VerticalAlignment="Center" Text="into" Foreground="{DynamicResource GitHubVsGrayText}" />
+            <StackPanel Margin="10,0,10,10" Orientation="Horizontal">
+                <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
                 <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
-
+                <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
+                <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
                 <Popup
                     x:Name="branchPopup"
                     AllowsTransparency="True"
