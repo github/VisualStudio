@@ -372,12 +372,20 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <StackPanel Margin="10,0,10,10" Orientation="Horizontal">
-                <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
-                <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
-                <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
-                <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
-                <ui:OcticonImage Icon="check" Foreground="Green" HorizontalAlignment="Right"/>
+            <Grid Margin="10,0,10,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
+                    <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
+                    <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
+                    <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                </StackPanel>
+
+                <ui:OcticonImage Grid.Column="1" Icon="check" Foreground="Green" HorizontalAlignment="Right"/>
                 <Popup
                     x:Name="branchPopup"
                     AllowsTransparency="True"
@@ -429,7 +437,7 @@
                         </Grid>
                     </Border>
                 </Popup>
-            </StackPanel>
+            </Grid>
 
         </StackPanel>
 
