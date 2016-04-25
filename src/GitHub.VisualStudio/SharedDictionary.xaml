@@ -7,6 +7,7 @@
   <ResourceDictionary.MergedDictionaries>
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml"/>
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ActionLinkButton.xaml" />
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubComboBox.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}" />

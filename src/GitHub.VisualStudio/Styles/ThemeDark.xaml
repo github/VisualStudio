@@ -41,4 +41,7 @@
   <SolidColorBrush x:Key="GitHubPrimaryButtonBorderBrush" Color="#FF7BA84D" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBorderMouseOverBrush" Color="#FF95CC5E" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBorderPressedBrush" Color="#FF7BA84D" />
+
+  <SolidColorBrush x:Key="GitHubComboBoxBackgroundBrush" Color="#FF1B1B1C" />
+  <SolidColorBrush x:Key="GitHubComboBoxBorderBrush" Color="#FF434346" />
 </ResourceDictionary>
