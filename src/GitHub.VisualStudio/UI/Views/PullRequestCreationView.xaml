@@ -386,12 +386,16 @@
                     <i:Interaction.Behaviors>
                         <ui:DropDownActionLinkBehaviour />
                     </i:Interaction.Behaviors>
-                    <ui:GitHubActionLink.ContextMenu>
-                        <ContextMenu ItemsSource="{Binding Branches}" >
+                    <!--<ui:GitHubActionLink.ContextMenu>
+                        <ContextMenu x:Name="branchList" ItemsSource="{Binding Branches}" >
                           
                         </ContextMenu>
-                    </ui:GitHubActionLink.ContextMenu>
+                    </ui:GitHubActionLink.ContextMenu>-->
+                    
                 </ui:GitHubActionLink>
+                <ListBox x:Name="branchList" ItemsSource="{Binding Branches}">
+                    
+                </ListBox>    
             </StackPanel>
 
             <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{StaticResource GitHubVsPromptTextBox}" />
