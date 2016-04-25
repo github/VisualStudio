@@ -104,16 +104,22 @@
                         <ControlTemplate TargetType="{x:Type TabItem}">
                             <Border Name="Border" CornerRadius="2,2,0,0"
                                     Padding="10,3">
-                                <DockPanel>
-                                    <ui:OcticonImage Icon="info" Margin="0,0,5,0" />
+                                <DockPanel HorizontalAlignment="Center">
+                                    <ui:OcticonImage 
+                                        VerticalAlignment="Center"
+                                        Icon="info" Margin="0,0,5,0" />
 
                                     <TextBlock
                                         x:Name="ContentSite"
                                         FontSize="12"
                                         VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
                                         Foreground="#ff333333"
                                         Text="{TemplateBinding Header}" />
+
+                                    <TextBlock  Margin="5,0,0,0" Foreground="#FFAAAAAA"
+                                        VerticalAlignment="Center"
+                                        Text="3" />
+
                                 </DockPanel>
                             </Border>
 
