@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
         private bool IsLoading;
 
 
-
+        [ImportingConstructor]
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
         {
             Branches = new ReactiveList<IBranch>();
