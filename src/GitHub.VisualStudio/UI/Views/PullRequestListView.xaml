@@ -283,8 +283,7 @@
                                              RelativeSource={RelativeSource FindAncestor,
                                                                             AncestorType={x:Type local:PullRequestListView}}}"
                            Content="Create New" />
-
-    </Grid>
+        </Grid>
 
     <ListView x:Name="pullRequests"
               Margin="0,0,0,0"

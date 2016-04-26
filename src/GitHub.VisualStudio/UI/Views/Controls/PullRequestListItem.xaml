@@ -35,6 +35,7 @@
              Height="32"
              Margin="0,0,9,0"
              RenderOptions.BitmapScalingMode="HighQuality"
+             VerticalAlignment="Top"
              Source="{Binding Author.Avatar}" />
       <TextBlock x:Name="title"
                  Grid.Row="0"
@@ -46,32 +47,33 @@
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
                  Text="{Binding Title}"
                  TextWrapping="WrapWithOverflow" />
-      <ui:OcticonImage x:Name="comment_icon"
-                       Grid.Row="0"
-                       Grid.Column="2"
-                       Width="14"
-                       Height="14"
-                       Margin="0,0,1,0"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Foreground="{DynamicResource GitHubVsToolWindowText}"
-                       Icon="comment">
-        <ui:OcticonImage.Style>
-          <Style>
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding CommentCount}" Value="0">
-                <Setter Property="FrameworkElement.IsEnabled" Value="False" />
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </ui:OcticonImage.Style>
+        <ui:OcticonImage x:Name="comment_icon"
+                   Grid.Row="0"
+                   Grid.Column="2"
+                   Icon="comment"
+                   Margin="5,0"
+                   Width="14"
+                   Height="14"
+                   VerticalAlignment="Top"
+                   Foreground="{DynamicResource GitHubVsToolWindowText}" >
+            <!--
+            <ui:OcticonImage.Style>
+              <Style>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding CommentCount}" Value="0">
+                    <Setter Property="FrameworkElement.IsEnabled" Value="False" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </ui:OcticonImage.Style>
+            -->
+        </ui:OcticonImage>
 
-      </ui:OcticonImage>
       <TextBlock x:Name="comment_count"
                  Grid.Row="0"
                  Grid.Column="3"
                  HorizontalAlignment="Left"
-                 VerticalAlignment="Center"
+                 VerticalAlignment="Top"
                  FontFamily="Segoe UI"
                  FontSize="12"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
@@ -85,15 +87,16 @@
             </Style.Triggers>
           </Style>
         </TextBlock.Style>
-
       </TextBlock>
+
       <ui:OcticonImage x:Name="comment_new"
                        Grid.Row="0"
                        Grid.Column="4"
                        Width="10"
                        Height="10"
                        HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
+                       VerticalAlignment="Top"
+                       Margin="0,3"
                        Foreground="Green"
                        Icon="primitive_dot"
                        Visibility="{Binding HasNewComments,

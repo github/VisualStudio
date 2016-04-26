@@ -26,7 +26,7 @@ namespace GitHub.SampleData
                 new AccountDesigner { Login = "haacked", IsUser = true },
                 new AccountDesigner { Login = "shana", IsUser = true },
                 DateTimeOffset.Now - TimeSpan.FromMinutes(2)) { CommentCount = 4, HasNewComments = false });
-            prs.Add(new PullRequestModel(409, "Fix publish button style",
+            prs.Add(new PullRequestModel(409, "Fix publish button style and a really, really long name for this thing... OMG look how long this name is yusssss",
                 new AccountDesigner { Login = "shana", IsUser = true },
                 new AccountDesigner { Login = "Haacked", IsUser = true },
                 DateTimeOffset.Now - TimeSpan.FromHours(5)) { CommentCount = 27, HasNewComments = true });
