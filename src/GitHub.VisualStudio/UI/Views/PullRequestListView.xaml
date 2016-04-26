@@ -155,6 +155,7 @@
         <ui:GitHubActionLink x:Name="stateSelection"
                              Margin="5,0"
                              VerticalAlignment="Center"
+                             ToolTip="Filter by state"
                              Content="{Binding SelectedState}"
                              HasDropDown="True" />
 
@@ -185,6 +186,7 @@
         <ui:GitHubActionLink x:Name="assigneeSelection"
                              Margin="5,0"
                              VerticalAlignment="Center"
+                             ToolTip="Filter by assignee"
                              Content="{Binding SelectedAssignee,
                                                Converter={ui:DefaultValueConverter},
                                                ConverterParameter=Assignee}"
@@ -232,6 +234,7 @@
         <ui:GitHubActionLink x:Name="authorSelection"
                              Margin="5,0"
                              VerticalAlignment="Center"
+                             ToolTip="Filter by author"
                              Content="{Binding SelectedAuthor,
                                                Converter={ui:DefaultValueConverter},
                                                ConverterParameter=Author}"
