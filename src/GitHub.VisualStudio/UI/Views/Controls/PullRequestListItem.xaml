@@ -33,7 +33,7 @@
              Grid.Column="0"
              Width="32"
              Height="32"
-             Margin="0,0,9,0"
+             Margin="0,0,10,0"
              RenderOptions.BitmapScalingMode="HighQuality"
              VerticalAlignment="Top"
              Source="{Binding Author.Avatar}" />
@@ -41,10 +41,11 @@
                  Grid.Row="0"
                  Grid.Column="1"
                  HorizontalAlignment="Left"
-                 VerticalAlignment="Center"
+                 VerticalAlignment="Top"
                  FontFamily="Segoe UI"
                  FontSize="14"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
+                 Margin="0,-5,10,0"
                  Text="{Binding Title}"
                  TextWrapping="WrapWithOverflow" />
         <ui:OcticonImage x:Name="comment_icon"
@@ -55,7 +56,7 @@
                    Width="14"
                    Height="14"
                    VerticalAlignment="Top"
-                   Foreground="{DynamicResource GitHubVsToolWindowText}" >
+                   Foreground="{DynamicResource GitHubVsToolWindowText}">
             <!--
             <ui:OcticonImage.Style>
               <Style>
@@ -122,6 +123,7 @@
                    Grid.Column="1"
                    FontFamily="Segoe UI"
                    FontSize="11"
+                   Margin="0,0,10,0"
                    Foreground="{DynamicResource GitHubVsGrayText}">
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2} {3}">
