@@ -45,6 +45,8 @@
                  FontFamily="Segoe UI"
                  FontSize="14"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
+                 LineHeight="20"
+                 LineStackingStrategy="BlockLineHeight"
                  Margin="0,-5,10,0"
                  Text="{Binding Title}"
                  TextWrapping="WrapWithOverflow" />
@@ -117,13 +119,14 @@
                 CommandParameter="{Binding Number}"
                 Content="{Binding Number}"
                 FontFamily="Segoe UI"
-                FontSize="11"
+                FontSize="12"
+                Margin="0,3,0,0"
                 Style="{StaticResource HashtagActionLink}" />
         <TextBlock x:Name="description"
                    Grid.Column="1"
                    FontFamily="Segoe UI"
-                   FontSize="11"
-                   Margin="0,0,10,0"
+                   FontSize="12"
+                   Margin="0,3,10,0"
                    Foreground="{DynamicResource GitHubVsGrayText}">
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2} {3}">
