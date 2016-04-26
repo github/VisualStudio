@@ -180,10 +180,10 @@
           </Border>
         </Popup>
 
-        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
+        <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink x:Name="assigneeSelection"
-                             Margin="10,0"
+                             Margin="5,0"
                              VerticalAlignment="Center"
                              Content="{Binding SelectedAssignee,
                                                Converter={ui:DefaultValueConverter},
@@ -227,7 +227,7 @@
           </Border>
         </Popup>
 
-        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
+        <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink x:Name="authorSelection"
                              Margin="5,0"
