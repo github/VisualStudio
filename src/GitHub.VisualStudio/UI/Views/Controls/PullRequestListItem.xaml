@@ -55,8 +55,8 @@
                    Grid.Column="2"
                    Icon="comment"
                    Margin="5,0"
-                   Width="14"
-                   Height="14"
+                   Width="16"
+                   Height="16"
                    VerticalAlignment="Top"
                    Foreground="{DynamicResource GitHubVsToolWindowText}">
             <!--
