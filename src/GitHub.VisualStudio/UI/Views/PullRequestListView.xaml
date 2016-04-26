@@ -34,7 +34,7 @@
 
       <Style x:Key="PullRequestListItemContainerStyle" TargetType="{x:Type ListViewItem}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Margin" Value="0,8" />
+        <Setter Property="Margin" Value="0,0,0,15" />
         <Setter Property="Padding" Value="1" />
 
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -144,7 +144,7 @@
 
   <DockPanel Margin="6,0,6,0">
 
-    <Grid Margin="0,0,0,4" DockPanel.Dock="Top">
+    <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
@@ -153,7 +153,7 @@
       <WrapPanel Grid.Column="0" HorizontalAlignment="Stretch">
 
         <ui:GitHubActionLink x:Name="stateSelection"
-                             Margin="5,0,0,0"
+                             Margin="5,0"
                              VerticalAlignment="Center"
                              Content="{Binding SelectedState}"
                              HasDropDown="True" />
@@ -183,7 +183,7 @@
         <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink x:Name="assigneeSelection"
-                             Margin="5,0,0,0"
+                             Margin="10,0"
                              VerticalAlignment="Center"
                              Content="{Binding SelectedAssignee,
                                                Converter={ui:DefaultValueConverter},
@@ -230,7 +230,7 @@
         <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink x:Name="authorSelection"
-                             Margin="5,0,0,0"
+                             Margin="5,0"
                              VerticalAlignment="Center"
                              Content="{Binding SelectedAuthor,
                                                Converter={ui:DefaultValueConverter},
