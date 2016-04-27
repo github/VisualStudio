@@ -126,6 +126,7 @@
                    FontFamily="Segoe UI"
                    FontSize="12"
                    Margin="0,0,10,0"
+                   TextTrimming="CharacterEllipsis"
                    Foreground="{DynamicResource GitHubVsGrayText}">
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2} {3}">
@@ -135,6 +136,21 @@
               <Binding Path="Author.Login" />
             </MultiBinding>
           </TextBlock.Text>
+
+          <TextBlock.ToolTip>
+            <ToolTip>
+                <TextBlock>
+                    <TextBlock.Text>
+                       <MultiBinding StringFormat="{} {0} {1} {2} {3}">
+                          <Binding Source="{x:Static i18n:Resources.prOpenedText}" />
+                          <Binding Converter="{StaticResource DurationToStringConverter}" Path="UpdatedAt" />
+                          <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
+                          <Binding Path="Author.Login" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </ToolTip>
+          </TextBlock.ToolTip>
         </TextBlock>
       </Grid>
     </Grid>
