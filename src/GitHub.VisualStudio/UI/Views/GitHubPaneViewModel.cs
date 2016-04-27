@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using GitHub.Api;
+using GitHub.App.Factories;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
