@@ -130,9 +130,9 @@ namespace GitHub.VisualStudio.UI.Views
             }
             else
             {
-                //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
-                //Control = c.View;
+                var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                Control = c.View;
             }
         }
 
