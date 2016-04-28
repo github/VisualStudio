@@ -386,6 +386,8 @@
                     <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
                 </StackPanel>
 
+                <!-- Show a check if the branch is mergeable (is that even a word??), 
+                     show an alert icon if it conflicts with the base branch -->
                 <ui:OcticonImage Grid.Column="1"
                     Icon="check"
                     Foreground="{DynamicResource GitHubPrimaryGreenBrush}"
