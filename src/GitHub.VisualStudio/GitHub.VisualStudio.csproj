@@ -214,7 +214,6 @@
     <Compile Include="Menus\AddConnection.cs" />
     <Compile Include="Menus\CopyLink.cs" />
     <Compile Include="Menus\MenuProvider.cs" />
-    <Compile Include="Base\PackageBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Settings\Constants.cs" />
@@ -374,10 +373,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
-    </Page>
-    <Page Include="UI\Settings\OptionsStyles.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
       <SubType>Designer</SubType>
