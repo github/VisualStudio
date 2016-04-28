@@ -18,7 +18,7 @@
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
@@ -45,13 +45,13 @@
                  FontFamily="Segoe UI"
                  FontSize="14"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
-                 LineHeight="18"
-                 LineStackingStrategy="BlockLineHeight"
-                 Margin="0,-3,10,2"
+                 Margin="0,-3,5,0"
                  Text="{Binding Title}"
+                 ToolTip="{Binding Title}"
                  TextTrimming="CharacterEllipsis" />
         <ui:OcticonImage x:Name="comment_icon"
                    Grid.Row="0"
+                   Grid.RowSpan="2"
                    Grid.Column="2"
                    Icon="comment"
                    Margin="5,0"
@@ -74,6 +74,7 @@
 
       <TextBlock x:Name="comment_count"
                  Grid.Row="0"
+                 Grid.RowSpan="2"
                  Grid.Column="3"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Center"
@@ -94,11 +95,12 @@
 
       <ui:OcticonImage x:Name="comment_new"
                        Grid.Row="0"
+                       Grid.RowSpan="2"
                        Grid.Column="4"
                        Width="10"
                        Height="10"
                        HorizontalAlignment="Right"
-                       VerticalAlignment="Top"
+                       VerticalAlignment="Center"
                        Margin="0,3"
                        Foreground="Green"
                        Icon="primitive_dot"
