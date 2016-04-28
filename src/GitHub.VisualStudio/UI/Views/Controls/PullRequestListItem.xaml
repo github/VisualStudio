@@ -49,7 +49,7 @@
                  LineStackingStrategy="BlockLineHeight"
                  Margin="0,-3,10,2"
                  Text="{Binding Title}"
-                 TextWrapping="WrapWithOverflow" />
+                 TextTrimming="CharacterEllipsis" />
         <ui:OcticonImage x:Name="comment_icon"
                    Grid.Row="0"
                    Grid.Column="2"
@@ -57,7 +57,7 @@
                    Margin="5,0"
                    Width="16"
                    Height="16"
-                   VerticalAlignment="Top"
+                   VerticalAlignment="Center"
                    Foreground="{DynamicResource GitHubVsToolWindowText}">
             <!--
             <ui:OcticonImage.Style>
@@ -76,7 +76,7 @@
                  Grid.Row="0"
                  Grid.Column="3"
                  HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
+                 VerticalAlignment="Center"
                  FontFamily="Segoe UI"
                  FontSize="12"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
