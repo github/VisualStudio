@@ -1,4 +1,9 @@
-﻿using System.Windows;
+﻿using GitHub.VisualStudio;
+using System;
+using System.Collections;
+using System.Diagnostics;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Interactivity;
@@ -22,21 +27,40 @@ namespace GitHub.UI
                         previousSelection = AssociatedObject.SelectedItem;
                         if (defaultValue == null)
                         {
-                            var binding = AssociatedObject.GetBindingExpression(ListBox.ItemsSourceProperty);
+                            var binding = GetBinding();
+                            Debug.Assert(binding != null, "Cannot find ItemsSource binding. Did you configure it in the target Listbox?");
                             if (binding == null)
-                            {
-                                var m = BindingOperations.GetMultiBindingExpression(AssociatedObject, ListBox.ItemsSourceProperty);
-                                binding = (BindingExpression)m.BindingExpressions[0];
-                            }
+                                return;
                             defaultValue = PropertyPathHelper.GetValue(binding.ResolvedSource, binding.ResolvedSourcePropertyName);
                         }
                         dynamic items = AssociatedObject.ItemsSource;
-                        items.Insert(0, defaultValue);
+                        var list = items as IList;
+                        Debug.Assert(list != null, "ItemsSource data source is not an IList, cannot change it.");
+                        if (list == null)
+                            return;
+                        try
+                        {
+                            items.Insert(0, defaultValue);
+                        }
+                        catch (Exception ex)
+                        {
+#if DEBUG
+                            throw ex;
+#else
+                            VsOutputLogger.WriteLine(String.Format(CultureInfo.CurrentCulture, "Could not add default empty item to the bound ItemsSource data source - the collection does not allow insertion (or the type does not match). {0}", ex));
+#endif
+                        }
                     }
                     else if (AssociatedObject.SelectedIndex == 0)
                     {
                         dynamic items = AssociatedObject.ItemsSource;
-                        items.RemoveAt(0);
+                        var list = items as IList;
+                        Debug.Assert(list != null, "ItemsSource data source is not an IList, cannot change it.");
+                        Debug.Assert(list.Count == 0, "ItemsSource data source is empty, something went wrong.");
+                        if (list == null || list.Count == 0)
+                            return;
+                        if (items[0] == defaultValue)
+                            items.RemoveAt(0);
                     }
                 }
                 if (e.RemovedItems.Count > 0)
@@ -48,6 +72,18 @@ namespace GitHub.UI
                     }
                 }
             };
+        }
+
+        BindingExpression GetBinding()
+        {
+            var binding = AssociatedObject.GetBindingExpression(ListBox.ItemsSourceProperty);
+            if (binding == null)
+            {
+                var m = BindingOperations.GetMultiBindingExpression(AssociatedObject, ItemsControl.ItemsSourceProperty);
+                if (m != null && m.BindingExpressions.Count > 0)
+                    binding = (BindingExpression) m.BindingExpressions[0];
+            }
+            return binding;
         }
 
         static class PropertyPathHelper
