@@ -57,7 +57,7 @@
                    Margin="5,0"
                    Width="16"
                    Height="16"
-                   VerticalAlignment="Center"
+                   VerticalAlignment="Top"
                    Foreground="{DynamicResource GitHubVsToolWindowText}">
             <!--
             <ui:OcticonImage.Style>
@@ -77,7 +77,7 @@
                  Grid.RowSpan="2"
                  Grid.Column="3"
                  HorizontalAlignment="Left"
-                 VerticalAlignment="Center"
+                 VerticalAlignment="Top"
                  FontFamily="Segoe UI"
                  FontSize="12"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
@@ -100,7 +100,7 @@
                        Width="10"
                        Height="10"
                        HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
+                       VerticalAlignment="Top"
                        Margin="0,3"
                        Foreground="Green"
                        Icon="primitive_dot"
