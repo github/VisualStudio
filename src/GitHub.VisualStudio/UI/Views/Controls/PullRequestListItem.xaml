@@ -27,16 +27,28 @@
         <ColumnDefinition Width="12" />
         <ColumnDefinition Width="11" />
       </Grid.ColumnDefinitions>
-      <Image x:Name="avatar"
-             Grid.Row="0"
-             Grid.RowSpan="2"
-             Grid.Column="0"
-             Width="30"
-             Height="30"
-             Margin="0,0,10,0"
-             RenderOptions.BitmapScalingMode="HighQuality"
-             VerticalAlignment="Top"
-             Source="{Binding Author.Avatar}" />
+
+      <Grid 
+          Grid.Row="0"
+          Grid.RowSpan="2"
+          Grid.Column="0"
+          VerticalAlignment="Top">
+
+          <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
+
+          <StackPanel>
+              <StackPanel.OpacityMask>
+                  <VisualBrush Visual="{Binding ElementName=avatarMask}" />
+              </StackPanel.OpacityMask>
+              <Image x:Name="avatar"
+                     Width="30"
+                     Margin="0,0,10,0"
+                     Height="30"
+                     RenderOptions.BitmapScalingMode="HighQuality"
+                     Source="{Binding Author.Avatar}" />
+          </StackPanel>
+      </Grid>
+        
       <TextBlock x:Name="title"
                  Grid.Row="0"
                  Grid.Column="1"
