@@ -26,7 +26,7 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
-        CompositeDisposable disposables = new CompositeDisposable();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
         WindowController windowController;
 
