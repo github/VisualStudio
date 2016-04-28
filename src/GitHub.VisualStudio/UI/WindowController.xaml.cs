@@ -10,9 +10,9 @@ namespace GitHub.VisualStudio.UI
     public partial class WindowController : DialogWindow, IDisposable
     {
         IDisposable subscription;
-        IObservable<LoadData> controls;
-        Func<IView, bool> shouldLoad;
-        Func<IView, bool> shouldStop;
+        readonly IObservable<LoadData> controls;
+        readonly Func<IView, bool> shouldLoad;
+        readonly Func<IView, bool> shouldStop;
 
         /// <summary>
         /// 
@@ -64,7 +64,6 @@ namespace GitHub.VisualStudio.UI
         public void Stop()
         {
             subscription?.Dispose();
-            subscription = null;
         }
 
         bool disposed = false;
