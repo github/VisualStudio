@@ -3,33 +3,690 @@
                                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                       xmlns:helpers="clr-namespace:GitHub.VisualStudio.Helpers"
+                                      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                      xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
-                                      d:DesignHeight="300"
+                                      d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       mc:Ignorable="d">
 
-  <d:DesignProperties.DataContext>
-    <Binding>
-      <Binding.Source>
-        <sampleData:PullRequestCreationViewModelDesigner />
-      </Binding.Source>
-    </Binding>
-  </d:DesignProperties.DataContext>
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <sampleData:PullRequestCreationViewModelDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
-        <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
-  <StackPanel Orientation="Vertical">
-    <Label Content="{Binding Name}" />
-    <ListView ItemsSource="{Binding Users}"></ListView>
-  </StackPanel>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+                <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="GitHubPRDetailsTabControl" TargetType="{x:Type TabControl}">
+                <Setter Property="Padding" Value="2"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Background" Value="{DynamicResource TabItem.Selected.Background}"/>
+                <Setter Property="BorderBrush" Value="#FFD0D7E4"/>
+                <Setter Property="BorderThickness" Value="0,1,0,0"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabControl}">
+                            <Grid x:Name="templateRoot" ClipToBounds="true" SnapsToDevicePixels="true" KeyboardNavigation.TabNavigation="Local">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition x:Name="ColumnDefinition0"/>
+                                    <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
+                                    <RowDefinition x:Name="RowDefinition1" Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TabPanel x:Name="headerPanel" Background="Transparent" Grid.Column="0" IsItemsHost="true" Margin="2,2,2,-1" Grid.Row="0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"/>
+                                <Border x:Name="contentPanel" BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Background="{TemplateBinding Background}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
+                                    <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                </Border>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="TabStripPlacement" Value="Bottom">
+                                    <Setter Property="Grid.Row" TargetName="headerPanel" Value="1"/>
+                                    <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
+                                    <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+                                    <Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
+                                    <Setter Property="Margin" TargetName="headerPanel" Value="2,0,2,2"/>
+                                </Trigger>
+                                <Trigger Property="TabStripPlacement" Value="Left">
+                                    <Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>
+                                    <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
+                                    <Setter Property="Grid.Column" TargetName="headerPanel" Value="0"/>
+                                    <Setter Property="Grid.Column" TargetName="contentPanel" Value="1"/>
+                                    <Setter Property="Width" TargetName="ColumnDefinition0" Value="Auto"/>
+                                    <Setter Property="Width" TargetName="ColumnDefinition1" Value="*"/>
+                                    <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+                                    <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
+                                    <Setter Property="Margin" TargetName="headerPanel" Value="2,2,0,2"/>
+                                </Trigger>
+                                <Trigger Property="TabStripPlacement" Value="Right">
+                                    <Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>
+                                    <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
+                                    <Setter Property="Grid.Column" TargetName="headerPanel" Value="1"/>
+                                    <Setter Property="Grid.Column" TargetName="contentPanel" Value="0"/>
+                                    <Setter Property="Width" TargetName="ColumnDefinition0" Value="*"/>
+                                    <Setter Property="Width" TargetName="ColumnDefinition1" Value="Auto"/>
+                                    <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+                                    <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
+                                    <Setter Property="Margin" TargetName="headerPanel" Value="0,2,2,2"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="GitHubPRDetailsTabItem" TargetType="{x:Type TabItem}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource NoMarginFocusVisual}" />
+                <Setter Property="Width" Value="Auto" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabItem}">
+                            <Border Name="Border" CornerRadius="2,2,0,0"
+                                    Padding="10,3">
+                                <DockPanel HorizontalAlignment="Center">
+                                    <ui:OcticonImage 
+                                        VerticalAlignment="Center"
+                                        Icon="info" Margin="0,0,5,0" />
+
+                                    <TextBlock
+                                        x:Name="ContentSite"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"
+                                        Foreground="#ff333333"
+                                        Text="{TemplateBinding Header}" />
+
+                                    <TextBlock  Margin="5,0,0,0" Foreground="#FFAAAAAA"
+                                        VerticalAlignment="Center"
+                                        Text="3" />
+
+                                </DockPanel>
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="White" /> 
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="#ffD0D7E4" /> 
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" /> 
+                                </Trigger>
+
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{StaticResource GHBlueLinkButtonHoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
+                <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}"/>
+                <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}"/>
+                <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="AllowDrop" Value="true"/>
+                <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ui:PromptTextBox}">
+                            <Grid>
+                                <Border x:Name="Bd" CornerRadius="0" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                    <Border CornerRadius="0" BorderBrush="Black" BorderThickness="0,1,0,0" Margin="2,-2,2,0" Opacity="0.4">
+                                        <Border.Effect>
+                                            <DropShadowEffect Direction="270" ShadowDepth="0" BlurRadius="4" Opacity="1" />
+                                        </Border.Effect>
+                                    </Border>
+                                </Border>
+
+                                <Grid Margin="1,2,0,0">
+                                    <ScrollViewer x:Name="PART_ContentHost" Padding="{TemplateBinding Padding}" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" VerticalAlignment="Top" Margin="0"/>
+                                    <Label x:Name="PromptLabel" HorizontalAlignment="Left"
+                                         Foreground="{DynamicResource GitHubVsGrayText}"
+                                         FontSize="{TemplateBinding FontSize}" Margin="2,0,0,0" Padding="{TemplateBinding Padding}" Opacity="0"
+                                         Target="{Binding ElementName=Bd}"
+                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Focusable="False" IsHitTestVisible="False"
+                                         VerticalAlignment="Top">
+                                        <TextBlock Text="{TemplateBinding PromptText}" TextTrimming="CharacterEllipsis" />
+                                    </Label>
+                                </Grid>
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
+                                </Trigger>
+                                <DataTrigger Binding="{Binding Text.Length, RelativeSource={RelativeSource Self}}" Value="0">
+                                    <Setter Property="Opacity" TargetName="PromptLabel" Value="0.7" />
+                                    <Setter Property="Foreground" Value="Transparent" />
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Button -->
+            <Style x:Key="GitHubVsButton" TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="{DynamicResource GitHubButtonBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubButtonBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
+                <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="12,5" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="MinWidth" Value="76" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="ToolTipService.ShowDuration" Value="30000" />
+                <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                           Storyboard.TargetName="MouseOverBorder">
+                                                    <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                           Storyboard.TargetName="PressedBorder">
+                                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                           Storyboard.TargetName="DisabledVisualElement">
+                                                    <SplineDoubleKeyFrame KeyTime="0" Value="0.5" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                           Storyboard.TargetName="contentPresenter">
+                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0.5" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="FocusStates">
+                                        <VisualState x:Name="Focused" />
+                                        <VisualState x:Name="Unfocused" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border x:Name="Background" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
+                            Background="{TemplateBinding Background}" />
+                                <Rectangle x:Name="DisabledVisualElement"
+                               Fill="{DynamicResource GitHubButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                               Opacity="0" />
+                                <Border x:Name="MouseOverBorder" BorderBrush="{DynamicResource GitHubButtonBorderMouseOverBrush}"
+                            Background="{DynamicResource GitHubButtonBackgroundMouseOverBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubButtonBorderPressedBrush}"
+                            Background="{DynamicResource GitHubButtonBackgroundPressedBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                                <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
+                            Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                                <ContentPresenter x:Name="contentPresenter"
+                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsDefaulted" Value="True">
+                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!-- End Button -->
+
+            <!-- PrimaryActionButton -->
+            <Style x:Key="GitHubVsPrimaryActionButton" TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="{DynamicResource GitHubPrimaryButtonBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundBrush}" />
+                <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="12,5" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="MinWidth" Value="76" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="ToolTipService.ShowDuration" Value="30000" />
+                <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                           Storyboard.TargetName="MouseOverBorder">
+                                                    <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                           Storyboard.TargetName="PressedBorder">
+                                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                           Storyboard.TargetName="DisabledVisualElement">
+                                                    <SplineDoubleKeyFrame KeyTime="0" Value="0.5" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                           Storyboard.TargetName="contentPresenter">
+                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0.5" />
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="FocusStates">
+                                        <VisualState x:Name="Focused" />
+                                        <VisualState x:Name="Unfocused" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border x:Name="Background" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
+                            Background="{TemplateBinding Background}" />
+                                <Rectangle x:Name="DisabledVisualElement"
+                               Fill="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
+                               Opacity="0" />
+                                <Border x:Name="MouseOverBorder" BorderBrush="#FF6ba157"
+                                    Background="#FF71BD1E"
+                                    BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderPressedBrush}"
+                            Background="#FF55A532"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                                <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
+                                    Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
+                                <ContentPresenter x:Name="contentPresenter"
+                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsDefaulted" Value="True">
+                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!-- End PrimaryActionButton -->
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <Grid Margin="10,0,10,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
+                    <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
+                    <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
+                    <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                </StackPanel>
+
+                <!--
+                <ui:OcticonImage Grid.Column="1" Icon="check" Foreground="{DynamicResource GitHubPrimaryGreenBrush}" HorizontalAlignment="Right"VerticalAlignment="Center" />
+                -->
+                <ui:OcticonImage Grid.Column="1" Icon="alert" Foreground="{DynamicResource GitHubPrimaryOrangeBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+
+                <Popup
+                    x:Name="branchPopup"
+                    AllowsTransparency="True"
+                    StaysOpen="False"
+                    PlacementTarget="{Binding ElementName=branchSelectionButton}"
+                    Placement="Bottom">
+                    <Border Style="{DynamicResource GitHubComboBoxBorder}">
+                        <Grid 
+                            Style="{DynamicResource GitHubComboBoxContainer}"
+                            Width="200" >
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ui:FilterTextBox
+                                x:Name="filterBranch"
+                                Grid.Row="0"
+                                PromptText="Filter branches" />
+                            <Separator Grid.Row="1" Margin="0" />
+
+                            <ListBox Grid.Row="2">
+                                <ListBoxItem>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">master</TextBlock>
+                                        <ui:OcticonImage Icon="check" Grid.Column="1" HorizontalAlignment="Right" Opacity="0.6" />
+                                    </Grid>
+                                </ListBoxItem>
+
+                                <ListBoxItem>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0">not-master</TextBlock>
+                                        <TextBlock Grid.Column="1" Opacity="0.6" HorizontalAlignment="Right">March 1</TextBlock>
+                                    </Grid>
+                                </ListBoxItem>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Popup>
+            </Grid>
+
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Style="{DynamicResource GitHubPRDetailsTabControl}" BorderThickness="0,1,0,0">
+            <TabItem Header="Details"  Style="{DynamicResource GitHubPRDetailsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{StaticResource GitHubVsPromptTextBox}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{StaticResource GitHubVsPromptTextBox}" />
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
+                            <ui:GitHubActionLink
+                                x:Name="assigneePopupButton" 
+                                Grid.Column="1"
+                                Content="Haacked (Phil Haack)"
+                                HasDropDown="True"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                Click="assigneePopupButton_Click" />
+
+                            <Popup
+                                x:Name="assigneePopup"
+                                AllowsTransparency="True"
+                                StaysOpen="False"
+                                PlacementTarget="{Binding ElementName=assigneePopupButton}"
+                                Placement="Bottom">
+                                <Border Style="{DynamicResource GitHubComboBoxBorder}">
+                                    <Grid Style="{DynamicResource GitHubComboBoxContainer}"
+                                        MinWidth="150"
+                                        MaxWidth="300">
+                                        
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <ui:FilterTextBox
+                                            x:Name="filterAssignee"
+                                            Grid.Row="0"
+                                            Foreground="{DynamicResource GitHubVsWindowText}"
+                                            PromptText="Filter people" />
+                                        <Separator Grid.Row="1" />
+
+                                        <ListBox Grid.Row="2">
+                                            <ListBoxItem>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image
+                                                        VerticalAlignment="Top"
+                                                        Grid.Column="0"
+                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
+                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Phil Haack</TextBlock>
+                                                    <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" Opacity="0.6" />
+                                                </Grid>
+                                            </ListBoxItem>
+
+                                            <ListBoxItem>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image
+                                                        VerticalAlignment="Top"
+                                                        Grid.Column="0"
+                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Andreia Gaita</TextBlock>
+                                                </Grid>
+                                            </ListBoxItem>
+
+                                            <ListBoxItem>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image
+                                                        VerticalAlignment="Top"
+                                                        Grid.Column="0"
+                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
+                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Brendan Forster</TextBlock>
+                                                </Grid>
+                                            </ListBoxItem>
+
+                                            <ListBoxItem>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image
+                                                        VerticalAlignment="Top"
+                                                        Grid.Column="0"
+                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
+                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Jasmine Greenaway</TextBlock>
+                                                </Grid>
+                                            </ListBoxItem>
+
+                                            <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image
+                                                        VerticalAlignment="Top"
+                                                        Grid.Column="0"
+                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
+                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Andreia Gaita</TextBlock>
+                                                </Grid>
+                                            </ListBoxItem>
+                                        </ListBox>
+                                    </Grid>
+                                </Border>
+                            </Popup>
+
+                            <ui:GitHubActionLink Grid.Column="2" Content="Clear assignee" HorizontalAlignment="Right"  VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid Margin="10,5,10,10" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0" Style="{StaticResource GitHubVsButton}"/>
+                            <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{StaticResource GitHubVsPrimaryActionButton}" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Image VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="2" Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
+                            <TextBlock Margin="5,0,0,0" Text="I am an example commit message" FontSize="14" Grid.Column="1" Grid.Row="0" />
+                            <TextBlock Margin="5,0,0,0" Text="Andreia Gaita committed 20 hours ago" FontSize="11" Grid.Column="1" Grid.Row="1" Foreground="#FF777777"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Files Changed" Style="{DynamicResource GitHubPRDetailsTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical">
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <Label Grid.Column="1" Content="src\start.cs" />
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                                <TextBlock VerticalAlignment="Center" Foreground="#ff6cc644" Text="+14" />
+                                <TextBlock Margin="5,0" VerticalAlignment="Center" Foreground="#ffbd2c00" Text="-14" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Column="3">
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FF6CC644" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFBD2C00" />
+                                <Border
+                                    Height="6" Width="6" 
+                                    BorderThickness="1"
+                                    Background="#FFCCCCCC" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </local:GenericPullRequestCreationView>

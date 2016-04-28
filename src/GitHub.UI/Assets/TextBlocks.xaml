@@ -71,7 +71,7 @@
                             </Border>
                         </Border>
 
-                        <Grid Margin="1,0,0,0">
+                        <Grid Margin="1,2,0,0">
                             <ScrollViewer x:Name="PART_ContentHost" Padding="{TemplateBinding Padding}" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" VerticalAlignment="Top" Margin="0"/>
                             <Label x:Name="PromptLabel" HorizontalAlignment="Left"
                                  Foreground="{DynamicResource GHTextBrush}"
