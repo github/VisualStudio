@@ -33,9 +33,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             CheckLogin().Forget();
         }
 
-        protected override void RepoChanged()
+        protected override void RepoChanged(bool changed)
         {
-            base.RepoChanged();
+            base.RepoChanged(changed);
             CheckLogin().Forget();
         }
 

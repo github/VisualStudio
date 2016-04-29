@@ -128,8 +128,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SampleData\AccountDesigner.cs" />
     <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
+    <Compile Include="SampleData\LoggedOutViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestListViewModelDesigner.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\GitHubCredentialProvider.cs" />

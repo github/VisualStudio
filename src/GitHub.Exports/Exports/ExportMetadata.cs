@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
+using GitHub.VisualStudio;
 
 namespace GitHub.Exports
 {
@@ -22,6 +23,13 @@ namespace GitHub.Exports
         PRCreation,
         End = 100,
         GitHubPane,
+        LoggedOut
+    }
+
+    public enum MenuType
+    {
+        GitHubPane,
+        OpenPullRequests
     }
 
     [MetadataAttribute]
@@ -45,12 +53,28 @@ namespace GitHub.Exports
         public UIViewType ViewType { get; set; }
     }
 
+    [MetadataAttribute]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public sealed class ExportMenuAttribute : ExportAttribute
+    {
+        public ExportMenuAttribute() : base(typeof(IMenuHandler))
+        {
+        }
+
+        public MenuType MenuType { get; set; }
+    }
+
     public interface IViewModelMetadata
     {
         UIViewType ViewType { get; }
     }
 
-    public static class ExportViewAttributeExtensions
+    public interface IMenuMetadata
+    {
+        MenuType MenuType { get; }
+    }
+
+    public static class ExportMetadataAttributeExtensions
     {
         public static bool IsViewType(this UserControl c, UIViewType type)
         {
@@ -62,11 +86,23 @@ namespace GitHub.Exports
             return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
         }
 
-        private static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
+        static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
         {
             Debug.Assert(attributeData.NamedArguments != null);
             return attributeData.AttributeType == typeof(ExportViewAttribute)
                 && (UIViewType)attributeData.NamedArguments[0].TypedValue.Value == viewType;
+        }
+
+        public static bool IsMenuType(this IMenuHandler c, MenuType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(attr => IsMenuType(attr, type));
+        }
+
+        static bool IsMenuType(CustomAttributeData attributeData, MenuType type)
+        {
+            Debug.Assert(attributeData.NamedArguments != null);
+            return attributeData.AttributeType == typeof(ExportMenuAttribute)
+                && (MenuType)attributeData.NamedArguments[0].TypedValue.Value == type;
         }
     }
 }

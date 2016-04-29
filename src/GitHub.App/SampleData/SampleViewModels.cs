@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Extensions;
@@ -18,6 +17,7 @@ using ReactiveUI;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 
 namespace GitHub.SampleData
 {
@@ -28,7 +28,7 @@ namespace GitHub.SampleData
         public bool IsShowing { get; set; }
         public string Title { get; set; }
 
-        public void Initialize(object data)
+        public void Initialize(ViewWithData data)
         { }
     }
 
@@ -330,68 +330,6 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public sealed class AccountDesigner : IAccount
-    {
-        public AccountDesigner()
-        {
-            Login = "octocat";
-            IsUser = true;
-        }
-
-        public BitmapSource Avatar
-        {
-            get
-            {
-                return IsUser
-                    ? AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")
-                    : AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
-            }
-        }
-
-        public bool HasMaximumPrivateRepositories
-        {
-            get;
-            set;
-        }
-
-        public bool IsEnterprise
-        {
-            get;
-            set;
-        }
-
-        public bool IsOnFreePlan
-        {
-            get;
-            set;
-        }
-
-        public bool IsUser
-        {
-            get;
-            set;
-        }
-
-        public string Login
-        {
-            get;
-            set;
-        }
-
-        public int OwnedPrivateRepos
-        {
-            get;
-            set;
-        }
-
-        public long PrivateReposInPlan
-        {
-            get;
-            set;
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
     public class RepositoryModelDesigner : NotificationAwareObject, IRepositoryModel
     {
         public RepositoryModelDesigner() : this("repo")
@@ -529,9 +467,9 @@ namespace GitHub.SampleData
     {
         public GitHubHomeSectionDesigner()
         {
-            Icon = Octicon.@lock;
+            Icon = Octicon.repo;
             RepoName = "octokit";
-            RepoUrl = "https://github.com/octokit/octokit.net";
+            RepoUrl = "https://github.com/octokit/something-really-long-here-to-check-for-trimming";
         }
 
         public Octicon Icon

@@ -89,7 +89,8 @@ namespace GitHub.UI
     }
 
     public class SimpleViewUserControl<TViewModel, TImplementor> : SimpleViewUserControl, IViewFor<TViewModel>, IView 
-        where TViewModel : class, IViewModel where TImplementor : class
+        where TViewModel : class, IViewModel
+        where TImplementor : class
     {
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
             "ViewModel", typeof(TViewModel), typeof(TImplementor), new PropertyMetadata(null));
@@ -103,11 +104,10 @@ namespace GitHub.UI
         }
 
         [AllowNull]
-        object IView.ViewModel
+        IViewModel IView.ViewModel
         {
             [return: AllowNull]
             get { return ViewModel; }
-            set { ViewModel = (TViewModel)value; }
         }
 
         [AllowNull]

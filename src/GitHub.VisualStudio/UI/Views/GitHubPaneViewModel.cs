@@ -1,13 +1,12 @@
-#pragma warning disable 169
 using System;
 using System.ComponentModel.Composition;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using GitHub.Api;
+using GitHub.App.Factories;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -18,7 +17,8 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using ReactiveUI;
-using GitHub.App.Factories;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -26,17 +26,18 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
-        CompositeDisposable disposables = new CompositeDisposable();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
         WindowController windowController;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        bool loggedIn;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IRepositoryHosts hosts;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly SynchronizationContext syncContext;
         readonly IConnectionManager connectionManager;
+
+        readonly List<ViewWithData> navStack = new List<ViewWithData>();
+        int currentNavItem = -1;
+        bool navigatingViaArrows;
+        OleMenuCommand back, forward, refresh;
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -47,54 +48,96 @@ namespace GitHub.VisualStudio.UI.Views
             this.hosts = hosts;
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
+            Title = "GitHub";
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
             base.Initialize(serviceProvider);
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
-                async (s, e) => {
-                    var connection = await connectionManager.LookupConnection(ActiveRepo);
-                    StartFlow(UIControllerFlow.PullRequests, connection);
-                });
+            ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+                (s, e) => Reload(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList }));
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
-                (s, e) => { });
+            back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+                () => !disabled && currentNavItem > 0,
+                () => {
+                    DisableButtons();
+                    Reload(navStack[--currentNavItem], true);
+                },
+                true);
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
-                (s, e) => { });
+            forward = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+                () => !disabled && currentNavItem < navStack.Count - 1,
+                () => {
+                    DisableButtons();
+                    Reload(navStack[++currentNavItem], true);
+                },
+                true);
 
-            ServiceProvider.AddTopLevelMenuItem(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
-                (s, e) => { });
+            refresh = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+                () => !disabled && navStack.Count > 0,
+                () => {
+                    DisableButtons();
+                    Reload();
+                },
+                true);
         }
 
-        void IViewModel.Initialize([AllowNull] object data)
+        public void Initialize([AllowNull] ViewWithData data)
         {
+            Title = "GitHub";
+            Reload(data);
         }
 
-        protected async override void RepoChanged()
+        protected async override void RepoChanged(bool changed)
         {
-            base.RepoChanged();
+            base.RepoChanged(changed);
+
+            if (!changed)
+                return;
 
             IsGitHubRepo = await IsAGitHubRepo();
             if (!IsGitHubRepo)
                 return;
-                
+
+            Reload();
+        }
+
+        async void Reload([AllowNull] ViewWithData data = null, bool navigating = false)
+        {
+            navigatingViaArrows = navigating;
+
+            if (!IsGitHubRepo)
+            {
+                if (uiController != null)
+                {
+                    Stop();
+                    //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                    //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                    //Control = c.View;
+                }
+                return;
+            }
+
             var connection = await connectionManager.LookupConnection(ActiveRepo);
             IsLoggedIn = await connection.IsLoggedIn(hosts);
 
             if (IsLoggedIn)
-                StartFlow(UIControllerFlow.PullRequests, connection);
+            {
+                if (uiController == null || (data != null && data.Flow != uiController.CurrentFlow))
+                    StartFlow(data?.Flow ?? UIControllerFlow.PullRequests, connection, data);
+                else if (data != null || currentNavItem >= 0)
+                    uiController.Jump(data ?? navStack[currentNavItem]);
+            }
             else
             {
-                //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
-                //Control = c.View;
+                var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                Control = c.View;
             }
         }
 
-        void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn)
+        void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
         {
             if (uiController != null)
                 Stop();
@@ -102,6 +145,16 @@ namespace GitHub.VisualStudio.UI.Views
             if (conn == null)
                 return;
 
+            switch (controllerFlow)
+            {
+                case UIControllerFlow.PullRequests:
+                    Title = Resources.PullRequestsNavigationItemText;
+                    break;
+                default:
+                    Title = "GitHub";
+                    break;
+            }
+            
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
@@ -126,7 +179,7 @@ namespace GitHub.VisualStudio.UI.Views
                             __ => uiController.CurrentFlow == UIControllerFlow.Authentication,
                             ___ => uiController.CurrentFlow != UIControllerFlow.Authentication);
                         windowController.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                        windowController.Load(c);
+                        windowController.Load(c.View);
                         windowController.ShowModal();
                         windowController = null;
                     }, null);
@@ -136,10 +189,51 @@ namespace GitHub.VisualStudio.UI.Views
                 .Where(c => uiController.CurrentFlow != UIControllerFlow.Authentication)
                 .Subscribe(c =>
                 {
-                    Control = c;
+                    if (!navigatingViaArrows)
+                    {
+                        if (c.Direction == LoadDirection.Forward)
+                            GoForward(c.Data);
+                        else if (c.Direction == LoadDirection.Back)
+                            GoBack();
+                    }
+                    UpdateToolbar();
+
+                    Control = c.View;
                 });
 
+            if (data != null)
+                uiController.Jump(data);
             uiController.Start(conn);
+        }
+
+        void GoForward(ViewWithData data)
+        {
+            currentNavItem++;
+            if (currentNavItem < navStack.Count - 1)
+                navStack.RemoveRange(currentNavItem, navStack.Count - 1 - currentNavItem);
+            navStack.Add(data);
+        }
+
+        void GoBack()
+        {
+            navStack.RemoveRange(currentNavItem, navStack.Count - 1 - currentNavItem);
+            currentNavItem--;
+        }
+
+        void UpdateToolbar()
+        {
+            back.Enabled = currentNavItem > 0;
+            forward.Enabled = currentNavItem < navStack.Count - 1;
+            refresh.Enabled = navStack.Count > 0;
+            disabled = false;
+        }
+
+        void DisableButtons()
+        {
+            disabled = true;
+            back.Enabled = false;
+            forward.Enabled = false;
+            refresh.Enabled = false;
         }
 
         void Stop()
@@ -148,6 +242,8 @@ namespace GitHub.VisualStudio.UI.Views
             uiController.Stop();
             disposables.Clear();
             uiController = null;
+            currentNavItem = -1;
+            navStack.Clear();
         }
 
         string title;
@@ -186,6 +282,8 @@ namespace GitHub.VisualStudio.UI.Views
         public bool IsShowing => true;
 
         bool disposed = false;
+        private bool disabled;
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

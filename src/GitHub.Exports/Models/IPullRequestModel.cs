@@ -14,5 +14,6 @@ namespace GitHub.Models
         DateTimeOffset CreatedAt { get; }
         DateTimeOffset UpdatedAt { get; }
         IAccount Author { get; }
+        IAccount Assignee { get; }
     }
 }

@@ -7,6 +7,9 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 using GitHub.VisualStudio.UI;
+using System.Linq;
+using GitHub.Extensions;
+using GitHub.Exports;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -17,20 +20,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
 
         readonly Lazy<IVisualStudioBrowser> browser;
+        readonly IMenuProvider menuProvider;
 
         [ImportingConstructor]
         public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
-                                    ITeamExplorerServiceHolder holder)
+                                    ITeamExplorerServiceHolder holder, IMenuProvider menuProvider)
             : base(apiFactory, holder, Octicon.git_pull_request)
         {
             this.browser = browser;
+            this.menuProvider = menuProvider;
             Text = Resources.PullRequestsNavigationItemText;
             ArgbColor = Colors.RedNavigationItem.ToInt32();
         }
 
         public override void Execute()
         {
-            OpenInBrowser(browser, "pulls");
+            var menu = menuProvider.Menus.FirstOrDefault(m => m.IsMenuType(MenuType.OpenPullRequests));
+            menu?.Activate(UIControllerFlow.PullRequests);
             base.Execute();
         }
     }

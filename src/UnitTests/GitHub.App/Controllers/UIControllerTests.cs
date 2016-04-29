@@ -46,11 +46,11 @@ public class UIControllerTests
             else
                 view = Substitute.For<IView, IViewFor<VM>>();
 
-            view.Done.Returns(new ReplaySubject<object>());
-            view.Cancel.Returns(new ReplaySubject<object>());
+            view.Done.Returns(new ReplaySubject<ViewWithData>());
+            view.Cancel.Returns(new ReplaySubject<ViewWithData>());
 
-            (view as IHasDetailView)?.Open.Returns(new ReplaySubject<object>());
-            (view as IHasCreationView)?.Create.Returns(new ReplaySubject<object>());
+            (view as IHasDetailView)?.Open.Returns(new ReplaySubject<ViewWithData>());
+            (view as IHasCreationView)?.Create.Returns(new ReplaySubject<ViewWithData>());
 
             var e = new ExportLifetimeContext<IView>(view, () => { });
             factory.GetView(type).Returns(e);
@@ -106,12 +106,12 @@ public class UIControllerTests
 
         protected void TriggerCancel(IView view)
         {
-            ((ReplaySubject<object>)view.Cancel).OnNext(null);
+            ((ReplaySubject<ViewWithData>)view.Cancel).OnNext(null);
         }
 
         protected void TriggerDone(IView view)
         {
-            ((ReplaySubject<object>)view.Done).OnNext(null);
+            ((ReplaySubject<ViewWithData>)view.Done).OnNext(null);
         }
     }
 
@@ -131,8 +131,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -165,8 +166,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -196,8 +198,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -231,8 +234,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -262,8 +266,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -299,8 +304,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -344,8 +350,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1: {
@@ -412,8 +419,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -449,8 +457,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Create);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -487,8 +496,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Publish);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -523,8 +533,9 @@ public class UIControllerTests
             {
                 var count = 0;
                 var flow = uiController.SelectFlow(UIControllerFlow.Publish);
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
@@ -567,13 +578,15 @@ public class UIControllerTests
                     {
                         success = s;
                     });
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<object>)((IHasDetailView)uc).Open).OnNext(1);
+                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -581,7 +594,8 @@ public class UIControllerTests
                             break;
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<object>)((IHasDetailView)uc).Open).OnNext(1);
+                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -589,7 +603,7 @@ public class UIControllerTests
                             break;
                         case 5:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<object>)((IHasCreationView)uc).Create).OnNext(null);
+                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
                             break;
                         case 6:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
@@ -597,7 +611,7 @@ public class UIControllerTests
                             break;
                         case 7:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<object>)((IHasCreationView)uc).Create).OnNext(null);
+                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
                             break;
                         case 8:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
@@ -643,13 +657,15 @@ public class UIControllerTests
                         Assert.Equal(4, count);
                         count++;
                     });
-                flow.Subscribe(uc =>
+                flow.Subscribe(data =>
                 {
+                    var uc = data.View;
                     switch (++count)
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<object>)((IHasDetailView)uc).Open).OnNext(1);
+                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -657,7 +673,8 @@ public class UIControllerTests
                             break;
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<object>)((IHasDetailView)uc).Open).OnNext(1);
+                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);

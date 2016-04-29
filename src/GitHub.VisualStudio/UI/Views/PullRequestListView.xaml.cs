@@ -19,8 +19,8 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class PullRequestListView : GenericPullRequestListView, IHasDetailView, IHasCreationView
     {
-        readonly Subject<object> open = new Subject<object>();
-        readonly Subject<object> create = new Subject<object>();
+        readonly Subject<ViewWithData> open = new Subject<ViewWithData>();
+        readonly Subject<ViewWithData> create = new Subject<ViewWithData>();
 
         public PullRequestListView()
         {
@@ -41,15 +41,14 @@ namespace GitHub.VisualStudio.UI.Views
 
             this.WhenActivated(d =>
             {
-                d(this.OneWayBind(ViewModel, vm => vm.PullRequests, v => v.pullRequests.ItemsSource));
             });
         }
 
-        public IObservable<object> Open { get { return open; } }
-        public IObservable<object> Create { get { return create; } }
+        public IObservable<ViewWithData> Open { get { return open; } }
+        public IObservable<ViewWithData> Create { get { return create; } }
         public ICommand OpenPR { get; set; }
         public ICommand CreatePR { get; set; }
-        protected void NotifyOpen(object id)
+        protected void NotifyOpen(ViewWithData id)
         {
             open.OnNext(id);
             open.OnCompleted();

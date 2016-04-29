@@ -10,12 +10,12 @@ namespace GitHub.VisualStudio
     public interface IMenuProvider
     {
         /// <summary>
-        /// Registered via AddTopLevelMenuItem
+        /// Registered via AddCommandHandler
         /// </summary>
         IReadOnlyCollection<IMenuHandler> Menus { get; }
 
         /// <summary>
-        /// Registered via AddDynamicMenuItem
+        /// Registered via AddCommandHandler
         /// </summary>
         IReadOnlyCollection<IDynamicMenuHandler> DynamicMenus { get; }
     }

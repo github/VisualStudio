@@ -10,9 +10,9 @@ namespace GitHub.VisualStudio.UI
     public partial class WindowController : DialogWindow, IDisposable
     {
         IDisposable subscription;
-        IObservable<IView> controls;
-        Func<IView, bool> shouldLoad;
-        Func<IView, bool> shouldStop;
+        readonly IObservable<LoadData> controls;
+        readonly Func<IView, bool> shouldLoad;
+        readonly Func<IView, bool> shouldStop;
 
         /// <summary>
         /// 
@@ -20,7 +20,7 @@ namespace GitHub.VisualStudio.UI
         /// <param name="controls">Observable that provides controls to host in this window</param>
         /// <param name="shouldLoad">If set, this condition will be checked before loading each control</param>
         /// <param name="shouldStop">If set, this condition will be checked to determine when to close this window</param>
-        public WindowController(IObservable<IView> controls,
+        public WindowController(IObservable<LoadData> controls,
             Func<IView, bool> shouldLoad = null,
             Func<IView, bool> shouldStop = null)
         {
@@ -36,9 +36,9 @@ namespace GitHub.VisualStudio.UI
         {
             subscription = controls.Subscribe(c =>
             {
-                if (shouldLoad == null || shouldLoad(c))
-                    Load(c);
-                if (shouldStop != null && shouldStop(c))
+                if (shouldLoad == null || shouldLoad(c.View))
+                    Load(c.View);
+                if (shouldStop != null && shouldStop(c.View))
                 {
                     Stop();
                     Close();
@@ -64,7 +64,6 @@ namespace GitHub.VisualStudio.UI
         public void Stop()
         {
             subscription?.Dispose();
-            subscription = null;
         }
 
         bool disposed = false;

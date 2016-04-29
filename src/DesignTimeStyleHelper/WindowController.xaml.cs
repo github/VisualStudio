@@ -12,11 +12,11 @@ namespace DesignTimeStyleHelper
     {
         IDisposable disposable;
 
-        public WindowController(IObservable<IView> controls)
+        public WindowController(IObservable<LoadData> controls)
         {
             InitializeComponent();
 
-            disposable = controls.Subscribe(c => Load(c),
+            disposable = controls.Subscribe(c => Load(c.View),
             Close
             );
         }

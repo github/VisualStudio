@@ -9,10 +9,10 @@
                                   xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-                                  Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                  DataContext="{Binding ViewModel}"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
+                                  Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                  DataContext="{Binding ViewModel}"
                                   mc:Ignorable="d">
 
   <d:DesignProperties.DataContext>
@@ -31,7 +31,6 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/UI/Views/Controls/PullRequestListItem.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
       </ResourceDictionary.MergedDictionaries>
-      <ui:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
 
       <Style x:Key="PullRequestListItemContainerStyle" TargetType="{x:Type ListViewItem}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -59,7 +58,7 @@
         </Setter>
       </Style>
 
-      <Style x:Key="MenuItemBaseStyle" TargetType="MenuItem">
+      <Style x:Key="MenuItemStyle" TargetType="MenuItem">
         <Style.Triggers>
           <Trigger Property="IsMouseOver" Value="true">
             <Setter Property="Background" Value="#0a99f3" />
@@ -76,6 +75,69 @@
           </Setter.Value>
         </Setter>
       </Style>
+
+      <Style x:Key="GitHubComboBoxBorder" TargetType="{x:Type Border}">
+        <Setter Property="Margin" Value="10" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GitHubComboBoxBorderBrush}" />
+        <Setter Property="Effect">
+          <Setter.Value>
+            <DropShadowEffect BlurRadius="5"
+                              Direction="315"
+                              Opacity="0.25"
+                              ShadowDepth="5" />
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style x:Key="GitHubComboBoxContainer" TargetType="{x:Type DockPanel}">
+        <Setter Property="Background" Value="{DynamicResource GitHubComboBoxBackgroundBrush}" />
+
+        <Style.Resources>
+          <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+          </Style>
+
+          <Style BasedOn="{StaticResource {x:Type ui:OcticonImage}}" TargetType="{x:Type ui:OcticonImage}">
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+          </Style>
+
+          <Style BasedOn="{StaticResource {x:Type Separator}}" TargetType="{x:Type Separator}">
+            <Setter Property="Background" Value="{DynamicResource GitHubComboBoxBorderBrush}" />
+            <Setter Property="Margin" Value="0" />
+          </Style>
+
+          <Style BasedOn="{StaticResource {x:Type ui:FilterTextBox}}" TargetType="{x:Type ui:FilterTextBox}">
+            <Setter Property="BorderBrush" Value="{DynamicResource GitHubComboBoxBorderBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
+            <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Height" Value="25" />
+          </Style>
+
+          <Style BasedOn="{StaticResource {x:Type ListBox}}" TargetType="{x:Type ListBox}">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="MaxHeight" Value="100" />
+          </Style>
+
+          <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Padding" Value="3" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+          </Style>
+        </Style.Resources>
+      </Style>
+
+      <Style x:Key="GitHubPopupThing" TargetType="{x:Type ListBox}">
+        <Setter Property="ItemTemplate">
+          <Setter.Value>
+            <DataTemplate>
+              <TextBlock Text="{Binding Path=.}" />
+            </DataTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
     </ResourceDictionary>
 
   </UserControl.Resources>
@@ -88,57 +150,138 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-
       <WrapPanel Grid.Column="0" HorizontalAlignment="Stretch">
 
-        <ui:GitHubActionLink Content="State" HasDropDown="True">
-          <i:Interaction.Behaviors>
-            <ui:DropDownActionLinkBehaviour />
-          </i:Interaction.Behaviors>
-          <ui:GitHubActionLink.ContextMenu>
-            <ContextMenu>
-              <MenuItem Header="Open" Style="{StaticResource MenuItemBaseStyle}" />
-              <MenuItem Header="Closed" Style="{StaticResource MenuItemBaseStyle}" />
-              <MenuItem Header="All" Style="{StaticResource MenuItemBaseStyle}" />
-            </ContextMenu>
-          </ui:GitHubActionLink.ContextMenu>
-        </ui:GitHubActionLink>
+        <ui:GitHubActionLink x:Name="stateSelection"
+                             Margin="5,0,0,0"
+                             VerticalAlignment="Center"
+                             Content="{Binding SelectedState}"
+                             HasDropDown="True" />
+
+        <Popup x:Name="statePopup"
+               AllowsTransparency="True"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=stateSelection}"
+               StaysOpen="False">
+          <Border Style="{DynamicResource GitHubComboBoxBorder}">
+            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxContainer}">
+              <ListBox x:Name="states"
+                       DockPanel.Dock="Top"
+                       ItemsSource="{Binding States}"
+                       SelectedItem="{Binding SelectedState}"
+                       Style="{DynamicResource GitHubPopupThing}">
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <ui:ClosePopupAction TargetName="statePopup" />
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ListBox>
+            </DockPanel>
+          </Border>
+        </Popup>
 
         <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
 
-        <ui:GitHubActionLink Content="Assignee" HasDropDown="True">
-          <i:Interaction.Behaviors>
-            <ui:DropDownActionLinkBehaviour />
-          </i:Interaction.Behaviors>
-          <ui:GitHubActionLink.ContextMenu>
-            <ContextMenu>
-              <MenuItem Header="Open" />
-              <MenuItem Header="Closed" />
-              <MenuItem Header="All" />
-            </ContextMenu>
-          </ui:GitHubActionLink.ContextMenu>
+        <ui:GitHubActionLink x:Name="assigneeSelection"
+                             Margin="5,0,0,0"
+                             VerticalAlignment="Center"
+                             Content="{Binding SelectedAssignee,
+                                               Converter={ui:DefaultValueConverter},
+                                               ConverterParameter=Assignee}"
+                             HasDropDown="True">
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+              <ui:OpenPopupAction TargetName="assigneePopup" />
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
         </ui:GitHubActionLink>
+
+        <Popup x:Name="assigneePopup"
+               AllowsTransparency="True"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=assigneeSelection}"
+               StaysOpen="False">
+          <Border Style="{DynamicResource GitHubComboBoxBorder}">
+            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxContainer}">
+
+              <ListBox x:Name="assignees"
+                       DockPanel.Dock="Top"
+                       SelectedItem="{Binding SelectedAssignee}"
+                       Style="{DynamicResource GitHubPopupThing}">
+                <ListBox.ItemsSource>
+                  <MultiBinding Converter="{ui:StickieListItemConverter}">
+                    <Binding Path="EmptyUser" />
+                    <Binding Path="Assignees" />
+                  </MultiBinding>
+                </ListBox.ItemsSource>
+                <i:Interaction.Behaviors>
+                  <ui:AddEmptyItemToList />
+                </i:Interaction.Behaviors>
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <ui:ClosePopupAction TargetName="assigneePopup" />
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ListBox>
+            </DockPanel>
+          </Border>
+        </Popup>
 
         <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
 
-        <ui:GitHubActionLink Content="Author" HasDropDown="True">
-          <i:Interaction.Behaviors>
-            <ui:DropDownActionLinkBehaviour />
-          </i:Interaction.Behaviors>
-          <ui:GitHubActionLink.ContextMenu>
-            <ContextMenu>
-              <MenuItem Header="Open" />
-              <MenuItem Header="Closed" />
-              <MenuItem Header="All" />
-            </ContextMenu>
-          </ui:GitHubActionLink.ContextMenu>
+        <ui:GitHubActionLink x:Name="authorSelection"
+                             Margin="5,0,0,0"
+                             VerticalAlignment="Center"
+                             Content="{Binding SelectedAuthor,
+                                               Converter={ui:DefaultValueConverter},
+                                               ConverterParameter=Author}"
+                             HasDropDown="True">
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+              <ui:OpenPopupAction TargetName="authorPopup" />
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+
         </ui:GitHubActionLink>
+
+        <Popup x:Name="authorPopup"
+               AllowsTransparency="True"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=authorSelection}"
+               StaysOpen="False">
+          <Border Style="{DynamicResource GitHubComboBoxBorder}">
+            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxContainer}">
+
+              <ListBox x:Name="authors"
+                       DockPanel.Dock="Top"
+                       SelectedItem="{Binding SelectedAuthor}"
+                       Style="{DynamicResource GitHubPopupThing}">
+                <ListBox.ItemsSource>
+                  <MultiBinding Converter="{ui:StickieListItemConverter}">
+                    <Binding Path="EmptyUser" />
+                    <Binding Path="Authors" />
+                  </MultiBinding>
+                </ListBox.ItemsSource>
+                <i:Interaction.Behaviors>
+                  <ui:AddEmptyItemToList />
+                </i:Interaction.Behaviors>
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <ui:ClosePopupAction TargetName="authorPopup" />
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ListBox>
+            </DockPanel>
+          </Border>
+        </Popup>
 
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"
                            HorizontalAlignment="Right"
-                           Command="{Binding CreatePR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+                           Command="{Binding CreatePR,
+                                             RelativeSource={RelativeSource FindAncestor,
+                                                                            AncestorType={x:Type local:PullRequestListView}}}"
                            Content="Create New" />
 
     </Grid>
@@ -160,8 +303,7 @@
               VirtualizingPanel.IsVirtualizing="True"
               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
               VirtualizingPanel.ScrollUnit="Pixel"
-              VirtualizingPanel.VirtualizationMode="Recycling"
-              Visibility="{Binding PullRequests, Converter={StaticResource HasItemsVisibilityConverter}}" />
+              VirtualizingPanel.VirtualizationMode="Recycling" />
 
   </DockPanel>
 </local:GenericPullRequestListView>

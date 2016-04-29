@@ -28,11 +28,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             View.DataContext = this;
         }
 
-        protected async override void RepoChanged()
+        protected async override void RepoChanged(bool changed)
         {
             IsVisible = false;
 
-            base.RepoChanged();
+            base.RepoChanged(changed);
 
             IsVisible = await IsAGitHubRepo();
 

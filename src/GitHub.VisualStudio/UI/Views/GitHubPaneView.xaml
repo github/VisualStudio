@@ -47,7 +47,7 @@
                  FontSize="14.7"
                  FontWeight="SemiBold"
                  Foreground="{DynamicResource GitHubPaneTitleBrush}"
-                 Text="{x:Static prop:Resources.PullRequestsNavigationItemText}" />
+                 Text="{Binding Title}" />
       <Separator Margin="5,-2,5,0" Foreground="{DynamicResource GitHubPaneTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
       <TextBlock Margin="0,-5,0,0"
                  VerticalAlignment="Center"
@@ -59,7 +59,7 @@
                DockPanel.Dock="Top"
                Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <UserControl x:Name="container" Content="{Binding Control}" />
+    <UserControl x:Name="container" Content="{Binding Control}" DockPanel.Dock="Top" />
 
   </DockPanel>
 </view:GenericGitHubPaneView>

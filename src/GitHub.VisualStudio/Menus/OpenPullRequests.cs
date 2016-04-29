@@ -7,16 +7,17 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.Menus
 {
-    [ExportMenu(MenuType = MenuType.GitHubPane)]
+    [ExportMenu(MenuType = MenuType.OpenPullRequests)]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class ShowGitHubPane: MenuBase, IMenuHandler
+    public class OpenPullRequests: MenuBase, IMenuHandler
     {
         public Guid Guid => GuidList.guidGitHubCmdSet;
-        public int CmdId => PkgCmdIDList.showGitHubPaneCommand;
+        public int CmdId => PkgCmdIDList.openPullRequestsCommand;
 
         public void Activate([AllowNull]object data = null)
         {
-            GitHubPane.Activate();
+            var pane = GitHubPane.Activate();
+            pane.ShowView(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList });
         }
     }
 }

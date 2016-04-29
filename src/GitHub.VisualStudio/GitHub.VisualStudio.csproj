@@ -8,7 +8,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.18.3</ApplicationVersion>
+    <ApplicationVersion>1.0.99.0</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -211,6 +211,7 @@
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Menus\OpenLink.cs" />
     <Compile Include="Menus\LinkMenuBase.cs" />
+    <Compile Include="Menus\OpenPullRequests.cs" />
     <Compile Include="Menus\ShowGitHubPane.cs" />
     <Compile Include="Menus\AddConnection.cs" />
     <Compile Include="Menus\CopyLink.cs" />
@@ -258,7 +259,11 @@
     <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Views\LoggedOutViewModel.cs" />
     <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
+    <Compile Include="UI\Views\LoggedOutView.xaml.cs">
+      <DependentUpon>LoggedOutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\PullRequestCreationView.xaml.cs">
       <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
     </Compile>
@@ -424,6 +429,10 @@
       </SubType>
     </Page>
     <Page Include="UI\Views\GitHubPaneView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\LoggedOutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

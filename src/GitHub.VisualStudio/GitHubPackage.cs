@@ -56,10 +56,10 @@ namespace GitHub.VisualStudio
 
             var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
             foreach (var menu in menus.Menus)
-                ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
+                ServiceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
             foreach (var menu in menus.DynamicMenus)
-                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+                ServiceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
         }
     }
 
