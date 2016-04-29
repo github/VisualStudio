@@ -366,7 +366,7 @@
 
             <Style x:Key="CommitListItemContainerStyle" TargetType="{x:Type ListViewItem}">
               <Setter Property="SnapsToDevicePixels" Value="True" />
-              <Setter Property="Margin" Value="0" />
+              <Setter Property="Margin" Value="5" />
               <Setter Property="Padding" Value="1" />
   
               <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -645,7 +645,7 @@
             <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ListView Background="Transparent"
                           BorderBrush="Transparent">
-                    <ListViewItem Margin="0,5" Style="{StaticResource CommitListItemContainerStyle}">
+                    <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="30" />
@@ -698,6 +698,97 @@
             </TabItem>
 
             <TabItem Header="Files Changed" Style="{DynamicResource GitHubPRDetailsTabItem}">
+                <ListView Background="Transparent"
+                          BorderBrush="Transparent">
+                    <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="21" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <TextBlock Grid.Column="1" Text="src\file_added.cs" />
+
+                            <ui:OcticonImage Icon="diff_added" Grid.Column="2" Foreground="#ff6cc644" ToolTip="Added" />
+                        </Grid>
+                    </ListViewItem>
+
+                    <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="21" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <TextBlock Grid.Column="1" Text="src\file_modified.cs" />
+
+                            <ui:OcticonImage Icon="diff_modified" Grid.Column="2" Foreground="#ffbbbbbb" ToolTip="Modified" />
+                        </Grid>
+                    </ListViewItem>
+
+                    <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="21" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <TextBlock Grid.Column="1" Text="src\file_removed.cs" />
+
+                            <ui:OcticonImage Icon="diff_removed" Grid.Column="2" Foreground="#FFbd2c00" ToolTip="Removed" />
+                        </Grid>
+                    </ListViewItem>
+
+                    <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="21" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:OcticonImage
+                                Grid.Column="0"
+                                Height="16"
+                                Width="16"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Icon="file_text" />
+
+                            <TextBlock Grid.Column="1" Text="src\file_renamed.cs" />
+
+                            <ui:OcticonImage Icon="diff_renamed" Grid.Column="2" Foreground="#ff4078c0" ToolTip="Renamed" />
+                        </Grid>
+                    </ListViewItem>
+                </ListView>
+                <!--
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical">
                         <Grid Margin="10,0">
@@ -748,6 +839,7 @@
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
+                -->
             </TabItem>
         </TabControl>
     </Grid>
