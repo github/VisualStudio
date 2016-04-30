@@ -492,7 +492,6 @@
                         <Grid Margin="10,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
@@ -503,7 +502,7 @@
                                 Content="Haacked (Phil Haack)"
                                 HasDropDown="True"
                                 VerticalAlignment="Center"
-                                HorizontalAlignment="Left"
+                                HorizontalAlignment="Right"
                                 Click="assigneePopupButton_Click" />
 
                             <Popup
@@ -624,8 +623,6 @@
                                     </Grid>
                                 </Border>
                             </Popup>
-
-                            <ui:GitHubActionLink Grid.Column="2" Content="Clear assignee" HorizontalAlignment="Right"  VerticalAlignment="Center" />
                         </Grid>
 
                         <Grid Margin="10,5,10,10" HorizontalAlignment="Stretch">
