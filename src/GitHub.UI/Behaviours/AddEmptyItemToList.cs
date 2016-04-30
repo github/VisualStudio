@@ -56,7 +56,7 @@ namespace GitHub.UI
                         dynamic items = AssociatedObject.ItemsSource;
                         var list = items as IList;
                         Debug.Assert(list != null, "ItemsSource data source is not an IList, cannot change it.");
-                        Debug.Assert(list.Count == 0, "ItemsSource data source is empty, something went wrong.");
+                        Debug.Assert(list.Count > 0, "ItemsSource data source is empty, something went wrong.");
                         if (list == null || list.Count == 0)
                             return;
                         if (items[0] == defaultValue)
