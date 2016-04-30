@@ -33,14 +33,13 @@ namespace GitHub.UI
                                 return;
                             defaultValue = PropertyPathHelper.GetValue(binding.ResolvedSource, binding.ResolvedSourcePropertyName);
                         }
-                        dynamic items = AssociatedObject.ItemsSource;
-                        var list = items as IList;
+                        var list = AssociatedObject.ItemsSource as IList;
                         Debug.Assert(list != null, "ItemsSource data source is not an IList, cannot change it.");
                         if (list == null)
                             return;
                         try
                         {
-                            items.Insert(0, defaultValue);
+                            list.Insert(0, defaultValue);
                         }
                         catch (Exception ex)
                         {
@@ -53,14 +52,13 @@ namespace GitHub.UI
                     }
                     else if (AssociatedObject.SelectedIndex == 0)
                     {
-                        dynamic items = AssociatedObject.ItemsSource;
-                        var list = items as IList;
+                        var list = AssociatedObject.ItemsSource as IList;
                         Debug.Assert(list != null, "ItemsSource data source is not an IList, cannot change it.");
                         Debug.Assert(list.Count > 0, "ItemsSource data source is empty, something went wrong.");
                         if (list == null || list.Count == 0)
                             return;
-                        if (items[0] == defaultValue)
-                            items.RemoveAt(0);
+                        if (list[0] == defaultValue)
+                            list.RemoveAt(0);
                     }
                 }
                 if (e.RemovedItems.Count > 0)

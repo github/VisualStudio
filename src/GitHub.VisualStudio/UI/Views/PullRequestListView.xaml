@@ -156,7 +156,13 @@
                              Margin="5,0,0,0"
                              VerticalAlignment="Center"
                              Content="{Binding SelectedState}"
-                             HasDropDown="True" />
+                             HasDropDown="True">
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+              <ui:OpenPopupAction TargetName="statePopup" />
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+        </ui:GitHubActionLink>
 
         <Popup x:Name="statePopup"
                AllowsTransparency="True"
