@@ -34,7 +34,7 @@
                 <Setter Property="Padding" Value="2"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Background" Value="{DynamicResource TabItem.Selected.Background}"/>
+                <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
                 <Setter Property="BorderBrush" Value="#FFD0D7E4"/>
                 <Setter Property="BorderThickness" Value="0,1,0,0"/>
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
@@ -116,9 +116,9 @@
 
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Border" Property="Background" Value="White" /> 
-                                    <Setter TargetName="Border" Property="BorderBrush" Value="#ffD0D7E4" /> 
-                                    <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" /> 
+                                    <Setter TargetName="Border" Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="#ffD0D7E4" />
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" />
                                 </Trigger>
 
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -399,7 +399,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <Grid Margin="10,0">
+            <Grid Margin="10,-3,10,5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
