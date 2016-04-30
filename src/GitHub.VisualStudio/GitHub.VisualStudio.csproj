@@ -204,7 +204,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Base\MenuBase.cs" />
-    <Compile Include="Converters\CountToVisibilityConverter.cs" />
     <Compile Include="..\common\SharedDictionaryManager.cs">
       <Link>Helpers\SharedDictionaryManager.cs</Link>
     </Compile>

@@ -15,6 +15,7 @@ using GitHub.Api;
 using GitHub.VisualStudio.TeamExplorer;
 using System.Windows.Controls;
 using GitHub.VisualStudio.UI;
+using GitHub.ViewModels;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -126,7 +127,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 var c = data.View;
                 SectionContent = c;
-                ((UserControl)c).DataContext = this;
                 c.IsBusy.Subscribe(x => IsBusy = x);
             },
             () =>
