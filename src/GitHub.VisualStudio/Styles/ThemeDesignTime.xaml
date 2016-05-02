@@ -4,10 +4,11 @@
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeBlue.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDark.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <!-- Design time colors taken from the VS dark theme
+  -->
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FF252526" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF999999" />
@@ -16,7 +17,6 @@
   <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="#FF333337" />
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FFF1F1F1" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="#FF3F3F46" />
-  -->
 
   <!-- Design time colors taken from the VS light theme
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF1E1E1E" />
@@ -31,7 +31,6 @@
   -->
 
   <!-- Design time colors taken from the VS blue theme
-  -->
   <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="#FF000000" />
   <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="GitHubVsGrayText" Color="#FF6d6d6d" />
@@ -41,4 +40,5 @@
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF000000" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="#FF8591A2" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="#FFFFFFFF" />
+  -->
 </ResourceDictionary>

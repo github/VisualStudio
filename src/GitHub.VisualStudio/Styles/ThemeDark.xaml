@@ -19,9 +19,6 @@
   <Color x:Key="GitHubPaneTitleColor">#FFFFFFFF</Color>
   <SolidColorBrush x:Key="GitHubPaneTitleBrush" Color="{StaticResource GitHubPaneTitleColor}" />
 
-  <SolidColorBrush x:Key="GitHubTabItemSelectedBackground" Color="#000000"/>
-  <SolidColorBrush x:Key="GitHubTabItemSelectedBorder" Color="#ACACAC"/>
-
   <SolidColorBrush x:Key="GitHubPrimaryGreenBrush" Color="#FF6CC644" />
   <SolidColorBrush x:Key="GitHubPrimaryOrangeBrush" Color="#FFC9510C" />
 
