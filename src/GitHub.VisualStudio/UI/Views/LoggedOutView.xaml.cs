@@ -18,7 +18,6 @@ namespace GitHub.VisualStudio.UI.Views
         public LoggedOutView()
         {
             this.InitializeComponent();
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as LoggedOutViewModel;
             this.WhenActivated(d =>
             {
             });

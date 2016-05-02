@@ -26,7 +26,6 @@ namespace GitHub.VisualStudio.UI.Views
         {
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestListViewModel;
             OpenPR = new RelayCommand(x =>
             {
                 var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;

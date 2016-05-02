@@ -34,8 +34,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as IRepositoryCloneViewModel;
-
             this.WhenActivated(d =>
             {
                 d(this.OneWayBind(ViewModel, vm => vm.IsLoading, v => v.loadingProgressBar.Visibility));

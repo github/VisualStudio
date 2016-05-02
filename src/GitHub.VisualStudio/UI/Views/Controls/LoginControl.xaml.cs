@@ -26,8 +26,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
-
             this.WhenActivated(d =>
             {
                 SetupDotComBindings(d);

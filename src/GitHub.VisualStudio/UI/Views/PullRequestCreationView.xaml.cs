@@ -17,7 +17,6 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestCreationView()
         {
             InitializeComponent();
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestCreationViewModel;
 
             this.WhenActivated(d =>
             {

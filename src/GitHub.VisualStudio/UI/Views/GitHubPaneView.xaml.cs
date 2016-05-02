@@ -18,7 +18,6 @@ namespace GitHub.VisualStudio.UI.Views
         public GitHubPaneView()
         {
             this.InitializeComponent();
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as GitHubPaneViewModel;
             this.WhenActivated(d =>
             {
             });
