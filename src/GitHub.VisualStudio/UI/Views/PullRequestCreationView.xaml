@@ -126,7 +126,7 @@
                                 </Trigger>
 
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{StaticResource GHBlueLinkButtonHoverBrush}" />
+                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -499,7 +499,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Column="0" Padding="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
+                            <Label Grid.Column="0" Padding="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsWindowText}" />
                             <ui:GitHubActionLink
                                 x:Name="assigneePopupButton" 
                                 Grid.Column="1"
