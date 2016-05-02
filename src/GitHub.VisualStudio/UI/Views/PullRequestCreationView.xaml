@@ -31,7 +31,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="GitHubPRDetailsTabControl" TargetType="{x:Type TabControl}">
-                <Setter Property="Padding" Value="2"/>
+                <Setter Property="Padding" Value="0,5" />
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
@@ -493,13 +493,13 @@
                     <StackPanel Orientation="Vertical">
                         <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{StaticResource GitHubVsPromptTextBox}" />
                         <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{StaticResource GitHubVsPromptTextBox}" />
-                        <Grid Margin="10,0">
+                        <Grid Margin="10,3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Column="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
+                            <Label Grid.Column="0" Padding="0" Content="Assignee" VerticalAlignment="Center" Foreground="{DynamicResource GitHubVsGrayText}" />
                             <ui:GitHubActionLink
                                 x:Name="assigneePopupButton" 
                                 Grid.Column="1"
@@ -629,7 +629,7 @@
                             </Popup>
                         </Grid>
 
-                        <Grid Margin="10,5,10,10" HorizontalAlignment="Stretch">
+                        <Grid Margin="10,10,10,20" HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
