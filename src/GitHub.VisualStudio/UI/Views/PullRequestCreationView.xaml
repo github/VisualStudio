@@ -103,13 +103,13 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type TabItem}">
                             <Border Name="Border" CornerRadius="2,2,0,0"
-                                    Padding="10,3">
+                                    BorderThickness="1,1,1,0"
+                                    Padding="10,5">
                                 <DockPanel HorizontalAlignment="Center">
                                     <TextBlock
                                         x:Name="ContentSite"
                                         FontSize="12"
                                         VerticalAlignment="Center"
-                                        Foreground="{DynamicResource GitHubVsToolWindowText}"
                                         Text="{TemplateBinding Header}" />
                                 </DockPanel>
                             </Border>
@@ -118,7 +118,11 @@
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter TargetName="Border" Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
                                     <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource GitHubTabItemSelectedBorder}" />
-                                    <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" />
+                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+                                </Trigger>
+
+                                <Trigger Property="IsSelected" Value="False">
+                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsGrayText}" />
                                 </Trigger>
 
                                 <Trigger Property="IsMouseOver" Value="True">
