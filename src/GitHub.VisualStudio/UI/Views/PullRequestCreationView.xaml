@@ -409,7 +409,7 @@
                     <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
                     <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
                     <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
-                    <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsToolWindowText}"/>
+                    <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsGrayText}"/>
                 </StackPanel>
 
                 <!-- Show a check if the branch is mergeable (is that even a word??), 
@@ -674,6 +674,7 @@
                             <TextBlock Text="I am an example commit message"
                                        ToolTip="I am an example commit message"
                                        VerticalAlignment="Top"
+                                       Foreground="{DynamicResource GitHubVsToolWindowText}"
                                        FontSize="14"
                                        Margin="10,-3,5,0"
                                        Grid.Column="1"
@@ -686,7 +687,7 @@
                                        FontSize="11"
                                        Grid.Column="1"
                                        Grid.Row="1" 
-                                       Foreground="#FF777777"/>
+                                       Foreground="{DynamicResource GitHubVsGrayText}"/>
                         </Grid>
                     </ListViewItem>
 
@@ -710,9 +711,12 @@
                                 Width="16"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
+                                Foreground="{DynamicResource GitHubVsGrayText}"
                                 Icon="file_text" />
 
-                            <TextBlock Grid.Column="1" Text="src\file_added.cs" />
+                            <TextBlock 
+                                Foreground="{DynamicResource GitHubVsWindowText}"
+                                Grid.Column="1" Text="src\file_added.cs" />
 
                             <ui:OcticonImage Icon="diff_added" Grid.Column="2" Foreground="#ff6cc644" ToolTip="Added" />
                         </Grid>
@@ -732,9 +736,12 @@
                                 Width="16"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
+                                Foreground="{DynamicResource GitHubVsGrayText}"
                                 Icon="file_text" />
 
-                            <TextBlock Grid.Column="1" Text="src\file_modified.cs" />
+                            <TextBlock 
+                                Foreground="{DynamicResource GitHubVsWindowText}"
+                                Grid.Column="1" Text="src\file_modified.cs" />
 
                             <ui:OcticonImage Icon="diff_modified" Grid.Column="2" Foreground="#ffbbbbbb" ToolTip="Modified" />
                         </Grid>
@@ -754,9 +761,12 @@
                                 Width="16"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
+                                Foreground="{DynamicResource GitHubVsGrayText}"
                                 Icon="file_text" />
 
-                            <TextBlock Grid.Column="1" Text="src\file_removed.cs" />
+                            <TextBlock 
+                                Foreground="{DynamicResource GitHubVsWindowText}"
+                                Grid.Column="1" Text="src\file_removed.cs" />
 
                             <ui:OcticonImage Icon="diff_removed" Grid.Column="2" Foreground="#FFbd2c00" ToolTip="Removed" />
                         </Grid>
@@ -776,9 +786,12 @@
                                 Width="16"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
+                                Foreground="{DynamicResource GitHubVsGrayText}"
                                 Icon="file_text" />
 
-                            <TextBlock Grid.Column="1" Text="src\file_renamed.cs" />
+                            <TextBlock 
+                                Foreground="{DynamicResource GitHubVsWindowText}"
+                                Grid.Column="1" Text="src\file_renamed.cs" />
 
                             <ui:OcticonImage Icon="diff_renamed" Grid.Column="2" Foreground="#ff4078c0" ToolTip="Renamed" />
                         </Grid>
