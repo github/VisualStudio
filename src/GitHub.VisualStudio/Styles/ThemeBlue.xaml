@@ -42,4 +42,6 @@
 
   <SolidColorBrush x:Key="GitHubComboBoxBackgroundBrush" Color="#FFF6F6F6" />
   <SolidColorBrush x:Key="GitHubComboBoxBorderBrush" Color="#FFCCCEDC" />
+
+  <SolidColorBrush x:Key="GitHubTabItemSelectedBorder" Color="#FFD0D7E4" />
 </ResourceDictionary>
