@@ -87,7 +87,7 @@ namespace GitHub.ViewModels
             base.Initialize(data);
 
             repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
-            list.Subscribe();
+            pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
                 trackingAuthors.AddItem(pr.Author);
