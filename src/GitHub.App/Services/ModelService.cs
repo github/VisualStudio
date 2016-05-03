@@ -286,15 +286,6 @@ namespace GitHub.Services
             if (disposing)
             {
                 if (disposed) return;
-
-                try
-                {
-                    hostCache.Dispose();
-                }
-                catch (Exception e)
-                {
-                    log.Warn("Exception occured while disposing host cache", e);
-                }
                 disposed = true;
             }
         }
