@@ -137,7 +137,7 @@
           <Setter Property="Foreground"
                   Value="{DynamicResource GHTextBrush}" />
           <Setter Property="Margin"
-                  Value="0,0,12,0" />
+                  Value="0,6,12,6" />
         </Style>
       </Border.Resources>
       <Grid Margin="0">
