@@ -18,7 +18,7 @@ using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using ReactiveUI;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.Shell;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -26,6 +26,7 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
+        bool initialized;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
         WindowController windowController;
@@ -37,7 +38,8 @@ namespace GitHub.VisualStudio.UI.Views
         readonly List<ViewWithData> navStack = new List<ViewWithData>();
         int currentNavItem = -1;
         bool navigatingViaArrows;
-        OleMenuCommand back, forward, refresh;
+        bool disabled;
+        Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -56,13 +58,13 @@ namespace GitHub.VisualStudio.UI.Views
             base.Initialize(serviceProvider);
 
             ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
-                (s, e) => Reload(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList }));
+                (s, e) => Reload(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList }).Forget());
 
             back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && currentNavItem > 0,
                 () => {
                     DisableButtons();
-                    Reload(navStack[--currentNavItem], true);
+                    Reload(navStack[--currentNavItem], true).Forget();
                 },
                 true);
 
@@ -70,7 +72,7 @@ namespace GitHub.VisualStudio.UI.Views
                 () => !disabled && currentNavItem < navStack.Count - 1,
                 () => {
                     DisableButtons();
-                    Reload(navStack[++currentNavItem], true);
+                    Reload(navStack[++currentNavItem], true).Forget();
                 },
                 true);
 
@@ -78,36 +80,41 @@ namespace GitHub.VisualStudio.UI.Views
                 () => !disabled && navStack.Count > 0,
                 () => {
                     DisableButtons();
-                    Reload();
+                    Reload().Forget();
                 },
                 true);
+
+            initialized = true;
         }
 
         public void Initialize([AllowNull] ViewWithData data)
         {
             Title = "GitHub";
-            Reload(data);
+            Reload(data).Forget();
         }
 
-        protected async override void RepoChanged(bool changed)
+        protected override void RepoChanged(bool changed)
         {
             base.RepoChanged(changed);
+
+            if (!initialized)
+                return;
 
             if (!changed)
                 return;
 
-            IsGitHubRepo = await IsAGitHubRepo();
-            if (!IsGitHubRepo)
-                return;
-
-            Reload();
+            IsGitHubRepo = null;
+            Reload().Forget();
         }
 
-        async void Reload([AllowNull] ViewWithData data = null, bool navigating = false)
+        async Task Reload([AllowNull] ViewWithData data = null, bool navigating = false)
         {
             navigatingViaArrows = navigating;
 
-            if (!IsGitHubRepo)
+            if (!IsGitHubRepo.HasValue)
+                IsGitHubRepo = await IsAGitHubRepo();
+
+            if (!IsGitHubRepo.Value)
             {
                 if (uiController != null)
                 {
@@ -135,6 +142,7 @@ namespace GitHub.VisualStudio.UI.Views
                 var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
                 Control = c.View;
             }
+            return;
         }
 
         void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
@@ -268,8 +276,8 @@ namespace GitHub.VisualStudio.UI.Views
             set { isLoggedIn = value;  this.RaisePropertyChange(); }
         }
 
-        bool isGitHubRepo;
-        public bool IsGitHubRepo
+        bool? isGitHubRepo;
+        public bool? IsGitHubRepo
         {
             get { return isGitHubRepo; }
             set { isGitHubRepo = value; this.RaisePropertyChange(); }
@@ -282,17 +290,15 @@ namespace GitHub.VisualStudio.UI.Views
         public bool IsShowing => true;
 
         bool disposed = false;
-        private bool disabled;
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (!disposed)
-                {
-                    disposables.Dispose();
-                    disposed = true;
-                }
+                if (disposed)
+                    return;
+                disposed = true;
+                DisableButtons();
+                disposables.Dispose();
             }
             base.Dispose(disposing);
         }
