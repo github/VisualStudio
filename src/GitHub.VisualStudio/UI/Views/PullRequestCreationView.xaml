@@ -74,7 +74,7 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
                     <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
-                    <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
+                    <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="5,2,3,0"  VerticalAlignment="Center" />
                     <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsGrayText}"/>
                 </StackPanel>
 
