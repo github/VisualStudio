@@ -80,7 +80,6 @@
                         <DockPanel HorizontalAlignment="Center">
                             <TextBlock
                                 x:Name="ContentSite"
-                                FontSize="12"
                                 VerticalAlignment="Center"
                                 Text="{TemplateBinding Header}" />
                         </DockPanel>
