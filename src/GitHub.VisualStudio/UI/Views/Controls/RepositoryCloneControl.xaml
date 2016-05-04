@@ -152,25 +152,26 @@
                   <Setter Property="Template">
                     <Setter.Value>
                       <ControlTemplate TargetType="{x:Type GroupItem}">
-                        <StackPanel Orientation="Vertical"
-                                    Margin="0">
-                          <Border Background="#F8F8F8"
-                                  Style="{StaticResource repositoryBorderStyle}">
+                        <Expander IsExpanded="{Binding Name.IsExpanded}">
+                          <Expander.Header>
+                            <Border Background="#F8F8F8"
+                                    Style="{StaticResource repositoryBorderStyle}">
                             <StackPanel Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         Margin="0">
-                              <Image x:Name="avatar"
-                                     Width="16"
-                                     Height="16"
-                                     Margin="10,0,6,0"
-                                     RenderOptions.BitmapScalingMode="HighQuality"
-                                     Source="{Binding Items[0].Owner.Avatar}" />
-                              <TextBlock Text="{Binding Path=Name}"
-                                         Style="{StaticResource cloneRepoHeaderStyle}" />
+                                <Image x:Name="avatar"
+                                        Width="16"
+                                        Height="16"
+                                        Margin="10,0,6,0"
+                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                        Source="{Binding Items[0].Owner.Avatar}" />
+                                <TextBlock Text="{Binding Path=Name.Header}"
+                                           Style="{StaticResource cloneRepoHeaderStyle}" />
                             </StackPanel>
-                          </Border>
+                            </Border>
+                          </Expander.Header>                        
                           <ItemsPresenter Margin="0" />
-                        </StackPanel>
+                        </Expander>
                       </ControlTemplate>
                     </Setter.Value>
                   </Setter>
