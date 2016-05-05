@@ -8,7 +8,6 @@
         <Setter Property="BorderBrush" Value="{DynamicResource GitHubButtonBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
-        <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="12,5" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="MinWidth" Value="76" />
@@ -97,7 +96,6 @@
         <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
-        <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="12,5" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="MinWidth" Value="76" />
