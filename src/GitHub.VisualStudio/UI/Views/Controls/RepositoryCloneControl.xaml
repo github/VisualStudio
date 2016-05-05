@@ -51,15 +51,16 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Border Padding="{TemplateBinding Padding}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock x:Name="arrow" Text="Foobar" Foreground="Red" />
+                            <Border Padding="{TemplateBinding Padding}" Style="{StaticResource repositoryBorderStyle}">
+                                <StackPanel Orientation="Horizontal" Background="#F8F8F8">
+                                    <ui:OcticonImage x:Name="arrow" Icon="triangle_right" Foreground="Black" Height="10" Margin="5,0,0,0" />
+                                    <ContentPresenter HorizontalAlignment="Left" Margin="0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Foreground" TargetName="arrow" Value="Blue" />
+                                    <Setter TargetName="arrow" Property="Icon" Value="triangle_down" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -215,22 +216,19 @@
                     <ControlTemplate TargetType="{x:Type GroupItem}">
                         <Expander Style="{StaticResource StatusGroupExpander}" IsExpanded="{Binding Name.IsExpanded}">
                           <Expander.Header>
-                            <Border Background="#F8F8F8"
-                                    Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}, Path=ActualWidth}"
-                                    Style="{StaticResource repositoryBorderStyle}">
-                            <StackPanel Orientation="Horizontal"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Stretch"
-                                        Margin="0">
-                                <Image x:Name="avatar"
-                                        Width="16"
-                                        Height="16"
-                                        Margin="10,0,6,0"
-                                        RenderOptions.BitmapScalingMode="HighQuality"
-                                        Source="{Binding Items[0].Owner.Avatar}" />
-                                <TextBlock Text="{Binding Path=Name.Header}"
-                                           Style="{StaticResource cloneRepoHeaderStyle}" />
-                            </StackPanel>
+                            <Border Style="{StaticResource repositoryBorderStyle}">
+                                <StackPanel Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            Margin="0">
+                                    <Image x:Name="avatar"
+                                            Width="16"
+                                            Height="16"
+                                            Margin="0,0,5,0"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            Source="{Binding Items[0].Owner.Avatar}" />
+                                    <TextBlock Text="{Binding Path=Name.Header}"
+                                               Style="{StaticResource cloneRepoHeaderStyle}" />
+                                </StackPanel>
                             </Border>
                           </Expander.Header>                        
                           <ItemsPresenter Margin="0" />
