@@ -51,6 +51,7 @@ namespace GitHub.Factories
 
                 loginCache.Dispose();
                 avatarProvider.Dispose();
+                hostCacheFactory.Dispose();
                 disposed = true;
             }
         }

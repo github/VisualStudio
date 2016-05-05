@@ -80,12 +80,12 @@
     <Compile Include="Behaviours\AddEmptyItemToList.cs" />
     <Compile Include="Behaviours\ClosePopupAction.cs" />
     <Compile Include="Behaviours\OpenPopupAction.cs" />
-    <Compile Include="Controls\DropDownActionLinkBehaviour.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>OcticonPaths.resx</DependentUpon>
     </Compile>
+    <Compile Include="Converters\CountToVisibilityConverter.cs" />
     <Compile Include="Converters\DefaultValueConverter.cs" />
     <Compile Include="Converters\StickieListItemConverter.cs" />
     <Compile Include="Resources.Designer.cs">

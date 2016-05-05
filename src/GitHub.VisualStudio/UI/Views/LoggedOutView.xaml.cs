@@ -6,16 +6,16 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericGitHubPaneView : SimpleViewUserControl<IGitHubPaneViewModel, GitHubPaneView>
+    public class GenericLoggedOutView : SimpleViewUserControl<IViewModel, GenericLoggedOutView>
     {
     }
 
-    [ExportView(ViewType = UIViewType.GitHubPane)]
+    [ExportView(ViewType = UIViewType.LoggedOut)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
 
-    public partial class GitHubPaneView : GenericGitHubPaneView
+    public partial class LoggedOutView : GenericLoggedOutView
     {
-        public GitHubPaneView()
+        public LoggedOutView()
         {
             this.InitializeComponent();
             this.WhenActivated(d =>

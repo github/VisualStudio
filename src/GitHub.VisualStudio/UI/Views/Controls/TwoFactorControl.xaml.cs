@@ -24,8 +24,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
-
             this.WhenActivated(d =>
             {
                 d(this.BindCommand(ViewModel, vm => vm.OkCommand, view => view.okButton));
