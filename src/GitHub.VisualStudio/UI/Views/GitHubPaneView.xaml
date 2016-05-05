@@ -46,7 +46,7 @@
       <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"
-                 Foreground="{StaticResource GitHubPaneTitleBrush}"
+                 Foreground="{DynamicResource GitHubPaneTitleBrush}"
                  Text="{Binding Title}" />
       <Separator Margin="5,-2,5,0" Foreground="{DynamicResource GitHubPaneTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
       <TextBlock Margin="0,-5,0,0"
