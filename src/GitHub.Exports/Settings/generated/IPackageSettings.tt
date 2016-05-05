@@ -27,5 +27,6 @@ foreach (var j in json["settings"].Children()) {
 <#
 }
 #>
+		UIState UIState { get; }
     }
 }
