@@ -294,11 +294,12 @@ namespace GitHub.VisualStudio.UI.Views
         {
             if (disposing)
             {
-                if (disposed)
-                    return;
-                disposed = true;
-                DisableButtons();
-                disposables.Dispose();
+                if (!disposed)
+                {
+                    disposed = true;
+                    DisableButtons();
+                    disposables.Dispose();
+                }
             }
             base.Dispose(disposing);
         }
