@@ -101,7 +101,7 @@
                     Grid.Row="4"
                     Margin="0,10"
                     Message="{x:Static prop:Resources.gistCreationFailedMessage}">
-                    <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.gistCreationFailedMessage}"/>
+                    <TextBlock x:Name="errorMessageText" TextWrapping="Wrap" Text="{x:Static prop:Resources.gistCreationFailedMessage}"/>
                 </uirx:ErrorMessageDisplay>
             </Grid>
         </StackPanel>

@@ -44,7 +44,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     .Subscribe(n =>
                     {
                         errorMessage.Visibility = Visibility.Visible;
-                        errorMessage.Content = n.Message;
+                        errorMessageText.Text = n.Message;
                     }));
             });
         }
