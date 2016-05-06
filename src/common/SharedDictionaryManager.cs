@@ -11,63 +11,9 @@ namespace GitHub.VisualStudio.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary
     {
-        static readonly string[] ourAssemblies =
-        {
-            "GitHub.Api",
-            "GitHub.App",
-            "GitHub.CredentialManagement",
-            "GitHub.Exports",
-            "GitHub.Exports.Reactive",
-            "GitHub.Extensions",
-            "GitHub.Extensions.Reactive",
-            "GitHub.UI",
-            "GitHub.UI.Reactive",
-            "GitHub.VisualStudio",
-            "GitHub.TeamFoundation",
-            "GitHub.TeamFoundation.14",
-            "GitHub.TeamFoundation.15",
-            "GitHub.VisualStudio.UI"
-        };
-
-        readonly static int VSVersion;
-        static SharedDictionaryManager()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
-            var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.FullName.StartsWith("Microsoft.TeamFoundation", StringComparison.Ordinal));
-            VSVersion = asm?.GetName().Version.Major ?? 14;
-        }
-
         public SharedDictionaryManager()
         {
             currentTheme = Colors.DetectTheme();
-        }
-
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
-        static Assembly LoadAssemblyFromRunDir(object sender, ResolveEventArgs e)
-        {
-            try
-            {
-                var name = new AssemblyName(e.Name);
-                if (!ourAssemblies.Contains(name.Name))
-                    return null;
-                // This assembly should only be loaded in the matching VS version
-                if (name.Name.StartsWith("GitHub.TeamFoundation", StringComparison.Ordinal))
-                {
-                    if (!String.Equals("GitHub.TeamFoundation." + VSVersion, name.Name, StringComparison.Ordinal))
-                        return null;
-                }
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filename = Path.Combine(path, name.Name + ".dll");
-                if (!File.Exists(filename))
-                    return null;
-                return Assembly.LoadFrom(filename);
-            }
-            catch (Exception ex)
-            {
-                var log = string.Format(CultureInfo.CurrentCulture, "Error occurred loading {0} from {1}.{2}{3}{4}", e.Name, Assembly.GetExecutingAssembly().Location, Environment.NewLine, ex, Environment.NewLine);
-                VsOutputLogger.Write(log);
-            }
-            return null;
         }
 
 #region ResourceDictionaryImplementation
