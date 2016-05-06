@@ -341,7 +341,7 @@
                                        ToolTip="I am an example commit message"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                       FontSize="14"
+                                       FontSize="{StaticResource GitHubVsListItemTitleFontSize}"
                                        Margin="10,-3,5,0"
                                        Grid.Column="1"
                                        Grid.Row="0" />
@@ -350,7 +350,6 @@
                                        Text="Andreia Gaita committed 20 hours ago"
                                        ToolTip="Andreia Gaita committed 20 hours ago"
                                        VerticalAlignment="Top"
-                                       FontSize="11"
                                        Grid.Column="1"
                                        Grid.Row="1" 
                                        Foreground="{DynamicResource GitHubVsGrayText}"/>
