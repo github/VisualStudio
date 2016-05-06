@@ -9,6 +9,8 @@ using GitHub.Services;
 using Octokit;
 using ReactiveUI;
 using NullGuard;
+using GitHub.Extensions;
+using NLog;
 
 namespace GitHub.ViewModels
 {
@@ -16,15 +18,23 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IApiClient apiClient;
         readonly ObservableAsPropertyHelper<IAccount> account;
+        readonly IGistPublishService gistPublishService;
+        readonly INotificationService notificationService;
 
         [ImportingConstructor]
         GistCreationViewModel(
-        IConnectionRepositoryHostMap connectionRepositoryHostMap,
-        ISelectedTextProvider selectedTextProvider)
-        : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider)
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            ISelectedTextProvider selectedTextProvider,
+            IGistPublishService gistPublishService,
+            INotificationService notificationService)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider)
         {
+            this.gistPublishService = gistPublishService;
+            this.notificationService = notificationService;
         }
 
         public GistCreationViewModel(IRepositoryHost repositoryHost, ISelectedTextProvider selectedTextProvider)
@@ -49,18 +59,31 @@ namespace GitHub.ViewModels
             CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
         }
 
-        IObservable<Gist> OnCreateGist(object _)
+        IObservable<ProgressState> OnCreateGist(object unused)
         {
             var newGist = new NewGist
             {
                 Description = Description,
                 Public = !IsPrivate
             };
+
             newGist.Files.Add(FileName, SelectedText);
-            return apiClient.CreateGist(newGist);
+
+            return gistPublishService.PublishGist(apiClient, newGist)
+                .Select(_ => ProgressState.Success)
+                .Catch<ProgressState, Exception>(ex =>
+                {
+                    if (!ex.IsCriticalException())
+                    {
+                        log.Error(ex);
+                        var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.GistCreateFailed);
+                        notificationService.ShowError(error);
+                    }
+                    return Observable.Return(ProgressState.Fail);
+                });
         }
 
-        public IReactiveCommand<Gist> CreateGist { get; }
+        public IReactiveCommand<ProgressState> CreateGist { get; }
 
         public IAccount Account
         {

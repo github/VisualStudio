@@ -250,6 +250,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to create gist.
+        /// </summary>
+        public static string gistCreationFailedMessage {
+            get {
+                return ResourceManager.GetString("gistCreationFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connect….
         /// </summary>
         public static string GitHubInvitationSectionConnectLabel {

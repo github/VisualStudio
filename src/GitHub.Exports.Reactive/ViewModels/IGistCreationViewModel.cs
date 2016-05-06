@@ -9,7 +9,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the command to create a new gist.
         /// </summary>
-        IReactiveCommand<Gist> CreateGist { get; }
+        IReactiveCommand<ProgressState> CreateGist { get; }
 
         /// <summary>
         /// True if the gist should be private.
