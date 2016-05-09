@@ -5,6 +5,7 @@
                     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                     xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
                     xmlns:viewmodels="clr-namespace:GitHub.ViewModels;assembly=GitHub.Exports.Reactive"
+                    xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
 
   <ResourceDictionary.MergedDictionaries>
@@ -54,10 +55,9 @@
                  Grid.Column="1"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
-                 FontFamily="Segoe UI"
-                 FontSize="{DynamicResource GitHubVsListTitleFontSize}"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
                  Margin="0,-3,5,0"
+                 Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                  Text="{Binding Title}"
                  ToolTip="{Binding Title}"
                  TextTrimming="CharacterEllipsis" />

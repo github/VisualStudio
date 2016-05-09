@@ -7,6 +7,7 @@
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                      xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
@@ -341,7 +342,7 @@
                                        ToolTip="I am an example commit message"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                       FontSize="{StaticResource GitHubVsListItemTitleFontSize}"
+                                       Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                                        Margin="10,-3,5,0"
                                        Grid.Column="1"
                                        Grid.Row="0" />

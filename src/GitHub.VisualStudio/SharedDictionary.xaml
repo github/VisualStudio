@@ -12,7 +12,6 @@
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/Buttons.xaml" />
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubTabControl.xaml" />
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/TextBlocks.xaml" />
-    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/Typography.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}" />
