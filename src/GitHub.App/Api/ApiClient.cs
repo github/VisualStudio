@@ -70,7 +70,7 @@ namespace GitHub.Api
             return GetScopesInternal().ToObservable();
         }
 
-        private async Task<string[]> GetScopesInternal()
+        async Task<string[]> GetScopesInternal()
         {
             var response = await gitHubClient.Connection.Get<string>(
                 new Uri("/", UriKind.Relative),

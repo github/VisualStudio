@@ -13,11 +13,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GistPublishService : IGistPublishService
     {
-        [ImportingConstructor]
-        public GistPublishService()
-        {
-        }
-
         /// <summary>
         /// Publishes a gist to GitHub.
         /// </summary>
