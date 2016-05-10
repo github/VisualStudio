@@ -13,11 +13,14 @@ using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 
 namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
+        const string scopesHeader = "X-OAuth-Scopes";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
@@ -60,6 +63,28 @@ namespace GitHub.Api
         public IObservable<User> GetUser()
         {
             return gitHubClient.User.Current();
+        }
+
+        public IObservable<string[]> GetScopes()
+        {
+            return GetScopesInternal().ToObservable();
+        }
+
+        private async Task<string[]> GetScopesInternal()
+        {
+            var response = await gitHubClient.Connection.Get<string>(
+                new Uri("/", UriKind.Relative),
+                TimeSpan.FromSeconds(3));
+
+            if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+            {
+                return response.HttpResponse.Headers[scopesHeader]
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .ToArray();
+            }
+
+            return new string[0];
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
