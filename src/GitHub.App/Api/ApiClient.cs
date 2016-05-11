@@ -72,17 +72,21 @@ namespace GitHub.Api
 
         async Task<string[]> GetScopesInternal()
         {
-            var response = await gitHubClient.Connection.Get<string>(
-                new Uri("/", UriKind.Relative),
-                TimeSpan.FromSeconds(3));
-
-            if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+            try
             {
-                return response.HttpResponse.Headers[scopesHeader]
-                    .Split(',')
-                    .Select(x => x.Trim())
-                    .ToArray();
+                var response = await gitHubClient.Connection.Get<string>(
+                    new Uri("/", UriKind.Relative),
+                    TimeSpan.FromSeconds(3));
+
+                if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+                {
+                    return response.HttpResponse.Headers[scopesHeader]
+                        .Split(',')
+                        .Select(x => x.Trim())
+                        .ToArray();
+                }
             }
+            catch { }
 
             return new string[0];
         }
