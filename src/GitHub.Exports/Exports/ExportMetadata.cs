@@ -17,6 +17,7 @@ namespace GitHub.Exports {
 		Clone,
         Publish,
         Gist,
+        LogoutRequired,
         End = 100,
         Finished,
         GitHubPane,

@@ -194,6 +194,7 @@
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
+    <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\LoginControlViewModel.cs" />

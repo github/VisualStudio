@@ -129,6 +129,14 @@ namespace GitHub.Controllers
                 .Permit(Trigger.Cancel, UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.End);
 
+            machine.Configure(UIViewType.LogoutRequired)
+                .OnEntry(() =>
+                {
+                    RunView(UIViewType.LogoutRequired);
+                })
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.End);
+
             machine.Configure(UIViewType.End)
                 .OnEntryFrom(Trigger.Cancel, () => End(false))
                 .OnEntryFrom(Trigger.Next, () => End(true))
@@ -254,7 +262,8 @@ namespace GitHub.Controllers
                             .PermitIf(Trigger.Clone, UIViewType.Login, () => !host.IsLoggedIn)
                             .PermitIf(Trigger.Publish, UIViewType.Publish, () => host.IsLoggedIn)
                             .PermitIf(Trigger.Publish, UIViewType.Login, () => !host.IsLoggedIn)
-                            .PermitIf(Trigger.Gist, UIViewType.Gist, () => host.IsLoggedIn)
+                            .PermitIf(Trigger.Gist, UIViewType.Gist, () => host.IsLoggedIn && host.SupportsGist)
+                            .PermitIf(Trigger.Gist, UIViewType.LogoutRequired, () => host.IsLoggedIn && !host.SupportsGist)
                             .PermitIf(Trigger.Gist, UIViewType.Login, () => !host.IsLoggedIn);
                     })
                     .ObserveOn(RxApp.MainThreadScheduler)
