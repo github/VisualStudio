@@ -1,6 +1,8 @@
 ﻿using GitHub.Models;
 using ReactiveUI;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 
 namespace GitHub.ViewModels
 {

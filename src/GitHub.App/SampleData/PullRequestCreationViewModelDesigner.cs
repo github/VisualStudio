@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using GitHub.ViewModels;
 using System.Collections.Generic;
 using ReactiveUI;
+using System.Collections.ObjectModel;
 using GitHub.Models;
 using System;
 using System.Windows.Media.Imaging;
@@ -14,7 +15,6 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            //TODO:Make String into an IBranch
             Branches = new ObservableCollection<IBranch>
             {
                new Branch { Name = "don/stub-ui" },
@@ -37,22 +37,14 @@ namespace GitHub.SampleData
             };
         }
 
-
-        public IReactiveList<IBranch> Branches
-        {
-            get;
-            private set;
-        }
-
-        public IReadOnlyList<IAccount> Assignees
-        {
-            get;
-            private set;
-        }
-
         public IAccount SelectedAssignee { get; set; }
         public IBranch TargetBranch { get; set; }
         public IBranch CurrentBranch { get; set; }
+        public ObservableCollection<IBranch> Branches { get; set; }
+        public ObservableCollection<IAccount> Assignees { get; set; }
+
+
+
 
     }
 }

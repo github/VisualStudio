@@ -41,7 +41,7 @@ namespace GitHub.ViewModels
             this.repository = repository;
 
             //We don't need a reactive list
-            Branches = new ReactiveUI.ObservableCollection<IBranch>
+            Branches = new ObservableCollection<IBranch>
             {
                new Models.Branch { Name = "don/stub-ui" },
                new Models.Branch { Name = "feature/pr/views" },
