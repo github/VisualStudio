@@ -15,7 +15,7 @@ namespace GitHub.SampleData
         public PullRequestCreationViewModelDesigner()
         {
             //TODO:Make String into an IBranch
-            Branches = new ReactiveList<IBranch>
+            Branches = new ObservableCollection<IBranch>
             {
                new Branch { Name = "don/stub-ui" },
                new Branch { Name = "feature/pr/views" },
@@ -30,7 +30,7 @@ namespace GitHub.SampleData
             TargetBranch = new Branch { Name = "master" }; //IBranch
 
             //IAcct
-            Users = new ReactiveList<IAccount>
+            Assignees = new ObservableCollection<IAccount>
             {
                 new AccountDesigner { Login = "Haacked (Phil Haack)" },
                 new AccountDesigner { Login = "shana(Andreia Gaita)" }            
@@ -44,7 +44,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IReadOnlyList<IAccount> Users
+        public IReadOnlyList<IAccount> Assignees
         {
             get;
             private set;

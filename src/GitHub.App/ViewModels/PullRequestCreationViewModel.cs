@@ -6,12 +6,14 @@ using NullGuard;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace GitHub.ViewModels
 {
@@ -39,23 +41,27 @@ namespace GitHub.ViewModels
             this.repository = repository;
 
             //We don't need a reactive list
-            // Branches = new ReactiveList<IBranch>();
-            //loadBranchesCommand = ReactiveCommand.CreateAsyncObservable(LoadBranches);
-            Branches = new ReactiveUI.ReactiveList<IBranch>
+            Branches = new ReactiveUI.ObservableCollection<IBranch>
             {
                new Models.Branch { Name = "don/stub-ui" },
                new Models.Branch { Name = "feature/pr/views" },
                new Models.Branch { Name = "release-1.0.17.0" }
             };
-            //isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
-            // .CombineLatest(loadBranchesCommand.IsExecuting, (failed, loading) => !failed && loading)
-            //.ToProperty(this, x => x.IsLoading);
-           // loadBranchesCommand.Subscribe(Branches.AddRange);
-           
+
+            CurrentBranch = new Branch("master");
+
+            assignees = new ObservableCollection<IAccount>
+            {
+                new Account("User1", false, false, 0, 0, Observable.Empty<BitmapSource>()),
+                new Account("User2", false, false, 0, 0, Observable.Empty<BitmapSource>()),
+                new Account("User3", false, false, 0, 0, Observable.Empty<BitmapSource>()),
+
+            };
+
         }
 
-        IReactiveList<IBranch> branches;
-        public IReactiveList<IBranch> Branches
+        ObservableCollection<IBranch> branches;
+        public ObservableCollection<IBranch> Branches
         {
             get { return branches ; }
             private set { this.RaiseAndSetIfChanged(ref branches, value); }
@@ -67,12 +73,11 @@ namespace GitHub.ViewModels
 
         public IBranch TargetBranch { get; private set; }
 
-        public IReadOnlyList<IAccount> Users
+        ObservableCollection<IAccount> assignees;
+        public ObservableCollection<IAccount> Assignees
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return assignees; }
+            private set { this.RaiseAndSetIfChanged(ref assignees, value); }
         }
 
         bool loadingFailed;
