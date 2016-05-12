@@ -615,8 +615,7 @@ public class ModelServiceTests
         var uri = new Uri("https://url");
         return new PullRequest(uri, uri, uri, uri, uri, uri,
             id, state, title, "", createdAt, updatedAt,
-            null, null, null, null, user, null, false, null,
-            commentCount, 0, 0, 0, 0,
-            null, false);
+            null, null, null, null, user, "", false, null, null, commentCount, 0, 0, 0,
+            0);
     }
 }
