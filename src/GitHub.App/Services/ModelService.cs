@@ -16,6 +16,7 @@ using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
+using System.Collections.ObjectModel;
 
 namespace GitHub.Services
 {
@@ -234,7 +235,7 @@ namespace GitHub.Services
                     });
         }
 
-        public IObservable<IReadOnlyList<IBranch>> GetBranches(ISimpleRepositoryModel repo)
+        public ObservableCollection<IBranch> GetBranches(ISimpleRepositoryModel repo)
         {
 
             //var keyobs = GetUserFromCache()
@@ -254,12 +255,12 @@ namespace GitHub.Services
             //    .Select(Create)
             //);
 
-            return Observable.Return(new ReactiveUI.ReactiveList<IBranch>
+            return new ObservableCollection<IBranch>
             {
                new Models.Branch { Name = "don/stub-ui" },
                new Models.Branch { Name = "feature/pr/views" },
                new Models.Branch { Name = "release-1.0.17.0" }
-            });
+            };
 
         }
 

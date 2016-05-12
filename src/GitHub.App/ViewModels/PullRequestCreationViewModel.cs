@@ -1,6 +1,7 @@
 ﻿using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.UI;
 using NLog;
 using NullGuard;
 using ReactiveUI;
@@ -40,13 +41,12 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.repository = repository;
 
-            //We don't need a reactive list
-            Branches = new ObservableCollection<IBranch>
-            {
-               new Models.Branch { Name = "don/stub-ui" },
-               new Models.Branch { Name = "feature/pr/views" },
-               new Models.Branch { Name = "release-1.0.17.0" }
-            };
+            Branches = new ObservableCollection<IBranch>();
+            //{
+            //   new Models.Branch { Name = "don/stub-ui" },
+            //   new Models.Branch { Name = "feature/pr/views" },
+            //   new Models.Branch { Name = "release-1.0.17.0" }
+            //};
 
             CurrentBranch = new Branch("master");
 
@@ -60,10 +60,19 @@ namespace GitHub.ViewModels
 
         }
 
+        public override void Initialize([AllowNull] ViewWithData data)
+        {
+            base.Initialize(data);
+
+            repositoryHost.ModelService.GetBranches(repository)
+                          .ForEach(br => branches.Add(br));
+
+        }
+
         ObservableCollection<IBranch> branches;
         public ObservableCollection<IBranch> Branches
         {
-            get { return branches ; }
+            get { return branches; }
             private set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
 
@@ -88,19 +97,19 @@ namespace GitHub.ViewModels
         }
 
 
-        IObservable<IReadOnlyList<IBranch>> LoadBranches(object value)
-        {
+        //IObservable<IReadOnlyList<IBranch>> LoadBranches(object value)
+        //{
 
-            var list = repositoryHost.ModelService.GetBranches(repository);
+        //    var list = repositoryHost.ModelService.GetBranches(repository);
 
-            return list
-                .Catch<IReadOnlyList<IBranch>, Exception>(ex =>
-                {
-                    log.Error("Error while loading repositories", ex);
-                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
-                        .Select(_ => new IBranch[] { });
-                });
-        }
+        //    return list
+        //        .Catch<IReadOnlyList<IBranch>, Exception>(ex =>
+        //        {
+        //            log.Error("Error while loading repositories", ex);
+        //            return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
+        //                .Select(_ => new IBranch[] { });
+        //        });
+        //}
 
     }
 }
