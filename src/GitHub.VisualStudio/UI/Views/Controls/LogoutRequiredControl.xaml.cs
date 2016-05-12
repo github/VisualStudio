@@ -17,6 +17,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     {
         public LogoutRequiredControl()
         {
+            InitializeComponent();
         }
     }
 }

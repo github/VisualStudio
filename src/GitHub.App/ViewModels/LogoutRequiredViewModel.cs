@@ -7,5 +7,9 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LogoutRequiredViewModel : BaseViewModel, ILogoutRequiredViewModel
     {
+        public LogoutRequiredViewModel()
+        {
+            Title = Resources.LogoutRequiredTitle;
+        }
     }
 }

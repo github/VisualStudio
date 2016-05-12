@@ -150,6 +150,9 @@
   <data name="LoginTitle" xml:space="preserve">
     <value>Connect To GitHub</value>
   </data>
+  <data name="LogoutRequiredTitle" xml:space="preserve">
+    <value>Sign Out Required</value>
+  </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
     <value>Please enter your password</value>
   </data>

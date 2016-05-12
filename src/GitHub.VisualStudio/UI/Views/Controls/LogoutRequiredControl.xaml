@@ -23,7 +23,16 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel>
-        <TextBlock>Logout Required</TextBlock>
-    </StackPanel>
+    <DockPanel LastChildFill="True">
+        <ui:OcticonCircleButton DockPanel.Dock="Bottom"
+                                IsDefault="True"
+                                Margin="12"
+                                x:Name="logoutButton"
+                                HorizontalAlignment="Center"
+                                Icon="check">
+            <TextBlock Text="{x:Static prop:Resources.SignOutLink}" />
+        </ui:OcticonCircleButton>
+
+        <TextBlock>TODO: Explain why you must sign out and back in here...</TextBlock>
+    </DockPanel>
 </local:GenericLogoutRequiredControl>

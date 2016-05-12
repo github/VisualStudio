@@ -160,6 +160,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sign Out Required.
+        /// </summary>
+        public static string LogoutRequiredTitle {
+            get {
+                return ResourceManager.GetString("LogoutRequiredTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter your password.
         /// </summary>
         public static string PasswordValidatorEmpty {
