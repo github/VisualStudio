@@ -44,6 +44,10 @@ public class UIControllerTests
             factory.GetView(GitHub.Exports.UIViewType.TwoFactor).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ITwoFactorDialogViewModel>, SimpleViewUserControl>(), () => { }));
             factory.GetViewModel(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
             factory.GetView(GitHub.Exports.UIViewType.Clone).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IRepositoryCloneViewModel>, SimpleViewUserControl>(), () => { }));
+            factory.GetViewModel(GitHub.Exports.UIViewType.Gist).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.Gist).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<IGistCreationViewModel>, SimpleViewUserControl>(), () => { }));
+            factory.GetViewModel(GitHub.Exports.UIViewType.LogoutRequired).Returns(new ExportLifetimeContext<IViewModel>(Substitute.For<IViewModel>(), () => { }));
+            factory.GetView(GitHub.Exports.UIViewType.LogoutRequired).Returns(new ExportLifetimeContext<IView>(Substitute.For<IView, IViewFor<ILogoutRequiredViewModel>, SimpleViewUserControl>(), () => { }));
             return factory;
         }
 
@@ -127,6 +131,64 @@ public class UIControllerTests
                                     ((IUIProvider)provider).Received().AddService(connection);
                                 });
                 uiController.Start(null);
+            }
+        }
+
+        [STAFact]
+        public void ShowingGistDialogWhenGistNotSupportedShowsLogoutDialog()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var connection = provider.GetConnection();
+            connection.Login().Returns(Observable.Return(connection));
+            var cm = provider.GetConnectionManager();
+            cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(connection.HostAddress).Returns(host);
+            host.IsLoggedIn.Returns(true);
+            host.SupportsGist.Returns(false);
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
+            {
+                var list = new List<IView>();
+                uiController.SelectFlow(UIControllerFlow.Gist)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.Equal(1, list.Count);
+                                    Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(list[0]);
+                                });
+                uiController.Start(connection);
+            }
+        }
+
+        [STAFact]
+        public void ShowingGistDialogWhenGistSupportedShowsGistDialog()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var connection = provider.GetConnection();
+            connection.Login().Returns(Observable.Return(connection));
+            var cm = provider.GetConnectionManager();
+            cm.Connections.Returns(new ObservableCollection<IConnection> { connection });
+            var host = hosts.GitHubHost;
+            hosts.LookupHost(connection.HostAddress).Returns(host);
+            host.IsLoggedIn.Returns(true);
+            host.SupportsGist.Returns(true);
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm, LazySubstitute.For<ITwoFactorChallengeHandler>()))
+            {
+                var list = new List<IView>();
+                uiController.SelectFlow(UIControllerFlow.Gist)
+                    .Subscribe(uc => list.Add(uc as IView),
+                                () =>
+                                {
+                                    Assert.Equal(1, list.Count);
+                                    Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(list[0]);
+                                });
+                uiController.Start(connection);
             }
         }
     }
