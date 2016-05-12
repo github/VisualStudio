@@ -1,7 +1,10 @@
 ﻿using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
+using ReactiveUI;
+using System;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -18,6 +21,15 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         public LogoutRequiredControl()
         {
             InitializeComponent();
+
+            this.WhenActivated(d =>
+            {
+                d(this.BindCommand(ViewModel, vm => vm.Logout, v => v.logoutButton));
+
+                ViewModel.Logout
+                    .Where(x => x == ProgressState.Success)
+                    .Subscribe(_ => NotifyDone());
+            });
         }
     }
 }
