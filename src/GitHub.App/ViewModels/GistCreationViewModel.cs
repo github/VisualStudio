@@ -31,16 +31,19 @@ namespace GitHub.ViewModels
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
             INotificationService notificationService)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService)
         {
-            this.gistPublishService = gistPublishService;
             this.notificationService = notificationService;
         }
 
-        public GistCreationViewModel(IRepositoryHost repositoryHost, ISelectedTextProvider selectedTextProvider)
+        public GistCreationViewModel(
+            IRepositoryHost repositoryHost,
+            ISelectedTextProvider selectedTextProvider,
+            IGistPublishService gistPublishService)
         {
             Title = Resources.CreateGistTitle;
             apiClient = repositoryHost.ApiClient;
+            this.gistPublishService = gistPublishService;
 
             FileName = VisualStudio.Services.GetFileNameFromActiveDocument() ?? Resources.DefaultGistFileName;
             SelectedText = selectedTextProvider.GetSelectedText();
