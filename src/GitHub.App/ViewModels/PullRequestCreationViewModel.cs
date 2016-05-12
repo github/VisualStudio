@@ -83,9 +83,6 @@ namespace GitHub.ViewModels
         }
 
 
-       
-
-
         IObservable<IReadOnlyList<IBranch>> LoadBranches(object value)
         {
 

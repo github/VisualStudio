@@ -119,30 +119,12 @@
                                 PromptText="Filter branches" />
                             <Separator Grid.Row="1" Margin="0" />
 
-                            <ListBox Grid.Row="2">
-                                <ListBoxItem>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">master</TextBlock>
-                                        <ui:OcticonImage Icon="check" Grid.Column="1" HorizontalAlignment="Right" Opacity="0.6" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">not-master</TextBlock>
-                                        <TextBlock Grid.Column="1" Opacity="0.6" HorizontalAlignment="Right">March 1</TextBlock>
-                                    </Grid>
-                                </ListBoxItem>
+                            <ListBox Grid.Row="2" ItemsSource="{Binding Branches}" >
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
                             </ListBox>
                         </Grid>
                     </Border>
