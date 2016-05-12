@@ -9,7 +9,7 @@ using GitHub.Settings;
 namespace GitHub.VisualStudio.Settings
 {
     [Export(typeof(IPackageSettings))]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class PackageSettings : IPackageSettings
     {
         readonly SettingsStore settingsStore;
@@ -20,11 +20,15 @@ namespace GitHub.VisualStudio.Settings
             var sm = new ShellSettingsManager(serviceProvider);
             settingsStore = new SettingsStore(sm.GetWritableSettingsStore(SettingsScope.UserSettings), Info.ApplicationInfo.ApplicationSafeName);
             LoadSettings();
+            UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
         }
+
+        public UIState UIState { get; }
 
         public void Save()
         {
             SaveSettings();
+            settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
         }
     }
 }

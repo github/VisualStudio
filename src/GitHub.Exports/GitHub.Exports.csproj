@@ -130,6 +130,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IPackageSettings.tt</DependentUpon>
     </Compile>
+    <Compile Include="Settings\GitHubConnectSectionState.cs" />
+    <Compile Include="Settings\UIState.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />
