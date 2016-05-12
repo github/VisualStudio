@@ -31,7 +31,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RepositoryCloneControl : GenericRepositoryCloneControl
     {
-        private Dictionary<string, RepositoryGroup> groups = new Dictionary<string, RepositoryGroup>();
+        readonly Dictionary<string, RepositoryGroup> groups = new Dictionary<string, RepositoryGroup>();
 
         public RepositoryCloneControl()
         {
@@ -73,7 +73,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
         class RepositoryGroupDescription : GroupDescription
         {
-            RepositoryCloneControl owner;
+            readonly RepositoryCloneControl owner;
 
             public RepositoryGroupDescription(RepositoryCloneControl owner)
             {
@@ -82,7 +82,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
-                var name = ((IRepositoryModel)item).Owner.Login;
+                var repo = item as IRepositoryModel;
+                Debug.Assert(repo.Owner != null, "Repository owner cannot be null, did something get changed in the RepositoryModel ctor?");
+                var name = repo.Owner.Login;
                 RepositoryGroup group;
 
                 if (!owner.groups.TryGetValue(name, out group))
@@ -90,10 +92,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     group = new RepositoryGroup(name, owner.groups.Count == 0);
 
                     if (owner.groups.Count == 1)
-                    {
                         owner.groups.Values.First().IsExpanded = false;
-                    }
-
                     owner.groups.Add(name, group);
                 }
 
@@ -103,7 +102,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
         class RepositoryGroup : ReactiveObject
         {
-            private bool isExpanded;
+            bool isExpanded;
 
             public RepositoryGroup(string header, bool isExpanded)
             {
