@@ -41,7 +41,7 @@ namespace GitHub.ViewModels
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.Branches, initialValue: new IBranchModel[] { });
 
-            CurrentBranchName = repository.CurrentBranchName;
+            CurrentBranch = new BranchModel { Name = repository.CurrentBranchName };
 
             assignees = new ObservableCollection<IAccount>
             {
@@ -62,7 +62,7 @@ namespace GitHub.ViewModels
             get { return branches.Value; }
         }
 
-        public string CurrentBranchName { get; private set; }
+        public IBranchModel CurrentBranch { get; private set; }
 
         public IAccount SelectedAssignee {get; private set;}
 

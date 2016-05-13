@@ -13,7 +13,7 @@ namespace GitHub.ViewModels
         ObservableCollection<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; }
         IBranchModel TargetBranch { get; }
-        string CurrentBranchName { get; }
+        IBranchModel CurrentBranch { get; }
 
     }
 }

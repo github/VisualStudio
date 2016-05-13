@@ -15,8 +15,8 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            
-            CurrentBranchName = "fix-everything" ;
+
+            CurrentBranch = new BranchModel { Name = "fix-everything" };
 
             SelectedAssignee = new AccountDesigner { Login = "Haacked (Phil Haack)" }; 
 
@@ -31,7 +31,7 @@ namespace GitHub.SampleData
 
         public IAccount SelectedAssignee { get; set; }
         public IBranchModel TargetBranch { get; set; }
-        public string CurrentBranchName { get; set; }
+        public IBranchModel CurrentBranch { get; set; }
         public IReadOnlyList<IBranchModel> Branches { get; set; }
         public ObservableCollection<IAccount> Assignees { get; set; }
 
