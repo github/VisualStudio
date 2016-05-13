@@ -60,10 +60,6 @@ namespace GitHub.ViewModels
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);
-           
-  
-                     
-
         }
 
         readonly ObservableAsPropertyHelper<IReadOnlyList<IBranchModel>> branches;
@@ -91,21 +87,6 @@ namespace GitHub.ViewModels
             get { return loadingFailed; }
             private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
         }
-
-
-        //IObservable<IReadOnlyList<IBranch>> LoadBranches(object value)
-        //{
-
-        //    var list = repositoryHost.ModelService.GetBranches(repository);
-
-        //    return list
-        //        .Catch<IReadOnlyList<IBranch>, Exception>(ex =>
-        //        {
-        //            log.Error("Error while loading repositories", ex);
-        //            return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
-        //                .Select(_ => new IBranch[] { });
-        //        });
-        //}
 
     }
 }

@@ -95,6 +95,14 @@ namespace GitHub.Services
                 .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
         }
 
+        IObservable<IEnumerable<BranchCacheItem>> GetBranchesFromApi(ISimpleRepositoryModel repo)
+        {
+            return apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                .WhereNotNull()
+                .Select(BranchCacheItem.Create)
+                .ToList();
+        }
+
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
         {
             return hostCache.GetAndRefreshObject("user",
@@ -187,34 +195,7 @@ namespace GitHub.Services
                      return Observable.Return(new IBranchModel[] { });
                  }));
 
-            }
-
-        IObservable<IEnumerable<BranchCacheItem>> GetBranchesFromApi(ISimpleRepositoryModel repo)
-        {
-            return apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-                .WhereNotNull()
-                .Select(BranchCacheItem.Create)
-                .ToList();
-        }
-        //IObservable<IEnumerable<AccountCacheItem>> GetBranchesFromApi()
-        //{
-        //    return GetUserFromCache().SelectMany(user =>
-        //        hostCache.GetAndRefreshObject(user.Login + "|orgs",
-        //            () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
-        //            TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
-        //        .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
-        //            // This could in theory happen if we try to call this before the user is logged in.
-        //            e =>
-        //            {
-        //                log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
-        //                return Observable.Return(Enumerable.Empty<AccountCacheItem>());
-        //            })
-        //         .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
-        //         {
-        //             log.Error("Retrieve user organizations failed.", e);
-        //             return Observable.Return(Enumerable.Empty<AccountCacheItem>());
-        //         });
-        //}
+         }
 
         public IObservable<Unit> InvalidateAll()
         {
@@ -278,9 +259,6 @@ namespace GitHub.Services
                         return Observable.Return(new IRepositoryModel[] {});
                     });
         }
-
-
-
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
         {
