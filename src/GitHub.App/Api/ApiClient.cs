@@ -74,16 +74,26 @@ namespace GitHub.Api
         {
             try
             {
-                var response = await gitHubClient.Connection.Get<string>(
-                    new Uri("/", UriKind.Relative),
-                    TimeSpan.FromSeconds(3));
+                var connection = gitHubClient.Connection;
 
-                if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+                if (connection.Credentials.AuthenticationType == AuthenticationType.Oauth)
                 {
-                    return response.HttpResponse.Headers[scopesHeader]
-                        .Split(',')
-                        .Select(x => x.Trim())
-                        .ToArray();
+                    var response = await gitHubClient.Connection.Get<string>(
+                        new Uri("/", UriKind.Relative),
+                        TimeSpan.FromSeconds(3));
+
+                    if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+                    {
+                        return response.HttpResponse.Headers[scopesHeader]
+                            .Split(',')
+                            .Select(x => x.Trim())
+                            .ToArray();
+                    }
+                }
+                else if (connection.Credentials.AuthenticationType == AuthenticationType.Basic)
+                {
+                    var auth = await gitHubClient.Authorization.GetAll();
+                    return auth.Scopes;
                 }
             }
             catch { }
