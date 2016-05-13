@@ -24,15 +24,25 @@
     </UserControl.Resources>
 
     <DockPanel LastChildFill="True">
-        <ui:OcticonCircleButton DockPanel.Dock="Bottom"
-                                IsDefault="True"
-                                Margin="12"
-                                x:Name="logoutButton"
-                                HorizontalAlignment="Center"
-                                Icon="check">
-            <TextBlock Text="{x:Static prop:Resources.SignOutLink}" />
-        </ui:OcticonCircleButton>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+            <ui:OcticonCircleButton 
+                IsDefault="True"
+                Margin="12"
+                x:Name="logoutButton"
+                HorizontalAlignment="Center"
+                Icon="check">
+                <TextBlock Text="{x:Static prop:Resources.SignOutLink}" />
+            </ui:OcticonCircleButton>
+            <ui:OcticonCircleButton 
+                IsDefault="True"
+                Margin="12"
+                x:Name="cancelButton"
+                HorizontalAlignment="Center"
+                Icon="x">
+                <TextBlock Text="{x:Static prop:Resources.CancelLink}" />
+            </ui:OcticonCircleButton>
+        </StackPanel>
 
-        <TextBlock>TODO: Explain why you must sign out and back in here...</TextBlock>
+        <TextBlock Text="{x:Static prop:Resources.needLogout}"/>
     </DockPanel>
 </local:GenericLogoutRequiredControl>

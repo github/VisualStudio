@@ -10,5 +10,7 @@ namespace GitHub.ViewModels
     public interface ILogoutRequiredViewModel : IViewModel
     {
         IReactiveCommand<ProgressState> Logout { get; }
+
+        ReactiveCommand<object> CancelCommand { get; }
     }
 }

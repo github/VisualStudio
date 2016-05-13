@@ -25,10 +25,12 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(this.BindCommand(ViewModel, vm => vm.Logout, v => v.logoutButton));
+                d(this.BindCommand(ViewModel, vm => vm.Cancel, v => v.cancelButton));
 
                 ViewModel.Logout
                     .Where(x => x == ProgressState.Success)
                     .Subscribe(_ => NotifyDone());
+                ViewModel.CancelCommand.Subscribe(_ => NotifyCancel());
             });
         }
     }

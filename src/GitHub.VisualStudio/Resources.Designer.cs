@@ -115,6 +115,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelLink {
+            get {
+                return ResourceManager.GetString("CancelLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone.
         /// </summary>
         public static string CloneLink {
@@ -399,6 +408,15 @@ namespace GitHub.VisualStudio {
         public static string nameText {
             get {
                 return ResourceManager.GetString("nameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To use this feature you need to sign in again..
+        /// </summary>
+        public static string needLogout {
+            get {
+                return ResourceManager.GetString("needLogout", resourceCulture);
             }
         }
         

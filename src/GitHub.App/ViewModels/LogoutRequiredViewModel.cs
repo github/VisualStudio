@@ -29,6 +29,7 @@ namespace GitHub.ViewModels
 
             Title = Resources.LogoutRequiredTitle;
             Logout = ReactiveCommand.CreateAsyncObservable(OnLogout);
+            CancelCommand = ReactiveCommand.Create();
         }
 
         public IReactiveCommand<ProgressState> Logout { get; }
