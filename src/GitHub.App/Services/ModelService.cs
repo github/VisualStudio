@@ -16,7 +16,6 @@ using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
-using System.Collections.ObjectModel;
 
 namespace GitHub.Services
 {
@@ -100,7 +99,7 @@ namespace GitHub.Services
             return apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
                 .WhereNotNull()
                 .Select(BranchCacheItem.Create)
-                .ToList();
+                .ToList();           
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
@@ -193,8 +192,10 @@ namespace GitHub.Services
                  {
                      log.Info("Failed to retrieve branches", e);
                      return Observable.Return(new IBranchModel[] { });
-                 }));
-
+                 }
+               )
+            );
+            
          }
 
         public IObservable<Unit> InvalidateAll()

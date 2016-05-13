@@ -360,7 +360,7 @@ namespace GitHub.SampleData
         public string Name { get; set; }
         public UriString CloneUrl { get; set; }
         public string LocalPath { get; set; }
-
+        public string CurrentBranchName { get; }
         public Octicon Icon { get; set; }
 
         public IAccount Owner { get; set; }

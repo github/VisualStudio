@@ -10,6 +10,7 @@ namespace GitHub.Models
         UriString CloneUrl { get; }
         string LocalPath { get; }
         Octicon Icon { get; }
+        string CurrentBranchName { get; }
 
         void SetIcon(bool isPrivate, bool isFork);
 

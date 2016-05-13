@@ -18,15 +18,11 @@ using System.Windows.Media.Imaging;
 
 namespace GitHub.ViewModels
 {
-    //Add properties to interface first
-    //Ex would be login tab view model
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-       // readonly IReactiveCommand<IReadOnlyList<IBranch>> loadBranchesCommand;
-        //readonly ObservableAsPropertyHelper<bool> isLoading;
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel repository;
 
@@ -45,16 +41,14 @@ namespace GitHub.ViewModels
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.Branches, initialValue: new IBranchModel[] { });
 
-            CurrentBranch = new BranchModel("master");
+            CurrentBranchName = repository.CurrentBranchName;
 
             assignees = new ObservableCollection<IAccount>
             {
                 new Account("User1", false, false, 0, 0, Observable.Empty<BitmapSource>()),
                 new Account("User2", false, false, 0, 0, Observable.Empty<BitmapSource>()),
                 new Account("User3", false, false, 0, 0, Observable.Empty<BitmapSource>()),
-
             };
-
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -68,7 +62,7 @@ namespace GitHub.ViewModels
             get { return branches.Value; }
         }
 
-        public IBranchModel CurrentBranch { get; private set; }
+        public string CurrentBranchName { get; private set; }
 
         public IAccount SelectedAssignee {get; private set;}
 
