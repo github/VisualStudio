@@ -32,6 +32,8 @@ namespace GitHub.Api
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
         IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name);
         IObservable<Branch> GetBranchesForRepository(string owner, string name);
+        IObservable<Account> GetAssignees(string owner, string name);
+
 
     }
 }

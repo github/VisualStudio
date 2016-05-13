@@ -77,6 +77,38 @@ namespace GitHub.Services
             .ToReadOnlyList(Create);
         }
 
+        public IObservable<IReadOnlyList<IAccount>> GetAvailableAssignees(ISimpleRepositoryModel repo)
+        {
+            return Observable.Zip(
+                GetUser(),
+                GetAssigneesFromApi(repo),
+                (user, orgs) => user.Concat(orgs))
+            .ToReadOnlyList(Create);
+        }
+
+        public IObservable<IEnumerable<AccountCacheItem>> GetAssigneesFromApi(ISimpleRepositoryModel repo)
+        {
+            return GetUserFromCache().SelectMany(user =>
+               hostCache.GetAndRefreshObject(user.Login + "|assignees",
+                   () => apiClient.GetAssignees(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                   .Select(AccountCacheItem.Create)
+                   .ToList(),
+                   TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
+               .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
+                   // This could in theory happen if we try to call this before the user is logged in.
+                   e =>
+                   {
+                       log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
+                       return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                   })
+                .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
+                {
+                    log.Error("Retrieve user organizations failed.", e);
+                    return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                });
+        }
+
+
         IObservable<IEnumerable<LicenseCacheItem>> GetOrderedLicensesFromApi()
         {
             return apiClient.GetLicenses()

@@ -10,7 +10,7 @@ namespace GitHub.ViewModels
     public interface IPullRequestCreationViewModel : IViewModel
     {
         IReadOnlyList<IBranchModel> Branches { get; }
-        ObservableCollection<IAccount> Assignees { get; }
+        IReadOnlyList<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; }
         IBranchModel TargetBranch { get; }
         IBranchModel CurrentBranch { get; }

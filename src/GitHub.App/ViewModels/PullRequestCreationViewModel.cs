@@ -43,12 +43,9 @@ namespace GitHub.ViewModels
 
             CurrentBranch = new BranchModel { Name = repository.CurrentBranchName };
 
-            assignees = new ObservableCollection<IAccount>
-            {
-                new Account("User1", false, false, 0, 0, Observable.Empty<BitmapSource>()),
-                new Account("User2", false, false, 0, 0, Observable.Empty<BitmapSource>()),
-                new Account("User3", false, false, 0, 0, Observable.Empty<BitmapSource>()),
-            };
+            assignees = repositoryHost.ModelService.GetAvailableAssignees(repository)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.Assignees, initialValue: new IAccount[] { });
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -68,11 +65,10 @@ namespace GitHub.ViewModels
 
         public IBranchModel TargetBranch { get; private set; }
 
-        ObservableCollection<IAccount> assignees;
-        public ObservableCollection<IAccount> Assignees
+        ObservableAsPropertyHelper<IReadOnlyList<IAccount>> assignees;
+        public IReadOnlyList<IAccount> Assignees
         {
-            get { return assignees; }
-            private set { this.RaiseAndSetIfChanged(ref assignees, value); }
+            get { return assignees.Value; }
         }
 
         bool loadingFailed;

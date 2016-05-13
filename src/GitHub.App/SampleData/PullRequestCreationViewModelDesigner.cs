@@ -22,18 +22,13 @@ namespace GitHub.SampleData
 
             TargetBranch = new BranchModel { Name = "master" };
 
-            Assignees = new ObservableCollection<IAccount>
-            {
-                new AccountDesigner { Login = "Haacked (Phil Haack)" },
-                new AccountDesigner { Login = "shana(Andreia Gaita)" }            
-            };
         }
 
         public IAccount SelectedAssignee { get; set; }
         public IBranchModel TargetBranch { get; set; }
         public IBranchModel CurrentBranch { get; set; }
         public IReadOnlyList<IBranchModel> Branches { get; set; }
-        public ObservableCollection<IAccount> Assignees { get; set; }
+        public IReadOnlyList<IAccount> Assignees { get; set; }
 
 
 
