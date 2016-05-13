@@ -7,6 +7,7 @@
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                      xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
@@ -306,7 +307,8 @@
 
             <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ListView Background="Transparent"
-                          BorderBrush="Transparent">
+                          BorderBrush="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -338,19 +340,20 @@
                             </Grid>
 
                             <TextBlock Text="I am an example commit message"
+                                       TextTrimming="CharacterEllipsis"
                                        ToolTip="I am an example commit message"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                       FontSize="14"
+                                       Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                                        Margin="10,-3,5,0"
                                        Grid.Column="1"
                                        Grid.Row="0" />
 
                             <TextBlock Margin="10,0,0,0"
                                        Text="Andreia Gaita committed 20 hours ago"
+                                       TextTrimming="CharacterEllipsis"
                                        ToolTip="Andreia Gaita committed 20 hours ago"
                                        VerticalAlignment="Top"
-                                       FontSize="11"
                                        Grid.Column="1"
                                        Grid.Row="1" 
                                        Foreground="{DynamicResource GitHubVsGrayText}"/>
@@ -361,7 +364,8 @@
 
             <TabItem Header="Files Changed" Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ListView Background="Transparent"
-                          BorderBrush="Transparent">
+                          BorderBrush="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -381,7 +385,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_added.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_added.cs"
+                                ToolTip="src\file_added.cs"
+                                Grid.Column="1" />
 
                             <ui:OcticonImage Icon="diff_added" Grid.Column="2" Foreground="#ff6cc644" ToolTip="Added" />
                         </Grid>
@@ -406,7 +413,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_modified.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_modified.cs"
+                                ToolTip="src\file_modified.cs"
+                                Grid.Column="1" />
 
                             <ui:OcticonImage Icon="diff_modified" Grid.Column="2" Foreground="#ffbbbbbb" ToolTip="Modified" />
                         </Grid>
@@ -431,7 +441,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_removed.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_removed.cs"
+                                ToolTip="src\file_removed.cs"
+                                Grid.Column="1"  />
 
                             <ui:OcticonImage Icon="diff_removed" Grid.Column="2" Foreground="#FFbd2c00" ToolTip="Removed" />
                         </Grid>
@@ -456,7 +469,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_renamed.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_renamed.cs" 
+                                ToolTip="src\file_renamed.cs" 
+                                Grid.Column="1" />
 
                             <ui:OcticonImage Icon="diff_renamed" Grid.Column="2" Foreground="#ff4078c0" ToolTip="Renamed" />
                         </Grid>
