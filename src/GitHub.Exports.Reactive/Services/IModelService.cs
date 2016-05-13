@@ -24,6 +24,6 @@ namespace GitHub.Services
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection = null);
         IObservable<Unit> InvalidateAll();
-        ObservableCollection<IBranch> GetBranches(ISimpleRepositoryModel repo);
+        IObservable<IReadOnlyList<IBranchModel>> GetBranches(ISimpleRepositoryModel repo);
     }
 }

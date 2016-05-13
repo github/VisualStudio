@@ -9,25 +9,25 @@ using ReactiveUI;
 
 namespace GitHub.Models
 {
-    public class Branch : ReactiveObject, IBranch
+    public class BranchModel : ReactiveObject, IBranchModel
     {
-        public Branch() { }
-        public Branch(string name) {
+        public BranchModel() { }
+        public BranchModel(string name) {
             Name = name;
         }
         public string Name { get; set; }
 
-        public int CompareTo(IBranch other)
+        public int CompareTo(IBranchModel other)
         {
             throw new NotImplementedException();
         }
 
-        public void CopyFrom(IBranch other)
+        public void CopyFrom(IBranchModel other)
         {
             throw new NotImplementedException();
         }
         
-        public bool Equals([AllowNull]IBranch other)
+        public bool Equals([AllowNull]IBranchModel other)
         {
             return this == other;
         }

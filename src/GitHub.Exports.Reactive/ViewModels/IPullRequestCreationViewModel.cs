@@ -9,11 +9,11 @@ namespace GitHub.ViewModels
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
     public interface IPullRequestCreationViewModel : IViewModel
     {
-        ObservableCollection<IBranch> Branches { get; }
+        IReadOnlyList<IBranchModel> Branches { get; }
         ObservableCollection<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; }
-        IBranch TargetBranch { get; }
-        IBranch CurrentBranch { get; }
+        IBranchModel TargetBranch { get; }
+        IBranchModel CurrentBranch { get; }
 
     }
 }

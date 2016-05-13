@@ -41,14 +41,11 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.repository = repository;
 
-            Branches = new ObservableCollection<IBranch>();
-            //{
-            //   new Models.Branch { Name = "don/stub-ui" },
-            //   new Models.Branch { Name = "feature/pr/views" },
-            //   new Models.Branch { Name = "release-1.0.17.0" }
-            //};
+            branches = repositoryHost.ModelService.GetBranches(repository)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.Branches, initialValue: new IBranchModel[] { });
 
-            CurrentBranch = new Branch("master");
+            CurrentBranch = new BranchModel("master");
 
             assignees = new ObservableCollection<IAccount>
             {
@@ -63,24 +60,23 @@ namespace GitHub.ViewModels
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);
-
-            repositoryHost.ModelService.GetBranches(repository)
-                          .ForEach(br => branches.Add(br));
+           
+  
+                     
 
         }
 
-        ObservableCollection<IBranch> branches;
-        public ObservableCollection<IBranch> Branches
+        readonly ObservableAsPropertyHelper<IReadOnlyList<IBranchModel>> branches;
+        public IReadOnlyList<IBranchModel> Branches
         {
-            get { return branches; }
-            private set { this.RaiseAndSetIfChanged(ref branches, value); }
+            get { return branches.Value; }
         }
 
-        public IBranch CurrentBranch { get; private set; }
+        public IBranchModel CurrentBranch { get; private set; }
 
         public IAccount SelectedAssignee {get; private set;}
 
-        public IBranch TargetBranch { get; private set; }
+        public IBranchModel TargetBranch { get; private set; }
 
         ObservableCollection<IAccount> assignees;
         public ObservableCollection<IAccount> Assignees

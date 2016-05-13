@@ -172,6 +172,50 @@ namespace GitHub.Services
             return collection;
         }
 
+        public IObservable<IReadOnlyList<IBranchModel>> GetBranches(ISimpleRepositoryModel repo)
+        {
+            return Observable.Defer(() =>
+                 hostCache.GetAndRefreshObject(
+                     "branches",
+                     () => GetBranchesFromApi(repo),
+                     TimeSpan.FromDays(1),
+                     TimeSpan.FromDays(7))
+                 .ToReadOnlyList(Create)
+                 .Catch<IReadOnlyList<IBranchModel>, Exception>(e =>
+                 {
+                     log.Info("Failed to retrieve branches", e);
+                     return Observable.Return(new IBranchModel[] { });
+                 }));
+
+            }
+
+        IObservable<IEnumerable<BranchCacheItem>> GetBranchesFromApi(ISimpleRepositoryModel repo)
+        {
+            return apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                .WhereNotNull()
+                .Select(BranchCacheItem.Create)
+                .ToList();
+        }
+        //IObservable<IEnumerable<AccountCacheItem>> GetBranchesFromApi()
+        //{
+        //    return GetUserFromCache().SelectMany(user =>
+        //        hostCache.GetAndRefreshObject(user.Login + "|orgs",
+        //            () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
+        //            TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
+        //        .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
+        //            // This could in theory happen if we try to call this before the user is logged in.
+        //            e =>
+        //            {
+        //                log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
+        //                return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+        //            })
+        //         .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
+        //         {
+        //             log.Error("Retrieve user organizations failed.", e);
+        //             return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+        //         });
+        //}
+
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
@@ -235,44 +279,12 @@ namespace GitHub.Services
                     });
         }
 
-        public ObservableCollection<IBranch> GetBranches(ISimpleRepositoryModel repo)
-        {
 
-            //var keyobs = GetUserFromCache()
-            //.Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
-
-            //var col = new TrackingCollection<IBranch>();
-
-            //var source = Observable.Defer(() => keyobs
-            //    .SelectMany(key =>
-            //        hostCache.GetAndFetchLatestFromIndex(key, () =>
-            //            apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-            //                     .Select(BranchCacheItem.Create),
-            //            item => col.RemoveItem(Create(item)),
-            //            TimeSpan.FromMinutes(5),
-            //            TimeSpan.FromDays(1))
-            //    )
-            //    .Select(Create)
-            //);
-
-            return new ObservableCollection<IBranch>
-            {
-               new Models.Branch { Name = "don/stub-ui" },
-               new Models.Branch { Name = "feature/pr/views" },
-               new Models.Branch { Name = "release-1.0.17.0" }
-            };
-
-        }
 
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
         {
             return new LicenseItem(licenseCacheItem.Key, licenseCacheItem.Name);
-        }
-
-        Models.Branch Create(BranchCacheItem branchCacheItem)
-        {
-            return new Models.Branch(branchCacheItem.Name);
         }
 
         Models.Account Create(AccountCacheItem accountCacheItem)
@@ -311,6 +323,12 @@ namespace GitHub.Services
             };
         }
 
+        IBranchModel Create(BranchCacheItem brCacheItem)
+        {
+            return new BranchModel( brCacheItem.Name )
+            {
+            };
+        }
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
             return hostCache.InsertObject("user", user);
@@ -343,15 +361,6 @@ namespace GitHub.Services
             public string Name { get; set; }
         }
 
-        public class BranchCacheItem
-        {
-            public static BranchCacheItem Create(Octokit.Branch apiBranch)
-            {
-                return new BranchCacheItem { Name = apiBranch.Name };
-            }
-
-            public string Name { get; set; }
-        }
 
         public class RepositoryCacheItem
         {
@@ -416,6 +425,24 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public bool IsOpen { get; set; }
+        }
+
+        public class BranchCacheItem : CacheItem
+        {
+            public static BranchCacheItem Create(Branch br)
+            {
+                return new BranchCacheItem(br);
+            }
+
+            public BranchCacheItem() { }
+            public BranchCacheItem(Branch br)
+            {
+                Name = br.Name;
+            }
+
+            [AllowNull]
+            public string Name { [return: AllowNull] get; set; }
+
         }
     }
    

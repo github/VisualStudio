@@ -15,21 +15,13 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            Branches = new ObservableCollection<IBranch>
-            {
-               new Branch { Name = "don/stub-ui" },
-               new Branch { Name = "feature/pr/views" },
-               new Branch { Name = "release-1.0.17.0" }
-            };
+            
+            CurrentBranch = new BranchModel { Name = "fix-everything" };
 
-           
-            CurrentBranch = new Branch { Name = "fix-everything" };
+            SelectedAssignee = new AccountDesigner { Login = "Haacked (Phil Haack)" }; 
 
-            SelectedAssignee = new AccountDesigner { Login = "Haacked (Phil Haack)" }; //IAcct
+            TargetBranch = new BranchModel { Name = "master" };
 
-            TargetBranch = new Branch { Name = "master" }; //IBranch
-
-            //IAcct
             Assignees = new ObservableCollection<IAccount>
             {
                 new AccountDesigner { Login = "Haacked (Phil Haack)" },
@@ -38,9 +30,9 @@ namespace GitHub.SampleData
         }
 
         public IAccount SelectedAssignee { get; set; }
-        public IBranch TargetBranch { get; set; }
-        public IBranch CurrentBranch { get; set; }
-        public ObservableCollection<IBranch> Branches { get; set; }
+        public IBranchModel TargetBranch { get; set; }
+        public IBranchModel CurrentBranch { get; set; }
+        public IReadOnlyList<IBranchModel> Branches { get; set; }
         public ObservableCollection<IAccount> Assignees { get; set; }
 
 
