@@ -116,7 +116,7 @@ namespace GitHub.Api
                         .ToArray();
                 }
             }
-            catch {
+            catch { }
 
             return new string[0];
         }
