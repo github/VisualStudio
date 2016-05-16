@@ -105,8 +105,8 @@ namespace GitHub.Api
             try
             {
                 var response = await gitHubClient.Connection.Get<string>(
-                        new Uri("/", UriKind.Relative),
-                        TimeSpan.FromSeconds(3));
+                    new Uri("user", UriKind.Relative),
+                    TimeSpan.FromSeconds(3));
 
                 if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
                 {
