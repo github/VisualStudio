@@ -15,6 +15,8 @@ using Octokit.Reactive;
 using ReactiveUI;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using Octokit.Internal;
+using System.Collections.Generic;
 
 namespace GitHub.Api
 {
@@ -72,31 +74,49 @@ namespace GitHub.Api
 
         async Task<string[]> GetScopesInternal()
         {
-            try
-            {
-                var connection = gitHubClient.Connection;
+            // If auth type is Basic we might be able to read /api/authorizations to get the 
+            // current scopes. However this request sometimes gets mysteriously converted to an
+            // OAuth request so if that doesn't work try reading from / and checking for the 
+            // X-OAuth-Scopes header.
+            var connection = gitHubClient.Connection;
 
-                if (connection.Credentials.AuthenticationType == AuthenticationType.Oauth)
+            if (connection.Credentials.AuthenticationType == AuthenticationType.Basic)
+            {
+                try
                 {
                     var response = await gitHubClient.Connection.Get<string>(
+                        ApiUrls.Authorizations(),
+                        TimeSpan.FromSeconds(3));
+
+                    var json = new SimpleJsonSerializer();
+                    var authorizations = json.Deserialize<Octokit.Authorization[]>(response.Body);
+                    var scopes = new List<string>();
+
+                    foreach (var authorization in authorizations)
+                    {
+                        scopes.AddRange(authorization.Scopes);
+                    }
+
+                    return scopes.Distinct().ToArray();
+                }
+                catch { }
+            }
+
+            try
+            {
+                var response = await gitHubClient.Connection.Get<string>(
                         new Uri("/", UriKind.Relative),
                         TimeSpan.FromSeconds(3));
 
-                    if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
-                    {
-                        return response.HttpResponse.Headers[scopesHeader]
-                            .Split(',')
-                            .Select(x => x.Trim())
-                            .ToArray();
-                    }
-                }
-                else if (connection.Credentials.AuthenticationType == AuthenticationType.Basic)
+                if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
                 {
-                    var auth = await gitHubClient.Authorization.GetAll();
-                    return auth.Scopes;
+                    return response.HttpResponse.Headers[scopesHeader]
+                        .Split(',')
+                        .Select(x => x.Trim())
+                        .ToArray();
                 }
             }
-            catch { }
+            catch {
 
             return new string[0];
         }
