@@ -52,12 +52,12 @@ namespace GitHub.ViewModels
 
         async Task DoLogout()
         {
-            if (repositoryHosts.GitHubHost != null)
+            if (repositoryHosts.GitHubHost?.SupportsGist == false)
             {
                 await repositoryHosts.GitHubHost.LogOut();
             }
 
-            if (repositoryHosts.EnterpriseHost != null)
+            if (repositoryHosts.EnterpriseHost?.SupportsGist == false)
             {
                 await repositoryHosts.EnterpriseHost.LogOut();
             }
