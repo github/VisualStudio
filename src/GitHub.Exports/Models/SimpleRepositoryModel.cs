@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
@@ -10,7 +11,7 @@ using GitHub.Services;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, INotifyPropertySource, IEquatable<SimpleRepositoryModel>
+    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, IEquatable<SimpleRepositoryModel>
     {
         public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
         {
@@ -53,12 +54,75 @@ namespace GitHub.Models
                 CloneUrl = uri;
         }
 
+        /// <summary>
+        /// Generates a http(s) url to the repository in the remote server, optionally
+        /// pointing to a specific file and specific line range in it.
+        /// </summary>
+        /// <param name="path">The file to generate an url to. Optional.</param>
+        /// <param name="startLine">A specific line, or (if specifying the <paramref name="endLine"/> as well) the start of a range</param>
+        /// <param name="endLine">The end of a line range on the specified file.</param>
+        /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
+        public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        {
+            if (CloneUrl == null)
+                return null;
+
+            var sha = HeadSha;
+            // this also incidentally checks whether the repo has a valid LocalPath
+            if (String.IsNullOrEmpty(sha))
+                return CloneUrl.ToRepositoryUrl().AbsoluteUri;
+
+            if (path != null && Path.IsPathRooted(path))
+            {
+                // if the path root doesn't match the repository local path, then ignore it
+                if (!path.StartsWith(LocalPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.Assert(false, String.Format(CultureInfo.CurrentCulture, "GenerateUrl: path {0} doesn't match repository {1}", path, LocalPath));
+                    path = null;
+                }
+                else
+                    path = path.Substring(LocalPath.Length + 1);
+            }
+
+            return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
+        }
+
+        const string CommitFormat = "{0}/commit/{1}";
+        const string BlobFormat = "{0}/blob/{1}/{2}";
+        const string StartLineFormat = "{0}#L{1}";
+        const string EndLineFormat = "{0}-L{1}";
+        static string GenerateUrl(string basePath, string sha, string path, int startLine = -1, int endLine = -1)
+        {
+            if (sha == null)
+                return basePath;
+
+            if (String.IsNullOrEmpty(path))
+                return String.Format(CultureInfo.InvariantCulture, CommitFormat, basePath, sha);
+
+            var ret = String.Format(CultureInfo.InvariantCulture, BlobFormat, basePath, sha, path.Replace(@"\", "/"));
+            if (startLine < 0)
+                return ret;
+            ret = String.Format(CultureInfo.InvariantCulture, StartLineFormat, ret, startLine);
+            if (endLine < 0)
+                return ret;
+            return String.Format(CultureInfo.InvariantCulture, EndLineFormat, ret, endLine);
+        }
+
         public string Name { get; }
         UriString cloneUrl;
         public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
         public string LocalPath { get; }
         Octicon icon;
         public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
+
+        public string HeadSha
+        {
+            get
+            {
+                var repo = GitService.GitServiceHelper.GetRepo(LocalPath);
+                return repo?.Commits.FirstOrDefault()?.Sha ?? String.Empty;
+            }
+        }
 
         /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime

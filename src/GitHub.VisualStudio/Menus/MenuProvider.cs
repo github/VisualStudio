@@ -9,9 +9,9 @@ namespace GitHub.VisualStudio.Menus
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class MenuProvider : IMenuProvider
     {
-        public IReadOnlyCollection<IMenuHandler> Menus { get; private set; }
+        public IReadOnlyCollection<IMenuHandler> Menus { get; }
 
-        public IReadOnlyCollection<IDynamicMenuHandler> DynamicMenus { get; private set; }
+        public IReadOnlyCollection<IDynamicMenuHandler> DynamicMenus { get; }
 
         [ImportingConstructor]
         public MenuProvider([ImportMany] IEnumerable<IMenuHandler> menus, [ImportMany] IEnumerable<IDynamicMenuHandler> dynamicMenus)

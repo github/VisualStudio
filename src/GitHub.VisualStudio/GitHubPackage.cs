@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -13,52 +16,104 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Octokit;
 
 namespace GitHub.VisualStudio
 {
-    /// <summary>
-    /// This is the class that implements the package exposed by this assembly.
-    ///
-    /// The minimum requirement for a class to be considered a valid package for Visual Studio
-    /// is to implement the IVsPackage interface and register itself with the shell.
-    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-    /// to do it: it derives from the Package class that provides the implementation of the 
-    /// IVsPackage interface and uses the registration attributes defined in the framework to 
-    /// register itself and its components with the shell.
-    /// </summary>
-    // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
-    // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    // This attribute is used to register the information needed to show this package
-    // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.guidGitHubPkgString)]
     //[ProvideBindingPath]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     //[ProvideAutoLoad(UIContextGuids.NoSolution)]
+    // this is the Git service GUID, so we load whenever it loads
     [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
-    public class GitHubPackage : PackageBase
+    [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
+    public class GitHubPackage : Package
     {
+        // list of assemblies to be loaded from the extension installation path
+        static readonly string[] ourAssemblies =
+        {
+            "GitHub.Api",
+            "GitHub.App",
+            "GitHub.CredentialManagement",
+            "GitHub.Exports",
+            "GitHub.Exports.Reactive",
+            "GitHub.Extensions",
+            "GitHub.Extensions.Reactive",
+            "GitHub.UI",
+            "GitHub.UI.Reactive",
+            "GitHub.VisualStudio",
+            "GitHub.TeamFoundation",
+            "GitHub.TeamFoundation.14",
+            "GitHub.TeamFoundation.15",
+            "GitHub.VisualStudio.UI",
+            "System.Windows.Interactivity"
+        };
+
+        readonly IServiceProvider serviceProvider;
+
         public GitHubPackage()
         {
+            serviceProvider = this;
         }
 
         public GitHubPackage(IServiceProvider serviceProvider)
-            : base(serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
         }
 
         protected override void Initialize()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
+
             base.Initialize();
 
-            var menus = ServiceProvider.GetExportedValue<IMenuProvider>();
+            var menus = serviceProvider.GetExportedValue<IMenuProvider>();
             foreach (var menu in menus.Menus)
-                ServiceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
+                serviceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
             foreach (var menu in menus.DynamicMenus)
-                ServiceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+                serviceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
+        static Assembly LoadAssemblyFromRunDir(object sender, ResolveEventArgs e)
+        {
+            try
+            {
+                var name = new AssemblyName(e.Name);
+                if (!ourAssemblies.Contains(name.Name))
+                    return null;
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var filename = Path.Combine(path, name.Name + ".dll");
+                if (!File.Exists(filename))
+                    return null;
+                return Assembly.LoadFrom(filename);
+            }
+            catch (Exception ex)
+            {
+                var log = string.Format(CultureInfo.CurrentCulture,
+                    "Error occurred loading {0} from {1}.{2}{3}{4}",
+                    e.Name,
+                    Assembly.GetExecutingAssembly().Location,
+                    Environment.NewLine,
+                    ex,
+                    Environment.NewLine);
+                VsOutputLogger.Write(log);
+            }
+            return null;
+        }
+    }
+
+    [Export(typeof(IGitHubClient))]
+    public class GHClient : GitHubClient
+    {
+        [ImportingConstructor]
+        public GHClient(IProgram program)
+            : base(program.ProductHeader)
+        {
         }
     }
 }

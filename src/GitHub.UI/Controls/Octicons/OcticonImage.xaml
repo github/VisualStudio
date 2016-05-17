@@ -18,7 +18,7 @@
                             <ui:OcticonPath 
                                 Fill="{TemplateBinding Foreground}" 
                                 Icon="{TemplateBinding Icon}"
-                                Height="1024" 
+                                Height="16" 
                                 SnapsToDevicePixels="True" />
                         </Viewbox>
                     </ui:FixedAspectRatioPanel>

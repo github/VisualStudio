@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reactive.Linq;
+using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Info;

@@ -17,8 +17,8 @@ namespace GitHub.VisualStudio.Menus
         {
         }
 
-        public Guid Guid { get { return GuidList.guidGitHubCmdSet; } }
-        public int CmdId { get { return PkgCmdIDList.addConnectionCommand; } }
+        public Guid Guid => GuidList.guidGitHubCmdSet;
+        public int CmdId => PkgCmdIDList.addConnectionCommand;
 
         public void Activate()
         {

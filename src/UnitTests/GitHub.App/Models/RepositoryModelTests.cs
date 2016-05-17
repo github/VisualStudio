@@ -53,6 +53,7 @@ public class RepositoryModelTests
         }
     }
 
+    [Collection("PackageServiceProvider global data tests")]
     public class PathConstructorTests : TempFileBaseClass
     {
         [Fact]

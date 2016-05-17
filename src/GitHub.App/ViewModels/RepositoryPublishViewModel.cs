@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
+using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
