@@ -19,6 +19,7 @@ using ReactiveUI;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
 using GitHub.Primitives;
+using GitHub.Settings;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -27,6 +28,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly int sectionIndex;
         bool isCloning;
         bool isCreating;
+        IPackageSettings packageSettings;
+        GitHubConnectSectionState settings;
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         SectionStateTracker sectionTracker;
 
@@ -83,16 +87,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         internal ITeamExplorerServiceHolder Holder => holder;
 
-        public GitHubConnectSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, IConnectionManager manager, int index)
+        public GitHubConnectSection(ISimpleApiClientFactory apiFactory,
+            ITeamExplorerServiceHolder holder,
+            IConnectionManager manager,
+            IPackageSettings packageSettings,
+            int index)
             : base(apiFactory, holder, manager)
         {
             Title = "GitHub";
             IsEnabled = true;
             IsVisible = false;
-            IsExpanded = true;
             LoggedIn = false;
-
             sectionIndex = index;
+
+            this.packageSettings = packageSettings;
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
@@ -125,6 +133,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 if (Repositories != null)
                     Repositories.CollectionChanged -= UpdateRepositoryList;
                 Repositories = null;
+                settings = null;
 
                 if (sectionIndex == 0 && ServiceProvider != null)
                 {
@@ -151,6 +160,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     LoggedIn = true;
                     if (ServiceProvider != null)
                         RefreshRepositories().Forget();
+
+                    settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
+                    IsExpanded = settings.IsExpanded;
                 }
             }
         }
@@ -183,6 +195,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             if (e.PropertyName == "IsVisible" && IsVisible && View == null)
                 View = new GitHubConnectContent { DataContext = this };
+            else if (e.PropertyName == "IsExpanded" && settings != null)
+                settings.IsExpanded = IsExpanded;
         }
 
         async void UpdateRepositoryList(object sender, NotifyCollectionChangedEventArgs e)
@@ -358,6 +372,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     if (Repositories != null)
                         Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;
+                    packageSettings.Save();
                 }
             }
             base.Dispose(disposing);

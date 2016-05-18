@@ -7,6 +7,7 @@
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                      xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
@@ -29,344 +30,6 @@
                 <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <helpers:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <Style x:Key="GitHubPRDetailsTabControl" TargetType="{x:Type TabControl}">
-                <Setter Property="Padding" Value="0,5" />
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubTabItemSelectedBorder}"/>
-                <Setter Property="BorderThickness" Value="0,1,0,0"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type TabControl}">
-                            <Grid x:Name="templateRoot" ClipToBounds="true" SnapsToDevicePixels="true" KeyboardNavigation.TabNavigation="Local">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition x:Name="ColumnDefinition0"/>
-                                    <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
-                                    <RowDefinition x:Name="RowDefinition1" Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TabPanel x:Name="headerPanel" Background="Transparent" Grid.Column="0" IsItemsHost="true" Margin="2,2,2,-1" Grid.Row="0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"/>
-                                <Border x:Name="contentPanel" BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        Background="{TemplateBinding Background}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
-                                    <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                                </Border>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="TabStripPlacement" Value="Bottom">
-                                    <Setter Property="Grid.Row" TargetName="headerPanel" Value="1"/>
-                                    <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
-                                    <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
-                                    <Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
-                                    <Setter Property="Margin" TargetName="headerPanel" Value="2,0,2,2"/>
-                                </Trigger>
-                                <Trigger Property="TabStripPlacement" Value="Left">
-                                    <Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>
-                                    <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
-                                    <Setter Property="Grid.Column" TargetName="headerPanel" Value="0"/>
-                                    <Setter Property="Grid.Column" TargetName="contentPanel" Value="1"/>
-                                    <Setter Property="Width" TargetName="ColumnDefinition0" Value="Auto"/>
-                                    <Setter Property="Width" TargetName="ColumnDefinition1" Value="*"/>
-                                    <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
-                                    <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
-                                    <Setter Property="Margin" TargetName="headerPanel" Value="2,2,0,2"/>
-                                </Trigger>
-                                <Trigger Property="TabStripPlacement" Value="Right">
-                                    <Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>
-                                    <Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
-                                    <Setter Property="Grid.Column" TargetName="headerPanel" Value="1"/>
-                                    <Setter Property="Grid.Column" TargetName="contentPanel" Value="0"/>
-                                    <Setter Property="Width" TargetName="ColumnDefinition0" Value="*"/>
-                                    <Setter Property="Width" TargetName="ColumnDefinition1" Value="Auto"/>
-                                    <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
-                                    <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
-                                    <Setter Property="Margin" TargetName="headerPanel" Value="0,2,2,2"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style x:Key="GitHubPRDetailsTabItem" TargetType="{x:Type TabItem}">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource NoMarginFocusVisual}" />
-                <Setter Property="Width" Value="Auto" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type TabItem}">
-                            <Border Name="Border" CornerRadius="2,2,0,0"
-                                    BorderThickness="1,1,1,0"
-                                    Padding="10,5">
-                                <DockPanel HorizontalAlignment="Center">
-                                    <TextBlock
-                                        x:Name="ContentSite"
-                                        FontSize="12"
-                                        VerticalAlignment="Center"
-                                        Text="{TemplateBinding Header}" />
-                                </DockPanel>
-                            </Border>
-
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Border" Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}" />
-                                    <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource GitHubTabItemSelectedBorder}" />
-                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
-                                </Trigger>
-
-                                <Trigger Property="IsSelected" Value="False">
-                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsGrayText}" />
-                                </Trigger>
-
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="ContentSite" Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style x:Key="GitHubVsPromptTextBox" TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubTextBox}">
-                <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}"/>
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}"/>
-                <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                <Setter Property="AllowDrop" Value="true"/>
-                <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
-                <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-                <Setter Property="Height" Value="24" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ui:PromptTextBox}">
-                            <Grid>
-                                <Border x:Name="Bd" CornerRadius="0" ClipToBounds="True" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                    <Border CornerRadius="0" BorderBrush="Black" BorderThickness="0,1,0,0" Margin="2,-2,2,0" Opacity="0.4">
-                                        <Border.Effect>
-                                            <DropShadowEffect Direction="270" ShadowDepth="0" BlurRadius="4" Opacity="1" />
-                                        </Border.Effect>
-                                    </Border>
-                                </Border>
-
-                                <Grid Margin="1,2,0,0">
-                                    <ScrollViewer x:Name="PART_ContentHost" Padding="{TemplateBinding Padding}" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" VerticalAlignment="Top" Margin="0"/>
-                                    <Label x:Name="PromptLabel" HorizontalAlignment="Left"
-                                         Foreground="{DynamicResource GitHubVsGrayText}"
-                                         FontSize="{TemplateBinding FontSize}" Margin="2,0,0,0" Padding="{TemplateBinding Padding}" Opacity="0"
-                                         Target="{Binding ElementName=Bd}"
-                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Focusable="False" IsHitTestVisible="False"
-                                         VerticalAlignment="Top">
-                                        <TextBlock Text="{TemplateBinding PromptText}" TextTrimming="CharacterEllipsis" />
-                                    </Label>
-                                </Grid>
-                            </Grid>
-
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Opacity" Value="0.5" />
-                                </Trigger>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
-                                </Trigger>
-                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GitHubAccentBrush}" />
-                                </Trigger>
-                                <DataTrigger Binding="{Binding Text.Length, RelativeSource={RelativeSource Self}}" Value="0">
-                                    <Setter Property="Opacity" TargetName="PromptLabel" Value="0.7" />
-                                    <Setter Property="Foreground" Value="Transparent" />
-                                </DataTrigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <!-- Button -->
-            <Style x:Key="GitHubVsButton" TargetType="{x:Type Button}">
-                <Setter Property="Background" Value="{DynamicResource GitHubButtonBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubButtonBorderBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
-                <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Padding" Value="12,5" />
-                <Setter Property="Margin" Value="0" />
-                <Setter Property="MinWidth" Value="76" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="ToolTipService.ShowDuration" Value="30000" />
-                <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Grid>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal" />
-                                        <VisualState x:Name="MouseOver">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                           Storyboard.TargetName="MouseOverBorder">
-                                                    <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                           Storyboard.TargetName="PressedBorder">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
-                                                           Storyboard.TargetName="DisabledVisualElement">
-                                                    <SplineDoubleKeyFrame KeyTime="0" Value="0.5" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                           Storyboard.TargetName="contentPresenter">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0.5" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="FocusStates">
-                                        <VisualState x:Name="Focused" />
-                                        <VisualState x:Name="Unfocused" />
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                                <Border x:Name="Background" BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
-                            Background="{TemplateBinding Background}" />
-                                <Rectangle x:Name="DisabledVisualElement"
-                               Fill="{DynamicResource GitHubButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
-                               Opacity="0" />
-                                <Border x:Name="MouseOverBorder" BorderBrush="{DynamicResource GitHubButtonBorderMouseOverBrush}"
-                            Background="{DynamicResource GitHubButtonBackgroundMouseOverBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubButtonBorderPressedBrush}"
-                            Background="{DynamicResource GitHubButtonBackgroundPressedBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
-                            Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <ContentPresenter x:Name="contentPresenter"
-                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                      Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsDefaulted" Value="True">
-                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
-                                </Trigger>
-                                <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <!-- End Button -->
-
-            <!-- PrimaryActionButton -->
-            <Style x:Key="GitHubVsPrimaryActionButton" TargetType="{x:Type Button}">
-                <Setter Property="Background" Value="{DynamicResource GitHubPrimaryButtonBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderBrush}" />
-                <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundBrush}" />
-                <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Padding" Value="12,5" />
-                <Setter Property="Margin" Value="0" />
-                <Setter Property="MinWidth" Value="76" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="ToolTipService.ShowDuration" Value="30000" />
-                <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Grid>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal" />
-                                        <VisualState x:Name="MouseOver">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                           Storyboard.TargetName="MouseOverBorder">
-                                                    <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                           Storyboard.TargetName="PressedBorder">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
-                                                           Storyboard.TargetName="DisabledVisualElement">
-                                                    <SplineDoubleKeyFrame KeyTime="0" Value="0.5" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                                           Storyboard.TargetName="contentPresenter">
-                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0.5" />
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="FocusStates">
-                                        <VisualState x:Name="Focused" />
-                                        <VisualState x:Name="Unfocused" />
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                                <Border x:Name="Background" BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True"
-                            Background="{TemplateBinding Background}" />
-                                <Rectangle x:Name="DisabledVisualElement"
-                               Fill="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
-                               Opacity="0" />
-                                <Border x:Name="MouseOverBorder" BorderBrush="#FF6ba157"
-                                    Background="#FF71BD1E"
-                                    BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderPressedBrush}"
-                            Background="#FF55A532"
-                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <Border x:Name="DefaultVisualElement" BorderBrush="{DynamicResource GitHubAccentBrush}"
-                                    Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
-                                <ContentPresenter x:Name="contentPresenter"
-                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                      Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsDefaulted" Value="True">
-                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
-                                </Trigger>
-                                <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <!-- End PrimaryActionButton -->
 
             <Style x:Key="CommitListItemContainerStyle" TargetType="{x:Type ListViewItem}">
                 <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -412,8 +75,8 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
                     <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
-                    <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="0,1,0,0"  VerticalAlignment="Center" />
-                    <Label Content="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsGrayText}"/>
+                    <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="5,2,3,0"  VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsGrayText}"/>
                 </StackPanel>
 
                 <!-- Show a check if the branch is mergeable (is that even a word??), 
@@ -491,8 +154,8 @@
             <TabItem Header="Details"  Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical">
-                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{StaticResource GitHubVsPromptTextBox}" />
-                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{StaticResource GitHubVsPromptTextBox}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" />
                         <Grid Margin="10,3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -644,7 +307,8 @@
 
             <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ListView Background="Transparent"
-                          BorderBrush="Transparent">
+                          BorderBrush="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -676,19 +340,20 @@
                             </Grid>
 
                             <TextBlock Text="I am an example commit message"
+                                       TextTrimming="CharacterEllipsis"
                                        ToolTip="I am an example commit message"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                       FontSize="14"
+                                       Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                                        Margin="10,-3,5,0"
                                        Grid.Column="1"
                                        Grid.Row="0" />
 
                             <TextBlock Margin="10,0,0,0"
                                        Text="Andreia Gaita committed 20 hours ago"
+                                       TextTrimming="CharacterEllipsis"
                                        ToolTip="Andreia Gaita committed 20 hours ago"
                                        VerticalAlignment="Top"
-                                       FontSize="11"
                                        Grid.Column="1"
                                        Grid.Row="1" 
                                        Foreground="{DynamicResource GitHubVsGrayText}"/>
@@ -699,7 +364,8 @@
 
             <TabItem Header="Files Changed" Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ListView Background="Transparent"
-                          BorderBrush="Transparent">
+                          BorderBrush="Transparent"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -719,7 +385,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_added.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_added.cs"
+                                ToolTip="src\file_added.cs"
+                                Grid.Column="1" />
 
                             <ui:OcticonImage Icon="diff_added" Grid.Column="2" Foreground="#ff6cc644" ToolTip="Added" />
                         </Grid>
@@ -744,7 +413,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_modified.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_modified.cs"
+                                ToolTip="src\file_modified.cs"
+                                Grid.Column="1" />
 
                             <ui:OcticonImage Icon="diff_modified" Grid.Column="2" Foreground="#ffbbbbbb" ToolTip="Modified" />
                         </Grid>
@@ -769,7 +441,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_removed.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_removed.cs"
+                                ToolTip="src\file_removed.cs"
+                                Grid.Column="1"  />
 
                             <ui:OcticonImage Icon="diff_removed" Grid.Column="2" Foreground="#FFbd2c00" ToolTip="Removed" />
                         </Grid>
@@ -794,7 +469,10 @@
 
                             <TextBlock 
                                 Foreground="{DynamicResource GitHubVsWindowText}"
-                                Grid.Column="1" Text="src\file_renamed.cs" />
+                                TextTrimming="CharacterEllipsis"
+                                Text="src\file_renamed.cs" 
+                                ToolTip="src\file_renamed.cs" 
+                                Grid.Column="1" />
 
                             <ui:OcticonImage Icon="diff_renamed" Grid.Column="2" Foreground="#ff4078c0" ToolTip="Renamed" />
                         </Grid>

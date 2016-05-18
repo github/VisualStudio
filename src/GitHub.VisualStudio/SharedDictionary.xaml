@@ -2,12 +2,16 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+  xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
   xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers">
 
   <ResourceDictionary.MergedDictionaries>
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml"/>
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ActionLinkButton.xaml" />
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubComboBox.xaml" />
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/Buttons.xaml" />
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubTabControl.xaml" />
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/TextBlocks.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}" />
@@ -51,7 +55,7 @@
   </Style>
 
   <Style x:Key="VerticalSeparator" TargetType="{x:Type Separator}">
-    <Setter Property="Background" Value="Gray" />
+    <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
     <Setter Property="Margin" Value="3,0,3,0" />
     <Setter Property="LayoutTransform">
       <Setter.Value>

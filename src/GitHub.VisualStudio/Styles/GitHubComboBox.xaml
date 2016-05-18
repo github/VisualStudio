@@ -40,7 +40,6 @@
                 <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}" />
                 <Setter Property="Background" Value="{DynamicResource GitHubVsBrandedUIBackground}" />
                 <Setter Property="Margin" Value="5" />
-                <Setter Property="Height" Value="25" />
             </Style>
 
             <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource {x:Type ListBox}}">
