@@ -74,33 +74,7 @@ namespace GitHub.Api
 
         async Task<string[]> GetScopesInternal()
         {
-            // If auth type is Basic we might be able to read /api/authorizations to get the 
-            // current scopes. However this request sometimes gets mysteriously converted to an
-            // OAuth request so if that doesn't work try reading from / and checking for the 
-            // X-OAuth-Scopes header.
             var connection = gitHubClient.Connection;
-
-            if (connection.Credentials.AuthenticationType == AuthenticationType.Basic)
-            {
-                try
-                {
-                    var response = await gitHubClient.Connection.Get<string>(
-                        ApiUrls.Authorizations(),
-                        TimeSpan.FromSeconds(3));
-
-                    var json = new SimpleJsonSerializer();
-                    var authorizations = json.Deserialize<Octokit.Authorization[]>(response.Body);
-                    var scopes = new List<string>();
-
-                    foreach (var authorization in authorizations)
-                    {
-                        scopes.AddRange(authorization.Scopes);
-                    }
-
-                    return scopes.Distinct().ToArray();
-                }
-                catch { }
-            }
 
             try
             {
@@ -115,8 +89,15 @@ namespace GitHub.Api
                         .Select(x => x.Trim())
                         .ToArray();
                 }
+                else
+                {
+                    log.Error($"Error reading scopes: /user succeeded but {scopesHeader} was not present.");
+                }
             }
-            catch { }
+            catch (Exception e)
+            {
+                log.Error($"Error reading scopes: /user failed: {e}.");
+            }
 
             return new string[0];
         }

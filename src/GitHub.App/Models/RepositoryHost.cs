@@ -84,8 +84,9 @@ namespace GitHub.Models
                         })
                         .ObserveOn(RxApp.MainThreadScheduler);
                 })
-                .CombineLatest(GetScopes(), (user, scopes) => new { user, scopes })
-                .SelectMany(x => LoginWithApiUser(x.user, x.scopes))
+                .Select(user => GetScopesIfLoggedIn(user))
+                .Switch()
+                .SelectMany(x => LoginWithApiUser(x.User, x.Scopes))
                 .PublishAsync();
         }
 
@@ -200,8 +201,9 @@ namespace GitHub.Models
                     }
                     return Observable.Throw<AccountCacheItem>(ex);
                 })
-                .CombineLatest(GetScopes(), (user, scopes) => new { user, scopes })
-                .SelectMany(x => LoginWithApiUser(x.user, x.scopes))
+                .Select(user => GetScopesIfLoggedIn(user))
+                .Switch()
+                .SelectMany(x => LoginWithApiUser(x.User, x.Scopes))
                 .PublishAsync();
         }
 
@@ -276,9 +278,17 @@ namespace GitHub.Models
                 .Select(user => new AccountCacheItem(user)));
         }
 
-        IObservable<string[]> GetScopes()
+        IObservable<UserAndScopes> GetScopesIfLoggedIn(AccountCacheItem user)
         {
-            return Observable.Defer(() => ApiClient.GetScopes());
+            if (user != null)
+            {
+                return Observable.Defer(() => ApiClient.GetScopes())
+                    .Select(scopes => new UserAndScopes(user, scopes));
+            }
+            else
+            {
+                return Observable.Return(new UserAndScopes());
+            }
         }
         
         bool disposed;
@@ -318,6 +328,22 @@ namespace GitHub.Models
         {
             get;
             private set;
+        }
+
+        private class UserAndScopes
+        {
+            public UserAndScopes()
+            {
+            }
+
+            public UserAndScopes(AccountCacheItem user, string[] scopes)
+            {
+                User = user;
+                Scopes = scopes;
+            }
+
+            public AccountCacheItem User { get; }
+            public string[] Scopes { get; }
         }
     }
 }
