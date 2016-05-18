@@ -93,9 +93,9 @@
         - [ ] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
 - [ ] **Creating Multiple Repositories**
     - [ ] Go to Team Explorer Connect page (logged in)
-    - [ ] Create additional repository
-    - [ ] Publish new repository
-    - [ ] Verify remote information present in repository settings
+      - [ ] Create additional repository
+        - [ ] Publish new repository
+          - [ ] Verify remote information present in repository settings
 - [ ] **Validate Publish Repository Error**
     - [ ] Remove remote settings from repository
     - [ ] Go to Sync page and publish repository
@@ -121,3 +121,10 @@
 - [ ] **Login with 2FA on**
       - [ ] Login GitHub with 2FA turned on
       - [ ] Resend works
+
+# Settings
+- [ ] **Property page loads outside of team explorer view**
+  - [ ] Select solution explorer as focused pane
+  - [ ] Restart Visual Studio
+  - [ ] Go to GitHub for VS property pane in Options
+    - [ ] Property page loads without errors
