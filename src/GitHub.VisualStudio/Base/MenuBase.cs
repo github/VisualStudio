@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using GitHub.Extensions;
@@ -6,7 +7,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
-using System.Diagnostics;
 
 namespace GitHub.VisualStudio
 {
@@ -14,6 +14,8 @@ namespace GitHub.VisualStudio
     {
         readonly IServiceProvider serviceProvider;
         protected IServiceProvider ServiceProvider { get { return serviceProvider; } }
+
+        protected ISimpleRepositoryModel ActiveRepo { get; private set; }
 
         protected MenuBase()
         {
@@ -58,6 +60,31 @@ namespace GitHub.VisualStudio
                     .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
             }
             uiProvider.RunUI(controllerFlow, connection);
+        }
+
+        void RefreshRepo()
+        {
+            ActiveRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+
+            if (ActiveRepo == null)
+            {
+                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
+                string path = vsservices?.GetActiveRepoPath() ?? String.Empty;
+                try
+                {
+                    ActiveRepo = !String.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
+                }
+                catch (Exception ex)
+                {
+                    VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}: Error loading the repository from '{1}'. {2}", GetType(), path, ex));
+                }
+            }
+        }
+
+        protected bool IsGitHubRepo()
+        {
+            RefreshRepo();
+            return ActiveRepo?.CloneUrl?.RepositoryName != null;
         }
     }
 }

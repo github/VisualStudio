@@ -1,16 +1,17 @@
 ﻿using System;
-using GitHub.Exports;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using GitHub.Api;
+using GitHub.App;
+using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using NLog;
+using NullGuard;
 using Octokit;
 using ReactiveUI;
-using NullGuard;
-using GitHub.Extensions;
-using NLog;
 
 namespace GitHub.ViewModels
 {

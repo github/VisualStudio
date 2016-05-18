@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -24,11 +25,17 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class UIProvider : IUIProvider, IDisposable
     {
+        class OwnedComposablePart
+        {
+            public object Owner { get; set; }
+            public ComposablePart Part { get; set; }
+        }
+
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProvider serviceProvider;
         CompositionContainer tempContainer;
-        readonly Dictionary<string, ComposablePart> tempParts;
+        readonly Dictionary<string, OwnedComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
         readonly Version currentVersion;
         bool initializingLogging = false;
@@ -66,7 +73,7 @@ namespace GitHub.VisualStudio
             {
                 SourceProvider = ExportProvider
             }));
-            tempParts = new Dictionary<string, ComposablePart>();
+            tempParts = new Dictionary<string, OwnedComposablePart>();
         }
 
         [return: AllowNull]
@@ -112,6 +119,13 @@ namespace GitHub.VisualStudio
             return null;
         }
 
+        [return: AllowNull]
+        public object TryGetService(string typename)
+        {
+            var type = Type.GetType(typename, false, true);
+            return TryGetService(type);
+        }
+
         public object GetService(Type serviceType)
         {
             var instance = TryGetService(serviceType);
@@ -123,12 +137,28 @@ namespace GitHub.VisualStudio
                 "Could not locate any instances of contract {0}.", contract));
         }
 
-        public void AddService<T>(T instance)
+        public T GetService<T>()
         {
-            AddService(typeof(T), instance);
+            return (T)GetService(typeof(T));
         }
 
-        public void AddService(Type t, object instance)
+        public T TryGetService<T>() where T : class
+        {
+            return TryGetService(typeof(T)) as T;
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public Ret GetService<T, Ret>() where Ret : class
+        {
+            return GetService<T>() as Ret;
+        }
+
+        public void AddService<T>(object owner, T instance)
+        {
+            AddService(typeof(T), owner, instance);
+        }
+
+        public void AddService(Type t, object owner, object instance)
         {
             if (!Initialized)
             {
@@ -139,13 +169,23 @@ namespace GitHub.VisualStudio
             var batch = new CompositionBatch();
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+
+            // we want to remove stale instances of a service, if they exist, regardless of who put them there
+            RemoveService(t, null);
+
             var part = batch.AddExportedValue(contract, instance);
             Debug.Assert(part != null, "Adding an exported value must return a non-null part");
-            tempParts.Add(contract, part);
+            tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
             tempContainer.Compose(batch);
         }
 
-        public void RemoveService(Type t)
+        /// <summary>
+        /// Removes a service from the catalog
+        /// </summary>
+        /// <param name="t">The type we want to remove</param>
+        /// <param name="owner">The owner, which either has to match what was passed to AddService,
+        /// or if it's null, the service will be removed without checking for ownership</param>
+        public void RemoveService(Type t, [AllowNull] object owner)
         {
             if (!Initialized)
             {
@@ -156,13 +196,14 @@ namespace GitHub.VisualStudio
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
-            ComposablePart part; 
-
+            OwnedComposablePart part; 
             if (tempParts.TryGetValue(contract, out part))
             {
+                if (owner != null && part.Owner != owner)
+                    return;
                 tempParts.Remove(contract);
                 var batch = new CompositionBatch();
-                batch.RemovePart(part);
+                batch.RemovePart(part.Part);
                 tempContainer.Compose(batch);
             }
         }

@@ -6,7 +6,7 @@
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
-                                  xmlns:prop="clr-namespace:GitHub.VisualStudio"
+                                  xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                   mc:Ignorable="d"
                                   d:DesignWidth="414"

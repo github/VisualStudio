@@ -51,7 +51,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 {
                     if (state == ProgressState.Success)
                     {
-                        teServices.ShowMessage(VisualStudio.Resources.RepositoryPublishedMessage);
+                        teServices.ShowMessage(UI.Resources.RepositoryPublishedMessage);
                         NotifyDone();
                     }
                 });

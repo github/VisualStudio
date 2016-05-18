@@ -1,15 +1,15 @@
-﻿using GitHub.Api;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using NLog;
 using ReactiveUI;
-using System;
-using System.ComponentModel.Composition;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 
 namespace GitHub.ViewModels
 {

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
