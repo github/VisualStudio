@@ -409,6 +409,11 @@ namespace GitHub.SampleData
         {
         }
 
+        public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        {
+            return null;
+        }
+
         public string Name { get; set; }
         public UriString CloneUrl { get; set; }
         public string LocalPath { get; set; }
@@ -520,9 +525,9 @@ namespace GitHub.SampleData
     {
         public GitHubHomeSectionDesigner()
         {
-            Icon = Octicon.@lock;
+            Icon = Octicon.repo;
             RepoName = "octokit";
-            RepoUrl = "https://github.com/octokit/octokit.net";
+            RepoUrl = "https://github.com/octokit/something-really-long-here-to-check-for-trimming";
         }
 
         public Octicon Icon

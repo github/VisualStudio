@@ -9,6 +9,7 @@ using GitHub.Services;
 using Octokit;
 using ReactiveUI;
 using NullGuard;
+using GitHub.App;
 
 namespace GitHub.ViewModels
 {

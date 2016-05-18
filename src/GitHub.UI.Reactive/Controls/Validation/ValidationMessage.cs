@@ -33,6 +33,7 @@ namespace GitHub.UI
                 .Do(CreateBinding)
                 .Select(control =>
                     Observable.Merge(
+                        this.WhenAnyValue(x => x.ShowError),
                         control.Events().TextChanged
                             .Throttle(TimeSpan.FromSeconds(ShowError ? defaultTextChangeThrottle : TextChangeThrottle),
                             RxApp.MainThreadScheduler)

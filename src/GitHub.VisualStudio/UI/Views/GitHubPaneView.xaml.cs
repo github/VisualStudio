@@ -33,15 +33,15 @@ namespace GitHub.VisualStudio.UI.Views
 
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GitHubPaneViewModel : TeamExplorerSectionBase, IGitHubPaneViewModel
+    public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
         CompositeDisposable disposables = new CompositeDisposable();
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         IUIController uiController;
 
         [ImportingConstructor]
-        public GitHubPaneViewModel(ITeamExplorerServiceHolder holder, IConnectionManager cm)
-            : base(holder, cm)
+        public GitHubPaneViewModel(ITeamExplorerServiceHolder holder)
+            : base(holder)
         {
             Controls = new ObservableCollection<IView>();
         }
@@ -72,6 +72,14 @@ namespace GitHub.VisualStudio.UI.Views
         {
             [return: AllowNull] get { return controls; }
             set { controls = value; this.RaisePropertyChange(); }
+        }
+
+        string title;
+        [AllowNull]
+        public string Title
+        {
+            get { return title; }
+            set { title = value; this.RaisePropertyChange(); }
         }
 
         public ReactiveCommand<object> CancelCommand { get; private set; }
