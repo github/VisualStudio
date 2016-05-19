@@ -68,7 +68,8 @@
         <Grid
             ToolTip="{Binding ElementName=adornerPlaceholder, Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}"
             Background="Transparent"
-            Cursor="IBeam">
+            Cursor="IBeam"
+            IsHitTestVisible="False">
             
             <AdornedElementPlaceholder
                 Name="adornerPlaceholder"
