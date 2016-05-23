@@ -64,6 +64,7 @@ namespace UnitTests
         public static IConnection Connection { get { return Substitute.For<IConnection>(); } }
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
         public static ITwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<ITwoFactorChallengeHandler>(); } }
+        public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -124,6 +125,7 @@ namespace UnitTests
             ret.GetService(typeof(IConnectionManager)).Returns(ConnectionManager);
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
             ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
+            ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
             return ret;
         }
 
@@ -189,6 +191,11 @@ namespace UnitTests
         public static ITwoFactorChallengeHandler GetTwoFactorChallengeHandler(this IServiceProvider provider)
         {
             return provider.GetService(typeof(ITwoFactorChallengeHandler)) as ITwoFactorChallengeHandler;
+        }
+
+        public static IGistPublishService GetGistPublishService(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IGistPublishService)) as IGistPublishService;
         }
     }
 }

@@ -13,11 +13,16 @@ using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using Octokit.Internal;
+using System.Collections.Generic;
 
 namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
+        const string scopesHeader = "X-OAuth-Scopes";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
@@ -25,9 +30,9 @@ namespace GitHub.Api
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
         // The old scopes must be used by older versions of Enterprise that don't support the new scopes:
-        readonly string[] oldAuthorizationScopes = { "user", "repo" };
+        readonly string[] oldAuthorizationScopes = { "user", "repo", "gist" };
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
-        readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
+        readonly string[] newAuthorizationScopes = { "user", "repo", "gist", "write:public_key" };
         readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
         readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
@@ -52,9 +57,68 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<Gist> CreateGist(NewGist newGist)
+        {
+            return gitHubClient.Gist.Create(newGist);
+        }
+
         public IObservable<User> GetUser()
         {
             return gitHubClient.User.Current();
+        }
+
+        public IObservable<string[]> GetScopes()
+        {
+            return GetScopesInternal().ToObservable();
+        }
+
+        async Task<string[]> GetScopesInternal()
+        {
+            // If auth type is Basic we might be able to read /api/authorizations to get the 
+            // current scopes. However this request sometimes gets mysteriously converted to an
+            // OAuth request so if that doesn't work try reading from / and checking for the 
+            // X-OAuth-Scopes header.
+            var connection = gitHubClient.Connection;
+
+            if (connection.Credentials.AuthenticationType == AuthenticationType.Basic)
+            {
+                try
+                {
+                    var response = await gitHubClient.Connection.Get<string>(
+                        ApiUrls.Authorizations(),
+                        TimeSpan.FromSeconds(3));
+
+                    var json = new SimpleJsonSerializer();
+                    var authorizations = json.Deserialize<Octokit.Authorization[]>(response.Body);
+                    var scopes = new List<string>();
+
+                    foreach (var authorization in authorizations)
+                    {
+                        scopes.AddRange(authorization.Scopes);
+                    }
+
+                    return scopes.Distinct().ToArray();
+                }
+                catch { }
+            }
+
+            try
+            {
+                var response = await gitHubClient.Connection.Get<string>(
+                    new Uri("user", UriKind.Relative),
+                    TimeSpan.FromSeconds(3));
+
+                if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+                {
+                    return response.HttpResponse.Headers[scopesHeader]
+                        .Split(',')
+                        .Select(x => x.Trim())
+                        .ToArray();
+                }
+            }
+            catch { }
+
+            return new string[0];
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(

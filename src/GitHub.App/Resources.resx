@@ -123,8 +123,14 @@
   <data name="CloneTitle" xml:space="preserve">
     <value>Clone a {0} Repository</value>
   </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>Create a GitHub Gist</value>
+  </data>
   <data name="CreateTitle" xml:space="preserve">
     <value>Create a {0} Repository</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
     <value>Please enter an Enterprise URL</value>
@@ -143,6 +149,9 @@
   </data>
   <data name="LoginTitle" xml:space="preserve">
     <value>Connect To GitHub</value>
+  </data>
+  <data name="LogoutRequiredTitle" xml:space="preserve">
+    <value>Sign Out Required</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
     <value>Please enter your password</value>

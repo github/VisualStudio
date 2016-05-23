@@ -54,6 +54,7 @@
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -180,6 +181,7 @@
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
+    <Compile Include="Services\GistPublishService.cs" />
     <Compile Include="Services\RepositoryPublishService.cs" />
     <Compile Include="Services\SerializedObjectProvider.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />
@@ -193,6 +195,8 @@
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\GistCreationViewModel.cs" />
+    <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\LoginControlViewModel.cs" />

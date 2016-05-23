@@ -298,6 +298,12 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public bool SupportsGist
+        {
+            get;
+            private set;
+        }
+
         public IModelService ModelService
         {
             get;

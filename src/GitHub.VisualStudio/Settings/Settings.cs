@@ -1,6 +1,7 @@
 ﻿// Guids.cs
 // MUST match guids.h
 using System;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio
 {

@@ -28,6 +28,7 @@ namespace GitHub.UI
         Clone,
         Publish,
         PullRequests,
+        Gist,
         Home
     }
 

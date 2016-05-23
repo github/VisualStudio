@@ -25,11 +25,5 @@ namespace GitHub.VisualStudio.Menus
         {
             StartFlow(UIControllerFlow.Authentication);
         }
-
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
-        }
     }
 }

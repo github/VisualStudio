@@ -79,11 +79,29 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create a GitHub Gist.
+        /// </summary>
+        internal static string CreateGistTitle {
+            get {
+                return ResourceManager.GetString("CreateGistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create a {0} Repository.
         /// </summary>
         internal static string CreateTitle {
             get {
                 return ResourceManager.GetString("CreateTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GistFromVisualStudio.cs.
+        /// </summary>
+        internal static string DefaultGistFileName {
+            get {
+                return ResourceManager.GetString("DefaultGistFileName", resourceCulture);
             }
         }
         
@@ -138,6 +156,15 @@ namespace GitHub.App {
         internal static string LoginTitle {
             get {
                 return ResourceManager.GetString("LoginTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign Out Required.
+        /// </summary>
+        public static string LogoutRequiredTitle {
+            get {
+                return ResourceManager.GetString("LogoutRequiredTitle", resourceCulture);
             }
         }
         

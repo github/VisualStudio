@@ -14,6 +14,8 @@ using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
+using System.Linq;
+using System.Reactive.Threading.Tasks;
 
 namespace GitHub.Models
 {
@@ -58,6 +60,8 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggedIn, value); }
         }
 
+        public bool SupportsGist { get; private set; }
+
         public string Title { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -80,7 +84,8 @@ namespace GitHub.Models
                         })
                         .ObserveOn(RxApp.MainThreadScheduler);
                 })
-                .SelectMany(LoginWithApiUser)
+                .CombineLatest(GetScopes(), (user, scopes) => new { user, scopes })
+                .SelectMany(x => LoginWithApiUser(x.user, x.scopes))
                 .PublishAsync();
         }
 
@@ -195,7 +200,8 @@ namespace GitHub.Models
                     }
                     return Observable.Throw<AccountCacheItem>(ex);
                 })
-                .SelectMany(LoginWithApiUser)
+                .CombineLatest(GetScopes(), (user, scopes) => new { user, scopes })
+                .SelectMany(x => LoginWithApiUser(x.user, x.scopes))
                 .PublishAsync();
         }
 
@@ -232,7 +238,7 @@ namespace GitHub.Models
                     : AuthenticationResult.Success);
         }
 
-        IObservable<AuthenticationResult> LoginWithApiUser(AccountCacheItem user)
+        IObservable<AuthenticationResult> LoginWithApiUser(AccountCacheItem user, string[] scopes)
         {
             return GetAuthenticationResultForUser(user)
                 .SelectMany(result =>
@@ -254,6 +260,7 @@ namespace GitHub.Models
                     if (result.IsSuccess())
                     {
                         IsLoggedIn = true;
+                        SupportsGist = scopes?.Contains("gist") ?? false;
                     }
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
@@ -269,6 +276,11 @@ namespace GitHub.Models
                 .Select(user => new AccountCacheItem(user)));
         }
 
+        IObservable<string[]> GetScopes()
+        {
+            return Observable.Defer(() => ApiClient.GetScopes());
+        }
+        
         bool disposed;
         protected virtual void Dispose(bool disposing)
         {
