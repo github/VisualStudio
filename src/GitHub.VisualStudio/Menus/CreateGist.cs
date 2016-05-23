@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Menus
             return !String.IsNullOrWhiteSpace(stp?.GetSelectedText());
         }
 
-        public void Activate()
+        public void Activate(object data)
         {
             StartFlow(UIControllerFlow.Gist);
         }
