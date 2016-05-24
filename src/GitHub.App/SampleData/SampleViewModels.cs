@@ -525,9 +525,9 @@ namespace GitHub.SampleData
     {
         public GitHubHomeSectionDesigner()
         {
-            Icon = Octicon.@lock;
+            Icon = Octicon.repo;
             RepoName = "octokit";
-            RepoUrl = "https://github.com/octokit/octokit.net";
+            RepoUrl = "https://github.com/octokit/something-really-long-here-to-check-for-trimming";
         }
 
         public Octicon Icon
