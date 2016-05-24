@@ -715,8 +715,9 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
+            var host = hosts.GitHubHost;
             // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true, true));
+            cons.Add(SetupConnection(provider, hosts, host, true, false));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
@@ -727,7 +728,7 @@ public class UIControllerTests
                     .Subscribe(s =>
                     {
                         success = s;
-                        Assert.Equal(1, count);
+                        Assert.Equal(3, count);
                         count++;
                     });
 
@@ -738,17 +739,32 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(uc);
-                            uiController.Stop();
+                            host.IsLoggedIn.Returns(false);
+                            TriggerDone(uc);
+                            break;
+                        case 2:
+                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+                            // login
+                            host.IsLoggedIn.Returns(true);
+                            host.SupportsGist.Returns(true);
+                            TriggerDone(uc);
+                            break;
+                        case 3:
+                            Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
+                            TriggerDone(uc);
+                            break;
+                        default:
+                            Assert.True(false, "Received more views than expected");
                             break;
                     }
                 }, () =>
                 {
-                    Assert.Equal(1, count);
+                    Assert.Equal(4, count);
                     count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(5, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);
@@ -790,15 +806,18 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
                             TriggerDone(uc);
                             break;
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
                 }, () =>
                 {
-                    Assert.Equal(1, count);
+                    Assert.Equal(2, count);
                     count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(3, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);
