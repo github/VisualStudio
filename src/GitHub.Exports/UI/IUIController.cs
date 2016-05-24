@@ -29,6 +29,7 @@ namespace GitHub.UI
         Publish,
         PullRequests,
         Gist,
+        LogoutRequired,
         Home
     }
 
