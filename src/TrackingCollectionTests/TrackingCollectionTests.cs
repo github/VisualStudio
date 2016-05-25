@@ -1595,7 +1595,7 @@ public class TrackingTests : TestBase
             GetThing(9, 9),
         });
 
-        col.SetFilter((item, position, list) => item.UpdatedAt < Now + TimeSpan.FromMinutes(8));
+        col.Filter = (item, position, list) => item.UpdatedAt < Now + TimeSpan.FromMinutes(8);
 
         CollectionAssert.AreEqual(col, new List<Thing> {
             GetThing(1, 1),
@@ -1646,7 +1646,7 @@ public class TrackingTests : TestBase
         evt.Reset();
         CollectionAssert.AreEqual(col, list1);
 
-        col.SetComparer(OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare);
+        col.Comparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
 
         CollectionAssert.AreEqual(col, list1.Reverse<Thing>().ToArray());
         col.Dispose();
@@ -1771,7 +1771,7 @@ public class TrackingTests : TestBase
         evt.WaitOne();
         evt.Reset();
         CollectionAssert.AreEqual(col, list1);
-        col.SetComparer(null);
+        col.Comparer = null;
         CollectionAssert.AreEqual(col, list1.Reverse<Thing>().ToArray());
         col.Dispose();
     }
@@ -1838,7 +1838,7 @@ public class TrackingTests : TestBase
             GetThing(9, 9),
         });
 
-        col.SetFilter(null);
+        col.Filter = null;
 
         expectedCount = 14;
         col.RemoveItem(GetThing(100)); // this one won't result in a new element from the observable
@@ -1865,8 +1865,8 @@ public class TrackingTests : TestBase
     {
         var col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
         col.Dispose();
-        Assert.Throws<ObjectDisposedException>(() => col.SetFilter(null));
-        Assert.Throws<ObjectDisposedException>(() => col.SetComparer(null));
+        Assert.Throws<ObjectDisposedException>(() => col.Filter = null);
+        Assert.Throws<ObjectDisposedException>(() => col.Comparer = null);
         Assert.Throws<ObjectDisposedException>(() => col.Subscribe());
         Assert.Throws<ObjectDisposedException>(() => col.AddItem(GetThing(1)));
         Assert.Throws<ObjectDisposedException>(() => col.RemoveItem(GetThing(1)));
@@ -1936,22 +1936,22 @@ public class TrackingTests : TestBase
         Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderByDescending(x => x.CreatedAt).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
-        col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare);
+        col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.Number).Compare;
         sortlist = list1.ToEnumerable().ToArray();
         Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
-        col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare);
+        col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare;
         sortlist = list1.ToEnumerable().ToArray();
         Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
-        col.SetComparer(OrderedComparer<Thing>.OrderByDescending(x => x.Title).Compare);
+        col.Comparer = OrderedComparer<Thing>.OrderByDescending(x => x.Title).Compare;
         sortlist = list1.ToEnumerable().ToArray();
         Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderByDescending(x => x.Title).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
-        col.SetComparer(OrderedComparer<Thing>.OrderBy(x => x.Title).Compare);
+        col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.Title).Compare;
         sortlist = list1.ToEnumerable().ToArray();
         Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderBy(x => x.Title).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);

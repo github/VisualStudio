@@ -6,7 +6,6 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
-using Microsoft.TeamFoundation.MVVM;
 using System.Globalization;
 using GitHub.Primitives;
 using System.Threading.Tasks;
@@ -34,9 +33,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             CheckLogin().Forget();
         }
 
-        protected override void RepoChanged()
+        protected override void RepoChanged(bool changed)
         {
-            base.RepoChanged();
+            base.RepoChanged(changed);
             CheckLogin().Forget();
         }
 
@@ -58,7 +57,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);
                 teServices.ShowMessage(
                     msg,
-                    new RelayCommand(() => StartFlow(UIControllerFlow.Authentication))
+                    new Primitives.RelayCommand(_ => StartFlow(UIControllerFlow.Authentication))
                 );
             }
         }

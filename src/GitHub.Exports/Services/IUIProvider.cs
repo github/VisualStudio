@@ -25,7 +25,7 @@ namespace GitHub.Services
         /// or if it's null, the service will be removed without checking for ownership</param>
         void RemoveService(Type t, object owner);
 
-        IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
+        IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
         void RunUI();
         void RunUI(UIControllerFlow controllerFlow, IConnection connection);
         IObservable<bool> ListenToCompletionState();

@@ -1,3 +1,4 @@
+using GitHub.UI;
 using System.Windows.Input;
 
 namespace GitHub.ViewModels
@@ -7,5 +8,6 @@ namespace GitHub.ViewModels
         string Title { get; }
         ICommand Cancel { get; }
         bool IsShowing { get; }
-	}
+        void Initialize(ViewWithData data);
+    }
 }

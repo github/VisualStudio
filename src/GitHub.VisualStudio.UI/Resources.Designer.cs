@@ -511,6 +511,24 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to by.
+        /// </summary>
+        public static string prOpenedByText {
+            get {
+                return ResourceManager.GetString("prOpenedByText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to opened.
+        /// </summary>
+        public static string prOpenedText {
+            get {
+                return ResourceManager.GetString("prOpenedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publish.
         /// </summary>
         public static string publishText {

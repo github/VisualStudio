@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.Extensions;
+using NullGuard;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -20,7 +21,7 @@ namespace GitHub.VisualStudio.Menus
         public Guid Guid => GuidList.guidGitHubCmdSet;
         public int CmdId => PkgCmdIDList.addConnectionCommand;
 
-        public void Activate()
+        public void Activate([AllowNull]object data = null)
         {
             StartFlow(UIControllerFlow.Authentication);
         }

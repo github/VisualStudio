@@ -52,7 +52,7 @@ namespace GitHub.ViewModels
             )
             .ToProperty(this, x => x.Title);
 
-            Connections = new ReactiveList<IConnection>(connectionManager.Connections);
+            Connections = connectionManager.Connections;
             this.repositoryPublishService = repositoryPublishService;
 
             if (Connections.Any())
@@ -112,7 +112,7 @@ namespace GitHub.ViewModels
         public bool IsPublishing { get { return isPublishing.Value; } }
 
         public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
-        public ReactiveList<IConnection> Connections { get; private set; }
+        public ObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
         [AllowNull]
