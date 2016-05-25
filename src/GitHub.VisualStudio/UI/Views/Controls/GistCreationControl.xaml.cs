@@ -35,7 +35,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.Bind(ViewModel, vm => vm.Description, v => v.descriptionTextBox.Text));
                 d(this.Bind(ViewModel, vm => vm.FileName, v => v.fileNameTextBox.Text));
                 d(this.Bind(ViewModel, vm => vm.IsPrivate, v => v.makePrivate.IsChecked));
-                d(this.Bind(ViewModel, vm => vm.OpenInBrowser, v => v.openInBrowser.IsChecked));
                 d(this.BindCommand(ViewModel, vm => vm.CreateGist, v => v.createGistButton));
 
                 d(this.Bind(ViewModel, vm => vm.Account, v => v.accountStackPanel.DataContext));
@@ -44,12 +43,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     .Where(x => x != null)
                     .Subscribe(gist =>
                     {
-                        if (ViewModel.OpenInBrowser)
-                        {
-                            var browser = serviceProvider.GetExportedValue<IVisualStudioBrowser>();
-                            browser?.OpenUrl(new Uri(gist.HtmlUrl));
-                        }
-
+                        var browser = serviceProvider.GetExportedValue<IVisualStudioBrowser>();
+                        browser?.OpenUrl(new Uri(gist.HtmlUrl));
                         NotifyDone();
                     });
 

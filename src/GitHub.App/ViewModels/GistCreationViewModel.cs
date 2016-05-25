@@ -101,13 +101,6 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref isPrivate, value); }
         }
 
-        bool openInBrowser = true;
-        public bool OpenInBrowser
-        {
-            get { return openInBrowser; }
-            set { this.RaiseAndSetIfChanged(ref openInBrowser, value); }
-        }
-
         string description;
         [AllowNull]
         public string Description

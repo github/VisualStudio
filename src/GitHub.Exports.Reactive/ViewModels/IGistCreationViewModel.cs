@@ -17,12 +17,6 @@ namespace GitHub.ViewModels
         bool IsPrivate { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the gist should be opened in the browser
-        /// on sucessful creation.
-        /// </summary>
-        bool OpenInBrowser { get; set; }
-
-        /// <summary>
         /// Gets or sets the optional description used in the gist description field.
         /// </summary>
         string Description { get; set; }
