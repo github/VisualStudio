@@ -50,8 +50,9 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateRepo(ISimpleRepositoryModel repo)
         {
+            var changed = ActiveRepo != repo;
             ActiveRepo = repo;
-            RepoChanged();
+            RepoChanged(changed);
             Invalidate();
         }
 

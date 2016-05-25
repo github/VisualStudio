@@ -96,7 +96,7 @@ namespace GitHub.Extensions
             return ret as T;
         }
 
-        public static void AddTopLevelMenuItem(this IServiceProvider provider,
+        public static void AddCommandHandler(this IServiceProvider provider,
             Guid guid,
             int cmdId,
             EventHandler eventHandler)
@@ -110,26 +110,31 @@ namespace GitHub.Extensions
             mcs.AddCommand(item);
         }
 
-        public static void AddDynamicMenuItem(this IServiceProvider provider,
+        public static OleMenuCommand AddCommandHandler(this IServiceProvider provider,
             Guid guid,
             int cmdId,
             Func<bool> canEnable,
-            Action execute)
+            Action execute,
+            bool disable = false)
         {
             var mcs = provider.GetService(typeof(IMenuCommandService)) as IMenuCommandService;
             Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
             if (mcs == null)
-                return;
+                return null;
             var id = new CommandID(guid, cmdId);
             var item = new OleMenuCommand(
                 (s, e) => execute(),
                 (s, e) => { },
                 (s, e) =>
                 {
-                    ((OleMenuCommand)s).Visible = canEnable();
+                    if (disable)
+                        ((OleMenuCommand)s).Enabled = canEnable();
+                    else
+                        ((OleMenuCommand)s).Visible = canEnable();
                 },
                 id);
             mcs.AddCommand(item);
+            return item;
         }
     }
 }

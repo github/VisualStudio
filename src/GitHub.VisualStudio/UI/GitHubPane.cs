@@ -12,6 +12,8 @@ using GitHub.VisualStudio.Base;
 using GitHub.ViewModels;
 using System.Diagnostics;
 using Microsoft.VisualStudio;
+using GitHub.App.Factories;
+using NullGuard;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -32,6 +34,12 @@ namespace GitHub.VisualStudio.UI
     {
         const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
 
+        IView View
+        {
+            get { return Content as IView; }
+            set { Content = value; }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
         {
@@ -47,35 +55,49 @@ namespace GitHub.VisualStudio.UI
             ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
 
-            var factory = this.GetExportedValue<IUIProvider>().GetService<IExportFactoryProvider>();
+            var factory = this.GetExportedValue<IUIFactory>();
+            var d = factory.CreateViewAndViewModel(Exports.UIViewType.GitHubPane);
             // placeholder logic to load the view until the UIController is able to do it for us
-            Content = factory.GetView(Exports.UIViewType.GitHubPane).Value;
-            (Content as UserControl).DataContext = factory.GetViewModel(Exports.UIViewType.GitHubPane).Value;
+            View = d.View;
+            View.DataContext = d.ViewModel;
         }
 
         protected override void Initialize()
         {
             base.Initialize();
-            var vm = (Content as IView).ViewModel as IServiceProviderAware;
+            var vm = View.ViewModel as IServiceProviderAware;
             Debug.Assert(vm != null);
             vm?.Initialize(this);
         }
 
-        public static bool Activate()
+        public void ShowView(ViewWithData data)
+        {
+            View.ViewModel?.Initialize(data);
+        }
+
+        [return: AllowNull]
+        public static GitHubPane Activate()
         {
             var windowGuid = new Guid(GitHubPaneGuid);
             IVsWindowFrame frame;
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate, ref windowGuid, out frame)))
             {
                 VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + GitHubPaneGuid + "'");
-                return false;
+                return null;
             }
             if (ErrorHandler.Failed(frame.Show()))
             {
                 VsOutputLogger.WriteLine("Unable to show GitHubPane '" + GitHubPaneGuid + "'");
-                return false;
+                return null;
             }
-            return true;
+
+            object docView = null;
+            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
+                VsOutputLogger.WriteLine("Unable to grab instance of GitHubPane '" + GitHubPaneGuid + "'");
+                return null;
+            }
+            return docView as GitHubPane;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Windows;
 using GitHub.Extensions;
 using GitHub.Services;
 using GitHub.VisualStudio.UI;
+using NullGuard;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -21,7 +22,7 @@ namespace GitHub.VisualStudio.Menus
         public Guid Guid => GuidList.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.copyLinkCommand;
 
-        public void Activate()
+        public void Activate([AllowNull]object data = null)
         {
             if (!IsGitHubRepo())
                 return;
