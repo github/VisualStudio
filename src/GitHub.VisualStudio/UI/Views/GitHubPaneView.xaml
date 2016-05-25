@@ -6,6 +6,7 @@
                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                             xmlns:opts="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                            xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
                             Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -13,13 +14,13 @@
                             d:DesignHeight="300"
                             d:DesignWidth="300"
                             mc:Ignorable="d">
+
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
-
       <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">
         <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
         <Setter Property="Height" Value="2" />
@@ -35,17 +36,18 @@
           </Setter.Value>
         </Setter>
       </Style>
-
     </ResourceDictionary>
   </UserControl.Resources>
 
   <DockPanel>
-    <StackPanel Margin="6,9,9,5" DockPanel.Dock="Top" Orientation="Horizontal">
+    <StackPanel Margin="6,9,9,5"
+                DockPanel.Dock="Top"
+                Orientation="Horizontal">
       <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"
                  Foreground="{DynamicResource GitHubPaneTitleBrush}"
-                 Text="{x:Static prop:Resources.PullRequestsNavigationItemText}" />
+                 Text="{Binding Title}" />
       <Separator Margin="5,-2,5,0" Foreground="{DynamicResource GitHubPaneTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
       <TextBlock Margin="0,-5,0,0"
                  VerticalAlignment="Center"
@@ -53,24 +55,11 @@
                  Text="{Binding ActiveRepo.Name}" />
     </StackPanel>
 
-    <Separator Margin="0,0,0,9" DockPanel.Dock="Top" Style="{StaticResource PaneHorizontalSeparator}" />
+    <Separator Margin="0,0,0,9"
+               DockPanel.Dock="Top"
+               Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <ListBox x:Name="container"
-             Margin="6,0,6,9"
-             Background="{DynamicResource GitHubVsToolWindowBackground}"
-             ItemsSource="{Binding Panels}">
-      <ListBox.ItemContainerStyle>
-        <Style TargetType="{x:Type ListBoxItem}">
-          <Setter Property="DockPanel.Dock" Value="{Binding Dock}" />
-          <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-          <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        </Style>
-      </ListBox.ItemContainerStyle>
-      <ListBox.ItemsPanel>
-        <ItemsPanelTemplate>
-          <DockPanel IsItemsHost="True" />
-        </ItemsPanelTemplate>
-      </ListBox.ItemsPanel>
-    </ListBox>
+    <UserControl x:Name="container" Content="{Binding Control}" DockPanel.Dock="Top" />
+
   </DockPanel>
 </view:GenericGitHubPaneView>

@@ -3,6 +3,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Composition;
+using NullGuard;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -19,7 +20,7 @@ namespace GitHub.VisualStudio.Menus
         public Guid Guid => GuidList.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.openLinkCommand;
 
-        public void Activate()
+        public void Activate([AllowNull]object data = null)
         {
             if (!IsGitHubRepo())
                 return;

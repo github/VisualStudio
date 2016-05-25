@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using GitHub.Api;
-using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -14,12 +13,12 @@ using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.TeamFoundation.MVVM;
 using Microsoft.VisualStudio;
 using NullGuard;
 using ReactiveUI;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
+using GitHub.Primitives;
 using GitHub.Settings;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect

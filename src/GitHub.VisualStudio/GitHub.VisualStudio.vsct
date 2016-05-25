@@ -88,6 +88,7 @@
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
         <Icon guid="guidImages" id="arrow_left" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText></ButtonText>
         </Strings>
@@ -96,6 +97,7 @@
       <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" type="Button">
         <Icon guid="guidImages" id="arrow_right" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText></ButtonText>
         </Strings>
@@ -104,6 +106,7 @@
       <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" type="Button">
         <Icon guid="guidImages" id="pullrequest" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText></ButtonText>
         </Strings>
@@ -112,6 +115,7 @@
       <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
         <Icon guid="guidImages" id="refresh" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText></ButtonText>
         </Strings>
@@ -187,9 +191,9 @@
     </CommandPlacement>
 
     <!-- Show GitHub pane command -->
-    <!-- CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100">
+    <CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-    </CommandPlacement -->
+    </CommandPlacement>
 
     <!-- Add Connection (Team Explorer) command -->
     <CommandPlacement guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100">

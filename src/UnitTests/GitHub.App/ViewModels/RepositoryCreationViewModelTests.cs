@@ -9,11 +9,13 @@ using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
-using ReactiveUI;
 using Rothko;
 using UnitTests;
 using Xunit;
 using GitHub.Extensions;
+using GitHub.SampleData;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 public class RepositoryCreationViewModelTests
 {
@@ -325,7 +327,7 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void IsPopulatedByTheRepositoryHost()
         {
-            var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
+            var accounts = new List<IAccount> { new AccountDesigner(), new AccountDesigner() };
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
             var vm = new RepositoryCreationViewModel(
@@ -495,7 +497,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -526,7 +528,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -558,7 +560,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -594,7 +596,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel();
             vm.RepositoryName = repositoryName;
             vm.BaseRepositoryPath = baseRepositoryPath;
-            var reactiveCommand = vm.CreateRepository as ReactiveCommand<Unit>;
+            var reactiveCommand = vm.CreateRepository as ReactiveUI.ReactiveCommand<Unit>;
 
             bool result = reactiveCommand.CanExecute(null);
 

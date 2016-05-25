@@ -10,7 +10,7 @@ namespace GitHub.VisualStudio
     {
         Guid Guid { get; }
         int CmdId { get; }
-        void Activate();
+        void Activate(object data = null);
     }
 
     /// <summary>

@@ -70,10 +70,10 @@ namespace GitHub.VisualStudio
 
             var menus = serviceProvider.GetExportedValue<IMenuProvider>();
             foreach (var menu in menus.Menus)
-                serviceProvider.AddTopLevelMenuItem(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
+                serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
             foreach (var menu in menus.DynamicMenus)
-                serviceProvider.AddDynamicMenuItem(menu.Guid, menu.CmdId, menu.CanShow, menu.Activate);
+                serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods")]
