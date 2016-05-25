@@ -56,7 +56,6 @@ namespace GitHub.UI
                 return;
 
             cancel.OnNext(null);
-            cancel.OnCompleted();
         }
 
         protected void NotifyIsBusy(bool busy)
