@@ -73,8 +73,9 @@
       <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\lib\net45\SQLitePCL.raw.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Stateless">
-      <HintPath>..\..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>
+    <Reference Include="Stateless, Version=2.5.56.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Stateless.2.5.56.0\lib\portable-net40+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Stateless.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -119,6 +120,7 @@
     <Compile Include="Extensions\AkavacheExtensions.cs" />
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="Extensions\ValidationExtensions.cs" />
+    <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
     <Compile Include="Models\PullRequestModel.cs" />
@@ -127,6 +129,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SampleData\AccountDesigner.cs" />
+    <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
+    <Compile Include="SampleData\LoggedOutViewModelDesigner.cs" />
+    <Compile Include="SampleData\PullRequestListViewModelDesigner.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\GitHubCredentialProvider.cs" />
     <Compile Include="Services\IGitHubCredentialProvider.cs" />
@@ -185,6 +192,9 @@
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\LoginControlViewModel.cs" />

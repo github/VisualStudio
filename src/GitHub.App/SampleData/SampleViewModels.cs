@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Extensions;
@@ -17,6 +16,8 @@ using GitHub.VisualStudio.TeamExplorer.Home;
 using ReactiveUI;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace GitHub.SampleData
 {
@@ -26,6 +27,9 @@ namespace GitHub.SampleData
         public ICommand Cancel { get; set; }
         public bool IsShowing { get; set; }
         public string Title { get; set; }
+
+        public void Initialize(ViewWithData data)
+        { }
     }
 
     [ExcludeFromCodeCoverage]
@@ -36,18 +40,20 @@ namespace GitHub.SampleData
             RepositoryName = "Hello-World";
             Description = "A description";
             KeepPrivate = true;
+            CanKeepPrivate = true;
             Accounts = new ReactiveList<IAccount>
             {
                 new AccountDesigner { Login = "shana" },
                 new AccountDesigner { Login = "GitHub", IsUser = false }
             };
+            SelectedAccount = Accounts[0];
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>
             {
                 GitIgnoreItem.Create("VisualStudio"),
                 GitIgnoreItem.Create("Wap"),
                 GitIgnoreItem.Create("WordPress")
             };
-
+            SelectedGitIgnoreTemplate = GitIgnoreTemplates[0];
             Licenses = new ReactiveList<LicenseItem>
             {
                 new LicenseItem("agpl-3.0", "GNU Affero GPL v3.0"),
@@ -56,8 +62,7 @@ namespace GitHub.SampleData
                 new LicenseItem("mit", "MIT License")
             };
 
-            SelectedLicense = LicenseItem.None;
-            SelectedGitIgnoreTemplate = null;
+            SelectedLicense = Licenses[0];
         }
 
         public new string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -65,7 +70,7 @@ namespace GitHub.SampleData
         public IReadOnlyList<IAccount> Accounts
         {
             get;
-            private set;
+            set;
         }
 
         public string BaseRepositoryPath
@@ -219,7 +224,7 @@ namespace GitHub.SampleData
 
         public RepositoryPublishViewModelDesigner()
         {
-            Connections = new ReactiveList<IConnection>
+            Connections = new ObservableCollection<IConnection>
             {
                 new Conn() { HostAddress = new HostAddress() },
                 new Conn() { HostAddress = HostAddress.Create("ghe.io") }
@@ -255,7 +260,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ReactiveList<IConnection> Connections
+        public ObservableCollection<IConnection> Connections
         {
             get;
             private set;
@@ -322,68 +327,6 @@ namespace GitHub.SampleData
         public IObservable<Unit> LogOut()
         {
             throw new NotImplementedException();
-        }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public sealed class AccountDesigner : IAccount
-    {
-        public AccountDesigner()
-        {
-            Login = "octocat";
-            IsUser = true;
-        }
-
-        public BitmapSource Avatar
-        {
-            get
-            {
-                return IsUser
-                    ? AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png")
-                    : AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
-            }
-        }
-
-        public bool HasMaximumPrivateRepositories
-        {
-            get;
-            set;
-        }
-
-        public bool IsEnterprise
-        {
-            get;
-            set;
-        }
-
-        public bool IsOnFreePlan
-        {
-            get;
-            set;
-        }
-
-        public bool IsUser
-        {
-            get;
-            set;
-        }
-
-        public string Login
-        {
-            get;
-            set;
-        }
-
-        public int OwnedPrivateRepos
-        {
-            get;
-            set;
-        }
-
-        public long PrivateReposInPlan
-        {
-            get;
-            set;
         }
     }
 

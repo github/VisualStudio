@@ -3,7 +3,6 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
-using ReactiveUI;
 using Xunit;
 using UnitTests;
 using System.Threading.Tasks;
@@ -69,7 +68,7 @@ public class RepositoryPublishViewModelTests
             var hsts = new List<IRepositoryHost>();
             var conns = new List<IConnection>();
             SetupConnections(hosts, cm, adds, conns, hsts, uri);
-            hsts[0].ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+            hsts[0].ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
             return GetViewModel(hosts, service, notificationService, cm);
         }
@@ -104,7 +103,7 @@ public class RepositoryPublishViewModelTests
                 Helpers.SetupConnections(hosts, cm, adds, conns, hsts, uri);
 
             foreach(var host in hsts)
-                host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+                host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
 
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
 
@@ -138,7 +137,7 @@ public class RepositoryPublishViewModelTests
                 Helpers.SetupConnections(hosts, cm, adds, conns, hsts, uri);
 
             foreach (var host in hsts)
-                host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+                host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
 
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
             var vm = Helpers.GetViewModel(hosts, connectionManager: cm);
@@ -162,8 +161,8 @@ public class RepositoryPublishViewModelTests
             Helpers.SetupConnections(hosts, cm, adds, conns, hsts, GitHubUrls.GitHub);
             Helpers.SetupConnections(hosts, cm, adds, conns, hsts, "https://ghe.io");
 
-            var gitHubAccounts = new ReactiveList<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
-            var enterpriseAccounts = new ReactiveList<IAccount> { Substitute.For<IAccount>() };
+            var gitHubAccounts = new List<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
+            var enterpriseAccounts = new List<IAccount> { Substitute.For<IAccount>() };
 
             hsts.First(x => x.Address.IsGitHubDotCom()).ModelService.GetAccounts().Returns(Observable.Return(gitHubAccounts));
             hsts.First(x => !x.Address.IsGitHubDotCom()).ModelService.GetAccounts().Returns(Observable.Return(enterpriseAccounts));
@@ -353,7 +352,7 @@ public class RepositoryPublishViewModelTests
                 Helpers.SetupConnections(hosts, cm, adds, conns, hsts, uri);
 
             foreach (var host in hsts)
-                host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount>()));
+                host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount>()));
 
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));
 
@@ -389,7 +388,7 @@ public class RepositoryPublishViewModelTests
             var conns = new List<IConnection>();
                 Helpers.SetupConnections(hosts, cm, adds, conns, hsts, GitHubUrls.GitHub);
 
-            var accounts = new ReactiveList<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
+            var accounts = new List<IAccount> { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
             hsts[0].ModelService.GetAccounts().Returns(Observable.Return(accounts));
 
             cm.Connections.Returns(new ObservableCollection<IConnection>(conns));

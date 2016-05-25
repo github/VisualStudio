@@ -24,7 +24,6 @@ namespace GitHub.VisualStudio.Helpers
             "GitHub.UI",
             "GitHub.UI.Reactive",
             "GitHub.VisualStudio",
-            "GitHub.TeamFoundation",
             "GitHub.TeamFoundation.14",
             "GitHub.TeamFoundation.15"
         };

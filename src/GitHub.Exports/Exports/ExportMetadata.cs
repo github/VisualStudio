@@ -6,35 +6,45 @@ using System.Windows.Controls;
 using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
+using GitHub.VisualStudio;
 
-namespace GitHub.Exports {
-
-	public enum UIViewType {
+namespace GitHub.Exports
+{
+    public enum UIViewType
+    {
         None,
-		Login,
-		TwoFactor,
-		Create,
-		Clone,
+        Login,
+        TwoFactor,
+        Create,
+        Clone,
         Publish,
         Gist,
+        PRList,
+        PRDetail,
+        PRCreation,
         End = 100,
-        Finished,
         GitHubPane,
+        LoggedOut
+    }
+
+    public enum MenuType
+    {
+        GitHubPane,
+        OpenPullRequests
     }
 
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ExportViewModelAttribute : ExportAttribute
     {
         public ExportViewModelAttribute() : base(typeof(IViewModel))
-        {
-        }
+        {}
 
         public UIViewType ViewType { get; set; }
     }
 
     [MetadataAttribute]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ExportViewAttribute : ExportAttribute
     {
         public ExportViewAttribute() : base(typeof(IView))
@@ -44,23 +54,56 @@ namespace GitHub.Exports {
         public UIViewType ViewType { get; set; }
     }
 
+    [MetadataAttribute]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public sealed class ExportMenuAttribute : ExportAttribute
+    {
+        public ExportMenuAttribute() : base(typeof(IMenuHandler))
+        {
+        }
+
+        public MenuType MenuType { get; set; }
+    }
+
     public interface IViewModelMetadata
     {
         UIViewType ViewType { get; }
     }
 
-    public static class ExportViewAttributeExtensions
+    public interface IMenuMetadata
+    {
+        MenuType MenuType { get; }
+    }
+
+    public static class ExportMetadataAttributeExtensions
     {
         public static bool IsViewType(this UserControl c, UIViewType type)
         {
             return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
         }
 
-        private static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
+        public static bool IsViewType(this IView c, UIViewType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(attr => IsViewType(attr, type));
+        }
+
+        static bool IsViewType(CustomAttributeData attributeData, UIViewType viewType)
         {
             Debug.Assert(attributeData.NamedArguments != null);
             return attributeData.AttributeType == typeof(ExportViewAttribute)
                 && (UIViewType)attributeData.NamedArguments[0].TypedValue.Value == viewType;
+        }
+
+        public static bool IsMenuType(this IMenuHandler c, MenuType type)
+        {
+            return c.GetType().GetCustomAttributesData().Any(attr => IsMenuType(attr, type));
+        }
+
+        static bool IsMenuType(CustomAttributeData attributeData, MenuType type)
+        {
+            Debug.Assert(attributeData.NamedArguments != null);
+            return attributeData.AttributeType == typeof(ExportMenuAttribute)
+                && (MenuType)attributeData.NamedArguments[0].TypedValue.Value == type;
         }
     }
 }

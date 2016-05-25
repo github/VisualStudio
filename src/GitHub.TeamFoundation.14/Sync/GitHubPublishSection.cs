@@ -13,7 +13,9 @@ using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Api;
 using GitHub.VisualStudio.TeamExplorer;
+using System.Windows.Controls;
 using GitHub.VisualStudio.UI;
+using GitHub.ViewModels;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -71,9 +73,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             Setup();
         }
 
-        protected override void RepoChanged()
+        protected override void RepoChanged(bool changed)
         {
-            base.RepoChanged();
+            base.RepoChanged(changed);
             Setup();
         }
 
@@ -121,11 +123,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             bool success = false;
             ui.ListenToCompletionState().Subscribe(s => success = s);
 
-            creation.Subscribe(c =>
+            creation.Subscribe(data =>
             {
+                var c = data.View;
                 SectionContent = c;
-                c.DataContext = this;
-                ((IView)c).IsBusy.Subscribe(x => IsBusy = x);
+                c.IsBusy.Subscribe(x => IsBusy = x);
             },
             () =>
             {

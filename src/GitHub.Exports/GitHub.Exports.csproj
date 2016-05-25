@@ -89,6 +89,8 @@
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
+    <Compile Include="Factories\IUIFactory.cs" />
+    <Compile Include="Factories\IUIPair.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Models\ISimpleRepositoryModel.cs" />
     <Compile Include="Models\SimpleRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
+    <Compile Include="Primitives\RelayCommand.cs" />
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />

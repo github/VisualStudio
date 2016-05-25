@@ -300,4 +300,10 @@
   <data name="Options_PrivacyTitle" xml:space="preserve">
     <value>Privacy</value>
   </data>
+  <data name="prOpenedText" xml:space="preserve">
+    <value>opened</value>
+  </data>
+  <data name="prOpenedByText" xml:space="preserve">
+    <value>by</value>
+  </data>
 </root>

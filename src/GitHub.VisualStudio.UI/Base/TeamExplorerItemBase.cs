@@ -7,10 +7,11 @@ using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
+using GitHub.ViewModels;
 
 namespace GitHub.VisualStudio.Base
 {
-    public class TeamExplorerItemBase : TeamExplorerGitRepoInfo
+    public class TeamExplorerItemBase : TeamExplorerGitRepoInfo, IServiceProviderAware
     {
         readonly ISimpleApiClientFactory apiFactory;
         protected ITeamExplorerServiceHolder holder;
@@ -70,8 +71,9 @@ namespace GitHub.VisualStudio.Base
         {
             holder.Subscribe(this, (ISimpleRepositoryModel repo) =>
             {
+                var changed = ActiveRepo != repo;
                 ActiveRepo = repo;
-                RepoChanged();
+                RepoChanged(changed);
             });
         }
 
@@ -82,7 +84,7 @@ namespace GitHub.VisualStudio.Base
                 holder.ClearServiceProvider(ServiceProvider);
         }
 
-        protected virtual void RepoChanged()
+        protected virtual void RepoChanged(bool changed)
         {
             var repo = ActiveRepo;
             if (repo != null)
@@ -102,6 +104,7 @@ namespace GitHub.VisualStudio.Base
             if (uri == null)
                 return false;
 
+            Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
             SimpleApiClient = apiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
