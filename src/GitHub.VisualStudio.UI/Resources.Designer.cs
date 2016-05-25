@@ -457,6 +457,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in Browser.
+        /// </summary>
+        public static string openInBrowser {
+            get {
+                return ResourceManager.GetString("openInBrowser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         public static string openTwoFactorAuthAppText {

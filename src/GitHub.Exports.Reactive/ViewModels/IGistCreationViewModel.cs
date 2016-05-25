@@ -9,12 +9,18 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the command to create a new gist.
         /// </summary>
-        IReactiveCommand<ProgressState> CreateGist { get; }
+        IReactiveCommand<Gist> CreateGist { get; }
 
         /// <summary>
         /// True if the gist should be private.
         /// </summary>
         bool IsPrivate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the gist should be opened in the browser
+        /// on sucessful creation.
+        /// </summary>
+        bool OpenInBrowser { get; set; }
 
         /// <summary>
         /// Gets or sets the optional description used in the gist description field.

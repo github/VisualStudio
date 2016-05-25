@@ -63,7 +63,7 @@ namespace GitHub.ViewModels
             CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
         }
 
-        IObservable<ProgressState> OnCreateGist(object unused)
+        IObservable<Gist> OnCreateGist(object unused)
         {
             var newGist = new NewGist
             {
@@ -74,8 +74,7 @@ namespace GitHub.ViewModels
             newGist.Files.Add(FileName, SelectedText);
 
             return gistPublishService.PublishGist(apiClient, newGist)
-                .Select(_ => ProgressState.Success)
-                .Catch<ProgressState, Exception>(ex =>
+                .Catch<Gist, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
                     {
@@ -83,11 +82,11 @@ namespace GitHub.ViewModels
                         var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.GistCreateFailed);
                         notificationService.ShowError(error);
                     }
-                    return Observable.Return(ProgressState.Fail);
+                    return Observable.Return<Gist>(null);
                 });
         }
 
-        public IReactiveCommand<ProgressState> CreateGist { get; }
+        public IReactiveCommand<Gist> CreateGist { get; }
 
         public IAccount Account
         {
@@ -100,6 +99,13 @@ namespace GitHub.ViewModels
         {
             get { return isPrivate; }
             set { this.RaiseAndSetIfChanged(ref isPrivate, value); }
+        }
+
+        bool openInBrowser = true;
+        public bool OpenInBrowser
+        {
+            get { return openInBrowser; }
+            set { this.RaiseAndSetIfChanged(ref openInBrowser, value); }
         }
 
         string description;
