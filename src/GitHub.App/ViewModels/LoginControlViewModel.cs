@@ -45,7 +45,7 @@ namespace GitHub.ViewModels
 
                 }).ToProperty(this, x => x.LoginMode);
 
-            AuthenticationResults = Observable.Amb(
+            AuthenticationResults = Observable.Merge(
                 loginToGitHubViewModel.Login,
                 EnterpriseLogin.Login);
             CancelCommand = ReactiveCommand.Create();
