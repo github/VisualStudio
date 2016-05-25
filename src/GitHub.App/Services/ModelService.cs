@@ -97,7 +97,7 @@ namespace GitHub.Services
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
         {
             return hostCache.GetAndRefreshObject("user",
-                () => apiClient.GetUser().Select(AccountCacheItem.Create), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
+                () => apiClient.GetUser().Select(x => new AccountCacheItem(x.User)), TimeSpan.FromMinutes(5), TimeSpan.FromDays(7))
                 .TakeLast(1)
                 .ToList();
         }

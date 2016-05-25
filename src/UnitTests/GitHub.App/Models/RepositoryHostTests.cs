@@ -27,7 +27,7 @@ public class RepositoryHostTests
             apiClient.GetOrCreateApplicationAuthenticationCode(
                 Args.TwoFactorChallengCallback, Args.String, Args.Boolean)
                 .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("baymax")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
@@ -53,7 +53,7 @@ public class RepositoryHostTests
             apiClient.GetOrCreateApplicationAuthenticationCode(
                 Args.TwoFactorChallengCallback, Args.String, Args.Boolean)
                 .Returns(Observable.Throw<ApplicationAuthorization>(new NotFoundException("", HttpStatusCode.BadGateway)));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
@@ -81,7 +81,7 @@ public class RepositoryHostTests
             // Throw a 404 on the retry with the old scopes:
             apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, true, false)
                 .Returns(Observable.Throw<ApplicationAuthorization>(new NotFoundException("Also not there", HttpStatusCode.NotFound)));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("Cthulu")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("Cthulu")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
@@ -122,7 +122,7 @@ public class RepositoryHostTests
                     received2 = true;
                     return Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException());
                 });
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
@@ -148,7 +148,7 @@ public class RepositoryHostTests
                 .Returns(Observable.Throw<ApplicationAuthorization>(new ApiException("Bad scopes", (HttpStatusCode)422)));
             apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, true, false)
                 .Returns(Observable.Return(new ApplicationAuthorization("T0k3n")));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
@@ -161,6 +161,11 @@ public class RepositoryHostTests
             Assert.Equal("jiminy", loginInfo.UserName);
             Assert.Equal("T0k3n", loginInfo.Password);
         }
+    }
+
+    static UserAndScopes CreateUserAndScopes(string login)
+    {
+        return new UserAndScopes(CreateOctokitUser(login), null);
     }
 
     static User CreateOctokitUser(string login)
