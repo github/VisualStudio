@@ -5,6 +5,7 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.Extensions;
 using System.Diagnostics;
+using NullGuard;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -32,7 +33,7 @@ namespace GitHub.VisualStudio.Menus
             return !String.IsNullOrWhiteSpace(stp?.GetSelectedText());
         }
 
-        public void Activate(object data)
+        public void Activate([AllowNull]object data)
         {
             StartFlow(UIControllerFlow.Gist);
         }
