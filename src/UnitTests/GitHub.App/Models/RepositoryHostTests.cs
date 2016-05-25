@@ -161,11 +161,66 @@ public class RepositoryHostTests
             Assert.Equal("jiminy", loginInfo.UserName);
             Assert.Equal("T0k3n", loginInfo.Password);
         }
+
+        [Fact]
+        public async Task SupportsGistIsTrueWhenGistScopeIsPresent()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax", new[] { "gist" })));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginCache = new TestLoginCache();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+
+            var result = await host.LogIn("baymax", "aPassword");
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            Assert.True(host.SupportsGist);
+        }
+
+        [Fact]
+        public async Task SupportsGistIsFalseWhenGistScopeIsNotPresent()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax", new[] { "foo" })));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginCache = new TestLoginCache();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+
+            var result = await host.LogIn("baymax", "aPassword");
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            Assert.False(host.SupportsGist);
+        }
+
+        [Fact]
+        public async Task SupportsGistIsTrueWhenScopesAreNull()
+        {
+            // TODO: Check assumptions here. From my conversation with @shana it seems that the first login
+            // will be done with basic auth and from then on a token will be used. So if it's the first login,
+            // it's from this version and so gists will be supported. However I've been unable to repro this
+            // behavior.
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginCache = new TestLoginCache();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+
+            var result = await host.LogIn("baymax", "aPassword");
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            Assert.True(host.SupportsGist);
+        }
     }
 
-    static UserAndScopes CreateUserAndScopes(string login)
+    static UserAndScopes CreateUserAndScopes(string login, string[] scopes = null)
     {
-        return new UserAndScopes(CreateOctokitUser(login), null);
+        return new UserAndScopes(CreateOctokitUser(login), scopes);
     }
 
     static User CreateOctokitUser(string login)
