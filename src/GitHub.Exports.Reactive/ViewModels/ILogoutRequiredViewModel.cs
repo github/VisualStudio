@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using GitHub.UI;
+using ReactiveUI;
 using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.ViewModels
@@ -11,5 +12,8 @@ namespace GitHub.ViewModels
         IReactiveCommand<ProgressState> Logout { get; }
 
         ReactiveCommand<object> CancelCommand { get; }
+
+        string LogoutRequiredMessage { get; set; }
+        Octicon Icon { get; set; }
     }
 }

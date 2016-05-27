@@ -593,7 +593,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -602,7 +602,7 @@ public class UIControllerTests
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -672,7 +672,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -681,7 +681,7 @@ public class UIControllerTests
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);

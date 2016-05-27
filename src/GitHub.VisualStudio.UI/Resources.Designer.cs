@@ -430,15 +430,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to To use this feature you need to sign in again..
-        /// </summary>
-        public static string needLogout {
-            get {
-                return ResourceManager.GetString("needLogout", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No repositories.
         /// </summary>
         public static string noRepositoriesMessageText {

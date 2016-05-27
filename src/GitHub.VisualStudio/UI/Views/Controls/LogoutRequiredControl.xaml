@@ -23,7 +23,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="True">
+    <DockPanel>
         <StackPanel Margin="0,0,0,50" DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
             <ui:OcticonCircleButton 
                 IsDefault="True"
@@ -43,16 +43,15 @@
             </ui:OcticonCircleButton>
         </StackPanel>
 
-
         <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ui:OcticonImage Height="75" Width="100" Icon="logo_github" />
-                <ui:OcticonImage Height="40" Width="50" Margin="-10,0,0,0" Icon="logo_gist" />
+                <ui:OcticonImage Height="40" Width="50" Margin="-10,0,0,0" Icon="{Binding Icon}" />
             </StackPanel>
 
             <ui:HorizontalShadowDivider />
 
-            <TextBlock FontSize="14" TextAlignment="Center" Text="{x:Static prop:Resources.needLogout}"/>
+            <TextBlock FontSize="14" TextAlignment="Center" Text="{Binding LogoutRequiredMessage}"/>
         </StackPanel>
     </DockPanel>
 </local:GenericLogoutRequiredControl>
