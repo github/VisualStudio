@@ -85,7 +85,6 @@ namespace GitHub.VisualStudio
         {
             RefreshRepo();
             return ActiveRepo?.CloneUrl?.RepositoryName != null && ActiveRepo?.CloneUrl?.IsGithubUri == true;
-
         }
     }
 }
