@@ -8,8 +8,12 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.UI;
 using NLog;
+using NullGuard;
 using ReactiveUI;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace GitHub.ViewModels
 {
@@ -30,6 +34,22 @@ namespace GitHub.ViewModels
             Title = Resources.LogoutRequiredTitle;
             Logout = ReactiveCommand.CreateAsyncObservable(OnLogout);
             CancelCommand = ReactiveCommand.Create();
+            Icon = Octicon.mark_github;
+        }
+
+        public override void Initialize([AllowNull] ViewWithData data)
+        {
+            if (data.MainFlow == UIControllerFlow.Gist)
+            {
+                Icon = Octicon.logo_gist;
+                LogoutRequiredMessage = string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.LogoutRequiredMessage,
+                    Resources.LogoutRequiredFeatureGist);
+            }
+            else
+                Debug.Assert(false, "Add a resource string for feature " + data.MainFlow + "!");
+            base.Initialize(data);
         }
 
         public IReactiveCommand<ProgressState> Logout { get; }
@@ -61,6 +81,21 @@ namespace GitHub.ViewModels
             {
                 await repositoryHosts.EnterpriseHost.LogOut();
             }
+        }
+
+        string logoutRequiredMessage;
+        public string LogoutRequiredMessage
+        {
+            [return: AllowNull]
+            get { return logoutRequiredMessage; }
+            set { this.RaiseAndSetIfChanged(ref logoutRequiredMessage, value); }
+        }
+
+        Octicon icon;
+        public Octicon Icon
+        {
+            get { return icon; }
+            set { this.RaiseAndSetIfChanged(ref icon, value); }
         }
     }
 }

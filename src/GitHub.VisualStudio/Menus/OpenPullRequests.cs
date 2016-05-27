@@ -17,7 +17,7 @@ namespace GitHub.VisualStudio.Menus
         public void Activate([AllowNull]object data = null)
         {
             var pane = GitHubPane.Activate();
-            pane.ShowView(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList });
+            pane.ShowView(new ViewWithData(UIControllerFlow.PullRequests) { ViewType = UIViewType.PRList });
         }
     }
 }

@@ -259,12 +259,12 @@ namespace GitHub.Controllers
 
         public void Jump(ViewWithData where)
         {
-            Debug.Assert(where.Flow == mainFlow, "Jump called for flow " + where.Flow + " but this is " + mainFlow);
-            if (where.Flow != mainFlow)
+            Debug.Assert(where.ActiveFlow == mainFlow, "Jump called for flow " + where.ActiveFlow + " but this is " + mainFlow);
+            if (where.ActiveFlow != mainFlow)
                 return;
 
             requestedTarget = where;
-            if (activeFlow == where.Flow)
+            if (activeFlow == where.ActiveFlow)
                 Fire(Trigger.Next, where);
         }
 
@@ -630,12 +630,14 @@ namespace GitHub.Controllers
                 requestedTarget = null;
             }
 
+            if (arg == null)
+                arg = new ViewWithData { ActiveFlow = activeFlow, MainFlow = mainFlow, ViewType = viewType };
             bool firstTime = CreateViewAndViewModel(viewType, arg);
             var view = GetObjectsForFlow(activeFlow)[viewType].View;
             transition.OnNext(new LoadData
             {
                 View = view,
-                Data = arg ?? new ViewWithData { Flow = activeFlow, ViewType = viewType },
+                Data = arg,
                 Direction = direction
             });
 
@@ -710,7 +712,7 @@ namespace GitHub.Controllers
         /// </summary>
         /// <param name="viewType"></param>
         /// <returns>true if the View/ViewModel didn't exist and had to be created</returns>
-        bool CreateViewAndViewModel(UIViewType viewType, [AllowNull]ViewWithData data = null)
+        bool CreateViewAndViewModel(UIViewType viewType, ViewWithData data = null)
         {
             var list = GetObjectsForFlow(activeFlow);
             if (viewType == UIViewType.Login)
