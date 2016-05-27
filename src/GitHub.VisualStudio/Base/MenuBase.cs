@@ -44,7 +44,8 @@ namespace GitHub.VisualStudio
         protected bool IsGitHubRepo()
         {
             RefreshRepo();
-            return ActiveRepo?.CloneUrl?.RepositoryName != null;
+            return ActiveRepo?.CloneUrl?.RepositoryName != null && ActiveRepo?.CloneUrl?.IsGithubUri == true;
+
         }
     }
 }
