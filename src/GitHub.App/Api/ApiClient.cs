@@ -23,11 +23,10 @@ namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
-        const string scopesHeader = "X-OAuth-Scopes";
+        const string ScopesHeader = "X-OAuth-Scopes";
+        const string ProductName = Info.ApplicationInfo.ApplicationDescription;
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
-
-        const string ProductName = Info.ApplicationInfo.ApplicationDescription;
 
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
@@ -75,16 +74,16 @@ namespace GitHub.Api
                 userEndpoint, null, null).ConfigureAwait(false);
             var scopes = default(string[]);
 
-            if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
+            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
             {
-                scopes = response.HttpResponse.Headers[scopesHeader]
+                scopes = response.HttpResponse.Headers[ScopesHeader]
                     .Split(',')
                     .Select(x => x.Trim())
                     .ToArray();
             }
             else
             {
-                log.Error($"Error reading scopes: /user succeeded but {scopesHeader} was not present.");
+                log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
             }
 
             return new UserAndScopes(response.Body, scopes);
