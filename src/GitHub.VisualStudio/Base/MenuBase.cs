@@ -84,9 +84,8 @@ namespace GitHub.VisualStudio
         protected bool IsGitHubRepo()
         {
             RefreshRepo();
-            return ActiveRepo?.CloneUrl?.RepositoryName != null;
-            //&& (ActiveRepo?.CloneUrl?.StartsWith("https://github.com/")??
-            //Can't use StartsWith for CloneURL
+            return ActiveRepo?.CloneUrl?.RepositoryName != null && ActiveRepo?.CloneUrl?.IsGithubUri == true;
+
         }
     }
 }

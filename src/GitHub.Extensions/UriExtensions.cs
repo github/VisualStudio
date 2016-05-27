@@ -25,6 +25,11 @@ namespace GitHub.Extensions
             return uri.Scheme == "http" || uri.Scheme == "https";
         }
 
+        public static bool IsGithubUri(this Uri uri)
+        {
+            return uri.OriginalString.Contains("github.com");
+        }
+
         public static bool IsSameHost(this Uri uri, Uri compareUri)
         {
             return uri.Host.Equals(compareUri.Host, StringComparison.OrdinalIgnoreCase);
