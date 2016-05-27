@@ -257,7 +257,7 @@ namespace GitHub.Models
                     }
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                        userAndScopes.User != null ? userAndScopes.User.Login : "(null)",
+                        userAndScopes?.User?.Login ?? "(null)",
                         hostAddress.ApiUri,
                         result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });

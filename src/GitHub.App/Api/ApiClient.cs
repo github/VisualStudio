@@ -25,6 +25,7 @@ namespace GitHub.Api
     {
         const string scopesHeader = "X-OAuth-Scopes";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
 
@@ -71,7 +72,7 @@ namespace GitHub.Api
         async Task<UserAndScopes> GetUserInternal()
         {
             var response = await gitHubClient.Connection.Get<User>(
-                new Uri("user", UriKind.Relative), null, null);
+                userEndpoint, null, null).ConfigureAwait(false);
             var scopes = default(string[]);
 
             if (response.HttpResponse.Headers.ContainsKey(scopesHeader))
