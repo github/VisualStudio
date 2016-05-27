@@ -12,6 +12,11 @@ namespace GitHub.Caches
             return new AccountCacheItem(apiAccount);
         }
 
+        public static AccountCacheItem Create(UserAndScopes userAndScopes)
+        {
+            return new AccountCacheItem(userAndScopes.User);
+        }
+
         public AccountCacheItem()
         { }
 

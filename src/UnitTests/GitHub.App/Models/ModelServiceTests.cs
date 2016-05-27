@@ -180,7 +180,7 @@ public class ModelServiceTests
                 CreateOctokitOrganization("fake")
             };
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("snoopy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("snoopy")));
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
@@ -234,8 +234,8 @@ public class ModelServiceTests
             // This should be impossible, but let's pretend it does happen.
             var users = new[]
             {
-                CreateOctokitUser("peppermintpatty"),
-                CreateOctokitUser("peppermintpatty")
+                CreateUserAndScopes("peppermintpatty"),
+                CreateUserAndScopes("peppermintpatty")
             };
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetUser().Returns(users.ToObservable());
@@ -414,7 +414,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = CreateOctokitUser(username);
-            apiClient.GetUser().Returns(Observable.Return(user));
+            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
@@ -471,7 +471,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = CreateOctokitUser(username);
-            apiClient.GetUser().Returns(Observable.Return(user));
+            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
@@ -533,7 +533,7 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
             var user = CreateOctokitUser(username);
-            apiClient.GetUser().Returns(Observable.Return(user));
+            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
@@ -592,6 +592,11 @@ public class ModelServiceTests
                 t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(9, t.Number); }
             );
         }
+    }
+
+    static UserAndScopes CreateUserAndScopes(string login)
+    {
+        return new UserAndScopes(CreateOctokitUser(login), null);
     }
 
     static User CreateOctokitUser(string login)
