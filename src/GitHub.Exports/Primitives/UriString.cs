@@ -126,6 +126,8 @@ namespace GitHub.Primitives
 
         public bool IsScpUri { get; private set; }
 
+        public bool IsGithubUri { get; private set; }
+
         public bool IsValidUri => url != null;
 
         /// <summary>
