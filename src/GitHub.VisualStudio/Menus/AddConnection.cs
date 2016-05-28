@@ -4,6 +4,8 @@ using System.ComponentModel.Composition;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.Extensions;
+using NullGuard;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -12,8 +14,8 @@ namespace GitHub.VisualStudio.Menus
     public class AddConnection: MenuBase, IMenuHandler
     {
         [ImportingConstructor]
-        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
         }
 
@@ -23,12 +25,6 @@ namespace GitHub.VisualStudio.Menus
         public void Activate()
         {
             StartFlow(UIControllerFlow.Authentication);
-        }
-
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
         }
     }
 }

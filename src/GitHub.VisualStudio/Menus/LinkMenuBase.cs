@@ -1,4 +1,5 @@
-﻿using GitHub.Extensions;
+﻿using GitHub.Api;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using System;
 
@@ -6,8 +7,8 @@ namespace GitHub.VisualStudio.Menus
 {
     public class LinkMenuBase: MenuBase
     {
-        public LinkMenuBase(IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public LinkMenuBase(IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
         }
 
