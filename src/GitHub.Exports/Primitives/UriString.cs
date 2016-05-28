@@ -77,7 +77,6 @@ namespace GitHub.Primitives
             }
             
             IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
-            IsGithubUri = uri.IsGithubUri();
         }
 
         void SetFilePath(Uri uri)
@@ -126,8 +125,6 @@ namespace GitHub.Primitives
         public bool IsFileUri { get; private set; }
 
         public bool IsScpUri { get; private set; }
-
-        public bool IsGithubUri { get; private set; }
 
         public bool IsValidUri => url != null;
 
