@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using SysTask = System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;

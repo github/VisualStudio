@@ -4,6 +4,8 @@ using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Composition;
 using NullGuard;
+using System.Threading.Tasks;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -12,17 +14,18 @@ namespace GitHub.VisualStudio.Menus
     public class OpenLink: LinkMenuBase, IDynamicMenuHandler
     {
         [ImportingConstructor]
-        public OpenLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public OpenLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
         }
 
         public Guid Guid => GuidList.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.openLinkCommand;
 
-        public void Activate([AllowNull]object data = null)
+        public async void Activate([AllowNull]object data = null)
         {
-            if (!IsGitHubRepo())
+            var isgithub = await IsGitHubRepo();
+            if (!isgithub)
                 return;
 
             var link = GenerateLink();
@@ -34,7 +37,10 @@ namespace GitHub.VisualStudio.Menus
 
         public bool CanShow()
         {
-            return IsGitHubRepo();
+            return System.Threading.Tasks.Task.Run(() =>
+            {
+                return IsGitHubRepo();
+            }).Result;
         }
     }
 }
