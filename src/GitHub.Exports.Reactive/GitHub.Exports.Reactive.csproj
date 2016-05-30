@@ -87,6 +87,8 @@
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
+    <Compile Include="Models\UsageModel.cs" />
+    <Compile Include="Services\IMetricsService.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
