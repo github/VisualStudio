@@ -25,6 +25,7 @@ namespace GitHub.SampleData
     public class BaseViewModelDesigner : ReactiveObject, IViewModel
     {
         public ICommand Cancel { get; set; }
+        public ReactiveCommand<object> CancelCommand { get; protected set; }
         public bool IsShowing { get; set; }
         public string Title { get; set; }
 

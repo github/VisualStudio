@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -14,5 +15,9 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
+        public PullRequestCreationViewModel()
+        {
+            CancelCommand = ReactiveCommand.Create();
+        }
     }
 }
