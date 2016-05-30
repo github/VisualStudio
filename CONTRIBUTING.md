@@ -31,6 +31,8 @@ There are certain areas of the extension that are restricted in what they can do
 - Team Explorer content outside the Home page is slightly less restricted, but not by much
 - Dialogs and views that don't inherit from TeamExplorer classes are free to use what they need.
 
+## Submitting an Issue
+
 ## Things to improve in the current version
 
 - Localization
