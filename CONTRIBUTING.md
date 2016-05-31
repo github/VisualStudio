@@ -40,11 +40,11 @@ Here are a few helpful tips when reporting a bug:
   - A lot of functionality within this extension resides in the Team Explorer       pane, where there are additional tools to manage and collaborate on source code, including Visual Studio's Git Extension, which is owned by Microsoft.
   - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
 - A log file can be helpful in diagnosing bug issues, if you'd like to include one in your issue, here is how you'd do it:
-  1. Close Visual Studio if it's open
-  1. Open a Developer Command Prompt for VS2015
-  1. Run devenv /log
-  1. Close VS
-  1. Locate the following files on your system and email them to windows@github.com or copy their contents into the issue:
+  0. Close Visual Studio if it's open
+  0. Open a Developer Command Prompt for VS2015
+  0. Run devenv /log
+  0. Close VS
+  0. Locate the following files on your system and email them to windows@github.com or copy their contents into the issue:
   - `%appdata%\Microsoft\VisualStudio\14.0\ActivityLog.xml`
   - `%localappdata%\temp\extension.log`
 - Screenshots are also helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems.
