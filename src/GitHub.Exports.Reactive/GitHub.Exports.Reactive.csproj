@@ -88,6 +88,7 @@
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
     <Compile Include="Services\IModelService.cs" />
+    <Compile Include="Services\IPullRequestCreationService.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />

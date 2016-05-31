@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using Octokit;
 
 namespace GitHub.ViewModels
 {
@@ -27,17 +28,20 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel repository;
+        readonly IPullRequestCreationService pullRequestCreationService;
+
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo)
+            IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice, IPullRequestCreationService pullRequestCreationService)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, pullRequestCreationService)
         { }
 
-        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
+        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository, IPullRequestCreationService pullRequestCreationService)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.pullRequestCreationService = pullRequestCreationService;
 
             branches = repositoryHost.ModelService.GetBranches(repository)
             .ObserveOn(RxApp.MainThreadScheduler)
@@ -77,6 +81,7 @@ namespace GitHub.ViewModels
         }
 
         bool loadingFailed;
+
         public bool LoadingFailed
         {
             get { return loadingFailed; }
@@ -88,21 +93,16 @@ namespace GitHub.ViewModels
         //public ICommand Create => CreateCommand;
         IObservable<Unit> OnCreatePullRequest(object state)
         {
-            //var newRepository = GatherRepositoryInfo();
+            var newPullRequest = GatherPullRequestInfo();
 
-            //return repositoryCreationService.CreateRepository(
-            //    newRepository,
-            //    SelectedAccount,
-            //    BaseRepositoryPath,
-            //    repositoryHost.ApiClient);
+            return pullRequestCreationService.CreatePullRequest(
+                newPullRequest, repositoryHost.ApiClient);
 
-            return null;
         }
 
 
         ReactiveCommand<Unit> InitializeCreatePullRequestCommand()
-        {
-       
+        {       
             var createCommand = ReactiveCommand.CreateAsyncObservable(OnCreatePullRequest);
             createCommand.ThrownExceptions.Subscribe(ex =>
             {
@@ -113,6 +113,14 @@ namespace GitHub.ViewModels
             });
 
             return createCommand;
+        }
+
+        protected override NewPullRequest GatherPullRequestInfo()
+        {
+            var gitHubPullRequest= base.GatherPullRequestInfo();
+
+           
+            return gitHubPullRequest;
         }
 
     }

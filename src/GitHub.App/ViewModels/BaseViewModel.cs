@@ -2,6 +2,8 @@
 using ReactiveUI;
 using NullGuard;
 using GitHub.UI;
+using System;
+using Octokit;
 
 namespace GitHub.ViewModels
 {
@@ -17,6 +19,11 @@ namespace GitHub.ViewModels
 
         public virtual void Initialize([AllowNull] ViewWithData data)
         {
+        }
+
+        protected virtual NewPullRequest GatherPullRequestInfo()
+        {
+            throw new NotImplementedException();
         }
     }
 }

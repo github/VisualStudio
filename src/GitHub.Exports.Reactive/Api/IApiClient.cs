@@ -16,6 +16,8 @@ namespace GitHub.Api
         /// </summary>
         /// <returns></returns>
         IObservable<Repository> GetUserRepositories(RepositoryType repositoryType);
+        IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest,string owner, string name);
+
         /// <summary>
         /// Retrieves the repository for this org.
         /// </summary>

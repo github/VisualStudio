@@ -14,7 +14,6 @@ namespace GitHub.Services
     /// </summary>
     public interface IModelService : IDisposable
     {
-        //IBranch here
         IObservable<AccountCacheItem> GetUserFromCache();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();

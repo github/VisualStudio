@@ -52,6 +52,15 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string name)
+        {
+            //Guard.ArgumentNotEmptyString(login, nameof(login));
+
+            var client = gitHubClient.PullRequest;
+
+           return client.Create(owner, name, pullRequest);
+        }
+
         public IObservable<User> GetUser()
         {
             return gitHubClient.User.Current();
