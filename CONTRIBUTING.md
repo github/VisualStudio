@@ -50,7 +50,7 @@ Here are a few helpful tips when reporting a bug:
 - Screenshots are also helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems.
 
 ### Feature Requests
-If you have a feature that you think would be a great addition to the extension, we might already have thought about it too, so be sure to check if your suggestion matches our roadmap before making a request.
+If you have a feature that you think would be a great addition to the extension, we might already have thought about it too, so be sure to check if your suggestion matches our [roadmap](#roadmap-and-future-feature-ideas) before making a request.
 
 ## Things to improve in the current version
 
