@@ -50,11 +50,11 @@ Here are a few helpful tips when reporting a bug:
 - Screenshots are also helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems.
 
 ### Feature Requests
-If you have a feature that you think would be a great addition to the extension, we might already have thought about it too, so be sure to check if your suggestion matches our [roadmap](#roadmap-and-future-feature-ideas) before making a request.
+If you have a feature that you think would be a great addition to the extension, we might already have thought about it too, so be sure to check if your suggestion matches our [roadmap](#roadmap-and-future-feature-ideas) before making a request. Also take a peek at our [pull requests](https://github.com/github/VisualStudio/pulls) to see what we're currently working on. Additionally, someone might have already thought of your idea, so check out Issues labeled as [features](https://github.com/github/VisualStudio/issues?q=is%3Aopen+is%3Aissue+label%3Afeature) to see if it already exists.
 
 ## Things to improve in the current version
 
-- Localization
+- [Localization](https://github.com/github/VisualStudio/issues/18)
 
 ## Roadmap and future feature ideas
 
