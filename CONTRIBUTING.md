@@ -35,11 +35,19 @@ There are certain areas of the extension that are restricted in what they can do
 
 ### Bug Reporting
 
-Here are a few things to verify when reporting a bug:
-- The bug resides in the GitHub for Visual Studio extension
+Here are a few helpful tips when reporting a bug:
+- Verify the bug resides in the GitHub for Visual Studio extension
   - A lot of functionality within this extension resides in the Team Explorer       pane, where there are additional tools to manage source code, including Git.
   - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
+- A log file can be helpful in diagnosing bug issues, if you'd like to include one in your issue, here is how you'd do it:
+  1. Close Visual Studio if it's open
+  1. Open a Developer Command Prompt for VS2015
+  1. Run devenv /log
+  1. Close VS
+  1. Locate the following files on your system and email them to windows@github.com:
+  - `%appdata%\Microsoft\VisualStudio\14.0\ActivityLog.xml`
 
+  - `%localappdata%\temp\extension.log`
 
 ### Feature Requests
 
