@@ -2,7 +2,7 @@
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -14,6 +14,9 @@ namespace GitHub.ViewModels
         IAccount SelectedAssignee { get; }
         IBranchModel TargetBranch { get; }
         IBranchModel CurrentBranch { get; }
+        IReactiveCommand<Unit> CreatePullRequest { get; }
+
+
 
     }
 }

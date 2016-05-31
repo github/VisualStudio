@@ -11,9 +11,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 namespace GitHub.ViewModels
@@ -46,6 +48,9 @@ namespace GitHub.ViewModels
             assignees = repositoryHost.ModelService.GetAvailableAssignees(repository)
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.Assignees, initialValue: new IAccount[] { });
+
+            CreatePullRequest = InitializeCreatePullRequestCommand();
+
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -76,6 +81,38 @@ namespace GitHub.ViewModels
         {
             get { return loadingFailed; }
             private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
+        }
+
+        public IReactiveCommand<Unit> CreatePullRequest { get; private set; }
+
+        //public ICommand Create => CreateCommand;
+        IObservable<Unit> OnCreatePullRequest(object state)
+        {
+            //var newRepository = GatherRepositoryInfo();
+
+            //return repositoryCreationService.CreateRepository(
+            //    newRepository,
+            //    SelectedAccount,
+            //    BaseRepositoryPath,
+            //    repositoryHost.ApiClient);
+
+            return null;
+        }
+
+
+        ReactiveCommand<Unit> InitializeCreatePullRequestCommand()
+        {
+       
+            var createCommand = ReactiveCommand.CreateAsyncObservable(OnCreatePullRequest);
+            createCommand.ThrownExceptions.Subscribe(ex =>
+            {
+                if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
+                {
+                    log.Error("Error creating pull request.", ex);
+                }
+            });
+
+            return createCommand;
         }
 
     }

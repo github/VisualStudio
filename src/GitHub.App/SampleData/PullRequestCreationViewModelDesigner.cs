@@ -7,6 +7,7 @@ using GitHub.Models;
 using System;
 using System.Windows.Media.Imaging;
 using GitHub.Services;
+using System.Reactive;
 
 namespace GitHub.SampleData
 {
@@ -29,8 +30,7 @@ namespace GitHub.SampleData
         public IBranchModel CurrentBranch { get; set; }
         public IReadOnlyList<IBranchModel> Branches { get; set; }
         public IReadOnlyList<IAccount> Assignees { get; set; }
-
-
+        public IReactiveCommand<Unit> CreatePullRequest { get; set; }
 
 
     }
