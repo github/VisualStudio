@@ -33,6 +33,16 @@ There are certain areas of the extension that are restricted in what they can do
 
 ## Submitting an Issue
 
+### Bug Reporting
+
+Here are a few things to verify when reporting a bug:
+- The bug resides in the GitHub for Visual Studio extension
+  - A lot of functionality within this extension resides in the Team Explorer       pane, where there are additional tools to manage source code, including Git.
+  - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
+
+
+### Feature Requests
+
 ## Things to improve in the current version
 
 - Localization
