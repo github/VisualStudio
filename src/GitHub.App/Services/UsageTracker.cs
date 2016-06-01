@@ -69,15 +69,15 @@ namespace GitHub.App.Services
             ////Lazy<IAppVersionProvider> appVersionProvider,
             Lazy<IEnvironment> environment,
             IPackageSettings userSettings,
-            IMetricsService client)
+            IServiceProvider serviceProvider)
         {
             Guard.ArgumentNotNull(cache, "cache");
             ////Guard.ArgumentNotNull(trackedRepositories, "trackedRepositories");
             Guard.ArgumentNotNull(repositoryHosts, "repositoryHosts");
             ////Guard.ArgumentNotNull(appVersionProvider, "appVersionProvider");
             Guard.ArgumentNotNull(environment, "environment");
-            ////Guard.ArgumentNotNull(userSettings, "userSettings");
-            Guard.ArgumentNotNull(client, "client");
+            Guard.ArgumentNotNull(userSettings, "userSettings");
+            Guard.ArgumentNotNull(serviceProvider, "serviceProvider");
 
             this.cache = cache;
             ////this.trackedRepositories = trackedRepositories;
@@ -85,39 +85,46 @@ namespace GitHub.App.Services
             ////this.appVersionProvider = appVersionProvider;
             this.environment = environment;
             this.userSettings = userSettings;
-            this.client = client;
+            this.client = (IMetricsService)serviceProvider.GetService(typeof(IMetricsService));
         }
 
         IObservable<Unit> SubmitIfNeeded()
         {
-            return GetLastUpdated()
-                .SelectMany(lastSubmission =>
-                {
-                    var now = RxApp.MainThreadScheduler.Now;
-
-                    var lastDate = lastSubmission.LocalDateTime.Date;
-                    var currentDate = now.LocalDateTime.Date;
-
-                    // New day, new stats. This matches the GHfM implementation
-                    // of when to send stats.
-                    if (lastDate == currentDate)
+            if (client != null)
+            {
+                return GetLastUpdated()
+                    .SelectMany(lastSubmission =>
                     {
-                        return Observable.Return(Unit.Default);
-                    }
+                        var now = RxApp.MainThreadScheduler.Now;
 
-                    // Every time we increment the launch count we increment both GHLaunchCountKeyDay
-                    // and GHLaunchCountKeyWeek but we only submit (and clear) the GHLaunchCountKeyWeek
-                    // when we've transitioned into a new week. We've defined a week by the ISO8601 
-                    // definition, i.e. week starting on Monday and ending on Sunday.
-                    var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
-                    var includeMonthly = lastDate.Month != currentDate.Month;
+                        var lastDate = lastSubmission.LocalDateTime.Date;
+                        var currentDate = now.LocalDateTime.Date;
 
-                    return BuildUsageModel(includeWeekly, includeMonthly)
-                        .SelectMany(client.PostUsage)
-                        .Concat(ClearCounters(includeWeekly, includeMonthly))
-                        .Concat(StoreLastUpdated(now));
-                })
-                .AsCompletion();
+                        // New day, new stats. This matches the GHfM implementation
+                        // of when to send stats.
+                        if (lastDate == currentDate)
+                        {
+                            return Observable.Return(Unit.Default);
+                        }
+
+                        // Every time we increment the launch count we increment both GHLaunchCountKeyDay
+                        // and GHLaunchCountKeyWeek but we only submit (and clear) the GHLaunchCountKeyWeek
+                        // when we've transitioned into a new week. We've defined a week by the ISO8601 
+                        // definition, i.e. week starting on Monday and ending on Sunday.
+                        var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
+                        var includeMonthly = lastDate.Month != currentDate.Month;
+
+                        return BuildUsageModel(includeWeekly, includeMonthly)
+                            .SelectMany(client.PostUsage)
+                            .Concat(ClearCounters(includeWeekly, includeMonthly))
+                            .Concat(StoreLastUpdated(now));
+                    })
+                    .AsCompletion();
+            }
+            else
+            {
+                return Observable.Return(Unit.Default);
+            }
         }
 
         IObservable<DateTimeOffset> GetLastUpdated()
@@ -472,24 +479,37 @@ namespace GitHub.App.Services
 
         IObservable<Unit> OptOut()
         {
-            return Observable.Defer(() =>
+            if (client != null)
             {
-                log.Info("User has disabled sending anonymized usage statistics to GitHub");
+                return Observable.Defer(() =>
+                {
+                    log.Info("User has disabled sending anonymized usage statistics to GitHub");
 
-                return ClearCounters(true, true)
-                    .ContinueAfter(() => client.SendOptOut());
-            });
-
+                    return ClearCounters(true, true)
+                        .ContinueAfter(() => client.SendOptOut());
+                });
+            }
+            else
+            {
+                return Observable.Return(Unit.Default);
+            }
         }
 
         IObservable<Unit> OptIn()
         {
-            return Observable.Defer(() =>
+            if (client != null)
             {
-                log.Info("User has enabled sending anonymized usage statistics to GitHub");
+                return Observable.Defer(() =>
+                {
+                    log.Info("User has enabled sending anonymized usage statistics to GitHub");
 
-                return client.SendOptIn();
-            });
+                    return client.SendOptIn();
+                });
+            }
+            else
+            {
+                return Observable.Return(Unit.Default);
+            }
         }
     }
 }
