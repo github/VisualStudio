@@ -90,6 +90,7 @@
     <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Services\IMetricsService.cs" />
     <Compile Include="Services\IModelService.cs" />
+    <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />

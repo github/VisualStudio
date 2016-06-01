@@ -31,7 +31,7 @@ namespace GitHub.App.Services
         readonly Lazy<IRepositoryHosts> repositoryHosts;
         //readonly Lazy<IAppVersionProvider> appVersionProvider;
         readonly Lazy<IEnvironment> environment;
-        readonly Lazy<IRepositoryHosts> trackedRepositories;
+        ////readonly Lazy<IRepositoryHosts> trackedRepositories;
         readonly IPackageSettings userSettings;
 
         // Whenever you add a counter make sure it gets added to _both_
@@ -228,15 +228,15 @@ namespace GitHub.App.Services
             model.Is64BitOperatingSystem = env.Is64BitOperatingSystem;
             model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
 
-            try
-            {
-                model.RamMB = (int)(env.GetTotalInstalledPhysicalMemory() / 1024 / 1024);
-            }
-            catch (Exception ex)
-            {
-                // This shouldn't really throw but let's be super defensive.
-                log.Warn("Could not get total installed physical memory", ex);
-            }
+            ////try
+            ////{
+            ////    model.RamMB = (int)(env.GetTotalInstalledPhysicalMemory() / 1024 / 1024);
+            ////}
+            ////catch (Exception ex)
+            ////{
+            ////    // This shouldn't really throw but let's be super defensive.
+            ////    log.Warn("Could not get total installed physical memory", ex);
+            ////}
 
             try
             {
@@ -301,23 +301,22 @@ namespace GitHub.App.Services
             ////if (!repo.IsHosted || !repo.OwnerId.HasValue)
             ////    return false;
 
-            if (hosts.GitHubHost != null && IsOwner(repo, hosts.GitHubHost))
-                return true;
+            ////if (hosts.GitHubHost != null && IsOwner(repo, hosts.GitHubHost))
+            ////    return true;
 
-            if (hosts.EnterpriseHost != null && IsOwner(repo, hosts.EnterpriseHost))
-                return true;
+            ////if (hosts.EnterpriseHost != null && IsOwner(repo, hosts.EnterpriseHost))
+            ////    return true;
 
             return false;
         }
 
-        static bool IsOwner(IRepositoryModel repo, IRepositoryHost host)
-        {
-            throw new NotImplementedException();
-            ////Guard.ArgumentNotNull(repo, "repo");
-            ////Guard.ArgumentNotNull(host, "host");
+        ////static bool IsOwner(IRepositoryModel repo, IRepositoryHost host)
+        ////{
+        ////    Guard.ArgumentNotNull(repo, "repo");
+        ////    Guard.ArgumentNotNull(host, "host");
 
-            ////return host.User != null && repo.OwnerId.HasValue && host.User.Id == repo.OwnerId.Value;
-        }
+        ////    return host.User != null && repo.OwnerId.HasValue && host.User.Id == repo.OwnerId.Value;
+        ////}
 
         IObservable<Unit> Run()
         {
