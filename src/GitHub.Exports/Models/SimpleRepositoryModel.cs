@@ -124,6 +124,14 @@ namespace GitHub.Models
             }
         }
 
+        public string CurrentBranchName
+        {
+            get
+            {
+                var repo = GitService.GitServiceHelper.GetRepo(LocalPath);
+                return repo?.Head.FriendlyName ?? String.Empty;
+            }
+        }
         /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
         /// of a repository. Equals takes care of any hash collisions because of this

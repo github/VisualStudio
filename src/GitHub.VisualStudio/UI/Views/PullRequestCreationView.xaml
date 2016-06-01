@@ -7,9 +7,10 @@
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                      xmlns:data="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                  DataContext="{Binding ViewModel}"
+                                      Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                      DataContext="{Binding ViewModel}"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       mc:Ignorable="d">
@@ -73,9 +74,9 @@
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <ui:OcticonImage Icon="git_branch" Foreground="{DynamicResource GitHubVsGrayText}" />
-                    <ui:GitHubActionLink x:Name="branchSelectionButton" Content="master" HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
+                    <ui:GitHubActionLink x:Name="branchSelectionButton" Content="{Binding CurrentBranch.Name}"  HasDropDown="True" Margin="5,0,0,0" VerticalAlignment="Center" Click="branchSelectionButton_Click" />
                     <ui:OcticonImage Height="13" Icon="chevron_left" Foreground="{DynamicResource GitHubVsGrayText}" Margin="5,2,3,0"  VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding CurrentBranchName}" Foreground="{DynamicResource GitHubVsGrayText}"/>
+                    <TextBlock Text="{Binding CurrentBranch.Name}" Foreground="{DynamicResource GitHubVsGrayText}"/>
                 </StackPanel>
 
                 <!-- Show a check if the branch is mergeable (is that even a word??), 
@@ -118,30 +119,12 @@
                                 PromptText="Filter branches" />
                             <Separator Grid.Row="1" Margin="0" />
 
-                            <ListBox Grid.Row="2">
-                                <ListBoxItem>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">master</TextBlock>
-                                        <ui:OcticonImage Icon="check" Grid.Column="1" HorizontalAlignment="Right" Opacity="0.6" />
-                                    </Grid>
-                                </ListBoxItem>
-
-                                <ListBoxItem>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0">not-master</TextBlock>
-                                        <TextBlock Grid.Column="1" Opacity="0.6" HorizontalAlignment="Right">March 1</TextBlock>
-                                    </Grid>
-                                </ListBoxItem>
+                            <ListBox Grid.Row="2" ItemsSource="{Binding Branches}" >
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
                             </ListBox>
                         </Grid>
                     </Border>
@@ -153,8 +136,8 @@
             <TabItem Header="Details"  Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical">
-                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}" />
-                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}"  Text="{Binding PullRequestTitle}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" Text="{Binding PullRequestTitle}" />
                         <Grid Margin="10,3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -195,96 +178,28 @@
                                             PromptText="Filter people" />
                                         <Separator Grid.Row="1" />
 
-                                        <ListBox Grid.Row="2">
-                                            <ListBoxItem>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
+                                        <ListBox Grid.Row="2" ItemsSource="{Binding Assignees}">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="16" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
 
-                                                    <Image
+                                                        <Image
                                                         VerticalAlignment="Top"
                                                         Grid.Column="0"
-                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">Haacked</TextBlock>
-                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Phil Haack</TextBlock>
-                                                    <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" Opacity="0.6" />
-                                                </Grid>
-                                            </ListBoxItem>
+                                                        Source="{Binding Avatar}"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Login}" Margin="5,0,0,0"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding Login}" Margin="5,0,0,0" Opacity="0.6"/>
+                                                        <ui:OcticonImage Foreground="{DynamicResource GitHubVsToolWindowText}" Icon="check" Grid.Column="3" HorizontalAlignment="Right" Opacity="0.6" />
+                                                    </Grid>
+                                                </DataTemplate>
 
-                                            <ListBoxItem>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Image
-                                                        VerticalAlignment="Top"
-                                                        Grid.Column="0"
-                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
-                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Andreia Gaita</TextBlock>
-                                                </Grid>
-                                            </ListBoxItem>
-
-                                            <ListBoxItem>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Image
-                                                        VerticalAlignment="Top"
-                                                        Grid.Column="0"
-                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">shiftkey</TextBlock>
-                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Brendan Forster</TextBlock>
-                                                </Grid>
-                                            </ListBoxItem>
-
-                                            <ListBoxItem>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Image
-                                                        VerticalAlignment="Top"
-                                                        Grid.Column="0"
-                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">paladique</TextBlock>
-                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Jasmine Greenaway</TextBlock>
-                                                </Grid>
-                                            </ListBoxItem>
-
-                                            <ListBoxItem Padding="3" HorizontalContentAlignment="Stretch">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Image
-                                                        VerticalAlignment="Top"
-                                                        Grid.Column="0"
-                                                        Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png"/>
-                                                    <TextBlock Grid.Column="1" Margin="5,0,0,0">shana</TextBlock>
-                                                    <TextBlock Grid.Column="2" Margin="5,0,0,0" Opacity="0.6">Andreia Gaita</TextBlock>
-                                                </Grid>
-                                            </ListBoxItem>
+                                            </ListBox.ItemTemplate>
                                         </ListBox>
                                     </Grid>
                                 </Border>
@@ -298,7 +213,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Button HorizontalAlignment="Right" Content="Cancel" Grid.Column="0" Style="{StaticResource GitHubVsButton}"/>
-                            <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{StaticResource GitHubVsPrimaryActionButton}" />
+                            <Button Name="createButton" HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{StaticResource GitHubVsPrimaryActionButton}" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>

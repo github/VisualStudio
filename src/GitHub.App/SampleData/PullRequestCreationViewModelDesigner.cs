@@ -1,6 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using GitHub.ViewModels;
 using System.Collections.Generic;
+using ReactiveUI;
+using System.Collections.ObjectModel;
+using GitHub.Models;
+using System;
+using System.Windows.Media.Imaging;
+using GitHub.Services;
+using System.Reactive;
 
 namespace GitHub.SampleData
 {
@@ -9,27 +16,22 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            Branches = new List<string>()
-            {
-                "don/stub-ui",
-                "feature/pr/views",
-                "release-1.0.17.0"
-            };
 
-            CurrentBranchName = "fix-everything";
-            SelectedAssignee = "Haacked (Phil Haack)";
-            TargetBranchName = "master";
-            Users = new List<string>()
-            {
-                "Haacked (Phil Haack)",
-                "shana (Andreia Gaita)"
-            };
+            CurrentBranch = new BranchModel { Name = "fix-everything" };
+
+            SelectedAssignee = new AccountDesigner { Login = "Haacked (Phil Haack)" }; 
+
+            TargetBranch = new BranchModel { Name = "master" };
+
         }
 
-        public string CurrentBranchName { get; set; }
-        public string SelectedAssignee { get; set; }
-        public string TargetBranchName { get; set; }
-        public List<string> Branches { get; set; }
-        public List<string> Users { get; set; }
+        public IAccount SelectedAssignee { get; set; }
+        public IBranchModel TargetBranch { get; set; }
+        public IBranchModel CurrentBranch { get; set; }
+        public IReadOnlyList<IBranchModel> Branches { get; set; }
+        public IReadOnlyList<IAccount> Assignees { get; set; }
+        public IReactiveCommand<Unit> CreatePullRequest { get; set; }
+
+
     }
 }

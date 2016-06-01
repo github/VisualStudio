@@ -4,6 +4,9 @@ using GitHub.ViewModels;
 using System.ComponentModel.Composition;
 using System.Windows.Controls;
 using ReactiveUI;
+using System.Reactive.Linq;
+
+
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -17,10 +20,11 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestCreationView()
         {
             InitializeComponent();
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as IPullRequestCreationViewModel;
 
             this.WhenActivated(d =>
             {
+                d(this.BindCommand(ViewModel, vm => vm.CreatePullRequest, v => v.createButton));
+                //d(this.OneWayBind(ViewModel, vm => vm.Branches,  v => v.branchList.ItemsSource));
             });
         }
 

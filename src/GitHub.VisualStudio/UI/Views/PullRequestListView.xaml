@@ -34,7 +34,7 @@
 
       <Style x:Key="PullRequestListItemContainerStyle" TargetType="{x:Type ListViewItem}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Margin" Value="0" />
+        <Setter Property="Margin" Value="0,0,0,10" />
         <Setter Property="Padding" Value="1" />
 
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -144,7 +144,7 @@
 
   <DockPanel Margin="6,0,6,0">
 
-    <Grid Margin="0,0,0,4" DockPanel.Dock="Top">
+    <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
@@ -153,10 +153,17 @@
       <WrapPanel Grid.Column="0" HorizontalAlignment="Stretch">
 
         <ui:GitHubActionLink x:Name="stateSelection"
-                             Margin="5,0,0,0"
+                             Margin="5,0"
                              VerticalAlignment="Center"
+                             ToolTip="Filter by state"
                              Content="{Binding SelectedState}"
-                             HasDropDown="True" />
+                             HasDropDown="True">
+          <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Click">
+              <ui:OpenPopupAction TargetName="statePopup" />
+            </i:EventTrigger>
+          </i:Interaction.Triggers>
+        </ui:GitHubActionLink>
 
         <Popup x:Name="statePopup"
                AllowsTransparency="True"
@@ -180,11 +187,12 @@
           </Border>
         </Popup>
 
-        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
+        <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink x:Name="assigneeSelection"
-                             Margin="5,0,0,0"
+                             Margin="5,0"
                              VerticalAlignment="Center"
+                             ToolTip="Filter by assignee"
                              Content="{Binding SelectedAssignee,
                                                Converter={ui:DefaultValueConverter},
                                                ConverterParameter=Assignee}"
@@ -227,11 +235,12 @@
           </Border>
         </Popup>
 
-        <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
+        <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:GitHubActionLink x:Name="authorSelection"
-                             Margin="5,0,0,0"
+                             Margin="5,0"
                              VerticalAlignment="Center"
+                             ToolTip="Filter by author"
                              Content="{Binding SelectedAuthor,
                                                Converter={ui:DefaultValueConverter},
                                                ConverterParameter=Author}"
@@ -283,7 +292,6 @@
                                              RelativeSource={RelativeSource FindAncestor,
                                                                             AncestorType={x:Type local:PullRequestListView}}}"
                            Content="Create New" />
-
     </Grid>
 
     <ListView x:Name="pullRequests"

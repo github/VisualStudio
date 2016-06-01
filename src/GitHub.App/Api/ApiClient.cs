@@ -52,6 +52,15 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
+        public IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string name)
+        {
+            //Guard.ArgumentNotEmptyString(login, nameof(login));
+
+            var client = gitHubClient.PullRequest;
+
+           return client.Create(owner, name, pullRequest);
+        }
+
         public IObservable<User> GetUser()
         {
             return gitHubClient.User.Current();
@@ -204,6 +213,21 @@ namespace GitHub.Api
                     SortProperty = PullRequestSort.Updated,
                     SortDirection = SortDirection.Descending
                 });
+        }
+
+        public IObservable<Branch> GetBranchesForRepository(string owner, string name)
+        {
+            return gitHubClient.Repository.GetAllBranches(owner, name);
+        }
+
+        public IObservable<Account> GetAssignees(string owner, string name)
+        {
+            return gitHubClient.Issue.Assignee.GetAllForRepository(owner, name);
+        }
+        
+        public IObservable<GitHubCommit> GetBranchCommits(string owner, string name)
+        {   
+            return gitHubClient.Repository.Commit.GetAll(owner, name);
         }
     }
 }

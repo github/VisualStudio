@@ -40,18 +40,20 @@ namespace GitHub.SampleData
             RepositoryName = "Hello-World";
             Description = "A description";
             KeepPrivate = true;
+            CanKeepPrivate = true;
             Accounts = new ReactiveList<IAccount>
             {
                 new AccountDesigner { Login = "shana" },
                 new AccountDesigner { Login = "GitHub", IsUser = false }
             };
+            SelectedAccount = Accounts[0];
             GitIgnoreTemplates = new ReactiveList<GitIgnoreItem>
             {
                 GitIgnoreItem.Create("VisualStudio"),
                 GitIgnoreItem.Create("Wap"),
                 GitIgnoreItem.Create("WordPress")
             };
-
+            SelectedGitIgnoreTemplate = GitIgnoreTemplates[0];
             Licenses = new ReactiveList<LicenseItem>
             {
                 new LicenseItem("agpl-3.0", "GNU Affero GPL v3.0"),
@@ -60,8 +62,7 @@ namespace GitHub.SampleData
                 new LicenseItem("mit", "MIT License")
             };
 
-            SelectedLicense = LicenseItem.None;
-            SelectedGitIgnoreTemplate = null;
+            SelectedLicense = Licenses[0];
         }
 
         public new string Title { get { return "Create a GitHub Repository"; } } // TODO: this needs to be contextual
@@ -69,7 +70,7 @@ namespace GitHub.SampleData
         public IReadOnlyList<IAccount> Accounts
         {
             get;
-            private set;
+            set;
         }
 
         public string BaseRepositoryPath
@@ -223,7 +224,7 @@ namespace GitHub.SampleData
 
         public RepositoryPublishViewModelDesigner()
         {
-            Connections = new ReactiveList<IConnection>
+            Connections = new ObservableCollection<IConnection>
             {
                 new Conn() { HostAddress = new HostAddress() },
                 new Conn() { HostAddress = HostAddress.Create("ghe.io") }
@@ -259,7 +260,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ReactiveList<IConnection> Connections
+        public ObservableCollection<IConnection> Connections
         {
             get;
             private set;
@@ -359,7 +360,7 @@ namespace GitHub.SampleData
         public string Name { get; set; }
         public UriString CloneUrl { get; set; }
         public string LocalPath { get; set; }
-
+        public string CurrentBranchName { get; }
         public Octicon Icon { get; set; }
 
         public IAccount Owner { get; set; }

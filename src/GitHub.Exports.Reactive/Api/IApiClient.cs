@@ -16,6 +16,8 @@ namespace GitHub.Api
         /// </summary>
         /// <returns></returns>
         IObservable<Repository> GetUserRepositories(RepositoryType repositoryType);
+        IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest,string owner, string name);
+
         /// <summary>
         /// Retrieves the repository for this org.
         /// </summary>
@@ -31,5 +33,8 @@ namespace GitHub.Api
         IObservable<LicenseMetadata> GetLicenses();
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
         IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name);
+        IObservable<Branch> GetBranchesForRepository(string owner, string name);
+        IObservable<Account> GetAssignees(string owner, string name);
+        IObservable<GitHubCommit> GetBranchCommits(string owner, string name);
     }
 }

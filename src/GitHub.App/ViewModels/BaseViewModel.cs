@@ -2,6 +2,8 @@
 using ReactiveUI;
 using NullGuard;
 using GitHub.UI;
+using System;
+using Octokit;
 
 namespace GitHub.ViewModels
 {

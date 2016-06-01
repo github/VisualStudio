@@ -77,6 +77,38 @@ namespace GitHub.Services
             .ToReadOnlyList(Create);
         }
 
+        public IObservable<IReadOnlyList<IAccount>> GetAvailableAssignees(ISimpleRepositoryModel repo)
+        {
+            return Observable.Zip(
+                GetUser(),
+                GetAssigneesFromApi(repo),
+                (user, orgs) => user.Concat(orgs))
+            .ToReadOnlyList(Create);
+        }
+
+        public IObservable<IEnumerable<AccountCacheItem>> GetAssigneesFromApi(ISimpleRepositoryModel repo)
+        {
+            return GetUserFromCache().SelectMany(user =>
+               hostCache.GetAndRefreshObject(user.Login + "|assignees",
+                   () => apiClient.GetAssignees(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                   .Select(AccountCacheItem.Create)
+                   .ToList(),
+                   TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
+               .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
+                   // This could in theory happen if we try to call this before the user is logged in.
+                   e =>
+                   {
+                       log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
+                       return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                   })
+                .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
+                {
+                    log.Error("Retrieve user organizations failed.", e);
+                    return Observable.Return(Enumerable.Empty<AccountCacheItem>());
+                });
+        }
+
+
         IObservable<IEnumerable<LicenseCacheItem>> GetOrderedLicensesFromApi()
         {
             return apiClient.GetLicenses()
@@ -92,6 +124,22 @@ namespace GitHub.Services
                 .WhereNotNull()
                 .ToList()
                 .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
+        }
+
+        IObservable<IEnumerable<BranchCacheItem>> GetBranchesFromApi(ISimpleRepositoryModel repo)
+        {
+            return apiClient.GetBranchesForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                .WhereNotNull()
+                .Select(BranchCacheItem.Create)
+                .ToList();           
+        }
+
+        IObservable<IEnumerable<CommitCacheItem>> GetCommitsFromApi(ISimpleRepositoryModel repo)
+        {
+            return apiClient.GetBranchCommits(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                .WhereNotNull()
+                .Select(CommitCacheItem.Create)
+                .ToList();
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
@@ -171,6 +219,43 @@ namespace GitHub.Services
             return collection;
         }
 
+        public IObservable<IReadOnlyList<IBranchModel>> GetBranches(ISimpleRepositoryModel repo)
+        {
+            return Observable.Defer(() =>
+                 hostCache.GetAndRefreshObject(
+                     "branches",
+                     () => GetBranchesFromApi(repo),
+                     TimeSpan.FromDays(1),
+                     TimeSpan.FromDays(7))
+                 .ToReadOnlyList(Create)
+                 .Catch<IReadOnlyList<IBranchModel>, Exception>(e =>
+                 {
+                     log.Info("Failed to retrieve branches", e);
+                     return Observable.Return(new IBranchModel[] { });
+                 }
+               )
+            );
+            
+         }
+
+        public IObservable<IReadOnlyList<ICommitModel>> GetCommits(ISimpleRepositoryModel repo)
+        {
+            return Observable.Defer(() =>
+                 hostCache.GetAndRefreshObject(
+                     "commits",
+                     () => GetCommitsFromApi(repo),
+                     TimeSpan.FromDays(1),
+                     TimeSpan.FromDays(7))
+                 .ToReadOnlyList(Create)
+                 .Catch<IReadOnlyList<ICommitModel>, Exception>(e =>
+                 {
+                     log.Info("Failed to retrieve commits", e);
+                     return Observable.Return(new ICommitModel[] { });
+                 }
+               )
+            );
+
+        }
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
@@ -275,6 +360,12 @@ namespace GitHub.Services
             };
         }
 
+        IBranchModel Create(BranchCacheItem brCacheItem)
+        {
+            return new BranchModel( brCacheItem.Name )
+            {
+            };
+        }
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
             return hostCache.InsertObject("user", user);
@@ -286,15 +377,6 @@ namespace GitHub.Services
             if (disposing)
             {
                 if (disposed) return;
-
-                try
-                {
-                    hostCache.Dispose();
-                }
-                catch (Exception e)
-                {
-                    log.Warn("Exception occured while disposing host cache", e);
-                }
                 disposed = true;
             }
         }
@@ -315,6 +397,7 @@ namespace GitHub.Services
             public string Key { get; set; }
             public string Name { get; set; }
         }
+
 
         public class RepositoryCacheItem
         {
@@ -380,5 +463,43 @@ namespace GitHub.Services
             public DateTimeOffset UpdatedAt { get; set; }
             public bool IsOpen { get; set; }
         }
+
+        public class BranchCacheItem : CacheItem
+        {
+            public static BranchCacheItem Create(Branch br)
+            {
+                return new BranchCacheItem(br);
+            }
+
+            public BranchCacheItem() { }
+            public BranchCacheItem(Branch br)
+            {
+                Name = br.Name;
+            }
+
+            [AllowNull]
+            public string Name { [return: AllowNull] get; set; }
+
+        }
+
+        public class CommitCacheItem : CacheItem
+        {
+            public static CommitCacheItem Create(Commit com)
+            {
+                return new CommitCacheItem(com);
+            }
+
+            public CommitCacheItem() { }
+            public CommitCacheItem(Commit br)
+            {
+                Message = br.Message;
+            }
+
+            [AllowNull]
+            public string Message { [return: AllowNull] get; set; }
+
+        }
     }
+   
 }
+

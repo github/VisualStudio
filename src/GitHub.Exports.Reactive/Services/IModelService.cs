@@ -4,6 +4,7 @@ using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
+using System.Collections.ObjectModel;
 
 namespace GitHub.Services
 {
@@ -22,5 +23,7 @@ namespace GitHub.Services
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection = null);
         IObservable<Unit> InvalidateAll();
+        IObservable<IReadOnlyList<IBranchModel>> GetBranches(ISimpleRepositoryModel repo);
+        IObservable<IReadOnlyList<IAccount>> GetAvailableAssignees(ISimpleRepositoryModel repo);
     }
 }
