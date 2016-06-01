@@ -1,12 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive;
-using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.Extensions.Reactive;
-using GitHub.Models;
 using Octokit;
-using GitHub.Services;
 
 namespace GitHub.Services
 {
