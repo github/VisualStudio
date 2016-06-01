@@ -35,7 +35,6 @@ namespace GitHub.Api
         IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name);
         IObservable<Branch> GetBranchesForRepository(string owner, string name);
         IObservable<Account> GetAssignees(string owner, string name);
-
-
+        IObservable<GitHubCommit> GetBranchCommits(string owner, string name);
     }
 }

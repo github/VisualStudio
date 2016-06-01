@@ -134,6 +134,14 @@ namespace GitHub.Services
                 .ToList();           
         }
 
+        IObservable<IEnumerable<CommitCacheItem>> GetCommitsFromApi(ISimpleRepositoryModel repo)
+        {
+            return apiClient.GetBranchCommits(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
+                .WhereNotNull()
+                .Select(CommitCacheItem.Create)
+                .ToList();
+        }
+
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
         {
             return hostCache.GetAndRefreshObject("user",
@@ -230,6 +238,24 @@ namespace GitHub.Services
             
          }
 
+        public IObservable<IReadOnlyList<ICommitModel>> GetCommits(ISimpleRepositoryModel repo)
+        {
+            return Observable.Defer(() =>
+                 hostCache.GetAndRefreshObject(
+                     "commits",
+                     () => GetCommitsFromApi(repo),
+                     TimeSpan.FromDays(1),
+                     TimeSpan.FromDays(7))
+                 .ToReadOnlyList(Create)
+                 .Catch<IReadOnlyList<ICommitModel>, Exception>(e =>
+                 {
+                     log.Info("Failed to retrieve commits", e);
+                     return Observable.Return(new ICommitModel[] { });
+                 }
+               )
+            );
+
+        }
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
@@ -453,6 +479,24 @@ namespace GitHub.Services
 
             [AllowNull]
             public string Name { [return: AllowNull] get; set; }
+
+        }
+
+        public class CommitCacheItem : CacheItem
+        {
+            public static CommitCacheItem Create(Commit com)
+            {
+                return new CommitCacheItem(com);
+            }
+
+            public CommitCacheItem() { }
+            public CommitCacheItem(Commit br)
+            {
+                Message = br.Message;
+            }
+
+            [AllowNull]
+            public string Message { [return: AllowNull] get; set; }
 
         }
     }

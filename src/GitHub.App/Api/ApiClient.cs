@@ -224,5 +224,10 @@ namespace GitHub.Api
         {
             return gitHubClient.Issue.Assignee.GetAllForRepository(owner, name);
         }
+        
+        public IObservable<GitHubCommit> GetBranchCommits(string owner, string name)
+        {
+            return gitHubClient.Repository.Commit.GetAll(owner, name);
+        }
     }
 }
