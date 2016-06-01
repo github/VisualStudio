@@ -96,7 +96,7 @@ namespace GitHub.ViewModels
             var newPullRequest = GatherPullRequestInfo();
 
             return pullRequestCreationService.CreatePullRequest(
-                newPullRequest, repositoryHost.ApiClient);
+                newPullRequest, repository, repositoryHost.ApiClient);
 
         }
 

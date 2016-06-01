@@ -4,6 +4,7 @@ using System.Reactive;
 using GitHub.Api;
 using GitHub.Extensions.Reactive;
 using Octokit;
+using GitHub.Models;
 
 namespace GitHub.Services
 {
@@ -11,17 +12,9 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     class PullRequestCreationService : IPullRequestCreationService
     {
-        public string LocalRepositoryName
+        public IObservable<Unit> CreatePullRequest(NewPullRequest newPullRequest, ISimpleRepositoryModel repository, IApiClient apiClient)
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public IObservable<Unit> CreatePullRequest(NewPullRequest newPullRequest, IApiClient apiClient)
-        {
-            return apiClient.CreatePullRequest(newPullRequest,"","")
+            return apiClient.CreatePullRequest(newPullRequest,repository.CloneUrl.Owner, repository.CloneUrl.RepositoryName)
                    .SelectUnit();
         }
     }

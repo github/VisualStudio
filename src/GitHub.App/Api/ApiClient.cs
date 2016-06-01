@@ -226,7 +226,7 @@ namespace GitHub.Api
         }
         
         public IObservable<GitHubCommit> GetBranchCommits(string owner, string name)
-        {
+        {   
             return gitHubClient.Repository.Commit.GetAll(owner, name);
         }
     }
