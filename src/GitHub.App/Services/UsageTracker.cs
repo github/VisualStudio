@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reactive;
+using System.Reactive.Linq;
 using Akavache;
 using GitHub.Caches;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
+using ReactiveUI;
 using Rothko;
 
 namespace GitHub.App.Services
 {
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using Extensions.Reactive;
-    using ReactiveUI;
-    using Settings;
     using Guard = GitHub.Extensions.Guard;
 
     [Export(typeof(IUsageTracker))]
