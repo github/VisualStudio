@@ -10,6 +10,8 @@ using GitHub.Services;
 
 namespace GitHub.Services
 {
+    [Export(typeof(IPullRequestCreationService))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     class PullRequestCreationService : IPullRequestCreationService
     {
         public string LocalRepositoryName
