@@ -15,8 +15,5 @@ namespace GitHub.ViewModels
         IBranchModel TargetBranch { get; }
         IBranchModel CurrentBranch { get; }
         IReactiveCommand<Unit> CreatePullRequest { get; }
-
-
-
     }
 }
