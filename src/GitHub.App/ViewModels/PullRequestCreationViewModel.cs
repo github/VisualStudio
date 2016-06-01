@@ -23,7 +23,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
+    class PullRequestCreationViewModel : PullRequestFormViewModel, IPullRequestCreationViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IRepositoryHost repositoryHost;

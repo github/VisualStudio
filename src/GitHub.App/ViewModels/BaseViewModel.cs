@@ -20,10 +20,5 @@ namespace GitHub.ViewModels
         public virtual void Initialize([AllowNull] ViewWithData data)
         {
         }
-
-        protected virtual NewPullRequest GatherPullRequestInfo()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

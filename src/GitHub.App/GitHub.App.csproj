@@ -140,6 +140,7 @@
     <Compile Include="Services\ImageDownloader.cs" />
     <Compile Include="Services\GitClient.cs" />
     <Compile Include="Services\ModelService.cs" />
+    <Compile Include="Services\PullRequestCreationService.cs" />
     <Compile Include="Services\RepositoryCloneService.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="Caches\CredentialCache.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestFormViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
