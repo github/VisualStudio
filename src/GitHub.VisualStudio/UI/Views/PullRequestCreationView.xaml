@@ -136,8 +136,8 @@
             <TabItem Header="Details"  Style="{DynamicResource GitHubPRDetailsTabItem}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical">
-                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}" />
-                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Title" Style="{DynamicResource GitHubVsPromptTextBox}"  Text="{Binding PullRequestTitle}" />
+                        <ui:PromptTextBox Margin="10,5" PromptText="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="100" Style="{DynamicResource GitHubVsPromptTextBox}" Text="{Binding PullRequestTitle}" />
                         <Grid Margin="10,3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

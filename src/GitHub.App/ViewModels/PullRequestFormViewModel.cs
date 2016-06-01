@@ -19,20 +19,6 @@ namespace GitHub.ViewModels
 
             protected PullRequestFormViewModel()
             {
-                //CanKeepPrivateObservable = this.WhenAny(
-                //    x => x.SelectedAccount.IsEnterprise,
-                //    x => x.SelectedAccount.IsOnFreePlan,
-                //    x => x.SelectedAccount.HasMaximumPrivateRepositories,
-                //    (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
-                //    isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
-
-                //CanKeepPrivateObservable
-                //    .Where(x => !x)
-                //    .Subscribe(x => KeepPrivate = false);
-
-                //safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
-                //    .Select(x => x != null ? GetSafeRepositoryName(x) : null)
-                //    .ToProperty(this, x => x.SafeRepositoryName);
             }
 
             string description;
@@ -57,16 +43,16 @@ namespace GitHub.ViewModels
                 set { this.RaiseAndSetIfChanged(ref keepPrivate, value); }
             }
 
-            string repositoryName;
+            string pullRequestTitle;
             /// <summary>
             /// Name of the repository as typed by user
             /// </summary>
             [AllowNull]
-            public string RepositoryName
+            public string PullRequestTitle
             {
                 [return: AllowNull]
-                get { return repositoryName; }
-                set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
+                get { return pullRequestTitle; }
+                set { this.RaiseAndSetIfChanged(ref pullRequestTitle, value); }
             }
 
             public ReactivePropertyValidator<string> RepositoryNameValidator { get; protected set; }
@@ -113,9 +99,9 @@ namespace GitHub.ViewModels
                 return invalidRepositoryCharsRegex.Replace(name, "-");
             }
 
-
             protected virtual NewPullRequest GatherPullRequestInfo()
             {
+                string justtest = PullRequestTitle;
                 throw new NotImplementedException();
             }
         }
