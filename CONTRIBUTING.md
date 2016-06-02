@@ -37,17 +37,20 @@ There are certain areas of the extension that are restricted in what they can do
 
 Here are a few helpful tips when reporting a bug:
 - Verify the bug resides in the GitHub for Visual Studio extension
-  - A lot of functionality within this extension resides in the Team Explorer       pane, where there are additional tools to manage and collaborate on source code, including Visual Studio's Git Extension, which is owned by Microsoft.
+  - A lot of functionality provided by this extension resides in the Team Explorer pane, alongside other non-GitHub tools to manage and collaborate on source code, including Visual Studio's Git support, which is owned by Microsoft.
   - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
-- A log file can be helpful in diagnosing bug issues, if you'd like to include one in your issue, here is how you'd do it:
-  0. Close Visual Studio if it's open
-  0. Open a Developer Command Prompt for VS2015
-  0. Run devenv /log
-  0. Close VS
-  0. Locate the following files on your system and email them to windows@github.com or copy their contents into the issue:
-  - `%appdata%\Microsoft\VisualStudio\14.0\ActivityLog.xml`
-  - `%localappdata%\temp\extension.log`
-- Screenshots are also helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems.
+- Screenshots are very helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems. Please include them whenever possible.
+- A log file is helpful in diagnosing bug issues. To include log files in your issue:
+
+  1. Close Visual Studio if it's open
+  2. Open a Developer Command Prompt for VS2015
+  3. Run devenv /log
+  4. Reproduce your issue
+  5. Close VS
+  6. Locate the following files on your system and email them to windows@github.com or create a gist and link it in the issue report:
+    - `%appdata%\Microsoft\VisualStudio\14.0\ActivityLog.xml`
+    - `%localappdata%\temp\extension.log`
+    - `%localappdata%\GitHubVisualStudio\extension.log`
 
 ### Feature Requests
 If you have a feature that you think would be a great addition to the extension, we might already have thought about it too, so be sure to check if your suggestion matches our [roadmap](#roadmap-and-future-feature-ideas) before making a request. Also take a peek at our [pull requests](https://github.com/github/VisualStudio/pulls) to see what we're currently working on. Additionally, someone might have already thought of your idea, so check out Issues labeled as [features](https://github.com/github/VisualStudio/issues?q=is%3Aopen+is%3Aissue+label%3Afeature) to see if it already exists.
