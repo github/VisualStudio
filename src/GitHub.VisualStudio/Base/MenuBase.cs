@@ -20,9 +20,10 @@ namespace GitHub.VisualStudio
 
         protected ISimpleRepositoryModel ActiveRepo { get; private set; }
 
-        ISimpleApiClient simpleApiClient;
+        protected ISimpleApiClient simpleApiClient;
+
         [AllowNull]
-        public ISimpleApiClient SimpleApiClient
+        protected ISimpleApiClient SimpleApiClient
         {
             [return: AllowNull]
             get { return simpleApiClient; }
