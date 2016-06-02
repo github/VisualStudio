@@ -48,10 +48,7 @@ namespace GitHub.VisualStudio.Menus
 
         public bool CanShow()
         {
-            return System.Threading.Tasks.Task.Run(() =>
-            {
-                return IsGitHubRepo(); 
-            }).Result;
+            return IsGitHubRepo().Wait(250); 
         }
 
     }
