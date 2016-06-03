@@ -13,14 +13,20 @@ using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using Octokit.Internal;
+using System.Collections.Generic;
+using GitHub.Models;
 
 namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-
+        const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
@@ -57,9 +63,30 @@ namespace GitHub.Api
             return gitHubClient.Gist.Create(newGist);
         }
 
-        public IObservable<User> GetUser()
+        public IObservable<UserAndScopes> GetUser()
         {
-            return gitHubClient.User.Current();
+            return GetUserInternal().ToObservable();
+        }
+
+        async Task<UserAndScopes> GetUserInternal()
+        {
+            var response = await gitHubClient.Connection.Get<User>(
+                userEndpoint, null, null).ConfigureAwait(false);
+            var scopes = default(string[]);
+
+            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
+            {
+                scopes = response.HttpResponse.Headers[ScopesHeader]
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .ToArray();
+            }
+            else
+            {
+                log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
+            }
+
+            return new UserAndScopes(response.Body, scopes);
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(

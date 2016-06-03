@@ -238,8 +238,14 @@
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\Views\Controls\Spinner.xaml.cs">
+      <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
       <DependentUpon>GistCreationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\LogoutRequiredControl.xaml.cs">
+      <DependentUpon>LogoutRequiredControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
@@ -394,9 +400,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\Views\Controls\Spinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Views\Controls\GistCreationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\LogoutRequiredControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
       <SubType>Designer</SubType>

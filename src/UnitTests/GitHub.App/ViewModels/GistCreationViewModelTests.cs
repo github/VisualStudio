@@ -23,7 +23,8 @@ public class GistCreationViewModelTests
         var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
         var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
         repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
-        return new GistCreationViewModel(repositoryHost, selectedTextProvider)
+        var gistPublishService = provider.GetGistPublishService();
+        return new GistCreationViewModel(repositoryHost, selectedTextProvider, gistPublishService)
         {
             FileName = fileName,
             IsPrivate = isPrivate
@@ -39,15 +40,17 @@ public class GistCreationViewModelTests
         {
             var provider = Substitutes.ServiceProvider;
             var vm = CreateViewModel(provider, selectedText, fileName, isPrivate);
+            var gistPublishService = provider.GetGistPublishService();
             var repositoryHost = provider.GetRepositoryHosts().GitHubHost;
             vm.CreateGist.Execute(null);
 
-            repositoryHost.ApiClient
+            gistPublishService
                 .Received()
-                .CreateGist(
+                .PublishGist(
+                    repositoryHost.ApiClient,
                     Arg.Is<NewGist>(g => g.Public == !isPrivate
-                    && g.Files.First().Key == fileName
-                    && g.Files.First().Value == selectedText));
+                        && g.Files.First().Key == fileName
+                        && g.Files.First().Value == selectedText));
         }
 
         [Theory]

@@ -115,6 +115,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelLink {
+            get {
+                return ResourceManager.GetString("CancelLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone.
         /// </summary>
         public static string CloneLink {
@@ -255,6 +264,15 @@ namespace GitHub.VisualStudio.UI {
         public static string GetStartedLink {
             get {
                 return ResourceManager.GetString("GetStartedLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create gist.
+        /// </summary>
+        public static string gistCreationFailedMessage {
+            get {
+                return ResourceManager.GetString("gistCreationFailedMessage", resourceCulture);
             }
         }
         
@@ -426,6 +444,15 @@ namespace GitHub.VisualStudio.UI {
         public static string NotLoggedInMessage {
             get {
                 return ResourceManager.GetString("NotLoggedInMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in Browser.
+        /// </summary>
+        public static string openInBrowser {
+            get {
+                return ResourceManager.GetString("openInBrowser", resourceCulture);
             }
         }
         

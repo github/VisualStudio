@@ -14,6 +14,9 @@ using GitHub.Services;
 using NLog;
 using Octokit;
 using ReactiveUI;
+using System.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GitHub.Models
 {
@@ -21,7 +24,7 @@ namespace GitHub.Models
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
-        static readonly AccountCacheItem unverifiedUser = new AccountCacheItem();
+        static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly HostAddress hostAddress;
@@ -58,6 +61,8 @@ namespace GitHub.Models
             private set { this.RaiseAndSetIfChanged(ref isLoggedIn, value); }
         }
 
+        public bool SupportsGist { get; private set; }
+
         public string Title { get; private set; }
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
@@ -65,20 +70,13 @@ namespace GitHub.Models
         {
             return GetUserFromApi()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<AccountCacheItem, Exception>(ex =>
+                .Catch<UserAndScopes, Exception>(ex =>
                 {
                     if (ex is AuthorizationException)
                     {
                         log.Warn("Got an authorization exception", ex);
-                        return Observable.Return<AccountCacheItem>(null);
                     }
-                    return ModelService.GetUserFromCache()
-                        .Catch<AccountCacheItem, Exception>(e =>
-                        {
-                            log.Warn("User does not exist in cache", e);
-                            return Observable.Return<AccountCacheItem>(null);
-                        })
-                        .ObserveOn(RxApp.MainThreadScheduler);
+                    return Observable.Return<UserAndScopes>(null);
                 })
                 .SelectMany(LoginWithApiUser)
                 .PublishAsync();
@@ -121,14 +119,14 @@ namespace GitHub.Models
                 .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
                 .SelectMany(_ => GetUserFromApi())
-                .Catch<AccountCacheItem, ApiException>(firstTryEx =>
+                .Catch<UserAndScopes, ApiException>(firstTryEx =>
                 {
                     var exception = firstTryEx as AuthorizationException;
                     if (isEnterprise
                         && exception != null
                         && exception.Message == "Bad credentials")
                     {
-                        return Observable.Throw<AccountCacheItem>(exception);
+                        return Observable.Throw<UserAndScopes>(exception);
                     }
 
                     // If the Enterprise host doesn't support the write:public_key scope, it'll return a 422.
@@ -164,9 +162,9 @@ namespace GitHub.Models
                             .SelectMany(_ => GetUserFromApi());
                     }
 
-                    return Observable.Throw<AccountCacheItem>(firstTryEx);
+                    return Observable.Throw<UserAndScopes>(firstTryEx);
                 })
-                .Catch<AccountCacheItem, ApiException>(retryEx =>
+                .Catch<UserAndScopes, ApiException>(retryEx =>
                 {
                     // Older Enterprise hosts either don't have the API end-point to PUT an authorization, or they
                     // return 422 because they haven't white-listed our client ID. In that case, we just ignore
@@ -179,10 +177,10 @@ namespace GitHub.Models
                         return GetUserFromApi();
 
                     // Other errors are "real" so we pass them along:
-                    return Observable.Throw<AccountCacheItem>(retryEx);
+                    return Observable.Throw<UserAndScopes>(retryEx);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Catch<AccountCacheItem, Exception>(ex =>
+                .Catch<UserAndScopes, Exception>(ex =>
                 {
                     // If we get here, we have an actual login failure:
                     if (ex is TwoFactorChallengeFailedException)
@@ -191,9 +189,9 @@ namespace GitHub.Models
                     }
                     if (ex is AuthorizationException)
                     {
-                        return Observable.Return(default(AccountCacheItem));
+                        return Observable.Return(default(UserAndScopes));
                     }
-                    return Observable.Throw<AccountCacheItem>(ex);
+                    return Observable.Throw<UserAndScopes>(ex);
                 })
                 .SelectMany(LoginWithApiUser)
                 .PublishAsync();
@@ -224,7 +222,7 @@ namespace GitHub.Models
                 });
         }
 
-        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(AccountCacheItem account)
+        static IObservable<AuthenticationResult> GetAuthenticationResultForUser(UserAndScopes account)
         {
             return Observable.Return(account == null ? AuthenticationResult.CredentialFailure
                 : account == unverifiedUser
@@ -232,14 +230,15 @@ namespace GitHub.Models
                     : AuthenticationResult.Success);
         }
 
-        IObservable<AuthenticationResult> LoginWithApiUser(AccountCacheItem user)
+        IObservable<AuthenticationResult> LoginWithApiUser(UserAndScopes userAndScopes)
         {
-            return GetAuthenticationResultForUser(user)
+            return GetAuthenticationResultForUser(userAndScopes)
                 .SelectMany(result =>
                 {
                     if (result.IsSuccess())
                     {
-                        return ModelService.InsertUser(user).Select(_ => result);
+                        var accountCacheItem = new AccountCacheItem(userAndScopes.User);
+                        return ModelService.InsertUser(accountCacheItem).Select(_ => result);
                     }
 
                     if (result == AuthenticationResult.VerificationFailure)
@@ -254,19 +253,19 @@ namespace GitHub.Models
                     if (result.IsSuccess())
                     {
                         IsLoggedIn = true;
+                        SupportsGist = userAndScopes.Scopes?.Contains("gist") ?? true;
                     }
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                        user != null ? user.Login : "(null)",
+                        userAndScopes?.User?.Login ?? "(null)",
                         hostAddress.ApiUri,
                         result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
         }
 
-        IObservable<AccountCacheItem> GetUserFromApi()
+        IObservable<UserAndScopes> GetUserFromApi()
         {
-            return Observable.Defer(() => ApiClient.GetUser().WhereNotNull()
-                .Select(user => new AccountCacheItem(user)));
+            return Observable.Defer(() => ApiClient.GetUser());
         }
 
         bool disposed;

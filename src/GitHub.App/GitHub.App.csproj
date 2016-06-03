@@ -181,6 +181,7 @@
     <Compile Include="Services\IEnterpriseProbe.cs" />
     <Compile Include="Factories\RepositoryHostFactory.cs" />
     <Compile Include="Services\RepositoryCreationService.cs" />
+    <Compile Include="Services\GistPublishService.cs" />
     <Compile Include="Services\RepositoryPublishService.cs" />
     <Compile Include="Services\SerializedObjectProvider.cs" />
     <Compile Include="Services\StandardUserErrors.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
+    <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />

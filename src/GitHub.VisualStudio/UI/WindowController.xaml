@@ -23,6 +23,9 @@
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
     <Grid x:Name="Container">
-        
+        <ctl:Spinner HorizontalAlignment="Center" 
+                     VerticalAlignment="Center"
+                     Width="48" 
+                     Height="48"/>
     </Grid>
 </pfui:DialogWindow>

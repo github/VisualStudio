@@ -306,4 +306,13 @@
   <data name="prOpenedByText" xml:space="preserve">
     <value>by</value>
   </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>Failed to create gist</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>Open in Browser</value>
+  </data>
 </root>

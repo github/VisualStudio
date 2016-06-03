@@ -1,15 +1,17 @@
 ﻿using System;
-using GitHub.Exports;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using GitHub.Api;
+using GitHub.App;
+using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using NLog;
+using NullGuard;
 using Octokit;
 using ReactiveUI;
-using NullGuard;
-using GitHub.App;
 
 namespace GitHub.ViewModels
 {
@@ -17,21 +19,32 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IApiClient apiClient;
         readonly ObservableAsPropertyHelper<IAccount> account;
+        readonly IGistPublishService gistPublishService;
+        readonly INotificationService notificationService;
 
         [ImportingConstructor]
         GistCreationViewModel(
-        IConnectionRepositoryHostMap connectionRepositoryHostMap,
-        ISelectedTextProvider selectedTextProvider)
-        : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider)
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            ISelectedTextProvider selectedTextProvider,
+            IGistPublishService gistPublishService,
+            INotificationService notificationService)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService)
         {
+            this.notificationService = notificationService;
         }
 
-        public GistCreationViewModel(IRepositoryHost repositoryHost, ISelectedTextProvider selectedTextProvider)
+        public GistCreationViewModel(
+            IRepositoryHost repositoryHost,
+            ISelectedTextProvider selectedTextProvider,
+            IGistPublishService gistPublishService)
         {
             Title = Resources.CreateGistTitle;
             apiClient = repositoryHost.ApiClient;
+            this.gistPublishService = gistPublishService;
 
             FileName = VisualStudio.Services.GetFileNameFromActiveDocument() ?? Resources.DefaultGistFileName;
             SelectedText = selectedTextProvider.GetSelectedText();
@@ -50,15 +63,27 @@ namespace GitHub.ViewModels
             CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
         }
 
-        IObservable<Gist> OnCreateGist(object _)
+        IObservable<Gist> OnCreateGist(object unused)
         {
             var newGist = new NewGist
             {
                 Description = Description,
                 Public = !IsPrivate
             };
+
             newGist.Files.Add(FileName, SelectedText);
-            return apiClient.CreateGist(newGist);
+
+            return gistPublishService.PublishGist(apiClient, newGist)
+                .Catch<Gist, Exception>(ex =>
+                {
+                    if (!ex.IsCriticalException())
+                    {
+                        log.Error(ex);
+                        var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.GistCreateFailed);
+                        notificationService.ShowError(error);
+                    }
+                    return Observable.Return<Gist>(null);
+                });
         }
 
         public IReactiveCommand<Gist> CreateGist { get; }
