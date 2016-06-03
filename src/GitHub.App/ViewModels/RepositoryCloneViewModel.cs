@@ -134,7 +134,7 @@ namespace GitHub.ViewModels
                 // The following is a noop if the directory already exists.
                 operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
 
-                // Are we OK doing this here or should we be doing it after the clone succeeds.
+                // Are we OK doing this here or should we be doing it after the clone succeeds?
                 this.usageTracker.IncrementCloneCount();
 
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath);

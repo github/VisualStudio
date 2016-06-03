@@ -15,8 +15,11 @@ using GitHub.Settings;
 using ReactiveUI;
 using Rothko;
 
+#pragma warning disable CS0649
+
 namespace GitHub.Services
 {
+    using Microsoft.VisualStudio.Shell;
     using Guard = GitHub.Extensions.Guard;
 
     [Export(typeof(IUsageTracker))]
@@ -67,16 +70,8 @@ namespace GitHub.Services
             ////Lazy<IAppVersionProvider> appVersionProvider,
             Lazy<IEnvironment> environment,
             IPackageSettings userSettings,
-            IServiceProvider serviceProvider)
+            IUIProvider serviceProvider)
         {
-            Guard.ArgumentNotNull(cache, "cache");
-            ////Guard.ArgumentNotNull(trackedRepositories, "trackedRepositories");
-            Guard.ArgumentNotNull(repositoryHosts, "repositoryHosts");
-            ////Guard.ArgumentNotNull(appVersionProvider, "appVersionProvider");
-            Guard.ArgumentNotNull(environment, "environment");
-            Guard.ArgumentNotNull(userSettings, "userSettings");
-            Guard.ArgumentNotNull(serviceProvider, "serviceProvider");
-
             this.cache = cache;
             ////this.trackedRepositories = trackedRepositories;
             this.repositoryHosts = repositoryHosts;
