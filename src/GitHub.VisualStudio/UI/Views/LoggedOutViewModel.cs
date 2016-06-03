@@ -9,10 +9,8 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoggedOutViewModel : BaseViewModel
     {
-        [ImportingConstructor]
         public LoggedOutViewModel()
         {
-            CancelCommand = ReactiveCommand.Create();
         }
     }
 }
