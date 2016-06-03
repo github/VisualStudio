@@ -22,19 +22,7 @@ using System.Reactive.Linq;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class BaseViewModelDesigner : ReactiveObject, IViewModel
-    {
-        public ICommand Cancel { get; set; }
-        public ReactiveCommand<object> CancelCommand { get; protected set; }
-        public bool IsShowing { get; set; }
-        public string Title { get; set; }
-
-        public void Initialize(ViewWithData data)
-        { }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : BaseViewModelDesigner, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : BaseViewModel, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -369,7 +357,7 @@ namespace GitHub.SampleData
         public void Refresh() { }
     }
 
-    public class RepositoryCloneViewModelDesigner : BaseViewModelDesigner, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : BaseViewModel, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
