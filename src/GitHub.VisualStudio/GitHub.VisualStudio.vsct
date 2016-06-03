@@ -90,7 +90,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Back</ButtonText>
         </Strings>
       </Button>
 
@@ -99,7 +99,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Forward</ButtonText>
         </Strings>
       </Button>
 
@@ -108,7 +108,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Pull Requests</ButtonText>
         </Strings>
       </Button>
 
@@ -117,7 +117,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Refresh</ButtonText>
         </Strings>
       </Button>
 

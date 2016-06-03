@@ -232,14 +232,6 @@ namespace GitHub.SampleData
             SelectedConnection = Connections[0];
         }
 
-        public string DefaultRepositoryName
-        {
-            get
-            {
-                return "whatever";
-            }
-        }
-
         public bool IsHostComboBoxVisible
         {
             get
