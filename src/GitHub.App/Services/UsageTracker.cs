@@ -15,7 +15,7 @@ using GitHub.Settings;
 using ReactiveUI;
 using Rothko;
 
-namespace GitHub.App.Services
+namespace GitHub.Services
 {
     using Guard = GitHub.Extensions.Guard;
 
