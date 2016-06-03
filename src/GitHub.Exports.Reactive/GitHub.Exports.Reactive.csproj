@@ -102,6 +102,7 @@
     <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\IReactiveViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />

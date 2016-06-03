@@ -3,8 +3,7 @@
 namespace GitHub.ViewModels
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
-    public interface IPullRequestCreationViewModel : IViewModel
+    public interface IPullRequestCreationViewModel : IReactiveViewModel
     {
-        ReactiveCommand<object> CancelCommand { get; }
     }
 }
