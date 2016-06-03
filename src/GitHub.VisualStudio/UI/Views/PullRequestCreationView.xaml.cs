@@ -21,7 +21,6 @@ namespace GitHub.VisualStudio.UI.Views
 
             this.WhenActivated(d =>
             {
-                d(this.BindCommand(ViewModel, vm => vm.Cancel, v => v.cancelButton));
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
             });
         }
