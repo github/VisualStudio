@@ -42,7 +42,6 @@ namespace GitHub.ViewModels
                 (code, busy) => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6 && !busy.Value);
 
             OkCommand = ReactiveCommand.Create(canVerify);
-            CancelCommand = ReactiveCommand.Create();
             NavigateLearnMore = ReactiveCommand.Create();
             NavigateLearnMore.Subscribe(x => browser.OpenUrl(GitHubUrls.TwoFactorLearnMore));
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));

@@ -1,4 +1,5 @@
-﻿using GitHub.Exports;
+﻿using System;
+using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
 using System.ComponentModel.Composition;
@@ -20,6 +21,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             this.WhenActivated(d =>
             {
+                d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
             });
         }
 

@@ -56,7 +56,6 @@ namespace GitHub.VisualStudio.UI.Views
         protected void NotifyCreate()
         {
             create.OnNext(null);
-            create.OnCompleted();
         }
 
         bool disposed;

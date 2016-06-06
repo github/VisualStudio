@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestCreationViewModelDesigner : BaseViewModelDesigner, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModelDesigner : BaseViewModel, IPullRequestCreationViewModel
     {
         public PullRequestCreationViewModelDesigner()
         {
