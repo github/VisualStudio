@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GitHub.VisualStudio.UI {
+namespace GitHub.VisualStudio {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio.UI {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GitHub.VisualStudio.UI.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GitHub.VisualStudio.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -223,15 +223,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not copy to the clipboard. Please try again..
-        /// </summary>
-        public static string Error_FailedToCopyToClipboard {
-            get {
-                return ResourceManager.GetString("Error_FailedToCopyToClipboard", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to File Name.
         /// </summary>
         public static string fileNameText {
@@ -340,15 +331,6 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Link copied to clipboard.
-        /// </summary>
-        public static string LinkCopiedToClipboardMessage {
-            get {
-                return ResourceManager.GetString("LinkCopiedToClipboardMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Some or all repositories may not have loaded. Close the dialog and try again..
         /// </summary>
         public static string loadingFailedMessageContent {
@@ -430,6 +412,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To use this feature you need to sign in again..
+        /// </summary>
+        public static string needLogout {
+            get {
+                return ResourceManager.GetString("needLogout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No repositories.
         /// </summary>
         public static string noRepositoriesMessageText {
@@ -448,38 +439,11 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open in Browser.
-        /// </summary>
-        public static string openInBrowser {
-            get {
-                return ResourceManager.GetString("openInBrowser", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         public static string openTwoFactorAuthAppText {
             get {
                 return ResourceManager.GetString("openTwoFactorAuthAppText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Help us improve by sending anonymous usage data.
-        /// </summary>
-        public static string Options_MetricsLabel {
-            get {
-                return ResourceManager.GetString("Options_MetricsLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Privacy.
-        /// </summary>
-        public static string Options_PrivacyTitle {
-            get {
-                return ResourceManager.GetString("Options_PrivacyTitle", resourceCulture);
             }
         }
         
@@ -507,24 +471,6 @@ namespace GitHub.VisualStudio.UI {
         public static string pathText {
             get {
                 return ResourceManager.GetString("pathText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to by.
-        /// </summary>
-        public static string prOpenedByText {
-            get {
-                return ResourceManager.GetString("prOpenedByText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to opened.
-        /// </summary>
-        public static string prOpenedText {
-            get {
-                return ResourceManager.GetString("prOpenedText", resourceCulture);
             }
         }
         

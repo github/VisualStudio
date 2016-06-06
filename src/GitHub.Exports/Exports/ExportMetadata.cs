@@ -13,15 +13,17 @@ namespace GitHub.Exports
     public enum UIViewType
     {
         None,
+        End,
         Login,
         TwoFactor,
         Create,
         Clone,
         Publish,
+        Gist,
         PRList,
         PRDetail,
         PRCreation,
-        End = 100,
+        LogoutRequired,
         GitHubPane,
         LoggedOut
     }

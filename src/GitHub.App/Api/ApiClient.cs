@@ -13,21 +13,27 @@ using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using Octokit.Internal;
+using System.Collections.Generic;
+using GitHub.Models;
 
 namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-
+        const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
         // The old scopes must be used by older versions of Enterprise that don't support the new scopes:
-        readonly string[] oldAuthorizationScopes = { "user", "repo" };
+        readonly string[] oldAuthorizationScopes = { "user", "repo", "gist" };
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
-        readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
+        readonly string[] newAuthorizationScopes = { "user", "repo", "gist", "write:public_key" };
         readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
         readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
@@ -52,9 +58,35 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
-        public IObservable<User> GetUser()
+        public IObservable<Gist> CreateGist(NewGist newGist)
         {
-            return gitHubClient.User.Current();
+            return gitHubClient.Gist.Create(newGist);
+        }
+
+        public IObservable<UserAndScopes> GetUser()
+        {
+            return GetUserInternal().ToObservable();
+        }
+
+        async Task<UserAndScopes> GetUserInternal()
+        {
+            var response = await gitHubClient.Connection.Get<User>(
+                userEndpoint, null, null).ConfigureAwait(false);
+            var scopes = default(string[]);
+
+            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
+            {
+                scopes = response.HttpResponse.Headers[ScopesHeader]
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .ToArray();
+            }
+            else
+            {
+                log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
+            }
+
+            return new UserAndScopes(response.Body, scopes);
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(

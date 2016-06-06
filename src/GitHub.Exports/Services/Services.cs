@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 
 namespace GitHub.VisualStudio
 {
@@ -101,6 +102,16 @@ namespace GitHub.VisualStudio
             if (solutionDir == null)
                 return null;
             return GitService.GitServiceHelper.GetUri(solutionDir);
+        }
+
+        /// <summary>
+        /// Gets the file name of the currently active document in the text editor, 
+        /// or null if there there is no active document.
+        /// </summary>
+        public static string GetFileNameFromActiveDocument()
+        {
+            var fullName = Dte2?.ActiveDocument?.FullName;
+            return Path.GetFileName(fullName);
         }
     }
 }

@@ -28,14 +28,24 @@ namespace GitHub.UI
         Clone,
         Publish,
         PullRequests,
+        Gist,
+        LogoutRequired,
         Home
     }
 
     public class ViewWithData
     {
-        public UIControllerFlow Flow;
+        public UIControllerFlow ActiveFlow;
+        public UIControllerFlow MainFlow;
         public UIViewType ViewType;
         public object Data;
+
+        public ViewWithData() {}
+        public ViewWithData(UIControllerFlow flow)
+        {
+            ActiveFlow = flow;
+            MainFlow = flow;
+        }
     }
 
     public enum LoadDirection

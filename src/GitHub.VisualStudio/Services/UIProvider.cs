@@ -8,15 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows.Controls;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using NullGuard;
 using NLog;
-using System.Reactive.Linq;
-using GitHub.Infrastructure;
+using NullGuard;
 
 namespace GitHub.VisualStudio
 {
@@ -40,14 +41,10 @@ namespace GitHub.VisualStudio
         bool initializingLogging = false;
 
         [AllowNull]
-        public ExportProvider ExportProvider { get; private set; }
+        public ExportProvider ExportProvider { get; }
 
-        IServiceProvider gitServiceProvider;
         [AllowNull]
-        public IServiceProvider GitServiceProvider {
-            get { return gitServiceProvider; }
-            set { gitServiceProvider = value; }
-        }
+        public IServiceProvider GitServiceProvider { get; set; }
 
         bool Initialized { get { return ExportProvider != null; } }
 
@@ -90,7 +87,7 @@ namespace GitHub.VisualStudio
                 initializingLogging = true;
                 try
                 {
-                    var logging = TryGetService<ILoggingConfiguration>();
+                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
                     logging.Configure();
                 }
                 catch
@@ -112,9 +109,9 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
-            if (gitServiceProvider != null)
+            if (GitServiceProvider != null)
             {
-                instance = gitServiceProvider.GetService(serviceType);
+                instance = GitServiceProvider.GetService(serviceType);
                 if (instance != null)
                     return instance;
             }
@@ -222,7 +219,7 @@ namespace GitHub.VisualStudio
 
             StopUI();
 
-            var factory = GetService<IExportFactoryProvider>();
+            var factory = TryGetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
             currentUIFlow = factory.UIControllerFactory.CreateExport();
             var disposable = currentUIFlow;
             var ui = currentUIFlow.Value;
