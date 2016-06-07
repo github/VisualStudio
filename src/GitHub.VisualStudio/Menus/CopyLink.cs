@@ -13,10 +13,13 @@ namespace GitHub.VisualStudio.Menus
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class CopyLink : LinkMenuBase, IDynamicMenuHandler
     {
+        readonly IUsageTracker usageTracker;
+
         [ImportingConstructor]
-        public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IUsageTracker usageTracker)
             : base(serviceProvider)
         {
+            this.usageTracker = usageTracker;
         }
 
         public Guid Guid => GuidList.guidContextMenuSet;
@@ -35,6 +38,7 @@ namespace GitHub.VisualStudio.Menus
                 Clipboard.SetText(link);
                 var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
+                this.usageTracker.IncrementLinkToGitHubCount();
             }
             catch
             {

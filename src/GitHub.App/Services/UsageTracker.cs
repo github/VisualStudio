@@ -25,18 +25,17 @@ namespace GitHub.Services
         // Whenever you add a counter make sure it gets added to _both_
         // BuildUsageModel and ClearCounters
         const string GHLastSubmissionKey = "GHLastSubmission";
-        const string GHCommitCountKey = "GHCommitCount";
         const string GHCreateCountKey = "GHCreateCountKey";
         const string GHCloneCountKey = "GHCloneCount";
         const string GHPublishCountKey = "GHPublishCountKey";
         const string GHGistCountKey = "GHPublishCountKey";
         const string GHOpenInGitHubCountKey = "GHOpenInGitHubCountKey";
         const string GHLinkToGitHubCountKey = "GHLinkToGitHubCountKey";
+        const string GHUpstreamPullRequestCount = "GHUpstreamPullRequestCount";
         const string GHLoginCountKey = "GHLoginCountKey";
         const string GHLaunchCountKeyDay = "GHLaunchCountDay";
         const string GHLaunchCountKeyWeek = "GHLaunchCountWeek";
         const string GHLaunchCountKeyMonth = "GHLaunchCountMonth";
-        const string GHUpstreamPullRequestCount = "GHUpstreamPullRequestCount";
 
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
@@ -132,15 +131,14 @@ namespace GitHub.Services
         {
             var standardCounters = new[] {
                 GHLaunchCountKeyDay,
-                GHUpstreamPullRequestCount,
                 GHCloneCountKey,
                 GHCreateCountKey,
                 GHPublishCountKey,
-                GHCommitCountKey,
                 GHGistCountKey,
                 GHOpenInGitHubCountKey,
                 GHLinkToGitHubCountKey,
                 GHLoginCountKey,
+                GHUpstreamPullRequestCount,
             };
 
             var counters = standardCounters
@@ -194,7 +192,6 @@ namespace GitHub.Services
                 GetCounter(GHLaunchCountKeyDay).Do(x => model.NumberOfStartups = x),
                 GetCounter(GHLaunchCountKeyWeek).Do(x => model.NumberOfStartupsWeek = x),
                 GetCounter(GHLaunchCountKeyMonth).Do(x => model.NumberOfStartupsMonth = x),
-                GetCounter(GHUpstreamPullRequestCount).Do(x => model.NumberOfUpstreamPullRequests = x),
                 GetCounter(GHCloneCountKey).Do(x => model.NumberOfClones = x),
                 GetCounter(GHCreateCountKey).Do(x => model.NumberOfReposCreated = x),
                 GetCounter(GHPublishCountKey).Do(x => model.NumberOfReposPublished = x),
@@ -202,6 +199,7 @@ namespace GitHub.Services
                 GetCounter(GHOpenInGitHubCountKey).Do(x => model.NumberOfOpenInGitHub = x),
                 GetCounter(GHLinkToGitHubCountKey).Do(x => model.NumberOfLinkToGitHub = x),
                 GetCounter(GHLoginCountKey).Do(x => model.NumberOfLogins = x),
+                GetCounter(GHUpstreamPullRequestCount).Do(x => model.NumberOfUpstreamPullRequests = x),
             };
 
             if (weekly)
@@ -270,15 +268,15 @@ namespace GitHub.Services
             });
         }
 
-        public void IncrementCommitCount()
-        {
-            IncrementCounter(GHCommitCountKey)
-                .Subscribe();
-        }
-
         public void IncrementCloneCount()
         {
             IncrementCounter(GHCloneCountKey)
+                .Subscribe();
+        }
+
+        public void IncrementCreateCount()
+        {
+            IncrementCounter(GHCreateCountKey)
                 .Subscribe();
         }
 
@@ -287,6 +285,24 @@ namespace GitHub.Services
             IncrementCounter(GHLaunchCountKeyDay)
                 .ContinueAfter(() => IncrementCounter(GHLaunchCountKeyWeek))
                 .ContinueAfter(() => IncrementCounter(GHLaunchCountKeyMonth))
+                .Subscribe();
+        }
+
+        public void IncrementPublishCount()
+        {
+            IncrementCounter(GHPublishCountKey)
+                .Subscribe();
+        }
+
+        public void IncrementOpenInGitHubCount()
+        {
+            IncrementCounter(GHOpenInGitHubCountKey)
+                .Subscribe();
+        }
+
+        public void IncrementLinkToGitHubCount()
+        {
+            IncrementCounter(GHLinkToGitHubCountKey)
                 .Subscribe();
         }
 

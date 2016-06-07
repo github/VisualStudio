@@ -2,9 +2,12 @@
 {
     public interface IUsageTracker
     {
-        void IncrementCloneCount();
-        void IncrementCommitCount();
         void IncrementLaunchCount();
+        void IncrementCloneCount();
+        void IncrementCreateCount();
+        void IncrementPublishCount();
+        void IncrementOpenInGitHubCount();
+        void IncrementLinkToGitHubCount();
         void IncrementUpstreamPullRequestCount();
     }
 }
