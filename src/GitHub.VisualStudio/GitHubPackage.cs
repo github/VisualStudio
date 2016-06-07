@@ -67,6 +67,7 @@ namespace GitHub.VisualStudio
             AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
 
             base.Initialize();
+            IncrementLaunchCount();
 
             var menus = serviceProvider.GetExportedValue<IMenuProvider>();
             foreach (var menu in menus.Menus)
@@ -102,6 +103,12 @@ namespace GitHub.VisualStudio
                 VsOutputLogger.Write(log);
             }
             return null;
+        }
+
+        void IncrementLaunchCount()
+        {
+            var usageTracker = serviceProvider.GetExportedValue<IUsageTracker>();
+            usageTracker.IncrementLaunchCount();
         }
     }
 

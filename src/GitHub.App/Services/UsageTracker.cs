@@ -10,7 +10,6 @@ using Akavache;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
-using GitHub.Services;
 using GitHub.Settings;
 using ReactiveUI;
 using Rothko;
@@ -19,67 +18,47 @@ using Rothko;
 
 namespace GitHub.Services
 {
-    using Microsoft.VisualStudio.Shell;
-    using Guard = GitHub.Extensions.Guard;
-
     [Export(typeof(IUsageTracker))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class UsageTracker : IUsageTracker
     {
-        readonly IMetricsService client;
-
-        readonly Lazy<ISharedCache> cache;
-        readonly Lazy<IRepositoryHosts> repositoryHosts;
-        //readonly Lazy<IAppVersionProvider> appVersionProvider;
-        readonly Lazy<IEnvironment> environment;
-        ////readonly Lazy<IRepositoryHosts> trackedRepositories;
-        readonly IPackageSettings userSettings;
-
         // Whenever you add a counter make sure it gets added to _both_
         // BuildUsageModel and ClearCounters
-        internal const string GHLastSubmissionKey = "GHLastSubmission";
-        internal const string GHCommitCountKey = "GHCommitCount";
-        internal const string GHSyncCountKey = "GHSyncCount";
-        internal const string GHCloneCountKey = "GHCloneCount";
-        internal const string GHShellLaunchCountKey = "GHShellLaunchCount";
-        internal const string GHLaunchCountKeyDay = "GHLaunchCountDay";
-        internal const string GHLaunchCountKeyWeek = "GHLaunchCountWeek";
-        internal const string GHLaunchCountKeyMonth = "GHLaunchCountMonth";
-        internal const string GHPartialCommitCount = "GHPartialCommitCount";
-        internal const string GHTutorialRunCount = "GHTutorialRunCount";
-        internal const string GHOpenInExplorerCount = "GHOpenInExplorerCount";
-        internal const string GHOpenInShellCount = "GHOpenInShellCount";
-        internal const string GHBranchSwitchCount = "GHBranchSwitchCount";
-        internal const string GHDiscardChangesCount = "GHDiscardChangesCount";
-        internal const string GHOpenedURLCount = "GHOpenedURLCount";
-        internal const string GHLfsDiffCount = "GHLfsDiffCount";
-        internal const string GHMergeCommitCount = "GHMergeCommitCount";
-        internal const string GHMergeConflictCount = "GHMergeConflictCount";
-        internal const string GHOpenInEditorCount = "GHOpenInEditorCount";
-        internal const string GHUpstreamPullRequestCount = "GHUpstreamPullRequestCount";
+        const string GHLastSubmissionKey = "GHLastSubmission";
+        const string GHCommitCountKey = "GHCommitCount";
+        const string GHCreateCountKey = "GHCreateCountKey";
+        const string GHCloneCountKey = "GHCloneCount";
+        const string GHPublishCountKey = "GHPublishCountKey";
+        const string GHGistCountKey = "GHPublishCountKey";
+        const string GHOpenInGitHubCountKey = "GHOpenInGitHubCountKey";
+        const string GHLinkToGitHubCountKey = "GHLinkToGitHubCountKey";
+        const string GHLoginCountKey = "GHLoginCountKey";
+        const string GHLaunchCountKeyDay = "GHLaunchCountDay";
+        const string GHLaunchCountKeyWeek = "GHLaunchCountWeek";
+        const string GHLaunchCountKeyMonth = "GHLaunchCountMonth";
+        const string GHUpstreamPullRequestCount = "GHUpstreamPullRequestCount";
 
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
-        IBlobCache localMachineCache { get { return cache.Value.LocalMachine; } }
+        readonly IMetricsService client;
+        readonly Lazy<ISharedCache> cache;
+        readonly Lazy<IRepositoryHosts> repositoryHosts;
+        readonly IPackageSettings userSettings;
 
         [ImportingConstructor]
         public UsageTracker(
             Lazy<ISharedCache> cache,
-            ////Lazy<ITrackedRepositories> trackedRepositories,
             Lazy<IRepositoryHosts> repositoryHosts,
-            ////Lazy<IAppVersionProvider> appVersionProvider,
-            Lazy<IEnvironment> environment,
             IPackageSettings userSettings,
             IUIProvider serviceProvider)
         {
             this.cache = cache;
-            ////this.trackedRepositories = trackedRepositories;
             this.repositoryHosts = repositoryHosts;
-            ////this.appVersionProvider = appVersionProvider;
-            this.environment = environment;
             this.userSettings = userSettings;
             this.client = (IMetricsService)serviceProvider.GetService(typeof(IMetricsService));
         }
+
+        IBlobCache LocalMachineCache => cache.Value.LocalMachine;
 
         IObservable<Unit> SubmitIfNeeded()
         {
@@ -122,13 +101,13 @@ namespace GitHub.Services
 
         IObservable<DateTimeOffset> GetLastUpdated()
         {
-            return Observable.Defer(() => localMachineCache.GetObject<DateTimeOffset>(GHLastSubmissionKey))
+            return Observable.Defer(() => LocalMachineCache.GetObject<DateTimeOffset>(GHLastSubmissionKey))
                 .Catch<DateTimeOffset, KeyNotFoundException>(_ => Observable.Return(DateTimeOffset.MinValue));
         }
 
         IObservable<Unit> StoreLastUpdated(DateTimeOffset lastUpdated)
         {
-            return Observable.Defer(() => localMachineCache.InsertObject(GHLastSubmissionKey, lastUpdated));
+            return Observable.Defer(() => LocalMachineCache.InsertObject(GHLastSubmissionKey, lastUpdated));
         }
 
         static Calendar cal = CultureInfo.InvariantCulture.Calendar;
@@ -152,23 +131,16 @@ namespace GitHub.Services
         IObservable<Unit> ClearCounters(bool weekly, bool monthly)
         {
             var standardCounters = new[] {
-                GHCommitCountKey,
-                GHSyncCountKey,
-                GHCloneCountKey,
-                GHShellLaunchCountKey,
                 GHLaunchCountKeyDay,
-                GHPartialCommitCount,
-                GHTutorialRunCount,
-                GHOpenInExplorerCount,
-                GHOpenInShellCount,
-                GHBranchSwitchCount,
-                GHDiscardChangesCount,
-                GHOpenedURLCount,
-                GHLfsDiffCount,
-                GHMergeCommitCount,
-                GHMergeConflictCount,
-                GHOpenInEditorCount,
-                GHUpstreamPullRequestCount
+                GHUpstreamPullRequestCount,
+                GHCloneCountKey,
+                GHCreateCountKey,
+                GHPublishCountKey,
+                GHCommitCountKey,
+                GHGistCountKey,
+                GHOpenInGitHubCountKey,
+                GHLinkToGitHubCountKey,
+                GHLoginCountKey,
             };
 
             var counters = standardCounters
@@ -183,38 +155,29 @@ namespace GitHub.Services
 
         IObservable<Unit> ClearCounter(string key)
         {
-            return Observable.Defer(() => localMachineCache.InvalidateObject<int>(key));
+            return Observable.Defer(() => LocalMachineCache.InvalidateObject<int>(key));
         }
 
         IObservable<int> GetCounter(string key)
         {
-            return Observable.Defer(() => localMachineCache.GetObject<int>(key))
+            return Observable.Defer(() => LocalMachineCache.GetObject<int>(key))
                 .Catch<int, KeyNotFoundException>(_ => Observable.Return(0));
         }
 
         IObservable<Unit> SaveCounter(string key, int value)
         {
-            return Observable.Defer(() => localMachineCache.InsertObject(key, value));
+            return Observable.Defer(() => LocalMachineCache.InsertObject(key, value));
         }
 
         IObservable<UsageModel> BuildUsageModel(bool weekly, bool monthly)
         {
-            ////var repositories = trackedRepositories.Value.Repositories;
             var hosts = repositoryHosts.Value;
 
-            var model = new UsageModel
-            {
-                ////NumberOfRepositories = repositories.Count,
-                ////NumberOfGitHubRepositories = repositories.Count(x => x.IsHosted),
-                ////NumberOfGitHubForks = repositories.Count(x => x.IsHosted && x.IsFork),
-                ////NumberOfRepositoryOwners = repositories.Count(r => IsOwner(r, hosts))
-            };
-
+            var model = new UsageModel();
 
             if (hosts.GitHubHost?.IsLoggedIn == true)
             {
                 model.IsGitHubUser = true;
-                ////model.NumberOfOrgs = gitHubHost.Organizations.Count();
             }
 
             if (hosts.EnterpriseHost?.IsLoggedIn == true)
@@ -222,59 +185,22 @@ namespace GitHub.Services
                 model.IsEnterpriseUser = true;
             }
 
-            var env = environment.Value;
-
-            model.OsVersion = env.OSVersion.Version.ToString();
-            model.Is64BitOperatingSystem = env.Is64BitOperatingSystem;
             model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
-
-            ////try
-            ////{
-            ////    model.RamMB = (int)(env.GetTotalInstalledPhysicalMemory() / 1024 / 1024);
-            ////}
-            ////catch (Exception ex)
-            ////{
-            ////    // This shouldn't really throw but let's be super defensive.
-            ////    log.Warn("Could not get total installed physical memory", ex);
-            ////}
-
-            try
-            {
-                var currentProcess = Process.GetCurrentProcess();
-                var elapsedSinceStart = DateTime.Now - currentProcess.StartTime;
-                model.SecondsSinceLaunch = Math.Max(0, (int)elapsedSinceStart.TotalSeconds);
-            }
-            catch (Exception ex)
-            {
-                log.Warn("Could not get process uptime", ex);
-            }
-
-            ////model.AppVersion = appVersionProvider.Value.Version.ToString();
+            model.AppVersion = AssemblyVersionInformation.Version;
 
             var counters = new List<IObservable<int>>
             {
-                GetCounter(GHCommitCountKey).Do(x => model.NumberOfCommits = x),
-                GetCounter(GHCloneCountKey).Do(x => model.NumberOfClones = x),
-                GetCounter(GHSyncCountKey).Do(x => model.NumberOfSyncs = x),
-
-                // NB: We're using this in a slightly different way than MAC. On mac this means
-                // whether or not a user has installed their command line tools, for us (since it's
-                // always installed I've made it track whether or not the user has launched the Git 
-                // shell. We might be able to get some insight into how many of our users use the CLI.
-                GetCounter(GHShellLaunchCountKey).Do(x => model.InstalledCommandLineTools = x > 0),
                 GetCounter(GHLaunchCountKeyDay).Do(x => model.NumberOfStartups = x),
-                GetCounter(GHPartialCommitCount).Do(x => model.NumberOfPartialCommits = x),
-                GetCounter(GHTutorialRunCount).Do(x => model.NumberOfTutorialRuns = x),
-                GetCounter(GHOpenInExplorerCount).Do(x => model.NumberOfOpenOnDisks = x),
-                GetCounter(GHOpenInShellCount).Do(x => model.NumberOfOpenInShells = x),
-                GetCounter(GHBranchSwitchCount).Do(x => model.NumberOfBranchSwitches = x),
-                GetCounter(GHDiscardChangesCount).Do(x => model.NumberOfDiscardChanges = x),
-                GetCounter(GHOpenedURLCount).Do(x => model.NumberOfOpenedURLs = x),
-                GetCounter(GHLfsDiffCount).Do(x => model.NumberOfLFSDiffs = x),
-                GetCounter(GHMergeCommitCount).Do(x => model.NumberOfMergeCommits = x),
-                GetCounter(GHMergeConflictCount).Do(x => model.NumberOfMergeConflicts = x),
-                GetCounter(GHOpenInEditorCount).Do(x => model.NumberOfOpenInExternalEditors = x),
+                GetCounter(GHLaunchCountKeyWeek).Do(x => model.NumberOfStartupsWeek = x),
+                GetCounter(GHLaunchCountKeyMonth).Do(x => model.NumberOfStartupsMonth = x),
                 GetCounter(GHUpstreamPullRequestCount).Do(x => model.NumberOfUpstreamPullRequests = x),
+                GetCounter(GHCloneCountKey).Do(x => model.NumberOfClones = x),
+                GetCounter(GHCreateCountKey).Do(x => model.NumberOfReposCreated = x),
+                GetCounter(GHPublishCountKey).Do(x => model.NumberOfReposPublished = x),
+                GetCounter(GHGistCountKey).Do(x => model.NumberOfGists = x),
+                GetCounter(GHOpenInGitHubCountKey).Do(x => model.NumberOfOpenInGitHub = x),
+                GetCounter(GHLinkToGitHubCountKey).Do(x => model.NumberOfLinkToGitHub = x),
+                GetCounter(GHLoginCountKey).Do(x => model.NumberOfLogins = x),
             };
 
             if (weekly)
@@ -292,31 +218,6 @@ namespace GitHub.Services
             return Observable.Merge(counters)
                 .ContinueAfter(() => Observable.Return(model));
         }
-
-        static bool IsOwner(IRepositoryModel repo, IRepositoryHosts hosts)
-        {
-            Guard.ArgumentNotNull(repo, "repo");
-            Guard.ArgumentNotNull(hosts, "hosts");
-
-            ////if (!repo.IsHosted || !repo.OwnerId.HasValue)
-            ////    return false;
-
-            ////if (hosts.GitHubHost != null && IsOwner(repo, hosts.GitHubHost))
-            ////    return true;
-
-            ////if (hosts.EnterpriseHost != null && IsOwner(repo, hosts.EnterpriseHost))
-            ////    return true;
-
-            return false;
-        }
-
-        ////static bool IsOwner(IRepositoryModel repo, IRepositoryHost host)
-        ////{
-        ////    Guard.ArgumentNotNull(repo, "repo");
-        ////    Guard.ArgumentNotNull(host, "host");
-
-        ////    return host.User != null && repo.OwnerId.HasValue && host.User.Id == repo.OwnerId.Value;
-        ////}
 
         IObservable<Unit> Run()
         {
@@ -349,6 +250,7 @@ namespace GitHub.Services
                     return GetCounter(key)
                         .Select(x => x + 1)
                         .SelectMany(x => SaveCounter(key, x).Select(_ => x))
+                        .Do(x => Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "Incremented {0} to {1}", key, x)))
                         .Catch<int, Exception>(ex =>
                         {
                             log.Warn("Could not increment usage data counter", ex);
@@ -373,27 +275,9 @@ namespace GitHub.Services
                 .Subscribe();
         }
 
-        public void IncrementSyncCount()
-        {
-            IncrementCounter(GHSyncCountKey)
-                .Subscribe();
-        }
-
         public void IncrementCloneCount()
         {
             IncrementCounter(GHCloneCountKey)
-                .Subscribe();
-        }
-
-        public void IncrementShellLaunchCount()
-        {
-            IncrementCounter(GHShellLaunchCountKey)
-                .Subscribe();
-        }
-
-        public void IncrementLfsDiffCount()
-        {
-            IncrementCounter(GHLfsDiffCount)
                 .Subscribe();
         }
 
@@ -402,65 +286,6 @@ namespace GitHub.Services
             IncrementCounter(GHLaunchCountKeyDay)
                 .ContinueAfter(() => IncrementCounter(GHLaunchCountKeyWeek))
                 .ContinueAfter(() => IncrementCounter(GHLaunchCountKeyMonth))
-                .Subscribe();
-        }
-
-        public void IncrementPartialCommitCount()
-        {
-            IncrementCounter(GHPartialCommitCount)
-                .Subscribe();
-        }
-
-        public void IncrementTutorialRunCount()
-        {
-            IncrementCounter(GHTutorialRunCount)
-                .Subscribe();
-        }
-
-        public void IncrementOpenInExplorerCount()
-        {
-            IncrementCounter(GHOpenInExplorerCount)
-                .Subscribe();
-        }
-        public void IncrementOpenInShellCount()
-        {
-            IncrementCounter(GHOpenInShellCount)
-                .Subscribe();
-        }
-
-        public void IncrementBranchSwitchCount()
-        {
-            IncrementCounter(GHBranchSwitchCount)
-                .Subscribe();
-        }
-
-        public void IncrementDiscardChangesCount()
-        {
-            IncrementCounter(GHDiscardChangesCount)
-                .Subscribe();
-        }
-
-        public void IncrementNumberOfOpenedURLs()
-        {
-            IncrementCounter(GHOpenedURLCount)
-                .Subscribe();
-        }
-
-        public void IncrementMergeCommitCount()
-        {
-            IncrementCounter(GHMergeCommitCount)
-                .Subscribe();
-        }
-
-        public void IncrementMergeConflictCount()
-        {
-            IncrementCounter(GHMergeConflictCount)
-                .Subscribe();
-        }
-
-        public void IncrementOpenInEditorCount()
-        {
-            IncrementCounter(GHOpenInEditorCount)
                 .Subscribe();
         }
 
