@@ -8,7 +8,7 @@
     {
         "name": "UIState",
         "type": "object",
-		"typename": "UIState",
+        "typename": "UIState",
         "default": 'null'
     }
     ]
