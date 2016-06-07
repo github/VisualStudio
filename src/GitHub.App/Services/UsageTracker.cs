@@ -55,6 +55,28 @@ namespace GitHub.Services
             this.repositoryHosts = repositoryHosts;
             this.userSettings = userSettings;
             this.client = (IMetricsService)serviceProvider.GetService(typeof(IMetricsService));
+
+            userSettings.WhenAny(x => x.CollectMetrics, x => x.Value)
+                // If SendUsageData is true we'll subscribe to the Run()
+                // observable (which is a timer) and thus kick off the
+                // tracker. The Run method will produce on unit per tick
+                // but we don't care about that at all so we'll ignore
+                // that and instead send true or false down the chain
+                // indicating that the tracker is running or not.
+                .Select(sendUsageData => sendUsageData
+                    ? Run()
+                        .IgnoreElements()
+                        .Select(_ => true)
+                        .StartWith(true)
+                    : Observable.Return(false))
+                .Switch()
+                // The first value will be what initially kicks off the
+                // tracker. The second value (if there is one) will signal
+                // that the user has opted in or out of usage tracking.
+                .Skip(1)
+                .Select(sendUsageData => sendUsageData ? OptIn() : OptOut())
+                .Switch()
+                .Subscribe();
         }
 
         IBlobCache LocalMachineCache => cache.Value.LocalMachine;
