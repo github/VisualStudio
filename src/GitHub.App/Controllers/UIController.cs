@@ -601,7 +601,7 @@ namespace GitHub.Controllers
             ShutdownFlow(activeFlow);
 
             // if the auth was cancelled, we need to stop everything, otherwise we'll go into a loop
-            if (activeFlow == mainFlow || (activeFlow == UIControllerFlow.Authentication && !Success.Value))
+            if (activeFlow == mainFlow || !Success.Value)
                 stopping = true;
 
             Fire(Trigger.Next);
