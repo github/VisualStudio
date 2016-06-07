@@ -22,11 +22,13 @@ namespace GitHub.Settings
         void Save();
 <#
 foreach (var j in json["settings"].Children()) {
+	var type = j["type"].ToString();
+	if (type == "object")
+		type = j["typename"].ToString();
 #>
-        <#= j["type"] #> <#= j["name"] #> { get; set; }
+        <#= type #> <#= j["name"] #> { get; set; }
 <#
 }
 #>
-		UIState UIState { get; }
     }
 }

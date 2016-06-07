@@ -94,7 +94,7 @@ namespace GitHub.ViewModels
 
             var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
             if (!string.IsNullOrEmpty(defaultRepositoryName))
-                DefaultRepositoryName = defaultRepositoryName;
+                RepositoryName = defaultRepositoryName;
 
             this.WhenAny(x => x.SelectedConnection, x => x.SelectedAccount,
                 (a,b) => true)
@@ -109,7 +109,6 @@ namespace GitHub.ViewModels
                 });
         }
 
-        public string DefaultRepositoryName { get; private set; }
         public new string Title { get { return title.Value; } }
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
         public bool IsPublishing { get { return isPublishing.Value; } }

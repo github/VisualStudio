@@ -22,18 +22,7 @@ using System.Reactive.Linq;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class BaseViewModelDesigner : ReactiveObject, IViewModel
-    {
-        public ICommand Cancel { get; set; }
-        public bool IsShowing { get; set; }
-        public string Title { get; set; }
-
-        public void Initialize(ViewWithData data)
-        { }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : BaseViewModelDesigner, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : BaseViewModel, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -232,14 +221,6 @@ namespace GitHub.SampleData
             SelectedConnection = Connections[0];
         }
 
-        public string DefaultRepositoryName
-        {
-            get
-            {
-                return "whatever";
-            }
-        }
-
         public bool IsHostComboBoxVisible
         {
             get
@@ -293,6 +274,12 @@ namespace GitHub.SampleData
         }
 
         public bool IsLoggedIn
+        {
+            get;
+            private set;
+        }
+
+        public bool SupportsGist
         {
             get;
             private set;
@@ -368,7 +355,7 @@ namespace GitHub.SampleData
         public void Refresh() { }
     }
 
-    public class RepositoryCloneViewModelDesigner : BaseViewModelDesigner, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : BaseViewModel, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {

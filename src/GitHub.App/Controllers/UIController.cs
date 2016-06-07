@@ -170,7 +170,9 @@ namespace GitHub.Controllers
 
             uiStateMachine = new StateMachineType(UIViewType.None);
             triggers = new Dictionary<Trigger, StateMachineType.TriggerWithParameters<ViewWithData>>();
+
             ConfigureUIHandlingStates();
+
         }
 
         public IObservable<LoadData> SelectFlow(UIControllerFlow choice)
@@ -257,12 +259,12 @@ namespace GitHub.Controllers
 
         public void Jump(ViewWithData where)
         {
-            Debug.Assert(where.Flow == mainFlow, "Jump called for flow " + where.Flow + " but this is " + mainFlow);
-            if (where.Flow != mainFlow)
+            Debug.Assert(where.ActiveFlow == mainFlow, "Jump called for flow " + where.ActiveFlow + " but this is " + mainFlow);
+            if (where.ActiveFlow != mainFlow)
                 return;
 
             requestedTarget = where;
-            if (activeFlow == where.Flow)
+            if (activeFlow == where.ActiveFlow)
                 Fire(Trigger.Next, where);
         }
 
@@ -295,8 +297,7 @@ namespace GitHub.Controllers
                 .OnEntry(tr => stopping = false)
                 .PermitDynamic(Trigger.Next, () =>
                     {
-                        var loggedIn = connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
-                        activeFlow = loggedIn ? mainFlow : UIControllerFlow.Authentication;
+                        activeFlow = SelectActiveFlow();
                         return Go(Trigger.Next);
                     })
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
@@ -348,6 +349,18 @@ namespace GitHub.Controllers
 
             uiStateMachine.Configure(UIViewType.TwoFactor)
                 .OnEntry(tr => RunView(UIViewType.TwoFactor, CalculateDirection(tr)))
+                .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
+                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
+
+            uiStateMachine.Configure(UIViewType.Gist)
+                .OnEntry(tr => RunView(UIViewType.Gist, CalculateDirection(tr)))
+                .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
+                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
+
+            uiStateMachine.Configure(UIViewType.LogoutRequired)
+                .OnEntry(tr => RunView(UIViewType.LogoutRequired, CalculateDirection(tr)))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
@@ -518,6 +531,43 @@ namespace GitHub.Controllers
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.PullRequests, logic);
+
+            // gist flow
+            logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.Configure(UIViewType.None)
+                .Permit(Trigger.Next, UIViewType.Gist)
+                .Permit(Trigger.Finish, UIViewType.End);
+            logic.Configure(UIViewType.Gist)
+                .Permit(Trigger.Next, UIViewType.End)
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Finish, UIViewType.End);
+            logic.Configure(UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.None);
+            machines.Add(UIControllerFlow.Gist, logic);
+
+            // logout required flow
+            logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.Configure(UIViewType.None)
+                .Permit(Trigger.Next, UIViewType.LogoutRequired)
+                .Permit(Trigger.Finish, UIViewType.End);
+            logic.Configure(UIViewType.LogoutRequired)
+                .Permit(Trigger.Next, UIViewType.End)
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Finish, UIViewType.End);
+            logic.Configure(UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.None);
+            machines.Add(UIControllerFlow.LogoutRequired, logic);
+        }
+
+        UIControllerFlow SelectActiveFlow()
+        {
+            var host = connection != null ? hosts.LookupHost(connection.HostAddress) : null;
+            var loggedIn = host?.IsLoggedIn ?? false;
+            if (!loggedIn || mainFlow != UIControllerFlow.Gist)
+                return loggedIn ? mainFlow : UIControllerFlow.Authentication;
+
+            var supportsGist = host?.SupportsGist ?? false;
+            return supportsGist ? mainFlow : UIControllerFlow.LogoutRequired;
         }
 
         static LoadDirection CalculateDirection(StateMachineType.Transition tr)
@@ -580,12 +630,14 @@ namespace GitHub.Controllers
                 requestedTarget = null;
             }
 
+            if (arg == null)
+                arg = new ViewWithData { ActiveFlow = activeFlow, MainFlow = mainFlow, ViewType = viewType };
             bool firstTime = CreateViewAndViewModel(viewType, arg);
             var view = GetObjectsForFlow(activeFlow)[viewType].View;
             transition.OnNext(new LoadData
             {
                 View = view,
-                Data = arg ?? new ViewWithData { Flow = activeFlow, ViewType = viewType },
+                Data = arg,
                 Direction = direction
             });
 
@@ -660,7 +712,7 @@ namespace GitHub.Controllers
         /// </summary>
         /// <param name="viewType"></param>
         /// <returns>true if the View/ViewModel didn't exist and had to be created</returns>
-        bool CreateViewAndViewModel(UIViewType viewType, [AllowNull]ViewWithData data = null)
+        bool CreateViewAndViewModel(UIViewType viewType, ViewWithData data = null)
         {
             var list = GetObjectsForFlow(activeFlow);
             if (viewType == UIViewType.Login)

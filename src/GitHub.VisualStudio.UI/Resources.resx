@@ -279,6 +279,12 @@
   <data name="NotLoggedInMessage" xml:space="preserve">
     <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
   </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>File Name</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>Private Gist</value>
+  </data>
   <data name="RepositoryPublishedMessage" xml:space="preserve">
     <value>Repository created successfully.</value>
   </data>
@@ -299,5 +305,14 @@
   </data>
   <data name="prOpenedByText" xml:space="preserve">
     <value>by</value>
+  </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>Failed to create gist</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>Open in Browser</value>
   </data>
 </root>

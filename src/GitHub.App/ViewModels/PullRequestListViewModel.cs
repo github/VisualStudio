@@ -41,7 +41,6 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.repository = repository;
 
-            CancelCommand = ReactiveCommand.Create();
             openPullRequestCommand = ReactiveCommand.Create();
             openPullRequestCommand.Subscribe(_ =>
             {

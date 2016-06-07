@@ -9,6 +9,8 @@
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <ApplicationVersion>1.0.99.5</ApplicationVersion>
+    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
+    <ApplicationVersion>1.0.99.7</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -204,6 +206,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Base\MenuBase.cs" />
+    <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="..\common\SharedDictionaryManager.cs">
       <Link>Helpers\SharedDictionaryManager.cs</Link>
     </Compile>
@@ -219,6 +222,8 @@
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
+    <Compile Include="Services\Program.cs" />
+    <Compile Include="Services\SelectedTextProvider.cs" />
     <Compile Include="Settings\PackageSettings.cs" />
     <Compile Include="Settings\generated\PackageSettings.cs">
       <AutoGen>True</AutoGen>
@@ -228,7 +233,6 @@
     <Compile Include="Settings\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Services\Program.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
@@ -236,6 +240,15 @@
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\Views\Controls\Spinner.xaml.cs">
+      <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
+      <DependentUpon>GistCreationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\LogoutRequiredControl.xaml.cs">
+      <DependentUpon>LogoutRequiredControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
@@ -389,6 +402,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\Views\Controls\Spinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\LogoutRequiredControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styles\ThemeDark.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -416,10 +445,6 @@
     <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\RepositoryCreationControl.xaml">
       <Generator>MSBuild:Compile</Generator>

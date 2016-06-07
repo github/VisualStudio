@@ -5,9 +5,14 @@ using GitHub.UI;
 
 namespace GitHub.ViewModels
 {
-    public class BaseViewModel : ReactiveObject, IViewModel
+    public class BaseViewModel : ReactiveObject, IReactiveViewModel
     {
         protected ObservableAsPropertyHelper<bool> isShowing;
+
+        public BaseViewModel()
+        {
+            CancelCommand = ReactiveCommand.Create();
+        }
 
         public ReactiveCommand<object> CancelCommand { get; protected set; }
         public ICommand Cancel { get { return CancelCommand; } }

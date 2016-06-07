@@ -57,8 +57,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                         else
                             teServices.ClearNotifications();
                     }));
-
-                nameText.Text = ViewModel.DefaultRepositoryName;
             });
             IsVisibleChanged += (s, e) =>
             {

@@ -26,6 +26,7 @@ namespace GitHub.Models
         [AllowNull]
         public bool IsLoggedIn { get; private set; }
         public bool IsLoggingIn { get; private set; }
+        public bool SupportsGist { get; private set; }
         public ReactiveList<IAccount> Organizations { get; private set; }
         public ReactiveList<IAccount> Accounts { get; private set; }
         public string Title { get; private set; }

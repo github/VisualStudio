@@ -81,6 +81,9 @@ public class UIControllerTests
             SetupViewModel<IPullRequestListViewModel>(factory, GitHub.Exports.UIViewType.PRList);
             SetupViewModel<IPullRequestDetailViewModel>(factory, GitHub.Exports.UIViewType.PRDetail);
             SetupViewModel<IPullRequestCreationViewModel>(factory, GitHub.Exports.UIViewType.PRCreation);
+            SetupViewModel<IGistCreationViewModel>(factory, GitHub.Exports.UIViewType.Gist);
+            SetupViewModel<ILogoutRequiredViewModel>(factory, GitHub.Exports.UIViewType.LogoutRequired);
+
 
             SetupView<ILoginControlViewModel>(factory, GitHub.Exports.UIViewType.Login);
             SetupView<ITwoFactorDialogViewModel>(factory, GitHub.Exports.UIViewType.TwoFactor);
@@ -90,17 +93,20 @@ public class UIControllerTests
             SetupView<IPullRequestListViewModel>(factory, GitHub.Exports.UIViewType.PRList);
             SetupView<IPullRequestDetailViewModel>(factory, GitHub.Exports.UIViewType.PRDetail);
             SetupView<IPullRequestCreationViewModel>(factory, GitHub.Exports.UIViewType.PRCreation);
+            SetupView<IGistCreationViewModel>(factory, GitHub.Exports.UIViewType.Gist);
+            SetupView<ILogoutRequiredViewModel>(factory, GitHub.Exports.UIViewType.LogoutRequired);
 
             return new UIFactory(factory);
         }
 
         protected IConnection SetupConnection(IServiceProvider provider, IRepositoryHosts hosts,
-            IRepositoryHost host)
+            IRepositoryHost host, bool loggedIn = true, bool supportsGist = true)
         {
             var connection = provider.GetConnection();
             connection.Login().Returns(Observable.Return(connection));
             hosts.LookupHost(connection.HostAddress).Returns(host);
-            host.IsLoggedIn.Returns(true);
+            host.IsLoggedIn.Returns(loggedIn);
+            host.SupportsGist.Returns(supportsGist);
             return connection;
         }
 
@@ -551,6 +557,7 @@ public class UIControllerTests
                 Assert.True(uiController.IsStopped);
             }
         }
+
     }
 
     public class PullRequestsFlow : UIControllerTestBase
@@ -586,7 +593,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -595,7 +602,7 @@ public class UIControllerTests
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -665,7 +672,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -674,7 +681,7 @@ public class UIControllerTests
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
                             ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
@@ -689,6 +696,128 @@ public class UIControllerTests
 
                 uiController.Start(null);
                 Assert.Equal(6, count);
+                Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
+            }
+        }
+    }
+
+    public class GistFlow : UIControllerTestBase
+    {
+        [Fact]
+        public void ShowingGistDialogWhenGistNotSupportedShowsLogoutDialog()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var cm = provider.GetConnectionManager();
+            var cons = new ObservableCollection<IConnection>();
+            cm.Connections.Returns(cons);
+
+            var host = hosts.GitHubHost;
+            // simulate being logged in
+            cons.Add(SetupConnection(provider, hosts, host, true, false));
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            {
+                var count = 0;
+                bool? success = null;
+                var flow = uiController.SelectFlow(UIControllerFlow.Gist);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(3, count);
+                        count++;
+                    });
+
+                flow.Subscribe(data =>
+                {
+                    var uc = data.View;
+                    switch (++count)
+                    {
+                        case 1:
+                            Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(uc);
+                            host.IsLoggedIn.Returns(false);
+                            TriggerDone(uc);
+                            break;
+                        case 2:
+                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+                            // login
+                            host.IsLoggedIn.Returns(true);
+                            host.SupportsGist.Returns(true);
+                            TriggerDone(uc);
+                            break;
+                        case 3:
+                            Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
+                            TriggerDone(uc);
+                            break;
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
+                    }
+                }, () =>
+                {
+                    Assert.Equal(4, count);
+                    count++;
+                });
+
+                uiController.Start(null);
+                Assert.Equal(5, count);
+                Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
+            }
+        }
+
+        [Fact]
+        public void ShowingGistDialogWhenGistSupportedShowsGistDialog()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var cm = provider.GetConnectionManager();
+            var cons = new ObservableCollection<IConnection>();
+            cm.Connections.Returns(cons);
+
+            // simulate being logged in
+            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true, true));
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            {
+                var count = 0;
+                bool? success = null;
+                var flow = uiController.SelectFlow(UIControllerFlow.Gist);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(1, count);
+                        count++;
+                    });
+
+                flow.Subscribe(data =>
+                {
+                    var uc = data.View;
+                    switch (++count)
+                    {
+                        case 1:
+                            Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
+                            TriggerDone(uc);
+                            break;
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
+                    }
+                }, () =>
+                {
+                    Assert.Equal(2, count);
+                    count++;
+                });
+
+                uiController.Start(null);
+                Assert.Equal(3, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);

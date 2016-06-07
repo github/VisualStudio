@@ -58,7 +58,7 @@ namespace GitHub.VisualStudio.UI.Views
             base.Initialize(serviceProvider);
 
             ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
-                (s, e) => Reload(new ViewWithData { Flow = UIControllerFlow.PullRequests, ViewType = UIViewType.PRList }).Forget());
+                (s, e) => Reload(new ViewWithData(UIControllerFlow.PullRequests) { ViewType = UIViewType.PRList }).Forget());
 
             back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && currentNavItem > 0,
@@ -131,8 +131,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (IsLoggedIn)
             {
-                if (uiController == null || (data != null && data.Flow != uiController.CurrentFlow))
-                    StartFlow(data?.Flow ?? UIControllerFlow.PullRequests, connection, data);
+                if (uiController == null || (data != null && data.ActiveFlow != uiController.CurrentFlow))
+                    StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
                 else if (data != null || currentNavItem >= 0)
                     uiController.Jump(data ?? navStack[currentNavItem]);
             }

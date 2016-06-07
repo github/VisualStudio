@@ -1,11 +1,14 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Base;
@@ -14,7 +17,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
-using System.Linq;
 
 namespace GitHub.VisualStudio
 {

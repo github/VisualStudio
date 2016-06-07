@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 
@@ -9,7 +10,8 @@ namespace GitHub.Api
     {
         HostAddress HostAddress { get; }
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
-        IObservable<User> GetUser();
+        IObservable<Gist> CreateGist(NewGist newGist);
+        IObservable<UserAndScopes> GetUser();
         IObservable<Organization> GetOrganizations();
         /// <summary>
         /// Retrieves all repositories that belong to this user.
