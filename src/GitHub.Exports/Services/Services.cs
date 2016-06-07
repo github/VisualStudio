@@ -83,6 +83,8 @@ namespace GitHub.VisualStudio
 
         public static IVsUIShell UIShell => GetGlobalService<SVsUIShell, IVsUIShell>();
 
+        public static string VisualStudioVersion => Dte.Version;
+
         public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
         {
             return GetGlobalService<SVsActivityLog, IVsActivityLog>(provider);

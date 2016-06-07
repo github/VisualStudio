@@ -187,6 +187,7 @@ namespace GitHub.Services
 
             model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
             model.AppVersion = AssemblyVersionInformation.Version;
+            model.VSVersion = GitHub.VisualStudio.Services.VisualStudioVersion;
 
             var counters = new List<IObservable<int>>
             {
