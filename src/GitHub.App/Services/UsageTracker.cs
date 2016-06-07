@@ -28,7 +28,7 @@ namespace GitHub.Services
         const string GHCreateCountKey = "GHCreateCountKey";
         const string GHCloneCountKey = "GHCloneCount";
         const string GHPublishCountKey = "GHPublishCountKey";
-        const string GHGistCountKey = "GHPublishCountKey";
+        const string GHCreateGistCountKey = "GHCreateGistCountKey";
         const string GHOpenInGitHubCountKey = "GHOpenInGitHubCountKey";
         const string GHLinkToGitHubCountKey = "GHLinkToGitHubCountKey";
         const string GHUpstreamPullRequestCount = "GHUpstreamPullRequestCount";
@@ -134,7 +134,7 @@ namespace GitHub.Services
                 GHCloneCountKey,
                 GHCreateCountKey,
                 GHPublishCountKey,
-                GHGistCountKey,
+                GHCreateGistCountKey,
                 GHOpenInGitHubCountKey,
                 GHLinkToGitHubCountKey,
                 GHLoginCountKey,
@@ -195,7 +195,7 @@ namespace GitHub.Services
                 GetCounter(GHCloneCountKey).Do(x => model.NumberOfClones = x),
                 GetCounter(GHCreateCountKey).Do(x => model.NumberOfReposCreated = x),
                 GetCounter(GHPublishCountKey).Do(x => model.NumberOfReposPublished = x),
-                GetCounter(GHGistCountKey).Do(x => model.NumberOfGists = x),
+                GetCounter(GHCreateGistCountKey).Do(x => model.NumberOfGists = x),
                 GetCounter(GHOpenInGitHubCountKey).Do(x => model.NumberOfOpenInGitHub = x),
                 GetCounter(GHLinkToGitHubCountKey).Do(x => model.NumberOfLinkToGitHub = x),
                 GetCounter(GHLoginCountKey).Do(x => model.NumberOfLogins = x),
@@ -303,6 +303,12 @@ namespace GitHub.Services
         public void IncrementLinkToGitHubCount()
         {
             IncrementCounter(GHLinkToGitHubCountKey)
+                .Subscribe();
+        }
+
+        public void IncrementCreateGistCount()
+        {
+            IncrementCounter(GHCreateGistCountKey)
                 .Subscribe();
         }
 

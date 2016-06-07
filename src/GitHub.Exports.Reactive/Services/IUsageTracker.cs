@@ -8,6 +8,7 @@
         void IncrementPublishCount();
         void IncrementOpenInGitHubCount();
         void IncrementLinkToGitHubCount();
+        void IncrementCreateGistCount();
         void IncrementUpstreamPullRequestCount();
     }
 }
