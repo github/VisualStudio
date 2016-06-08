@@ -171,6 +171,24 @@ namespace GitHub.Services
             return collection;
         }
 
+        public IObservable<IPullRequestModel> CreatePullRequest(IPullRequestModel pr, ISimpleRepositoryModel repository)
+        {
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repository.Name));
+
+            return Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.PutAndUpdateIndex(key, () =>
+                        apiClient.CreatePullRequest(new NewPullRequest(pr.Title, pr.Head.Name, pr.Base.Name),
+                                    repository.CloneUrl.Owner,
+                                    repository.CloneUrl.RepositoryName)
+                                 .Select(PullRequestCacheItem.Create),
+                    TimeSpan.FromMinutes(30))
+                )
+                .Select(Create)
+            );
+        }
+
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
@@ -234,12 +252,22 @@ namespace GitHub.Services
                     });
         }
 
+       public IObservable<IBranch> GetBranches(ISimpleRepositoryModel repo)
+        {
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));
+
+            return Observable.Defer(() => keyobs
+                    .SelectMany(key => apiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
+                .Select(Create);
+        }
+
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
         {
             return new LicenseItem(licenseCacheItem.Key, licenseCacheItem.Name);
         }
 
-        Models.Account Create(AccountCacheItem accountCacheItem)
+        IAccount Create(AccountCacheItem accountCacheItem)
         {
             return new Models.Account(
                 accountCacheItem.Login,
@@ -273,6 +301,11 @@ namespace GitHub.Services
                 CommentCount = prCacheItem.CommentCount,
                 IsOpen = prCacheItem.IsOpen
             };
+        }
+
+        IBranch Create(Branch branch)
+        {
+            return new BranchModel(branch);
         }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
