@@ -21,6 +21,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             this.WhenActivated(d =>
             {
+                d(this.OneWayBind(ViewModel, vm => vm.BranchValidator, v => v.branchValidationMessage.ReactiveValidator));
+                d(this.OneWayBind(ViewModel, vm => vm.TitleValidator, v => v.titleValidationMessage.ReactiveValidator));
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
             });
         }
