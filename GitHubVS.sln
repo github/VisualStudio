@@ -52,7 +52,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Script", "Script", "{7B6C5F
 		script\Require-CleanWorkTree.ps1 = script\Require-CleanWorkTree.ps1
 		script\Run-NUnit.ps1 = script\Run-NUnit.ps1
 		script\Run-XUnit.ps1 = script\Run-XUnit.ps1
-		script\SolutionInfo.cs = script\SolutionInfo.cs
 		script\Upload-DirectoryToS3.ps1 = script\Upload-DirectoryToS3.ps1
 	EndProjectSection
 EndProject
