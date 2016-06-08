@@ -141,6 +141,9 @@ namespace GitHub.Models
             set { assignee = value; this.RaisePropertyChange(); }
         }
 
+        public ISimpleRepositoryModel Repository { get; }
+        public IBranch Head { get; }
+        public IBranch Base { get; }
 
         [return: AllowNull] // nullguard thinks a string.Format can return null. sigh.
         public override string ToString()
