@@ -8,6 +8,7 @@
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                                      xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                       xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
@@ -85,6 +86,29 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <Popup x:Name="branchPopup"
+               AllowsTransparency="True"
+               Placement="Bottom"
+               PlacementTarget="{Binding ElementName=branchSelection}"
+               StaysOpen="False">
+          <Border Style="{DynamicResource GitHubComboBoxBorder}">
+            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
+              <ListBox x:Name="branches"
+                       DisplayMemberPath="Name"
+                       DockPanel.Dock="Top"
+                       ItemsSource="{Binding Branches}"
+                       SelectedItem="{Binding SourceBranch}"
+                       Style="{DynamicResource GitHubPopupThing}">
+                <i:Interaction.Triggers>
+                  <i:EventTrigger EventName="SelectionChanged">
+                    <ui:ClosePopupAction TargetName="branchPopup" />
+                  </i:EventTrigger>
+                </i:Interaction.Triggers>
+              </ListBox>
+            </DockPanel>
+          </Border>
+        </Popup>
+
         <StackPanel Grid.Column="0" Orientation="Horizontal">
           <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
           <ui:GitHubActionLink x:Name="branchSelectionButton"
@@ -101,10 +125,11 @@
           <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding TargetBranch}" />
         </StackPanel>
 
-        <ui:GitHubActionLink Grid.Column="1" x:Name="branchSelection"
+        <ui:GitHubActionLink x:Name="sourceBranch"
+                             Grid.Column="1"
                              Margin="5,0"
                              VerticalAlignment="Center"
-                             Content="{Binding SelectedBranch.Name}"
+                             Content="{Binding SourceBranch.Name}"
                              HasDropDown="True"
                              ToolTip="Select a branch">
           <i:Interaction.Triggers>
@@ -113,31 +138,14 @@
             </i:EventTrigger>
           </i:Interaction.Triggers>
         </ui:GitHubActionLink>
-
-        <Popup x:Name="branchPopup"
-               AllowsTransparency="True"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=branchSelection}"
-               StaysOpen="False">
-          <Border Style="{DynamicResource GitHubComboBoxBorder}">
-            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
-              <ListBox x:Name="branches"
-                       DockPanel.Dock="Top"
-                       ItemsSource="{Binding Branches}"
-                       DisplayMemberPath="Name"
-                       SelectedItem="{Binding SelectedBranch}"
-                       Style="{DynamicResource GitHubPopupThing}">
-                <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="SelectionChanged">
-                    <ui:ClosePopupAction TargetName="branchPopup" />
-                  </i:EventTrigger>
-                </i:Interaction.Triggers>
-              </ListBox>
-            </DockPanel>
-          </Border>
-        </Popup>
-
       </Grid>
+
+      <uirx:ValidationMessage x:Name="branchValidationMessage"
+                              DockPanel.Dock="Bottom"
+                              Fill="{StaticResource GitHubWarningBrush}"
+                              Icon="alert"
+                              ValidatesControl="{Binding ElementName=sourceBranch}" />
+
     </DockPanel>
 
     <TabControl Grid.Row="1"
@@ -146,9 +154,16 @@
       <TabItem Header="Details" Style="{DynamicResource GitHubPRDetailsTabItem}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
           <StackPanel Orientation="Vertical">
-            <ui:PromptTextBox Margin="10,5"
+            <ui:PromptTextBox x:Name="title" Margin="10,5"
                               PromptText="Title"
                               Style="{DynamicResource GitHubVsPromptTextBox}" />
+            
+            <uirx:ValidationMessage x:Name="titleValidationMessage"
+                              DockPanel.Dock="Bottom"
+                              Fill="{StaticResource GitHubWarningBrush}"
+                              Icon="alert"
+                              ValidatesControl="{Binding ElementName=title}" />
+            
             <ui:PromptTextBox Height="100"
                               Margin="10,5"
                               AcceptsReturn="True"
@@ -325,6 +340,7 @@
               <Button Grid.Column="1"
                       Margin="6,0,0,0"
                       HorizontalAlignment="Right"
+                      Command="{Binding CreatePullRequest}"
                       Content="Create pull request"
                       Style="{StaticResource GitHubVsPrimaryActionButton}" />
             </Grid>

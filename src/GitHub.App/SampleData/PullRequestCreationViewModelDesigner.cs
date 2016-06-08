@@ -2,6 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 using GitHub.ViewModels;
 using System.Collections.Generic;
 using GitHub.Models;
+using GitHub.Validation;
+using System;
+using System.Windows.Input;
 
 namespace GitHub.SampleData
 {
@@ -35,5 +38,13 @@ namespace GitHub.SampleData
 
         public string SelectedAssignee { get; set; }
         public List<string> Users { get; set; }
+
+        public ICommand CreatePullRequest { get; }
+
+        public string PRTitle { get; set; }
+
+        public ReactivePropertyValidator TitleValidator { get; }
+
+        public ReactivePropertyValidator BranchValidator { get; }
     }
 }

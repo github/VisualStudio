@@ -10,6 +10,9 @@ using System.Collections.ObjectModel;
 using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using System.Linq;
+using System.Windows.Input;
+using GitHub.Validation;
+using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {
@@ -19,11 +22,12 @@ namespace GitHub.ViewModels
     {
         [ImportingConstructor]
         PullRequestCreationViewModel(
-             IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice)
-             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo)
+             IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice,
+             IPullRequestService service)
+             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service)
          {}
 
-        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo)
+        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo, IPullRequestService service)
         {
             repositoryHost.ModelService.GetBranches(activeRepo)
                             .ToReadOnlyList()
@@ -35,7 +39,33 @@ namespace GitHub.ViewModels
 
             // what do we do if there's no master?
             TargetBranch = new BranchModel { Name = "master" };
-        } 
+            var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value).WhereNotNull();
+            TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
+                .IfNullOrEmpty("Please enter a title for the Pull Request");
+
+            var branchObs = this.WhenAny(
+                x => x.SourceBranch,
+                x => x.TargetBranch,
+                (source, target) => source.Value.Name == target.Value.Name);
+
+            BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
+                .IfTrue(x => x, "Source and target branch cannot be the same");
+
+            var whenAnyValidationResultChanges = this.WhenAny(
+                x => x.TitleValidator.ValidationResult.IsValid,
+                x => x.BranchValidator.ValidationResult.IsValid,
+                (x, y) => x.Value && y.Value);
+
+            createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
+                _ => service.CreatePullRequest(repositoryHost, activeRepo, PRTitle, SourceBranch, TargetBranch)
+            );
+            createPullRequest.ThrownExceptions.Subscribe(ex =>
+            {
+                if (!ex.IsCriticalException())
+                {
+                }
+            });
+        }
 
         IBranch targetBranch;
         public IBranch TargetBranch
@@ -56,6 +86,30 @@ namespace GitHub.ViewModels
         {
             get { return branches; }
             set { this.RaiseAndSetIfChanged(ref branches, value); }
+        }
+
+        IReactiveCommand createPullRequest;
+        public ICommand CreatePullRequest => createPullRequest;
+
+        string title;
+        public string PRTitle
+        {
+            get { return title; }
+            set { this.RaiseAndSetIfChanged(ref title, value); }
+        }
+
+        ReactivePropertyValidator titleValidator;
+        public ReactivePropertyValidator TitleValidator
+        {
+            get { return titleValidator; }
+            private set { this.RaiseAndSetIfChanged(ref titleValidator, value); }
+        }
+
+        ReactivePropertyValidator branchValidator;
+        public ReactivePropertyValidator BranchValidator
+        {
+            get { return branchValidator; }
+            private set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
         }
     }
 }

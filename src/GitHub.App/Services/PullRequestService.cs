@@ -8,9 +8,9 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
-        public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host, ISimpleRepositoryModel repository, IPullRequestModel pullRequest)
+        public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host, ISimpleRepositoryModel repository, string title, IBranch source, IBranch target)
         {
-            return host.ModelService.CreatePullRequest(pullRequest, repository);
+            return host.ModelService.CreatePullRequest(repository, title, source, target);
         }
     }
 }
