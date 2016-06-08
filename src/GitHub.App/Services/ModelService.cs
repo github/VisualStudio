@@ -171,7 +171,7 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(IPullRequestModel pr, ISimpleRepositoryModel repository)
+        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel repository, string title, IBranch source, IBranch target)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repository.Name));
@@ -179,7 +179,7 @@ namespace GitHub.Services
             return Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.PutAndUpdateIndex(key, () =>
-                        apiClient.CreatePullRequest(new NewPullRequest(pr.Title, pr.Head.Name, pr.Base.Name),
+                        apiClient.CreatePullRequest(new NewPullRequest(title, source.Name, target.Name),
                                     repository.CloneUrl.Owner,
                                     repository.CloneUrl.RepositoryName)
                                  .Select(PullRequestCacheItem.Create),

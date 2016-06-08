@@ -10,6 +10,6 @@ namespace GitHub.Services
 {
     public interface IPullRequestService
     {
-        IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host, ISimpleRepositoryModel repository, IPullRequestModel pullRequest);
+        IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host, ISimpleRepositoryModel repository, string title, IBranch source, IBranch target);
     }
 }
