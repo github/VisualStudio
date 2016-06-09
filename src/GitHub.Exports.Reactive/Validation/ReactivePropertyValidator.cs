@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text.RegularExpressions;
@@ -69,7 +70,7 @@ namespace GitHub.Validation
         Valid = 2,
     }
 
-    public abstract class ReactivePropertyValidator : ReactiveObject
+    public abstract class ReactivePropertyValidator : ReactiveObject, IDisposable
     {
         public static ReactivePropertyValidator<TProp> For<TObj, TProp>(TObj This, Expression<Func<TObj, TProp>> property)
         {
@@ -92,9 +93,18 @@ namespace GitHub.Validation
         public abstract Task<ReactivePropertyValidationResult> ExecuteAsync();
 
         public abstract Task ResetAsync();
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class ReactivePropertyValidator<TProp> : ReactivePropertyValidator
     {
         readonly ReactiveCommand<ReactivePropertyValidationResult> validateCommand;
