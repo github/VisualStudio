@@ -13,6 +13,8 @@ using System.Linq;
 using System.Windows.Input;
 using GitHub.Validation;
 using GitHub.Extensions;
+using NullGuard;
+using System.Reactive.Disposables;
 
 namespace GitHub.ViewModels
 {
@@ -20,41 +22,57 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
+        readonly IRepositoryHost repositoryHost;
+        readonly ISimpleRepositoryModel activeRepo;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
+
         [ImportingConstructor]
         PullRequestCreationViewModel(
              IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice,
-             IPullRequestService service)
-             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service)
+             IPullRequestService service, INotificationService notifications)
+             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service, notifications)
          {}
 
-        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo, IPullRequestService service)
+        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo,
+            IPullRequestService service, INotificationService notifications)
         {
-            repositoryHost.ModelService.GetBranches(activeRepo)
-                            .ToReadOnlyList()
-                            .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(x => Branches = x);
+            this.repositoryHost = repositoryHost;
+            this.activeRepo = activeRepo;
 
             var repo = GitService.GitServiceHelper.GetRepo(activeRepo.LocalPath);
-            SourceBranch = new BranchModel(repo.Head);
+            this.WhenAny(x => x.Branches, x => x.Value)
+                .WhereNotNull()
+                .Subscribe(x =>
+                {
+                    // what do we do if there's no master?
+                    TargetBranch = x.FirstOrDefault(b => b.Name == "master");
+                    SourceBranch = x.FirstOrDefault(b => b.Name == repo.Head.FriendlyName);
+                });
 
-            // what do we do if there's no master?
-            TargetBranch = new BranchModel { Name = "master" };
-            var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value).WhereNotNull();
+            var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value);
             TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
                 .IfNullOrEmpty("Please enter a title for the Pull Request");
+            disposables.Add(TitleValidator);
 
             var branchObs = this.WhenAny(
                 x => x.SourceBranch,
-                x => x.TargetBranch,
-                (source, target) => source.Value.Name == target.Value.Name);
+                source => source.Value);
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
-                .IfTrue(x => x, "Source and target branch cannot be the same");
+                .IfTrue(x => x == null, "Source branch doesn't exist remotely, have you pushed it?")
+                .IfTrue(x => x.Name == TargetBranch.Name, "Source and target branch cannot be the same");
+            disposables.Add(BranchValidator);
 
             var whenAnyValidationResultChanges = this.WhenAny(
-                x => x.TitleValidator.ValidationResult.IsValid,
-                x => x.BranchValidator.ValidationResult.IsValid,
-                (x, y) => x.Value && y.Value);
+                x => x.TitleValidator.ValidationResult,
+                x => x.BranchValidator.ValidationResult,
+                (x, y) => (x.Value?.IsValid ?? false) && (y.Value?.IsValid ?? false));
+
+            disposables.Add(
+                this.WhenAny(x => x.BranchValidator.ValidationResult, x => x.GetValue())
+                    .WhereNotNull()
+                    .Where(x => !x.IsValid && x.DisplayValidationError)
+                    .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message)));
 
             createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service.CreatePullRequest(repositoryHost, activeRepo, PRTitle, SourceBranch, TargetBranch)
@@ -65,51 +83,76 @@ namespace GitHub.ViewModels
                 {
                 }
             });
+            disposables.Add(createPullRequest);
         }
 
-        IBranch targetBranch;
-        public IBranch TargetBranch
+        public override void Initialize([AllowNull] ViewWithData data)
         {
-            get { return targetBranch; }
-            set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
+            base.Initialize(data);
+
+            repositoryHost.ModelService.GetBranches(activeRepo)
+                            .ToReadOnlyList()
+                            .ObserveOn(RxApp.MainThreadScheduler)
+                            .Subscribe(x => Branches = x);
         }
 
         IBranch sourceBranch;
+        [AllowNull]
         public IBranch SourceBranch
         {
+            [return: AllowNull]
             get { return sourceBranch; }
             set { this.RaiseAndSetIfChanged(ref sourceBranch, value); }
+        }
+
+        IBranch targetBranch;
+        [AllowNull]
+        public IBranch TargetBranch
+        {
+            [return: AllowNull]
+            get { return targetBranch; }
+            set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
         }
 
         IReadOnlyList<IBranch> branches;
         public IReadOnlyList<IBranch> Branches
         {
+            [return: AllowNull]
             get { return branches; }
             set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
 
-        IReactiveCommand createPullRequest;
-        public ICommand CreatePullRequest => createPullRequest;
+        IReactiveCommand<IPullRequestModel> createPullRequest;
+        public IReactiveCommand<IPullRequestModel> CreatePullRequest => createPullRequest;
 
         string title;
         public string PRTitle
         {
+            [return: AllowNull]
             get { return title; }
             set { this.RaiseAndSetIfChanged(ref title, value); }
+        }
+
+        string description;
+        public string Description
+        {
+            [return: AllowNull]
+            get { return description; }
+            set { this.RaiseAndSetIfChanged(ref description, value); }
         }
 
         ReactivePropertyValidator titleValidator;
         public ReactivePropertyValidator TitleValidator
         {
             get { return titleValidator; }
-            private set { this.RaiseAndSetIfChanged(ref titleValidator, value); }
+            set { this.RaiseAndSetIfChanged(ref titleValidator, value); }
         }
 
         ReactivePropertyValidator branchValidator;
-        public ReactivePropertyValidator BranchValidator
+        ReactivePropertyValidator BranchValidator
         {
             get { return branchValidator; }
-            private set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
+            set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
         }
     }
 }
