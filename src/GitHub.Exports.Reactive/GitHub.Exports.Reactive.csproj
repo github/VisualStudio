@@ -92,8 +92,12 @@
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
+    <Compile Include="Models\UserAndScopes.cs" />
     <Compile Include="Services\IModelService.cs" />
+    <Compile Include="Services\IGistPublishService.cs" />
+    <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
+    <Compile Include="ViewModels\ILogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubViewModel.cs" />
@@ -104,6 +108,10 @@
     <Compile Include="Services\IGitClient.cs" />
     <Compile Include="Services\IRepositoryPublishService.cs" />
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\IReactiveViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />

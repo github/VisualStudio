@@ -9,7 +9,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.18.3</ApplicationVersion>
+    <ApplicationVersion>1.0.99.7</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -143,8 +143,8 @@
       <HintPath>..\..\packages\SQLitePCL.raw_basic.0.7.3.0-vs2012\lib\net45\SQLitePCL.raw.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Stateless, Version=2.5.11.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Stateless.2.5.11.0\lib\portable-net40+sl50+win+wp80\Stateless.dll</HintPath>
+    <Reference Include="Stateless, Version=2.5.56.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Stateless.2.5.56.0\lib\portable-net40+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Stateless.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -174,6 +174,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -208,13 +209,14 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Base\MenuBase.cs" />
-    <Compile Include="Converters\CountToVisibilityConverter.cs" />
+    <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="..\common\SharedDictionaryManager.cs">
       <Link>Helpers\SharedDictionaryManager.cs</Link>
     </Compile>
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Menus\OpenLink.cs" />
     <Compile Include="Menus\LinkMenuBase.cs" />
+    <Compile Include="Menus\OpenPullRequests.cs" />
     <Compile Include="Menus\ShowGitHubPane.cs" />
     <Compile Include="Menus\AddConnection.cs" />
     <Compile Include="Menus\CopyLink.cs" />
@@ -223,6 +225,8 @@
     <Compile Include="Helpers\Browser.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
+    <Compile Include="Services\Program.cs" />
+    <Compile Include="Services\SelectedTextProvider.cs" />
     <Compile Include="Settings\PackageSettings.cs" />
     <Compile Include="Settings\generated\PackageSettings.cs">
       <AutoGen>True</AutoGen>
@@ -232,7 +236,6 @@
     <Compile Include="Settings\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Services\Program.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
@@ -240,6 +243,15 @@
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\Views\Controls\Spinner.xaml.cs">
+      <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
+      <DependentUpon>GistCreationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\Controls\LogoutRequiredControl.xaml.cs">
+      <DependentUpon>LogoutRequiredControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
@@ -260,6 +272,20 @@
     </Compile>
     <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\LoggedOutViewModel.cs" />
+    <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
+    <Compile Include="UI\Views\LoggedOutView.xaml.cs">
+      <DependentUpon>LoggedOutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\PullRequestCreationView.xaml.cs">
+      <DependentUpon>PullRequestCreationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\PullRequestDetailView.xaml.cs">
+      <DependentUpon>PullRequestDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\PullRequestListView.xaml.cs">
+      <DependentUpon>PullRequestListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\WindowController.xaml.cs">
       <DependentUpon>WindowController.xaml</DependentUpon>
@@ -351,6 +377,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Styles\Buttons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\GitHubComboBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\GitHubTabControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\TextBlocks.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styles\ThemeBlue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -362,6 +404,22 @@
     <Page Include="Styles\ThemeLight.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Controls\Spinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\GistCreationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\Controls\LogoutRequiredControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\ThemeDark.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -379,13 +437,17 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
     </Page>
-    <Page Include="UI\Views\Controls\ActionLinkButton.xaml">
+    <Page Include="Styles\ActionLinkButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Views\Controls\RepositoryCloneControl.xaml">
+    <Page Include="Styles\GitHubActionLink.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\Controls\RepositoryCreationControl.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -405,6 +467,22 @@
       </SubType>
     </Page>
     <Page Include="UI\Views\GitHubPaneView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\LoggedOutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\PullRequestCreationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\PullRequestDetailView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\PullRequestListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

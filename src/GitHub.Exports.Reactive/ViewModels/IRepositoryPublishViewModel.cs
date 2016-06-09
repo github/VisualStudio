@@ -1,12 +1,13 @@
 ﻿using System.Reactive;
 using GitHub.Models;
 using ReactiveUI;
+using System.Collections.ObjectModel;
 
 namespace GitHub.ViewModels
 {
     public interface IRepositoryPublishViewModel : IRepositoryForm
     {
-        ReactiveList<IConnection> Connections { get; }
+        ObservableCollection<IConnection> Connections { get; }
 
         /// <summary>
         /// Command that creates the repository.
@@ -27,11 +28,6 @@ namespace GitHub.ViewModels
         /// The selected host to publish to.
         /// </summary>
         IConnection SelectedConnection { get; set; }
-
-        /// <summary>
-        /// Sets the default repository name when prepopulating the form.
-        /// </summary>
-        string DefaultRepositoryName { get; }
     }
 
     public enum ProgressState

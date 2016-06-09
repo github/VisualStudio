@@ -26,20 +26,10 @@ namespace GitHub.Extensions
             return string.Format(CultureInfo.InvariantCulture, "\"{0}\"", s);
         }
 
-        public static bool IsNotNullOrEmpty(this string s)
-        {
-            return !string.IsNullOrEmpty(s);
-        }
-
-        public static bool IsNullOrEmpty([AllowNull]this string s)
-        {
-            return string.IsNullOrEmpty(s);
-        }
-
         [return: AllowNull]
         public static string ToNullIfEmpty([AllowNull]this string s)
         {
-            return s.IsNullOrEmpty() ? null : s;
+            return String.IsNullOrEmpty(s) ? null : s;
         }
 
         public static bool StartsWith([AllowNull]this string s, char c)

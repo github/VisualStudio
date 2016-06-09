@@ -87,33 +87,45 @@ namespace GitHub.UI
         }
     }
 
-    public class SimpleViewUserControl<TViewModel, TImplementor> : SimpleViewUserControl, IViewFor<TViewModel>, IView 
-        where TViewModel : class, IViewModel where TImplementor : class
+    public class SimpleViewUserControl<TInterface, TImplementor> : SimpleViewUserControl, IViewFor<TInterface>, IView 
+        where TInterface : class, IViewModel
+        where TImplementor : class
     {
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-            "ViewModel", typeof(TViewModel), typeof(TImplementor), new PropertyMetadata(null));
+        public SimpleViewUserControl()
+        {
+            DataContextChanged += (s, e) => ViewModel = (TInterface)e.NewValue;
+        }
 
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
+            "ViewModel", typeof(TInterface), typeof(TImplementor), new PropertyMetadata(null));
+
+        [AllowNull]
         object IViewFor.ViewModel
         {
+            [return:AllowNull]
             get { return ViewModel; }
-            set { ViewModel = (TViewModel)value; }
+            set { ViewModel = (TInterface)value; }
         }
 
-        object IView.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (TViewModel)value; }
-        }
-
-        public TViewModel ViewModel
+        [AllowNull]
+        IViewModel IView.ViewModel
         {
             [return: AllowNull]
-            get { return (TViewModel)GetValue(ViewModelProperty); }
+            get { return ViewModel; }
+        }
+
+        [AllowNull]
+        public TInterface ViewModel
+        {
+            [return: AllowNull]
+            get { return (TInterface)GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
-        TViewModel IViewFor<TViewModel>.ViewModel
+        [AllowNull]
+        TInterface IViewFor<TInterface>.ViewModel
         {
+            [return: AllowNull]
             get { return ViewModel; }
             set { ViewModel = value; }
         }

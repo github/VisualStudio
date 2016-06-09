@@ -67,6 +67,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -76,11 +77,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviours\AddEmptyItemToList.cs" />
+    <Compile Include="Behaviours\ClosePopupAction.cs" />
+    <Compile Include="Behaviours\OpenPopupAction.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>OcticonPaths.resx</DependentUpon>
     </Compile>
+    <Compile Include="Converters\CountToVisibilityConverter.cs" />
+    <Compile Include="Converters\DefaultValueConverter.cs" />
+    <Compile Include="Converters\StickieListItemConverter.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -113,6 +120,7 @@
     <Compile Include="Controls\Buttons\OcticonButton.cs" />
     <Compile Include="Controls\Buttons\OcticonCircleButton.cs" />
     <Compile Include="Controls\Buttons\OcticonLinkButton.cs" />
+    <Compile Include="Controls\Buttons\GitHubActionLink.cs" />
     <Compile Include="Controls\ImageButton.cs" />
     <Compile Include="Controls\IShortcutContainer.cs" />
     <Compile Include="Controls\Panels\FixedAspectRatioPanel.cs" />

@@ -48,7 +48,6 @@ namespace GitHub.ViewModels
             AuthenticationResults = Observable.Merge(
                 loginToGitHubViewModel.Login,
                 EnterpriseLogin.Login);
-            CancelCommand = ReactiveCommand.Create();
         }
 
         ILoginToGitHubViewModel github;

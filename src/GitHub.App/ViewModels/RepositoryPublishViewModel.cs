@@ -52,7 +52,7 @@ namespace GitHub.ViewModels
             )
             .ToProperty(this, x => x.Title);
 
-            Connections = new ReactiveList<IConnection>(connectionManager.Connections);
+            Connections = connectionManager.Connections;
             this.repositoryPublishService = repositoryPublishService;
 
             if (Connections.Any())
@@ -91,7 +91,7 @@ namespace GitHub.ViewModels
 
             var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
             if (!string.IsNullOrEmpty(defaultRepositoryName))
-                DefaultRepositoryName = defaultRepositoryName;
+                RepositoryName = defaultRepositoryName;
 
             this.WhenAny(x => x.SelectedConnection, x => x.SelectedAccount,
                 (a,b) => true)
@@ -106,13 +106,12 @@ namespace GitHub.ViewModels
                 });
         }
 
-        public string DefaultRepositoryName { get; private set; }
         public new string Title { get { return title.Value; } }
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
         public bool IsPublishing { get { return isPublishing.Value; } }
 
         public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
-        public ReactiveList<IConnection> Connections { get; private set; }
+        public ObservableCollection<IConnection> Connections { get; private set; }
 
         IConnection selectedConnection;
         [AllowNull]

@@ -10,9 +10,6 @@ namespace GitHub.Services
     {
         ExportProvider ExportProvider { get; }
         IServiceProvider GitServiceProvider { get; set; }
-        T GetService<T>();
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        Ret GetService<T, Ret>() where Ret : class;
 
         object TryGetService(Type t);
         object TryGetService(string typename);
@@ -28,7 +25,7 @@ namespace GitHub.Services
         /// or if it's null, the service will be removed without checking for ownership</param>
         void RemoveService(Type t, object owner);
 
-        IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
+        IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
         void RunUI();
         void RunUI(UIControllerFlow controllerFlow, IConnection connection);
         IObservable<bool> ListenToCompletionState();

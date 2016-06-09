@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {

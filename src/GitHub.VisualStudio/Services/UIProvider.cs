@@ -8,17 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows.Controls;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using NullGuard;
 using NLog;
-using System.Reactive.Linq;
-using GitHub.Infrastructure;
-using System.Windows.Controls;
-using System.Reflection;
+using NullGuard;
 
 namespace GitHub.VisualStudio
 {
@@ -42,14 +41,10 @@ namespace GitHub.VisualStudio
         bool initializingLogging = false;
 
         [AllowNull]
-        public ExportProvider ExportProvider { get; private set; }
+        public ExportProvider ExportProvider { get; }
 
-        IServiceProvider gitServiceProvider;
         [AllowNull]
-        public IServiceProvider GitServiceProvider {
-            get { return gitServiceProvider; }
-            set { gitServiceProvider = value; }
-        }
+        public IServiceProvider GitServiceProvider { get; set; }
 
         bool Initialized { get { return ExportProvider != null; } }
 
@@ -92,7 +87,7 @@ namespace GitHub.VisualStudio
                 initializingLogging = true;
                 try
                 {
-                    var logging = TryGetService<ILoggingConfiguration>();
+                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
                     logging.Configure();
                 }
                 catch
@@ -114,9 +109,9 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
-            if (gitServiceProvider != null)
+            if (GitServiceProvider != null)
             {
-                instance = gitServiceProvider.GetService(serviceType);
+                instance = GitServiceProvider.GetService(serviceType);
                 if (instance != null)
                     return instance;
             }
@@ -171,13 +166,13 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            var batch = new CompositionBatch();
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
             // we want to remove stale instances of a service, if they exist, regardless of who put them there
             RemoveService(t, null);
 
+            var batch = new CompositionBatch();
             var part = batch.AddExportedValue(contract, instance);
             Debug.Assert(part != null, "Adding an exported value must return a non-null part");
             tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
@@ -214,17 +209,17 @@ namespace GitHub.VisualStudio
         }
 
         UI.WindowController windowController;
-        public IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             if (!Initialized)
             {
                 log.Error("ExportProvider is not initialized, cannot setup UI.");
-                return Observable.Return<UserControl>(null);
+                return Observable.Empty<LoadData>();
             }
 
             StopUI();
 
-            var factory = GetService<IExportFactoryProvider>();
+            var factory = TryGetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
             currentUIFlow = factory.UIControllerFactory.CreateExport();
             var disposable = currentUIFlow;
             var ui = currentUIFlow.Value;
@@ -232,7 +227,7 @@ namespace GitHub.VisualStudio
             windowController = new UI.WindowController(creation);
             windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
-            creation.Subscribe((c) => {}, () =>
+            creation.Subscribe(c => {}, () =>
             {
                 windowController.Closed -= StopUIFlowWhenWindowIsClosedByUser;
                 windowController.Close();
