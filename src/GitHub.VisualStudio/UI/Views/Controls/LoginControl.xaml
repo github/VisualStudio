@@ -108,7 +108,10 @@
                             <uirx:ErrorMessageDisplay
                                 x:Name="dotComConnectionFailedMessage"
                                 Message="{x:Static prop:Resources.dotComConnectionFailedMessageMessage}">
-                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToGitHubText}"/>
+                                <StackPanel>
+                                    <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToGitHubText}"/>
+                                    <TextBlock TextWrapping="Wrap" Text="{Binding ElementName=dotComConnectionFailedMessage,Path=Message}"/>
+                                </StackPanel>
                             </uirx:ErrorMessageDisplay>
 
                             <uirx:ValidationMessage
@@ -173,7 +176,10 @@
                         <uirx:ErrorMessageDisplay
                             x:Name="enterpriseConnectingFailedMessage"
                             Message="{x:Static prop:Resources.enterpriseConnectingFailedMessage}">
-                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToTheServerText}"/>
+                            <StackPanel>
+                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToTheServerText}"/>
+                                <TextBlock TextWrapping="Wrap" Text="{Binding ElementName=enterpriseConnectingFailedMessage,Path=Message}"/>
+                            </StackPanel>
                         </uirx:ErrorMessageDisplay>
                     </StackPanel>
                 </DockPanel>

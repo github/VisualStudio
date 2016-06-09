@@ -65,7 +65,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowLogInFailedError, v => v.dotComLoginFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.LoginFailedMessage, v => v.dotComLoginFailedMessage.Message));
+
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowConnectingToHostFailed, v => v.dotComConnectionFailedMessage.Visibility));
+            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.LoginFailedMessage, v => v.dotComConnectionFailedMessage.Message));
         }
 
         void SetupEnterpriseBindings(Action<IDisposable> d)
@@ -89,7 +91,9 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowLogInFailedError, v => v.enterpriseLoginFailedMessage.Visibility));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.LoginFailedMessage, v => v.enterpriseLoginFailedMessage.Message));
+
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowConnectingToHostFailed, v => v.enterpriseConnectingFailedMessage.Visibility));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.LoginFailedMessage, v => v.enterpriseConnectingFailedMessage.Message));
         }
 
         void SetupSelectedAndVisibleTabBindings(Action<IDisposable> d)

@@ -53,6 +53,7 @@ namespace GitHub.ViewModels
                 else
                 {
                     ShowConnectingToHostFailed = true;
+                    LoginFailedMessage = ex.Message;
                 }
             });
 
