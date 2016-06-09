@@ -3,6 +3,7 @@ using GitHub.UI;
 using System.Collections.Generic;
 using System.Windows.Input;
 using GitHub.Validation;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -11,9 +12,8 @@ namespace GitHub.ViewModels
         IBranch SourceBranch { get; set; }
         IBranch TargetBranch { get; set; }
         IReadOnlyList<IBranch> Branches { get; }
-        ICommand CreatePullRequest { get; }
+        IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
         string PRTitle { get; set; }
         ReactivePropertyValidator TitleValidator { get; }
-        ReactivePropertyValidator BranchValidator { get; }
     }
 }

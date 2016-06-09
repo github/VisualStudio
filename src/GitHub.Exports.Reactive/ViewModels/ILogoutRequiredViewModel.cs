@@ -7,12 +7,9 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a view model for the "Log out Required" dialog..
     /// </summary>
-    public interface ILogoutRequiredViewModel : IViewModel
+    public interface ILogoutRequiredViewModel : IReactiveViewModel
     {
         IReactiveCommand<ProgressState> Logout { get; }
-
-        ReactiveCommand<object> CancelCommand { get; }
-
         string LogoutRequiredMessage { get; set; }
         Octicon Icon { get; set; }
     }

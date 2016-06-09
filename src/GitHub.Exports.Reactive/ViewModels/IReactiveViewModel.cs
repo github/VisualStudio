@@ -4,6 +4,6 @@ namespace GitHub.ViewModels
 {
     public interface IReactiveViewModel : IViewModel
     {
-        ReactiveCommand<object> CancelCommand { get; }
+        IReactiveCommand<object> CancelCommand { get; }
     }
 }

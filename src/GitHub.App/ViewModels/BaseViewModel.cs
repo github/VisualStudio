@@ -14,7 +14,7 @@ namespace GitHub.ViewModels
             CancelCommand = ReactiveCommand.Create();
         }
 
-        public ReactiveCommand<object> CancelCommand { get; protected set; }
+        public IReactiveCommand<object> CancelCommand { get; protected set; }
         public ICommand Cancel { get { return CancelCommand; } }
 
         public string Title {[return: AllowNull] get; protected set; }
