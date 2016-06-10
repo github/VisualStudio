@@ -39,6 +39,7 @@
         <Rule Id="CA1506" Action="None" />
         <Rule Id="CA1701" Action="None" />
         <Rule Id="CA1702" Action="None" />
+        <Rule Id="CA1703" Action="None" />
         <Rule Id="CA1704" Action="None" />
         <Rule Id="CA1707" Action="None" />
         <Rule Id="CA1708" Action="None" />
