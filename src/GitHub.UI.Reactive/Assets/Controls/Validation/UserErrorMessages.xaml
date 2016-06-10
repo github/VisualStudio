@@ -47,6 +47,11 @@
                         <ItemsControl Grid.Column="2" 
                                       ItemsSource="{Binding RecoveryOptions}"
                                       VerticalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Margin="4,0,0,0">
