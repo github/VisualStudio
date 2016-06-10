@@ -46,7 +46,7 @@ namespace GitHub.UI
             };
         }
 
-        public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0,10,7,0)));
+        public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0,0,8,0)));
         public Thickness IconMargin
         {
             [return: AllowNull]
