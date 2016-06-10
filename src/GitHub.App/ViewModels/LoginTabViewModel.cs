@@ -81,13 +81,6 @@ namespace GitHub.ViewModels
         public IReactiveCommand<Unit> Reset { get; }
         public IRecoveryCommand NavigateForgotPassword { get; }
 
-        string loginFailedMessage = Resources.LoginFailedMessage;
-        public string LoginFailedMessage
-        {
-            get { return loginFailedMessage; }
-            set { this.RaiseAndSetIfChanged(ref loginFailedMessage, value); }
-        }
-
         string usernameOrEmail;
         [AllowNull]
         public string UsernameOrEmail
