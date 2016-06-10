@@ -105,7 +105,6 @@ namespace GitHub.Controllers
         readonly IUIFactory factory;
         readonly IUIProvider uiProvider;
         readonly IRepositoryHosts hosts;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IConnectionManager connectionManager;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
@@ -333,7 +332,8 @@ namespace GitHub.Controllers
                 .OnEntryFrom(triggers[Trigger.PRDetail], (arg, tr) => RunView(UIViewType.PRDetail, CalculateDirection(tr), arg))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
-                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
+                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish))
+                .OnExit(() => DisposeView(activeFlow, UIViewType.PRDetail));
 
             uiStateMachine.Configure(UIViewType.PRCreation)
                 .OnEntry(tr => RunView(UIViewType.PRCreation, CalculateDirection(tr)))
@@ -620,6 +620,17 @@ namespace GitHub.Controllers
             foreach (var i in list.Values)
                 i.Dispose();
             list.Clear();
+        }
+
+        void DisposeView(UIControllerFlow flow, UIViewType type)
+        {
+            var list = GetObjectsForFlow(flow);
+            IUIPair uipair = null;
+            if (list.TryGetValue(type, out uipair))
+            {
+                list.Remove(type);
+                uipair.Dispose();
+            }
         }
 
         void RunView(UIViewType viewType, LoadDirection direction, ViewWithData arg = null)
