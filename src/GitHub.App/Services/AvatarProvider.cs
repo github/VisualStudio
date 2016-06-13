@@ -83,7 +83,6 @@ namespace GitHub.Services
             if (disposing)
             {
                 if (disposed) return;
-                imageCache.Dispose();
                 disposed = true;
             }
         }

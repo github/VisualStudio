@@ -44,16 +44,14 @@ namespace GitHub.ViewModels
         RepositoryCreationViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService,
-            IAvatarProvider avatarProvider)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, avatarProvider)
+            IRepositoryCreationService repositoryCreationService)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService)
         {}
 
         public RepositoryCreationViewModel(
             IRepositoryHost repositoryHost,
             IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService,
-            IAvatarProvider avatarProvider)
+            IRepositoryCreationService repositoryCreationService)
         {
             this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;

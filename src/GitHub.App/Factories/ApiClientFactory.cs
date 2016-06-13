@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using GitHub.Api;
 using GitHub.Caches;
 using GitHub.Models;
@@ -35,5 +36,21 @@ namespace GitHub.Factories
         }
 
         protected ILoginCache LoginCache { get; private set; }
+
+        bool disposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

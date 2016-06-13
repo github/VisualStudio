@@ -219,19 +219,6 @@ namespace GitHub.Caches
             if (disposing)
             {
                 if (disposed) return;
-
-                try
-                {
-                    cacheFactory.Select(x =>
-                    {
-                        x.Dispose();
-                        return x.Shutdown;
-                    }).Wait();
-                }
-                catch (Exception e)
-                {
-                    log.Warn("Exception occured while disposing ImageCache", e);
-                }
                 disposed = true;
             }
         }
