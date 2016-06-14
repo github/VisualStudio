@@ -274,15 +274,6 @@ namespace GitHub.Models
             if (disposing)
             {
                 if (disposed) return;
-
-                try
-                {
-                    ModelService.Dispose();
-                }
-                catch (Exception e)
-                {
-                    log.Warn("Exception occured while disposing RepositoryHost's ModelService", e);
-                }
                 disposed = true;
             }
         }

@@ -24,6 +24,10 @@ namespace GitHub.Services
         }
     }
 
+    /// <summary>
+    /// Dispatches notifications sent to the <see cref="INotificationService"/>
+    /// to registered listeners.
+    /// </summary>
     public interface INotificationDispatcher : INotificationService
     {
         IObservable<Notification> Listen();

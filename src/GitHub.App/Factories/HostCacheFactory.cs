@@ -47,8 +47,6 @@ namespace GitHub.Factories
             {
                 if (disposed) return;
                 disposed = true;
-                if (blobCacheFactory.IsValueCreated)
-                    blobCacheFactory.Value.Dispose();
             }
         }
 

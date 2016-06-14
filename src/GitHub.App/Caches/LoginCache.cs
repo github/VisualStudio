@@ -62,15 +62,6 @@ namespace GitHub.Caches
             if (disposing)
             {
                 if (disposed) return;
-
-                try
-                {
-                    cache.Dispose();
-                }
-                catch (Exception e)
-                {
-                    log.Warn("Exception occurred while disposing shared cache", e);
-                }
                 disposed = true;
             }
         }
