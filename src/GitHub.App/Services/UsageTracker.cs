@@ -20,8 +20,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class UsageTracker : IUsageTracker
     {
-        // Whenever you add a counter make sure it gets added to _both_
-        // BuildUsageModel and ClearCounters
         const string GHLastSubmissionKey = "GHLastSubmission";
         const string GHCreateCountKey = "GHCreateCountKey";
         const string GHCloneCountKey = "GHCloneCount";
@@ -34,6 +32,20 @@ namespace GitHub.Services
         const string GHLaunchCountKeyDay = "GHLaunchCountDay";
         const string GHLaunchCountKeyWeek = "GHLaunchCountWeek";
         const string GHLaunchCountKeyMonth = "GHLaunchCountMonth";
+
+        readonly Dictionary<string, Action<UsageModel, int>> standardCounters = new Dictionary<string, Action<UsageModel, int>> {
+                {  GHCloneCountKey, (model, x) => model.NumberOfClones = x },
+                {  GHCreateCountKey, (model, x) => model.NumberOfReposCreated = x },
+                {  GHPublishCountKey, (model, x) => model.NumberOfReposPublished = x },
+                {  GHCreateGistCountKey, (model, x) => model.NumberOfGists = x },
+                {  GHOpenInGitHubCountKey, (model, x) => model.NumberOfOpenInGitHub = x },
+                {  GHLinkToGitHubCountKey, (model, x) => model.NumberOfLinkToGitHub = x },
+                {  GHUpstreamPullRequestCount, (model, x) => model.NumberOfUpstreamPullRequests = x },
+                {  GHLoginCountKey, (model, x) => model.NumberOfLogins = x },
+                {  GHLaunchCountKeyDay, (model, x) => model.NumberOfStartups = x },
+                {  GHLaunchCountKeyWeek, (model, x) => model.NumberOfStartupsWeek = x },
+                {  GHLaunchCountKeyMonth, (model, x) => model.NumberOfStartupsMonth = x },
+        };
 
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
@@ -94,9 +106,7 @@ namespace GitHub.Services
                         // New day, new stats. This matches the GHfM implementation
                         // of when to send stats.
                         if (lastDate == currentDate)
-                        {
                             return Observable.Return(Unit.Default);
-                        }
 
                         // Every time we increment the launch count we increment both GHLaunchCountKeyDay
                         // and GHLaunchCountKeyWeek but we only submit (and clear) the GHLaunchCountKeyWeek
@@ -149,21 +159,10 @@ namespace GitHub.Services
 
         IObservable<Unit> ClearCounters(bool weekly, bool monthly)
         {
-            var standardCounters = new[] {
-                GHLaunchCountKeyDay,
-                GHCloneCountKey,
-                GHCreateCountKey,
-                GHPublishCountKey,
-                GHCreateGistCountKey,
-                GHOpenInGitHubCountKey,
-                GHLinkToGitHubCountKey,
-                GHLoginCountKey,
-                GHUpstreamPullRequestCount,
-            };
-
-            var counters = standardCounters
-                .Concat(weekly ? new[] { GHLaunchCountKeyWeek } : Enumerable.Empty<string>())
-                .Concat(monthly ? new[] { GHLaunchCountKeyMonth } : Enumerable.Empty<string>());
+            var counters = standardCounters.Keys
+                .Except(new [] { GHLastSubmissionKey })
+                .Except(weekly ? new[] { GHLaunchCountKeyWeek } : Enumerable.Empty<string>())
+                .Except(monthly ? new[] { GHLaunchCountKeyMonth } : Enumerable.Empty<string>());
 
             return counters
                 .Select(ClearCounter)
@@ -194,45 +193,22 @@ namespace GitHub.Services
             var model = new UsageModel();
 
             if (hosts.GitHubHost?.IsLoggedIn == true)
-            {
                 model.IsGitHubUser = true;
-            }
 
             if (hosts.EnterpriseHost?.IsLoggedIn == true)
-            {
                 model.IsEnterpriseUser = true;
-            }
 
             model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
             model.AppVersion = AssemblyVersionInformation.Version;
-            model.VSVersion = GitHub.VisualStudio.Services.VisualStudioVersion;
+            model.VSVersion = VisualStudio.Services.VisualStudioVersion;
 
-            var counters = new List<IObservable<int>>
-            {
-                GetCounter(GHLaunchCountKeyDay).Do(x => model.NumberOfStartups = x),
-                GetCounter(GHLaunchCountKeyWeek).Do(x => model.NumberOfStartupsWeek = x),
-                GetCounter(GHLaunchCountKeyMonth).Do(x => model.NumberOfStartupsMonth = x),
-                GetCounter(GHCloneCountKey).Do(x => model.NumberOfClones = x),
-                GetCounter(GHCreateCountKey).Do(x => model.NumberOfReposCreated = x),
-                GetCounter(GHPublishCountKey).Do(x => model.NumberOfReposPublished = x),
-                GetCounter(GHCreateGistCountKey).Do(x => model.NumberOfGists = x),
-                GetCounter(GHOpenInGitHubCountKey).Do(x => model.NumberOfOpenInGitHub = x),
-                GetCounter(GHLinkToGitHubCountKey).Do(x => model.NumberOfLinkToGitHub = x),
-                GetCounter(GHLoginCountKey).Do(x => model.NumberOfLogins = x),
-                GetCounter(GHUpstreamPullRequestCount).Do(x => model.NumberOfUpstreamPullRequests = x),
-            };
-
-            if (weekly)
-            {
-                counters.Add(GetCounter(GHLaunchCountKeyWeek)
-                    .Do(x => model.NumberOfStartupsWeek = x));
-            }
-
-            if (monthly)
-            {
-                counters.Add(GetCounter(GHLaunchCountKeyMonth)
-                    .Do(x => model.NumberOfStartupsMonth = x));
-            }
+            var counters = standardCounters
+                .Where(x => x.Key != GHLastSubmissionKey &&               // filter out last submission date
+                            (!weekly && x.Key == GHLaunchCountKeyWeek) && // filter out weekly metrics if !weekly
+                            (!monthly && x.Key == GHLaunchCountKeyMonth)  // filter out monthly metrics if !monthly
+                      )
+                .ToObservable()
+                .SelectMany(c => GetCounter(GHLaunchCountKeyDay).Do(x => c.Value(model, x))); // set metric in model
 
             return Observable.Merge(counters)
                 .ContinueAfter(() => Observable.Return(model));
