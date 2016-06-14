@@ -1,18 +1,13 @@
 using System;
 using System.ComponentModel.Composition;
-using GitHub.Exports;
-using GitHub.Extensions;
-using GitHub.Models;
 using System.Reactive.Linq;
+using GitHub.Exports;
+using GitHub.Info;
 using GitHub.Services;
 using GitHub.UI;
-using GitHub.ViewModels;
 using ReactiveUI;
-using System.Reactive;
-using System.Reactive.Subjects;
-using GitHub.Info;
 
-namespace GitHub.VisualStudio.UI.Views
+namespace GitHub.ViewModels
 {
     /// <summary>
     /// The view model for the "Sign in to GitHub" view in the GitHub pane.
