@@ -10,6 +10,7 @@ using GitHub.ViewModels;
 using ReactiveUI;
 using System.Reactive;
 using System.Reactive.Subjects;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -21,17 +22,20 @@ namespace GitHub.VisualStudio.UI.Views
     public class LoggedOutViewModel : BaseViewModel, ILoggedOutViewModel
     {
         IUIProvider uiProvider;
+        IVisualStudioBrowser browser;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggedOutViewModel"/> class.
         /// </summary>
         [ImportingConstructor]
-        public LoggedOutViewModel(IUIProvider uiProvider)
+        public LoggedOutViewModel(IUIProvider uiProvider, IVisualStudioBrowser browser)
         {
             this.uiProvider = uiProvider;
+            this.browser = browser;
             SignIn = ReactiveCommand.Create();
             SignIn.Subscribe(_ => OnSignIn());
             Register = ReactiveCommand.Create();
+            Register.Subscribe(_ => OnRegister());
         }
 
         /// <inheritdoc/>
@@ -50,6 +54,14 @@ namespace GitHub.VisualStudio.UI.Views
             // this view when the user logs in.
             uiProvider.SetupUI(UIControllerFlow.Authentication, null);
             uiProvider.RunUI();
+        }
+
+        /// <summary>
+        /// Called when the <see cref="Register"/> command is executed.
+        /// </summary>
+        private void OnRegister()
+        {
+            browser.OpenUrl(GitHubUrls.Pricing);
         }
     }
 }
