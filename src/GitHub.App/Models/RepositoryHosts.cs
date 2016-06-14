@@ -157,15 +157,20 @@ namespace GitHub.Models
                     );
                     if (successful)
                     {
-                        // We need to add the connection before assigning to GitHubHost or
-                        // EnterpriseHost so that anything listening to those will find the
-                        // associated connection.
+                        // Make sure that GitHubHost/EnterpriseHost are set when the connections
+                        // changed event is raised and likewise that the connection is added when
+                        // the property changed notification is sent.
+                        if (isDotCom)
+                            githubHost = host;
+                        else
+                            enterpriseHost = host;
+
                         connectionManager.AddConnection(address, usernameOrEmail);
 
                         if (isDotCom)
-                            GitHubHost = host;
+                            this.RaisePropertyChanged(nameof(GitHubHost));
                         else
-                            EnterpriseHost = host;
+                            this.RaisePropertyChanged(nameof(EnterpriseHost));
                     }
                 });
         }
