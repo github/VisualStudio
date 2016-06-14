@@ -25,6 +25,6 @@ public class AccountCacheItemTests
 
     static User CreateOctokitUser(string url)
     {
-        return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, url, 10, 42, "somewhere", "foo", "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false);
+        return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, url, 10, 42, "somewhere", "foo", "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false, null, null);
     }
 }
