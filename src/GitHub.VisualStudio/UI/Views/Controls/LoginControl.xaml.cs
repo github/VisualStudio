@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class LoginControl : GenericLoginControl
     {
-        private IDisposable errorHandler;
+        IDisposable errorHandler;
 
         public LoginControl()
         {
@@ -108,7 +108,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 .BindTo(this, v => v.enterpriseTab.IsSelected));
         }
 
-        private void hostTabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        void hostTabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             // This is a bit ugly but it's the simplest way I could think of dealing with it: there can only
             // be one UserErrorMessages control active at any time and we need one for each tab. Register/unregister
