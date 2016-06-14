@@ -42,7 +42,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Called when the <see cref="SignIn"/> command is executed.
         /// </summary>
-        private void OnSignIn()
+        void OnSignIn()
         {
             // Show the Sign In dialog. We don't need to listen to the outcome of this: the parent
             // GitHubPaneViewModel will listen to RepositoryHosts.IsLoggedInToAnyHost and close
@@ -54,7 +54,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Called when the <see cref="Register"/> command is executed.
         /// </summary>
-        private void OnRegister()
+        void OnRegister()
         {
             browser.OpenUrl(GitHubUrls.Pricing);
         }
