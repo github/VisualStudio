@@ -37,8 +37,7 @@ namespace GitHub.VisualStudio.Menus
         public bool CanShow()
         {
             Task<bool> githubRepoCheckTask = IsGitHubRepo();
-            githubRepoCheckTask.Wait(250);
-            return githubRepoCheckTask.Result;
+            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
         }
     }
 }
