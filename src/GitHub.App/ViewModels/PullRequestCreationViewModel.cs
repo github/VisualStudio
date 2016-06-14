@@ -6,15 +6,12 @@ using System.Collections.Generic;
 using ReactiveUI;
 using GitHub.Services;
 using System.Reactive.Linq;
-using System.Collections.ObjectModel;
 using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using System.Linq;
-using System.Windows.Input;
 using GitHub.Validation;
 using GitHub.Extensions;
 using NullGuard;
-using System.Reactive.Disposables;
 
 namespace GitHub.ViewModels
 {
@@ -24,7 +21,6 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel activeRepo;
-        readonly CompositeDisposable disposables = new CompositeDisposable();
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
@@ -52,7 +48,6 @@ namespace GitHub.ViewModels
             var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value);
             TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
                 .IfNullOrEmpty("Please enter a title for the Pull Request");
-            disposables.Add(TitleValidator);
 
             var branchObs = this.WhenAny(
                 x => x.SourceBranch,
@@ -61,18 +56,16 @@ namespace GitHub.ViewModels
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
                 .IfTrue(x => x == null, "Source branch doesn't exist remotely, have you pushed it?")
                 .IfTrue(x => x.Name == TargetBranch.Name, "Source and target branch cannot be the same");
-            disposables.Add(BranchValidator);
 
             var whenAnyValidationResultChanges = this.WhenAny(
                 x => x.TitleValidator.ValidationResult,
                 x => x.BranchValidator.ValidationResult,
                 (x, y) => (x.Value?.IsValid ?? false) && (y.Value?.IsValid ?? false));
 
-            disposables.Add(
-                this.WhenAny(x => x.BranchValidator.ValidationResult, x => x.GetValue())
-                    .WhereNotNull()
-                    .Where(x => !x.IsValid && x.DisplayValidationError)
-                    .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message)));
+            this.WhenAny(x => x.BranchValidator.ValidationResult, x => x.GetValue())
+                .WhereNotNull()
+                .Where(x => !x.IsValid && x.DisplayValidationError)
+                .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
             createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service.CreatePullRequest(repositoryHost, activeRepo, PRTitle, SourceBranch, TargetBranch)
@@ -83,7 +76,6 @@ namespace GitHub.ViewModels
                 {
                 }
             });
-            disposables.Add(createPullRequest);
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
