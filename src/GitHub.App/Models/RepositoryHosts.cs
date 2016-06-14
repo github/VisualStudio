@@ -157,11 +157,15 @@ namespace GitHub.Models
                     );
                     if (successful)
                     {
+                        // We need to add the connection before assigning to GitHubHost or
+                        // EnterpriseHost so that anything listening to those will find the
+                        // associated connection.
+                        connectionManager.AddConnection(address, usernameOrEmail);
+
                         if (isDotCom)
                             GitHubHost = host;
                         else
                             EnterpriseHost = host;
-                        connectionManager.AddConnection(address, usernameOrEmail);
                     }
                 });
         }
