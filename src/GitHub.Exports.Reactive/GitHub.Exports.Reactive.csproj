@@ -93,6 +93,7 @@
     <Compile Include="Services\IPullRequestService.cs" />
     <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
+    <Compile Include="ViewModels\ILoggedOutViewModel.cs" />
     <Compile Include="ViewModels\ILogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\ILoginControlViewModel.cs" />
     <Compile Include="ViewModels\ILoginToGitHubForEnterpriseViewModel.cs" />
