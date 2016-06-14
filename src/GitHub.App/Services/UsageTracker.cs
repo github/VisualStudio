@@ -14,8 +14,6 @@ using GitHub.Settings;
 using ReactiveUI;
 using Rothko;
 
-#pragma warning disable CS0649
-
 namespace GitHub.Services
 {
     [Export(typeof(IUsageTracker))]
