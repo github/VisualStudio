@@ -52,7 +52,7 @@ namespace GitHub.Services
             this.cache = cache;
             this.repositoryHosts = repositoryHosts;
             this.userSettings = userSettings;
-            this.client = (IMetricsService)serviceProvider.GetService(typeof(IMetricsService));
+            this.client = serviceProvider.TryGetService<IMetricsService>();
 
             userSettings.WhenAny(x => x.CollectMetrics, x => x.Value)
                 // If SendUsageData is true we'll subscribe to the Run()
@@ -262,9 +262,7 @@ namespace GitHub.Services
                 {
                     // Don't even store data locally if the user opts out.
                     if (!userSettings.CollectMetrics)
-                    {
                         return Observable.Empty<int>();
-                    }
 
                     return GetCounter(key)
                         .Select(x => x + 1)
