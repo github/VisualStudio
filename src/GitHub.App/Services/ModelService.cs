@@ -124,10 +124,20 @@ namespace GitHub.Services
 
         public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
         {
-            return GetUserRepositories(RepositoryType.Owner)
+            return GetUserRepositories(RepositoryType.Owner).Select(x => Tuple.Create("Owner Repos", x))
                 .TakeLast(1)
-                .Concat(GetUserRepositories(RepositoryType.Member).TakeLast(1))
-                .Concat(GetAllRepositoriesForAllOrganizations());
+                .Concat(GetUserRepositories(RepositoryType.Member).Select(x => Tuple.Create("User Repos", x)).TakeLast(1))
+                .Concat(GetAllRepositoriesForAllOrganizations())
+                .Do(x =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"==== {x.Item1} ====");
+
+                    foreach (var i in x.Item2)
+                    {
+                        System.Diagnostics.Debug.WriteLine(i.CloneUrl);
+                    }
+                })
+                .Select(x => x.Item2);
         }
 
         public IObservable<AccountCacheItem> GetUserFromCache()
@@ -205,11 +215,13 @@ namespace GitHub.Services
                 .Catch<IEnumerable<RepositoryCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<RepositoryCacheItem>()));
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetAllRepositoriesForAllOrganizations()
+        IObservable<Tuple<string, IReadOnlyList<IRepositoryModel>>> GetAllRepositoriesForAllOrganizations()
         {
+            var orgs = GetUserOrganizations().ToList().Wait();
+
             return GetUserOrganizations()
                 .SelectMany(org => org.ToObservable())
-                .SelectMany(org => GetOrganizationRepositories(org.Login).TakeLast(1));
+                .SelectMany(org => GetOrganizationRepositories(org.Login).Select(x => Tuple.Create($"{org.Login} Org Repository", x)).TakeLast(1));
         }
 
         IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
@@ -230,7 +242,7 @@ namespace GitHub.Services
                             "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] {});
+                        return Observable.Return(new IRepositoryModel[] { });
                     });
         }
 
