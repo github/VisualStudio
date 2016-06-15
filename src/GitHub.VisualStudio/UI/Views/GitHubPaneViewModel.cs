@@ -85,6 +85,10 @@ namespace GitHub.VisualStudio.UI.Views
                 true);
 
             initialized = true;
+
+            // The base Initialized call will have called RepoChanged(true) but at that point
+            // initialized will have been false, so call it again now.
+            RepoChanged(true);
         }
 
         public void Initialize([AllowNull] ViewWithData data)
