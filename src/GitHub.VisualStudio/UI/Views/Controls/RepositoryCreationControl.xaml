@@ -147,7 +147,7 @@
           <ui:PromptTextBox x:Name="localPathText"
                             Grid.Row="0"
                             Grid.Column="0"
-                            Text="{Binding BaseRepositoryPath}" />
+                            Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}" />
           <Button x:Name="browsePathButton"
                   Grid.Row="0"
                   Grid.Column="1"
