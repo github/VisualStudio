@@ -49,6 +49,11 @@ namespace GitHub.VisualStudio
             this.apiFactory = apiFactory;
         }
 
+        protected MenuBase(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
         protected ISimpleRepositoryModel GetActiveRepo()
         {
             var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>()?.ActiveRepo;
