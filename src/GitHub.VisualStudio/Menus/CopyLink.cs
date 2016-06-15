@@ -6,7 +6,6 @@ using GitHub.Extensions;
 using GitHub.Services;
 using GitHub.VisualStudio.UI;
 using NullGuard;
-using System.Threading.Tasks;
 using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
