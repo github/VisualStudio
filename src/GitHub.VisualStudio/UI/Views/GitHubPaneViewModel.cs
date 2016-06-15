@@ -55,12 +55,10 @@ namespace GitHub.VisualStudio.UI.Views
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
-            base.Initialize(serviceProvider);
-
-            ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Reload(new ViewWithData(UIControllerFlow.PullRequests) { ViewType = UIViewType.PRList }).Forget());
 
-            back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+            back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && currentNavItem > 0,
                 () => {
                     DisableButtons();
@@ -68,7 +66,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            forward = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+            forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && currentNavItem < navStack.Count - 1,
                 () => {
                     DisableButtons();
@@ -76,7 +74,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            refresh = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+            refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled && navStack.Count > 0,
                 () => {
                     DisableButtons();
@@ -85,6 +83,8 @@ namespace GitHub.VisualStudio.UI.Views
                 true);
 
             initialized = true;
+
+            base.Initialize(serviceProvider);
         }
 
         public void Initialize([AllowNull] ViewWithData data)
