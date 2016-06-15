@@ -3,7 +3,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Composition;
-using System.Threading.Tasks;
+using NullGuard;
 using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus

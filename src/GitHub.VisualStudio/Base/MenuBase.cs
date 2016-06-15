@@ -5,9 +5,8 @@ using GitHub.Models;
 using GitHub.Services;
 using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Primitives;
 using NullGuard;
-using System.Diagnostics;
+using GitHub.UI;
 
 namespace GitHub.VisualStudio
 {
