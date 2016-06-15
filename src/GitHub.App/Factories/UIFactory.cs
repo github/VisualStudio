@@ -35,6 +35,23 @@ namespace GitHub.App.Factories
         {
             return new UIPair(viewType, factory.GetView(viewType), factory.GetViewModel(viewType));
         }
+
+        bool disposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
     }
 
     /// <summary>

@@ -33,7 +33,7 @@ public class RepositoryCreationViewModelTests
         var avatarProvider = provider.GetAvatarProvider();
         var connection = provider.GetConnection();
 
-        return new RepositoryCreationViewModel(repositoryHost, os, creationService, avatarProvider);
+        return new RepositoryCreationViewModel(repositoryHost, os, creationService);
     }
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
@@ -333,8 +333,7 @@ public class RepositoryCreationViewModelTests
             var vm = new RepositoryCreationViewModel(
                 repositoryHost,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryCreationService>(),
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IRepositoryCreationService>());
 
             Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
             Assert.Equal(2, vm.Accounts.Count);
