@@ -25,7 +25,8 @@ namespace GitHub.Exports
         PRCreation,
         LogoutRequired,
         GitHubPane,
-        LoggedOut
+        LoggedOut,
+        NotAGitHubRepository,
     }
 
     public enum MenuType
