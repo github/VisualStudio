@@ -253,21 +253,9 @@ namespace GitHub.ViewModels
                 if (Path.GetInvalidPathChars().Any(chr => BaseRepositoryPath.Contains(chr)))
                     return false;
                 string potentialPath = Path.Combine(BaseRepositoryPath, safeRepositoryName);
-                isAlreadyRepoAtPath = IsGitRepo(potentialPath);
+                isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
             }
             return isAlreadyRepoAtPath;
-        }
-
-        bool IsGitRepo(string path)
-        {
-            try
-            {
-                return operatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
-            }
-            catch (PathTooLongException)
-            {
-                return false;
-            }
         }
 
         IObservable<Unit> OnCreateRepository(object state)
