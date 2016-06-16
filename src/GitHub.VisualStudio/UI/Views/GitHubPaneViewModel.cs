@@ -133,7 +133,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (IsLoggedIn)
             {
-                if (uiController == null || (data != null && data.ActiveFlow != uiController.CurrentFlow))
+                if (uiController == null || (data != null && data.ActiveFlow != uiController.SelectedFlow))
                     StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
                 else if (data != null || currentNavItem >= 0)
                     uiController.Jump(data ?? navStack[currentNavItem]);
