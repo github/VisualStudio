@@ -126,7 +126,7 @@
 
         <Label Grid.Row="2"
                Grid.Column="0"
-               Content="{x:Static prop:Resources.descriptionText}"
+               Content="{x:Static prop:Resources.Description}"
                Target="{Binding ElementName=description}" />
         <ui:PromptTextBox x:Name="description"
                           Grid.Row="2"

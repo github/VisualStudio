@@ -160,20 +160,20 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Description (Optional).
+        ///   Looks up a localized string similar to Description.
         /// </summary>
-        public static string descriptionOptionalText {
+        public static string Description {
             get {
-                return ResourceManager.GetString("descriptionOptionalText", resourceCulture);
+                return ResourceManager.GetString("Description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Description.
+        ///   Looks up a localized string similar to Description (Optional).
         /// </summary>
-        public static string descriptionText {
+        public static string DescriptionOptional {
             get {
-                return ResourceManager.GetString("descriptionText", resourceCulture);
+                return ResourceManager.GetString("DescriptionOptional", resourceCulture);
             }
         }
         
@@ -654,6 +654,15 @@ namespace GitHub.VisualStudio.UI {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Title (required).
+        /// </summary>
+        public static string TitleRequired {
+            get {
+                return ResourceManager.GetString("TitleRequired", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>
