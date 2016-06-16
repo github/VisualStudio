@@ -27,6 +27,8 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
+        const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequests;
+
         bool initialized;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
@@ -53,8 +55,6 @@ namespace GitHub.VisualStudio.UI.Views
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
-
-            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -89,6 +89,8 @@ namespace GitHub.VisualStudio.UI.Views
             initialized = true;
 
             base.Initialize(serviceProvider);
+
+            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public void Initialize([AllowNull] ViewWithData data)
@@ -155,28 +157,50 @@ namespace GitHub.VisualStudio.UI.Views
             if (!IsGitHubRepo.Value)
             {
                 //LoadView(UIViewType.NotAGitHubRepo);
-                return;
             }
 
-            if (!IsLoggedIn)
+            else if (!IsLoggedIn)
             {
                 LoadView(UIViewType.LoggedOut);
-                return;
             }
 
-            if (uiController == null || (data != null && data.ActiveFlow != uiController.SelectedFlow))
-                StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
-            else if (data != null || currentNavItem >= 0)
+            else
+            {
+                LoadView(data?.ActiveFlow ?? DefaultControllerFlow, connection, data);
+            }
+        }
+
+        void LoadView(UIControllerFlow flow, IConnection connection = null, ViewWithData data = null, UIViewType type = UIViewType.None)
+        {
+            // if we're loading a single view or a different flow, we need to stop the current controller
+            var restart = flow == UIControllerFlow.None || uiController?.SelectedFlow != flow;
+
+            if (restart)
+                Stop();
+
+            // if there's no selected flow, then just load a view directly
+            if (flow == UIControllerFlow.None)
+            {
+                var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                var c = factory.CreateViewAndViewModel(type);
+                c.View.DataContext = c.ViewModel;
+                Control = c.View;
+            }
+            // it's a new flow!
+            else if (restart)
+            {
+                StartFlow(flow, connection, data);
+            }
+            // navigate to a requested view within the currently running uiController
+            else
+            {
                 uiController.Jump(data ?? navStack[currentNavItem]);
+            }
         }
 
         void LoadView(UIViewType type)
         {
-            Stop();
-            var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-            var c = factory.CreateViewAndViewModel(type);
-            c.View.DataContext = c.ViewModel;
-            Control = c.View;
+            LoadView(UIControllerFlow.None, type: type);
         }
 
         void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
