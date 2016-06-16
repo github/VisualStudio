@@ -118,34 +118,37 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (!IsGitHubRepo.Value)
             {
-                Stop();
+                //LoadView(UIViewType.NotAGitHubRepo);
                 return;
             }
 
             var connection = await connectionManager.LookupConnection(ActiveRepo);
             IsLoggedIn = await connection.IsLoggedIn(hosts);
 
-            if (IsLoggedIn)
+            if (!IsLoggedIn)
             {
-                if (uiController == null || (data != null && data.ActiveFlow != uiController.CurrentFlow))
-                    StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
-                else if (data != null || currentNavItem >= 0)
-                    uiController.Jump(data ?? navStack[currentNavItem]);
+                LoadView(UIViewType.LoggedOut);
+                return;
             }
-            else
-            {
-                var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
-                c.View.DataContext = c.ViewModel;
-                Control = c.View;
-            }
-            return;
+
+            if (uiController == null || (data != null && data.ActiveFlow != uiController.SelectedFlow))
+                StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
+            else if (data != null || currentNavItem >= 0)
+                uiController.Jump(data ?? navStack[currentNavItem]);
+        }
+
+        void LoadView(UIViewType type)
+        {
+            Stop();
+            var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+            var c = factory.CreateViewAndViewModel(type);
+            c.View.DataContext = c.ViewModel;
+            Control = c.View;
         }
 
         void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
         {
-            if (uiController != null)
-                Stop();
+            Stop();
 
             if (conn == null)
                 return;
