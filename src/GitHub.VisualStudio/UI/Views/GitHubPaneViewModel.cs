@@ -19,6 +19,7 @@ using NullGuard;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -40,6 +41,7 @@ namespace GitHub.VisualStudio.UI.Views
         bool navigatingViaArrows;
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
+        int latestReloadCallId;
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -110,21 +112,51 @@ namespace GitHub.VisualStudio.UI.Views
             Reload().Forget();
         }
 
+        /// <summary>
+        /// This method is reentrant, so all await calls need to be done before
+        /// any actions are performed on the data. More recent calls to this method
+        /// will cause previous calls pending on await calls to exit early.
+        /// </summary>
+        /// <returns></returns>
         async Task Reload([AllowNull] ViewWithData data = null, bool navigating = false)
         {
+            if (!initialized)
+                return;
+
+            latestReloadCallId++;
+            var reloadCallId = latestReloadCallId;
+
             navigatingViaArrows = navigating;
 
             if (!IsGitHubRepo.HasValue)
-                IsGitHubRepo = await IsAGitHubRepo();
+            {
+                var isGitHubRepo = await IsAGitHubRepo();
+                if (reloadCallId != latestReloadCallId)
+                    return;
+
+                IsGitHubRepo = isGitHubRepo;
+            }
+
+            var connection = await connectionManager.LookupConnection(ActiveRepo);
+            if (reloadCallId != latestReloadCallId)
+                return;
+
+            if (connection == null)
+                IsLoggedIn = false;
+            else
+            {
+                var isLoggedIn = await connection.IsLoggedIn(hosts);
+                if (reloadCallId != latestReloadCallId)
+                    return;
+
+                IsLoggedIn = isLoggedIn;
+            }
 
             if (!IsGitHubRepo.Value)
             {
                 //LoadView(UIViewType.NotAGitHubRepo);
                 return;
             }
-
-            var connection = await connectionManager.LookupConnection(ActiveRepo);
-            IsLoggedIn = await connection.IsLoggedIn(hosts);
 
             if (!IsLoggedIn)
             {
