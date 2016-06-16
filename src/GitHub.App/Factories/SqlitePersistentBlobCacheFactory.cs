@@ -4,7 +4,8 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace GitHub.Factories
 {
@@ -12,7 +13,6 @@ namespace GitHub.Factories
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class SqlitePersistentBlobCacheFactory : IBlobCacheFactory
     {
-        readonly CompositeDisposable disposables = new CompositeDisposable();
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         Dictionary<string, IBlobCache> cache = new Dictionary<string, IBlobCache>();
 
@@ -26,7 +26,6 @@ namespace GitHub.Factories
             {
                 var c = new SQLitePersistentBlobCache(path);
                 cache.Add(path, c);
-                disposables.Add(c);
                 return c;
             }
             catch(Exception ex)
@@ -43,7 +42,14 @@ namespace GitHub.Factories
             {
                 if (disposed) return;
                 disposed = true;
-                disposables.Dispose();
+                Task.Run(() =>
+                {
+                    foreach (var c in cache.Values)
+                    {
+                        c.Dispose();
+                        c.Shutdown.Wait();
+                    }
+                }).Wait(500);
             }
         }
 

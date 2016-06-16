@@ -280,15 +280,8 @@ namespace GitHub.Services
             return hostCache.InsertObject("user", user);
         }
 
-        bool disposed;
         protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (disposed) return;
-                disposed = true;
-            }
-        }
+        {}
 
         public void Dispose()
         {
