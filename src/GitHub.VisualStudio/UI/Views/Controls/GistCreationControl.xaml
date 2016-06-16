@@ -74,7 +74,7 @@
                 <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static prop:Resources.fileNameText}"/>
                 <ui:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" />
 
-                <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.descriptionText}"/>
+                <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.Description}"/>
                 <ui:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1"/>
 
                 <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">

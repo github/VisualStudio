@@ -10,6 +10,7 @@
                                       xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                       xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                       xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+                                      xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -137,16 +138,11 @@
 
     </DockPanel>
 
-    <!-- TabControl
-                BorderThickness="0,1,0,0"
-                Style="{DynamicResource GitHubPRDetailsTabControl}">
-      <TabItem Header="Details" Style="{DynamicResource GitHubPRDetailsTabItem}">
-        <ScrollViewer VerticalScrollBarVisibility="Auto"-->
     <StackPanel Orientation="Vertical">
       <ui:PromptTextBox x:Name="titleText"
                         Margin="10,5"
-                        Text="{Binding PRTitle}"
-                        PromptText="Title (required)"
+                        Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
+                        PromptText="{x:Static prop:Resources.TitleRequired}"
                         Style="{DynamicResource GitHubVsPromptTextBox}" />
 
       <uirx:ValidationMessage x:Name="titleValidationMessage"
@@ -158,55 +154,10 @@
       <ui:PromptTextBox Height="100"
                         Margin="10,5"
                         AcceptsReturn="True"
-                        PromptText="Description"
+                        PromptText="{x:Static prop:Resources.Description}"
+                        Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                         Style="{DynamicResource GitHubVsPromptTextBox}"
                         TextWrapping="Wrap" />
-      <!-- DockPanel Margin="10,3">
-
-        <Label VerticalAlignment="Center"
-               Content="Assignee"
-               Foreground="{DynamicResource GitHubVsWindowText}"
-               Padding="0" />
-
-
-        <ui:GitHubActionLink x:Name="assigneeSelection"
-                             Grid.Column="1"
-                             Margin="5,0"
-                             VerticalAlignment="Center"
-                             Content="{Binding SelectedAssignee}"
-                             HasDropDown="True"
-                             ToolTip="Select an assignee">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Click">
-              <ui:OpenPopupAction TargetName="assigneePopup" />
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-        </ui:GitHubActionLink>
-
-        <Popup x:Name="assigneePopup"
-               AllowsTransparency="True"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=assigneeSelection}"
-               StaysOpen="False">
-          <Border Style="{DynamicResource GitHubComboBoxBorder}">
-            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
-              <ListBox x:Name="branches"
-                       DisplayMemberPath="Name"
-                       DockPanel.Dock="Top"
-                       ItemsSource="{Binding Assignees}"
-                       SelectedItem="{Binding SelectedAssignee}"
-                       Style="{DynamicResource GitHubPopupThing}">
-                <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="SelectionChanged">
-                    <ui:ClosePopupAction TargetName="assigneePopup" />
-                  </i:EventTrigger>
-                </i:Interaction.Triggers>
-              </ListBox>
-            </DockPanel>
-          </Border>
-        </Popup>
-
-      </ -->
 
       <DockPanel Margin="10,10,10,20" HorizontalAlignment="Stretch">
         <Button DockPanel.Dock="Right"
@@ -223,189 +174,5 @@
       </DockPanel>
     </StackPanel>
 
-    <!-- /ScrollViewer>
-      </>
-
-      <TabItem Header="Commits" Style="{DynamicResource GitHubPRDetailsTabItem}">
-        <ListView Background="Transparent"
-                  BorderBrush="Transparent"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-          <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="30" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
-
-              <Grid Grid.Row="0"
-                    Grid.RowSpan="2"
-                    VerticalAlignment="Center">
-                <Border Name="avatarMask"
-                        Width="20"
-                        Background="White"
-                        CornerRadius="3" />
-
-                <StackPanel>
-                  <StackPanel.OpacityMask>
-                    <VisualBrush Visual="{Binding ElementName=avatarMask}" />
-                  </StackPanel.OpacityMask>
-
-                  <Image Width="30"
-                         Height="30"
-                         RenderOptions.BitmapScalingMode="HighQuality"
-                         Source="/GitHub.VisualStudio;component/Resources/default_user_avatar.png" />
-                </StackPanel>
-              </Grid>
-
-              <TextBlock Grid.Row="0"
-                         Grid.Column="1"
-                         Margin="10,-3,5,0"
-                         VerticalAlignment="Top"
-                         Foreground="{DynamicResource GitHubVsToolWindowText}"
-                         Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
-                         Text="I am an example commit message"
-                         TextTrimming="CharacterEllipsis"
-                         ToolTip="I am an example commit message" />
-
-              <TextBlock Grid.Row="1"
-                         Grid.Column="1"
-                         Margin="10,0,0,0"
-                         VerticalAlignment="Top"
-                         Foreground="{DynamicResource GitHubVsGrayText}"
-                         Text="Andreia Gaita committed 20 hours ago"
-                         TextTrimming="CharacterEllipsis"
-                         ToolTip="Andreia Gaita committed 20 hours ago" />
-            </Grid>
-          </ListViewItem>
-        </ListView>
-      </TabItem>
-
-      <TabItem Header="Files Changed" Style="{DynamicResource GitHubPRDetailsTabItem}">
-        <ListView Background="Transparent"
-                  BorderBrush="Transparent"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-          <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="21" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-
-              <ui:OcticonImage Grid.Column="0"
-                               Width="16"
-                               Height="16"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource GitHubVsGrayText}"
-                               Icon="file_text" />
-
-              <TextBlock Grid.Column="1"
-                         Foreground="{DynamicResource GitHubVsWindowText}"
-                         Text="src\file_added.cs"
-                         TextTrimming="CharacterEllipsis"
-                         ToolTip="src\file_added.cs" />
-
-              <ui:OcticonImage Grid.Column="2"
-                               Foreground="#ff6cc644"
-                               Icon="diff_added"
-                               ToolTip="Added" />
-            </Grid>
-          </ListViewItem>
-
-          <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="21" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-
-              <ui:OcticonImage Grid.Column="0"
-                               Width="16"
-                               Height="16"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource GitHubVsGrayText}"
-                               Icon="file_text" />
-
-              <TextBlock Grid.Column="1"
-                         Foreground="{DynamicResource GitHubVsWindowText}"
-                         Text="src\file_modified.cs"
-                         TextTrimming="CharacterEllipsis"
-                         ToolTip="src\file_modified.cs" />
-
-              <ui:OcticonImage Grid.Column="2"
-                               Foreground="#ffbbbbbb"
-                               Icon="diff_modified"
-                               ToolTip="Modified" />
-            </Grid>
-          </ListViewItem>
-
-          <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="21" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-
-              <ui:OcticonImage Grid.Column="0"
-                               Width="16"
-                               Height="16"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource GitHubVsGrayText}"
-                               Icon="file_text" />
-
-              <TextBlock Grid.Column="1"
-                         Foreground="{DynamicResource GitHubVsWindowText}"
-                         Text="src\file_removed.cs"
-                         TextTrimming="CharacterEllipsis"
-                         ToolTip="src\file_removed.cs" />
-
-              <ui:OcticonImage Grid.Column="2"
-                               Foreground="#FFbd2c00"
-                               Icon="diff_removed"
-                               ToolTip="Removed" />
-            </Grid>
-          </ListViewItem>
-
-          <ListViewItem Style="{StaticResource CommitListItemContainerStyle}">
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="21" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-
-              <ui:OcticonImage Grid.Column="0"
-                               Width="16"
-                               Height="16"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource GitHubVsGrayText}"
-                               Icon="file_text" />
-
-              <TextBlock Grid.Column="1"
-                         Foreground="{DynamicResource GitHubVsWindowText}"
-                         Text="src\file_renamed.cs"
-                         TextTrimming="CharacterEllipsis"
-                         ToolTip="src\file_renamed.cs" />
-
-              <ui:OcticonImage Grid.Column="2"
-                               Foreground="#ff4078c0"
-                               Icon="diff_renamed"
-                               ToolTip="Renamed" />
-            </Grid>
-          </ListViewItem>
-        </ListView>
-      </TabItem>
-    </-->
   </DockPanel>
 </local:GenericPullRequestCreationView>
