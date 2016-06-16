@@ -118,12 +118,9 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (!IsGitHubRepo.Value)
             {
-                if (uiController != null)
-                {
-                    var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                    var c = factory.CreateViewAndViewModel(UIViewType.NotAGitHubRepository);
-                    Control = c.View;
-                }
+                var factory = ServiceProvider.GetExportedValue<IUIFactory>();
+                var c = factory.CreateViewAndViewModel(UIViewType.NotAGitHubRepository);
+                Control = c.View;
 
                 return;
             }
