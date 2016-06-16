@@ -105,6 +105,7 @@ namespace GitHub.VisualStudio.UI.Views
             if (!changed)
                 return;
 
+            Stop();
             IsGitHubRepo = null;
             Reload().Forget();
         }
