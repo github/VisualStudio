@@ -21,5 +21,35 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <TextBlock HorizontalAlignment="Center">Not a GitHub repository.</TextBlock>
+  <DockPanel>
+    <StackPanel Margin="10" Orientation="Vertical">
+        <ui:OcticonImage Icon="mark_github"
+            Foreground="{DynamicResource GitHubVsWindowText}"
+            Margin="0,5"
+            Width="48"
+            Height="48" />
+        <Label
+            Foreground="{DynamicResource GitHubVsWindowText}"
+            HorizontalAlignment="Center"
+            FontSize="16"
+            Content="This repository is not on GitHub" />
+        <TextBlock
+            TextWrapping="Wrap"
+            TextAlignment="Center"
+            HorizontalAlignment="Center"
+            Text="Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects." />
+        <StackPanel
+            Margin="0,5"
+            HorizontalAlignment="Center"
+            Orientation="Vertical">
+
+            <CheckBox Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="10">Publish as a private repository</CheckBox>
+
+                <Button HorizontalAlignment="Center" Style="{DynamicResource GitHubVsPrimaryActionButton}">
+                    Publish to GitHub
+            </Button>
+
+        </StackPanel>
+    </StackPanel>
+  </DockPanel>
 </local:GenericNotAGitHubRepositoryView>
