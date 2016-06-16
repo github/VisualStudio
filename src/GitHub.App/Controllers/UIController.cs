@@ -736,16 +736,21 @@ namespace GitHub.Controllers
                 }
             }
 
-            if (!list.ContainsKey(viewType))
+            IUIPair pair = null;
+            var firstTime = !list.TryGetValue(viewType, out pair);
+
+            if (firstTime)
+                pair = factory.CreateViewAndViewModel(viewType);
+
+            pair.ViewModel.Initialize(data);
+
+            if (firstTime)
             {
-                var d = factory.CreateViewAndViewModel(viewType);
-                d.ViewModel.Initialize(data);
-                d.View.DataContext = d.ViewModel;
-                list.Add(viewType, d);
-                return true;
+                pair.View.DataContext = pair.ViewModel;
+                list.Add(viewType, pair);
             }
 
-            return false;
+            return firstTime;
         }
 
 
@@ -834,6 +839,7 @@ namespace GitHub.Controllers
 
         public bool IsStopped => uiStateMachine.IsInState(UIViewType.None) || stopping;
         public UIControllerFlow CurrentFlow => activeFlow;
+        public UIControllerFlow SelectedFlow => mainFlow;
         bool LoggedIn => connection != null && hosts.LookupHost(connection.HostAddress).IsLoggedIn;
         bool? Success { get; set; }
     }
