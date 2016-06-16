@@ -208,9 +208,9 @@ public class RepositoryCloneViewModelTests
             repositoryHost.ModelService.GetRepositories().Returns(Observable.Return(new[] { repo }));
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var os = Substitute.For<IOperatingSystem>();
-            var files = Substitute.For<IFileFacade>();
-            os.File.Returns(files);
-            files.Exists(@"c:\foo\bar\.git\HEAD").Returns(true);
+            var directories = Substitute.For<IDirectoryFacade>();
+            os.Directory.Returns(directories);
+            directories.Exists(@"c:\foo\bar").Returns(true);
             var vm = new RepositoryCloneViewModel(
                 repositoryHost,
                 cloneService,

@@ -153,7 +153,7 @@ namespace GitHub.ViewModels
             });
         }
 
-        bool IsAlreadyRepoAtPath(string baseRepositoryPath)
+        bool IsAlreadyRepoAtPath(string path)
         {
             bool isAlreadyRepoAtPath = false;
 
@@ -162,24 +162,12 @@ namespace GitHub.ViewModels
                 var validationResult = BaseRepositoryPathValidator.ValidationResult;
                 if (validationResult != null && validationResult.IsValid)
                 {
-                    string potentialPath = Path.Combine(baseRepositoryPath, SelectedRepository.Name);
-                    isAlreadyRepoAtPath = IsGitRepo(potentialPath);
+                    string potentialPath = Path.Combine(path, SelectedRepository.Name);
+                    isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
                 }
             }
 
             return isAlreadyRepoAtPath;
-        }
-
-        bool IsGitRepo(string path)
-        {
-            try
-            {
-                return operatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
-            }
-            catch (PathTooLongException)
-            {
-                return false;
-            }
         }
 
         /// <summary>
