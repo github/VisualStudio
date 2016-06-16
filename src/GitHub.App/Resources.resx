@@ -123,6 +123,9 @@
   <data name="CloneTitle" xml:space="preserve">
     <value>Clone a {0} Repository</value>
   </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>Could not connect to github.com</value>
+  </data>
   <data name="CreateGistTitle" xml:space="preserve">
     <value>Create a GitHub Gist</value>
   </data>
@@ -141,11 +144,17 @@
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
     <value>Not an Enterprise server. Please enter an Enterprise URL</value>
   </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(forgot your password?)</value>
+  </data>
   <data name="LoginFailedForbiddenMessage" xml:space="preserve">
     <value>Make sure to use your password and not a Personal Access token to log in.</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
     <value>Check your username and password, then try again</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>Login failed.</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
     <value>Connect To GitHub</value>
