@@ -51,6 +51,8 @@ namespace GitHub.VisualStudio.UI.Views
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
+
+            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -140,6 +142,7 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var factory = ServiceProvider.GetExportedValue<IUIFactory>();
                 var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                c.View.DataContext = c.ViewModel;
                 Control = c.View;
             }
             return;

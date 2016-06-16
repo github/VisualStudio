@@ -157,11 +157,20 @@ namespace GitHub.Models
                     );
                     if (successful)
                     {
+                        // Make sure that GitHubHost/EnterpriseHost are set when the connections
+                        // changed event is raised and likewise that the connection is added when
+                        // the property changed notification is sent.
                         if (isDotCom)
-                            GitHubHost = host;
+                            githubHost = host;
                         else
-                            EnterpriseHost = host;
+                            enterpriseHost = host;
+
                         connectionManager.AddConnection(address, usernameOrEmail);
+
+                        if (isDotCom)
+                            this.RaisePropertyChanged(nameof(GitHubHost));
+                        else
+                            this.RaisePropertyChanged(nameof(EnterpriseHost));
                     }
                 });
         }
