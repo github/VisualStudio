@@ -1,5 +1,6 @@
 ﻿using GitHub.Api;
 using GitHub.Primitives;
+using System;
 
 namespace GitHub.Factories
 {

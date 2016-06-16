@@ -51,16 +51,16 @@ namespace GitHub.VisualStudio.UI.Views
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
+
+            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
-            base.Initialize(serviceProvider);
-
-            ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Reload(new ViewWithData(UIControllerFlow.PullRequests) { ViewType = UIViewType.PRList }).Forget());
 
-            back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+            back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && currentNavItem > 0,
                 () => {
                     DisableButtons();
@@ -68,7 +68,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            forward = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+            forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && currentNavItem < navStack.Count - 1,
                 () => {
                     DisableButtons();
@@ -76,7 +76,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            refresh = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+            refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled && navStack.Count > 0,
                 () => {
                     DisableButtons();
@@ -85,6 +85,8 @@ namespace GitHub.VisualStudio.UI.Views
                 true);
 
             initialized = true;
+
+            base.Initialize(serviceProvider);
         }
 
         public void Initialize([AllowNull] ViewWithData data)
@@ -140,6 +142,7 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var factory = ServiceProvider.GetExportedValue<IUIFactory>();
                 var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                c.View.DataContext = c.ViewModel;
                 Control = c.View;
             }
             return;

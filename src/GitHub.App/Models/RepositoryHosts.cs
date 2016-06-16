@@ -39,7 +39,6 @@ namespace GitHub.Models
             this.connectionManager = connectionManager;
 
             RepositoryHostFactory = repositoryHostFactory;
-            disposables.Add(repositoryHostFactory);
             GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
 
@@ -101,9 +100,7 @@ namespace GitHub.Models
                 {
                     var host = LookupHost(x.HostAddress);
                     if (host.Address != x.HostAddress)
-                    {
                         host = RepositoryHostFactory.Create(x.HostAddress);
-                    }
                     return host;
                 })
                 .Select(h => LogOut(h))
@@ -147,7 +144,6 @@ namespace GitHub.Models
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
-            disposables.Add(host);
             return host.LogIn(usernameOrEmail, password)
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
@@ -161,11 +157,20 @@ namespace GitHub.Models
                     );
                     if (successful)
                     {
+                        // Make sure that GitHubHost/EnterpriseHost are set when the connections
+                        // changed event is raised and likewise that the connection is added when
+                        // the property changed notification is sent.
                         if (isDotCom)
-                            GitHubHost = host;
+                            githubHost = host;
                         else
-                            EnterpriseHost = host;
+                            enterpriseHost = host;
+
                         connectionManager.AddConnection(address, usernameOrEmail);
+
+                        if (isDotCom)
+                            this.RaisePropertyChanged(nameof(GitHubHost));
+                        else
+                            this.RaisePropertyChanged(nameof(EnterpriseHost));
                     }
                 });
         }
@@ -180,7 +185,6 @@ namespace GitHub.Models
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
-            disposables.Add(host);
             return host.LogInFromCache()
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
@@ -210,7 +214,7 @@ namespace GitHub.Models
                     else
                         EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
-                    disposables.Remove(host);
+                    RepositoryHostFactory.Remove(host);
                 });
         }
 

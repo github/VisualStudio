@@ -268,24 +268,8 @@ namespace GitHub.Models
             return Observable.Defer(() => ApiClient.GetUser());
         }
 
-        bool disposed;
         protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (disposed) return;
-
-                try
-                {
-                    ModelService.Dispose();
-                }
-                catch (Exception e)
-                {
-                    log.Warn("Exception occured while disposing RepositoryHost's ModelService", e);
-                }
-                disposed = true;
-            }
-        }
+        {}
 
         public void Dispose()
         {
