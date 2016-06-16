@@ -19,7 +19,6 @@ using NullGuard;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace GitHub.VisualStudio.UI.Views
 {
