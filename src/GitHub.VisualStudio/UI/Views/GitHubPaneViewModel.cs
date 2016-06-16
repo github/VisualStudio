@@ -118,13 +118,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (!IsGitHubRepo.Value)
             {
-                if (uiController != null)
-                {
-                    Stop();
-                    //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                    //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
-                    //Control = c.View;
-                }
+                Stop();
                 return;
             }
 
@@ -249,12 +243,17 @@ namespace GitHub.VisualStudio.UI.Views
 
         void Stop()
         {
+            if (uiController == null)
+                return;
+
+            DisableButtons();
             windowController?.Close();
             uiController.Stop();
             disposables.Clear();
             uiController = null;
             currentNavItem = -1;
             navStack.Clear();
+            UpdateToolbar();
         }
 
         string title;
