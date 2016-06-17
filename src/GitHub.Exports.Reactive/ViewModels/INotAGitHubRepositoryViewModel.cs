@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reactive;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace GitHub.ViewModels
 {

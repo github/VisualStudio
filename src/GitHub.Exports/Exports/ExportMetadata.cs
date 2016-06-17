@@ -26,6 +26,7 @@ namespace GitHub.Exports
         LogoutRequired,
         GitHubPane,
         LoggedOut,
+        NotAGitRepository,
         NotAGitHubRepository,
     }
 
