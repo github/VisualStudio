@@ -43,10 +43,15 @@
             HorizontalAlignment="Center"
             Orientation="Vertical">
 
-            <CheckBox Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="10">Publish as a private repository</CheckBox>
+            <CheckBox Foreground="{DynamicResource GitHubVsToolWindowText}" 
+                      IsChecked="{Binding PublishPrivate}"
+                      Margin="10">
+                Publish as a private repository
+            </CheckBox>
 
-                <Button HorizontalAlignment="Center" Style="{DynamicResource GitHubVsPrimaryActionButton}">
-                    Publish to GitHub
+            <Button HorizontalAlignment="Center" Style="{DynamicResource GitHubVsPrimaryActionButton}"
+                    Command="{Binding Publish}">
+                Publish to GitHub
             </Button>
 
         </StackPanel>
