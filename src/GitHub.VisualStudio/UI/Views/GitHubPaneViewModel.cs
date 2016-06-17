@@ -26,6 +26,8 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
+        const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequests;
+
         bool initialized;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
@@ -40,6 +42,7 @@ namespace GitHub.VisualStudio.UI.Views
         bool navigatingViaArrows;
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
+        int latestReloadCallId;
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -51,8 +54,6 @@ namespace GitHub.VisualStudio.UI.Views
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
-
-            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -87,6 +88,8 @@ namespace GitHub.VisualStudio.UI.Views
             initialized = true;
 
             base.Initialize(serviceProvider);
+
+            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public void Initialize([AllowNull] ViewWithData data)
@@ -105,53 +108,103 @@ namespace GitHub.VisualStudio.UI.Views
             if (!changed)
                 return;
 
+            Stop();
             IsGitHubRepo = null;
             Reload().Forget();
         }
 
+        /// <summary>
+        /// This method is reentrant, so all await calls need to be done before
+        /// any actions are performed on the data. More recent calls to this method
+        /// will cause previous calls pending on await calls to exit early.
+        /// </summary>
+        /// <returns></returns>
         async Task Reload([AllowNull] ViewWithData data = null, bool navigating = false)
         {
+            if (!initialized)
+                return;
+
+            latestReloadCallId++;
+            var reloadCallId = latestReloadCallId;
+
             navigatingViaArrows = navigating;
 
             if (!IsGitHubRepo.HasValue)
-                IsGitHubRepo = await IsAGitHubRepo();
-
-            if (!IsGitHubRepo.Value)
             {
-                if (uiController != null)
-                {
-                    Stop();
-                    //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                    //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
-                    //Control = c.View;
-                }
-                return;
+                var isGitHubRepo = await IsAGitHubRepo();
+                if (reloadCallId != latestReloadCallId)
+                    return;
+
+                IsGitHubRepo = isGitHubRepo;
             }
 
             var connection = await connectionManager.LookupConnection(ActiveRepo);
-            IsLoggedIn = await connection.IsLoggedIn(hosts);
+            if (reloadCallId != latestReloadCallId)
+                return;
 
-            if (IsLoggedIn)
-            {
-                if (uiController == null || (data != null && data.ActiveFlow != uiController.SelectedFlow))
-                    StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
-                else if (data != null || currentNavItem >= 0)
-                    uiController.Jump(data ?? navStack[currentNavItem]);
-            }
+            if (connection == null)
+                IsLoggedIn = false;
             else
             {
+                var isLoggedIn = await connection.IsLoggedIn(hosts);
+                if (reloadCallId != latestReloadCallId)
+                    return;
+
+                IsLoggedIn = isLoggedIn;
+            }
+
+            if (!IsGitHubRepo.Value)
+            {
+                //LoadView(UIViewType.NotAGitHubRepo);
+            }
+
+            else if (!IsLoggedIn)
+            {
+                LoadView(UIViewType.LoggedOut);
+            }
+
+            else
+            {
+                LoadView(data?.ActiveFlow ?? DefaultControllerFlow, connection, data);
+            }
+        }
+
+        void LoadView(UIControllerFlow flow, IConnection connection = null, ViewWithData data = null, UIViewType type = UIViewType.None)
+        {
+            // if we're loading a single view or a different flow, we need to stop the current controller
+            var restart = flow == UIControllerFlow.None || uiController?.SelectedFlow != flow;
+
+            if (restart)
+                Stop();
+
+            // if there's no selected flow, then just load a view directly
+            if (flow == UIControllerFlow.None)
+            {
                 var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                var c = factory.CreateViewAndViewModel(type);
                 c.View.DataContext = c.ViewModel;
                 Control = c.View;
             }
-            return;
+            // it's a new flow!
+            else if (restart)
+            {
+                StartFlow(flow, connection, data);
+            }
+            // navigate to a requested view within the currently running uiController
+            else
+            {
+                uiController.Jump(data ?? navStack[currentNavItem]);
+            }
+        }
+
+        void LoadView(UIViewType type)
+        {
+            LoadView(UIControllerFlow.None, type: type);
         }
 
         void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
         {
-            if (uiController != null)
-                Stop();
+            Stop();
 
             if (conn == null)
                 return;
@@ -249,12 +302,17 @@ namespace GitHub.VisualStudio.UI.Views
 
         void Stop()
         {
+            if (uiController == null)
+                return;
+
+            DisableButtons();
             windowController?.Close();
             uiController.Stop();
             disposables.Clear();
             uiController = null;
             currentNavItem = -1;
             navStack.Clear();
+            UpdateToolbar();
         }
 
         string title;
