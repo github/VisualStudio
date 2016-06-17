@@ -17,6 +17,7 @@ namespace GitHub.UI
         void Stop();
         bool IsStopped { get; }
         UIControllerFlow CurrentFlow { get; }
+        UIControllerFlow SelectedFlow { get; }
         void Jump(ViewWithData where);
     }
 

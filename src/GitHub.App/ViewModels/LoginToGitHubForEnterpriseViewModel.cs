@@ -69,7 +69,6 @@ namespace GitHub.ViewModels
         {
             EnterpriseUrl = null;
             await EnterpriseUrlValidator.ResetAsync();
-            ShowConnectingToHostFailed = false;
         }
     }
 }

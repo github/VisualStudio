@@ -79,6 +79,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not connect to github.com.
+        /// </summary>
+        internal static string CouldNotConnectToGitHub {
+            get {
+                return ResourceManager.GetString("CouldNotConnectToGitHub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create a GitHub Gist.
         /// </summary>
         internal static string CreateGistTitle {
@@ -133,6 +142,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (forgot your password?).
+        /// </summary>
+        internal static string ForgotPasswordLink {
+            get {
+                return ResourceManager.GetString("ForgotPasswordLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to log in..
         /// </summary>
         internal static string LoginFailedForbiddenMessage {
@@ -147,6 +165,15 @@ namespace GitHub.App {
         internal static string LoginFailedMessage {
             get {
                 return ResourceManager.GetString("LoginFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login failed..
+        /// </summary>
+        internal static string LoginFailedText {
+            get {
+                return ResourceManager.GetString("LoginFailedText", resourceCulture);
             }
         }
         

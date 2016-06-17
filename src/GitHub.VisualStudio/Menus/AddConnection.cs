@@ -5,6 +5,7 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.Extensions;
 using NullGuard;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -13,8 +14,8 @@ namespace GitHub.VisualStudio.Menus
     public class AddConnection: MenuBase, IMenuHandler
     {
         [ImportingConstructor]
-        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
         }
 

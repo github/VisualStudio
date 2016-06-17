@@ -117,13 +117,11 @@ namespace GitHub.Collections
             sourceQueue = obs
                 .Do(data => queue.Enqueue(new ActionData(data)));
 
-            source = Observable
-                .Generate(StartQueue(),
-                    i => !disposed,
-                    i => i + 1,
-                    i => GetFromQueue(),
-                    i => delay
-                )
+            source = Observable.Defer(() => {
+                StartQueue();
+                return Observable.Timer(TimeSpan.Zero, delay)
+                                 .Select(_ => GetFromQueue());
+            })
                 .Where(data => data.Item != null)
                 .ObserveOn(scheduler)
                 .Select(x => ProcessItem(x, original))
