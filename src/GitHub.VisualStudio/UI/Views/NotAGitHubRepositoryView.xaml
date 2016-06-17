@@ -38,23 +38,12 @@
             TextAlignment="Center"
             HorizontalAlignment="Center"
             Text="Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects." />
-        <StackPanel
-            Margin="0,5"
-            HorizontalAlignment="Center"
-            Orientation="Vertical">
-
-            <CheckBox Foreground="{DynamicResource GitHubVsToolWindowText}" 
-                      IsChecked="{Binding PublishPrivate}"
-                      Margin="10">
-                Publish as a private repository
-            </CheckBox>
-
-            <Button HorizontalAlignment="Center" Style="{DynamicResource GitHubVsPrimaryActionButton}"
-                    Command="{Binding Publish}">
-                Publish to GitHub
-            </Button>
-
-        </StackPanel>
+        <Button HorizontalAlignment="Center"
+                Margin="0,15"
+                Style="{DynamicResource GitHubVsPrimaryActionButton}"
+                Command="{Binding Publish}">
+            Get Started
+        </Button>
     </StackPanel>
   </DockPanel>
 </local:GenericNotAGitHubRepositoryView>

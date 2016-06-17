@@ -111,7 +111,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             uiProvider.RunUI();
         }
 
-        void ShowPublish()
+        public void ShowPublish()
         {
             IsBusy = true;
             var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();

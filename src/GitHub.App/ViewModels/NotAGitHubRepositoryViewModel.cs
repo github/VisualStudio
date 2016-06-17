@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using GitHub.Exports;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using ReactiveUI;
@@ -14,12 +15,15 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class NotAGitHubRepositoryViewModel : BaseViewModel, INotAGitHubRepositoryViewModel
     {
+        ITeamExplorerServices teamExplorerServices;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NotAGitHubRepositoryViewModel"/> class.
         /// </summary>
         [ImportingConstructor]
-        public NotAGitHubRepositoryViewModel()
+        public NotAGitHubRepositoryViewModel(ITeamExplorerServices teamExplorerServices)
         {
+            this.teamExplorerServices = teamExplorerServices;
             Publish = ReactiveCommand.Create();
             Publish.Subscribe(_ => OnPublish());
         }
@@ -30,16 +34,11 @@ namespace GitHub.ViewModels
         public IReactiveCommand<object> Publish { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the repository publish dialog will be opened
-        /// with the private option checked.
-        /// </summary>
-        public bool PublishPrivate { get; set; }
-
-        /// <summary>
         /// Called when the <see cref="Publish"/> command is executed.
         /// </summary>
         private void OnPublish()
         {
+            teamExplorerServices.ShowPublishSection();
         }
     }
 }
