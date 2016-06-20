@@ -36,8 +36,10 @@
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="The current project isn't a repository. You might wanna fix that bruh." />
+            HorizontalAlignment="Center">
+                We couldn't find a git repository here. Open a git project or click "File -> Add to Source Control"
+                in a project to get started
+        </TextBlock>
     </StackPanel>
   </DockPanel>
 </local:GenericNotAGitRepositoryView>
