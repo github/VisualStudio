@@ -99,8 +99,8 @@ namespace GitHub.ViewModels
                 return;
             pullRequests.Filter = (pr, i, l) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
-                     (ass == null || pr.Assignee == ass) &&
-                     (aut == null || pr.Author == aut);
+                     (ass == null || ass.Equals(pr.Assignee)) &&
+                     (aut == null || aut.Equals(pr.Author));
         }
 
         TrackingCollection<IPullRequestModel> pullRequests;
