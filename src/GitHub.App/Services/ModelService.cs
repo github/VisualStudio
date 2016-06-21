@@ -16,6 +16,7 @@ using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
+using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -136,7 +137,7 @@ namespace GitHub.Services
         }
 
         public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
-            [AllowNull]ITrackingCollection<IPullRequestModel> collection = null)
+            ITrackingCollection<IPullRequestModel> collection)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
             // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
@@ -146,9 +147,6 @@ namespace GitHub.Services
 
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
-
-            if (collection == null)
-                collection = new TrackingCollection<IPullRequestModel>();
 
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
@@ -306,6 +304,11 @@ namespace GitHub.Services
         IBranch Create(Branch branch)
         {
             return new BranchModel(branch);
+        }
+
+        static IPullRequestModel Create(string key)
+        {
+            return new PullRequestModel(Int32.Parse(key.Split('|').Last(), CultureInfo.InvariantCulture));
         }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)

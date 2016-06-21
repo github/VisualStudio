@@ -4,6 +4,7 @@ using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using System.Diagnostics;
+using GitHub.SampleData;
 
 namespace GitHub.Models
 {
@@ -20,6 +21,13 @@ namespace GitHub.Models
             Assignee = assignee;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt ?? CreatedAt;
+        }
+
+        internal PullRequestModel(int number)
+        {
+            Number = number;
+            Title = "";
+            Author = new AccountDesigner();
         }
 
         public void CopyFrom(IPullRequestModel other)

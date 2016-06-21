@@ -79,6 +79,7 @@ namespace GitHub.ViewModels
             PullRequests = new TrackingCollection<IPullRequestModel>();
             pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
             pullRequests.Filter = (pr, i, l) => pr.IsOpen;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
         }
 
         public override void Initialize([AllowNull] ViewWithData data)

@@ -13,6 +13,7 @@ using NSubstitute;
 using Octokit;
 using Xunit;
 using System.Globalization;
+using System.Reactive.Subjects;
 using System.Threading;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -441,20 +442,25 @@ public class ModelServiceTests
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var col = modelService.GetPullRequests(repo);
+
+            ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
+            col = modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
-            var evt = new ManualResetEvent(false);
+            var done = new Subject<Unit>();
+            done.Subscribe();
+
             col.Subscribe(t =>
             {
                 if (++count == expected)
-                    evt.Set();
+                {
+                    done.OnNext(Unit.Default);
+                    done.OnCompleted();
+                }
             }, () => { });
 
-
-            evt.WaitOne();
-            evt.Reset();
+            await done;
 
             Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Cache")))).ToArray());
         }
@@ -503,20 +509,25 @@ public class ModelServiceTests
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var col = modelService.GetPullRequests(repo);
+
+            ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
+            col = modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
-            var evt = new ManualResetEvent(false);
+            var done = new Subject<Unit>();
+            done.Subscribe();
+
             col.Subscribe(t =>
             {
                 if (++count == expected * 2)
-                    evt.Set();
+                {
+                    done.OnNext(Unit.Default);
+                    done.OnCompleted();
+                }
             }, () => { });
 
-            
-            evt.WaitOne();
-            evt.Reset();
+            await done;
 
             Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
         }
@@ -565,23 +576,28 @@ public class ModelServiceTests
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
 
             await modelService.InsertUser(new AccountCacheItem(user));
-            var col = modelService.GetPullRequests(repo);
+
+            ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
+            col = modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
-            var evt = new ManualResetEvent(false);
+            var done = new Subject<Unit>();
+            done.Subscribe();
+
             col.Subscribe(t =>
             {
                 // we get all the items from the cache (items 1-5), all the items from the live (items 5-9),
                 // and 4 deletions (items 1-4) because the cache expired the items that were not
                 // a part of the live data
                 if (++count == 14)
-                    evt.Set();
+                {
+                    done.OnNext(Unit.Default);
+                    done.OnCompleted();
+                }
             }, () => { });
 
-
-            evt.WaitOne();
-            evt.Reset();
+            await done;
 
             Assert.Equal(5, col.Count);
             Assert.Collection(col, 
