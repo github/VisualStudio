@@ -348,7 +348,7 @@ namespace GitHub.VisualStudio
 
                 StopUI();
                 if (disposables != null)
-				    disposables.Dispose();
+                    disposables.Dispose();
                 disposables = null;
                 if (tempContainer != null)
                     tempContainer.Dispose();
