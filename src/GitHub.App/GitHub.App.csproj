@@ -19,7 +19,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
+    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -119,6 +119,9 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
+    <Compile Include="..\..\script\src\MetricsService.cs" Condition="$(Buildtype) == 'Internal'">
+      <Link>Services\MetricsService.cs</Link>
+    </Compile>
     <Compile Include="Caches\CacheIndex.cs" />
     <Compile Include="Caches\CacheItem.cs" />
     <Compile Include="Caches\ImageCache.cs" />
@@ -153,7 +156,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\script\ApiClientConfiguration.cs" Condition="$(Buildtype) == 'Internal'">
+    <Compile Include="..\..\script\src\ApiClientConfiguration.cs" Condition="$(Buildtype) == 'Internal'">
       <Link>Api\ApiClientConfiguration.cs</Link>
     </Compile>
     <Compile Include="Api\ApiClientConfiguration.cs" Condition="$(Buildtype) != 'Internal'" />
@@ -193,6 +196,7 @@
     <Compile Include="Services\StandardUserErrors.cs" />
     <Compile Include="Controllers\UIController.cs" />
     <Compile Include="Services\Translation.cs" />
+    <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />

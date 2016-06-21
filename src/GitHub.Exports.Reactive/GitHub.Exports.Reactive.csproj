@@ -12,7 +12,7 @@
     <AssemblyName>GitHub.Exports.Reactive</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
+    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -93,6 +93,9 @@
     <Compile Include="Models\IAvatarContainer.cs" />
     <Compile Include="Models\IConnectionRepositoryHostMap.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
+    <Compile Include="Models\UsageModel.cs" />
+    <Compile Include="Services\IMetricsService.cs" />
+    <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Models\UserAndScopes.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />

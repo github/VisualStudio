@@ -25,14 +25,16 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<IAccount> account;
         readonly IGistPublishService gistPublishService;
         readonly INotificationService notificationService;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         GistCreationViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ISelectedTextProvider selectedTextProvider,
             IGistPublishService gistPublishService,
-            INotificationService notificationService)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService)
+            INotificationService notificationService,
+            IUsageTracker usageTracker)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, selectedTextProvider, gistPublishService, usageTracker)
         {
             this.notificationService = notificationService;
         }
@@ -40,11 +42,13 @@ namespace GitHub.ViewModels
         public GistCreationViewModel(
             IRepositoryHost repositoryHost,
             ISelectedTextProvider selectedTextProvider,
-            IGistPublishService gistPublishService)
+            IGistPublishService gistPublishService,
+            IUsageTracker usageTracker)
         {
             Title = Resources.CreateGistTitle;
             apiClient = repositoryHost.ApiClient;
             this.gistPublishService = gistPublishService;
+            this.usageTracker = usageTracker;
 
             FileName = VisualStudio.Services.GetFileNameFromActiveDocument() ?? Resources.DefaultGistFileName;
             SelectedText = selectedTextProvider.GetSelectedText();
@@ -74,6 +78,7 @@ namespace GitHub.ViewModels
             newGist.Files.Add(FileName, SelectedText);
 
             return gistPublishService.PublishGist(apiClient, newGist)
+                .Do(_ => usageTracker.IncrementCreateGistCount())
                 .Catch<Gist, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())

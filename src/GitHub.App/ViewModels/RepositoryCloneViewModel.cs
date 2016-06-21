@@ -32,6 +32,7 @@ namespace GitHub.ViewModels
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
         readonly INotificationService notificationService;
+        readonly IUsageTracker usageTracker;
         readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<bool> isLoading;
@@ -45,20 +46,23 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
             IOperatingSystem operatingSystem,
-            INotificationService notificationService)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService)
+            INotificationService notificationService,
+            IUsageTracker usageTracker)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService, usageTracker)
         { }
         
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IUsageTracker usageTracker)
         {
             this.repositoryHost = repositoryHost;
             this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
             this.notificationService = notificationService;
+            this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
             Repositories = new ReactiveList<IRepositoryModel>();
@@ -139,9 +143,12 @@ namespace GitHub.ViewModels
                     notificationService.ShowError(Resources.RepositoryCloneFailedNoSelectedRepo);
                     return Observable.Return(Unit.Default);
                 }
+                
                 // The following is a noop if the directory already exists.
                 operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
-                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath);
+
+                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath)
+                    .Do(_ => this.usageTracker.IncrementCloneCount());
             })
             .SelectMany(_ => _)
             .Catch<Unit, Exception>(e =>

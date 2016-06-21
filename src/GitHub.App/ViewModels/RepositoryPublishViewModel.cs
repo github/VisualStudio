@@ -33,16 +33,19 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<bool> isPublishing;
         readonly ObservableAsPropertyHelper<string> title;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public RepositoryPublishViewModel(
             IRepositoryHosts hosts,
             IRepositoryPublishService repositoryPublishService,
             INotificationService notificationService,
-            IConnectionManager connectionManager)
+            IConnectionManager connectionManager,
+            IUsageTracker usageTracker)
         {
             this.notificationService = notificationService;
             this.hosts = hosts;
+            this.usageTracker = usageTracker;
 
             title = this.WhenAny(
                 x => x.SelectedHost,
@@ -150,6 +153,7 @@ namespace GitHub.ViewModels
             var account = SelectedAccount;
 
             return repositoryPublishService.PublishRepository(newRepository, account, SelectedHost.ApiClient)
+                .Do(_ => usageTracker.IncrementPublishCount())
                 .Select(_ => ProgressState.Success)
                 .Catch<ProgressState, Exception>(ex =>
                 {

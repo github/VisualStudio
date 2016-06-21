@@ -142,6 +142,7 @@ namespace GitHub.VisualStudio
             return (T)GetService(typeof(T));
         }
 
+        [return: AllowNull]
         public T TryGetService<T>() where T : class
         {
             return TryGetService(typeof(T)) as T;
