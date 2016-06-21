@@ -124,7 +124,6 @@
     <Compile Include="Caches\ImageCache.cs" />
     <Compile Include="Extensions\AkavacheExtensions.cs" />
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
-    <Compile Include="Extensions\ValidationExtensions.cs" />
     <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />

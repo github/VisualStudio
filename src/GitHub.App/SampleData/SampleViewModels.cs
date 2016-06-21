@@ -377,7 +377,11 @@ namespace GitHub.SampleData
                 x => x
             );
 
-            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
+            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
+                .IfNullOrEmpty("Please enter a repository path")
+                .IfTrue(x => x.Length > 200, "Path too long")
+                .IfContainsInvalidPathChars("Path contains invalid characters")
+                .IfPathNotRooted("Please enter a valid path");
         }
 
         public IReactiveCommand<Unit> CloneCommand

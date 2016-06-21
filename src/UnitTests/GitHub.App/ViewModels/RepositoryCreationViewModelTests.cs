@@ -283,7 +283,7 @@ public class RepositoryCreationViewModelTests
         {
             var provider = Substitutes.ServiceProvider;
             var operatingSystem = provider.GetOperatingSystem();
-            operatingSystem.File.Exists(@"c:\fake\foo\.git\HEAD").Returns(exists);
+            operatingSystem.Directory.Exists(@"c:\fake\foo").Returns(exists);
             var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\";
 
