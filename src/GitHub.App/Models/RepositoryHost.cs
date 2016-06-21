@@ -252,8 +252,8 @@ namespace GitHub.Models
                 {
                     if (result.IsSuccess())
                     {
-                        IsLoggedIn = true;
                         SupportsGist = userAndScopes.Scopes?.Contains("gist") ?? true;
+                        IsLoggedIn = true;
                     }
 
                     log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
