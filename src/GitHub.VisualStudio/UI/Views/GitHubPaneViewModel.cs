@@ -110,7 +110,7 @@ namespace GitHub.VisualStudio.UI.Views
                 return;
 
             Stop();
-            RepositoryOrigin = null;
+            RepositoryOrigin = RepositoryOrigin.Unknown;
             Reload().Forget();
         }
 
@@ -130,7 +130,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             navigatingViaArrows = navigating;
 
-            if (!RepositoryOrigin.HasValue)
+            if (RepositoryOrigin == RepositoryOrigin.Unknown)
             {
                 var origin = await GetRepositoryOrigin();
                 if (reloadCallId != latestReloadCallId)
@@ -154,11 +154,11 @@ namespace GitHub.VisualStudio.UI.Views
                 IsLoggedIn = isLoggedIn;
             }
 
-            if (RepositoryOrigin.Value == UI.RepositoryOrigin.NonGitRepository)
+            if (RepositoryOrigin == UI.RepositoryOrigin.NonGitRepository)
             {
                 LoadView(UIViewType.NotAGitRepository);
             }
-            else if (RepositoryOrigin.Value == UI.RepositoryOrigin.Other)
+            else if (RepositoryOrigin == UI.RepositoryOrigin.Other)
             {
                 LoadView(UIViewType.NotAGitHubRepository);
             }
@@ -340,8 +340,8 @@ namespace GitHub.VisualStudio.UI.Views
             set { isLoggedIn = value;  this.RaisePropertyChange(); }
         }
 
-        RepositoryOrigin? repositoryOrigin;
-        public RepositoryOrigin? RepositoryOrigin
+        RepositoryOrigin repositoryOrigin;
+        public RepositoryOrigin RepositoryOrigin
         {
             get { return repositoryOrigin; }
             private set { repositoryOrigin = value; }
@@ -351,10 +351,10 @@ namespace GitHub.VisualStudio.UI.Views
         {
             get
             {
-                return repositoryOrigin.HasValue ?
-                    repositoryOrigin.Value == UI.RepositoryOrigin.DotCom ||
-                    repositoryOrigin.Value == UI.RepositoryOrigin.Enterprise :
-                    (bool?)null;
+                return repositoryOrigin == RepositoryOrigin.Unknown ?
+                    (bool?)null :
+                    repositoryOrigin == UI.RepositoryOrigin.DotCom ||
+                    repositoryOrigin == UI.RepositoryOrigin.Enterprise;
             }
         }
 
