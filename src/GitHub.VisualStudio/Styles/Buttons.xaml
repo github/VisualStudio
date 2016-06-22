@@ -178,7 +178,10 @@
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.6" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderDisabledBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundDisabledBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" />
+                            <Setter Property="FontWeight" Value="Normal" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

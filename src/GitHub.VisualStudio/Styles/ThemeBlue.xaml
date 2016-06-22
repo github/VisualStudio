@@ -32,7 +32,9 @@
   <SolidColorBrush x:Key="GitHubButtonBorderPressedBrush" Color="#FFBFBFBF" />
 
   <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundBrush" Color="#FF7ED321" />
-  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledBrush" Color="#FF7ED321" Opacity="0.3" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledBrush" Color="#FFFAFAFA" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonForegroundDisabledBrush" Color="#FF9B9B9B" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBorderDisabledBrush" Color="#FFD4D4D4" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundMouseOverBrush" Color="#FF90D96F" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundPressedBrush" Color="#FF7FBF62" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonForegroundBrush" Color="#FFFFFFFF" />

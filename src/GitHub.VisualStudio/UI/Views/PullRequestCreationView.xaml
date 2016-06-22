@@ -298,11 +298,13 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
+                            <!--
                             <Button Grid.Column="0"
                                     HorizontalAlignment="Right"
                                     Content="Cancel"
                                     Style="{StaticResource GitHubVsButton}"
                                     Command="{Binding Cancel}"/>
+                                    -->
                             <Button HorizontalAlignment="Right" Margin="6,0,0,0" Content="Create pull request" Grid.Column="1" Style="{StaticResource GitHubVsPrimaryActionButton}" />
                         </Grid>
                     </StackPanel>
