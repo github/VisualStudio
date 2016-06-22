@@ -315,4 +315,16 @@
   <data name="openInBrowser" xml:space="preserve">
     <value>Open in Browser</value>
   </data>
+  <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
+    <value>Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects.</value>
+  </data>
+  <data name="NotAGitHubRepository" xml:space="preserve">
+    <value>This repository is not on GitHub</value>
+  </data>
+  <data name="NotAGitRepository" xml:space="preserve">
+    <value>No repository</value>
+  </data>
+  <data name="NotAGitRepositoryMessage" xml:space="preserve">
+    <value>We couldn't find a git repository here. Open a git project or click "File -&gt; Add to Source Control" in a project to get started.</value>
+  </data>
 </root>
