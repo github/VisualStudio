@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Validation;
 using GitHub.ViewModels;
 using NSubstitute;
 using Rothko;
@@ -193,6 +194,33 @@ public class RepositoryCloneViewModelTests
 
             Assert.True(vm.LoadingFailed);
             Assert.False(vm.IsLoading);
+        }
+    }
+
+    public class TheBaseRepositoryPathValidator
+    {
+        [Fact]
+        public void IsInvalidWhenDestinationRepositoryExists()
+        {
+            var repo = Substitute.For<IRepositoryModel>();
+            repo.Name.Returns("bar");
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories().Returns(Observable.Return(new[] { repo }));
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var os = Substitute.For<IOperatingSystem>();
+            var directories = Substitute.For<IDirectoryFacade>();
+            os.Directory.Returns(directories);
+            directories.Exists(@"c:\foo\bar").Returns(true);
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                os,
+                Substitute.For<INotificationService>());
+
+            vm.BaseRepositoryPath = @"c:\foo";
+            vm.SelectedRepository = repo;
+
+            Assert.Equal(ValidationStatus.Invalid, vm.BaseRepositoryPathValidator.ValidationResult.Status);
         }
     }
 

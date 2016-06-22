@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 using GitHub.App;
 using GitHub.Exports;
@@ -80,7 +83,17 @@ namespace GitHub.ViewModels
                 signalReset: filterResetSignal
             );
 
-            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
+            var baseRepositoryPath = this.WhenAny(
+                x => x.BaseRepositoryPath,
+                x => x.SelectedRepository,
+                (x, y) => x.Value);
+
+            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(baseRepositoryPath)
+                .IfNullOrEmpty("Please enter a repository path")
+                .IfTrue(x => x.Length > 200, "Path too long")
+                .IfContainsInvalidPathChars("Path contains invalid characters")
+                .IfPathNotRooted("Please enter a valid path")
+                .IfTrue(IsAlreadyRepoAtPath, Resources.RepositoryNameValidatorAlreadyExists);
 
             var canCloneObservable = this.WhenAny(
                 x => x.SelectedRepository,
@@ -138,6 +151,23 @@ namespace GitHub.ViewModels
                 notificationService.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
                 return Observable.Return(Unit.Default);
             });
+        }
+
+        bool IsAlreadyRepoAtPath(string path)
+        {
+            bool isAlreadyRepoAtPath = false;
+
+            if (SelectedRepository != null)
+            {
+                var validationResult = BaseRepositoryPathValidator.ValidationResult;
+                if (validationResult != null && validationResult.IsValid)
+                {
+                    string potentialPath = Path.Combine(path, SelectedRepository.Name);
+                    isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
+                }
+            }
+
+            return isAlreadyRepoAtPath;
         }
 
         /// <summary>
