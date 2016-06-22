@@ -15,7 +15,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace GitHub.Collections
 {
@@ -30,7 +29,7 @@ namespace GitHub.Collections
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IDisposable
-        where T : class, ICopyable<T>, IComparable<T>
+        where T : class, ICopyable<T>
     {
         enum TheAction
         {
@@ -38,7 +37,8 @@ namespace GitHub.Collections
             Move,
             Add,
             Insert,
-            Remove
+            Remove,
+            Ignore
         }
 
         bool isChanging;
@@ -83,10 +83,7 @@ namespace GitHub.Collections
         public TimeSpan ProcessingDelay
         {
             get { return requestedDelay; }
-            set
-            {
-                requestedDelay = value;
-            }
+            set { requestedDelay = value; }
         }
 
         bool ManualProcessing => cache.IsEmpty && originalSourceIsCompleted;
@@ -105,7 +102,7 @@ namespace GitHub.Collections
 #endif
             this.comparer = comparer ?? Comparer<T>.Default.Compare;
             this.filter = filter;
-            this.newer = newer ?? Comparer<T>.Default.Compare;
+            this.newer = newer;
         }
 
         public TrackingCollection(IObservable<T> source,
@@ -132,8 +129,12 @@ namespace GitHub.Collections
 
             Reset();
 
+            // ManualResetEvent uses the realtime clock for accurate <50ms delays
             var waitHandle = new ManualResetEventSlim();
 
+            // empty the source observable as fast as possible
+            // to the cache queue, and signal that data is available
+            // for processing
             dataPump = obs
                 .Do(data =>
                 {
@@ -146,7 +147,6 @@ namespace GitHub.Collections
                     signalOriginalSourceCompletion = true;
                 })
                 .Publish();
-
 
             // when both signalHaveData and signalNeedData produce a value, dataListener gets a value
             // this will empty the queue of items that have been cached in regular intervals according
@@ -167,7 +167,8 @@ namespace GitHub.Collections
             source = dataListener
                 .Where(data => data.Item != null)
                 .ObserveOn(scheduler)
-                .Select(data => {
+                .Select(data =>
+                {
                     data = ProcessItem(data, original);
 
                     // if we're removing an item that doesn't exist, ignore it
@@ -197,7 +198,6 @@ namespace GitHub.Collections
                             signalOriginalSourceCompletion = false;
                             originalSourceCompleted.OnNext(Unit.Default);
                         }
-
                     }
                     else
                         signalNeedData.OnNext(Unit.Default);
@@ -339,16 +339,6 @@ namespace GitHub.Collections
 
         #region Source pipeline processing
 
-        ActionData CheckFilter(ActionData data)
-        {
-            var isIncluded = true;
-            if (data.TheAction == TheAction.Remove)
-                isIncluded = false;
-            else if (filter != null)
-                isIncluded = filter(data.Item, data.Position, this);
-            return new ActionData(data, isIncluded);
-        }
-
         int StartQueue()
         {
             disposables.Add(cachePump.Connect());
@@ -382,11 +372,12 @@ namespace GitHub.Collections
             if (idx >= 0)
             {
                 var old = list[idx];
-                var isNewer = newer(item, old);
-
-                // the object is "older" than the one we have, ignore it
-                if (isNewer > 0)
-                    ret = new ActionData(TheAction.None, list, item, null, idx, idx);
+                if (newer != null)
+                {
+                    // the object is "older" than the one we have, ignore it
+                    if (newer(item, old) > 0)
+                        return new ActionData(TheAction.Ignore, list, item, null, idx, idx);
+                }
 
                 var comparison = comparer(item, old);
 
@@ -466,8 +457,18 @@ namespace GitHub.Collections
             // unfiltered list update
             sortedIndexCache.Remove(data.Item);
             UpdateIndexCache(data.List.Count - 1, data.OldPosition, data.List, sortedIndexCache);
-            original.Remove(data.Item);
+            data.List.Remove(data.Item);
             return data;
+        }
+
+        ActionData CheckFilter(ActionData data)
+        {
+            var isIncluded = true;
+            if (data.TheAction == TheAction.Remove)
+                isIncluded = false;
+            else if (filter != null)
+                isIncluded = filter(data.Item, data.Position, this);
+            return new ActionData(data, isIncluded);
         }
 
         ActionData FilteredAdd(ActionData data)
