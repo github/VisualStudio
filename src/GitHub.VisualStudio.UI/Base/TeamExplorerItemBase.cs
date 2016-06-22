@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using GitHub.ViewModels;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -98,22 +99,41 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        protected async Task<bool> IsAGitHubRepo()
+        protected async Task<RepositoryOrigin> GetRepositoryOrigin()
         {
+            if (ActiveRepo == null)
+                return RepositoryOrigin.NonGitRepository;
+
             var uri = ActiveRepoUri;
             if (uri == null)
-                return false;
+                return RepositoryOrigin.Other;
 
             Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
             SimpleApiClient = apiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
-            if (!isdotcom)
+
+            if (isdotcom)
+            {
+                return RepositoryOrigin.DotCom;
+            }
+            else
             {
                 var repo = await SimpleApiClient.GetRepository();
-                return (repo.FullName == ActiveRepoName || repo.Id == 0) && SimpleApiClient.IsEnterprise();
+
+                if ((repo.FullName == ActiveRepoName || repo.Id == 0) && SimpleApiClient.IsEnterprise())
+                {
+                    return RepositoryOrigin.Enterprise;
+                }
             }
-            return isdotcom;
+
+            return RepositoryOrigin.Other;
+        }
+
+        protected async Task<bool> IsAGitHubRepo()
+        {
+            var origin = await GetRepositoryOrigin();
+            return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
         }
 
         bool disposed;
