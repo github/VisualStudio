@@ -18,6 +18,84 @@ using System.Threading;
 
 namespace GitHub.Collections
 {
+    public static class TrackingCollection
+    {
+        public static TrackingCollection<T> Create<T>(IObservable<T> source,
+            Func<T, T, int> comparer = null,
+            Func<T, int, IList<T>, bool> filter = null,
+            Func<T, T, int> newer = null,
+            IScheduler scheduler = null)
+            where T : class, ICopyable<T>
+        {
+            return new TrackingCollection<T>(source, comparer, filter, newer, scheduler);
+        }
+
+        public static ObservableCollection<T> CreateListenerCollectionAndRun<T>(IObservable<T> source,
+            IList<T> stickieItemsOnTop = null,
+            Func<T, T, int> comparer = null,
+            Action<T> onNext = null)
+            where T : class, ICopyable<T>
+        {
+            var col = Create(source, comparer);
+            var ret = col.CreateListenerCollection(stickieItemsOnTop);
+            col.Subscribe(onNext ?? (_ => {}), () => {});
+            return ret;
+        }
+
+        public static ObservableCollection<T> CreateListenerCollection<T>(this ITrackingCollection<T> tcol,
+            IList<T> stickieItemsOnTop = null)
+            where T : ICopyable<T>
+        {
+            var col = new ObservableCollection<T>(stickieItemsOnTop);
+            tcol.CollectionChanged += (s, e) =>
+            {
+                var offset = 0;
+                if (stickieItemsOnTop != null)
+                {
+                    foreach (var item in stickieItemsOnTop)
+                    {
+                        if (col.Contains(item))
+                            offset++;
+                    }
+                }
+
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+                {
+                    for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
+                        i < e.OldItems.Count; i++, oldIdx++, newIdx++)
+                    {
+                        col.Move(oldIdx + offset, newIdx + offset);
+                    }
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                {
+                    foreach (T item in e.NewItems)
+                        col.Add(item);
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (T item in e.OldItems)
+                        col.Remove(item);
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+                {
+                    for (int i = 0, idx = e.OldStartingIndex; i < e.OldItems.Count; i++, idx++)
+                        col[idx + offset] = (T)e.NewItems[i];
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+                {
+                    col.Clear();
+                    if (stickieItemsOnTop != null)
+                    {
+                        foreach (var item in stickieItemsOnTop)
+                            col.Add(item);
+                    }
+                }
+            };
+            return col;
+        }
+    }
+
     /// <summary>
     /// TrackingCollection is a specialization of ObservableCollection that gets items from
     /// an observable sequence and updates its contents in such a way that two updates to

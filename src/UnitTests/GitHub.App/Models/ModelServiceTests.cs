@@ -19,6 +19,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Collections;
 using ReactiveUI;
+using static GitHub.Services.ModelService;
 
 public class ModelServiceTests
 {
@@ -59,56 +60,25 @@ public class ModelServiceTests
         [Fact]
         public async Task CanRetrieveAndCacheGitIgnores()
         {
-            var templates = new[] { "dotnet", "peanuts", "bloomcounty" };
+            var data = new[] { "dotnet", "peanuts", "bloomcounty" };
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetGitIgnoreTemplates().Returns(templates.ToObservable());
+            apiClient.GetGitIgnoreTemplates().Returns(data.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetGitIgnoreTemplates();
+            var fetched = await modelService.GetGitIgnoreTemplates().ToList();
 
-            Assert.Equal(4, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
-            Assert.Equal("dotnet", fetched[1].Name);
-            Assert.Equal("peanuts", fetched[2].Name);
-            Assert.Equal("bloomcounty", fetched[3].Name);
-            var cached = await cache.GetObject<IReadOnlyList<string>>("gitignores");
-            Assert.Equal(3, cached.Count);
-            Assert.Equal("dotnet", cached[0]);
-            Assert.Equal("peanuts", cached[1]);
-            Assert.Equal("bloomcounty", cached[2]);
-        }
+            Assert.Equal(3, fetched.Count);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i], fetched[i].Name);
 
-        [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionnWhenGitIgnoreEndpointNotFound()
-        {
-            var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetGitIgnoreTemplates()
-                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
-            var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var indexKey = "global|ignores";
+            var cached = await cache.GetObject<CacheIndex>(indexKey);
+            Assert.Equal(3, cached.Keys.Count);
 
-            var fetched = await modelService.GetGitIgnoreTemplates();
-
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
-        }
-
-        [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
-        {
-            var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetGitIgnoreTemplates()
-                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
-            var cache = Substitute.For<IBlobCache>();
-            cache.Get(Args.String)
-                .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
-
-            var fetched = await modelService.GetGitIgnoreTemplates();
-
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
+            var items = await cache.GetObjects<GitIgnoreCacheItem>(cached.Keys).Take(1);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i], items[indexKey + "|" + data[i]].Name);
         }
     }
 
@@ -117,30 +87,34 @@ public class ModelServiceTests
         [Fact]
         public async Task CanRetrieveAndCacheLicenses()
         {
-            var licenses = new[]
+            var data = new[]
             {
                 new LicenseMetadata("mit", "MIT", new Uri("https://github.com/")),
                 new LicenseMetadata("apache", "Apache", new Uri("https://github.com/"))
             };
+
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetLicenses().Returns(licenses.ToObservable());
+            apiClient.GetLicenses().Returns(data.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetLicenses();
+            var fetched = await modelService.GetLicenses().ToList();
 
-            Assert.Equal(3, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
-            Assert.Equal("MIT", fetched[1].Name);
-            Assert.Equal("Apache", fetched[2].Name);
-            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("licenses");
-            Assert.Equal(2, cached.Count);
-            Assert.Equal("mit", cached[0].Key);
-            Assert.Equal("apache", cached[1].Key);
+            Assert.Equal(2, fetched.Count);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i].Name, fetched[i].Name);
+
+            var indexKey = "global|licenses";
+            var cached = await cache.GetObject<CacheIndex>(indexKey);
+            Assert.Equal(2, cached.Keys.Count);
+
+            var items = await cache.GetObjects<LicenseCacheItem>(cached.Keys).Take(1);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i].Name, items[indexKey + "|" + data[i].Key].Name);
         }
 
         [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionWhenLicenseApiNotFound()
+        public async Task ReturnsEmptyIfLicenseApiNotFound()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses()
@@ -148,14 +122,13 @@ public class ModelServiceTests
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetLicenses();
+            var fetched = await modelService.GetLicenses().ToList();
 
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
+            Assert.Equal(0, fetched.Count);
         }
 
         [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
+        public async Task ReturnsEmptyIfCacheReadFails()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = Substitute.For<IBlobCache>();
@@ -163,10 +136,9 @@ public class ModelServiceTests
                 .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetLicenses();
+            var fetched = await modelService.GetLicenses().ToList();
 
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
+            Assert.Equal(0, fetched.Count);
         }
     }
 
@@ -447,21 +419,18 @@ public class ModelServiceTests
             col = modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
-            var count = 0;
             var done = new Subject<Unit>();
-            done.Subscribe();
-
-            col.Subscribe(t =>
+            col.OriginalCompleted.Subscribe(u =>
             {
-                if (++count == expected)
-                {
-                    done.OnNext(Unit.Default);
-                    done.OnCompleted();
-                }
-            }, () => { });
+                done.OnNext(u);
+                done.OnCompleted();
+            });
+
+            col.Subscribe();
 
             await done;
 
+            Assert.Equal(expected, col.Count);
             Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Cache")))).ToArray());
         }
 

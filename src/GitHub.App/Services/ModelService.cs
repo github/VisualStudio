@@ -16,7 +16,6 @@ using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
-using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -37,35 +36,37 @@ namespace GitHub.Services
             this.avatarProvider = avatarProvider;
         }
 
-        public IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates()
+        public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject(
-                    "gitignores",
-                    GetOrderedGitIgnoreTemplatesFromApi,
-                    TimeSpan.FromDays(1),
-                    TimeSpan.FromDays(7))
-                .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None))
-                .Catch<IReadOnlyList<GitIgnoreItem>, Exception>(e =>
+                hostCache.GetAndFetchLatestFromIndex("global|ignores", () =>
+                        GetGitIgnoreTemplatesFromApi(),
+                        item => { },
+                        TimeSpan.FromMinutes(1),
+                        TimeSpan.FromDays(7))
+                )
+                .Select(Create)
+                .Catch<GitIgnoreItem, Exception>(e =>
                 {
                     log.Info("Failed to retrieve GitIgnoreTemplates", e);
-                    return Observable.Return(new[] { GitIgnoreItem.None });
+                    return Observable.Empty<GitIgnoreItem>();
                 });
         }
 
-        public IObservable<IReadOnlyList<LicenseItem>> GetLicenses()
+        public IObservable<LicenseItem> GetLicenses()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject(
-                    "licenses",
-                    GetOrderedLicensesFromApi,
-                    TimeSpan.FromDays(1),
-                    TimeSpan.FromDays(7))
-                .ToReadOnlyList(Create, LicenseItem.None))
-                .Catch<IReadOnlyList<LicenseItem>, Exception>(e =>
+                hostCache.GetAndFetchLatestFromIndex("global|licenses", () =>
+                        GetLicensesFromApi(),
+                        item => { },
+                        TimeSpan.FromMinutes(1),
+                        TimeSpan.FromDays(7))
+                )
+                .Select(Create)
+                .Catch<LicenseItem, Exception>(e =>
                 {
-                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
-                    return Observable.Return(new[] { LicenseItem.None });
+                    log.Info("Failed to retrieve licenses", e);
+                    return Observable.Empty<LicenseItem>();
                 });
         }
 
@@ -78,21 +79,18 @@ namespace GitHub.Services
             .ToReadOnlyList(Create);
         }
 
-        IObservable<IEnumerable<LicenseCacheItem>> GetOrderedLicensesFromApi()
+        IObservable<LicenseCacheItem> GetLicensesFromApi()
         {
             return apiClient.GetLicenses()
                 .WhereNotNull()
-                .Select(LicenseCacheItem.Create)
-                .ToList()
-                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)));
+                .Select(LicenseCacheItem.Create);
         }
 
-        IObservable<IEnumerable<string>> GetOrderedGitIgnoreTemplatesFromApi()
+        IObservable<GitIgnoreCacheItem> GetGitIgnoreTemplatesFromApi()
         {
             return apiClient.GetGitIgnoreTemplates()
                 .WhereNotNull()
-                .ToList()
-                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
+                .Select(GitIgnoreCacheItem.Create);
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
@@ -232,6 +230,11 @@ namespace GitHub.Services
                     });
         }
 
+        static GitIgnoreItem Create(GitIgnoreCacheItem item)
+        {
+            return GitIgnoreItem.Create(item.Name);
+        }
+
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
         {
             return new LicenseItem(licenseCacheItem.Key, licenseCacheItem.Name);
@@ -288,18 +291,28 @@ namespace GitHub.Services
             GC.SuppressFinalize(this);
         }
 
-        public class LicenseCacheItem
+        public class GitIgnoreCacheItem : CacheItem
         {
-            public static LicenseCacheItem Create(LicenseMetadata licenseMetadata)
+            public static GitIgnoreCacheItem Create(string ignore)
             {
-                return new LicenseCacheItem { Key = licenseMetadata.Key, Name = licenseMetadata.Name };
+                return new GitIgnoreCacheItem { Key = ignore, Name = ignore, Timestamp = DateTime.Now };
             }
 
-            public string Key { get; set; }
             public string Name { get; set; }
         }
 
-        public class RepositoryCacheItem
+
+        public class LicenseCacheItem : CacheItem
+        {
+            public static LicenseCacheItem Create(LicenseMetadata licenseMetadata)
+            {
+                return new LicenseCacheItem { Key = licenseMetadata.Key, Name = licenseMetadata.Name, Timestamp = DateTime.Now };
+            }
+
+            public string Name { get; set; }
+        }
+
+        public class RepositoryCacheItem : CacheItem
         {
             public static RepositoryCacheItem Create(Repository apiRepository)
             {
@@ -315,6 +328,8 @@ namespace GitHub.Services
                 CloneUrl = apiRepository.CloneUrl;
                 Private = apiRepository.Private;
                 Fork = apiRepository.Fork;
+                Key = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Name, Owner);
+                Timestamp = apiRepository.UpdatedAt;
             }
 
             public string Name { get; set; }
