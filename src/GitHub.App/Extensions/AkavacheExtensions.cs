@@ -208,21 +208,17 @@ namespace GitHub.Extensions
                 .Where(predicateIsTrue => predicateIsTrue.Item2)
                 .Select(x => x.Item1)
                 .Select(index => index.Clear())
-                .SelectMany(index =>
-                {
-                    var fetchObs = fetchFunc()
+                .SelectMany(index => fetchFunc()
                         .Catch<T, Exception>(ex =>
                         {
                             var shouldInvalidate = shouldInvalidateOnError ?
                                 This.InvalidateObject<CacheIndex>(key) :
                                 Observable.Return(Unit.Default);
                             return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
-                        });
-
-                    return fetchObs
+                        })
                         .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
-                        .Do(x => index.Add(key, x));
-                });
+                        .Do(x => index.Add(key, x))
+                );
 
             var cache = idx
                 .SelectMany(index => This.GetObjects<T>(index.Keys.ToList()))
