@@ -7,7 +7,6 @@ using System.Linq;
 using System.Windows.Threading;
 using GitHub.Models;
 using GitHub.Settings;
-using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -19,7 +18,6 @@ namespace GitHub.Services
     public class UsageTracker : IUsageTracker
     {
         const string StoreFileName = "ghfvs.usage";
-        //static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
         readonly IMetricsService client;
@@ -27,7 +25,6 @@ namespace GitHub.Services
         readonly IPackageSettings userSettings;
         readonly DispatcherTimer timer;
         readonly string storePath;
-        UsageStore usage;
 
         [ImportingConstructor]
         public UsageTracker(
@@ -50,7 +47,6 @@ namespace GitHub.Services
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 program.ApplicationName,
                 StoreFileName);
-            this.usage = LoadUsage();
 
             userSettings.PropertyChanged += (s, e) =>
             {
@@ -65,6 +61,7 @@ namespace GitHub.Services
 
         public void IncrementLaunchCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfStartups;
             ++usage.Model.NumberOfStartupsWeek;
             ++usage.Model.NumberOfStartupsMonth;
@@ -73,42 +70,49 @@ namespace GitHub.Services
 
         public void IncrementCloneCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfClones;
             SaveUsage(usage);
         }
 
         public void IncrementCreateCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfReposCreated;
             SaveUsage(usage);
         }
 
         public void IncrementPublishCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfReposPublished;
             SaveUsage(usage);
         }
 
         public void IncrementOpenInGitHubCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfOpenInGitHub;
             SaveUsage(usage);
         }
 
         public void IncrementLinkToGitHubCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfLinkToGitHub;
             SaveUsage(usage);
         }
 
         public void IncrementCreateGistCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfGists;
             SaveUsage(usage);
         }
 
         public void IncrementUpstreamPullRequestCount()
         {
+            var usage = LoadUsage();
             ++usage.Model.NumberOfClones;
             SaveUsage(usage);
         }
@@ -167,6 +171,7 @@ namespace GitHub.Services
                 // launch count but we only submit (and clear) the weekly launch count when we've
                 // transitioned into a new week. We've defined a week by the ISO8601 definition,
                 // i.e. week starting on Monday and ending on Sunday.
+                var usage = LoadUsage();
                 var lastDate = usage.LastUpdated;
                 var currentDate = DateTimeOffset.Now;
                 var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
@@ -175,8 +180,8 @@ namespace GitHub.Services
                 // Only send stats once a day.
                 if (lastDate.Date != currentDate.Date)
                 {
-                    await SendUsage(includeWeekly, includeMonthly);
-                    ClearCounters(includeWeekly, includeMonthly);
+                    await SendUsage(usage.Model, includeWeekly, includeMonthly);
+                    ClearCounters(usage.Model, includeWeekly, includeMonthly);
                     usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
                     SaveUsage(usage);
                 }
@@ -187,7 +192,7 @@ namespace GitHub.Services
             }
         }
 
-        async Task SendUsage(bool weekly, bool monthly)
+        async Task SendUsage(UsageModel usage, bool weekly, bool monthly)
         {
             Debug.Assert(client != null, "SendUsage should not be called when there is no IMetricsService");
 
@@ -195,15 +200,15 @@ namespace GitHub.Services
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
-                usage.Model.IsGitHubUser = true;
+                usage.IsGitHubUser = true;
             }
 
             if (connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()))
             {
-                usage.Model.IsEnterpriseUser = true;
+                usage.IsEnterpriseUser = true;
             }
 
-            var model = usage.Model.Clone(weekly, monthly);
+            var model = usage.Clone(weekly, monthly);
             await client.PostUsage(model);
         }
 
@@ -223,23 +228,23 @@ namespace GitHub.Services
             return cal.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
 
-        void ClearCounters(bool weekly, bool monthly)
+        static void ClearCounters(UsageModel usage, bool weekly, bool monthly)
         {
-            usage.Model.NumberOfStartups = 0;
-            usage.Model.NumberOfClones = 0;
-            usage.Model.NumberOfReposCreated = 0;
-            usage.Model.NumberOfReposPublished = 0;
-            usage.Model.NumberOfGists = 0;
-            usage.Model.NumberOfOpenInGitHub = 0;
-            usage.Model.NumberOfLinkToGitHub = 0;
-            usage.Model.NumberOfLogins = 0;
-            usage.Model.NumberOfUpstreamPullRequests = 0;
+            usage.NumberOfStartups = 0;
+            usage.NumberOfClones = 0;
+            usage.NumberOfReposCreated = 0;
+            usage.NumberOfReposPublished = 0;
+            usage.NumberOfGists = 0;
+            usage.NumberOfOpenInGitHub = 0;
+            usage.NumberOfLinkToGitHub = 0;
+            usage.NumberOfLogins = 0;
+            usage.NumberOfUpstreamPullRequests = 0;
 
             if (weekly)
-                usage.Model.NumberOfStartupsWeek = 0;
+                usage.NumberOfStartupsWeek = 0;
 
             if (monthly)
-                usage.Model.NumberOfStartupsMonth = 0;
+                usage.NumberOfStartupsMonth = 0;
         }
 
         class UsageStore
