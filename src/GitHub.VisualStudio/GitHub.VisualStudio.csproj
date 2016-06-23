@@ -227,15 +227,15 @@
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\SelectedTextProvider.cs" />
-    <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="Settings\generated\PackageSettings.cs">
+    <Compile Include="Settings\generated\PackageSettingsGen.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>PackageSettings.tt</DependentUpon>
+      <DependentUpon>PackageSettingsGen.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Settings\PackageSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
@@ -320,10 +320,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Settings\generated\PackageSettings.tt">
+    <Content Include="Settings\generated\PackageSettingsGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
-      <LastGenOutput>PackageSettings1.cs</LastGenOutput>
+      <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
     </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
