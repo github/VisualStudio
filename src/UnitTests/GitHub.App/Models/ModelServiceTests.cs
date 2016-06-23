@@ -72,7 +72,7 @@ public class ModelServiceTests
             for (int i = 0; i < data.Length; i++)
                 Assert.Equal(data[i], fetched[i].Name);
 
-            var indexKey = "global|ignores";
+            var indexKey = CacheIndex.GitIgnoresPrefix;
             var cached = await cache.GetObject<CacheIndex>(indexKey);
             Assert.Equal(3, cached.Keys.Count);
 
@@ -104,7 +104,7 @@ public class ModelServiceTests
             for (int i = 0; i < data.Length; i++)
                 Assert.Equal(data[i].Name, fetched[i].Name);
 
-            var indexKey = "global|licenses";
+            var indexKey = CacheIndex.LicensesPrefix;
             var cached = await cache.GetObject<CacheIndex>(indexKey);
             Assert.Equal(2, cached.Keys.Count);
 

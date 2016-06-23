@@ -39,7 +39,7 @@ namespace GitHub.Services
         public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndFetchLatestFromIndex("global|ignores", () =>
+                hostCache.GetAndFetchLatestFromIndex(CacheIndex.GitIgnoresPrefix, () =>
                         GetGitIgnoreTemplatesFromApi(),
                         item => { },
                         TimeSpan.FromMinutes(1),
@@ -56,7 +56,7 @@ namespace GitHub.Services
         public IObservable<LicenseItem> GetLicenses()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndFetchLatestFromIndex("global|licenses", () =>
+                hostCache.GetAndFetchLatestFromIndex(CacheIndex.LicensesPrefix, () =>
                         GetLicensesFromApi(),
                         item => { },
                         TimeSpan.FromMinutes(1),
@@ -144,7 +144,7 @@ namespace GitHub.Services
             // and replaces it instead of appending, so items get refreshed in-place as they come in.
 
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name));
 
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
