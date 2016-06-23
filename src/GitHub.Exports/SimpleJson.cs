@@ -66,12 +66,12 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
-using GitHub.VisualStudio.Reflection;
+using GitHub.Reflection;
 
 // ReSharper disable LoopCanBeConvertedToQuery
 // ReSharper disable RedundantExplicitArrayCreation
 // ReSharper disable SuggestUseVarKeywordEvident
-namespace GitHub.VisualStudio
+namespace GitHub
 {
     /// <summary>
     /// Represents the json array.
@@ -87,12 +87,12 @@ namespace GitHub.VisualStudio
  class JsonArray : List<object>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="JsonArray"/> class.
+        /// Initializes a new instance of the <see cref="JsonArray"/> class. 
         /// </summary>
         public JsonArray() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JsonArray"/> class.
+        /// Initializes a new instance of the <see cref="JsonArray"/> class. 
         /// </summary>
         /// <param name="capacity">The capacity of the json array.</param>
         public JsonArray(int capacity) : base(capacity) { }
@@ -484,12 +484,12 @@ namespace GitHub.VisualStudio
     }
 }
 
-namespace GitHub.VisualStudio
+namespace GitHub
 {
     /// <summary>
     /// This class encodes and decodes JSON strings.
     /// Spec. details, see http://www.json.org/
-    ///
+    /// 
     /// JSON uses Arrays and Objects. These correspond here to the datatypes JsonArray(IList&lt;object>) and JsonObject(IDictionary&lt;string,object>).
     /// All numbers are parsed to doubles.
     /// </summary>
@@ -1222,7 +1222,7 @@ namespace GitHub.VisualStudio
 
 #endif
     }
-
+    
     [GeneratedCode("simple-json", "1.0.0")]
 #if SIMPLE_JSON_INTERNAL
     internal
@@ -1335,7 +1335,7 @@ namespace GitHub.VisualStudio
 
             if (value == null)
                 return null;
-
+            
             object obj = null;
 
             if (str != null)
@@ -1358,8 +1358,8 @@ namespace GitHub.VisualStudio
 
 												return null;
                     }
-
-									if (type == typeof(string))
+                  
+									if (type == typeof(string))  
 										return str;
 
 									return Convert.ChangeType(str, type, CultureInfo.InvariantCulture);
@@ -1379,7 +1379,7 @@ namespace GitHub.VisualStudio
             }
             else if (value is bool)
                 return value;
-
+            
             bool valueIsLong = value is long;
             bool valueIsDouble = value is double;
             if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)))
@@ -1596,7 +1596,7 @@ namespace GitHub.VisualStudio
     namespace Reflection
     {
         // This class is meant to be copied into other libraries. So we want to exclude it from Code Analysis rules
-	    // that might be in place in the target project.
+ 	    // that might be in place in the target project.
         [GeneratedCode("reflection-utils", "1.0.0")]
 #if SIMPLE_JSON_REFLECTION_UTILS_PUBLIC
         public

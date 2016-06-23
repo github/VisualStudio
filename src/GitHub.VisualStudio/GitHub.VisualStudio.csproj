@@ -238,7 +238,6 @@
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
-    <Compile Include="SimpleJson.cs" />
     <Compile Include="UI\GitHubPane.cs" />
     <Compile Include="UI\Views\Controls\Spinner.xaml.cs">
       <DependentUpon>Spinner.xaml</DependentUpon>

@@ -114,9 +114,6 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
-    <Compile Include="..\..\script\src\MetricsService.cs" Condition="$(Buildtype) == 'Internal'">
-      <Link>Services\MetricsService.cs</Link>
-    </Compile>
     <Compile Include="Caches\CacheIndex.cs" />
     <Compile Include="Caches\CacheItem.cs" />
     <Compile Include="Caches\ImageCache.cs" />
@@ -190,7 +187,6 @@
     <Compile Include="Services\StandardUserErrors.cs" />
     <Compile Include="Controllers\UIController.cs" />
     <Compile Include="Services\Translation.cs" />
-    <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
