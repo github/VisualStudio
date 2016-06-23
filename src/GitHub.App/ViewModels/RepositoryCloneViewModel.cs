@@ -93,10 +93,10 @@ namespace GitHub.ViewModels
                 (x, y) => x.Value);
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(baseRepositoryPath)
-                .IfNullOrEmpty("Please enter a repository path")
-                .IfTrue(x => x.Length > 200, "Path too long")
-                .IfContainsInvalidPathChars("Path contains invalid characters")
-                .IfPathNotRooted("Please enter a valid path")
+                .IfNullOrEmpty(Resources.RepositoryCreationPathEmpty)
+                .IfTrue(x => x.Length > 200, Resources.RepositoryClonePathTooLong)
+                .IfContainsInvalidPathChars(Resources.RepositoryClonePathInvalidCharacters)
+                .IfPathNotRooted(Resources.RepositoryClonePathInvalid)
                 .IfTrue(IsAlreadyRepoAtPath, Resources.RepositoryNameValidatorAlreadyExists);
 
             var canCloneObservable = this.WhenAny(
