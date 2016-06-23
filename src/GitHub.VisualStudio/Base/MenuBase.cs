@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using NullGuard;
 using GitHub.UI;
+using System.Diagnostics;
+using System.Linq;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio
 {
