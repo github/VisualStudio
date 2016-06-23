@@ -332,7 +332,7 @@ namespace GitHub.SampleData
     {
         public RepositoryCloneViewModelDesigner()
         {
-            var repositories = new ReactiveList<IRepositoryModel>
+            Repositories = new ObservableCollection<IRepositoryModel>
             {
                 RepositoryModelDesigner.Create("encourage", "haacked"),
                 RepositoryModelDesigner.Create("haacked.com", "haacked"),
@@ -345,10 +345,6 @@ namespace GitHub.SampleData
             };
 
             BrowseForDirectory = ReactiveCommand.Create();
-
-            FilteredRepositories = repositories.CreateDerivedCollection(
-                x => x
-            );
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
                 .IfNullOrEmpty("Please enter a repository path")
@@ -365,7 +361,7 @@ namespace GitHub.SampleData
 
         public IRepositoryModel SelectedRepository { get; set; }
 
-        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
+        public ObservableCollection<IRepositoryModel> Repositories
         {
             get;
             private set;

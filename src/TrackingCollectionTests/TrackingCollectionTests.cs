@@ -1933,21 +1933,13 @@ public class TrackingTests : TestBase
         var list1 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, count - i, "Run 1")).ToList());
         var list2 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, i + count, "Run 2")).ToList());
 
-        var subj = new ReplaySubject<Unit>();
-        subj.OnNext(Unit.Default);
-        var disp = col.OriginalCompleted.Subscribe(x => subj.OnCompleted());
         col.Listen(list1.ToObservable());
         col.Subscribe();
-        subj.Wait();
+        col.OriginalCompleted.Wait();
 
-        disp.Dispose();
         col.Listen(list2.ToObservable());
-        subj = new ReplaySubject<Unit>();
-        subj.OnNext(Unit.Default);
-        disp = col.OriginalCompleted.Subscribe(x => subj.OnCompleted());
         col.Subscribe();
-        subj.Wait();
-        disp.Dispose();
+        col.OriginalCompleted.Wait();
 
         CollectionAssert.AreEqual(list2, col);
     }

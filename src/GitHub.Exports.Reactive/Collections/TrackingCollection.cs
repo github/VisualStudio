@@ -152,7 +152,7 @@ namespace GitHub.Collections
 
         bool originalSourceIsCompleted;
         bool signalOriginalSourceCompletion;
-        readonly Subject<Unit> originalSourceCompleted = new Subject<Unit>();
+        ReplaySubject<Unit> originalSourceCompleted;
         public IObservable<Unit> OriginalCompleted => originalSourceCompleted;
 
         TimeSpan requestedDelay;
@@ -214,6 +214,11 @@ namespace GitHub.Collections
             // to the cache queue, and signal that data is available
             // for processing
             dataPump = obs
+                .Catch<T, Exception>(ex =>
+                {
+                    originalSourceCompleted.OnError(ex);
+                    return Observable.Throw<T>(ex);
+                })
                 .Do(data =>
                 {
                     cache.Enqueue(new ActionData(data));
@@ -221,8 +226,21 @@ namespace GitHub.Collections
                 })
                 .Finally(() =>
                 {
+                    if (disposed)
+                        return;
+
                     originalSourceIsCompleted = true;
-                    signalOriginalSourceCompletion = true;
+                    if (!cache.IsEmpty)
+                    {
+                        signalOriginalSourceCompletion = true;
+                    }
+                    else
+                    {
+                        originalSourceCompleted.OnNext(Unit.Default);
+                        originalSourceCompleted.OnCompleted();
+                        signalNeedData.OnCompleted();
+                        signalHaveData.OnCompleted();
+                    }
                 })
                 .Publish();
 
@@ -275,6 +293,7 @@ namespace GitHub.Collections
                         {
                             signalOriginalSourceCompletion = false;
                             originalSourceCompleted.OnNext(Unit.Default);
+                            originalSourceCompleted.OnCompleted();
                         }
                     }
                     else
@@ -1086,6 +1105,7 @@ namespace GitHub.Collections
             disposables.Add(signalHaveData);
             signalNeedData = new Subject<Unit>();
             disposables.Add(signalNeedData);
+            originalSourceCompleted = new ReplaySubject<Unit>();
 
             resetting = false;
         }

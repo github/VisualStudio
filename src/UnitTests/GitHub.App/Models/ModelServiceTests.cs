@@ -395,15 +395,15 @@ public class ModelServiceTests
             repo.Name.Returns(reponame);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
-            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
 
             var prcache = Enumerable.Range(1, expected)
                 .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
 
             // seed the cache
             prcache
-                .Select(item => new ModelService.PullRequestCacheItem(item))
-                .Select(item => item.Save<ModelService.PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .Select(item => new PullRequestCacheItem(item))
+                .Select(item => item.Save<PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
                 .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
                 .ToList();
 
@@ -416,19 +416,11 @@ public class ModelServiceTests
             await modelService.InsertUser(new AccountCacheItem(user));
 
             ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
-            col = modelService.GetPullRequests(repo, col);
+            modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
-            var done = new Subject<Unit>();
-            col.OriginalCompleted.Subscribe(u =>
-            {
-                done.OnNext(u);
-                done.OnCompleted();
-            });
-
             col.Subscribe();
-
-            await done;
+            await col.OriginalCompleted;
 
             Assert.Equal(expected, col.Count);
             Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Cache")))).ToArray());
@@ -454,7 +446,7 @@ public class ModelServiceTests
             repo.Name.Returns(reponame);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
-            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
 
             var prcache = Enumerable.Range(1, expected)
                 .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
@@ -480,18 +472,18 @@ public class ModelServiceTests
             await modelService.InsertUser(new AccountCacheItem(user));
 
             ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
-            col = modelService.GetPullRequests(repo, col);
+            modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
-            var done = new Subject<Unit>();
+            var done = new ReplaySubject<Unit>();
+            done.OnNext(Unit.Default);
             done.Subscribe();
 
             col.Subscribe(t =>
             {
                 if (++count == expected * 2)
                 {
-                    done.OnNext(Unit.Default);
                     done.OnCompleted();
                 }
             }, () => { });
@@ -521,7 +513,7 @@ public class ModelServiceTests
             repo.Name.Returns(reponame);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
-            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name);
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
 
             var prcache = Enumerable.Range(1, expected)
                 .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
@@ -547,11 +539,12 @@ public class ModelServiceTests
             await modelService.InsertUser(new AccountCacheItem(user));
 
             ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
-            col = modelService.GetPullRequests(repo, col);
+            modelService.GetPullRequests(repo, col);
             col.ProcessingDelay = TimeSpan.Zero;
 
             var count = 0;
-            var done = new Subject<Unit>();
+            var done = new ReplaySubject<Unit>();
+            done.OnNext(Unit.Default);
             done.Subscribe();
 
             col.Subscribe(t =>
@@ -561,7 +554,6 @@ public class ModelServiceTests
                 // a part of the live data
                 if (++count == 14)
                 {
-                    done.OnNext(Unit.Default);
                     done.OnCompleted();
                 }
             }, () => { });

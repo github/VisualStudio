@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Reactive;
 
 namespace GitHub.Collections
@@ -15,7 +17,10 @@ namespace GitHub.Collections
     /// for T
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITrackingCollection<T> : IDisposable, IList<T> where T : ICopyable<T>
+    public interface ITrackingCollection<T> : IDisposable,
+        INotifyCollectionChanged, INotifyPropertyChanged,
+        IList<T>, ICollection<T>, IEnumerable<T>
+        where T : ICopyable<T>
     {
         /// <summary>
         /// Sets up an observable as source for the collection.
@@ -55,7 +60,6 @@ namespace GitHub.Collections
         /// How long to delay between processing incoming items
         /// </summary>
         TimeSpan ProcessingDelay { get; set; }
-        event NotifyCollectionChangedEventHandler CollectionChanged;
         IObservable<Unit> OriginalCompleted { get; }
     }
 }
