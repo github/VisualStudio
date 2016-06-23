@@ -250,6 +250,33 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter a valid path.
+        /// </summary>
+        internal static string RepositoryClonePathInvalid {
+            get {
+                return ResourceManager.GetString("RepositoryClonePathInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path contains invalid characters.
+        /// </summary>
+        internal static string RepositoryClonePathInvalidCharacters {
+            get {
+                return ResourceManager.GetString("RepositoryClonePathInvalidCharacters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path too long.
+        /// </summary>
+        internal static string RepositoryClonePathTooLong {
+            get {
+                return ResourceManager.GetString("RepositoryClonePathTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Repository &apos;{0}/{1}&apos; already exists..
         /// </summary>
         internal static string RepositoryCreationFailedAlreadyExists {
@@ -273,6 +300,15 @@ namespace GitHub.App {
         internal static string RepositoryCreationFailedQuota {
             get {
                 return ResourceManager.GetString("RepositoryCreationFailedQuota", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a repository path.
+        /// </summary>
+        internal static string RepositoryCreationPathEmpty {
+            get {
+                return ResourceManager.GetString("RepositoryCreationPathEmpty", resourceCulture);
             }
         }
         
