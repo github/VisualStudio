@@ -167,7 +167,7 @@ namespace GitHub.Services
                 // launch count but we only submit (and clear) the weekly launch count when we've
                 // transitioned into a new week. We've defined a week by the ISO8601 definition,
                 // i.e. week starting on Monday and ending on Sunday.
-                var lastDate = DateTimeOffset.MinValue; //usage.LastUpdated;
+                var lastDate = usage.LastUpdated;
                 var currentDate = DateTimeOffset.Now;
                 var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
                 var includeMonthly = lastDate.Month != currentDate.Month;
