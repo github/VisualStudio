@@ -273,10 +273,6 @@ namespace GitHub.Services
             };
         }
 
-        static IPullRequestModel Create(string key)
-        {
-            return new PullRequestModel(Int32.Parse(key.Split('|').Last(), CultureInfo.InvariantCulture));
-        }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {

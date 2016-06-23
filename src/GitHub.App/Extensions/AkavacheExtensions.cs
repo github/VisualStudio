@@ -166,7 +166,7 @@ namespace GitHub.Extensions
             this IBlobCache blobCache,
             string key,
             Func<IObservable<T>> fetchFunc,
-            Action<string> removedItemsCallback,
+            Action<T> removedItemsCallback,
             TimeSpan refreshInterval,
             TimeSpan maxCacheDuration)
                 where T : CacheItem
@@ -194,7 +194,7 @@ namespace GitHub.Extensions
         static IObservable<T> GetAndFetchLatestFromIndex<T>(this IBlobCache This,
             string key,
             Func<IObservable<T>> fetchFunc,
-            Action<string> removedItemsCallback,
+            Action<T> removedItemsCallback,
             Func<DateTimeOffset, bool> fetchPredicate = null,
             DateTimeOffset? absoluteExpiration = null,
             bool shouldInvalidateOnError = false)
@@ -237,7 +237,8 @@ namespace GitHub.Extensions
                     var list = index.OldKeys.Except(index.Keys);
                     if (!list.Any())
                         return;
-                    foreach (var d in list)
+                    var removed = await This.GetObjects<T>(list);
+                    foreach (var d in removed.Values)
                         removedItemsCallback(d);
                     await This.InvalidateObjects<T>(list);
                 })

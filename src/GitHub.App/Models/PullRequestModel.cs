@@ -23,13 +23,6 @@ namespace GitHub.Models
             UpdatedAt = updatedAt ?? CreatedAt;
         }
 
-        internal PullRequestModel(int number)
-        {
-            Number = number;
-            Title = "";
-            Author = new AccountDesigner();
-        }
-
         public void CopyFrom(IPullRequestModel other)
         {
             if (!Equals(other))
