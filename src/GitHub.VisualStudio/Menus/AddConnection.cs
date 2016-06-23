@@ -4,16 +4,17 @@ using System.ComponentModel.Composition;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.Extensions;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
 {
     [Export(typeof(IMenuHandler))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class AddConnection: MenuBase, IMenuHandler
+    public class AddConnection : MenuBase, IMenuHandler
     {
         [ImportingConstructor]
-        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
         }
 
