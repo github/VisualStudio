@@ -318,41 +318,14 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class RepositoryModelDesigner : NotificationAwareObject, IRepositoryModel
+    public static class RepositoryModelDesigner
     {
-        public RepositoryModelDesigner() : this("repo")
+        public static IRepositoryModel Create(string name = null, string owner = null)
         {
+            name = name ?? "octocat";
+            owner = owner ?? "github";
+            return new RepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner });
         }
-
-        public RepositoryModelDesigner(string name) : this("repo", "github")
-        {
-            Name = name;
-        }
-
-        public RepositoryModelDesigner(string name, string owner)
-        {
-            Name = name;
-            Owner = new AccountDesigner { Login = owner };
-        }
-
-        public void SetIcon(bool isPrivate, bool isFork)
-        {
-        }
-
-        public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
-        {
-            return null;
-        }
-
-        public string Name { get; set; }
-        public UriString CloneUrl { get; set; }
-        public string LocalPath { get; set; }
-
-        public Octicon Icon { get; set; }
-
-        public IAccount Owner { get; set; }
-
-        public void Refresh() { }
     }
 
     public class RepositoryCloneViewModelDesigner : BaseViewModel, IRepositoryCloneViewModel
@@ -361,14 +334,14 @@ namespace GitHub.SampleData
         {
             var repositories = new ReactiveList<IRepositoryModel>
             {
-                new RepositoryModelDesigner("encourage", "haacked"),
-                new RepositoryModelDesigner("haacked.com", "haacked"),
-                new RepositoryModelDesigner("octokit.net", "octokit"),
-                new RepositoryModelDesigner("octokit.rb", "octokit"),
-                new RepositoryModelDesigner("octokit.objc", "octokit"),
-                new RepositoryModelDesigner("windows", "github"),
-                new RepositoryModelDesigner("mac", "github"),
-                new RepositoryModelDesigner("github", "github")
+                RepositoryModelDesigner.Create("encourage", "haacked"),
+                RepositoryModelDesigner.Create("haacked.com", "haacked"),
+                RepositoryModelDesigner.Create("octokit.net", "octokit"),
+                RepositoryModelDesigner.Create("octokit.rb", "octokit"),
+                RepositoryModelDesigner.Create("octokit.objc", "octokit"),
+                RepositoryModelDesigner.Create("windows", "github"),
+                RepositoryModelDesigner.Create("mac", "github"),
+                RepositoryModelDesigner.Create("github", "github")
             };
 
             BrowseForDirectory = ReactiveCommand.Create();

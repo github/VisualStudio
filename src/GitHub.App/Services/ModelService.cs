@@ -167,6 +167,32 @@ namespace GitHub.Services
             return collection;
         }
 
+        public ITrackingCollection<IRepositoryModel> GetRepositories(ITrackingCollection<IRepositoryModel> collection)
+        {
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
+
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
+                        apiClient.GetRepositories()
+                                 .Select(RepositoryCacheItem.Create),
+                        item =>
+                        {
+                            // this could blow up due to the collection being disposed somewhere else
+                            try { collection.RemoveItem(Create(item)); }
+                            catch (ObjectDisposedException) { }
+                        },
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
+
+            collection.Listen(source);
+            return collection;
+        }
+
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
@@ -251,14 +277,19 @@ namespace GitHub.Services
                 avatarProvider.GetAvatar(accountCacheItem));
         }
 
-        IRepositoryModel Create(RepositoryCacheItem repositoryCacheItem)
+        IRepositoryModel Create(RepositoryCacheItem item)
         {
             return new RepositoryModel(
-                repositoryCacheItem.Name,
-                new UriString(repositoryCacheItem.CloneUrl),
-                repositoryCacheItem.Private,
-                repositoryCacheItem.Fork,
-                Create(repositoryCacheItem.Owner));
+                item.Id,
+                item.Name,
+                new UriString(item.CloneUrl),
+                item.Private,
+                item.Fork,
+                Create(item.Owner))
+            {
+                CreatedAt = item.CreatedAt,
+                UpdatedAt = item.UpdatedAt
+            };
         }
 
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
@@ -323,14 +354,19 @@ namespace GitHub.Services
 
             public RepositoryCacheItem(Repository apiRepository)
             {
+                Id = apiRepository.Id;
                 Name = apiRepository.Name;
                 Owner = AccountCacheItem.Create(apiRepository.Owner);
                 CloneUrl = apiRepository.CloneUrl;
                 Private = apiRepository.Private;
                 Fork = apiRepository.Fork;
-                Key = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Name, Owner);
+                Key = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, Name);
+                CreatedAt = apiRepository.CreatedAt;
+                UpdatedAt = apiRepository.UpdatedAt;
                 Timestamp = apiRepository.UpdatedAt;
             }
+
+            public long Id { get; set; }
 
             public string Name { get; set; }
             [AllowNull]
@@ -342,6 +378,8 @@ namespace GitHub.Services
             public string CloneUrl { get; set; }
             public bool Private { get; set; }
             public bool Fork { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
+            public DateTimeOffset UpdatedAt { get; set; }
         }
 
         public class PullRequestCacheItem : CacheItem
