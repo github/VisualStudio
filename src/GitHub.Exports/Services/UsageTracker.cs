@@ -173,14 +173,13 @@ namespace GitHub.Services
                 var includeMonthly = lastDate.Month != currentDate.Month;
 
                 // Only send stats once a day.
-                if (lastDate != currentDate)
+                if (lastDate.Date != currentDate.Date)
                 {
                     await SendUsage(includeWeekly, includeMonthly);
+                    ClearCounters(includeWeekly, includeMonthly);
+                    usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
+                    SaveUsage(usage);
                 }
-
-                ClearCounters(includeWeekly, includeMonthly);
-                usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
-                SaveUsage(usage);
             }
             catch //(Exception ex)
             {
