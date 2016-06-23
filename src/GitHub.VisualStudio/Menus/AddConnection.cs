@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.Extensions;
-using NullGuard;
 using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
