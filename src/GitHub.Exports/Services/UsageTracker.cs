@@ -2,8 +2,8 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Threading;
 using GitHub.Models;
 using GitHub.Settings;
@@ -26,6 +26,11 @@ namespace GitHub.Services
         readonly DispatcherTimer timer;
         readonly string storePath;
 
+        Func<string, bool> fileExists;
+        Func<string, Encoding, string> readAllText;
+        Action<string, string, Encoding> writeAllText;
+        Action<string> dirCreate;
+
         [ImportingConstructor]
         public UsageTracker(
             IProgram program,
@@ -34,6 +39,11 @@ namespace GitHub.Services
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+
+            fileExists = (path) => System.IO.File.Exists(path);
+            readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
+            writeAllText = (path, content, encoding) => System.IO.File.WriteAllText(path, content, encoding);
+            dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
             this.connectionManager = connectionManager;
             this.userSettings = userSettings;
@@ -119,8 +129,8 @@ namespace GitHub.Services
 
         UsageStore LoadUsage()
         {
-            var result = File.Exists(storePath) ?
-                SimpleJson.DeserializeObject<UsageStore>(File.ReadAllText(storePath)) :
+            var result = fileExists(storePath) ?
+                SimpleJson.DeserializeObject<UsageStore>(readAllText(storePath, Encoding.UTF8)) :
                 new UsageStore { Model = new UsageModel() };
 
             result.Model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
@@ -132,9 +142,9 @@ namespace GitHub.Services
 
         void SaveUsage(UsageStore store)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(storePath));
+            dirCreate(System.IO.Path.GetDirectoryName(storePath));
             var json = SimpleJson.SerializeObject(store);
-            File.WriteAllText(storePath, json);
+            writeAllText(storePath, json, Encoding.UTF8);
         }
 
         void UpdateTimer(bool initialCall)
