@@ -21,6 +21,7 @@ using ReactiveUI;
 using Rothko;
 using System.Collections.ObjectModel;
 using GitHub.Collections;
+using GitHub.UI;
 
 namespace GitHub.ViewModels
 {
@@ -64,21 +65,23 @@ namespace GitHub.ViewModels
             this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
+            IsLoading = true;
 
-            var col = new TrackingCollection<IRepositoryModel>(filter: FilterRepository);
-            col = repositoryHost.ModelService.GetRepositories(col) as TrackingCollection<IRepositoryModel>;
-            col.OriginalCompleted.Subscribe(
-                _ => {}
+            Repositories = new TrackingCollection<IRepositoryModel>();
+            repositories.ProcessingDelay = TimeSpan.Zero;
+            repositories.Comparer = OrderedComparer<IRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
+            repositories.Filter = FilterRepository;
+            repositories.NewerComparer = OrderedComparer<IRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+
+            repositories.OriginalCompleted.Subscribe(
+                _ => { }
                 , ex =>
-                    {
-                        LoadingFailed = true;
-                        log.Error("Error while loading repositories", ex);
-                    },
+                {
+                    LoadingFailed = true;
+                    log.Error("Error while loading repositories", ex);
+                },
                 () => IsLoading = false
             );
-            col.Subscribe(_ => IsLoading = true, () => {});
-
-            Repositories = col;
 
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
@@ -90,7 +93,7 @@ namespace GitHub.ViewModels
             this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
                 .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler)
-                .Subscribe(_ => col.Filter = FilterRepository);
+                .Subscribe(_ => repositories.Filter = FilterRepository);
 
             var baseRepositoryPath = this.WhenAny(
                 x => x.BaseRepositoryPath,
@@ -214,14 +217,14 @@ namespace GitHub.ViewModels
         /// </summary>
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        ObservableCollection<IRepositoryModel> repositories;
+        TrackingCollection<IRepositoryModel> repositories;
         /// <summary>
         /// List of repositories as returned by the server
         /// </summary>
         public ObservableCollection<IRepositoryModel> Repositories
         {
             get { return repositories; }
-            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
+            private set { repositories = value as TrackingCollection<IRepositoryModel>; this.RaisePropertyChanged(); }
         }
 
         IRepositoryModel selectedRepository;

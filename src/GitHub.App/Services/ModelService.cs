@@ -134,6 +134,12 @@ namespace GitHub.Services
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
 
+        /// <summary>
+        /// Gets a collection of Pull Requests. If you want to refresh existing data, pass a collection in
+        /// </summary>
+        /// <param name="repo"></param>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
@@ -360,7 +366,7 @@ namespace GitHub.Services
                 CloneUrl = apiRepository.CloneUrl;
                 Private = apiRepository.Private;
                 Fork = apiRepository.Fork;
-                Key = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, Name);
+                Key = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner.Login, Name);
                 CreatedAt = apiRepository.CreatedAt;
                 UpdatedAt = apiRepository.UpdatedAt;
                 Timestamp = apiRepository.UpdatedAt;

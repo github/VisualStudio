@@ -149,7 +149,7 @@
                       Margin="10"
                       DockPanel.Dock="Top"
                       PromptText="{x:Static prop:Resources.filterTextPromptText}"
-                      Text="{Binding FilterText}"
+                      Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
                       IsEnabled="{Binding FilterTextIsEnabled, Mode=OneWay}"/>
 
     <ui:GitHubProgressBar x:Name="loadingProgressBar"
