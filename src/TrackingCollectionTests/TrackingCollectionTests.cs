@@ -1888,18 +1888,9 @@ public class TrackingTests : TestBase
         );
         col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
         col.ProcessingDelay = TimeSpan.Zero;
-
-        var evt = new ManualResetEvent(false);
-        col.OriginalCompleted.Subscribe(_ => evt.Set());
         col.Subscribe();
-        //col.Subscribe(t =>
-        //{
-        //    if (++count == expectedTotal * 2)
-        //        evt.Set();
-        //}, () => { });
 
-        evt.WaitOne();
-        evt.Reset();
+        col.OriginalCompleted.Wait();
 
         // it's initially sorted by date, so id list should not match
         CollectionAssert.AreNotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
