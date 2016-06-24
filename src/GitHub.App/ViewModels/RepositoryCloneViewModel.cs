@@ -67,7 +67,7 @@ namespace GitHub.ViewModels
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
             IsLoading = true;
 
-            Repositories = new TrackingCollection<IRepositoryModel>();
+            Repositories = repositoryHost.ModelService.GetRepositories(new TrackingCollection<IRepositoryModel>()) as TrackingCollection<IRepositoryModel>;
             repositories.ProcessingDelay = TimeSpan.Zero;
             repositories.Comparer = OrderedComparer<IRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
             repositories.Filter = FilterRepository;
@@ -82,6 +82,7 @@ namespace GitHub.ViewModels
                 },
                 () => IsLoading = false
             );
+            repositories.Subscribe();
 
             filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
