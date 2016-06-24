@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Caches;
+using System.Threading.Tasks;
 
 namespace GitHub.Extensions
 {
@@ -199,39 +200,45 @@ namespace GitHub.Extensions
             bool shouldInvalidateOnError = false)
                 where T : CacheItem
         {
-            var fetch = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
+            var idx = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))).Replay().RefCount();
+
+
+            var fetch = idx
                 .Select(x => Tuple.Create(x, fetchPredicate == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
                 .Where(predicateIsTrue => predicateIsTrue.Item2)
                 .Select(x => x.Item1)
-                .SelectMany(index => index.Clear(This, key, absoluteExpiration))
-                .SelectMany(index =>
-                {
-                    var fetchObs = fetchFunc().Catch<T, Exception>(ex =>
-                    {
-                        var shouldInvalidate = shouldInvalidateOnError ?
-                            This.InvalidateObject<CacheIndex>(key) :
-                            Observable.Return(Unit.Default);
-                        return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
-                    });
-
-                    return fetchObs
-                        .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
-                        .Do(x => index.AddAndSave(This, key, x, absoluteExpiration))
-                        .Finally(() =>
+                .Select(index => index.Clear())
+                .SelectMany(index => fetchFunc()
+                        .Catch<T, Exception>(ex =>
                         {
-                            This.GetObjects<T>(index.OldKeys.Except(index.Keys))
-                                .Do(dict => This.InvalidateObjects<T>(dict.Keys))
-                                .SelectMany(dict => dict.Values)
-                                .Do(removedItemsCallback)
-                                .Subscribe();
-                        });
-                }));
+                            var shouldInvalidate = shouldInvalidateOnError ?
+                                This.InvalidateObject<CacheIndex>(key) :
+                                Observable.Return(Unit.Default);
+                            return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
+                        })
+                        .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
+                        .Do(x => index.Add(key, x))
+                );
 
-            var cache = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))
-                .SelectMany(index => This.GetObjects<T>(index.Keys))
-                .SelectMany(dict => dict.Values));
+            var cache = idx
+                .SelectMany(index => This.GetObjects<T>(index.Keys.ToList()))
+                .SelectMany(dict => dict.Values);
 
-            return cache.Merge(fetch).Replay().RefCount();
+            return cache.Merge(fetch)
+                .Finally(async () =>
+                {
+                    var index = await idx;
+                    await index.Save(This);
+
+                    var list = index.OldKeys.Except(index.Keys);
+                    if (!list.Any())
+                        return;
+                    var removed = await This.GetObjects<T>(list);
+                    foreach (var d in removed.Values)
+                        removedItemsCallback(d);
+                    await This.InvalidateObjects<T>(list);
+                })
+                .Replay().RefCount();
         }
 
         static bool IsExpired(IBlobCache blobCache, DateTimeOffset itemCreatedAt, TimeSpan cacheDuration)

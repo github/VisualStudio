@@ -4,6 +4,7 @@ using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using System.Diagnostics;
+using GitHub.SampleData;
 
 namespace GitHub.Models
 {
