@@ -103,7 +103,7 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameText}" Content="{x:Static prop:Resources.nameText}"/>
-                <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:PromptTextBox x:Name="nameText" Grid.Column="1" Grid.Row="0" MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"/>
 
                 <StackPanel Grid.Column="1" Grid.Row="1">
                     <uirx:ValidationMessage
@@ -121,7 +121,7 @@
                 <Label Grid.Column="0" Grid.Row="2" Target="{Binding ElementName=description}" Content="{x:Static prop:Resources.descriptionText}"/>
                 <ui:PromptTextBox x:Name="description" Grid.Column="1" Grid.Row="2"/>
 
-                <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=localPathText, UpdateSourceTrigger=PropertyChanged}" Content="{x:Static prop:Resources.localPathText}"/>
+                <Label Grid.Column="0" Grid.Row="3" Target="{Binding ElementName=localPathText}" Content="{x:Static prop:Resources.localPathText}"/>
                 <Grid Grid.Column="1" Grid.Row="3">
 
                     <Grid.ColumnDefinitions>
@@ -129,7 +129,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <ui:PromptTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0" Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ui:PromptTextBox x:Name="localPathText" Grid.Column="0" Grid.Row="0"/>
                     <Button
                         x:Name="browsePathButton"
                         Grid.Column="1"
