@@ -86,7 +86,7 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
-            repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
+            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests) as TrackingCollection<IPullRequestModel>;
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);

@@ -44,7 +44,7 @@ namespace GitHub.Collections
 
         public static ObservableCollection<T> CreateListenerCollection<T>(this ITrackingCollection<T> tcol,
             IList<T> stickieItemsOnTop = null)
-            where T : ICopyable<T>
+            where T : class, ICopyable<T>
         {
             var col = new ObservableCollection<T>(stickieItemsOnTop);
             tcol.CollectionChanged += (s, e) =>
@@ -163,6 +163,12 @@ namespace GitHub.Collections
             get { return requestedDelay; }
             set { requestedDelay = value; }
         }
+
+        /// <summary>
+        /// Returns the number of elements that the collection contains
+        /// regardless of filtering
+        /// </summary>
+        public int UnfilteredCount => original.Count;
 
         bool ManualProcessing => cache.IsEmpty && originalSourceIsCompleted;
 

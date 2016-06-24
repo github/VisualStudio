@@ -20,7 +20,7 @@ namespace GitHub.Collections
     public interface ITrackingCollection<T> : IDisposable,
         INotifyCollectionChanged, INotifyPropertyChanged,
         IList<T>, ICollection<T>, IEnumerable<T>
-        where T : ICopyable<T>
+        where T : class, ICopyable<T>
     {
         /// <summary>
         /// Sets up an observable as source for the collection.
@@ -61,5 +61,11 @@ namespace GitHub.Collections
         /// </summary>
         TimeSpan ProcessingDelay { get; set; }
         IObservable<Unit> OriginalCompleted { get; }
+
+        /// <summary>
+        /// Returns the number of elements that the collection contains
+        /// regardless of filtering
+        /// </summary>
+        int UnfilteredCount { get; }
     }
 }
