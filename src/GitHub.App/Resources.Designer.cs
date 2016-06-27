@@ -250,29 +250,38 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter a repository path.
+        /// </summary>
+        internal static string RepositoryCreationClonePathEmpty {
+            get {
+                return ResourceManager.GetString("RepositoryCreationClonePathEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter a valid path.
         /// </summary>
-        internal static string RepositoryClonePathInvalid {
+        internal static string RepositoryCreationClonePathInvalid {
             get {
-                return ResourceManager.GetString("RepositoryClonePathInvalid", resourceCulture);
+                return ResourceManager.GetString("RepositoryCreationClonePathInvalid", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Path contains invalid characters.
         /// </summary>
-        internal static string RepositoryClonePathInvalidCharacters {
+        internal static string RepositoryCreationClonePathInvalidCharacters {
             get {
-                return ResourceManager.GetString("RepositoryClonePathInvalidCharacters", resourceCulture);
+                return ResourceManager.GetString("RepositoryCreationClonePathInvalidCharacters", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Path too long.
         /// </summary>
-        internal static string RepositoryClonePathTooLong {
+        internal static string RepositoryCreationClonePathTooLong {
             get {
-                return ResourceManager.GetString("RepositoryClonePathTooLong", resourceCulture);
+                return ResourceManager.GetString("RepositoryCreationClonePathTooLong", resourceCulture);
             }
         }
         
@@ -300,15 +309,6 @@ namespace GitHub.App {
         internal static string RepositoryCreationFailedQuota {
             get {
                 return ResourceManager.GetString("RepositoryCreationFailedQuota", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please enter a repository path.
-        /// </summary>
-        internal static string RepositoryCreationPathEmpty {
-            get {
-                return ResourceManager.GetString("RepositoryCreationPathEmpty", resourceCulture);
             }
         }
         

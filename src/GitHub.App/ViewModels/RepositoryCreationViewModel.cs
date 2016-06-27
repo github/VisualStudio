@@ -76,10 +76,10 @@ namespace GitHub.ViewModels
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
-                .IfNullOrEmpty("Please enter a repository path")
-                .IfTrue(x => x.Length > 200, "Path too long")
-                .IfContainsInvalidPathChars("Path contains invalid characters")
-                .IfPathNotRooted("Please enter a valid path");
+                .IfNullOrEmpty(Resources.RepositoryCreationClonePathEmpty)
+                .IfTrue(x => x.Length > 200, Resources.RepositoryCreationClonePathTooLong)
+                .IfContainsInvalidPathChars(Resources.RepositoryCreationClonePathInvalidCharacters)
+                .IfPathNotRooted(Resources.RepositoryCreationClonePathInvalid);
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
