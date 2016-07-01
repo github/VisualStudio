@@ -10,6 +10,11 @@ namespace GitHub.Caches
 {
     public class CacheIndex
     {
+        public const string PRPrefix = "index:pr";
+        public const string RepoPrefix = "index:repos";
+        public const string GitIgnoresPrefix = "index:ignores";
+        public const string LicensesPrefix = "index:licenses";
+
         public static CacheIndex Create(string key)
         {
             return new CacheIndex { IndexKey = key };

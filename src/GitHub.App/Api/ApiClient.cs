@@ -237,5 +237,9 @@ namespace GitHub.Api
                     SortDirection = SortDirection.Descending
                 });
         }
+        public IObservable<Repository> GetRepositories()
+        {
+            return gitHubClient.Repository.GetAllForCurrent();
+        }
     }
 }

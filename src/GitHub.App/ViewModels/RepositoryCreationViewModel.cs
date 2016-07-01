@@ -21,6 +21,7 @@ using NullGuard;
 using Octokit;
 using ReactiveUI;
 using Rothko;
+using GitHub.Collections;
 
 namespace GitHub.ViewModels
 {
@@ -32,8 +33,6 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
-        readonly ObservableAsPropertyHelper<IReadOnlyList<LicenseItem>> licenses;
-        readonly ObservableAsPropertyHelper<IReadOnlyList<GitIgnoreItem>> gitIgnoreTemplates;
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
@@ -118,22 +117,20 @@ namespace GitHub.ViewModels
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
 
-            gitIgnoreTemplates = repositoryHost.ModelService.GetGitIgnoreTemplates()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.GitIgnoreTemplates, initialValue: new GitIgnoreItem[] { });
-
-            this.WhenAny(x => x.GitIgnoreTemplates, x => x.Value)
-                .WhereNotNull()
-                .Where(ignores => ignores.Any())
-                .Subscribe(ignores =>
+            GitIgnoreTemplates = TrackingCollection.CreateListenerCollectionAndRun(
+                repositoryHost.ModelService.GetGitIgnoreTemplates(),
+                new[] { GitIgnoreItem.None },
+                OrderedComparer<GitIgnoreItem>.OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name)).Compare,
+                x =>
                 {
-                    SelectedGitIgnoreTemplate = ignores.FirstOrDefault(
-                        template => template.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase));
+                    if (x.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase))
+                        SelectedGitIgnoreTemplate = x;
                 });
 
-            licenses = repositoryHost.ModelService.GetLicenses()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
+            Licenses = TrackingCollection.CreateListenerCollectionAndRun(
+                repositoryHost.ModelService.GetLicenses(),
+                new[] { LicenseItem.None },
+                OrderedComparer<LicenseItem>.OrderByDescending(item => LicenseItem.IsRecommended(item.Name)).Compare);
 
             BaseRepositoryPath = repositoryCreationService.DefaultClonePath;
         }
@@ -164,14 +161,18 @@ namespace GitHub.ViewModels
         /// </summary>
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
+        IReadOnlyList<GitIgnoreItem> gitIgnoreTemplates;
         public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates
         {
-            get { return gitIgnoreTemplates.Value; }
+            get { return gitIgnoreTemplates; }
+            set { this.RaiseAndSetIfChanged(ref gitIgnoreTemplates, value); }
         }
 
+        IReadOnlyList<LicenseItem> licenses;
         public IReadOnlyList<LicenseItem> Licenses
         {
-            get { return licenses.Value; }
+            get { return licenses; }
+            set { this.RaiseAndSetIfChanged(ref licenses, value); }
         }
 
         GitIgnoreItem selectedGitIgnoreTemplate;

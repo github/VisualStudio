@@ -19,6 +19,9 @@ using NLog;
 using NullGuard;
 using ReactiveUI;
 using Rothko;
+using System.Collections.ObjectModel;
+using GitHub.Collections;
+using GitHub.UI;
 
 namespace GitHub.ViewModels
 {
@@ -33,10 +36,9 @@ namespace GitHub.ViewModels
         readonly IOperatingSystem operatingSystem;
         readonly INotificationService notificationService;
         readonly IUsageTracker usageTracker;
-        readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        readonly ObservableAsPropertyHelper<bool> isLoading;
-        readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
+        bool isLoading;
+        bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
         bool loadingFailed;
@@ -65,27 +67,25 @@ namespace GitHub.ViewModels
             this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
-            Repositories = new ReactiveList<IRepositoryModel>();
-            loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
-            isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
-                .CombineLatest(loadRepositoriesCommand.IsExecuting, (failed, loading) => !failed && loading)
-                .ToProperty(this, x => x.IsLoading);
-            loadRepositoriesCommand.Subscribe(Repositories.AddRange);
-            filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
+
+            Repositories = new TrackingCollection<IRepositoryModel>();
+            repositories.ProcessingDelay = TimeSpan.Zero;
+            repositories.Comparer = OrderedComparer<IRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
+            repositories.Filter = FilterRepository;
+            repositories.NewerComparer = OrderedComparer<IRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+
+            filterTextIsEnabled = this.WhenAny(x => x.IsLoading, x => x.Value)
+                .Select(x => !x && repositories.UnfilteredCount > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
-            noRepositoriesFound = this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
+
+            this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
                 , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
-                .ToProperty(this, x => x.NoRepositoriesFound);
+                .Subscribe(x => NoRepositoriesFound = x);
 
-            var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
+            this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
-                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler);
-
-            FilteredRepositories = Repositories.CreateDerivedCollection(
-                x => x,
-                filter: FilterRepository,
-                signalReset: filterResetSignal
-            );
+                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler)
+                .Subscribe(_ => repositories.Filter = FilterRepository);
 
             var baseRepositoryPath = this.WhenAny(
                 x => x.BaseRepositoryPath,
@@ -110,20 +110,29 @@ namespace GitHub.ViewModels
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
                 .Subscribe();
             BaseRepositoryPath = cloneService.DefaultClonePath;
+            NoRepositoriesFound = true;
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
+        public override void Initialize([AllowNull] ViewWithData data)
         {
-            return repositoryHost.ModelService.GetRepositories()
-                .Catch<IReadOnlyList<IRepositoryModel>, Exception>(ex =>
+            base.Initialize(data);
+
+            IsLoading = true;
+            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRepositoryModel>;
+            repositories.OriginalCompleted.Subscribe(
+                _ => { }
+                , ex =>
                 {
+                    LoadingFailed = true;
+                    IsLoading = false;
                     log.Error("Error while loading repositories", ex);
-                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
-                        .Select(_ => new IRepositoryModel[] { });
-                });
+                },
+                () => IsLoading = false
+            );
+            repositories.Subscribe();
         }
-       
-        bool FilterRepository(IRepositoryModel repo)
+
+        bool FilterRepository(IRepositoryModel repo, int position, IList<IRepositoryModel> list)
         {
             if (string.IsNullOrWhiteSpace(FilterText))
                 return true;
@@ -177,6 +186,34 @@ namespace GitHub.ViewModels
             return isAlreadyRepoAtPath;
         }
 
+        IObservable<Unit> ShowBrowseForDirectoryDialog()
+        {
+            return Observable.Start(() =>
+            {
+                // We store this in a local variable to prevent it changing underneath us while the
+                // folder dialog is open.
+                var localBaseRepositoryPath = BaseRepositoryPath;
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath, Resources.BrowseForDirectory);
+
+                if (!browseResult.Success)
+                    return;
+
+                var directory = browseResult.DirectoryPath ?? localBaseRepositoryPath;
+
+                try
+                {
+                    BaseRepositoryPath = directory;
+                }
+                catch (Exception e)
+                {
+                    // TODO: We really should limit this to exceptions we know how to handle.
+                    log.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
+                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                }
+            }, RxApp.MainThreadScheduler);
+        }
+
         /// <summary>
         /// Path to clone repositories into
         /// </summary>
@@ -192,24 +229,12 @@ namespace GitHub.ViewModels
         /// </summary>
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        IReactiveList<IRepositoryModel> repositories;
-        /// <summary>
-        /// List of repositories as returned by the server
-        /// </summary>
-        public IReactiveList<IRepositoryModel> Repositories
+        TrackingCollection<IRepositoryModel> repositories;
+        public ObservableCollection<IRepositoryModel> Repositories
         {
+            [return: AllowNull]
             get { return repositories; }
-            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
-        }
-
-        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
-        /// <summary>
-        /// List of repositories as filtered by user
-        /// </summary>
-        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
-        {
-            get { return filteredRepositories; }
-            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
+            private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRepositoryModel>)value); }
         }
 
         IRepositoryModel selectedRepository;
@@ -244,12 +269,8 @@ namespace GitHub.ViewModels
 
         public bool IsLoading
         {
-            get { return isLoading.Value; }
-        }
-
-        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
-        {
-            get { return loadRepositoriesCommand; }
+            get { return isLoading; }
+            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
         public bool LoadingFailed
@@ -260,7 +281,8 @@ namespace GitHub.ViewModels
 
         public bool NoRepositoriesFound
         {
-            get { return noRepositoriesFound.Value; }
+            get { return noRepositoriesFound; }
+            private set { this.RaiseAndSetIfChanged(ref noRepositoriesFound, value); }
         }
 
         public ICommand BrowseForDirectory
@@ -277,34 +299,6 @@ namespace GitHub.ViewModels
         {
             get;
             private set;
-        }
-
-        IObservable<Unit> ShowBrowseForDirectoryDialog()
-        {
-            return Observable.Start(() =>
-            {
-                // We store this in a local variable to prevent it changing underneath us while the
-                // folder dialog is open.
-                var localBaseRepositoryPath = BaseRepositoryPath;
-                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath, Resources.BrowseForDirectory);
-
-                if (!browseResult.Success)
-                    return;
-
-                var directory = browseResult.DirectoryPath ?? localBaseRepositoryPath;
-
-                try
-                {
-                    BaseRepositoryPath = directory;
-                }
-                catch (Exception e)
-                {
-                    // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
-                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
-                }
-            }, RxApp.MainThreadScheduler);
         }
     }
 }

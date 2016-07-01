@@ -11,6 +11,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using NUnit.Framework;
 using System.Reactive;
+using System.Threading.Tasks;
 
 [TestFixture]
 public class TrackingTests : TestBase
@@ -1838,8 +1839,8 @@ public class TrackingTests : TestBase
         Assert.Throws<ObjectDisposedException>(() => col.RemoveItem(GetThing(1)));
     }
 
-    [Test]
-    public void MultipleSortingAndFiltering()
+    [Test, Category("Timings")]
+    public async Task MultipleSortingAndFiltering()
     {
         var expectedTotal = 20;
         var rnd = new Random(214748364);
@@ -1887,10 +1888,9 @@ public class TrackingTests : TestBase
             (item, idx, list) => idx < 5
         );
         col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
-        col.ProcessingDelay = TimeSpan.Zero;
         col.Subscribe();
 
-        col.OriginalCompleted.Wait();
+        await col.OriginalCompleted;
 
         // it's initially sorted by date, so id list should not match
         CollectionAssert.AreNotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
@@ -1933,21 +1933,13 @@ public class TrackingTests : TestBase
         var list1 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, count - i, "Run 1")).ToList());
         var list2 = new List<Thing>(Enumerable.Range(1, count).Select(i => GetThing(i, i, i + count, "Run 2")).ToList());
 
-        var subj = new ReplaySubject<Unit>();
-        subj.OnNext(Unit.Default);
-        var disp = col.OriginalCompleted.Subscribe(x => subj.OnCompleted());
         col.Listen(list1.ToObservable());
         col.Subscribe();
-        subj.Wait();
+        col.OriginalCompleted.Wait();
 
-        disp.Dispose();
         col.Listen(list2.ToObservable());
-        subj = new ReplaySubject<Unit>();
-        subj.OnNext(Unit.Default);
-        disp = col.OriginalCompleted.Subscribe(x => subj.OnCompleted());
         col.Subscribe();
-        subj.Wait();
-        disp.Dispose();
+        col.OriginalCompleted.Wait();
 
         CollectionAssert.AreEqual(list2, col);
     }
