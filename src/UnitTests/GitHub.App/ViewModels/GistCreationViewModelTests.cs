@@ -24,7 +24,7 @@ public class GistCreationViewModelTests
         var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
         repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
         var gistPublishService = provider.GetGistPublishService();
-        return new GistCreationViewModel(repositoryHost, selectedTextProvider, gistPublishService)
+        return new GistCreationViewModel(repositoryHost, selectedTextProvider, gistPublishService, Substitute.For<IUsageTracker>())
         {
             FileName = fileName,
             IsPrivate = isPrivate

@@ -39,23 +39,27 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly IOperatingSystem operatingSystem;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         RepositoryCreationViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService)
+            IRepositoryCreationService repositoryCreationService,
+            IUsageTracker usageTracker)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, usageTracker)
         {}
 
         public RepositoryCreationViewModel(
             IRepositoryHost repositoryHost,
             IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService)
+            IRepositoryCreationService repositoryCreationService,
+            IUsageTracker usageTracker)
         {
             this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
+            this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, repositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
@@ -268,7 +272,8 @@ namespace GitHub.ViewModels
                 newRepository,
                 SelectedAccount,
                 BaseRepositoryPath,
-                repositoryHost.ApiClient);
+                repositoryHost.ApiClient)
+                .Do(_ => usageTracker.IncrementCreateCount());
         }
 
         ReactiveCommand<Unit> InitializeCreateRepositoryCommand()

@@ -32,7 +32,8 @@ public class RepositoryPublishViewModelTests
             service = service ?? Substitute.For<IRepositoryPublishService>();
             notificationService = notificationService ?? Substitute.For<INotificationService>();
             connectionManager = connectionManager ?? Substitutes.ConnectionManager;
-            return new RepositoryPublishViewModel(hosts, service, notificationService, connectionManager);
+            return new RepositoryPublishViewModel(hosts, service, notificationService, connectionManager,
+                Substitute.For<IUsageTracker>());
         }
 
         public static void SetupConnections(IRepositoryHosts hosts, IConnectionManager cm,

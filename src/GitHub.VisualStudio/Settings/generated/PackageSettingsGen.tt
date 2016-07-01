@@ -16,16 +16,28 @@ var json = JObject.Parse(File.ReadAllText(file));
 */
 
 using GitHub.Settings;
+using GitHub.Primitives;
+using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.VisualStudio.Settings {
 
-    public partial class PackageSettings : IPackageSettings
+    public partial class PackageSettings : NotificationAwareObject, IPackageSettings
     {
 
 <#
 foreach (var j in json["settings"].Children()) {
+    var type = j["type"].ToString();
+    if (type == "object")
+        type = j["typename"].ToString();
+    var field = Char.ToLower(j["name"].ToString()[0]) + j["name"].ToString().Substring(1);
 #>
-        public <#= j["type"] #> <#= j["name"] #> { get; set; }
+        <#= type #> <#= field #>;
+        public <#= type #> <#= j["name"] #>
+        {
+            get { return <#= field #>; }
+            set { <#= field #>  = value; this.RaisePropertyChange(); }
+        }
+
 <#
 }
 #>
@@ -34,9 +46,18 @@ foreach (var j in json["settings"].Children()) {
         {
 <#
 foreach (var j in json.Children().Children().Children()) {
+    if (j["type"].ToString() == "object")
+    {
+#>
+            <#= j["name"] #> = SimpleJson.DeserializeObject<<#= j["typename"] #>>((string)settingsStore.Read("<#= j["name"] #>", "{}"));
+<#
+    }
+    else
+    {
 #>
             <#= j["name"] #> = (<#= j["type"] #>)settingsStore.Read("<#= j["name"] #>", <#= j["default"] #>);
 <#
+    }
 }
 #>
         }
@@ -45,9 +66,18 @@ foreach (var j in json.Children().Children().Children()) {
         {
 <#
 foreach (var j in json.Children().Children().Children()) {
+    if (j["type"].ToString() == "object")
+    {
+#>
+            settingsStore.Write("<#= j["name"] #>", SimpleJson.SerializeObject(<#= j["name"] #>));
+<#
+    }
+    else
+    {
 #>
             settingsStore.Write("<#= j["name"] #>", <#= j["name"] #>);
 <#
+    }
 }
 #>
         }

@@ -5,12 +5,13 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
 using SettingsStore = GitHub.Helpers.SettingsStore;
 using GitHub.Settings;
+using GitHub.Primitives;
 
 namespace GitHub.VisualStudio.Settings
 {
     [Export(typeof(IPackageSettings))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public partial class PackageSettings : IPackageSettings
+    public partial class PackageSettings : NotificationAwareObject, IPackageSettings
     {
         readonly SettingsStore settingsStore;
 
@@ -20,15 +21,11 @@ namespace GitHub.VisualStudio.Settings
             var sm = new ShellSettingsManager(serviceProvider);
             settingsStore = new SettingsStore(sm.GetWritableSettingsStore(SettingsScope.UserSettings), Info.ApplicationInfo.ApplicationSafeName);
             LoadSettings();
-            UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
         }
-
-        public UIState UIState { get; }
 
         public void Save()
         {
             SaveSettings();
-            settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
         }
     }
 }

@@ -32,8 +32,9 @@ public class RepositoryCreationViewModelTests
         creationService = creationService ?? provider.GetRepositoryCreationService();
         var avatarProvider = provider.GetAvatarProvider();
         var connection = provider.GetConnection();
+        var usageTracker = Substitute.For<IUsageTracker>();
 
-        return new RepositoryCreationViewModel(repositoryHost, os, creationService);
+        return new RepositoryCreationViewModel(repositoryHost, os, creationService, usageTracker);
     }
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
@@ -333,7 +334,8 @@ public class RepositoryCreationViewModelTests
             var vm = new RepositoryCreationViewModel(
                 repositoryHost,
                 Substitute.For<IOperatingSystem>(),
-                Substitute.For<IRepositoryCreationService>());
+                Substitute.For<IRepositoryCreationService>(),
+                Substitute.For<IUsageTracker>());
 
             Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
             Assert.Equal(2, vm.Accounts.Count);
