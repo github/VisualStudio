@@ -162,7 +162,7 @@ public class RepositoryCloneViewModelTests
             repoSubject.OnCompleted();
 
             await col.OriginalCompleted;
-
+            await Task.Delay(100);
             Assert.Equal(1, vm.Repositories.Count);
             Assert.False(vm.NoRepositoriesFound);
         }
