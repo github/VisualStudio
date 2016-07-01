@@ -132,9 +132,6 @@
   <data name="browsePathButtonContent" xml:space="preserve">
     <value>Browse</value>
   </data>
-  <data name="GetStartedLink" xml:space="preserve">
-    <value>Get Started</value>
-  </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
     <value>Could not connect to github.com</value>
   </data>
@@ -329,5 +326,20 @@
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>We couldn't find a git repository here. Open a git project or click "File -&gt; Add to Source Control" in a project to get started.</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>Create an account</value>
+  </data>
+  <data name="filterBranchesText" xml:space="preserve">
+    <value>Filter branches</value>
+  </data>
+  <data name="GetStartedLink" xml:space="preserve">
+    <value>Get Started</value>
+  </data>
+  <data name="GetStartedText" xml:space="preserve">
+    <value>Get Started</value>
+  </data>
+  <data name="SignInLink" xml:space="preserve">
+    <value>Sign In</value>
   </data>
 </root>

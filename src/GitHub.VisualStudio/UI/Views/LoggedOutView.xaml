@@ -6,6 +6,7 @@
                             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                            xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                             DataContext="{Binding ViewModel}"
                             d:DesignHeight="300"
@@ -52,13 +53,13 @@
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink Command="{Binding SignIn}">Sign in</Hyperlink>
+                <Hyperlink Command="{Binding SignIn}"><TextBlock Text="{x:Static prop:Resources.SignInLink}"/></Hyperlink>
             </TextBlock>
 
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink Command="{Binding Register}">Create an account</Hyperlink>
+                <Hyperlink Command="{Binding Register}"><TextBlock Text="{x:Static prop:Resources.CreateAccountLink}"/></Hyperlink>
             </TextBlock>
         </StackPanel>
     </StackPanel>
