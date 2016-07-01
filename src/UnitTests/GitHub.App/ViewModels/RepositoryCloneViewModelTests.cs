@@ -17,13 +17,14 @@ using GitHub.Collections;
 public class RepositoryCloneViewModelTests
 {
     static RepositoryCloneViewModel GetVM(IRepositoryHost repositoryHost, IRepositoryCloneService cloneService,
-        IOperatingSystem os, INotificationService notificationService)
+        IOperatingSystem os, INotificationService notificationService, IUsageTracker usageTracker)
     {
         var vm = new RepositoryCloneViewModel(
             repositoryHost,
             cloneService,
             os,
-            notificationService);
+            notificationService,
+            usageTracker);
         vm.Initialize(null);
         return vm;
     }
