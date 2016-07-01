@@ -11,6 +11,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using NUnit.Framework;
 using System.Reactive;
+using System.Threading.Tasks;
 
 [TestFixture]
 public class TrackingTests : TestBase
@@ -1839,7 +1840,7 @@ public class TrackingTests : TestBase
     }
 
     [Test]
-    public void MultipleSortingAndFiltering()
+    public async Task MultipleSortingAndFiltering()
     {
         var expectedTotal = 20;
         var rnd = new Random(214748364);
@@ -1887,10 +1888,9 @@ public class TrackingTests : TestBase
             (item, idx, list) => idx < 5
         );
         col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
-        col.ProcessingDelay = TimeSpan.Zero;
         col.Subscribe();
 
-        col.OriginalCompleted.Wait();
+        await col.OriginalCompleted;
 
         // it's initially sorted by date, so id list should not match
         CollectionAssert.AreNotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
