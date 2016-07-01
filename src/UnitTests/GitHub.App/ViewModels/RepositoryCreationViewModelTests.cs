@@ -34,7 +34,7 @@ public class RepositoryCreationViewModelTests
         var connection = provider.GetConnection();
         var usageTracker = Substitute.For<IUsageTracker>();
 
-        return new RepositoryCreationViewModel(repositoryHost, os, creationService, avatarProvider, usageTracker);
+        return new RepositoryCreationViewModel(repositoryHost, os, creationService, usageTracker);
     }
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
@@ -284,7 +284,7 @@ public class RepositoryCreationViewModelTests
         {
             var provider = Substitutes.ServiceProvider;
             var operatingSystem = provider.GetOperatingSystem();
-            operatingSystem.File.Exists(@"c:\fake\foo\.git\HEAD").Returns(exists);
+            operatingSystem.Directory.Exists(@"c:\fake\foo").Returns(exists);
             var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\";
 
@@ -335,7 +335,6 @@ public class RepositoryCreationViewModelTests
                 repositoryHost,
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IRepositoryCreationService>(),
-                Substitute.For<IAvatarProvider>(),
                 Substitute.For<IUsageTracker>());
 
             Assert.Equal(vm.Accounts[0], vm.SelectedAccount);

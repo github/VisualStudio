@@ -53,6 +53,7 @@
             x:Name="hostTabControl"
             Margin="30,0"
             Style="{StaticResource LightModalViewTabControl}"
+            SelectionChanged="hostTabControl_SelectionChanged"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
             helpers:AccessKeysManagerScoping.IsEnabled="True">
@@ -97,19 +98,8 @@
                             
                             <ui:SecurePasswordBox x:Name="dotComPassword" PromptText="{x:Static prop:Resources.PasswordPrompt}" />
 
-                            <uirx:ErrorMessageDisplay
-                                x:Name="dotComLoginFailedMessage"
-                                Message="{x:Static prop:Resources.LoginFailedMessage}">
-                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.LoginFailedText}">
-                                    <Hyperlink x:Name="dotComForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.ForgotPasswordLink}"/></Hyperlink>
-                                </TextBlock>
-                            </uirx:ErrorMessageDisplay>
-
-                            <uirx:ErrorMessageDisplay
-                                x:Name="dotComConnectionFailedMessage"
-                                Message="{x:Static prop:Resources.dotComConnectionFailedMessageMessage}">
-                                <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToGitHubText}"/>
-                            </uirx:ErrorMessageDisplay>
+                            <uirx:UserErrorMessages x:Name="dotComErrorMessage" Margin="0,10">
+                            </uirx:UserErrorMessages>
 
                             <uirx:ValidationMessage
                                 x:Name="dotComUserNameOrEmailValidationMessage"
@@ -162,19 +152,8 @@
                             ValidatesControl="{Binding ElementName=enterpriseUrl}"
                             TextChangeThrottle="1.0"/>
 
-                        <uirx:ErrorMessageDisplay
-                            x:Name="enterpriseLoginFailedMessage"
-                            Message="{x:Static prop:Resources.LoginFailedMessage}">
-                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.LoginFailedText}">
-                                <Hyperlink x:Name="enterpriseForgotPasswordLink"><TextBlock Text="{x:Static prop:Resources.ForgotPasswordLink}"/></Hyperlink>
-                            </TextBlock>
-                        </uirx:ErrorMessageDisplay>
-
-                        <uirx:ErrorMessageDisplay
-                            x:Name="enterpriseConnectingFailedMessage"
-                            Message="{x:Static prop:Resources.enterpriseConnectingFailedMessage}">
-                            <TextBlock TextWrapping="Wrap" Text="{x:Static prop:Resources.couldNotConnectToTheServerText}"/>
-                        </uirx:ErrorMessageDisplay>
+                        <uirx:UserErrorMessages x:Name="enterpriseErrorMessage" Margin="0,10">
+                        </uirx:UserErrorMessages>
                     </StackPanel>
                 </DockPanel>
             </TabItem>

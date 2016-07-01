@@ -79,6 +79,7 @@ namespace GitHub.ViewModels
             PullRequests = new TrackingCollection<IPullRequestModel>();
             pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
             pullRequests.Filter = (pr, i, l) => pr.IsOpen;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -99,8 +100,8 @@ namespace GitHub.ViewModels
                 return;
             pullRequests.Filter = (pr, i, l) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
-                     (ass == null || pr.Assignee == ass) &&
-                     (aut == null || pr.Author == aut);
+                     (ass == null || ass.Equals(pr.Assignee)) &&
+                     (aut == null || aut.Equals(pr.Author));
         }
 
         TrackingCollection<IPullRequestModel> pullRequests;

@@ -19,6 +19,7 @@ using NullGuard;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitHub.VisualStudio.UI;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -26,6 +27,8 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
     {
+        const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequests;
+
         bool initialized;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         IUIController uiController;
@@ -40,6 +43,7 @@ namespace GitHub.VisualStudio.UI.Views
         bool navigatingViaArrows;
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
+        int latestReloadCallId;
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
@@ -55,12 +59,10 @@ namespace GitHub.VisualStudio.UI.Views
 
         public override void Initialize(IServiceProvider serviceProvider)
         {
-            base.Initialize(serviceProvider);
-
-            ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
+            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.pullRequestCommand,
                 (s, e) => Reload(new ViewWithData(UIControllerFlow.PullRequests) { ViewType = UIViewType.PRList }).Forget());
 
-            back = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
+            back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && currentNavItem > 0,
                 () => {
                     DisableButtons();
@@ -68,7 +70,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            forward = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
+            forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && currentNavItem < navStack.Count - 1,
                 () => {
                     DisableButtons();
@@ -76,7 +78,7 @@ namespace GitHub.VisualStudio.UI.Views
                 },
                 true);
 
-            refresh = ServiceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
+            refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled && navStack.Count > 0,
                 () => {
                     DisableButtons();
@@ -85,6 +87,10 @@ namespace GitHub.VisualStudio.UI.Views
                 true);
 
             initialized = true;
+
+            base.Initialize(serviceProvider);
+
+            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
         }
 
         public void Initialize([AllowNull] ViewWithData data)
@@ -103,52 +109,105 @@ namespace GitHub.VisualStudio.UI.Views
             if (!changed)
                 return;
 
-            IsGitHubRepo = null;
+            Stop();
+            RepositoryOrigin = RepositoryOrigin.Unknown;
             Reload().Forget();
         }
 
+        /// <summary>
+        /// This method is reentrant, so all await calls need to be done before
+        /// any actions are performed on the data. More recent calls to this method
+        /// will cause previous calls pending on await calls to exit early.
+        /// </summary>
+        /// <returns></returns>
         async Task Reload([AllowNull] ViewWithData data = null, bool navigating = false)
         {
+            if (!initialized)
+                return;
+
+            latestReloadCallId++;
+            var reloadCallId = latestReloadCallId;
+
             navigatingViaArrows = navigating;
 
-            if (!IsGitHubRepo.HasValue)
-                IsGitHubRepo = await IsAGitHubRepo();
-
-            if (!IsGitHubRepo.Value)
+            if (RepositoryOrigin == RepositoryOrigin.Unknown)
             {
-                if (uiController != null)
-                {
-                    Stop();
-                    //var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                    //var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
-                    //Control = c.View;
-                }
-                return;
+                var origin = await GetRepositoryOrigin();
+                if (reloadCallId != latestReloadCallId)
+                    return;
+
+                RepositoryOrigin = origin;
             }
 
             var connection = await connectionManager.LookupConnection(ActiveRepo);
-            IsLoggedIn = await connection.IsLoggedIn(hosts);
+            if (reloadCallId != latestReloadCallId)
+                return;
 
-            if (IsLoggedIn)
+            if (connection == null)
+                IsLoggedIn = false;
+            else
             {
-                if (uiController == null || (data != null && data.ActiveFlow != uiController.CurrentFlow))
-                    StartFlow(data?.ActiveFlow ?? UIControllerFlow.PullRequests, connection, data);
-                else if (data != null || currentNavItem >= 0)
-                    uiController.Jump(data ?? navStack[currentNavItem]);
+                var isLoggedIn = await connection.IsLoggedIn(hosts);
+                if (reloadCallId != latestReloadCallId)
+                    return;
+
+                IsLoggedIn = isLoggedIn;
+            }
+
+            if (RepositoryOrigin == UI.RepositoryOrigin.NonGitRepository)
+            {
+                LoadView(UIViewType.NotAGitRepository);
+            }
+            else if (RepositoryOrigin == UI.RepositoryOrigin.Other)
+            {
+                LoadView(UIViewType.NotAGitHubRepository);
+            }
+            else if (!IsLoggedIn)
+            {
+                LoadView(UIViewType.LoggedOut);
             }
             else
             {
+                LoadView(data?.ActiveFlow ?? DefaultControllerFlow, connection, data);
+            }
+        }
+
+        void LoadView(UIControllerFlow flow, IConnection connection = null, ViewWithData data = null, UIViewType type = UIViewType.None)
+        {
+            // if we're loading a single view or a different flow, we need to stop the current controller
+            var restart = flow == UIControllerFlow.None || uiController?.SelectedFlow != flow;
+
+            if (restart)
+                Stop();
+
+            // if there's no selected flow, then just load a view directly
+            if (flow == UIControllerFlow.None)
+            {
                 var factory = ServiceProvider.GetExportedValue<IUIFactory>();
-                var c = factory.CreateViewAndViewModel(UIViewType.LoggedOut);
+                var c = factory.CreateViewAndViewModel(type);
+                c.View.DataContext = c.ViewModel;
                 Control = c.View;
             }
-            return;
+            // it's a new flow!
+            else if (restart)
+            {
+                StartFlow(flow, connection, data);
+            }
+            // navigate to a requested view within the currently running uiController
+            else
+            {
+                uiController.Jump(data ?? navStack[currentNavItem]);
+            }
+        }
+
+        void LoadView(UIViewType type)
+        {
+            LoadView(UIControllerFlow.None, type: type);
         }
 
         void StartFlow(UIControllerFlow controllerFlow, [AllowNull]IConnection conn, ViewWithData data = null)
         {
-            if (uiController != null)
-                Stop();
+            Stop();
 
             if (conn == null)
                 return;
@@ -246,12 +305,17 @@ namespace GitHub.VisualStudio.UI.Views
 
         void Stop()
         {
+            if (uiController == null)
+                return;
+
+            DisableButtons();
             windowController?.Close();
             uiController.Stop();
             disposables.Clear();
             uiController = null;
             currentNavItem = -1;
             navStack.Clear();
+            UpdateToolbar();
         }
 
         string title;
@@ -276,13 +340,23 @@ namespace GitHub.VisualStudio.UI.Views
             set { isLoggedIn = value;  this.RaisePropertyChange(); }
         }
 
-        bool? isGitHubRepo;
-        public bool? IsGitHubRepo
+        RepositoryOrigin repositoryOrigin;
+        public RepositoryOrigin RepositoryOrigin
         {
-            get { return isGitHubRepo; }
-            set { isGitHubRepo = value; this.RaisePropertyChange(); }
+            get { return repositoryOrigin; }
+            private set { repositoryOrigin = value; }
         }
 
+        public bool? IsGitHubRepo
+        {
+            get
+            {
+                return repositoryOrigin == RepositoryOrigin.Unknown ?
+                    (bool?)null :
+                    repositoryOrigin == UI.RepositoryOrigin.DotCom ||
+                    repositoryOrigin == UI.RepositoryOrigin.Enterprise;
+            }
+        }
 
         public ReactiveCommand<object> CancelCommand { get; private set; }
         public ICommand Cancel => CancelCommand;

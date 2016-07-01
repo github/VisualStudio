@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Reactive;
 
 namespace GitHub.Collections
 {
@@ -32,11 +33,22 @@ namespace GitHub.Collections
         /// </summary>
         /// <param name="theComparer">The comparer method for sorting, or null if not sorting</param>
         Func<T, T, int> Comparer { get; set; }
+
         /// <summary>
         /// Set a new filter. This will cause the collection to be filtered
         /// </summary>
         /// <param name="theFilter">The new filter, or null to not have any filtering</param>
         Func<T, int, IList<T>, bool> Filter { get; set; }
+
+        /// <summary>
+        /// Set a comparer that determines whether the item being processed is newer than the same
+        /// item seen before. This is to prevent stale items from overriding newer items when data
+        /// is coming simultaneously from cache and from live data. Use a timestamp-like comparison
+        /// for best results
+        /// </summary>
+        /// <param name="theComparer">The comparer method for sorting, or null if not sorting</param>
+        Func<T, T, int> NewerComparer { get; set; }
+
         void AddItem(T item);
         void RemoveItem(T item);
         /// <summary>
@@ -44,5 +56,6 @@ namespace GitHub.Collections
         /// </summary>
         TimeSpan ProcessingDelay { get; set; }
         event NotifyCollectionChangedEventHandler CollectionChanged;
+        IObservable<Unit> OriginalCompleted { get; }
     }
 }

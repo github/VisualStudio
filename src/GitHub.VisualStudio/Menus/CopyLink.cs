@@ -6,6 +6,7 @@ using GitHub.Extensions;
 using GitHub.Services;
 using GitHub.VisualStudio.UI;
 using NullGuard;
+using GitHub.Api;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -16,8 +17,9 @@ namespace GitHub.VisualStudio.Menus
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IUsageTracker usageTracker)
-            : base(serviceProvider)
+        public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+            IUsageTracker usageTracker, ISimpleApiClientFactory apiFactory)
+            : base(serviceProvider, apiFactory)
         {
             this.usageTracker = usageTracker;
         }
@@ -25,9 +27,10 @@ namespace GitHub.VisualStudio.Menus
         public Guid Guid => GuidList.guidContextMenuSet;
         public int CmdId => PkgCmdIDList.copyLinkCommand;
 
-        public void Activate([AllowNull]object data = null)
+        public async void Activate([AllowNull]object data = null)
         {
-            if (!IsGitHubRepo())
+            var isgithub = await IsGitHubRepo();
+            if (!isgithub)
                 return;
 
             var link = GenerateLink();
@@ -49,7 +52,9 @@ namespace GitHub.VisualStudio.Menus
 
         public bool CanShow()
         {
-            return IsGitHubRepo();
+            var githubRepoCheckTask = IsGitHubRepo();
+            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
         }
+
     }
 }

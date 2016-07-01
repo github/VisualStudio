@@ -53,13 +53,13 @@
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink>Sign in</Hyperlink>
+                <Hyperlink Command="{Binding SignIn}">Sign in</Hyperlink>
             </TextBlock>
 
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink>Create an account</Hyperlink>
+                <Hyperlink Command="{Binding Register}">Create an account</Hyperlink>
             </TextBlock>
         </StackPanel>
     </StackPanel>

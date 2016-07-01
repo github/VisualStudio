@@ -112,7 +112,7 @@
                           Grid.Row="0"
                           Grid.Column="1"
                           MaxLength="{x:Static GitHub:Constants.MaxRepositoryNameLength}"
-                          Text="{Binding RepositoryName}" />
+                          Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel Grid.Row="1" Grid.Column="1">
           <uirx:ValidationMessage x:Name="nameValidationMessage" ValidatesControl="{Binding ElementName=nameText}" />
@@ -131,7 +131,7 @@
         <ui:PromptTextBox x:Name="description"
                           Grid.Row="2"
                           Grid.Column="1"
-                          Text="{Binding Description}" />
+                          Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
 
         <Label Grid.Row="3"
                Grid.Column="0"
@@ -147,7 +147,7 @@
           <ui:PromptTextBox x:Name="localPathText"
                             Grid.Row="0"
                             Grid.Column="0"
-                            Text="{Binding BaseRepositoryPath}" />
+                            Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}" />
           <Button x:Name="browsePathButton"
                   Grid.Row="0"
                   Grid.Column="1"
