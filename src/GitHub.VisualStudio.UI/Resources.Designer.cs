@@ -151,6 +151,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create an account.
+        /// </summary>
+        public static string CreateAccountLink {
+            get {
+                return ResourceManager.GetString("CreateAccountLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         public static string CreateLink {
@@ -241,6 +250,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filter branches.
+        /// </summary>
+        public static string filterBranchesText {
+            get {
+                return ResourceManager.GetString("filterBranchesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -264,6 +282,15 @@ namespace GitHub.VisualStudio.UI {
         public static string GetStartedLink {
             get {
                 return ResourceManager.GetString("GetStartedLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Started.
+        /// </summary>
+        public static string GetStartedText {
+            get {
+                return ResourceManager.GetString("GetStartedText", resourceCulture);
             }
         }
         
@@ -633,6 +660,15 @@ namespace GitHub.VisualStudio.UI {
         public static string resendCodeButtonToolTip {
             get {
                 return ResourceManager.GetString("resendCodeButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign In.
+        /// </summary>
+        public static string SignInLink {
+            get {
+                return ResourceManager.GetString("SignInLink", resourceCulture);
             }
         }
         

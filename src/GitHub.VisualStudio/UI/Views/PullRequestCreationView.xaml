@@ -5,6 +5,7 @@
                                       xmlns:helpers="clr-namespace:GitHub.VisualStudio.Helpers"
                                       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
+                                      xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                       xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                       xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
@@ -116,7 +117,7 @@
                             <ui:FilterTextBox
                                 x:Name="filterBranch"
                                 Grid.Row="0"
-                                PromptText="Filter branches" />
+                                PromptText="{x:Static prop:Resources.filterBranchesText}" />
                             <Separator Grid.Row="1" Margin="0" />
 
                             <ListBox Grid.Row="2">
