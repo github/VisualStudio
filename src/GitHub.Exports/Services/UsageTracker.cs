@@ -10,6 +10,7 @@ using GitHub.Settings;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using GitHub.Extensions;
 
 namespace GitHub.Services
 {
@@ -21,7 +22,7 @@ namespace GitHub.Services
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
         readonly IMetricsService client;
-        readonly Lazy<IConnectionManager> connectionManager;
+        readonly IConnectionManager connectionManager;
         readonly IPackageSettings userSettings;
         readonly DispatcherTimer timer;
         readonly string storePath;
@@ -34,12 +35,10 @@ namespace GitHub.Services
         [ImportingConstructor]
         public UsageTracker(
             IProgram program,
-            Lazy<IConnectionManager> connectionManager,
+            IConnectionManager connectionManager,
             IPackageSettings userSettings,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
-            var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
-
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
             writeAllText = (path, content, encoding) => System.IO.File.WriteAllText(path, content, encoding);
@@ -47,7 +46,7 @@ namespace GitHub.Services
 
             this.connectionManager = connectionManager;
             this.userSettings = userSettings;
-            this.client = componentModel?.DefaultExportProvider.GetExportedValue<IMetricsService>();
+            this.client = serviceProvider.GetExportedValue<IMetricsService>();
             this.timer = new DispatcherTimer(
                 TimeSpan.FromMinutes(1),
                 DispatcherPriority.Background,
@@ -205,8 +204,6 @@ namespace GitHub.Services
         async Task SendUsage(UsageModel usage, bool weekly, bool monthly)
         {
             Debug.Assert(client != null, "SendUsage should not be called when there is no IMetricsService");
-
-            var connectionManager = this.connectionManager.Value;
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {
