@@ -1839,7 +1839,7 @@ public class TrackingTests : TestBase
         Assert.Throws<ObjectDisposedException>(() => col.RemoveItem(GetThing(1)));
     }
 
-    [Test]
+    [Test, Category("Timings")]
     public async Task MultipleSortingAndFiltering()
     {
         var expectedTotal = 20;
