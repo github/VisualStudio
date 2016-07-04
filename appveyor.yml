@@ -1,0 +1,18 @@
+# scripts that run after cloning repository
+install:
+  - if "%APPVEYOR_REPO_BRANCH%" EQU "master" if not defined APPVEYOR_PULL_REQUEST_NUMBER set MASTER_BUILD=1
+  - git submodule init
+  - if not defined MASTER_BUILD git submodule deinit script
+  - git submodule update
+  - nuget restore submodules\akavache\Akavache.sln
+  - nuget restore submodules\octokit.net\Octokit.sln
+  - nuget restore submodules\reactiveui\ReactiveUI.sln
+  - nuget restore submodules\Rothko\Rothko.sln
+  - nuget restore GitHubVS.sln
+
+build_script:
+  - msbuild "GitHubVS.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0
+  
+test_script:
+  - '%xunit20%\xunit.console.x86 "src\UnitTests\bin\Release\UnitTests.dll" -appveyor'
+  - nunit-console "src\TrackingCollectionTests\bin\Release\TrackingCollectionTests.dll" -framework:net-4.5 -exclude:Timings
