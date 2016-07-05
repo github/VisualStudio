@@ -149,7 +149,9 @@
                               DockPanel.Dock="Bottom"
                               Fill="{StaticResource GitHubWarningBrush}"
                               Icon="alert"
-                              ValidatesControl="{Binding ElementName=titleText}" />
+                              ValidatesControl="{Binding ElementName=titleText}"
+                              ReactiveValidator="{Binding TitleValidator, Mode=OneWay}"
+                              />
 
       <ui:PromptTextBox Height="100"
                         Margin="10,5"
