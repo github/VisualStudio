@@ -100,6 +100,46 @@ namespace GitHub.Collections
             };
             return col;
         }
+
+        /// <summary>
+        /// Creates an observable collection that tracks an <see cref="ITrackingCollection{T}"/>
+        /// and adds a sticky item to the top of the collection when a related selection is null.
+        /// </summary>
+        /// <typeparam name="T">The type of items in the collection.</typeparam>
+        /// <param name="tcol">The source tracking collection</param>
+        /// <param name="stickieItemOnTop">The sticky item to add to the top of the collection.</param>
+        /// <param name="selection">
+        /// The current selection. If null or equal to the sticky item then the sticky item will be
+        /// added to the collection.
+        /// </param>
+        /// <returns>An <see cref="ObservableCollection{T}"/>.</returns>
+        public static ObservableCollection<T> CreateListenerCollection<T>(this ITrackingCollection<T> tcol,
+            T stickieItemOnTop,
+            IObservable<T> selection)
+            where T : class, ICopyable<T>
+        {
+            Debug.Assert(stickieItemOnTop != null, "stickieItemOnTop may not be null in CreateListenerCollection");
+            Debug.Assert(selection != null, "selection may not be null in CreateListenerCollection");
+
+            var result = tcol.CreateListenerCollection(new[] { stickieItemOnTop });
+            var addedStickieItem = true;
+
+            selection.Subscribe(x =>
+            {
+                if ((x == null || object.Equals(x, stickieItemOnTop)) && addedStickieItem)
+                {
+                    result.Remove(stickieItemOnTop);
+                    addedStickieItem = false;
+                }
+                else if (x != null && !addedStickieItem)
+                {
+                    result.Insert(0, stickieItemOnTop);
+                    addedStickieItem = true;
+                }
+            });
+
+            return result;
+        }
     }
 
     /// <summary>
