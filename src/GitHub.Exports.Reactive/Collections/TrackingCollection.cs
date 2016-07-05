@@ -15,6 +15,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Linq;
 
 namespace GitHub.Collections
 {
@@ -46,7 +47,7 @@ namespace GitHub.Collections
             IList<T> stickieItemsOnTop = null)
             where T : class, ICopyable<T>
         {
-            var col = new ObservableCollection<T>(stickieItemsOnTop);
+            var col = new ObservableCollection<T>(stickieItemsOnTop ?? Enumerable.Empty<T>());
             tcol.CollectionChanged += (s, e) =>
             {
                 var offset = 0;
