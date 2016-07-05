@@ -171,6 +171,8 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string path)
         {
+            Debug.Assert(path != null);
+
             bool isAlreadyRepoAtPath = false;
 
             if (SelectedRepository != null)
