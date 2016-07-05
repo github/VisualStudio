@@ -1943,4 +1943,18 @@ public class TrackingTests : TestBase
 
         CollectionAssert.AreEqual(list2, col);
     }
+
+    [Test]
+    public void AddingWithNoObservableSetThrows()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>();
+        Assert.Throws<InvalidOperationException>(() => col.AddItem(new Thing()));
+    }
+
+    [Test]
+    public void RemovingWithNoObservableSetThrows()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>();
+        Assert.Throws<InvalidOperationException>(() => col.RemoveItem(new Thing()));
+    }
 }
