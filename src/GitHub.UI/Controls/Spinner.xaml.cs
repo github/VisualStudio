@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace GitHub.VisualStudio.UI.Views.Controls
+namespace GitHub.UI.Controls
 {
     public partial class Spinner : UserControl
     {
