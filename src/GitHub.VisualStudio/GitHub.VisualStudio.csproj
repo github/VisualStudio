@@ -9,8 +9,6 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.99.5</ApplicationVersion>
-    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
     <ApplicationVersion>1.0.99.8</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
