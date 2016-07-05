@@ -171,7 +171,7 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string path)
         {
-            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path paramter.");
+            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
 
             bool isAlreadyRepoAtPath = false;
 
