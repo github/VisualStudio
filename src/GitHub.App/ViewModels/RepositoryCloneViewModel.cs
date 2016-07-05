@@ -175,12 +175,8 @@ namespace GitHub.ViewModels
 
             if (SelectedRepository != null)
             {
-                var validationResult = BaseRepositoryPathValidator.ValidationResult;
-                if (validationResult != null && validationResult.IsValid)
-                {
-                    string potentialPath = Path.Combine(path, SelectedRepository.Name);
-                    isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
-                }
+                string potentialPath = Path.Combine(path, SelectedRepository.Name);
+                isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
             }
 
             return isAlreadyRepoAtPath;
