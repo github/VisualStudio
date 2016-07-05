@@ -163,17 +163,9 @@
 
               <ListBox x:Name="assignees"
                        DockPanel.Dock="Top"
+                       ItemsSource="{Binding Assignees}"
                        SelectedItem="{Binding SelectedAssignee}"
                        Style="{DynamicResource GitHubPopupThing}">
-                <ListBox.ItemsSource>
-                  <MultiBinding Converter="{ui:StickieListItemConverter}">
-                    <Binding Path="EmptyUser" />
-                    <Binding Path="Assignees" />
-                  </MultiBinding>
-                </ListBox.ItemsSource>
-                <i:Interaction.Behaviors>
-                  <ui:AddEmptyItemToList />
-                </i:Interaction.Behaviors>
                 <i:Interaction.Triggers>
                   <i:EventTrigger EventName="SelectionChanged">
                     <ui:ClosePopupAction TargetName="assigneePopup" />
@@ -212,17 +204,9 @@
 
               <ListBox x:Name="authors"
                        DockPanel.Dock="Top"
+                       ItemsSource="{Binding Authors}"
                        SelectedItem="{Binding SelectedAuthor}"
                        Style="{DynamicResource GitHubPopupThing}">
-                <ListBox.ItemsSource>
-                  <MultiBinding Converter="{ui:StickieListItemConverter}">
-                    <Binding Path="EmptyUser" />
-                    <Binding Path="Authors" />
-                  </MultiBinding>
-                </ListBox.ItemsSource>
-                <i:Interaction.Behaviors>
-                  <ui:AddEmptyItemToList />
-                </i:Interaction.Behaviors>
                 <i:Interaction.Triggers>
                   <i:EventTrigger EventName="SelectionChanged">
                     <ui:ClosePopupAction TargetName="authorPopup" />

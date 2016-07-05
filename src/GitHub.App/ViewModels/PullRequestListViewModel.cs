@@ -73,8 +73,8 @@ namespace GitHub.ViewModels
             trackingAuthors.Subscribe();
             trackingAssignees.Subscribe();
 
-            Authors = trackingAuthors.CreateListenerCollection(new List<IAccount> { EmptyUser });
-            Assignees = trackingAssignees.CreateListenerCollection(new List<IAccount> { EmptyUser });
+            Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
+            Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
 
             PullRequests = new TrackingCollection<IPullRequestModel>();
             pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
