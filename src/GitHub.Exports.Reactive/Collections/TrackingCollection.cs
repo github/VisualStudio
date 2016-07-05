@@ -131,9 +131,9 @@ namespace GitHub.Collections
         IConnectableObservable<Unit> cachePump;
         ConcurrentQueue<ActionData> cache;
 
-        Subject<Unit> signalHaveData;
-        Subject<Unit> signalNeedData;
-        Subject<ActionData> dataListener;
+        ReplaySubject<Unit> signalHaveData;
+        ReplaySubject<Unit> signalNeedData;
+        ReplaySubject<ActionData> dataListener;
 
         bool resetting = false;
 
@@ -1110,11 +1110,11 @@ namespace GitHub.Collections
             originalSourceIsCompleted = false;
             signalOriginalSourceCompletion = false;
             cache = new ConcurrentQueue<ActionData>();
-            dataListener = new Subject<ActionData>();
+            dataListener = new ReplaySubject<ActionData>();
             disposables.Add(dataListener);
-            signalHaveData = new Subject<Unit>();
+            signalHaveData = new ReplaySubject<Unit>();
             disposables.Add(signalHaveData);
-            signalNeedData = new Subject<Unit>();
+            signalNeedData = new ReplaySubject<Unit>();
             disposables.Add(signalNeedData);
             originalSourceCompleted = new ReplaySubject<Unit>();
 
