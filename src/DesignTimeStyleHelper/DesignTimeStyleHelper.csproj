@@ -120,6 +120,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
