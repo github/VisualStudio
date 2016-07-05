@@ -47,7 +47,12 @@ namespace GitHub.Collections
             IList<T> stickieItemsOnTop = null)
             where T : class, ICopyable<T>
         {
-            var col = new ObservableCollection<T>(stickieItemsOnTop ?? Enumerable.Empty<T>());
+            if (stickieItemsOnTop == null)
+            {
+                stickieItemsOnTop = new T[0];
+            }
+
+            var col = new ObservableCollection<T>(stickieItemsOnTop.Concat(tcol));
             tcol.CollectionChanged += (s, e) =>
             {
                 var offset = 0;
