@@ -397,6 +397,8 @@ namespace GitHub.Collections
 
         public void AddItem(T item)
         {
+            if (source == null)
+                throw new InvalidOperationException("No source observable has been set. Call Listen or pass an observable to the constructor");
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
 
@@ -411,6 +413,8 @@ namespace GitHub.Collections
 
         public void RemoveItem(T item)
         {
+            if (source == null)
+                throw new InvalidOperationException("No source observable has been set. Call Listen or pass an observable to the constructor");
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
 
