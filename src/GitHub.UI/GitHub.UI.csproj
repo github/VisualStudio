@@ -77,7 +77,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Behaviours\AddEmptyItemToList.cs" />
     <Compile Include="Behaviours\ClosePopupAction.cs" />
     <Compile Include="Behaviours\OpenPopupAction.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
