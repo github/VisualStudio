@@ -148,7 +148,9 @@
     <ui:FilterTextBox x:Name="filterText"
                       Margin="10"
                       DockPanel.Dock="Top"
-                      PromptText="{x:Static prop:Resources.filterTextPromptText}" />
+                      PromptText="{x:Static prop:Resources.filterTextPromptText}"
+                      Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                      IsEnabled="{Binding FilterTextIsEnabled, Mode=OneWay}"/>
 
     <ui:GitHubProgressBar x:Name="loadingProgressBar"
                           Margin="0"
@@ -157,7 +159,7 @@
                           Foreground="{DynamicResource GitHubAccentBrush}"
                           IsIndeterminate="True"
                           Style="{DynamicResource GitHubProgressBar}"
-                          Visibility="Visible" />
+                          Visibility="{Binding IsLoading, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}" />
 
     <StackPanel x:Name="loadingFailedPanel"
                 Margin="0,4,0,4"
@@ -169,7 +171,7 @@
                                 Content="{x:Static prop:Resources.loadingFailedMessageContent}"
                                 Icon="stop"
                                 Message="{x:Static prop:Resources.loadingFailedMessageMessage}"
-                                Visibility="Visible" />
+                                Visibility="{Binding LoadingFailed, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}" />
     </StackPanel>
 
     <ui:OcticonCircleButton x:Name="cloneButton"
@@ -177,7 +179,9 @@
                             HorizontalAlignment="Center"
                             DockPanel.Dock="Bottom"
                             Icon="check"
-                            IsDefault="True">
+                            IsDefault="True"
+                            Command="{Binding CloneCommand}"
+                            >
       <TextBlock Text="{x:Static prop:Resources.CloneLink}" />
     </ui:OcticonCircleButton>
 
@@ -191,14 +195,18 @@
 
         <ui:PromptTextBox x:Name="clonePath"
                           Grid.Column="1"
-                          Margin="0,2" />
+                          Margin="0,2"
+                          Text="{Binding BaseRepositoryPath}"
+                          />
         <Button x:Name="browsePathButton"
                 Grid.Column="2"
                 Margin="4,0,4,0"
                 VerticalContentAlignment="Center"
                 Content="{x:Static prop:Resources.browsePathButtonContent}"
                 Padding="0"
-                Style="{StaticResource GitHubBlueLinkButton}" />
+                Style="{StaticResource GitHubBlueLinkButton}"
+                Command="{Binding BrowseForDirectory}"
+                />
         <Label Grid.Row="3"
                Grid.Column="0"
                Margin="4,0"
@@ -207,7 +215,9 @@
         <uirx:ValidationMessage x:Name="pathValidationMessage"
                                 Grid.Row="4"
                                 Grid.Column="1"
-                                ValidatesControl="{Binding ElementName=clonePath}" />
+                                ValidatesControl="{Binding ElementName=clonePath}"
+                                ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}"
+                                />
       </Grid>
     </Border>
 
@@ -233,7 +243,8 @@
       <Grid Margin="0">
         <ListBox x:Name="repositoryList"
                  HorizontalContentAlignment="Stretch"
-                 ItemsSource="{Binding FilteredRepositories}"
+                 ItemsSource="{Binding Repositories}"
+                 SelectedItem="{Binding SelectedRepository}"
                  Style="{DynamicResource LightListBox}">
           <ListBox.GroupStyle>
             <GroupStyle HidesIfEmpty="true">
@@ -306,7 +317,8 @@
         <StackPanel x:Name="noRepositoriesMessage"
                     Margin="0,-70,0,0"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center"
+                    Visibility="{Binding NoRepositoriesFound, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}">
           <TextBlock HorizontalAlignment="Center"
                      Style="{DynamicResource GitHubH2TextBlock}"
                      Text="{x:Static prop:Resources.noRepositoriesMessageText}" />

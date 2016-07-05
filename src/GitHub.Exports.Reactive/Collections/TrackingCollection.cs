@@ -1,8 +1,8 @@
 #if !DISABLE_REACTIVEUI
+using GitHub.VisualStudio.Helpers;
 using ReactiveUI;
 #else
 using System.Windows.Threading;
-using System.Threading;
 #endif
 using System;
 using System.Collections.Concurrent;
@@ -13,9 +13,90 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading;
+using System.Linq;
 
 namespace GitHub.Collections
 {
+    public static class TrackingCollection
+    {
+        public static TrackingCollection<T> Create<T>(IObservable<T> source,
+            Func<T, T, int> comparer = null,
+            Func<T, int, IList<T>, bool> filter = null,
+            Func<T, T, int> newer = null,
+            IScheduler scheduler = null)
+            where T : class, ICopyable<T>
+        {
+            return new TrackingCollection<T>(source, comparer, filter, newer, scheduler);
+        }
+
+        public static ObservableCollection<T> CreateListenerCollectionAndRun<T>(IObservable<T> source,
+            IList<T> stickieItemsOnTop = null,
+            Func<T, T, int> comparer = null,
+            Action<T> onNext = null)
+            where T : class, ICopyable<T>
+        {
+            var col = Create(source, comparer);
+            var ret = col.CreateListenerCollection(stickieItemsOnTop);
+            col.Subscribe(onNext ?? (_ => {}), () => {});
+            return ret;
+        }
+
+        public static ObservableCollection<T> CreateListenerCollection<T>(this ITrackingCollection<T> tcol,
+            IList<T> stickieItemsOnTop = null)
+            where T : class, ICopyable<T>
+        {
+            var col = new ObservableCollection<T>(stickieItemsOnTop ?? Enumerable.Empty<T>());
+            tcol.CollectionChanged += (s, e) =>
+            {
+                var offset = 0;
+                if (stickieItemsOnTop != null)
+                {
+                    foreach (var item in stickieItemsOnTop)
+                    {
+                        if (col.Contains(item))
+                            offset++;
+                    }
+                }
+
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+                {
+                    for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
+                        i < e.OldItems.Count; i++, oldIdx++, newIdx++)
+                    {
+                        col.Move(oldIdx + offset, newIdx + offset);
+                    }
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                {
+                    foreach (T item in e.NewItems)
+                        col.Add(item);
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (T item in e.OldItems)
+                        col.Remove(item);
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+                {
+                    for (int i = 0, idx = e.OldStartingIndex; i < e.OldItems.Count; i++, idx++)
+                        col[idx + offset] = (T)e.NewItems[i];
+                }
+                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+                {
+                    col.Clear();
+                    if (stickieItemsOnTop != null)
+                    {
+                        foreach (var item in stickieItemsOnTop)
+                            col.Add(item);
+                    }
+                }
+            };
+            return col;
+        }
+    }
+
     /// <summary>
     /// TrackingCollection is a specialization of ObservableCollection that gets items from
     /// an observable sequence and updates its contents in such a way that two updates to
@@ -27,7 +108,7 @@ namespace GitHub.Collections
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class TrackingCollection<T> : ObservableCollection<T>, ITrackingCollection<T>, IDisposable
-        where T : class, ICopyable<T>, IComparable<T>
+        where T : class, ICopyable<T>
     {
         enum TheAction
         {
@@ -35,19 +116,29 @@ namespace GitHub.Collections
             Move,
             Add,
             Insert,
-            Remove
+            Remove,
+            Ignore
         }
 
         bool isChanging;
 
-        readonly CompositeDisposable disposables = new CompositeDisposable();
-        IObservable<T> source;
-        IObservable<T> sourceQueue;
         Func<T, T, int> comparer;
         Func<T, int, IList<T>, bool> filter;
-        readonly IScheduler scheduler;
-        ConcurrentQueue<ActionData> queue;
+        Func<T, T, int> newer; // comparer to check whether the item being processed is newer than the existing one
 
+        IObservable<T> source;
+        IConnectableObservable<T> dataPump;
+        IConnectableObservable<Unit> cachePump;
+        ConcurrentQueue<ActionData> cache;
+
+        Subject<Unit> signalHaveData;
+        Subject<Unit> signalNeedData;
+        Subject<ActionData> dataListener;
+
+        bool resetting = false;
+
+        readonly CompositeDisposable disposables = new CompositeDisposable();
+        readonly IScheduler scheduler;
         readonly List<T> original = new List<T>();
 #if DEBUG
         public IList<T> DebugInternalList => original;
@@ -60,22 +151,32 @@ namespace GitHub.Collections
         // for speeding up IndexOf in the filtered list
         readonly Dictionary<T, int> filteredIndexCache = new Dictionary<T, int>();
 
-        TimeSpan delay;
+        bool originalSourceIsCompleted;
+        bool signalOriginalSourceCompletion;
+        ReplaySubject<Unit> originalSourceCompleted;
+        public IObservable<Unit> OriginalCompleted => originalSourceCompleted;
+
         TimeSpan requestedDelay;
         readonly TimeSpan fuzziness;
+
         public TimeSpan ProcessingDelay
         {
             get { return requestedDelay; }
-            set
-            {
-                requestedDelay = value;
-                delay = value;
-            }
+            set { requestedDelay = value; }
         }
 
-        public TrackingCollection(Func<T, T, int> comparer = null, Func<T, int, IList<T>, bool> filter = null, IScheduler scheduler = null)
+        /// <summary>
+        /// Returns the number of elements that the collection contains
+        /// regardless of filtering
+        /// </summary>
+        public int UnfilteredCount => original.Count;
+
+        bool ManualProcessing => cache.IsEmpty && originalSourceIsCompleted;
+
+        public TrackingCollection(Func<T, T, int> comparer = null, Func<T, int, IList<T>, bool> filter = null,
+            Func<T, T, int> newer = null, IScheduler scheduler = null)
         {
-            queue = new ConcurrentQueue<ActionData>();
+            cache = new ConcurrentQueue<ActionData>();
             ProcessingDelay = TimeSpan.FromMilliseconds(10);
             fuzziness = TimeSpan.FromMilliseconds(1);
 
@@ -86,14 +187,15 @@ namespace GitHub.Collections
 #endif
             this.comparer = comparer ?? Comparer<T>.Default.Compare;
             this.filter = filter;
+            this.newer = newer;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public TrackingCollection(IObservable<T> source,
             Func<T, T, int> comparer = null,
             Func<T, int, IList<T>, bool> filter = null,
+            Func<T, T, int> newer = null,
             IScheduler scheduler = null)
-            : this(comparer, filter, scheduler)
+            : this(comparer, filter, newer, scheduler)
         {
             Listen(source);
         }
@@ -110,37 +212,101 @@ namespace GitHub.Collections
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
 
-            disposables.Clear();
-            while (!queue.IsEmpty)
-                GetFromQueue();
+            Reset();
 
-            sourceQueue = obs
-                .Do(data => queue.Enqueue(new ActionData(data)));
+            // ManualResetEvent uses the realtime clock for accurate <50ms delays
+            var waitHandle = new ManualResetEventSlim();
 
-            source = Observable.Defer(() => {
-                StartQueue();
-                return Observable.Timer(TimeSpan.Zero, delay)
-                                 .Select(_ => GetFromQueue());
-            })
+            // empty the source observable as fast as possible
+            // to the cache queue, and signal that data is available
+            // for processing
+            dataPump = obs
+                .Catch<T, Exception>(ex =>
+                {
+                    originalSourceCompleted.OnError(ex);
+                    return Observable.Throw<T>(ex);
+                })
+                .Do(data =>
+                {
+                    cache.Enqueue(new ActionData(data));
+                    signalHaveData.OnNext(Unit.Default);
+                })
+                .Finally(() =>
+                {
+                    if (disposed)
+                        return;
+
+                    originalSourceIsCompleted = true;
+                    if (!cache.IsEmpty)
+                    {
+                        signalOriginalSourceCompletion = true;
+                    }
+                    else
+                    {
+                        originalSourceCompleted.OnNext(Unit.Default);
+                        originalSourceCompleted.OnCompleted();
+                        signalNeedData.OnCompleted();
+                        signalHaveData.OnCompleted();
+                    }
+                })
+                .Publish();
+
+            // when both signalHaveData and signalNeedData produce a value, dataListener gets a value
+            // this will empty the queue of items that have been cached in regular intervals according
+            // to the requested delay
+            cachePump = signalHaveData
+                .Zip(signalNeedData, (a, b) => Unit.Default)
+                .ObserveOn(TaskPoolScheduler.Default)
+                .TimeInterval()
+                .Select(interval =>
+                {
+                    var delay = CalculateProcessingDelay(interval);
+                    waitHandle.Wait(delay);
+                    dataListener.OnNext(GetFromQueue());
+                    return Unit.Default;
+                })
+                .Publish();
+
+            source = dataListener
                 .Where(data => data.Item != null)
                 .ObserveOn(scheduler)
-                .Select(x => ProcessItem(x, original))
-                // if we're removing an item that doesn't exist, ignore it
-                .Where(data => !(data.TheAction == TheAction.Remove && data.OldPosition < 0))
-                .Select(SortedNone)
-                .Select(SortedAdd)
-                .Select(SortedInsert)
-                .Select(SortedMove)
-                .Select(SortedRemove)
-                .Select(CheckFilter)
-                .Select(FilteredAdd)
-                .Select(CalculateIndexes)
-                .Select(FilteredNone)
-                .Select(FilteredInsert)
-                .Select(FilteredMove)
-                .Select(FilteredRemove)
-                .TimeInterval()
-                .Select(UpdateProcessingDelay)
+                .Select(data =>
+                {
+                    data = ProcessItem(data, original);
+
+                    // if we're removing an item that doesn't exist, ignore it
+                    if (data.TheAction == TheAction.Remove && data.OldPosition < 0)
+                        return ActionData.Default;
+
+                    data = SortedNone(data);
+                    data = SortedAdd(data);
+                    data = SortedInsert(data);
+                    data = SortedMove(data);
+                    data = SortedRemove(data);
+                    data = CheckFilter(data);
+                    data = FilteredAdd(data);
+                    data = CalculateIndexes(data);
+                    data = FilteredNone(data);
+                    data = FilteredInsert(data);
+                    data = FilteredMove(data);
+                    data = FilteredRemove(data);
+                    return data;
+                })
+                .Do(_ =>
+                {
+                    if (ManualProcessing)
+                    {
+                        if (signalOriginalSourceCompletion)
+                        {
+                            signalOriginalSourceCompletion = false;
+                            originalSourceCompleted.OnNext(Unit.Default);
+                            originalSourceCompleted.OnCompleted();
+                        }
+                    }
+                    else
+                        signalNeedData.OnNext(Unit.Default);
+                })
+                .Where(data => data.Item != null)
                 .Select(data => data.Item)
                 .Publish()
                 .RefCount();
@@ -186,6 +352,27 @@ namespace GitHub.Collections
             }
         }
 
+        /// <summary>
+        /// Set a comparer that determines whether the item being processed is newer than the same
+        /// item seen before. This is to prevent stale items from overriding newer items when data
+        /// is coming simultaneously from cache and from live data. Use a timestamp-like comparison
+        /// for best results
+        /// </summary>
+        /// <param name="theComparer">The comparer method for sorting, or null if not sorting</param>
+        public Func<T, T, int> NewerComparer
+        {
+            get
+            {
+                return newer;
+            }
+            set
+            {
+                if (disposed)
+                    throw new ObjectDisposedException("TrackingCollection");
+                newer = value;
+            }
+        }
+
         public IDisposable Subscribe()
         {
             if (source == null)
@@ -193,6 +380,7 @@ namespace GitHub.Collections
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
             disposables.Add(source.Subscribe());
+            StartQueue();
             return this;
         }
 
@@ -203,6 +391,7 @@ namespace GitHub.Collections
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
             disposables.Add(source.Subscribe(onNext, onCompleted));
+            StartQueue();
             return this;
         }
 
@@ -210,14 +399,28 @@ namespace GitHub.Collections
         {
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
-            queue.Enqueue(new ActionData(item));
+
+            if (ManualProcessing)
+                dataListener.OnNext(new ActionData(item));
+            else
+            {
+                cache.Enqueue(new ActionData(item));
+                signalHaveData.OnNext(Unit.Default);
+            }
         }
 
         public void RemoveItem(T item)
         {
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
-            queue.Enqueue(new ActionData(TheAction.Remove, item));
+
+            if (ManualProcessing)
+                dataListener.OnNext(new ActionData(TheAction.Remove, item));
+            else
+            {
+                cache.Enqueue(new ActionData(TheAction.Remove, item));
+                signalHaveData.OnNext(Unit.Default);
+            }
         }
 
         void SetAndRecalculateSort(Func<T, T, int> theComparer)
@@ -240,19 +443,11 @@ namespace GitHub.Collections
 
         #region Source pipeline processing
 
-        ActionData CheckFilter(ActionData data)
-        {
-            var isIncluded = true;
-            if (data.TheAction == TheAction.Remove)
-                isIncluded = false;
-            else if (filter != null)
-                isIncluded = filter(data.Item, data.Position, this);
-            return new ActionData(data, isIncluded);
-        }
-
         int StartQueue()
         {
-            disposables.Add(sourceQueue.Subscribe());
+            disposables.Add(cachePump.Connect());
+            disposables.Add(dataPump.Connect());
+            signalNeedData.OnNext(Unit.Default);
             return 0;
         }
 
@@ -261,7 +456,7 @@ namespace GitHub.Collections
             try
             {
                 ActionData d = ActionData.Default;
-                if (queue?.TryDequeue(out d) ?? false)
+                if (cache?.TryDequeue(out d) ?? false)
                     return d;
             }
             catch { }
@@ -281,6 +476,13 @@ namespace GitHub.Collections
             if (idx >= 0)
             {
                 var old = list[idx];
+                if (newer != null)
+                {
+                    // the object is "older" than the one we have, ignore it
+                    if (newer(item, old) > 0)
+                        return new ActionData(TheAction.Ignore, list, item, null, idx, idx);
+                }
+
                 var comparison = comparer(item, old);
 
                 // no sorting to be done, just replacing the element in-place
@@ -359,8 +561,18 @@ namespace GitHub.Collections
             // unfiltered list update
             sortedIndexCache.Remove(data.Item);
             UpdateIndexCache(data.List.Count - 1, data.OldPosition, data.List, sortedIndexCache);
-            original.Remove(data.Item);
+            data.List.Remove(data.Item);
             return data;
+        }
+
+        ActionData CheckFilter(ActionData data)
+        {
+            var isIncluded = true;
+            if (data.TheAction == TheAction.Remove)
+                isIncluded = false;
+            else if (filter != null)
+                isIncluded = filter(data.Item, data.Position, this);
+            return new ActionData(data, isIncluded);
         }
 
         ActionData FilteredAdd(ActionData data)
@@ -510,17 +722,20 @@ namespace GitHub.Collections
         /// so that the average time between an item being processed
         /// is +- the requested processing delay.
         /// </summary>
-        ActionData UpdateProcessingDelay(TimeInterval<ActionData> data)
+        TimeSpan CalculateProcessingDelay(TimeInterval<Unit> interval)
         {
-            if (requestedDelay == TimeSpan.Zero)
-                return data.Value;
-            var time = data.Interval;
-            if (time > requestedDelay + fuzziness)
-                delay -= time - requestedDelay;
-            else if (time < requestedDelay + fuzziness)
-                delay += requestedDelay - time;
-            delay = delay < TimeSpan.Zero ? TimeSpan.Zero : delay;
-            return data.Value;
+            var delay = TimeSpan.Zero;
+            if (requestedDelay > TimeSpan.Zero)
+            {
+                var time = interval.Interval;
+                if (time > requestedDelay + fuzziness)
+                    delay -= time - requestedDelay;
+                else if (time < requestedDelay + fuzziness)
+                    delay += requestedDelay - time;
+                delay = delay < TimeSpan.Zero ? TimeSpan.Zero : delay;
+            }
+
+            return delay;
         }
 
         #endregion
@@ -693,7 +908,7 @@ namespace GitHub.Collections
 
         protected override void InsertItem(int index, T item)
         {
-#if DEBUG
+#if DEBUG && !DISABLE_REACTIVEUI
             if (Splat.ModeDetector.InDesignMode() && !isChanging)
             {
                 base.InsertItem(index, item);
@@ -729,7 +944,7 @@ namespace GitHub.Collections
 
         protected override void RemoveItem(int index)
         {
-#if DEBUG
+#if DEBUG && !DISABLE_REACTIVEUI
             if (Splat.ModeDetector.InDesignMode() && !isChanging)
             {
                 base.RemoveItem(index);
@@ -757,7 +972,7 @@ namespace GitHub.Collections
 
         protected override void MoveItem(int oldIndex, int newIndex)
         {
-#if DEBUG
+#if DEBUG && !DISABLE_REACTIVEUI
             if (Splat.ModeDetector.InDesignMode() && !isChanging)
             {
                 base.MoveItem(oldIndex, newIndex);
@@ -808,7 +1023,8 @@ namespace GitHub.Collections
             {
                 ret = original.IndexOf(item);
                 if (ret >= 0)
-                    sortedIndexCache.Add(item, ret);
+                    sortedIndexCache.Add(original[ret], ret);
+
             }
             return ret;
         }
@@ -879,6 +1095,28 @@ namespace GitHub.Collections
         }
 #endif
 
+        void Reset()
+        {
+            if (resetting)
+                return;
+
+            resetting = true;
+
+            disposables.Clear();
+            originalSourceIsCompleted = false;
+            signalOriginalSourceCompletion = false;
+            cache = new ConcurrentQueue<ActionData>();
+            dataListener = new Subject<ActionData>();
+            disposables.Add(dataListener);
+            signalHaveData = new Subject<Unit>();
+            disposables.Add(signalHaveData);
+            signalNeedData = new Subject<Unit>();
+            disposables.Add(signalNeedData);
+            originalSourceCompleted = new ReplaySubject<Unit>();
+
+            resetting = false;
+        }
+
         bool disposed = false;
         void Dispose(bool disposing)
         {
@@ -887,8 +1125,8 @@ namespace GitHub.Collections
                 if (!disposed)
                 {
                     disposed = true;
-                    queue = null;
                     disposables.Dispose();
+                    cache = null;
                 }
             }
         }

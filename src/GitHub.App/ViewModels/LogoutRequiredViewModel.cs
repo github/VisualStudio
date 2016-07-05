@@ -33,7 +33,6 @@ namespace GitHub.ViewModels
 
             Title = Resources.LogoutRequiredTitle;
             Logout = ReactiveCommand.CreateAsyncObservable(OnLogout);
-            CancelCommand = ReactiveCommand.Create();
             Icon = Octicon.mark_github;
         }
 

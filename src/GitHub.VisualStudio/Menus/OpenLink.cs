@@ -12,10 +12,14 @@ namespace GitHub.VisualStudio.Menus
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class OpenLink: LinkMenuBase, IDynamicMenuHandler
     {
+        readonly IUsageTracker usageTracker;
+
         [ImportingConstructor]
-        public OpenLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+        public OpenLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+            IUsageTracker usageTracker, ISimpleApiClientFactory apiFactory)
             : base(serviceProvider, apiFactory)
         {
+            this.usageTracker = usageTracker;
         }
 
         public Guid Guid => GuidList.guidContextMenuSet;
@@ -32,6 +36,8 @@ namespace GitHub.VisualStudio.Menus
                 return;
             var browser = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
+
+            usageTracker.IncrementOpenInGitHubCount();
         }
 
         public bool CanShow()

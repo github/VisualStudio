@@ -79,13 +79,14 @@ namespace GitHub.ViewModels
             PullRequests = new TrackingCollection<IPullRequestModel>();
             pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
             pullRequests.Filter = (pr, i, l) => pr.IsOpen;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);
 
-            repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
+            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests) as TrackingCollection<IPullRequestModel>;
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -99,8 +100,8 @@ namespace GitHub.ViewModels
                 return;
             pullRequests.Filter = (pr, i, l) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
-                     (ass == null || pr.Assignee == ass) &&
-                     (aut == null || pr.Author == aut);
+                     (ass == null || ass.Equals(pr.Assignee)) &&
+                     (aut == null || aut.Equals(pr.Author));
         }
 
         TrackingCollection<IPullRequestModel> pullRequests;
@@ -195,56 +196,6 @@ namespace GitHub.ViewModels
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-    }
-
-    // doing this as an extension because I get the feeling it might be useful in other places
-    public static class TrackingCollectionExtensions
-    {
-        public static ObservableCollection<T> CreateListenerCollection<T>(this ITrackingCollection<T> tcol,
-            IList<T> stickieItemsOnTop = null)
-            where T : ICopyable<T>
-        {
-            var col = new ObservableCollection<T>();
-            tcol.CollectionChanged += (s, e) =>
-            {
-                var offset = 0;
-                if (stickieItemsOnTop != null)
-                {
-                    foreach (var item in stickieItemsOnTop)
-                    {
-                        if (col.Contains(item))
-                            offset++;
-                    }
-                }
-
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
-                {
-                    for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
-                        i < e.OldItems.Count; i++, oldIdx++, newIdx++)
-                        col.Move(oldIdx + offset, newIdx + offset);
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-                    foreach (T item in e.NewItems)
-                        col.Add(item);
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-                    foreach (T item in e.OldItems)
-                        col.Remove(item);
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
-                    for (int i = 0, idx = e.OldStartingIndex;
-                        i < e.OldItems.Count; i++, idx++)
-                        col[idx + offset] = (T)e.NewItems[i];
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-                {
-                    col.Clear();
-                    if (stickieItemsOnTop != null)
-                    {
-                        foreach (var item in stickieItemsOnTop)
-                            col.Add(item);
-                    }
-                }
-            };
-            return col;
         }
     }
 }

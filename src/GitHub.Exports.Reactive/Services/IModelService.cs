@@ -16,11 +16,12 @@ namespace GitHub.Services
         IObservable<AccountCacheItem> GetUserFromCache();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
-        IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories();
-        IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
-        IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
-        ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
-            ITrackingCollection<IPullRequestModel> collection = null);
+        ITrackingCollection<IRepositoryModel> GetRepositories(ITrackingCollection<IRepositoryModel> collection);
+        IObservable<LicenseItem> GetLicenses();
+        IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
+        ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
+        IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel repository, string title, IBranch source, IBranch target);
+        IObservable<IBranch> GetBranches(ISimpleRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
     }
 }

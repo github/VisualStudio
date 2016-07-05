@@ -1,9 +1,10 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
+using GitHub.Extensions;
+using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
-using GitHub.Extensions;
 
 namespace GitHub.Services
 {
@@ -25,6 +26,14 @@ namespace GitHub.Services
         public TeamExplorerServices([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+        }
+
+        public void ShowPublishSection()
+        {
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            var foo = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
+            var publish = foo?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
+            publish?.ShowPublish();
         }
 
         public void ShowMessage(string message)

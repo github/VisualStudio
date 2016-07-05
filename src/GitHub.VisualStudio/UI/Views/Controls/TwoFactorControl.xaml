@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
     xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-    xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
+    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
     mc:Ignorable="d"
     d:DesignWidth="414"
@@ -18,8 +18,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
-            <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-            <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

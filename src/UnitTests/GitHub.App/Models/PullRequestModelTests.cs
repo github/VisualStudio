@@ -80,8 +80,8 @@ public class PullRequestModelTests : TestBaseClass
     {
         PullRequestModel left = new PullRequestModel(1, "", Substitute.For<IAccount>(), Substitute.For<IAccount>(), Now, Now + TimeSpan.FromMilliseconds(1));
         PullRequestModel right = new PullRequestModel(1, "", Substitute.For<IAccount>(), Substitute.For<IAccount>(), Now, Now + TimeSpan.FromMilliseconds(1));
-        Assert.True(left == right);
-        Assert.False(left != right);
+        Assert.False(left == right);
+        Assert.True(left != right);
         Assert.False(left > right);
         Assert.False(left < right);
     }

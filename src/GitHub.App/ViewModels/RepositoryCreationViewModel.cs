@@ -21,6 +21,7 @@ using NullGuard;
 using Octokit;
 using ReactiveUI;
 using Rothko;
+using GitHub.Collections;
 
 namespace GitHub.ViewModels
 {
@@ -32,30 +33,32 @@ namespace GitHub.ViewModels
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
-        readonly ObservableAsPropertyHelper<IReadOnlyList<LicenseItem>> licenses;
-        readonly ObservableAsPropertyHelper<IReadOnlyList<GitIgnoreItem>> gitIgnoreTemplates;
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
         readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly IOperatingSystem operatingSystem;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         RepositoryCreationViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService)
+            IRepositoryCreationService repositoryCreationService,
+            IUsageTracker usageTracker)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, operatingSystem, repositoryCreationService, usageTracker)
         {}
 
         public RepositoryCreationViewModel(
             IRepositoryHost repositoryHost,
             IOperatingSystem operatingSystem,
-            IRepositoryCreationService repositoryCreationService)
+            IRepositoryCreationService repositoryCreationService,
+            IUsageTracker usageTracker)
         {
             this.repositoryHost = repositoryHost;
             this.operatingSystem = operatingSystem;
             this.repositoryCreationService = repositoryCreationService;
+            this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, repositoryHost.Title);
             SelectedGitIgnoreTemplate = GitIgnoreItem.None;
@@ -64,21 +67,19 @@ namespace GitHub.ViewModels
             accounts = repositoryHost.ModelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
-            
+
             this.WhenAny(x => x.Accounts, x => x.Value)
+                .Select(accts => accts?.FirstOrDefault())
                 .WhereNotNull()
-                .Where(accts => accts.Any())
-                .Subscribe(accts => {
-                    var selectedAccount = accts.FirstOrDefault();
-                    if (selectedAccount != null)
-                    {
-                        SelectedAccount = accts.FirstOrDefault();
-                    }
-                });
+                .Subscribe(a => SelectedAccount = a);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 
-            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
+            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
+                .IfNullOrEmpty("Please enter a repository path")
+                .IfTrue(x => x.Length > 200, "Path too long")
+                .IfContainsInvalidPathChars("Path contains invalid characters")
+                .IfPathNotRooted("Please enter a valid path");
 
             var nonNullRepositoryName = this.WhenAny(
                 x => x.RepositoryName,
@@ -110,22 +111,20 @@ namespace GitHub.ViewModels
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
 
-            gitIgnoreTemplates = repositoryHost.ModelService.GetGitIgnoreTemplates()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.GitIgnoreTemplates, initialValue: new GitIgnoreItem[] { });
-
-            this.WhenAny(x => x.GitIgnoreTemplates, x => x.Value)
-                .WhereNotNull()
-                .Where(ignores => ignores.Any())
-                .Subscribe(ignores =>
+            GitIgnoreTemplates = TrackingCollection.CreateListenerCollectionAndRun(
+                repositoryHost.ModelService.GetGitIgnoreTemplates(),
+                new[] { GitIgnoreItem.None },
+                OrderedComparer<GitIgnoreItem>.OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name)).Compare,
+                x =>
                 {
-                    SelectedGitIgnoreTemplate = ignores.FirstOrDefault(
-                        template => template.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase));
+                    if (x.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase))
+                        SelectedGitIgnoreTemplate = x;
                 });
 
-            licenses = repositoryHost.ModelService.GetLicenses()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.Licenses, initialValue: new LicenseItem[] { });
+            Licenses = TrackingCollection.CreateListenerCollectionAndRun(
+                repositoryHost.ModelService.GetLicenses(),
+                new[] { LicenseItem.None },
+                OrderedComparer<LicenseItem>.OrderByDescending(item => LicenseItem.IsRecommended(item.Name)).Compare);
 
             BaseRepositoryPath = repositoryCreationService.DefaultClonePath;
         }
@@ -156,14 +155,18 @@ namespace GitHub.ViewModels
         /// </summary>
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
+        IReadOnlyList<GitIgnoreItem> gitIgnoreTemplates;
         public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates
         {
-            get { return gitIgnoreTemplates.Value; }
+            get { return gitIgnoreTemplates; }
+            set { this.RaiseAndSetIfChanged(ref gitIgnoreTemplates, value); }
         }
 
+        IReadOnlyList<LicenseItem> licenses;
         public IReadOnlyList<LicenseItem> Licenses
         {
-            get { return licenses.Value; }
+            get { return licenses; }
+            set { this.RaiseAndSetIfChanged(ref licenses, value); }
         }
 
         GitIgnoreItem selectedGitIgnoreTemplate;
@@ -251,21 +254,9 @@ namespace GitHub.ViewModels
                 if (Path.GetInvalidPathChars().Any(chr => BaseRepositoryPath.Contains(chr)))
                     return false;
                 string potentialPath = Path.Combine(BaseRepositoryPath, safeRepositoryName);
-                isAlreadyRepoAtPath = IsGitRepo(potentialPath);
+                isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
             }
             return isAlreadyRepoAtPath;
-        }
-
-        bool IsGitRepo(string path)
-        {
-            try
-            {
-                return operatingSystem.File.Exists(Path.Combine(path, ".git", "HEAD"));
-            }
-            catch (PathTooLongException)
-            {
-                return false;
-            }
         }
 
         IObservable<Unit> OnCreateRepository(object state)
@@ -276,7 +267,8 @@ namespace GitHub.ViewModels
                 newRepository,
                 SelectedAccount,
                 BaseRepositoryPath,
-                repositoryHost.ApiClient);
+                repositoryHost.ApiClient)
+                .Do(_ => usageTracker.IncrementCreateCount());
         }
 
         ReactiveCommand<Unit> InitializeCreateRepositoryCommand()

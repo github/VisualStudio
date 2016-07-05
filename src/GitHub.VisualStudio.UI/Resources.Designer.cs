@@ -160,20 +160,20 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Description (Optional).
+        ///   Looks up a localized string similar to Description.
         /// </summary>
-        public static string descriptionOptionalText {
+        public static string Description {
             get {
-                return ResourceManager.GetString("descriptionOptionalText", resourceCulture);
+                return ResourceManager.GetString("Description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Description.
+        ///   Looks up a localized string similar to Description (Optional).
         /// </summary>
-        public static string descriptionText {
+        public static string DescriptionOptional {
             get {
-                return ResourceManager.GetString("descriptionText", resourceCulture);
+                return ResourceManager.GetString("DescriptionOptional", resourceCulture);
             }
         }
         
@@ -439,6 +439,42 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This repository is not on GitHub.
+        /// </summary>
+        public static string NotAGitHubRepository {
+            get {
+                return ResourceManager.GetString("NotAGitHubRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects..
+        /// </summary>
+        public static string NotAGitHubRepositoryMessage {
+            get {
+                return ResourceManager.GetString("NotAGitHubRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No repository.
+        /// </summary>
+        public static string NotAGitRepository {
+            get {
+                return ResourceManager.GetString("NotAGitRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We couldn&apos;t find a git repository here. Open a git project or click &quot;File -&gt; Add to Source Control&quot; in a project to get started..
+        /// </summary>
+        public static string NotAGitRepositoryMessage {
+            get {
+                return ResourceManager.GetString("NotAGitRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are not logged in to {0}, so certain git operations may fail. [Login now]({1}).
         /// </summary>
         public static string NotLoggedInMessage {
@@ -618,6 +654,15 @@ namespace GitHub.VisualStudio.UI {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Title (required).
+        /// </summary>
+        public static string TitleRequired {
+            get {
+                return ResourceManager.GetString("TitleRequired", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>

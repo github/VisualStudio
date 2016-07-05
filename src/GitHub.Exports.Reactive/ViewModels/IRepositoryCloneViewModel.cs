@@ -2,6 +2,7 @@
 using System.Reactive;
 using GitHub.Models;
 using ReactiveUI;
+using System.Collections.ObjectModel;
 
 namespace GitHub.ViewModels
 {
@@ -11,11 +12,6 @@ namespace GitHub.ViewModels
     public interface IRepositoryCloneViewModel : IViewModel, IRepositoryCreationTarget
     {
         /// <summary>
-        /// Command to load the repositories.
-        /// </summary>
-        IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand { get; }
-
-        /// <summary>
         /// Command to clone the currently selected repository.
         /// </summary>
         IReactiveCommand<Unit> CloneCommand { get; }
@@ -23,7 +19,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
-        IReactiveDerivedList<IRepositoryModel> FilteredRepositories { get; }
+        ObservableCollection<IRepositoryModel> Repositories { get; }
 
         IRepositoryModel SelectedRepository { get; set; }
 
