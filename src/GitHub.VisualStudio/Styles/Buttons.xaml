@@ -83,6 +83,10 @@
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
                         </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -151,8 +155,8 @@
                         <Rectangle x:Name="DisabledVisualElement"
                        Fill="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
                        Opacity="0" />
-                        <Border x:Name="MouseOverBorder" BorderBrush="#FF6ba157"
-                            Background="#FF71BD1E"
+                        <Border x:Name="MouseOverBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderMouseOverBrush}"
+                            Background="{DynamicResource GitHubPrimaryButtonBackgroundMouseOverBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                         <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderPressedBrush}"
                     Background="#FF55A532"
@@ -170,6 +174,13 @@
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter Property="Opacity" Value="1" TargetName="DefaultVisualElement" />
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderDisabledBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundDisabledBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" />
+                            <Setter Property="FontWeight" Value="Normal" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
