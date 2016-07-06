@@ -138,7 +138,11 @@
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ui:GitHubActionLink x:Name="assigneeSelection"
+        <ui:LinkDropDown Header="Assignee"
+                         ItemsSource="{Binding Assignees}"
+                         SelectedItem="{Binding SelectedAssignee}"/>
+          
+        <!--<ui:GitHubActionLink x:Name="assigneeSelection"
                              Margin="5,0"
                              VerticalAlignment="Center"
                              ToolTip="Filter by assignee"
@@ -182,7 +186,7 @@
               </ListBox>
             </DockPanel>
           </Border>
-        </Popup>
+        </Popup>-->
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 

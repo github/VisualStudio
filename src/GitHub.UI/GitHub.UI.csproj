@@ -80,6 +80,7 @@
     <Compile Include="Behaviours\AddEmptyItemToList.cs" />
     <Compile Include="Behaviours\ClosePopupAction.cs" />
     <Compile Include="Behaviours\OpenPopupAction.cs" />
+    <Compile Include="Controls\ComboBoxes\LinkDropDown.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
