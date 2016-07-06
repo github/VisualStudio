@@ -17,6 +17,17 @@ public class ListenerCollectionTests : TestBase
 #endif
 
     [Test]
+    public void StickyItemShouldNotBePresentInitiallyWhereNoSelectionHasHappened()
+    {
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = Observable.Empty<Thing>();
+        var target = source.CreateListenerCollection(stickie, selection);
+
+        CollectionAssert.AreEqual(source, target);
+    }
+
+    [Test]
     public void StickyItemShouldNotBePresentAfterCreationWhenSelectionNull()
     {
         var source = CreateSource();
@@ -106,6 +117,20 @@ public class ListenerCollectionTests : TestBase
 
         selection.OnNext(stickie);
 
+        CollectionAssert.AreEqual(source, target);
+    }
+
+    [Test]
+    public void ResetingTrackingCollectionWorks()
+    {
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = new ReplaySubject<Thing>();
+        var target = source.CreateListenerCollection(stickie, selection);
+        selection.OnNext(stickie);
+        selection.OnNext(null);
+        CollectionAssert.AreEqual(source, target);
+        source.Filter = (a,b,c) => true;
         CollectionAssert.AreEqual(source, target);
     }
 
