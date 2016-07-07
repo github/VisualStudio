@@ -68,7 +68,7 @@ namespace GitHub.ViewModels
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
             createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
-                _ => service.CreatePullRequest(repositoryHost, activeRepo, PRTitle, SourceBranch, TargetBranch)
+                _ => service.CreatePullRequest(repositoryHost, activeRepo, PRTitle, Description, SourceBranch, TargetBranch)
             );
             createPullRequest.ThrownExceptions.Subscribe(ex =>
             {
