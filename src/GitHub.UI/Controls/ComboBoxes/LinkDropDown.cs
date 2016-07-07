@@ -54,7 +54,11 @@ namespace GitHub.UI
         /// <summary>
         /// Gets the text to display in the link.
         /// </summary>
-        public string LinkText => (string)GetValue(LinkTextProperty);
+        public string LinkText
+        {
+            get { return (string)GetValue(LinkTextProperty); }
+            private set { SetValue(LinkTextPropertyKey, value); }
+        }
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
@@ -69,7 +73,33 @@ namespace GitHub.UI
 
         private void UpdateLinkText()
         {
-            SetValue(LinkTextPropertyKey, SelectedItem?.ToString() ?? Header?.ToString());
+            if (SelectedItem != null)
+            {
+                var item = SelectedItem;
+
+                // HACK: The correct way to do this is to use a ContentPresenter in the control
+                // template to display the link text and do a:
+                //
+                //     ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                //
+                // to correctly display the DisplayMemberPath. However I couldn't work out how
+                // to do it like this and get the link text looking right. This is a hack that
+                // will work as long as DisplayMemberPath is just a property name, which is
+                // all we need right now.
+                if (string.IsNullOrWhiteSpace(DisplayMemberPath))
+                {
+                    LinkText = item.ToString();
+                }
+                else
+                {
+                    var property = item.GetType().GetProperty(DisplayMemberPath);
+                    LinkText = property?.GetValue(item)?.ToString();
+                }
+            }
+            else
+            {
+                LinkText = Header.ToString();
+            }
         }
     }
 }
