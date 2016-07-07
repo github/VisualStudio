@@ -53,7 +53,8 @@
                         <ToggleButton Style="{StaticResource HyperLinkToggleButton}"
                                       Content="{TemplateBinding LinkText}"
                                       Foreground="{TemplateBinding Foreground}"
-                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                      IsTabStop="False"/>
                         <Popup Name="PART_Popup"
                                AllowsTransparency="True"
                                IsOpen="{TemplateBinding IsDropDownOpen}" 
