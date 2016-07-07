@@ -92,6 +92,12 @@ namespace GitHub.Models
                 endLine = temp;
             }
 
+            if (startLine == endLine)
+            {
+                // if startLine is the same as endLine don't generate a range link
+                endLine = -1;
+            }
+
             return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
         }
 
