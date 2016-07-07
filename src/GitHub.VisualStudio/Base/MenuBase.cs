@@ -113,10 +113,7 @@ namespace GitHub.VisualStudio
         {
             RefreshRepo();
 
-            if(ActiveRepo == null)
-                return false;
-
-            var uri = ActiveRepo.CloneUrl;
+            var uri = ActiveRepo?.CloneUrl;
             if (uri == null)
                 return false;
 
