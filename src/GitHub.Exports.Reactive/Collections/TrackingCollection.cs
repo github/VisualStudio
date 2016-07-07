@@ -16,6 +16,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Linq;
+using System.Collections.Specialized;
 
 namespace GitHub.Collections
 {
@@ -53,51 +54,7 @@ namespace GitHub.Collections
             }
 
             var col = new ObservableCollection<T>(stickieItemsOnTop.Concat(tcol));
-            tcol.CollectionChanged += (s, e) =>
-            {
-                var offset = 0;
-                if (stickieItemsOnTop != null)
-                {
-                    foreach (var item in stickieItemsOnTop)
-                    {
-                        if (col.Contains(item))
-                            offset++;
-                    }
-                }
-
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
-                {
-                    for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
-                        i < e.OldItems.Count; i++, oldIdx++, newIdx++)
-                    {
-                        col.Move(oldIdx + offset, newIdx + offset);
-                    }
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-                {
-                    foreach (T item in e.NewItems)
-                        col.Add(item);
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-                {
-                    foreach (T item in e.OldItems)
-                        col.Remove(item);
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
-                {
-                    for (int i = 0, idx = e.OldStartingIndex; i < e.OldItems.Count; i++, idx++)
-                        col[idx + offset] = (T)e.NewItems[i];
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-                {
-                    col.Clear();
-                    if (stickieItemsOnTop != null)
-                    {
-                        foreach (var item in stickieItemsOnTop)
-                            col.Add(item);
-                    }
-                }
-            };
+            tcol.CollectionChanged += (_, e) => UpdateStickieItems(col, e, stickieItemsOnTop);
             return col;
         }
 
@@ -121,24 +78,90 @@ namespace GitHub.Collections
             Debug.Assert(stickieItemOnTop != null, "stickieItemOnTop may not be null in CreateListenerCollection");
             Debug.Assert(selection != null, "selection may not be null in CreateListenerCollection");
 
-            var result = tcol.CreateListenerCollection(new[] { stickieItemOnTop });
-            var addedStickieItem = true;
+            var stickieItems = new[] { stickieItemOnTop };
+            var result = new ObservableCollection<T>(tcol);
+            var addedStickieItem = false;
+            var hasSelection = false;
+
+            tcol.CollectionChanged += (_, e) =>
+            {
+                UpdateStickieItems(result, e, hasSelection ? stickieItems : null);
+            };
 
             selection.Subscribe(x =>
             {
-                if ((x == null || object.Equals(x, stickieItemOnTop)) && addedStickieItem)
+                if (x == null || object.Equals(x, stickieItemOnTop))
                 {
-                    result.Remove(stickieItemOnTop);
-                    addedStickieItem = false;
+                    if (addedStickieItem)
+                    {
+                        result.Remove(stickieItemOnTop);
+                        addedStickieItem = false;
+                    }
+
+                    hasSelection = false;
                 }
-                else if (x != null && !addedStickieItem)
+                else
                 {
-                    result.Insert(0, stickieItemOnTop);
-                    addedStickieItem = true;
+                    if (!addedStickieItem)
+                    {
+                        result.Insert(0, stickieItemOnTop);
+                        addedStickieItem = true;
+                    }
+
+                    hasSelection = true;
                 }
             });
 
             return result;
+        }
+
+        static void UpdateStickieItems<T>(
+            ObservableCollection<T> col,
+            NotifyCollectionChangedEventArgs e,
+            IList<T> stickieItemsOnTop)
+        {
+            var offset = 0;
+            if (stickieItemsOnTop != null)
+            {
+                foreach (var item in stickieItemsOnTop)
+                {
+                    if (col.Contains(item))
+                        offset++;
+                }
+            }
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+            {
+                for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
+                    i < e.OldItems.Count; i++, oldIdx++, newIdx++)
+                {
+                    col.Move(oldIdx + offset, newIdx + offset);
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (T item in e.NewItems)
+                    col.Add(item);
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (T item in e.OldItems)
+                    col.Remove(item);
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+            {
+                for (int i = 0, idx = e.OldStartingIndex; i < e.OldItems.Count; i++, idx++)
+                    col[idx + offset] = (T)e.NewItems[i];
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                col.Clear();
+                if (stickieItemsOnTop != null)
+                {
+                    foreach (var item in stickieItemsOnTop)
+                        col.Add(item);
+                }
+            }
         }
     }
 
