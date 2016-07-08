@@ -89,7 +89,7 @@ namespace GitHub.Collections
 
             selection.Subscribe(x =>
             {
-                hasSelection = !(x == null || object.Equals(x, stickieItemOnTop));
+                hasSelection = x != null && !object.Equals(x, stickieItemOnTop);
                 var hasStickie = result.FirstOrDefault() == stickieItemOnTop;
 
                 if (hasSelection && !hasStickie)
