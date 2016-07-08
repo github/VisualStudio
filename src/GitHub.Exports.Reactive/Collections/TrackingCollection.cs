@@ -96,7 +96,6 @@ namespace GitHub.Collections
                     if (hasStickieItem)
                     {
                         result.Remove(stickieItemOnTop);
-                        hasStickieItem = false;
                     }
 
                     hasSelection = false;
@@ -106,7 +105,6 @@ namespace GitHub.Collections
                     if (!hasStickieItem)
                     {
                         result.Insert(0, stickieItemOnTop);
-                        hasStickieItem = true;
                     }
 
                     hasSelection = true;
