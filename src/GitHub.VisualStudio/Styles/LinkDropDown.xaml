@@ -61,6 +61,7 @@
                                Placement="Bottom">
                             <Popup.Resources>
                                 <Style BasedOn="{StaticResource {x:Type ComboBoxItem}}" TargetType="{x:Type ComboBoxItem}">
+                                    <Setter Property="Foreground" Value="{DynamicResource GitHubButtonForegroundBrush}" />
                                     <Setter Property="Padding" Value="3" />
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 </Style>
