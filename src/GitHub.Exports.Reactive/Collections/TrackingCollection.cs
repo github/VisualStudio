@@ -80,7 +80,6 @@ namespace GitHub.Collections
 
             var stickieItems = new[] { stickieItemOnTop };
             var result = new ObservableCollection<T>(tcol);
-            var addedStickieItem = false;
             var hasSelection = false;
 
             tcol.CollectionChanged += (_, e) =>
@@ -90,22 +89,24 @@ namespace GitHub.Collections
 
             selection.Subscribe(x =>
             {
+                var hasStickieItem = result.FirstOrDefault() == stickieItemOnTop;
+
                 if (x == null || object.Equals(x, stickieItemOnTop))
                 {
-                    if (addedStickieItem)
+                    if (hasStickieItem)
                     {
                         result.Remove(stickieItemOnTop);
-                        addedStickieItem = false;
+                        hasStickieItem = false;
                     }
 
                     hasSelection = false;
                 }
                 else
                 {
-                    if (!addedStickieItem)
+                    if (!hasStickieItem)
                     {
                         result.Insert(0, stickieItemOnTop);
-                        addedStickieItem = true;
+                        hasStickieItem = true;
                     }
 
                     hasSelection = true;
@@ -123,11 +124,8 @@ namespace GitHub.Collections
             var offset = 0;
             if (stickieItemsOnTop != null)
             {
-                foreach (var item in stickieItemsOnTop)
-                {
-                    if (col.Contains(item))
-                        offset++;
-                }
+                if (object.Equals(col.FirstOrDefault(), stickieItemsOnTop.FirstOrDefault()))
+                    offset = stickieItemsOnTop.Count;
             }
 
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
