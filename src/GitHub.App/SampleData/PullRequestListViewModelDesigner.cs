@@ -44,7 +44,7 @@ namespace GitHub.SampleData
             SelectedAuthor = Authors.ElementAt(1);
         }
 
-        public ObservableCollection<IPullRequestModel> PullRequests { get; set; }
+        public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
         public IPullRequestModel SelectedPullRequest { get; set; }
         public ICommand OpenPullRequest { get; set; }
 

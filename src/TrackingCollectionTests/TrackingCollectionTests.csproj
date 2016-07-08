@@ -100,6 +100,7 @@
     <Compile Include="ITestOutputHelper.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Thing.cs" />
+    <Compile Include="ListenerCollectionTests.cs" />
     <Compile Include="TrackingCollectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
