@@ -163,8 +163,8 @@ namespace GitHub.Services
                             try { collection.RemoveItem(Create(item)); }
                             catch (ObjectDisposedException) { }
                         },
-                        TimeSpan.FromMinutes(5),
-                        TimeSpan.FromDays(1))
+                        TimeSpan.FromSeconds(30),
+                        TimeSpan.FromDays(90))
                 )
                 .Select(Create)
             );
