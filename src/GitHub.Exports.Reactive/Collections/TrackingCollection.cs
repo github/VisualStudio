@@ -89,25 +89,16 @@ namespace GitHub.Collections
 
             selection.Subscribe(x =>
             {
-                var hasStickieItem = result.FirstOrDefault() == stickieItemOnTop;
+                hasSelection = !(x == null || object.Equals(x, stickieItemOnTop));
+                var hasStickie = result.FirstOrDefault() == stickieItemOnTop;
 
-                if (x == null || object.Equals(x, stickieItemOnTop))
+                if (hasSelection && !hasStickie)
                 {
-                    if (hasStickieItem)
-                    {
-                        result.Remove(stickieItemOnTop);
-                    }
-
-                    hasSelection = false;
+                    result.Insert(0, stickieItemOnTop);
                 }
-                else
+                else if (hasStickie)
                 {
-                    if (!hasStickieItem)
-                    {
-                        result.Insert(0, stickieItemOnTop);
-                    }
-
-                    hasSelection = true;
+                    result.Remove(stickieItemOnTop);
                 }
             });
 
