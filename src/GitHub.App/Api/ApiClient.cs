@@ -232,7 +232,7 @@ namespace GitHub.Api
         {
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
                 new PullRequestRequest {
-                    State = ItemState.All,
+                    State = ItemStateFilter.All,
                     SortProperty = PullRequestSort.Updated,
                     SortDirection = SortDirection.Descending
                 });

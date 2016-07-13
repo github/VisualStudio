@@ -398,7 +398,7 @@ public class ModelServiceTests
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
 
             var prcache = Enumerable.Range(1, expected)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
 
             // seed the cache
             prcache
@@ -408,7 +408,7 @@ public class ModelServiceTests
                 .ToList();
 
             var prlive = Observable.Range(1, expected)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow))
                 .DelaySubscription(TimeSpan.FromMilliseconds(10));
 
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
@@ -449,7 +449,7 @@ public class ModelServiceTests
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
 
             var prcache = Enumerable.Range(1, expected)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
 
             // seed the cache
             prcache
@@ -464,7 +464,7 @@ public class ModelServiceTests
             await cache.InsertObject(indexKey, indexobj);
 
             var prlive = Observable.Range(1, expected)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow))
                 .DelaySubscription(TimeSpan.FromMilliseconds(10));
 
             apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
@@ -516,7 +516,7 @@ public class ModelServiceTests
             var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
 
             var prcache = Enumerable.Range(1, expected)
-                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0));
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
 
             // seed the cache
             prcache
@@ -569,36 +569,5 @@ public class ModelServiceTests
                 t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(9, t.Number); }
             );
         }
-    }
-
-    static UserAndScopes CreateUserAndScopes(string login)
-    {
-        return new UserAndScopes(CreateOctokitUser(login), null);
-    }
-
-    static User CreateOctokitUser(string login)
-    {
-        return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false, null, null);
-    }
-
-    static Organization CreateOctokitOrganization(string login)
-    {
-        return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
-    }
-
-    static Repository CreateRepository(string owner, string name)
-    {
-        return new Repository("https://url", "https://url", "https://url", "https://url", "https://url", "https://url", "https://url", 1, CreateOctokitUser(owner), name, "fullname", "description", "https://url", "c#", false, false, 0, 0, 0, "master", 0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, new RepositoryPermissions(), null, null, null, true, false, false);
-    }
-
-    static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
-        DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount)
-    {
-        var uri = new Uri("https://url");
-        return new PullRequest(uri, uri, uri, uri, uri, uri,
-            id, state, title, "", createdAt, updatedAt,
-            null, null, null, null, user, null, false, null,
-            commentCount, 0, 0, 0, 0,
-            null, false);
     }
 }
