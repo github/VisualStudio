@@ -101,122 +101,20 @@
 
       <WrapPanel Grid.Column="0" HorizontalAlignment="Stretch">
 
-        <ui:GitHubActionLink x:Name="stateSelection"
-                             Margin="5,0"
-                             VerticalAlignment="Center"
-                             ToolTip="Filter by state"
-                             Content="{Binding SelectedState}"
-                             HasDropDown="True">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Click">
-              <ui:OpenPopupAction TargetName="statePopup" />
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-        </ui:GitHubActionLink>
-
-        <Popup x:Name="statePopup"
-               AllowsTransparency="True"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=stateSelection}"
-               StaysOpen="False">
-          <Border Style="{DynamicResource GitHubComboBoxBorder}">
-            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
-              <ListBox x:Name="states"
-                       DockPanel.Dock="Top"
-                       ItemsSource="{Binding States}"
-                       SelectedItem="{Binding SelectedState}"
-                       Style="{DynamicResource GitHubPopupThing}">
-                <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="SelectionChanged">
-                    <ui:ClosePopupAction TargetName="statePopup" />
-                  </i:EventTrigger>
-                </i:Interaction.Triggers>
-              </ListBox>
-            </DockPanel>
-          </Border>
-        </Popup>
+        <ui:LinkDropDown ItemsSource="{Binding States}"
+                         SelectedItem="{Binding SelectedState}"/>
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ui:GitHubActionLink x:Name="assigneeSelection"
-                             Margin="5,0"
-                             VerticalAlignment="Center"
-                             ToolTip="Filter by assignee"
-                             Content="{Binding SelectedAssignee,
-                                               Converter={ui:DefaultValueConverter},
-                                               ConverterParameter=Assignee}"
-                             HasDropDown="True">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Click">
-              <ui:OpenPopupAction TargetName="assigneePopup" />
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-        </ui:GitHubActionLink>
-
-        <Popup x:Name="assigneePopup"
-               AllowsTransparency="True"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=assigneeSelection}"
-               StaysOpen="False">
-          <Border Style="{DynamicResource GitHubComboBoxBorder}">
-            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
-
-              <ListBox x:Name="assignees"
-                       DockPanel.Dock="Top"
-                       ItemsSource="{Binding Assignees}"
-                       SelectedItem="{Binding SelectedAssignee}"
-                       Style="{DynamicResource GitHubPopupThing}">
-                <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="SelectionChanged">
-                    <ui:ClosePopupAction TargetName="assigneePopup" />
-                  </i:EventTrigger>
-                </i:Interaction.Triggers>
-              </ListBox>
-            </DockPanel>
-          </Border>
-        </Popup>
-
+        <ui:LinkDropDown Header="Assignee"
+                         ItemsSource="{Binding Assignees}"
+                         SelectedItem="{Binding SelectedAssignee}"/>
+          
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ui:GitHubActionLink x:Name="authorSelection"
-                             Margin="5,0"
-                             VerticalAlignment="Center"
-                             ToolTip="Filter by author"
-                             Content="{Binding SelectedAuthor,
-                                               Converter={ui:DefaultValueConverter},
-                                               ConverterParameter=Author}"
-                             HasDropDown="True">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Click">
-              <ui:OpenPopupAction TargetName="authorPopup" />
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-
-        </ui:GitHubActionLink>
-
-        <Popup x:Name="authorPopup"
-               AllowsTransparency="True"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=authorSelection}"
-               StaysOpen="False">
-          <Border Style="{DynamicResource GitHubComboBoxBorder}">
-            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
-
-              <ListBox x:Name="authors"
-                       DockPanel.Dock="Top"
-                       ItemsSource="{Binding Authors}"
-                       SelectedItem="{Binding SelectedAuthor}"
-                       Style="{DynamicResource GitHubPopupThing}">
-                <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="SelectionChanged">
-                    <ui:ClosePopupAction TargetName="authorPopup" />
-                  </i:EventTrigger>
-                </i:Interaction.Triggers>
-              </ListBox>
-            </DockPanel>
-          </Border>
-        </Popup>
-
+        <ui:LinkDropDown Header="Author"
+                         ItemsSource="{Binding Authors}"
+                         SelectedItem="{Binding SelectedAuthor}"/>          
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"
