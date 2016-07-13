@@ -1,6 +1,6 @@
 # scripts that run after cloning repository
 install:
-  - if "%APPVEYOR_REPO_NAME%" EQU "github/VisualStudio" if "%APPVEYOR_REPO_BRANCH%" EQU "master" if not defined APPVEYOR_PULL_REQUEST_NUMBER set MASTER_BUILD=1
+  - if "%APPVEYOR_REPO_NAME%" EQU "github/VisualStudio" set MASTER_BUILD=1
   - git submodule init
   - if not defined MASTER_BUILD git submodule deinit script
   - git submodule update
