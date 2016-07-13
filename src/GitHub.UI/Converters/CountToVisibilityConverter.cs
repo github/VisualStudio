@@ -15,7 +15,7 @@ namespace GitHub.UI
     {
         public override object Convert(object value, Type targetType, [AllowNull] object parameter, [AllowNull] CultureInfo culture)
         {
-            return ((int)value == 0) ? Visibility.Visible : Visibility.Collapsed;
+            return ((int)value > 0) ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

@@ -1957,4 +1957,24 @@ public class TrackingTests : TestBase
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>();
         Assert.Throws<InvalidOperationException>(() => col.RemoveItem(new Thing()));
     }
+
+    [Test]
+    public async void AddingBeforeSubscribingWorks()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(Observable.Empty<Thing>());
+        ReplaySubject<Thing> done = new ReplaySubject<Thing>();
+        col.AddItem(GetThing(1));
+        col.AddItem(GetThing(2));
+        var count = 0;
+        done.OnNext(null);
+        col.Subscribe(t =>
+        {
+            done.OnNext(t);
+            if (++count == 2)
+                done.OnCompleted();
+        }, () => {});
+
+        await Observable.Timeout(done, TimeSpan.FromMilliseconds(500));
+        Assert.AreEqual(2, col.Count);
+    }
 }

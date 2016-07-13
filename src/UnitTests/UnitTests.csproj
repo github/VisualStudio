@@ -171,6 +171,7 @@
     <Compile Include="GitHub.App\ViewModels\GistCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\LoginControlViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\PullRequestListViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
