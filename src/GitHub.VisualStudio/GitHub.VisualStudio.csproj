@@ -9,9 +9,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.99.5</ApplicationVersion>
-    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.99.8</ApplicationVersion>
+    <ApplicationVersion>1.99.0.1</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -244,9 +242,6 @@
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Views\Controls\Spinner.xaml.cs">
-      <DependentUpon>Spinner.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
       <DependentUpon>GistCreationControl.xaml</DependentUpon>
     </Compile>
@@ -383,6 +378,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Styles\LinkDropDown.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Styles\Buttons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -410,10 +409,6 @@
     <Page Include="Styles\ThemeLight.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\Controls\Spinner.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Views\Controls\GistCreationControl.xaml">
       <SubType>Designer</SubType>

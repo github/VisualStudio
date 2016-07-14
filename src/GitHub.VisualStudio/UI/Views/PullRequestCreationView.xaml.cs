@@ -3,7 +3,6 @@ using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
 using System.ComponentModel.Composition;
-using System.Windows.Controls;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -22,17 +21,8 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
+                d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
             });
-        }
-
-        private void branchSelectionButton_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            branchPopup.IsOpen = true;
-        }
-
-        private void assigneePopupButton_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            assigneePopup.IsOpen = true;
         }
     }
 }

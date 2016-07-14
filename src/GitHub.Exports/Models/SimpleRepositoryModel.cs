@@ -84,6 +84,20 @@ namespace GitHub.Models
                     path = path.Substring(LocalPath.Length + 1);
             }
 
+            if (startLine > 0 && endLine > 0 && startLine > endLine)
+            {
+                // if startLine is greater than endLine and both are set, swap them
+                var temp = startLine;
+                startLine = endLine;
+                endLine = temp;
+            }
+
+            if (startLine == endLine)
+            {
+                // if startLine is the same as endLine don't generate a range link
+                endLine = -1;
+            }
+
             return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
         }
 

@@ -1,22 +1,18 @@
-﻿using GitHub.Exports;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GitHub.Models;
 using System.Collections.ObjectModel;
-using ReactiveUI;
-using NullGuard;
 using System.ComponentModel.Composition;
-using GitHub.Services;
+using System.Linq;
 using System.Reactive.Linq;
-using GitHub.Extensions.Reactive;
-using System.Windows.Data;
-using GitHub.Collections;
 using System.Windows.Input;
-using GitHub.UI;
 using System.Windows.Media.Imaging;
+using GitHub.Collections;
+using GitHub.Exports;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.UI;
+using NullGuard;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -59,11 +55,11 @@ namespace GitHub.ViewModels
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null)
+                .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null)
+                .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             trackingAuthors = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
@@ -73,8 +69,8 @@ namespace GitHub.ViewModels
             trackingAuthors.Subscribe();
             trackingAssignees.Subscribe();
 
-            Authors = trackingAuthors.CreateListenerCollection(new List<IAccount> { EmptyUser });
-            Assignees = trackingAssignees.CreateListenerCollection(new List<IAccount> { EmptyUser });
+            Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
+            Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
 
             PullRequests = new TrackingCollection<IPullRequestModel>();
             pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
@@ -86,7 +82,7 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests) as TrackingCollection<IPullRequestModel>;
+            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -104,12 +100,12 @@ namespace GitHub.ViewModels
                      (aut == null || aut.Equals(pr.Author));
         }
 
-        TrackingCollection<IPullRequestModel> pullRequests;
-        public ObservableCollection<IPullRequestModel> PullRequests
+        ITrackingCollection<IPullRequestModel> pullRequests;
+        public ITrackingCollection<IPullRequestModel> PullRequests
         {
             [return: AllowNull]
             get { return pullRequests; }
-            private set { this.RaiseAndSetIfChanged(ref pullRequests, (TrackingCollection<IPullRequestModel>)value); }
+            private set { this.RaiseAndSetIfChanged(ref pullRequests, value); }
         }
 
         IPullRequestModel selectedPullRequest;

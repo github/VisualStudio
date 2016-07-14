@@ -5,7 +5,7 @@
                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  xmlns:GitHub="clr-namespace:GitHub.VisualStudio.Helpers"
+                                  xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
                                   xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                   mc:Ignorable="d"
@@ -14,8 +14,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <GitHub:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -74,7 +74,7 @@
                 <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static prop:Resources.fileNameText}"/>
                 <ui:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" />
 
-                <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.descriptionText}"/>
+                <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.Description}"/>
                 <ui:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1"/>
 
                 <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">

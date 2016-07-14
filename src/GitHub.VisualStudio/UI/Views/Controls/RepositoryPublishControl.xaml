@@ -94,36 +94,26 @@
     </ComboBox>
 
     <Grid>
-      <TextBox x:Name="nameText"
+      <ui:PromptTextBox x:Name="nameText"
                Height="23"
                Margin="0"
                Background="{DynamicResource GitHubVsSearchBoxBackground}"
                Foreground="{DynamicResource GitHubVsWindowText}"
                MaxLength="{x:Static cache:Constants.MaxRepositoryNameLength}"
-               Text="{Binding RepositoryName}" />
-
-      <TextBlock Margin="7,4,0,0"
-                 Foreground="{DynamicResource GitHubVsGrayText}"
-                 IsHitTestVisible="False"
-                 Text="{x:Static prop:Resources.RepoNameText}"
-                 Visibility="{Binding ElementName=nameText, Path=Text.Length, Converter={ui:CountToVisibilityConverter}}" />
+               Text="{Binding RepositoryName}"
+               PromptText="{x:Static prop:Resources.RepoNameText}" />
     </Grid>
 
     <Grid>
-      <TextBox x:Name="description"
+      <ui:PromptTextBox x:Name="description"
                Height="52"
                Margin="0,8,0,0"
                AcceptsReturn="True"
                Background="{DynamicResource GitHubVsSearchBoxBackground}"
                Foreground="{DynamicResource GitHubVsWindowText}"
                Text="{Binding Description}"
-               TextWrapping="WrapWithOverflow" />
-
-      <TextBlock Margin="7,12,0,0"
-                 Foreground="{DynamicResource GitHubVsGrayText}"
-                 IsHitTestVisible="False"
-                 Text="{x:Static prop:Resources.descriptionOptionalText}"
-                 Visibility="{Binding ElementName=description, Path=Text.Length, Converter={ui:CountToVisibilityConverter}}" />
+               TextWrapping="WrapWithOverflow"
+               PromptText="{x:Static prop:Resources.DescriptionOptional}" />
     </Grid>
 
     <CheckBox x:Name="makePrivate"

@@ -241,6 +241,37 @@ namespace GitHub.Extensions
                 .Replay().RefCount();
         }
 
+        /// <summary>
+        /// This method adds a new object to the database and updates the
+        /// corresponding index.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="blobCache">The cache to retrieve the object from.</param>
+        /// <param name="key">The key to look up the cache value with.</param>
+        /// <param name="item">The item to add to the database</param>
+        /// <param name="maxCacheDuration">
+        /// The maximum age of a cache object before the object is treated as
+        /// expired and unusable. Cache objects older than this will be treated
+        /// as a cache miss.
+        /// <returns></returns>
+        public static IObservable<T> PutAndUpdateIndex<T>(this IBlobCache blobCache,
+            string key,
+            Func<IObservable<T>> fetchFunc,
+            TimeSpan maxCacheDuration)
+            where T : CacheItem
+        {
+            return Observable.Defer(() =>
+            {
+                var absoluteExpiration = blobCache.Scheduler.Now + maxCacheDuration;
+                return blobCache.GetOrCreateObject(key, () => CacheIndex.Create(key))
+                    .SelectMany(index => fetchFunc()
+                            .Catch<T, Exception>(Observable.Throw<T>)
+                            .SelectMany(x => x.Save<T>(blobCache, key, absoluteExpiration))
+                            .Do(x => index.AddAndSave(blobCache, key, x, absoluteExpiration))
+                    );
+            });
+        }
+
         static bool IsExpired(IBlobCache blobCache, DateTimeOffset itemCreatedAt, TimeSpan cacheDuration)
         {
             var elapsed = blobCache.Scheduler.Now - itemCreatedAt.ToUniversalTime();

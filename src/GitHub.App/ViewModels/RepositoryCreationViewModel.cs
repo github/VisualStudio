@@ -67,17 +67,11 @@ namespace GitHub.ViewModels
             accounts = repositoryHost.ModelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
-            
+
             this.WhenAny(x => x.Accounts, x => x.Value)
+                .Select(accts => accts?.FirstOrDefault())
                 .WhereNotNull()
-                .Where(accts => accts.Any())
-                .Subscribe(accts => {
-                    var selectedAccount = accts.FirstOrDefault();
-                    if (selectedAccount != null)
-                    {
-                        SelectedAccount = accts.FirstOrDefault();
-                    }
-                });
+                .Subscribe(a => SelectedAccount = a);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
 

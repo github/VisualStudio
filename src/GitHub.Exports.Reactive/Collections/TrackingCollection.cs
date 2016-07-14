@@ -15,6 +15,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Linq;
+using System.Collections.Specialized;
 
 namespace GitHub.Collections
 {
@@ -46,53 +48,107 @@ namespace GitHub.Collections
             IList<T> stickieItemsOnTop = null)
             where T : class, ICopyable<T>
         {
-            var col = new ObservableCollection<T>(stickieItemsOnTop);
-            tcol.CollectionChanged += (s, e) =>
+            if (stickieItemsOnTop == null)
             {
-                var offset = 0;
+                stickieItemsOnTop = new T[0];
+            }
+
+            var col = new ObservableCollection<T>(stickieItemsOnTop.Concat(tcol));
+            tcol.CollectionChanged += (_, e) => UpdateStickieItems(col, e, stickieItemsOnTop);
+            return col;
+        }
+
+        /// <summary>
+        /// Creates an observable collection that tracks an <see cref="ITrackingCollection{T}"/>
+        /// and adds a sticky item to the top of the collection when a related selection is null.
+        /// </summary>
+        /// <typeparam name="T">The type of items in the collection.</typeparam>
+        /// <param name="tcol">The source tracking collection</param>
+        /// <param name="stickieItemOnTop">The sticky item to add to the top of the collection.</param>
+        /// <param name="selection">
+        /// The current selection. If null or equal to the sticky item then the sticky item will be
+        /// added to the collection.
+        /// </param>
+        /// <returns>An <see cref="ObservableCollection{T}"/>.</returns>
+        public static ObservableCollection<T> CreateListenerCollection<T>(this ITrackingCollection<T> tcol,
+            T stickieItemOnTop,
+            IObservable<T> selection)
+            where T : class, ICopyable<T>
+        {
+            Debug.Assert(stickieItemOnTop != null, "stickieItemOnTop may not be null in CreateListenerCollection");
+            Debug.Assert(selection != null, "selection may not be null in CreateListenerCollection");
+
+            var stickieItems = new[] { stickieItemOnTop };
+            var result = new ObservableCollection<T>(tcol);
+            var hasSelection = false;
+
+            tcol.CollectionChanged += (_, e) =>
+            {
+                UpdateStickieItems(result, e, hasSelection ? stickieItems : null);
+            };
+
+            selection.Subscribe(x =>
+            {
+                hasSelection = x != null && !object.Equals(x, stickieItemOnTop);
+                var hasStickie = result.FirstOrDefault() == stickieItemOnTop;
+
+                if (hasSelection && !hasStickie)
+                {
+                    result.Insert(0, stickieItemOnTop);
+                }
+                else if (hasStickie)
+                {
+                    result.Remove(stickieItemOnTop);
+                }
+            });
+
+            return result;
+        }
+
+        static void UpdateStickieItems<T>(
+            ObservableCollection<T> col,
+            NotifyCollectionChangedEventArgs e,
+            IList<T> stickieItemsOnTop)
+        {
+            var offset = 0;
+            if (stickieItemsOnTop != null)
+            {
+                if (object.Equals(col.FirstOrDefault(), stickieItemsOnTop.FirstOrDefault()))
+                    offset = stickieItemsOnTop.Count;
+            }
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+            {
+                for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
+                    i < e.OldItems.Count; i++, oldIdx++, newIdx++)
+                {
+                    col.Move(oldIdx + offset, newIdx + offset);
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (T item in e.NewItems)
+                    col.Add(item);
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (T item in e.OldItems)
+                    col.Remove(item);
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+            {
+                for (int i = 0, idx = e.OldStartingIndex; i < e.OldItems.Count; i++, idx++)
+                    col[idx + offset] = (T)e.NewItems[i];
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                col.Clear();
                 if (stickieItemsOnTop != null)
                 {
                     foreach (var item in stickieItemsOnTop)
-                    {
-                        if (col.Contains(item))
-                            offset++;
-                    }
-                }
-
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
-                {
-                    for (int i = 0, oldIdx = e.OldStartingIndex, newIdx = e.NewStartingIndex;
-                        i < e.OldItems.Count; i++, oldIdx++, newIdx++)
-                    {
-                        col.Move(oldIdx + offset, newIdx + offset);
-                    }
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-                {
-                    foreach (T item in e.NewItems)
                         col.Add(item);
                 }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-                {
-                    foreach (T item in e.OldItems)
-                        col.Remove(item);
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
-                {
-                    for (int i = 0, idx = e.OldStartingIndex; i < e.OldItems.Count; i++, idx++)
-                        col[idx + offset] = (T)e.NewItems[i];
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-                {
-                    col.Clear();
-                    if (stickieItemsOnTop != null)
-                    {
-                        foreach (var item in stickieItemsOnTop)
-                            col.Add(item);
-                    }
-                }
-            };
-            return col;
+            }
         }
     }
 
@@ -130,9 +186,9 @@ namespace GitHub.Collections
         IConnectableObservable<Unit> cachePump;
         ConcurrentQueue<ActionData> cache;
 
-        Subject<Unit> signalHaveData;
-        Subject<Unit> signalNeedData;
-        Subject<ActionData> dataListener;
+        ReplaySubject<Unit> signalHaveData;
+        ReplaySubject<Unit> signalNeedData;
+        ReplaySubject<ActionData> dataListener;
 
         bool resetting = false;
 
@@ -396,6 +452,8 @@ namespace GitHub.Collections
 
         public void AddItem(T item)
         {
+            if (source == null)
+                throw new InvalidOperationException("No source observable has been set. Call Listen or pass an observable to the constructor");
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
 
@@ -410,6 +468,8 @@ namespace GitHub.Collections
 
         public void RemoveItem(T item)
         {
+            if (source == null)
+                throw new InvalidOperationException("No source observable has been set. Call Listen or pass an observable to the constructor");
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
 
@@ -1105,11 +1165,11 @@ namespace GitHub.Collections
             originalSourceIsCompleted = false;
             signalOriginalSourceCompletion = false;
             cache = new ConcurrentQueue<ActionData>();
-            dataListener = new Subject<ActionData>();
+            dataListener = new ReplaySubject<ActionData>();
             disposables.Add(dataListener);
-            signalHaveData = new Subject<Unit>();
+            signalHaveData = new ReplaySubject<Unit>();
             disposables.Add(signalHaveData);
-            signalNeedData = new Subject<Unit>();
+            signalNeedData = new ReplaySubject<Unit>();
             disposables.Add(signalNeedData);
             originalSourceCompleted = new ReplaySubject<Unit>();
 

@@ -19,7 +19,7 @@ namespace GitHub.ViewModels
 
     public interface IPullRequestListViewModel : IViewModel
     {
-        ObservableCollection<IPullRequestModel> PullRequests { get; }
+        ITrackingCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
         ICommand OpenPullRequest { get; }
         IReadOnlyList<PullRequestState> States { get; set; }
