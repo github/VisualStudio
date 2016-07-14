@@ -47,18 +47,21 @@
                      Source="{Binding Author.Avatar}" />
           </StackPanel>
       </Grid>
+
+      <Button x:Name="title"
+            Grid.Row="0"
+            Grid.Column="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Foreground="{DynamicResource GitHubVsToolWindowText}"
+            Margin="0,-3,5,0"
+            FontSize="{DynamicResource {x:Static vsui:VsFonts.Environment122PercentFontSizeKey}}"
+            Style="{StaticResource ActionLinkButton}"
+            Content="{Binding Title}"
+            ToolTip="{Binding Title}"
+            Command="{Binding OpenPR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+            CommandParameter="{Binding Number}"/>
         
-      <TextBlock x:Name="title"
-                 Grid.Row="0"
-                 Grid.Column="1"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 Foreground="{DynamicResource GitHubVsToolWindowText}"
-                 Margin="0,-3,5,0"
-                 Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
-                 Text="{Binding Title}"
-                 ToolTip="{Binding Title}"
-                 TextTrimming="CharacterEllipsis" />
         <ui:OcticonImage x:Name="comment_icon"
                    Grid.Row="0"
                    Grid.RowSpan="2"
