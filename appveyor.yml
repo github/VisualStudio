@@ -2,7 +2,9 @@ version: 1.0.{build}
 install:
 - ps: >-
     $full_build = Test-Path env:GHFVS_KEY
+
     git submodule init
+
     if ($full_build) {
       $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
       $fileContent += $env:GHFVS_KEY.Replace(' ', "`n")
@@ -11,11 +13,14 @@ install:
     } else {
       git submodule deinit script
     }
+
     git submodule update
+
     nuget restore GitHubVS.sln
 build_script:
 - cmd: msbuild "GitHubVS.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0
 test_script:
 - ps: >-
     scripts\Run-Nunit.ps1 TrackingCollectionTests 180 Release
+
     scripts\Run-Xunit.ps1 UnitTests 180 Release
