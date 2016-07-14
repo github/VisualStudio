@@ -99,41 +99,13 @@
           <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding TargetBranch}" />
         </StackPanel>
 
-        <ui:GitHubActionLink x:Name="sourceBranch"
-                             Grid.Column="1"
-                             Margin="5,0"
-                             VerticalAlignment="Center"
-                             Content="{Binding SourceBranch.Name}"
-                             HasDropDown="True"
-                             ToolTip="Select a branch">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Click">
-              <ui:OpenPopupAction TargetName="branchPopup" />
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-        </ui:GitHubActionLink>
-
-        <Popup x:Name="branchPopup"
-               AllowsTransparency="True"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=branchSelection}"
-               StaysOpen="False">
-          <Border Style="{DynamicResource GitHubComboBoxBorder}">
-            <DockPanel Width="100" Style="{DynamicResource GitHubComboBoxDockPanelContainer}">
-              <ListBox DisplayMemberPath="Name"
-                       DockPanel.Dock="Top"
-                       ItemsSource="{Binding Branches}"
-                       SelectedItem="{Binding SourceBranch}"
-                       Style="{DynamicResource GitHubPopupThing}">
-                <i:Interaction.Triggers>
-                  <i:EventTrigger EventName="SelectionChanged">
-                    <ui:ClosePopupAction TargetName="branchPopup" />
-                  </i:EventTrigger>
-                </i:Interaction.Triggers>
-              </ListBox>
-            </DockPanel>
-          </Border>
-        </Popup>
+        <ui:LinkDropDown Header="Source Branch"
+                         ItemsSource="{Binding Branches}"
+                         DisplayMemberPath="Name"
+                         SelectedItem="{Binding SourceBranch}"
+                         ToolTip="Select a branch"
+                         Margin="0,1,0,0"
+                         Grid.Column="1"/>
       </Grid>
 
     </DockPanel>

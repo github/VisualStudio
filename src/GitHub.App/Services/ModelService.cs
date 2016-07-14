@@ -433,7 +433,7 @@ namespace GitHub.Services
             {
                 Title = pr.Title;
                 Number = pr.Number;
-                CommentCount = pr.Comments;
+                CommentCount = pr.Comments + pr.ReviewComments;
                 Author = new AccountCacheItem(pr.User);
                 Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;
                 CreatedAt = pr.CreatedAt;
