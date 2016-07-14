@@ -1,18 +1,21 @@
-# scripts that run after cloning repository
+version: 1.0.{build}
 install:
-  - if "%APPVEYOR_REPO_NAME%" EQU "github/VisualStudio" set MASTER_BUILD=1
-  - git submodule init
-  - if not defined MASTER_BUILD git submodule deinit script
-  - git submodule update
-  - nuget restore submodules\akavache\Akavache.sln
-  - nuget restore submodules\octokit.net\Octokit.sln
-  - nuget restore submodules\reactiveui\ReactiveUI.sln
-  - nuget restore submodules\Rothko\Rothko.sln
-  - nuget restore GitHubVS.sln
-
+- ps: >-
+    $full_build = Test-Path env:GHFVS_KEY
+    git submodule init
+    if ($full_build) {
+      $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
+      $fileContent += $env:GHFVS_KEY.Replace(' ', "`n")
+      $fileContent += "`n-----END RSA PRIVATE KEY-----`n"
+      Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
+    } else {
+      git submodule deinit script
+    }
+    git submodule update
+    nuget restore GitHubVS.sln
 build_script:
-  - msbuild "GitHubVS.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0
-  
+- cmd: msbuild "GitHubVS.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0
 test_script:
-  - '%xunit20%\xunit.console.x86 "src\UnitTests\bin\Release\UnitTests.dll" -appveyor'
-  - nunit-console "src\TrackingCollectionTests\bin\Release\TrackingCollectionTests.dll" -framework:net-4.5 -exclude:Timings
+- ps: >-
+    scripts\Run-Nunit.ps1 TrackingCollectionTests 180 Release
+    scripts\Run-Xunit.ps1 UnitTests 180 Release
