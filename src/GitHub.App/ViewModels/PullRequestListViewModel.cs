@@ -6,10 +6,12 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using NullGuard;
 using ReactiveUI;
@@ -25,17 +27,30 @@ namespace GitHub.ViewModels
         readonly ISimpleRepositoryModel repository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
+        readonly IPackageSettings settings;
+        readonly PullRequestListUIState listSettings;
 
         [ImportingConstructor]
         PullRequestListViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo)
-        { }
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            ITeamExplorerServiceHolder teservice,
+            IPackageSettings settings)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
+        {
+        }
 
-        public PullRequestListViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
+        public PullRequestListViewModel(
+            IRepositoryHost repositoryHost,
+            ISimpleRepositoryModel repository,
+            IPackageSettings settings)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.settings = settings;
+
+            this.listSettings = settings.UIState
+                .GetOrCreateRepositoryState(repository.CloneUrl)
+                .PullRequests;
 
             openPullRequestCommand = ReactiveCommand.Create();
             openPullRequestCommand.Subscribe(_ =>
@@ -48,7 +63,16 @@ namespace GitHub.ViewModels
                 new PullRequestState { IsOpen = false, Name = "Closed" },
                 new PullRequestState { Name = "All" }
             };
-            SelectedState = States[0];
+
+            if (this.listSettings.SelectedState == null)
+            {
+                this.listSettings.SelectedState = States[0].Name;
+            }
+
+            if (selectedState == null)
+            {
+                selectedState = States.FirstOrDefault(x => x.Name == this.listSettings.SelectedState);
+            }
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
@@ -88,6 +112,21 @@ namespace GitHub.ViewModels
                 trackingAssignees.AddItem(pr.Assignee);
                 trackingAuthors.AddItem(pr.Author);
             }, () => { });
+
+            pullRequests.OriginalCompleted
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    if (listSettings.SelectedAuthor != null)
+                    {
+                        SelectedAuthor = Authors.FirstOrDefault(x => x.Login == listSettings.SelectedAuthor);
+                    }
+
+                    if (listSettings.SelectedAssignee != null)
+                    {
+                        SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
+                    }
+                });
         }
 
         void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass, [AllowNull]IAccount aut)
@@ -184,6 +223,7 @@ namespace GitHub.ViewModels
                 pullRequests.Dispose();
                 trackingAuthors.Dispose();
                 trackingAssignees.Dispose();
+                SaveSettings();
                 disposed = true;
             }
         }
@@ -192,6 +232,14 @@ namespace GitHub.ViewModels
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        void SaveSettings()
+        {
+            listSettings.SelectedState = SelectedState.Name;
+            listSettings.SelectedAssignee = SelectedAssignee?.Login;
+            listSettings.SelectedAuthor = SelectedAuthor?.Login;
+            settings.Save();
         }
     }
 }

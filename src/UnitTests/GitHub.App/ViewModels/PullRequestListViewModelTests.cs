@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using GitHub.Collections;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.ViewModels;
 using NSubstitute;
 using Xunit;
@@ -18,7 +19,8 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository);
+            var settings = Substitute.For<IPackageSettings>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
@@ -32,7 +34,8 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository);
+            var settings = Substitute.For<IPackageSettings>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
@@ -52,7 +55,8 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository);
+            var settings = Substitute.For<IPackageSettings>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
@@ -66,7 +70,8 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository);
+            var settings = Substitute.For<IPackageSettings>();
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;

@@ -18,6 +18,30 @@ namespace GitHub.Settings
             = new List<GitHubConnectSectionState>();
 
         /// <summary>
+        /// Gets or sets a a collection of UI state objects for repositories.
+        /// </summary>
+        public List<RepositoryUIState> RepositoryState { get; set; }
+            = new List<RepositoryUIState>();
+
+        /// <summary>
+        /// Gets or creates the UI state for a repository.
+        /// </summary>
+        /// <param name="repositoryUrl">The URL of the repository.</param>
+        /// <returns>A <see cref="RepositoryUIState"/> object.</returns>
+        public RepositoryUIState GetOrCreateRepositoryState(string repositoryUrl)
+        {
+            var result = RepositoryState.FirstOrDefault(x => x.RepositoryUrl == repositoryUrl);
+
+            if (result == null)
+            {
+                result = new RepositoryUIState { RepositoryUrl = repositoryUrl };
+                RepositoryState.Add(result);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Gets or creates the UI state for a named <see cref="IGitHubConnectSection"/>.
         /// </summary>
         /// <param name="sectionName">The name of the section.</param>
