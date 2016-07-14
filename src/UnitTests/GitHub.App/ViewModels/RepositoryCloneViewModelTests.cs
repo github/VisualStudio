@@ -339,8 +339,7 @@ public class RepositoryCloneViewModelTests
 
             await vm.CloneCommand.ExecuteAsync(null);
 
-            notificationService.Received().ShowError(@"Failed to clone the repository 'octokit'
-Email support@github.com if you continue to have problems.");
+            notificationService.Received().ShowError("Failed to clone the repository 'octokit'\r\nEmail support@github.com if you continue to have problems.");
         }
 
         [Fact]
