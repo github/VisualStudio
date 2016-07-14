@@ -1,4 +1,4 @@
-version: {build}
+version: '{build}'
 install:
 - ps: >-
     $full_build = Test-Path env:GHFVS_KEY
