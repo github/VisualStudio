@@ -15,8 +15,5 @@ namespace GitHub.Models
         DateTimeOffset UpdatedAt { get; }
         IAccount Author { get; }
         IAccount Assignee { get; }
-        ISimpleRepositoryModel Repository { get; }
-        IBranch Head { get; }
-        IBranch Base { get; }
     }
 }
