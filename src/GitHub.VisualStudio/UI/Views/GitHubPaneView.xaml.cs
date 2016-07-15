@@ -20,6 +20,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.InitializeComponent();
             this.WhenActivated(d =>
             {
+                ErrorMessage.Message = "testing the error message";
             });
         }
     }

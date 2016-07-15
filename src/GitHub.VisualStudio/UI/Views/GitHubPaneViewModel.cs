@@ -347,6 +347,15 @@ namespace GitHub.VisualStudio.UI.Views
             private set { repositoryOrigin = value; }
         }
 
+        
+        string errorMessage;
+        [AllowNull]
+        public string ErrorMessage
+        {
+            [return:AllowNull] get { return errorMessage; }
+            private set { errorMessage = value; this.RaisePropertyChange(); }
+        }
+
         public bool? IsGitHubRepo
         {
             get

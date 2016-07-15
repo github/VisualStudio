@@ -12,6 +12,9 @@ using System.Linq;
 using GitHub.Validation;
 using GitHub.Extensions;
 using NullGuard;
+using GitHub.UserErrors;
+using System.Globalization;
+using GitHub.App;
 
 namespace GitHub.ViewModels
 {
@@ -28,12 +31,13 @@ namespace GitHub.ViewModels
              IPullRequestService service, INotificationService notifications)
              : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service, notifications)
          {}
-
+        
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
         {
             this.repositoryHost = repositoryHost;
             this.activeRepo = activeRepo;
+            this.Notifications = notifications;
 
             var repo = GitService.GitServiceHelper.GetRepo(activeRepo.LocalPath);
             this.WhenAny(x => x.Branches, x => x.Value)
@@ -74,10 +78,11 @@ namespace GitHub.ViewModels
             {
                 if (!ex.IsCriticalException())
                 {
+                    notifications.ShowError(ex.Message);
                 }
             });
         }
-
+        
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);
@@ -87,6 +92,7 @@ namespace GitHub.ViewModels
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(x => Branches = x);
         }
+
 
         IBranch sourceBranch;
         [AllowNull]
@@ -146,5 +152,8 @@ namespace GitHub.ViewModels
             get { return branchValidator; }
             set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
         }
+
+        public INotificationService Notifications { get; }
+
     }
 }

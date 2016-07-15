@@ -9,6 +9,7 @@
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
+                            xmlns:control="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
                             Background="{DynamicResource GitHubVsToolWindowBackground}"
                             Foreground="{DynamicResource GitHubVsToolWindowText}"
                             d:DesignHeight="300"
@@ -43,6 +44,7 @@
     <StackPanel Margin="6,9,9,5"
                 DockPanel.Dock="Top"
                 Orientation="Horizontal">
+      <control:ErrorStrip x:Name="ErrorMessage" Message="{Binding ErrorMessage}"></control:ErrorStrip>
       <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"

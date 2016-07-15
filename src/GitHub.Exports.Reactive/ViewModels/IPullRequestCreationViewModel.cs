@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using GitHub.Validation;
 using ReactiveUI;
+using GitHub.Services;
 
 namespace GitHub.ViewModels
 {
@@ -15,5 +16,7 @@ namespace GitHub.ViewModels
         IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
         string PRTitle { get; set; }
         ReactivePropertyValidator TitleValidator { get; }
+        INotificationService Notifications { get; }
+
     }
 }
