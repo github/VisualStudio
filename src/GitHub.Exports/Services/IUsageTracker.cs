@@ -10,5 +10,6 @@
         void IncrementLinkToGitHubCount();
         void IncrementCreateGistCount();
         void IncrementUpstreamPullRequestCount();
+        void IncrementLoginCount();
     }
 }
