@@ -20,6 +20,7 @@ using ReactiveUI;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
+using System.Windows.Threading;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -47,14 +48,14 @@ namespace GitHub.VisualStudio.UI.Views
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts)
+            IConnectionManager cm, IRepositoryHosts hosts, INotificationDispatcher notifications)
             : base(apiFactory, holder)
         {
             this.connectionManager = cm;
             this.hosts = hosts;
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
-            Title = "GitHub";
+            Title = "GitHub"; 
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -91,6 +92,9 @@ namespace GitHub.VisualStudio.UI.Views
             base.Initialize(serviceProvider);
 
             hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
+
+
+            ErrorMessage = "testing";
         }
 
         public void Initialize([AllowNull] ViewWithData data)

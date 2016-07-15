@@ -44,7 +44,7 @@
     <StackPanel Margin="6,9,9,5"
                 DockPanel.Dock="Top"
                 Orientation="Horizontal">
-      <control:ErrorStrip x:Name="ErrorMessage" Message="{Binding ErrorMessage}"></control:ErrorStrip>
+      <control:ErrorStrip x:Name="ErrorMessage" Message="{Binding ErrorMessage}" VerticalAlignment="Top"></control:ErrorStrip>
       <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"

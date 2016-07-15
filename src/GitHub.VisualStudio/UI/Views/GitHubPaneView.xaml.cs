@@ -3,6 +3,10 @@ using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
+using GitHub.Services;
+using System.Windows.Threading;
+using System.Reactive.Linq;
+using System;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -15,12 +19,21 @@ namespace GitHub.VisualStudio.UI.Views
 
     public partial class GitHubPaneView : GenericGitHubPaneView
     {
-        public GitHubPaneView()
+        [ImportingConstructor]
+        public GitHubPaneView(INotificationDispatcher notifications)
         {
             this.InitializeComponent();
             this.WhenActivated(d =>
             {
-                ErrorMessage.Message = "testing the error message";
+                d(notifications.Listen()
+                    .Where(n => n.Type == Notification.NotificationType.Error)
+                    .ObserveOnDispatcher(DispatcherPriority.Normal)
+                    .Subscribe(n =>
+                    {
+                        //errorMessage.Visibility = Visibility.Visible;
+                        // errorMessage = n.Message;
+                        ErrorMessage.Message = n.Message;
+                    }));
             });
         }
     }
