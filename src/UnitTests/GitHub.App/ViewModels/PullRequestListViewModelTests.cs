@@ -19,7 +19,7 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var settings = Substitute.For<IPackageSettings>();
+            var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
@@ -34,7 +34,7 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var settings = Substitute.For<IPackageSettings>();
+            var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
@@ -55,7 +55,7 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var settings = Substitute.For<IPackageSettings>();
+            var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
@@ -70,7 +70,7 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ISimpleRepositoryModel>();
-            var settings = Substitute.For<IPackageSettings>();
+            var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
@@ -112,6 +112,13 @@ namespace UnitTests.GitHub.App.ViewModels
             result.ModelService.Returns(modelService);
 
             return result;
+        }
+
+        IPackageSettings CreateSettings()
+        {
+            var settings = Substitute.For<IPackageSettings>();
+            settings.UIState.Returns(new UIState());
+            return settings;
         }
     }
 }
