@@ -2,6 +2,7 @@
 using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
+using System.Windows;
 using ReactiveUI;
 using GitHub.Services;
 using System.Windows.Threading;
@@ -25,13 +26,12 @@ namespace GitHub.VisualStudio.UI.Views
             this.InitializeComponent();
             this.WhenActivated(d =>
             {
+                ErrorMessage.Visibility = Visibility.Collapsed;
                 d(notifications.Listen()
                     .Where(n => n.Type == Notification.NotificationType.Error)
                     .ObserveOnDispatcher(DispatcherPriority.Normal)
                     .Subscribe(n =>
                     {
-                        //errorMessage.Visibility = Visibility.Visible;
-                        // errorMessage = n.Message;
                         ErrorMessage.Message = n.Message;
                     }));
             });

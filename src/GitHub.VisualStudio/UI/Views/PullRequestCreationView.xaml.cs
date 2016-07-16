@@ -22,9 +22,6 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
                 d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
-            
-                //ErrorMessage.Message = "testing the error message";
-
             });
         }
     }

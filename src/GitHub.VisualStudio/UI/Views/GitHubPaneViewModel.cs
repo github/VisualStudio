@@ -92,9 +92,6 @@ namespace GitHub.VisualStudio.UI.Views
             base.Initialize(serviceProvider);
 
             hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
-
-
-            ErrorMessage = "testing";
         }
 
         public void Initialize([AllowNull] ViewWithData data)
