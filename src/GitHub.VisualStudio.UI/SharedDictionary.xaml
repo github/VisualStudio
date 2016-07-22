@@ -1,0 +1,10 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers">
+
+    <ResourceDictionary.MergedDictionaries>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

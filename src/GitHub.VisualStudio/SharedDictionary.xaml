@@ -6,7 +6,7 @@
   xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers">
 
   <ResourceDictionary.MergedDictionaries>
-    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeDesignTime.xaml"/>
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ActionLinkButton.xaml" />
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubComboBox.xaml" />
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/Buttons.xaml" />
