@@ -3,10 +3,7 @@ using GitHub.ViewModels;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Validation;
-using System;
-using System.Windows.Input;
 using ReactiveUI;
-using GitHub.Services;
 
 namespace GitHub.SampleData
 {
@@ -48,7 +45,6 @@ namespace GitHub.SampleData
         public ReactivePropertyValidator TitleValidator { get; }
 
         public ReactivePropertyValidator BranchValidator { get; }
-        public INotificationService Notifications { get; }
 
     }
 }
