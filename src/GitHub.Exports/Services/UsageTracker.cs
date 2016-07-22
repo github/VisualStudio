@@ -126,6 +126,13 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public void IncrementLoginCount()
+        {
+            var usage = LoadUsage();
+            ++usage.Model.NumberOfLogins;
+            SaveUsage(usage);
+        }
+
         UsageStore LoadUsage()
         {
             var result = fileExists(storePath) ?
