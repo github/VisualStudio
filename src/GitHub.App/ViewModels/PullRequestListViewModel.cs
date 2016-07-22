@@ -64,15 +64,19 @@ namespace GitHub.ViewModels
                 new PullRequestState { Name = "All" }
             };
 
-            if (this.listSettings.SelectedState == null)
-            {
-                this.listSettings.SelectedState = States[0].Name;
-            }
+            trackingAuthors = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
+                OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
+            trackingAssignees = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
+                OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
+            trackingAuthors.Subscribe();
+            trackingAssignees.Subscribe();
 
-            if (selectedState == null)
-            {
-                selectedState = States.FirstOrDefault(x => x.Name == this.listSettings.SelectedState);
-            }
+            Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
+            Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
+
+            PullRequests = new TrackingCollection<IPullRequestModel>();
+            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
@@ -86,20 +90,7 @@ namespace GitHub.ViewModels
                 .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
-            trackingAuthors = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
-                OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
-            trackingAssignees = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(), 
-                OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
-            trackingAuthors.Subscribe();
-            trackingAssignees.Subscribe();
-
-            Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
-            Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
-
-            PullRequests = new TrackingCollection<IPullRequestModel>();
-            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
-            pullRequests.Filter = (pr, i, l) => pr.IsOpen;
-            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -171,6 +162,7 @@ namespace GitHub.ViewModels
         PullRequestState selectedState;
         public PullRequestState SelectedState
         {
+            [return: AllowNull]
             get { return selectedState; }
             set { this.RaiseAndSetIfChanged(ref selectedState, value); }
         }
@@ -212,7 +204,6 @@ namespace GitHub.ViewModels
         {
             get { return emptyUser; }
         }
-
 
         bool disposed;
         protected void Dispose(bool disposing)
