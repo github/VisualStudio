@@ -493,4 +493,9 @@ namespace GitHub.SampleData
 
         public IConnection SectionConnection { get; }
     }
+
+    public class InfoPanelDesigner
+    {
+        public string Message => "This is an informational message for the info panel to test things in design mode. This is not meant to be run in release.";
+    }
 }

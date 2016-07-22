@@ -20,13 +20,8 @@ namespace GitHub.VisualStudio.UI.Controls
     /// </summary>
     public partial class InfoPanel : UserControl
     {
-        public InfoPanel()
-        {
-            InitializeComponent();
-        }
-
         public static readonly DependencyProperty MessageProperty =
-       DependencyProperty.Register(nameof(Message), typeof(string), typeof(InfoPanel), new PropertyMetadata(null, UpdateVisibilities));
+            DependencyProperty.Register(nameof(Message), typeof(string), typeof(InfoPanel), new PropertyMetadata(null, UpdateVisibility));
 
         public string Message
         {
@@ -34,11 +29,19 @@ namespace GitHub.VisualStudio.UI.Controls
             set { SetValue(MessageProperty, value); }
         }
 
-        static void UpdateVisibilities(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public InfoPanel()
         {
-            var control = (InfoPanel)d;          
+            InitializeComponent();
+
+            this.DataContext = this;
+        }
+
+        static void UpdateVisibility(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (InfoPanel)d;
             control.Visibility = string.IsNullOrEmpty(control.Message) ? Visibility.Collapsed : Visibility.Visible;
         }
+
         void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;

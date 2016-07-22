@@ -19,15 +19,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
     {
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";
 
-        readonly Lazy<IVisualStudioBrowser> browser;
         readonly IMenuProvider menuProvider;
 
         [ImportingConstructor]
-        public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
-                                    ITeamExplorerServiceHolder holder, IMenuProvider menuProvider)
+        public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, 
+                ITeamExplorerServiceHolder holder, IMenuProvider menuProvider)
             : base(apiFactory, holder, Octicon.git_pull_request)
         {
-            this.browser = browser;
             this.menuProvider = menuProvider;
             Text = Resources.PullRequestsNavigationItemText;
             ArgbColor = Colors.RedNavigationItem.ToInt32();

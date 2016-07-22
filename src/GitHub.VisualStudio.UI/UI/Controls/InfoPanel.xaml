@@ -1,15 +1,47 @@
 ﻿<UserControl x:Class="GitHub.VisualStudio.UI.Controls.InfoPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:cache="clr-namespace:GitHub.VisualStudio.UI.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Controls"
-             mc:Ignorable="d" 
-            Background="Beige">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             Background="Beige"
+             d:DataContext="{d:DesignInstance Type=sampleData:InfoPanelDesigner, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <DockPanel Margin="8" LastChildFill="True">
-        <Button Margin="8" HorizontalAlignment="Right" VerticalAlignment="Top" DockPanel.Dock="Right" Click="Button_Click">x</Button>
-        <Image DockPanel.Dock="Left" Source="~\Resources\logo_32x32@2x.png" Width="20" Height="20" VerticalAlignment="Top" Margin="8,0"></Image>
-        <TextBlock DockPanel.Dock="Top" Margin="8,0" TextWrapping="Wrap" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Control}}, Path=Message}"></TextBlock>
+        <ui:OcticonImage Width="16"
+                         Height="16"
+                         Margin="0,0,8,0"
+                         VerticalAlignment="Top"
+                         DockPanel.Dock="Left"
+                         Foreground="Black"
+                         Icon="x"
+                         />
+        <ui:OcticonButton Width="32"
+                          Height="32"
+                          
+                          VerticalAlignment="Top"
+                          DockPanel.Dock="Right"
+                          Foreground="Black"
+                          Icon="x"
+                          />
+        <TextBlock Margin="8,0"
+                   DockPanel.Dock="Top"
+                   Text="{Binding Message}"
+                   Foreground="Black"
+                   TextWrapping="Wrap"/>
     </DockPanel>
 </UserControl>

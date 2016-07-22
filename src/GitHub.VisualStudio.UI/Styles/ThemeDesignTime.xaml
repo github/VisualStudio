@@ -4,7 +4,7 @@
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/ThemeBlue.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeBlue.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <!-- Design time colors taken from the VS dark theme
