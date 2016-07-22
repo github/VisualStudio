@@ -16,17 +16,17 @@ using System.Windows.Shapes;
 namespace GitHub.VisualStudio.UI.Controls
 {
     /// <summary>
-    /// Interaction logic for ErrorStrip.xaml
+    /// Interaction logic for InfoPanel.xaml
     /// </summary>
-    public partial class ErrorStrip : UserControl
+    public partial class InfoPanel : UserControl
     {
-        public ErrorStrip()
+        public InfoPanel()
         {
             InitializeComponent();
         }
 
         public static readonly DependencyProperty MessageProperty =
-       DependencyProperty.Register(nameof(Message), typeof(string), typeof(ErrorStrip), new PropertyMetadata(null, UpdateVisibilities));
+       DependencyProperty.Register(nameof(Message), typeof(string), typeof(InfoPanel), new PropertyMetadata(null, UpdateVisibilities));
 
         public string Message
         {
@@ -36,7 +36,7 @@ namespace GitHub.VisualStudio.UI.Controls
 
         static void UpdateVisibilities(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = (ErrorStrip)d;          
+            var control = (InfoPanel)d;          
             control.Visibility = string.IsNullOrEmpty(control.Message) ? Visibility.Collapsed : Visibility.Visible;
         }
         void Button_Click(object sender, RoutedEventArgs e)

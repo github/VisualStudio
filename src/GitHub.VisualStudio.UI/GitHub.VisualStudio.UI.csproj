@@ -86,8 +86,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="SharedResources.cs" />
-    <Compile Include="UI\Controls\ErrorStrip.xaml.cs">
-      <DependentUpon>ErrorStrip.xaml</DependentUpon>
+    <Compile Include="UI\Controls\InfoPanel.xaml.cs">
+      <DependentUpon>InfoPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\DrawingExtensions.cs" />
     <Compile Include="UI\Views\GitHubConnectContent.xaml.cs">
@@ -112,7 +112,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\Controls\ErrorStrip.xaml">
+    <Page Include="UI\Controls\InfoPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
