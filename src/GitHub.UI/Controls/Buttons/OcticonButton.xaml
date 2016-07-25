@@ -5,32 +5,97 @@
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="Height" Value="16"/>
         <Setter Property="Width" Value="16"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:OcticonButton">
-                    <Grid x:Name="content" Background="Transparent">
+                    <Grid x:Name="content" Margin="{TemplateBinding Margin}" Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MouseOverBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PressedBorder" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity">
+                                            <SplineDoubleKeyFrame KeyTime="0" Value="0.5"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetName="contentPresenter" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.5"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused"/>
+                                <VisualState x:Name="Unfocused"/>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <ui:FixedAspectRatioPanel HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsHitTestVisible="False">
-                            <Viewbox>
+                        <Border x:Name="Background"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                SnapsToDevicePixels="True"/>
+                        <Rectangle x:Name="DisabledVisualElement"
+                                   Fill="#FFFCFCFC"
+                                   IsHitTestVisible="False"
+                                   Opacity="0"
+                                   SnapsToDevicePixels="True"/>
+                        <Border x:Name="MouseOverBorder"
+                                Background="#FFDDDDE6"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                Opacity="0"
+                                SnapsToDevicePixels="True"/>
+                        <Border x:Name="PressedBorder"
+                                Background="#FFCFCFDB"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                Opacity="0"
+                                SnapsToDevicePixels="True"/>
+                        <Border x:Name="DefaultVisualElement"
+                                Background="Transparent"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                Opacity="0"
+                                SnapsToDevicePixels="True"/>
+                        <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="16" Height="16">
+                            <Border BorderBrush="Transparent" BorderThickness="1">
+
                                 <ui:OcticonPath Height="16"
                                                 Fill="{TemplateBinding Foreground}"
                                                 Icon="{TemplateBinding Icon}"
                                                 SnapsToDevicePixels="True"/>
-                            </Viewbox>
-                        </ui:FixedAspectRatioPanel>
+                            </Border>
+                        </Viewbox>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="content" Property="Background" Value="#11FFFFFF"/>
+                        <Trigger Property="IsDefaulted" Value="True">
+                            <Setter TargetName="DefaultVisualElement" Property="Opacity" Value="1"/>
                         </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="content" Property="Background" Value="#11FFFFFF"/>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="DefaultVisualElement" Property="Opacity" Value="1"/>
                         </Trigger>
-                    </ControlTemplate.Triggers>                
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

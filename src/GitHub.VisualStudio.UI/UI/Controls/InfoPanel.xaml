@@ -12,11 +12,11 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -27,21 +27,21 @@
                          Margin="0,0,8,0"
                          VerticalAlignment="Top"
                          DockPanel.Dock="Left"
+                         Foreground="DarkRed"
+                         Icon="alert" />
+        <ui:OcticonButton Width="16"
+                         Height="16"
+                         Margin="0"
+                         VerticalAlignment="Top"
+                         DockPanel.Dock="Right"
                          Foreground="Black"
-                         Icon="x"
-                         />
-        <ui:OcticonButton Width="32"
-                          Height="32"
-                          
-                          VerticalAlignment="Top"
-                          DockPanel.Dock="Right"
-                          Foreground="Black"
-                          Icon="x"
-                          />
+                         Background="Transparent"
+                         Click="Button_Click"
+                         Icon="x" />
         <TextBlock Margin="8,0"
                    DockPanel.Dock="Top"
-                   Text="{Binding Message}"
                    Foreground="Black"
-                   TextWrapping="Wrap"/>
+                   Text="{Binding Message}"
+                   TextWrapping="Wrap" />
     </DockPanel>
 </UserControl>
