@@ -98,6 +98,8 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
+            pullRequestsLoaded = false;
+
             PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
