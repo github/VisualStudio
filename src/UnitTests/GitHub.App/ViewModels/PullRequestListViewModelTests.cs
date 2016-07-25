@@ -23,10 +23,10 @@ namespace UnitTests.GitHub.App.ViewModels
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
-            prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
+            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
 
             prViewModel.SelectedAssignee = prViewModel.PullRequests[0].Assignee;
-            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
+            prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
         [Fact]
@@ -38,16 +38,16 @@ namespace UnitTests.GitHub.App.ViewModels
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
-            prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
+            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
 
             prViewModel.SelectedAssignee = prViewModel.PullRequests[0].Assignee;
-            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
+            prViewModel.PullRequests.Received(2).Filter = AnyFilter;
 
             // Setting the Assignee filter to [None] should not trigger a filter:
             // doing this will remove the [None] entry from Assignees, which will cause
             // the selection in the view to be set to null which will reset the filter.
             prViewModel.SelectedAssignee = prViewModel.EmptyUser;
-            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
+            prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
         [Fact]
@@ -59,10 +59,10 @@ namespace UnitTests.GitHub.App.ViewModels
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
-            prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
+            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
 
             prViewModel.SelectedAuthor = prViewModel.PullRequests[0].Author;
-            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
+            prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
         [Fact]
@@ -74,16 +74,16 @@ namespace UnitTests.GitHub.App.ViewModels
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
             prViewModel.Initialize(null);
-            prViewModel.PullRequests.DidNotReceive().Filter = AnyFilter;
+            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
 
             prViewModel.SelectedAuthor = prViewModel.PullRequests[0].Author;
-            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
+            prViewModel.PullRequests.Received(2).Filter = AnyFilter;
 
             // Setting the Author filter to [None] should not trigger a filter:
             // doing this will remove the [None] entry from Authors, which will cause
             // the selection in the view to be set to null which will reset the filter.
             prViewModel.SelectedAuthor = prViewModel.EmptyUser;
-            prViewModel.PullRequests.Received(1).Filter = AnyFilter;
+            prViewModel.PullRequests.Received(2).Filter = AnyFilter;
         }
 
         Func<IPullRequestModel, int, IList<IPullRequestModel>, bool> AnyFilter =>
