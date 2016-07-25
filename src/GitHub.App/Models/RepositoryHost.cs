@@ -29,6 +29,7 @@ namespace GitHub.Models
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
+        readonly IUsageTracker usage;
 
         bool isLoggedIn;
         readonly bool isEnterprise;
@@ -37,12 +38,14 @@ namespace GitHub.Models
             IApiClient apiClient,
             IModelService modelService,
             ILoginCache loginCache,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler)
+            ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            IUsageTracker usage)
         {
             ApiClient = apiClient;
             ModelService = modelService;
             this.loginCache = loginCache;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
+            this.usage = usage;
 
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
@@ -238,6 +241,7 @@ namespace GitHub.Models
                     if (result.IsSuccess())
                     {
                         var accountCacheItem = new AccountCacheItem(userAndScopes.User);
+                        usage.IncrementLoginCount();
                         return ModelService.InsertUser(accountCacheItem).Select(_ => result);
                     }
 
