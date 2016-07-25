@@ -29,6 +29,7 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
+        bool pullRequestsLoaded;
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -83,11 +84,11 @@ namespace GitHub.ViewModels
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser)
+                .Where(x => PullRequests != null && x != EmptyUser && pullRequestsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser)
+                .Where(x => PullRequests != null && x != EmptyUser && pullRequestsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
@@ -117,6 +118,9 @@ namespace GitHub.ViewModels
                     {
                         SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
                     }
+ 
+                    pullRequestsLoaded = true;
+                    UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
                 });
         }
 
