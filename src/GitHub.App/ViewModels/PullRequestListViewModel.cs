@@ -6,10 +6,12 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using NullGuard;
 using ReactiveUI;
@@ -25,17 +27,31 @@ namespace GitHub.ViewModels
         readonly ISimpleRepositoryModel repository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
+        readonly IPackageSettings settings;
+        readonly PullRequestListUIState listSettings;
+        bool pullRequestsLoaded;
 
         [ImportingConstructor]
         PullRequestListViewModel(
-            IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo)
-        { }
+            IConnectionRepositoryHostMap connectionRepositoryHostMap,
+            ITeamExplorerServiceHolder teservice,
+            IPackageSettings settings)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
+        {
+        }
 
-        public PullRequestListViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel repository)
+        public PullRequestListViewModel(
+            IRepositoryHost repositoryHost,
+            ISimpleRepositoryModel repository,
+            IPackageSettings settings)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.settings = settings;
+
+            this.listSettings = settings.UIState
+                .GetOrCreateRepositoryState(repository.CloneUrl)
+                .PullRequests;
 
             openPullRequestCommand = ReactiveCommand.Create();
             openPullRequestCommand.Subscribe(_ =>
@@ -48,23 +64,10 @@ namespace GitHub.ViewModels
                 new PullRequestState { IsOpen = false, Name = "Closed" },
                 new PullRequestState { Name = "All" }
             };
-            SelectedState = States[0];
-
-            this.WhenAny(x => x.SelectedState, x => x.Value)
-                .Where(x => PullRequests != null)
-                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
-
-            this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser)
-                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
-
-            this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser)
-                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             trackingAuthors = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
-            trackingAssignees = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(), 
+            trackingAssignees = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
             trackingAuthors.Subscribe();
             trackingAssignees.Subscribe();
@@ -74,13 +77,28 @@ namespace GitHub.ViewModels
 
             PullRequests = new TrackingCollection<IPullRequestModel>();
             pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
-            pullRequests.Filter = (pr, i, l) => pr.IsOpen;
             pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+
+            this.WhenAny(x => x.SelectedState, x => x.Value)
+                .Where(x => PullRequests != null)
+                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
+
+            this.WhenAny(x => x.SelectedAssignee, x => x.Value)
+                .Where(x => PullRequests != null && x != EmptyUser && pullRequestsLoaded)
+                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
+
+            this.WhenAny(x => x.SelectedAuthor, x => x.Value)
+                .Where(x => PullRequests != null && x != EmptyUser && pullRequestsLoaded)
+                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
+
+            SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);
+
+            pullRequestsLoaded = false;
 
             PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
             pullRequests.Subscribe(pr =>
@@ -88,6 +106,24 @@ namespace GitHub.ViewModels
                 trackingAssignees.AddItem(pr.Assignee);
                 trackingAuthors.AddItem(pr.Author);
             }, () => { });
+
+            pullRequests.OriginalCompleted
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    if (listSettings.SelectedAuthor != null)
+                    {
+                        SelectedAuthor = Authors.FirstOrDefault(x => x.Login == listSettings.SelectedAuthor);
+                    }
+
+                    if (listSettings.SelectedAssignee != null)
+                    {
+                        SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
+                    }
+ 
+                    pullRequestsLoaded = true;
+                    UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
+                });
         }
 
         void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass, [AllowNull]IAccount aut)
@@ -132,6 +168,7 @@ namespace GitHub.ViewModels
         PullRequestState selectedState;
         public PullRequestState SelectedState
         {
+            [return: AllowNull]
             get { return selectedState; }
             set { this.RaiseAndSetIfChanged(ref selectedState, value); }
         }
@@ -174,7 +211,6 @@ namespace GitHub.ViewModels
             get { return emptyUser; }
         }
 
-
         bool disposed;
         protected void Dispose(bool disposing)
         {
@@ -184,6 +220,7 @@ namespace GitHub.ViewModels
                 pullRequests.Dispose();
                 trackingAuthors.Dispose();
                 trackingAssignees.Dispose();
+                SaveSettings();
                 disposed = true;
             }
         }
@@ -192,6 +229,14 @@ namespace GitHub.ViewModels
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        void SaveSettings()
+        {
+            listSettings.SelectedState = SelectedState.Name;
+            listSettings.SelectedAssignee = SelectedAssignee?.Login;
+            listSettings.SelectedAuthor = SelectedAuthor?.Login;
+            settings.Save();
         }
     }
 }
