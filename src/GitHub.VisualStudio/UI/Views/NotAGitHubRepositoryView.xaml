@@ -41,8 +41,8 @@
         <Button HorizontalAlignment="Center"
                 Margin="0,15"
                 Style="{DynamicResource GitHubVsPrimaryActionButton}"
-                Command="{Binding Publish}">
-            Get Started
+                Command="{Binding Publish}" >
+          <TextBlock Text="{x:Static prop:Resources.GetStartedText}" />
         </Button>
     </StackPanel>
   </DockPanel>

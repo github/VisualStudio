@@ -180,6 +180,18 @@
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
     <value>No selected repository.</value>
   </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>Please enter a repository path</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>Please enter a valid path</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>Path contains invalid characters</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>Path too long</value>
+  </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
     <value>Repository '{0}/{1}' already exists.</value>
   </data>
