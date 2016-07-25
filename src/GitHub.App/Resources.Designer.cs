@@ -241,6 +241,33 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter a title for the Pull Request.
+        /// </summary>
+        internal static string PullRequestCreationTitleValidatorEmpty {
+            get {
+                return ResourceManager.GetString("PullRequestCreationTitleValidatorEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source and target branch cannot be the same.
+        /// </summary>
+        internal static string PullRequestSourceAndTargetBranchTheSame {
+            get {
+                return ResourceManager.GetString("PullRequestSourceAndTargetBranchTheSame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source branch doesn&apos;t exist remotely, have you pushed it?.
+        /// </summary>
+        internal static string PullRequestSourceBranchDoesNotExist {
+            get {
+                return ResourceManager.GetString("PullRequestSourceBranchDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No selected repository..
         /// </summary>
         internal static string RepositoryCloneFailedNoSelectedRepo {

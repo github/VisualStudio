@@ -12,6 +12,7 @@ using System.Linq;
 using GitHub.Validation;
 using GitHub.Extensions;
 using NullGuard;
+using GitHub.App;
 
 namespace GitHub.ViewModels
 {
@@ -47,15 +48,15 @@ namespace GitHub.ViewModels
 
             var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value);
             TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
-                .IfNullOrEmpty("Please enter a title for the Pull Request");
+                .IfNullOrEmpty(Resources.PullRequestCreationTitleValidatorEmpty);
 
             var branchObs = this.WhenAny(
                 x => x.SourceBranch,
                 source => source.Value);
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
-                .IfTrue(x => x == null, "Source branch doesn't exist remotely, have you pushed it?")
-                .IfTrue(x => x.Name == TargetBranch.Name, "Source and target branch cannot be the same");
+                .IfTrue(x => x == null, Resources.PullRequestSourceBranchDoesNotExist)
+                .IfTrue(x => x.Name == TargetBranch.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
 
             var whenAnyValidationResultChanges = this.WhenAny(
                 x => x.TitleValidator.ValidationResult,
