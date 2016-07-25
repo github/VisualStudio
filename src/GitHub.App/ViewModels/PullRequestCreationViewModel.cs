@@ -28,7 +28,7 @@ namespace GitHub.ViewModels
              IPullRequestService service, INotificationService notifications)
              : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service, notifications)
          {}
-
+        
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
         {
@@ -74,10 +74,11 @@ namespace GitHub.ViewModels
             {
                 if (!ex.IsCriticalException())
                 {
+                    notifications.ShowError(ex.Message);
                 }
             });
         }
-
+        
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);

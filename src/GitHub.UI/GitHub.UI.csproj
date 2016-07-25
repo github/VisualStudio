@@ -194,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\Buttons\OcticonButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\Buttons\OcticonLinkButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

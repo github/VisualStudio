@@ -14,23 +14,29 @@
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
                                        Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                       d:DataContext="{d:DesignInstance Type=sampleData:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
                                        mc:Ignorable="d">
-
-  <d:DesignProperties.DataContext>
-    <Binding>
-      <Binding.Source>
-        <sampleData:RepositoryPublishViewModelDesigner />
-      </Binding.Source>
-    </Binding>
-  </d:DesignProperties.DataContext>
 
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
-      <Style BasedOn="{StaticResource VSStyledComboBox}" TargetType="{x:Type ComboBox}">
+        
+        <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}"/>
+        <Style x:Key="VSStyledCheckBox" BasedOn="{StaticResource VsCheckBoxStyleKey}" TargetType="{x:Type CheckBox}">
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
+            <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
+            <Style.Triggers>
+                <Trigger Property="UIElement.IsMouseOver" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="VSStyledComboBox" BasedOn="{StaticResource VsComboBoxStyleKey}" TargetType="{x:Type ComboBox}"/>
+
+        <Style BasedOn="{StaticResource VSStyledComboBox}" TargetType="{x:Type ComboBox}">
         <Setter Property="Margin" Value="0,0,0,8" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Height" Value="23" />
