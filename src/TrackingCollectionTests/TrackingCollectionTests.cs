@@ -16,6 +16,13 @@ using System.Threading.Tasks;
 [TestFixture]
 public class TrackingTests : TestBase
 {
+    [Test]
+    public void ThisFails()
+    {
+        Assert.AreEqual(0, 1);
+    }
+
+
 #if !DISABLE_REACTIVE_UI
     [TestFixtureSetUp]
     public void Setup()

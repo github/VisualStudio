@@ -9,6 +9,15 @@ using Xunit;
 
 public class SimpleApiClientTests
 {
+    public class FailingTest
+    {
+        [Fact]
+        public void ThisFails()
+        {
+            Assert.Equal(0, 1);
+        }
+    }
+
     public class TheCtor : TestBaseClass
     {
         public void Throws()
