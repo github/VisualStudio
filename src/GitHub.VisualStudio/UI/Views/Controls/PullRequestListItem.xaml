@@ -9,12 +9,10 @@
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
 
   <ResourceDictionary.MergedDictionaries>
-    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml"/>
+    <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml"/>
     <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
   </ResourceDictionary.MergedDictionaries>
-  <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-  <ui:DurationToStringConverter x:Key="DurationToStringConverter" />
-
+  
   <DataTemplate x:Key="PullRequestItemTemplate" DataType="models:IPullRequestModel">
     <Grid>
       <Grid.RowDefinitions>
@@ -49,18 +47,21 @@
                      Source="{Binding Author.Avatar}" />
           </StackPanel>
       </Grid>
+
+      <Button x:Name="title"
+            Grid.Row="0"
+            Grid.Column="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Foreground="{DynamicResource GitHubVsToolWindowText}"
+            Margin="0,-3,5,0"
+            FontSize="{DynamicResource {x:Static vsui:VsFonts.Environment122PercentFontSizeKey}}"
+            Style="{StaticResource ActionLinkButton}"
+            Content="{Binding Title}"
+            ToolTip="{Binding Title}"
+            Command="{Binding OpenPR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+            CommandParameter="{Binding Number}"/>
         
-      <TextBlock x:Name="title"
-                 Grid.Row="0"
-                 Grid.Column="1"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 Foreground="{DynamicResource GitHubVsToolWindowText}"
-                 Margin="0,-3,5,0"
-                 Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
-                 Text="{Binding Title}"
-                 ToolTip="{Binding Title}"
-                 TextTrimming="CharacterEllipsis" />
         <ui:OcticonImage x:Name="comment_icon"
                    Grid.Row="0"
                    Grid.RowSpan="2"
@@ -70,19 +71,8 @@
                    Width="16"
                    Height="16"
                    VerticalAlignment="Top"
-                   Foreground="{DynamicResource GitHubVsToolWindowText}">
-            <!--
-            <ui:OcticonImage.Style>
-              <Style>
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding CommentCount}" Value="0">
-                    <Setter Property="FrameworkElement.IsEnabled" Value="False" />
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </ui:OcticonImage.Style>
-            -->
-        </ui:OcticonImage>
+                   Foreground="{DynamicResource GitHubVsToolWindowText}"
+                   Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}" />
 
       <TextBlock x:Name="comment_count"
                  Grid.Row="0"
@@ -92,17 +82,8 @@
                  VerticalAlignment="Top"
                  FontFamily="Segoe UI"
                  Foreground="{DynamicResource GitHubVsToolWindowText}"
-                 Text="{Binding CommentCount}">
-        <TextBlock.Style>
-          <Style>
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding CommentCount}" Value="0">
-                <Setter Property="FrameworkElement.IsEnabled" Value="False" />
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </TextBlock.Style>
-      </TextBlock>
+                 Text="{Binding CommentCount}"
+                 Visibility="{Binding CommentCount, Converter={ui:CountToVisibilityConverter}}" />
 
       <ui:OcticonImage x:Name="comment_new"
                        Grid.Row="0"
@@ -115,8 +96,7 @@
                        Margin="0,3"
                        Foreground="Green"
                        Icon="primitive_dot"
-                       Visibility="{Binding HasNewComments,
-                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
+                       Visibility="{Binding HasNewComments, Converter={ui:BooleanToVisibilityConverter}}" />
       <Grid x:Name="status"
             Grid.Row="1"
             Grid.Column="1"
@@ -141,7 +121,7 @@
                    Foreground="{DynamicResource GitHubVsGrayText}">
           <TextBlock.Text>
             <MultiBinding StringFormat="{} {0} {1} {2}">
-              <Binding Converter="{StaticResource DurationToStringConverter}" Path="UpdatedAt" />
+              <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
               <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
               <Binding Path="Author.Login" />
             </MultiBinding>
@@ -153,7 +133,7 @@
                     <TextBlock.Text>
                        <MultiBinding StringFormat="{} {0} {1} {2} {3}">
                           <Binding Source="{x:Static i18n:Resources.prOpenedText}" />
-                          <Binding Converter="{StaticResource DurationToStringConverter}" Path="UpdatedAt" />
+                          <Binding Converter="{ui:DurationToStringConverter}" Path="UpdatedAt" />
                           <Binding Source="{x:Static i18n:Resources.prOpenedByText}" />
                           <Binding Path="Author.Login" />
                         </MultiBinding>

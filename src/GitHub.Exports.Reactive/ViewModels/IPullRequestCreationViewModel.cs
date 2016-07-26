@@ -1,7 +1,5 @@
 ﻿using GitHub.Models;
-using GitHub.UI;
 using System.Collections.Generic;
-using System.Windows.Input;
 using GitHub.Validation;
 using ReactiveUI;
 

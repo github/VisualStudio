@@ -91,6 +91,9 @@
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
+    <Compile Include="..\..\script\src\MetricsService.cs" Condition="$(Buildtype) == 'Internal'">
+      <Link>Services\MetricsService.cs</Link>
+    </Compile>
     <Compile Include="Collections\ICopyable.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Extensions\VSExtensions.cs" />
@@ -109,11 +112,13 @@
     <Compile Include="Models\ISimpleRepositoryModel.cs" />
     <Compile Include="Models\SimpleRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
+    <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Primitives\RelayCommand.cs" />
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />
     <Compile Include="Services\IGitService.cs" />
+    <Compile Include="Services\IMetricsService.cs" />
     <Compile Include="Services\ISelectedTextProvider.cs" />
     <Compile Include="Services\IMenuHandler.cs" />
     <Compile Include="Services\IMenuProvider.cs" />
@@ -122,6 +127,7 @@
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Services\IVSServices.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Services.cs" />
@@ -136,13 +142,17 @@
   <ItemGroup>
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
+    <Compile Include="Services\UsageTracker.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IPackageSettings.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings\GitHubConnectSectionState.cs" />
+    <Compile Include="Settings\PullRequestListUIState.cs" />
+    <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
+    <Compile Include="SimpleJson.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />

@@ -29,24 +29,24 @@ public class RepositoryModelTests
         }
 
         [Theory]
-        [InlineData("a name", "https://github.com/github/VisualStudio", "a name", "https://github.com/github/VisualStudio")]
-        public void SameContentEqualsTrue2(string name1, string url1, string name2, string url2)
+        [InlineData(1, "a name", "https://github.com/github/VisualStudio", 1, "a name", "https://github.com/github/VisualStudio")]
+        public void SameContentEqualsTrue2(long id1, string name1, string url1, long id2, string name2, string url2)
         {
             var account = Substitute.For<IAccount>();
-            var a = new RepositoryModel(name1, new UriString(url1), false, false, account);
-            var b = new RepositoryModel(name2, new UriString(url2), false, false, account);
+            var a = new RepositoryModel(id1, name1, new UriString(url1), false, false, account);
+            var b = new RepositoryModel(id2, name2, new UriString(url2), false, false, account);
             Assert.Equal(a, b);
             Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
         [Theory]
-        [InlineData("a name1", "https://github.com/github/VisualStudio", "a name", "https://github.com/github/VisualStudio")]
-        public void DifferentContentEqualsFalse(string name1, string url1, string name2, string url2)
+        [InlineData(1, "a name1", "https://github.com/github/VisualStudio", 2, "a name", "https://github.com/github/VisualStudio")]
+        public void DifferentContentEqualsFalse(long id1, string name1, string url1, long id2, string name2, string url2)
         {
             var account = Substitute.For<IAccount>();
-            var a = new RepositoryModel(name1, new UriString(url1), false, false, account);
-            var b = new RepositoryModel(name2, new UriString(url2), false, false, account);
+            var a = new RepositoryModel(id1, name1, new UriString(url1), false, false, account);
+            var b = new RepositoryModel(id2, name2, new UriString(url2), false, false, account);
             Assert.NotEqual(a, b);
             Assert.False(a == b);
             Assert.NotEqual(a.GetHashCode(), b.GetHashCode());

@@ -2,6 +2,7 @@
 {
     public enum RepositoryOrigin
     {
+        Unknown,
         DotCom,
         Enterprise,
         Other,

@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
     DataContext="{Binding ViewModel}"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -14,9 +15,8 @@
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/SharedDictionary.xaml" />
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/GitHubActionLink.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </UserControl.Resources>
@@ -32,14 +32,12 @@
             Foreground="{DynamicResource GitHubVsWindowText}"
             HorizontalAlignment="Center"
             FontSize="16"
-            Content="No repository" />
+            Content="{x:Static prop:Resources.NotAGitRepository}" />
         <TextBlock
             TextWrapping="Wrap"
             TextAlignment="Center"
-            HorizontalAlignment="Center">
-                We couldn't find a git repository here. Open a git project or click "File -> Add to Source Control"
-                in a project to get started
-        </TextBlock>
-    </StackPanel>
+            HorizontalAlignment="Center"
+            Text="{x:Static prop:Resources.NotAGitRepositoryMessage}"/>
+        </StackPanel>
   </DockPanel>
 </local:GenericNotAGitRepositoryView>

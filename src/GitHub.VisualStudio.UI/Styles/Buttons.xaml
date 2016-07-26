@@ -100,7 +100,6 @@
         <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource GitHubFontFamilyNormal}" />
-        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Padding" Value="12,5" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="MinWidth" Value="76" />
@@ -156,8 +155,8 @@
                         <Rectangle x:Name="DisabledVisualElement"
                        Fill="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" SnapsToDevicePixels="True" IsHitTestVisible="false"
                        Opacity="0" />
-                        <Border x:Name="MouseOverBorder" BorderBrush="#FF6ba157"
-                            Background="#FF71BD1E"
+                        <Border x:Name="MouseOverBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderMouseOverBrush}"
+                            Background="{DynamicResource GitHubPrimaryButtonBackgroundMouseOverBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" Opacity="0" />
                         <Border x:Name="PressedBorder" BorderBrush="{DynamicResource GitHubPrimaryButtonBorderPressedBrush}"
                     Background="#FF55A532"
@@ -178,7 +177,10 @@
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.6" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource GitHubPrimaryButtonBorderDisabledBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource GitHubPrimaryButtonForegroundDisabledBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource GitHubPrimaryButtonBackgroundDisabledBrush}" />
+                            <Setter Property="FontWeight" Value="Normal" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

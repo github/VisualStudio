@@ -18,8 +18,7 @@ namespace GitHub.VisualStudio.Menus
 
         [ImportingConstructor]
         public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker, ISimpleApiClientFactory apiFactory)
             : base(serviceProvider, apiFactory)
         {
             this.usageTracker = usageTracker;

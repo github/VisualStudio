@@ -9,9 +9,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.99.5</ApplicationVersion>
-    <BuildType Condition="Exists('..\..\script\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>1.0.99.7</ApplicationVersion>
+    <ApplicationVersion>1.99.0.3</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -229,25 +227,21 @@
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\Program.cs" />
     <Compile Include="Services\SelectedTextProvider.cs" />
-    <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="Settings\generated\PackageSettings.cs">
+    <Compile Include="Settings\generated\PackageSettingsGen.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>PackageSettings.tt</DependentUpon>
+      <DependentUpon>PackageSettingsGen.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Settings\PackageSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\UIProvider.cs" />
-    <Compile Include="SimpleJson.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Views\Controls\Spinner.xaml.cs">
-      <DependentUpon>Spinner.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
       <DependentUpon>GistCreationControl.xaml</DependentUpon>
     </Compile>
@@ -322,10 +316,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Settings\generated\PackageSettings.tt">
+    <Content Include="Settings\generated\PackageSettingsGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
-      <LastGenOutput>PackageSettings1.cs</LastGenOutput>
+      <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
     </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -384,38 +378,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Styles\Buttons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\GitHubComboBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\GitHubTabControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\TextBlocks.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\ThemeBlue.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Styles\ThemeDesignTime.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Styles\ThemeLight.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\Views\Controls\Spinner.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\Views\Controls\GistCreationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -428,29 +390,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Styles\ThemeDark.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="SharedDictionary.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\VsBrush.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI\Settings\OptionsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
-    </Page>
-    <Page Include="Styles\ActionLinkButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Styles\GitHubActionLink.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Views\Controls\PullRequestListItem.xaml">
       <SubType>Designer</SubType>

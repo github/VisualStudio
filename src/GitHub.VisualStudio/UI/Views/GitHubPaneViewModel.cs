@@ -20,6 +20,7 @@ using ReactiveUI;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
+using System.Windows.Threading;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -47,14 +48,14 @@ namespace GitHub.VisualStudio.UI.Views
 
         [ImportingConstructor]
         public GitHubPaneViewModel(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts)
+            IConnectionManager cm, IRepositoryHosts hosts, INotificationDispatcher notifications)
             : base(apiFactory, holder)
         {
             this.connectionManager = cm;
             this.hosts = hosts;
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
-            Title = "GitHub";
+            Title = "GitHub"; 
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -110,7 +111,7 @@ namespace GitHub.VisualStudio.UI.Views
                 return;
 
             Stop();
-            RepositoryOrigin = null;
+            RepositoryOrigin = RepositoryOrigin.Unknown;
             Reload().Forget();
         }
 
@@ -130,7 +131,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             navigatingViaArrows = navigating;
 
-            if (!RepositoryOrigin.HasValue)
+            if (RepositoryOrigin == RepositoryOrigin.Unknown)
             {
                 var origin = await GetRepositoryOrigin();
                 if (reloadCallId != latestReloadCallId)
@@ -154,11 +155,11 @@ namespace GitHub.VisualStudio.UI.Views
                 IsLoggedIn = isLoggedIn;
             }
 
-            if (RepositoryOrigin.Value == UI.RepositoryOrigin.NonGitRepository)
+            if (RepositoryOrigin == UI.RepositoryOrigin.NonGitRepository)
             {
                 LoadView(UIViewType.NotAGitRepository);
             }
-            else if (RepositoryOrigin.Value == UI.RepositoryOrigin.Other)
+            else if (RepositoryOrigin == UI.RepositoryOrigin.Other)
             {
                 LoadView(UIViewType.NotAGitHubRepository);
             }
@@ -340,21 +341,30 @@ namespace GitHub.VisualStudio.UI.Views
             set { isLoggedIn = value;  this.RaisePropertyChange(); }
         }
 
-        RepositoryOrigin? repositoryOrigin;
-        public RepositoryOrigin? RepositoryOrigin
+        RepositoryOrigin repositoryOrigin;
+        public RepositoryOrigin RepositoryOrigin
         {
             get { return repositoryOrigin; }
             private set { repositoryOrigin = value; }
+        }
+
+        
+        string errorMessage;
+        [AllowNull]
+        public string ErrorMessage
+        {
+            [return:AllowNull] get { return errorMessage; }
+            private set { errorMessage = value; this.RaisePropertyChange(); }
         }
 
         public bool? IsGitHubRepo
         {
             get
             {
-                return repositoryOrigin.HasValue ?
-                    repositoryOrigin.Value == UI.RepositoryOrigin.DotCom ||
-                    repositoryOrigin.Value == UI.RepositoryOrigin.Enterprise :
-                    (bool?)null;
+                return repositoryOrigin == RepositoryOrigin.Unknown ?
+                    (bool?)null :
+                    repositoryOrigin == UI.RepositoryOrigin.DotCom ||
+                    repositoryOrigin == UI.RepositoryOrigin.Enterprise;
             }
         }
 

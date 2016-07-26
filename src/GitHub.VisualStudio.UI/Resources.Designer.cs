@@ -151,6 +151,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create an account.
+        /// </summary>
+        public static string CreateAccountLink {
+            get {
+                return ResourceManager.GetString("CreateAccountLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         public static string CreateLink {
@@ -241,6 +250,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filter branches.
+        /// </summary>
+        public static string filterBranchesText {
+            get {
+                return ResourceManager.GetString("filterBranchesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -264,6 +282,15 @@ namespace GitHub.VisualStudio.UI {
         public static string GetStartedLink {
             get {
                 return ResourceManager.GetString("GetStartedLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Started.
+        /// </summary>
+        public static string GetStartedText {
+            get {
+                return ResourceManager.GetString("GetStartedText", resourceCulture);
             }
         }
         
@@ -439,6 +466,42 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This repository is not on GitHub.
+        /// </summary>
+        public static string NotAGitHubRepository {
+            get {
+                return ResourceManager.GetString("NotAGitHubRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects..
+        /// </summary>
+        public static string NotAGitHubRepositoryMessage {
+            get {
+                return ResourceManager.GetString("NotAGitHubRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No repository.
+        /// </summary>
+        public static string NotAGitRepository {
+            get {
+                return ResourceManager.GetString("NotAGitRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We couldn&apos;t find a git repository here. Open a git project or click &quot;File -&gt; Add to Source Control&quot; in a project to get started..
+        /// </summary>
+        public static string NotAGitRepositoryMessage {
+            get {
+                return ResourceManager.GetString("NotAGitRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are not logged in to {0}, so certain git operations may fail. [Login now]({1}).
         /// </summary>
         public static string NotLoggedInMessage {
@@ -597,6 +660,15 @@ namespace GitHub.VisualStudio.UI {
         public static string resendCodeButtonToolTip {
             get {
                 return ResourceManager.GetString("resendCodeButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign In.
+        /// </summary>
+        public static string SignInLink {
+            get {
+                return ResourceManager.GetString("SignInLink", resourceCulture);
             }
         }
         

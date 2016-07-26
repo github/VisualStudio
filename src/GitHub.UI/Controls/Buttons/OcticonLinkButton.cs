@@ -16,12 +16,6 @@ namespace GitHub.UI
 {
     public partial class OcticonLinkButton : OcticonButton
     {
-        public Octicon Icon
-        {
-            get { return (Octicon)GetValue(OcticonPath.IconProperty); }
-            set { SetValue(OcticonPath.IconProperty, value); }
-        }
-
         public Geometry Data
         {
             [return: AllowNull]

@@ -16,7 +16,6 @@ using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
-using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -37,35 +36,37 @@ namespace GitHub.Services
             this.avatarProvider = avatarProvider;
         }
 
-        public IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates()
+        public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject(
-                    "gitignores",
-                    GetOrderedGitIgnoreTemplatesFromApi,
-                    TimeSpan.FromDays(1),
-                    TimeSpan.FromDays(7))
-                .ToReadOnlyList(GitIgnoreItem.Create, GitIgnoreItem.None))
-                .Catch<IReadOnlyList<GitIgnoreItem>, Exception>(e =>
+                hostCache.GetAndFetchLatestFromIndex(CacheIndex.GitIgnoresPrefix, () =>
+                        GetGitIgnoreTemplatesFromApi(),
+                        item => { },
+                        TimeSpan.FromMinutes(1),
+                        TimeSpan.FromDays(7))
+                )
+                .Select(Create)
+                .Catch<GitIgnoreItem, Exception>(e =>
                 {
                     log.Info("Failed to retrieve GitIgnoreTemplates", e);
-                    return Observable.Return(new[] { GitIgnoreItem.None });
+                    return Observable.Empty<GitIgnoreItem>();
                 });
         }
 
-        public IObservable<IReadOnlyList<LicenseItem>> GetLicenses()
+        public IObservable<LicenseItem> GetLicenses()
         {
             return Observable.Defer(() =>
-                hostCache.GetAndRefreshObject(
-                    "licenses",
-                    GetOrderedLicensesFromApi,
-                    TimeSpan.FromDays(1),
-                    TimeSpan.FromDays(7))
-                .ToReadOnlyList(Create, LicenseItem.None))
-                .Catch<IReadOnlyList<LicenseItem>, Exception>(e =>
+                hostCache.GetAndFetchLatestFromIndex(CacheIndex.LicensesPrefix, () =>
+                        GetLicensesFromApi(),
+                        item => { },
+                        TimeSpan.FromMinutes(1),
+                        TimeSpan.FromDays(7))
+                )
+                .Select(Create)
+                .Catch<LicenseItem, Exception>(e =>
                 {
-                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
-                    return Observable.Return(new[] { LicenseItem.None });
+                    log.Info("Failed to retrieve licenses", e);
+                    return Observable.Empty<LicenseItem>();
                 });
         }
 
@@ -78,21 +79,18 @@ namespace GitHub.Services
             .ToReadOnlyList(Create);
         }
 
-        IObservable<IEnumerable<LicenseCacheItem>> GetOrderedLicensesFromApi()
+        IObservable<LicenseCacheItem> GetLicensesFromApi()
         {
             return apiClient.GetLicenses()
                 .WhereNotNull()
-                .Select(LicenseCacheItem.Create)
-                .ToList()
-                .Select(licenses => licenses.OrderByDescending(lic => LicenseItem.IsRecommended(lic.Key)));
+                .Select(LicenseCacheItem.Create);
         }
 
-        IObservable<IEnumerable<string>> GetOrderedGitIgnoreTemplatesFromApi()
+        IObservable<GitIgnoreCacheItem> GetGitIgnoreTemplatesFromApi()
         {
             return apiClient.GetGitIgnoreTemplates()
                 .WhereNotNull()
-                .ToList()
-                .Select(templates => templates.OrderByDescending(GitIgnoreItem.IsRecommended));
+                .Select(GitIgnoreCacheItem.Create);
         }
 
         IObservable<IEnumerable<AccountCacheItem>> GetUser()
@@ -136,6 +134,12 @@ namespace GitHub.Services
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
 
+        /// <summary>
+        /// Gets a collection of Pull Requests. If you want to refresh existing data, pass a collection in
+        /// </summary>
+        /// <param name="repo"></param>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
@@ -146,7 +150,7 @@ namespace GitHub.Services
             // and replaces it instead of appending, so items get refreshed in-place as they come in.
 
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repo.Name));
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name));
 
             var source = Observable.Defer(() => keyobs
                 .SelectMany(key =>
@@ -169,15 +173,41 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel repository, string title, IBranch source, IBranch target)
+        public ITrackingCollection<IRepositoryModel> GetRepositories(ITrackingCollection<IRepositoryModel> collection)
         {
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|pr", user.Login, repository.Name));
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
+
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
+                        apiClient.GetRepositories()
+                                 .Select(RepositoryCacheItem.Create),
+                        item =>
+                        {
+                            // this could blow up due to the collection being disposed somewhere else
+                            try { collection.RemoveItem(Create(item)); }
+                            catch (ObjectDisposedException) { }
+                        },
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
+
+            collection.Listen(source);
+            return collection;
+        }
+
+        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel repository, string title, string body, IBranch source, IBranch target)
+        {
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repository.Name));
 
             return Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.PutAndUpdateIndex(key, () =>
-                        apiClient.CreatePullRequest(new NewPullRequest(title, source.Name, target.Name),
+                        apiClient.CreatePullRequest(new NewPullRequest(title, source.Name, target.Name) { Body = body },
                                     repository.CloneUrl.Owner,
                                     repository.CloneUrl.RepositoryName)
                                  .Select(PullRequestCacheItem.Create),
@@ -250,7 +280,7 @@ namespace GitHub.Services
                     });
         }
 
-       public IObservable<IBranch> GetBranches(ISimpleRepositoryModel repo)
+        public IObservable<IBranch> GetBranches(ISimpleRepositoryModel repo)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));
@@ -258,6 +288,11 @@ namespace GitHub.Services
             return Observable.Defer(() => keyobs
                     .SelectMany(key => apiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
                 .Select(Create);
+        }
+
+        static GitIgnoreItem Create(GitIgnoreCacheItem item)
+        {
+            return GitIgnoreItem.Create(item.Name);
         }
 
         static LicenseItem Create(LicenseCacheItem licenseCacheItem)
@@ -276,14 +311,19 @@ namespace GitHub.Services
                 avatarProvider.GetAvatar(accountCacheItem));
         }
 
-        IRepositoryModel Create(RepositoryCacheItem repositoryCacheItem)
+        IRepositoryModel Create(RepositoryCacheItem item)
         {
             return new RepositoryModel(
-                repositoryCacheItem.Name,
-                new UriString(repositoryCacheItem.CloneUrl),
-                repositoryCacheItem.Private,
-                repositoryCacheItem.Fork,
-                Create(repositoryCacheItem.Owner));
+                item.Id,
+                item.Name,
+                new UriString(item.CloneUrl),
+                item.Private,
+                item.Fork,
+                Create(item.Owner))
+            {
+                CreatedAt = item.CreatedAt,
+                UpdatedAt = item.UpdatedAt
+            };
         }
 
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
@@ -306,10 +346,6 @@ namespace GitHub.Services
             return new BranchModel(branch);
         }
 
-        static IPullRequestModel Create(string key)
-        {
-            return new PullRequestModel(Int32.Parse(key.Split('|').Last(), CultureInfo.InvariantCulture));
-        }
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
@@ -325,18 +361,28 @@ namespace GitHub.Services
             GC.SuppressFinalize(this);
         }
 
-        public class LicenseCacheItem
+        public class GitIgnoreCacheItem : CacheItem
         {
-            public static LicenseCacheItem Create(LicenseMetadata licenseMetadata)
+            public static GitIgnoreCacheItem Create(string ignore)
             {
-                return new LicenseCacheItem { Key = licenseMetadata.Key, Name = licenseMetadata.Name };
+                return new GitIgnoreCacheItem { Key = ignore, Name = ignore, Timestamp = DateTime.Now };
             }
 
-            public string Key { get; set; }
             public string Name { get; set; }
         }
 
-        public class RepositoryCacheItem
+
+        public class LicenseCacheItem : CacheItem
+        {
+            public static LicenseCacheItem Create(LicenseMetadata licenseMetadata)
+            {
+                return new LicenseCacheItem { Key = licenseMetadata.Key, Name = licenseMetadata.Name, Timestamp = DateTime.Now };
+            }
+
+            public string Name { get; set; }
+        }
+
+        public class RepositoryCacheItem : CacheItem
         {
             public static RepositoryCacheItem Create(Repository apiRepository)
             {
@@ -347,12 +393,19 @@ namespace GitHub.Services
 
             public RepositoryCacheItem(Repository apiRepository)
             {
+                Id = apiRepository.Id;
                 Name = apiRepository.Name;
                 Owner = AccountCacheItem.Create(apiRepository.Owner);
                 CloneUrl = apiRepository.CloneUrl;
                 Private = apiRepository.Private;
                 Fork = apiRepository.Fork;
+                Key = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner.Login, Name);
+                CreatedAt = apiRepository.CreatedAt;
+                UpdatedAt = apiRepository.UpdatedAt;
+                Timestamp = apiRepository.UpdatedAt;
             }
+
+            public long Id { get; set; }
 
             public string Name { get; set; }
             [AllowNull]
@@ -364,6 +417,8 @@ namespace GitHub.Services
             public string CloneUrl { get; set; }
             public bool Private { get; set; }
             public bool Fork { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
+            public DateTimeOffset UpdatedAt { get; set; }
         }
 
         public class PullRequestCacheItem : CacheItem
@@ -378,7 +433,7 @@ namespace GitHub.Services
             {
                 Title = pr.Title;
                 Number = pr.Number;
-                CommentCount = pr.Comments;
+                CommentCount = pr.Comments + pr.ReviewComments;
                 Author = new AccountCacheItem(pr.User);
                 Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;
                 CreatedAt = pr.CreatedAt;

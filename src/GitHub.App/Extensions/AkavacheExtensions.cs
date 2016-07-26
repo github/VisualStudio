@@ -166,7 +166,7 @@ namespace GitHub.Extensions
             this IBlobCache blobCache,
             string key,
             Func<IObservable<T>> fetchFunc,
-            Action<string> removedItemsCallback,
+            Action<T> removedItemsCallback,
             TimeSpan refreshInterval,
             TimeSpan maxCacheDuration)
                 where T : CacheItem
@@ -194,35 +194,31 @@ namespace GitHub.Extensions
         static IObservable<T> GetAndFetchLatestFromIndex<T>(this IBlobCache This,
             string key,
             Func<IObservable<T>> fetchFunc,
-            Action<string> removedItemsCallback,
+            Action<T> removedItemsCallback,
             Func<DateTimeOffset, bool> fetchPredicate = null,
             DateTimeOffset? absoluteExpiration = null,
             bool shouldInvalidateOnError = false)
                 where T : CacheItem
         {
             var idx = Observable.Defer(() => This.GetOrCreateObject(key, () => CacheIndex.Create(key))).Replay().RefCount();
-            
+
 
             var fetch = idx
                 .Select(x => Tuple.Create(x, fetchPredicate == null || !x.Keys.Any() || fetchPredicate(x.UpdatedAt)))
                 .Where(predicateIsTrue => predicateIsTrue.Item2)
                 .Select(x => x.Item1)
                 .Select(index => index.Clear())
-                .SelectMany(index =>
-                {
-                    var fetchObs = fetchFunc()
+                .SelectMany(index => fetchFunc()
                         .Catch<T, Exception>(ex =>
                         {
                             var shouldInvalidate = shouldInvalidateOnError ?
                                 This.InvalidateObject<CacheIndex>(key) :
                                 Observable.Return(Unit.Default);
                             return shouldInvalidate.SelectMany(__ => Observable.Throw<T>(ex));
-                        });
-
-                    return fetchObs
+                        })
                         .SelectMany(x => x.Save<T>(This, key, absoluteExpiration))
-                        .Do(x => index.Add(key, x));
-                });
+                        .Do(x => index.Add(key, x))
+                );
 
             var cache = idx
                 .SelectMany(index => This.GetObjects<T>(index.Keys.ToList()))
@@ -237,7 +233,8 @@ namespace GitHub.Extensions
                     var list = index.OldKeys.Except(index.Keys);
                     if (!list.Any())
                         return;
-                    foreach (var d in list)
+                    var removed = await This.GetObjects<T>(list);
+                    foreach (var d in removed.Values)
                         removedItemsCallback(d);
                     await This.InvalidateObjects<T>(list);
                 })

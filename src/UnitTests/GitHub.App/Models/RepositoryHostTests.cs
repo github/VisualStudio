@@ -31,7 +31,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -57,7 +58,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await host.LogIn("jiminy", "cricket"));
 
@@ -85,7 +87,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("Cthulu", "aPassword");
 
@@ -126,7 +129,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await host.LogIn("aUsername", "aPassowrd");
 
@@ -152,7 +156,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await host.LogIn("jiminy", "aPassowrd");
 
@@ -171,7 +176,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -188,7 +194,8 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -209,27 +216,13 @@ public class RepositoryHostTests
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
             Assert.Equal(AuthenticationResult.Success, result);
             Assert.True(host.SupportsGist);
         }
-    }
-
-    static UserAndScopes CreateUserAndScopes(string login, string[] scopes = null)
-    {
-        return new UserAndScopes(CreateOctokitUser(login), scopes);
-    }
-
-    static User CreateOctokitUser(string login)
-    {
-        return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false, null, null);
-    }
-
-    static Organization CreateOctokitOrganization(string login)
-    {
-        return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
     }
 }

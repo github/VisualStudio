@@ -232,20 +232,25 @@ namespace GitHub.Api
         {
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
                 new PullRequestRequest {
-                    State = ItemState.All,
+                    State = ItemStateFilter.All,
                     SortProperty = PullRequestSort.Updated,
                     SortDirection = SortDirection.Descending
                 });
         }
 
-        public IObservable<Branch> GetBranches(string owner, string repo)
-        {
-            return gitHubClient.Repository.GetAllBranches(owner, repo);
-        }
-
         public IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo)
         {
             return gitHubClient.PullRequest.Create(owner, repo, pullRequest);
+        }
+
+        public IObservable<Repository> GetRepositories()
+        {
+            return gitHubClient.Repository.GetAllForCurrent();
+        }
+
+        public IObservable<Branch> GetBranches(string owner, string repo)
+        {
+            return gitHubClient.Repository.GetAllBranches(owner, repo);
         }
     }
 }

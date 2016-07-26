@@ -10,6 +10,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../Controls/Buttons/OcticonCircleButton.xaml" />
         <ResourceDictionary Source="../Controls/Buttons/OcticonLinkButton.xaml" />
+        <ResourceDictionary Source="../Controls/Buttons/OcticonButton.xaml" />
         <ResourceDictionary Source="../Controls/ToggleButtons/OcticonCircleToggleButton.xaml" />
         <ResourceDictionary Source="../Controls/ToggleButtons/OcticonLinkToggleButton.xaml" />
     </ResourceDictionary.MergedDictionaries>

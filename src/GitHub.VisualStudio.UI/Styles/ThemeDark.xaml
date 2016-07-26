@@ -4,7 +4,7 @@
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
 
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio;component/Styles/VsBrush.xaml" />
+    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsBrush.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <Color x:Key="GitHubContextMenuIconColor">#424242</Color>
@@ -32,13 +32,17 @@
   <SolidColorBrush x:Key="GitHubButtonBorderPressedBrush" Color="#FF2F3038" />
 
   <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundBrush" Color="#FF709946" />
-  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledBrush" Color="#FF709946" Opacity="0.3" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundMouseOverBrush" Color="#FF82b352" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundPressedBrush" Color="#FF82b352" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledBrush" Color="#FF709946" Opacity="0.3" />
+
   <SolidColorBrush x:Key="GitHubPrimaryButtonForegroundBrush" Color="#FFFFFFFF" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonForegroundDisabledBrush" Color="#FF9B9B9B" />
+
   <SolidColorBrush x:Key="GitHubPrimaryButtonBorderBrush" Color="#FF7BA84D" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBorderMouseOverBrush" Color="#FF95CC5E" />
   <SolidColorBrush x:Key="GitHubPrimaryButtonBorderPressedBrush" Color="#FF7BA84D" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBorderDisabledBrush" Color="#FFD4D4D4" />
 
   <SolidColorBrush x:Key="GitHubComboBoxBackgroundBrush" Color="#FF1B1B1C" />
   <SolidColorBrush x:Key="GitHubComboBoxBorderBrush" Color="#FF434346" />
