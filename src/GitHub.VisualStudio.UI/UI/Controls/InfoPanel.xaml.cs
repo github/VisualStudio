@@ -42,7 +42,7 @@ namespace GitHub.VisualStudio.UI.Controls
             control.Visibility = string.IsNullOrEmpty(control.Message) ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        void Button_Click(object sender, RoutedEventArgs e)
+        void Dismiss_Click(object sender, RoutedEventArgs e)
         {
             this.Message = string.Empty;
         }

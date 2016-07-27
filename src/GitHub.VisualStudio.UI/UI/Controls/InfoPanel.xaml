@@ -36,7 +36,7 @@
                          DockPanel.Dock="Right"
                          Foreground="Black"
                          Background="Transparent"
-                         Click="Button_Click"
+                         Click="Dismiss_Click"
                          Icon="x" />
         <TextBlock Margin="8,0"
                    DockPanel.Dock="Top"
