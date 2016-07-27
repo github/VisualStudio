@@ -44,7 +44,6 @@ namespace GitHub.VisualStudio.UI.Controls
 
         void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.Visibility = Visibility.Collapsed;
             this.Message = string.Empty;
         }
     }
