@@ -109,43 +109,45 @@
 
     </DockPanel>
 
-    <StackPanel Orientation="Vertical">
-      <ui:PromptTextBox x:Name="titleText"
-                        Margin="10,5"
-                        Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
-                        PromptText="{x:Static prop:Resources.TitleRequired}"
-                        Style="{DynamicResource GitHubVsPromptTextBox}" />
+    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical">
+            <ui:PromptTextBox x:Name="titleText"
+                    Margin="10,5"
+                    Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
+                    PromptText="{x:Static prop:Resources.TitleRequired}"
+                    Style="{DynamicResource GitHubVsPromptTextBox}" />
 
-      <uirx:ValidationMessage x:Name="titleValidationMessage"
-                              DockPanel.Dock="Bottom"
-                              Fill="{StaticResource GitHubWarningBrush}"
-                              Icon="alert"
-                              ValidatesControl="{Binding ElementName=titleText}"
-                              ReactiveValidator="{Binding TitleValidator, Mode=OneWay}"
-                              />
+            <uirx:ValidationMessage x:Name="titleValidationMessage"
+                            DockPanel.Dock="Bottom"
+                            Fill="{StaticResource GitHubWarningBrush}"
+                            Icon="alert"
+                            ValidatesControl="{Binding ElementName=titleText}"
+                            ReactiveValidator="{Binding TitleValidator, Mode=OneWay}"
+                            />
 
-      <ui:PromptTextBox Height="100"
-                        Margin="10,5"
-                        AcceptsReturn="True"
-                        PromptText="{x:Static prop:Resources.Description}"
-                        Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                        Style="{DynamicResource GitHubVsPromptTextBox}"
-                        TextWrapping="Wrap" />
+            <ui:PromptTextBox MinHeight="100"
+                    Margin="10,5"
+                    AcceptsReturn="True"
+                    PromptText="{x:Static prop:Resources.Description}"
+                    Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{DynamicResource GitHubVsPromptTextBox}"
+                    TextWrapping="Wrap" />
 
-      <DockPanel Margin="10,10,10,20" HorizontalAlignment="Stretch">
-        <Button DockPanel.Dock="Right"
-                Margin="6,0,0,0"
-                HorizontalAlignment="Right"
-                Command="{Binding CreatePullRequest}"
-                Content="Create pull request"
-                Style="{StaticResource GitHubVsPrimaryActionButton}" />
-        <Button DockPanel.Dock="Right"
-                HorizontalAlignment="Right"
-                Command="{Binding Cancel}"
-                Content="Cancel"
-                Style="{StaticResource GitHubVsButton}" />
-      </DockPanel>
-    </StackPanel>
+            <DockPanel Margin="10,10,10,20" HorizontalAlignment="Stretch">
+                <Button DockPanel.Dock="Right"
+            Margin="6,0,0,0"
+            HorizontalAlignment="Right"
+            Command="{Binding CreatePullRequest}"
+            Content="Create pull request"
+            Style="{StaticResource GitHubVsPrimaryActionButton}" />
+                <Button DockPanel.Dock="Right"
+            HorizontalAlignment="Right"
+            Command="{Binding Cancel}"
+            Content="Cancel"
+            Style="{StaticResource GitHubVsButton}" />
+            </DockPanel>
+        </StackPanel>
+    </ScrollViewer>
 
   </DockPanel>
 </local:GenericPullRequestCreationView>
