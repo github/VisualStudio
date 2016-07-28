@@ -58,8 +58,7 @@ namespace GitHub.ViewModels
                 x => x.SourceBranch,
                 source => source.Value)
                 .Where(_ => initialized)
-                .Merge(initializationComplete.Select(_ => SourceBranch))
-                .Do(x => System.Diagnostics.Debug.WriteLine("SourceBranch:" + x));
+                .Merge(initializationComplete.Select(_ => SourceBranch));
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
                 .IfTrue(x => x == null, Resources.PullRequestSourceBranchDoesNotExist)
