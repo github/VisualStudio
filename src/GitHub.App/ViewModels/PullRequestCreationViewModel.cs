@@ -15,11 +15,13 @@ using NullGuard;
 using GitHub.App;
 using System.Reactive.Subjects;
 using System.Reactive;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
         readonly IRepositoryHost repositoryHost;
