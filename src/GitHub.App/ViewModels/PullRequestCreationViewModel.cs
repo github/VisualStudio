@@ -79,7 +79,7 @@ namespace GitHub.ViewModels
                     //TODO:Will need a uniform solution to HTTP exception message handling
                     var apiException = ex as ApiValidationException;
                     var error = apiException?.ApiError?.Errors?.FirstOrDefault();
-                    notifications.ShowError(error.Message ?? ex.Message);
+                    notifications.ShowError(error?.Message ?? ex.Message);
                 }
             });
         }
