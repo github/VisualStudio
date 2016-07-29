@@ -13,6 +13,7 @@ using GitHub.Validation;
 using GitHub.Extensions;
 using NullGuard;
 using GitHub.App;
+using Octokit;
 
 namespace GitHub.ViewModels
 {
@@ -75,7 +76,10 @@ namespace GitHub.ViewModels
             {
                 if (!ex.IsCriticalException())
                 {
-                    notifications.ShowError(ex.Message);
+                    //TODO:Will need a uniform solution to HTTP exception message handling
+                    var apiException = ex as ApiValidationException;
+                    var error = apiException?.ApiError?.Errors?.FirstOrDefault();
+                    notifications.ShowError(error.Message ?? ex.Message);
                 }
             });
         }
