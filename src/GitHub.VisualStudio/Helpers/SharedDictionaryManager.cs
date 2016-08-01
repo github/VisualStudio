@@ -6,6 +6,11 @@ namespace GitHub.VisualStudio.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary
     {
+        static SharedDictionaryManager()
+        {
+            GitHubPackage.InitializeAssemblyResolver();
+        }
+
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
 
         Uri sourceUri;

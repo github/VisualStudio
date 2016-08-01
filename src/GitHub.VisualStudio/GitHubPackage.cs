@@ -53,6 +53,12 @@ namespace GitHub.VisualStudio
         };
 
         readonly IServiceProvider serviceProvider;
+        static bool resolverInitialized;
+
+        static GitHubPackage()
+        {
+            InitializeAssemblyResolver();
+        }
 
         public GitHubPackage()
         {
@@ -64,10 +70,16 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
+        public static void InitializeAssemblyResolver()
+        {
+            if (resolverInitialized)
+                return;
+            AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
+            resolverInitialized = true;
+        }
+
         protected override void Initialize()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromRunDir;
-
             base.Initialize();
             IncrementLaunchCount();
 
