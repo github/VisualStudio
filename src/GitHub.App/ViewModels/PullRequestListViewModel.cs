@@ -29,7 +29,6 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
-        bool pullRequestsLoaded;
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -84,11 +83,11 @@ namespace GitHub.ViewModels
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && pullRequestsLoaded)
+                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && pullRequestsLoaded)
+                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
@@ -98,7 +97,7 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
-            pullRequestsLoaded = false;
+            IsLoaded = false;
 
             PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
             pullRequests.Subscribe(pr =>
@@ -121,7 +120,7 @@ namespace GitHub.ViewModels
                         SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
                     }
  
-                    pullRequestsLoaded = true;
+                    IsLoaded = true;
                     UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
                 });
         }
@@ -134,6 +133,13 @@ namespace GitHub.ViewModels
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
                      (ass == null || ass.Equals(pr.Assignee)) &&
                      (aut == null || aut.Equals(pr.Author));
+        }
+
+        bool isLoaded;
+        public bool IsLoaded
+        {
+            get { return isLoaded; }
+            private set { this.RaiseAndSetIfChanged(ref isLoaded, value); }
         }
 
         ITrackingCollection<IPullRequestModel> pullRequests;
