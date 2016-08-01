@@ -13,16 +13,22 @@ using GitHub.Validation;
 using GitHub.Extensions;
 using NullGuard;
 using GitHub.App;
+using System.Reactive.Subjects;
+using System.Reactive;
+using System.Diagnostics.CodeAnalysis;
 using Octokit;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel activeRepo;
+        readonly Subject<Unit> initializationComplete = new Subject<Unit>();
+        bool initialized;
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
@@ -53,7 +59,9 @@ namespace GitHub.ViewModels
 
             var branchObs = this.WhenAny(
                 x => x.SourceBranch,
-                source => source.Value);
+                source => source.Value)
+                .Where(_ => initialized)
+                .Merge(initializationComplete.Select(_ => SourceBranch));
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
                 .IfTrue(x => x == null, Resources.PullRequestSourceBranchDoesNotExist)
@@ -86,12 +94,18 @@ namespace GitHub.ViewModels
         
         public override void Initialize([AllowNull] ViewWithData data)
         {
+            initialized = false;
             base.Initialize(data);
 
             repositoryHost.ModelService.GetBranches(activeRepo)
                             .ToReadOnlyList()
                             .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(x => Branches = x);
+                            .Subscribe(x =>
+                            {
+                                Branches = x;
+                                initialized = true;
+                                initializationComplete.OnNext(Unit.Default);
+                            });
         }
 
         IBranch sourceBranch;
