@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -25,6 +27,7 @@ namespace GitHub.ViewModels
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel repository;
+        readonly IPullRequestService prService;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
@@ -34,18 +37,21 @@ namespace GitHub.ViewModels
         PullRequestListViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
+            IPullRequestService prService,
             IPackageSettings settings)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, settings)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, prService, settings)
         {
         }
 
         public PullRequestListViewModel(
             IRepositoryHost repositoryHost,
             ISimpleRepositoryModel repository,
+            IPullRequestService prService,
             IPackageSettings settings)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.prService = prService;
             this.settings = settings;
 
             this.listSettings = settings.UIState
@@ -91,6 +97,8 @@ namespace GitHub.ViewModels
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
+
+            CheckoutPullRequest = ReactiveCommand.CreateAsyncTask(OnCheckoutPullRequest);
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -217,6 +225,8 @@ namespace GitHub.ViewModels
             get { return emptyUser; }
         }
 
+        public ReactiveCommand<ProgressState> CheckoutPullRequest { get; }
+
         bool disposed;
         protected void Dispose(bool disposing)
         {
@@ -235,6 +245,15 @@ namespace GitHub.ViewModels
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        Task<ProgressState> OnCheckoutPullRequest(object parameter)
+        {
+            Debug.Assert(parameter != null, "Null parameter passed to OnCheckoutPullRequest");
+
+            var pr = (IPullRequestModel)parameter;
+            prService.Checkout(repository, pr, $"pr/{pr.Number}");
+            return Task.FromResult(ProgressState.Success);
         }
 
         void SaveSettings()
