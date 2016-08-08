@@ -106,6 +106,7 @@ namespace UnitTests
             cc.ComposeExportedValue(gitservice);
             ((IComponentModel)cm).DefaultExportProvider.Returns(cc);
             ret.GetService(typeof(SComponentModel)).Returns(cm);
+            Services.PackageServiceProvider = ret;
 
             var os = OperatingSystem;
             var vs = IVSServices;
