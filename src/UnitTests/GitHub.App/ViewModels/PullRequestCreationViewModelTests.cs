@@ -30,7 +30,7 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
         vm.PRTitle = title;
 
         await vm.CreatePullRequest.ExecuteAsync();
-        ms.Received().CreatePullRequest(repository, vm.PRTitle, String.Empty, vm.SourceBranch, vm.TargetBranch);
+        var unused = ms.Received().CreatePullRequest(repository, vm.PRTitle, String.Empty, vm.SourceBranch, vm.TargetBranch);
     }
 
 }
