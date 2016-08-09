@@ -13,7 +13,6 @@ public class SimpleRepositoryModelTests : TempFileBaseClass
     void SetupRepository(string sha)
     {
         var provider = Substitutes.ServiceProvider;
-        Services.PackageServiceProvider = provider;
         var gitservice = provider.GetGitService();
         var repo = Substitute.For<IRepository>();
         gitservice.GetRepo(Args.String).Returns(repo);

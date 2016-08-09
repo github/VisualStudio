@@ -60,7 +60,6 @@ public class RepositoryModelTests
         public void NoRemoteUrl()
         {
             var provider = Substitutes.ServiceProvider;
-            Services.PackageServiceProvider = provider;
             var gitservice = provider.GetGitService();
             var repo = Substitute.For<IRepository>();
             var path = Directory.CreateSubdirectory("repo-name");
@@ -73,7 +72,6 @@ public class RepositoryModelTests
         public void WithRemoteUrl()
         {
             var provider = Substitutes.ServiceProvider;
-            Services.PackageServiceProvider = provider;
             var gitservice = provider.GetGitService();
             var repo = Substitute.For<IRepository>();
             var path = Directory.CreateSubdirectory("repo-name");
