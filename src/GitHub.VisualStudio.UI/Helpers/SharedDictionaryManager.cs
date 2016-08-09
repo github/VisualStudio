@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using GitHub.VisualStudio.Helpers;
+using GitHub.Helpers;
 
 namespace GitHub.VisualStudio.UI.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary
     {
+        static SharedDictionaryManager()
+        {
+            AssemblyResolver.InitializeAssemblyResolver();
+        }
+
         public SharedDictionaryManager()
         {
             currentTheme = Colors.DetectTheme();

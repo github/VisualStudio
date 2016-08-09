@@ -100,6 +100,7 @@
     <Compile Include="Factories\IUIFactory.cs" />
     <Compile Include="Factories\IUIPair.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helpers\AssemblyResolver.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
     <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
