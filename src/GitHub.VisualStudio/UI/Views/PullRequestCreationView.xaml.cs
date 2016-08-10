@@ -24,5 +24,11 @@ namespace GitHub.VisualStudio.UI.Views
                 d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
             });
         }
+
+        private void Cancel_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            titleText.Text = string.Empty;
+            descriptionText.Text = string.Empty;
+        }
     }
 }
