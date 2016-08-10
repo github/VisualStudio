@@ -9,6 +9,7 @@ using Rothko;
 using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using LibGit2Sharp;
 
 namespace UnitTests
 {
@@ -31,7 +32,17 @@ namespace UnitTests
 
 
        // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
-        public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
+        public static IGitService IGitService
+        {
+            get
+            {
+                var result = Substitute.For<IGitService>();
+                var repo = Substitute.For<IRepository>();
+                repo.Head.Returns(Substitute.For<Branch>());
+                result.GetRepo(Arg.Any<string>()).Returns(repo);
+                return result;
+            }
+        }
 
         public static IVSServices IVSServices
         {
@@ -205,6 +216,15 @@ namespace UnitTests
         public static IPullRequestService GetPullRequestsService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IPullRequestService)) as IPullRequestService;
+        }
+
+        // LibGit2Sharp's Branch class has a protected constructor, so override it here so we
+        // can use a branch in our mocks.
+        class BranchMock : Branch
+        {
+            public BranchMock()
+            {
+            }
         }
     }
 }

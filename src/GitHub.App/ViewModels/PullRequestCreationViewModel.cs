@@ -55,9 +55,7 @@ namespace GitHub.ViewModels
                 {
                     // what do we do if there's no master?
                     TargetBranch = x.FirstOrDefault(b => b.Name == "master");
-
-                    // 'repo.Head' will be null in unit tests.
-                    SourceBranch = x.FirstOrDefault(b => b.Name == repo.Head?.FriendlyName);
+                    SourceBranch = x.FirstOrDefault(b => b.Name == repo.Head.FriendlyName);
                 });
 
             var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value);

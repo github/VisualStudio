@@ -42,6 +42,9 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
 
         var host = serviceProvider.GetRepositoryHosts().GitHubHost;
         var ms = Substitute.For<IModelService>();
+        var master = Substitute.For<IBranch>();
+        master.Name.Returns("master");
+        ms.GetBranches(Arg.Any<ISimpleRepositoryModel>()).Returns(Observable.Return(master));
         host.ModelService.Returns(ms);
 
         var repository = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
@@ -51,12 +54,5 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
         vm.Initialize(null);
 
         Assert.Equal("Test PR template", vm.Description);
-    }
-
-    class BranchMock : LibGit2Sharp.Branch
-    {
-        public BranchMock()
-        {
-        }
     }
 }
