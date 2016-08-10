@@ -33,4 +33,30 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
         var unused = ms.Received().CreatePullRequest(repository, vm.PRTitle, String.Empty, vm.SourceBranch, vm.TargetBranch);
     }
 
+    [Fact]
+    public void TemplateIsUsedIfPresent()
+    {
+        var serviceProvider = Substitutes.ServiceProvider;
+        var service = Substitute.For<IPullRequestService>();
+        var notifications = Substitute.For<INotificationService>();
+
+        var host = serviceProvider.GetRepositoryHosts().GitHubHost;
+        var ms = Substitute.For<IModelService>();
+        host.ModelService.Returns(ms);
+
+        var repository = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
+        service.GetPullRequestTemplate(repository).Returns("Test PR template");
+
+        var vm = new PullRequestCreationViewModel(host, repository, service, notifications);
+        vm.Initialize(null);
+
+        Assert.Equal("Test PR template", vm.Description);
+    }
+
+    class BranchMock : LibGit2Sharp.Branch
+    {
+        public BranchMock()
+        {
+        }
+    }
 }
