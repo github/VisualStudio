@@ -38,7 +38,7 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
     public void TemplateIsUsedIfPresent()
     {
         var serviceProvider = Substitutes.ServiceProvider;
-        var service = Substitute.For<IPullRequestService>();
+        var service = serviceProvider.GetPullRequestsService();
         var notifications = Substitute.For<INotificationService>();
 
         var gitService = serviceProvider.GetGitService();
