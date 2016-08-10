@@ -30,6 +30,7 @@ namespace GitHub.ViewModels
 
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel activeRepo;
+        readonly IPullRequestService service;
         readonly Subject<Unit> initializationComplete = new Subject<Unit>();
         bool initialized;
 
@@ -45,6 +46,7 @@ namespace GitHub.ViewModels
         {
             this.repositoryHost = repositoryHost;
             this.activeRepo = activeRepo;
+            this.service = service;
 
             var repo = GitService.GitServiceHelper.GetRepo(activeRepo.LocalPath);
             this.WhenAny(x => x.Branches, x => x.Value)
@@ -99,6 +101,9 @@ namespace GitHub.ViewModels
         {
             initialized = false;
             base.Initialize(data);
+
+            this.Title = null;
+            this.Description = service.GetPullRequestTemplate(activeRepo) ?? string.Empty;
 
             repositoryHost.ModelService.GetBranches(activeRepo)
                             .ToReadOnlyList()

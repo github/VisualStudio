@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.IO;
 using GitHub.Models;
 
 namespace GitHub.Services
@@ -19,6 +20,29 @@ namespace GitHub.Services
             Extensions.Guard.ArgumentNotNull(target, nameof(target));
 
             return host.ModelService.CreatePullRequest(repository, title, body, source, target);
+        }
+
+        public string GetPullRequestTemplate(ISimpleRepositoryModel repository)
+        {
+            Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
+
+            var paths = new[]
+            {
+                Path.Combine(repository.LocalPath, "PULL_REQUEST_TEMPLATE"),
+                Path.Combine(repository.LocalPath, "PULL_REQUEST_TEMPLATE.md"),
+                Path.Combine(repository.LocalPath, ".github", "PULL_REQUEST_TEMPLATE"),
+                Path.Combine(repository.LocalPath, ".github", "PULL_REQUEST_TEMPLATE.md"),
+            };
+
+            foreach (var path in paths)
+            {
+                if (File.Exists(path))
+                {
+                    try { return File.ReadAllText(path); } catch { }
+                }
+            }
+
+            return null;
         }
     }
 }
