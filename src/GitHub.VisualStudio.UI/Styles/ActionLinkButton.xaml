@@ -10,7 +10,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <TextBlock>
+          <TextBlock TextTrimming="CharacterEllipsis">
             <Hyperlink Command="{TemplateBinding Command}"
                        CommandParameter="{TemplateBinding CommandParameter}"
                        Foreground="{TemplateBinding Foreground}">
