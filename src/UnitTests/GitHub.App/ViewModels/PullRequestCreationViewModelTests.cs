@@ -7,6 +7,7 @@ using GitHub.Models;
 using System;
 using GitHub.Services;
 using GitHub.ViewModels;
+using LibGit2Sharp;
 
 public class PullRequestCreationViewModelTests : TempFileBaseClass
 {
@@ -39,6 +40,11 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
         var serviceProvider = Substitutes.ServiceProvider;
         var service = Substitute.For<IPullRequestService>();
         var notifications = Substitute.For<INotificationService>();
+
+        var gitService = serviceProvider.GetGitService();
+        var repo = Substitute.For<IRepository>();
+        repo.Head.Returns(Substitute.For<Branch>());
+        gitService.GetRepo(Arg.Any<string>()).Returns(repo);
 
         var host = serviceProvider.GetRepositoryHosts().GitHubHost;
         var ms = Substitute.For<IModelService>();
