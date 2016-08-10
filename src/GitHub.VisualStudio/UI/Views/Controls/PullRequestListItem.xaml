@@ -55,7 +55,6 @@
             VerticalAlignment="Top"
             Foreground="{DynamicResource GitHubVsToolWindowText}"
             Margin="0,-3,5,0"
-            FontSize="{DynamicResource {x:Static vsui:VsFonts.Environment122PercentFontSizeKey}}"
             Style="{StaticResource ActionLinkButton}"
             Content="{Binding Title}"
             ToolTip="{Binding Title}"
