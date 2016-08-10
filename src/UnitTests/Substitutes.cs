@@ -2,6 +2,7 @@
 using GitHub.Authentication;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using NSubstitute;
 using Rothko;
@@ -65,6 +66,7 @@ namespace UnitTests
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
         public static ITwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<ITwoFactorChallengeHandler>(); } }
         public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
+        public static IPullRequestService PullRequestService { get { return Substitute.For<IPullRequestService>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -106,6 +108,7 @@ namespace UnitTests
             cc.ComposeExportedValue(gitservice);
             ((IComponentModel)cm).DefaultExportProvider.Returns(cc);
             ret.GetService(typeof(SComponentModel)).Returns(cm);
+            Services.PackageServiceProvider = ret;
 
             var os = OperatingSystem;
             var vs = IVSServices;
@@ -126,6 +129,7 @@ namespace UnitTests
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
             ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
             ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
+            ret.GetService(typeof(IPullRequestService)).Returns(PullRequestService);
             return ret;
         }
 
@@ -196,6 +200,11 @@ namespace UnitTests
         public static IGistPublishService GetGistPublishService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IGistPublishService)) as IGistPublishService;
+        }
+
+        public static IPullRequestService GetPullRequestsService(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IPullRequestService)) as IPullRequestService;
         }
     }
 }

@@ -26,6 +26,9 @@
                                             <Setter Property="FrameworkElement.Cursor" Value="Hand"/>
                                         </MultiDataTrigger.Setters>
                                     </MultiDataTrigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Foreground" Value="{StaticResource GHBlueLinkButtonDisabledBrush}"/>
+                                    </Trigger>
                                     <DataTrigger Binding="{Binding Path=IsPressed, RelativeSource={RelativeSource TemplatedParent}}" Value="true">
                                         <Setter Property="TextDecorations" Value="Underline"/>
                                         <Setter Property="FrameworkElement.Cursor" Value="Hand"/>

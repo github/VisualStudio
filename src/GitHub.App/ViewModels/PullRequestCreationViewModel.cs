@@ -13,15 +13,25 @@ using GitHub.Validation;
 using GitHub.Extensions;
 using NullGuard;
 using GitHub.App;
+using System.Reactive.Subjects;
+using System.Reactive;
+using System.Diagnostics.CodeAnalysis;
+using Octokit;
+using NLog;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly IRepositoryHost repositoryHost;
         readonly ISimpleRepositoryModel activeRepo;
+        readonly Subject<Unit> initializationComplete = new Subject<Unit>();
+        bool initialized;
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
@@ -29,7 +39,7 @@ namespace GitHub.ViewModels
              IPullRequestService service, INotificationService notifications)
              : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service, notifications)
          {}
-        
+
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
         {
@@ -52,7 +62,9 @@ namespace GitHub.ViewModels
 
             var branchObs = this.WhenAny(
                 x => x.SourceBranch,
-                source => source.Value);
+                source => source.Value)
+                .Where(_ => initialized)
+                .Merge(initializationComplete.Select(_ => SourceBranch));
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
                 .IfTrue(x => x == null, Resources.PullRequestSourceBranchDoesNotExist)
@@ -69,25 +81,34 @@ namespace GitHub.ViewModels
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
             createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
-                _ => service.CreatePullRequest(repositoryHost, activeRepo, PRTitle, Description, SourceBranch, TargetBranch)
-            );
-            createPullRequest.ThrownExceptions.Subscribe(ex =>
-            {
-                if (!ex.IsCriticalException())
-                {
-                    notifications.ShowError(ex.Message);
-                }
-            });
+                _ => service
+                    .CreatePullRequest(repositoryHost, activeRepo, PRTitle, Description ?? String.Empty, SourceBranch, TargetBranch)
+                    .Catch<IPullRequestModel, Exception>(ex =>
+                    {
+                        log.Error(ex);
+
+                        //TODO:Will need a uniform solution to HTTP exception message handling
+                        var apiException = ex as ApiValidationException;
+                        var error = apiException?.ApiError?.Errors?.FirstOrDefault();
+                        notifications.ShowError(error?.Message ?? ex.Message);
+                        return Observable.Empty<IPullRequestModel>();
+                    }));
         }
         
         public override void Initialize([AllowNull] ViewWithData data)
         {
+            initialized = false;
             base.Initialize(data);
 
             repositoryHost.ModelService.GetBranches(activeRepo)
                             .ToReadOnlyList()
                             .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(x => Branches = x);
+                            .Subscribe(x =>
+                            {
+                                Branches = x;
+                                initialized = true;
+                                initializationComplete.OnNext(Unit.Default);
+                            });
         }
 
         IBranch sourceBranch;

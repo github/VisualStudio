@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitHub.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -6,6 +7,11 @@ namespace GitHub.VisualStudio.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary
     {
+        static SharedDictionaryManager()
+        {
+            AssemblyResolver.InitializeAssemblyResolver();
+        }
+
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
 
         Uri sourceUri;
