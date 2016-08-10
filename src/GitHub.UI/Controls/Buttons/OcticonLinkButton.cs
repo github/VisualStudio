@@ -16,13 +16,6 @@ namespace GitHub.UI
 {
     public partial class OcticonLinkButton : OcticonButton
     {
-        public Geometry Data
-        {
-            [return: AllowNull]
-            get { return (Geometry)GetValue(Path.DataProperty); }
-            set { SetValue(Path.DataProperty, value); }
-        }
-
         public static readonly DependencyProperty IconHeightProperty = DependencyProperty.Register("IconHeight", typeof(int), typeof(OcticonLinkButton),new PropertyMetadata(16));
         public int IconHeight
         {
