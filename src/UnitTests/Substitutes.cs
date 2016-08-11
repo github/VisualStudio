@@ -9,7 +9,6 @@ using Rothko;
 using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using LibGit2Sharp;
 
 namespace UnitTests
 {
