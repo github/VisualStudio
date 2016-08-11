@@ -85,11 +85,12 @@
 
         <StackPanel Grid.Column="0" Orientation="Horizontal">
           <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
-          <ui:GitHubActionLink x:Name="branchSelectionButton"
-                               Margin="5,0,0,0"
-                               VerticalAlignment="Center"
-                               Content="master"
-                               HasDropDown="False" />
+          <ui:LinkDropDown Header="Target Branch"
+                           ItemsSource="{Binding Branches}"
+                           DisplayMemberPath="Name"
+                           SelectedItem="{Binding TargetBranch}"
+                           ToolTip="Select a branch"
+                           Margin="0,1,0,0"/>
           <ui:OcticonImage Height="13"
                            Margin="5,2,3,0"
                            VerticalAlignment="Center"
@@ -98,13 +99,12 @@
           <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding TargetBranch}" />
         </StackPanel>
 
-        <ui:LinkDropDown Header="Source Branch"
-                         ItemsSource="{Binding Branches}"
-                         DisplayMemberPath="Name"
-                         SelectedItem="{Binding SourceBranch}"
-                         ToolTip="Select a branch"
-                         Margin="0,1,0,0"
-                         Grid.Column="1"/>
+        <ui:GitHubActionLink Margin="5,0,0,0"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Left"
+                             Content="{Binding SourceBranch.Name}"
+                             HasDropDown="False"
+                             Grid.Column="1"/>
       </Grid>
 
     </DockPanel>
