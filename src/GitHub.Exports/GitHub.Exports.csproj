@@ -106,6 +106,7 @@
     <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
     <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
+    <Compile Include="Models\BranchModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />

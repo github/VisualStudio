@@ -252,5 +252,10 @@ namespace GitHub.Api
         {
             return gitHubClient.Repository.GetAllBranches(owner, repo);
         }
+
+        public IObservable<Repository> GetRepository(string owner, string repo)
+        {
+            return gitHubClient.Repository.Get(owner, repo);
+        }
     }
 }

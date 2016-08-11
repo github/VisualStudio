@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using LibGit2Sharp;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -80,6 +81,19 @@ namespace GitHub.Services
                 }
                 return Observable.Return(Unit.Default);
             });
+        }
+
+        public IObservable<Remote> GetHttpRemote(IRepository repo, string remote)
+        {
+            return Observable.Defer(() => Observable.Return(GitService.GitServiceHelper.GetOriginUri(repo, remote)))
+                .Select(uri => new { Remote = uri.IsHypertextTransferProtocol ? remote : remote + "-http", Uri = uri })
+                .Select(r =>
+                {
+                    var ret = repo.Network.Remotes[r.Remote];
+                    if (ret == null)
+                        ret = repo.Network.Remotes.Add(r.Remote, UriString.ToUriString(r.Uri.ToRepositoryUrl()));
+                    return ret;
+                });
         }
     }
 }

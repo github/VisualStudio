@@ -72,8 +72,8 @@ namespace GitHub.Services
         {
             var repo = GetRepoFromVS();
             return repo != null
-                ? serviceProvider.GetService<IGitService>().GetRepo(repo.RepositoryPath)
-                : serviceProvider.GetSolution().GetRepoFromSolution();
+                ? serviceProvider.GetService<IGitService>().GetRepository(repo.RepositoryPath)
+                : serviceProvider.GetSolution().GetRepositoryFromSolution();
         }
 
         public string GetActiveRepoPath()
@@ -83,7 +83,7 @@ namespace GitHub.Services
             if (repo != null)
                 ret = repo.RepositoryPath;
             if (ret == null)
-                ret = serviceProvider.GetSolution().GetRepoFromSolution()?.Info?.Path;
+                ret = serviceProvider.GetSolution().GetRepositoryFromSolution()?.Info?.Path;
             return ret ?? String.Empty;
         }
 

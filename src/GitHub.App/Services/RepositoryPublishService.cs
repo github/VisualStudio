@@ -37,13 +37,12 @@ namespace GitHub.Services
             IAccount account,
             IApiClient apiClient)
         {
-            return Observable.Defer(() => Observable.Return(activeRepository))
-                .SelectMany(r => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                    .Select(gitHubRepo => Tuple.Create(gitHubRepo, r)))
-                    .SelectMany(repo => gitClient.SetRemote(repo.Item2, "origin", new Uri(repo.Item1.CloneUrl)).Select(_ => repo))
-                    .SelectMany(repo => gitClient.Push(repo.Item2, "master", "origin").Select(_ => repo))
-                    .SelectMany(repo => gitClient.Fetch(repo.Item2, "origin").Select(_ => repo))
-                    .SelectMany(repo => gitClient.SetTrackingBranch(repo.Item2, "master", "origin").Select(_ => repo.Item1));
+            return Observable.Defer(() => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
+                         .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = activeRepository }))
+                    .SelectMany(repo => gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl)).Select(_ => repo))
+                    .SelectMany(repo => gitClient.Push(repo.LocalRepo, "master", "origin").Select(_ => repo))
+                    .SelectMany(repo => gitClient.Fetch(repo.LocalRepo, "origin").Select(_ => repo))
+                    .SelectMany(repo => gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin").Select(_ => repo.RemoteRepo));
         }
     }
 }
