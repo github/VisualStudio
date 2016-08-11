@@ -8,10 +8,19 @@ namespace GitHub.UI
         public static readonly DependencyProperty HasDropDownProperty = DependencyProperty.Register(
             "HasDropDown", typeof(bool), typeof(GitHubActionLink));
 
+        public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register(
+            "TextTrimming", typeof(TextTrimming), typeof(GitHubActionLink));
+
         public bool HasDropDown
         {
             get { return (bool)GetValue(HasDropDownProperty); }
             set { SetValue(HasDropDownProperty, value); }
+        }
+
+        public TextTrimming TextTrimming
+        {
+            get { return (TextTrimming)GetValue(TextTrimmingProperty); }
+            set { SetValue(TextTrimmingProperty, value); }
         }
 
         public GitHubActionLink()
