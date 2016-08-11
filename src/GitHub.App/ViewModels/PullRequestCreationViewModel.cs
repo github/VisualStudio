@@ -61,14 +61,15 @@ namespace GitHub.ViewModels
                 .IfNullOrEmpty(Resources.PullRequestCreationTitleValidatorEmpty);
 
             var branchObs = this.WhenAny(
+                x => x.TargetBranch,
                 x => x.SourceBranch,
-                source => source.Value)
+                (target, source) => new { Source = source.Value, Target = target.Value })
                 .Where(_ => initialized)
-                .Merge(initializationComplete.Select(_ => SourceBranch));
+                .Merge(initializationComplete.Select(_ => new { Source = SourceBranch, Target = TargetBranch }));
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
-                .IfTrue(x => x == null, Resources.PullRequestSourceBranchDoesNotExist)
-                .IfTrue(x => x.Name == TargetBranch.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
+                .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
+                .IfTrue(x => x.Source.Name == x.Target.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
 
             var whenAnyValidationResultChanges = this.WhenAny(
                 x => x.TitleValidator.ValidationResult,
