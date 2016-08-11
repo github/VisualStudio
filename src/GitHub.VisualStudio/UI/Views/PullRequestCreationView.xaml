@@ -127,6 +127,7 @@
                             PromptText="{x:Static prop:Resources.Description}"
                             Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                             Style="{DynamicResource GitHubVsPromptTextBox}"
+                            VerticalScrollBarVisibility="Auto"
                             TextWrapping="Wrap" />
 
         <uirx:ValidationMessage x:Name="titleValidationMessage"
