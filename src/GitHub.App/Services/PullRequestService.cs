@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using GitHub.Models;
 
 namespace GitHub.Services
@@ -10,6 +11,14 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
+        static readonly string[] TemplatePaths = new[]
+        {
+            "PULL_REQUEST_TEMPLATE.md",
+            "PULL_REQUEST_TEMPLATE",
+            ".github\\PULL_REQUEST_TEMPLATE.md",
+            ".github\\PULL_REQUEST_TEMPLATE",
+        };
+
         public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host, ISimpleRepositoryModel repository, string title, string body, IBranch source, IBranch target)
         {
             Extensions.Guard.ArgumentNotNull(host, nameof(host));
@@ -26,13 +35,7 @@ namespace GitHub.Services
         {
             Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
 
-            var paths = new[]
-            {
-                Path.Combine(repository.LocalPath, "PULL_REQUEST_TEMPLATE"),
-                Path.Combine(repository.LocalPath, "PULL_REQUEST_TEMPLATE.md"),
-                Path.Combine(repository.LocalPath, ".github", "PULL_REQUEST_TEMPLATE"),
-                Path.Combine(repository.LocalPath, ".github", "PULL_REQUEST_TEMPLATE.md"),
-            };
+            var paths = TemplatePaths.Select(x => Path.Combine(repository.LocalPath, x));
 
             foreach (var path in paths)
             {
