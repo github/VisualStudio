@@ -54,7 +54,6 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="{DynamicResource GitHubVsToolWindowText}"
-            FontWeight="SemiBold"
             TextTrimming="CharacterEllipsis"
             Margin="0,-3,5,0"
             Content="{Binding Title}"
