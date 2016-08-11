@@ -17,135 +17,138 @@
                                       DataContext="{Binding ViewModel}"
                                       mc:Ignorable="d">
 
-  <d:DesignProperties.DataContext>
-    <Binding>
-      <Binding.Source>
-        <sampleData:PullRequestCreationViewModelDesigner />
-      </Binding.Source>
-    </Binding>
-  </d:DesignProperties.DataContext>
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <sampleData:PullRequestCreationViewModelDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-      <Style x:Key="CommitListItemContainerStyle" TargetType="{x:Type ListViewItem}">
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="Padding" Value="1" />
+            <Style x:Key="CommitListItemContainerStyle" TargetType="{x:Type ListViewItem}">
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Padding" Value="1" />
 
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
 
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
 
-        <Setter Property="Template">
-          <Setter.Value>
-            <ControlTemplate TargetType="{x:Type ListViewItem}">
-              <Border x:Name="Bd"
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                            <Border x:Name="Bd"
                       Background="{TemplateBinding Background}"
                       BorderThickness="{TemplateBinding BorderThickness}"
                       Padding="{TemplateBinding Padding}">
-                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-              </Border>
-            </ControlTemplate>
-          </Setter.Value>
-        </Setter>
-      </Style>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-      <Style x:Key="GitHubPopupThing" TargetType="{x:Type ListBox}">
-        <Setter Property="ItemTemplate">
-          <Setter.Value>
-            <DataTemplate>
-              <TextBlock Text="{Binding Path=Name}" />
-            </DataTemplate>
-          </Setter.Value>
-        </Setter>
-      </Style>
+            <Style x:Key="GitHubPopupThing" TargetType="{x:Type ListBox}">
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-    </ResourceDictionary>
-  </UserControl.Resources>
+    <Grid VerticalAlignment="Top" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GenericPullRequestCreationView}}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-  <DockPanel>
+        <DockPanel Grid.Row="0">
+            <Grid Margin="10,-3,10,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-    <DockPanel DockPanel.Dock="Top">
-      <Grid Margin="10,-3,10,5">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
+                    <ui:LinkDropDown Header="Target Branch"
+                                     ItemsSource="{Binding Branches}"
+                                     DisplayMemberPath="Name"
+                                     SelectedItem="{Binding TargetBranch}"
+                                     ToolTip="Select a branch"
+                                     Margin="0,1,0,0"/>
+                    <ui:OcticonImage Height="13"
+                                     Margin="5,2,3,0"
+                                     VerticalAlignment="Center"
+                                     Foreground="{DynamicResource GitHubVsGrayText}"
+                                     Icon="chevron_left" />
+                </StackPanel>
 
-        <StackPanel Grid.Column="0" Orientation="Horizontal">
-          <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
-          <ui:LinkDropDown Header="Target Branch"
-                           ItemsSource="{Binding Branches}"
-                           DisplayMemberPath="Name"
-                           SelectedItem="{Binding TargetBranch}"
-                           ToolTip="Select a branch"
-                           Margin="0,1,0,0"/>
-          <ui:OcticonImage Height="13"
-                           Margin="5,2,3,0"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource GitHubVsGrayText}"
-                           Icon="chevron_left" />
-          <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding TargetBranch}" />
-        </StackPanel>
+                <ui:GitHubActionLink Margin="5,0,0,0"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Left"
+                                     Content="{Binding SourceBranch.Name}"
+                                     HasDropDown="False"
+                                     Grid.Column="1"/>
+            </Grid>
+        </DockPanel>
 
-        <ui:GitHubActionLink Margin="5,0,0,0"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Left"
-                             Content="{Binding SourceBranch.Name}"
-                             HasDropDown="False"
-                             Grid.Column="1"/>
-      </Grid>
+        <ui:PromptTextBox x:Name="titleText"
+                            Grid.Row="1"
+                            Margin="10,5"
+                            Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
+                            PromptText="{x:Static prop:Resources.TitleRequired}"
+                            Style="{DynamicResource GitHubVsPromptTextBox}" />
 
-    </DockPanel>
+        <ui:PromptTextBox Grid.Row="2"
+                            MinHeight="100"
+                            Margin="10,5"
+                            AcceptsReturn="True"
+                            PromptText="{x:Static prop:Resources.Description}"
+                            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{DynamicResource GitHubVsPromptTextBox}"
+                            VerticalScrollBarVisibility="Auto"
+                            TextWrapping="Wrap" />
 
-    <StackPanel Orientation="Vertical">
-      <ui:PromptTextBox x:Name="titleText"
-                        Margin="10,5"
-                        Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
-                        PromptText="{x:Static prop:Resources.TitleRequired}"
-                        Style="{DynamicResource GitHubVsPromptTextBox}" />
+        <uirx:ValidationMessage x:Name="titleValidationMessage"
+                                Grid.Row="3"
+                                Fill="{StaticResource GitHubWarningBrush}"
+                                Icon="alert"
+                                ValidatesControl="{Binding ElementName=titleText}"
+                                ReactiveValidator="{Binding TitleValidator, Mode=OneWay}"/>
 
-      <uirx:ValidationMessage x:Name="titleValidationMessage"
-                              DockPanel.Dock="Bottom"
-                              Fill="{StaticResource GitHubWarningBrush}"
-                              Icon="alert"
-                              ValidatesControl="{Binding ElementName=titleText}"
-                              ReactiveValidator="{Binding TitleValidator, Mode=OneWay}"
-                              />
-
-      <ui:PromptTextBox Height="100"
-                        Margin="10,5"
-                        AcceptsReturn="True"
-                        PromptText="{x:Static prop:Resources.Description}"
-                        Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                        Style="{DynamicResource GitHubVsPromptTextBox}"
-                        TextWrapping="Wrap" />
-
-      <DockPanel Margin="10,10,10,20" HorizontalAlignment="Stretch">
-        <Button DockPanel.Dock="Right"
-                Margin="6,0,0,0"
-                HorizontalAlignment="Right"
-                Command="{Binding CreatePullRequest}"
-                Content="Create pull request"
-                Style="{StaticResource GitHubVsPrimaryActionButton}" />
-        <Button DockPanel.Dock="Right"
-                HorizontalAlignment="Right"
-                Command="{Binding Cancel}"
-                Content="Cancel"
-                Style="{StaticResource GitHubVsButton}" />
-      </DockPanel>
-    </StackPanel>
-
-  </DockPanel>
+        <DockPanel Grid.Row="4" Margin="10,10,10,20" HorizontalAlignment="Stretch">
+            <Button DockPanel.Dock="Right"
+                    Margin="6,0,0,0"
+                    HorizontalAlignment="Right"
+                    Command="{Binding CreatePullRequest}"
+                    Content="Create pull request"
+                    Style="{StaticResource GitHubVsPrimaryActionButton}" />
+            <Button DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Command="{Binding Cancel}"
+                    Content="Cancel"
+                    Style="{StaticResource GitHubVsButton}" />
+        </DockPanel>
+    </Grid>
 </local:GenericPullRequestCreationView>
