@@ -18,6 +18,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
+    [Export(typeof(IPullRequestListViewModel))]
     [ExportViewModel(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
@@ -216,6 +217,8 @@ namespace GitHub.ViewModels
         {
             get { return emptyUser; }
         }
+
+        ReactiveCommand<object> IGitHubPanePage.Refresh => null;
 
         bool disposed;
         protected void Dispose(bool disposing)

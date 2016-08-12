@@ -7,6 +7,8 @@ using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using GitHub.Services;
+using System.Threading.Tasks;
+using GitHub.Api;
 
 namespace GitHub.Models
 {
@@ -99,6 +101,25 @@ namespace GitHub.Models
             }
 
             return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
+        }
+
+        public async Task<RepositoryOrigin> GetOrigin(ISimpleApiClient apiClient)
+        {
+            if (HostAddress.IsGitHubDotComUri(CloneUrl.ToRepositoryUrl()))
+            {
+                return RepositoryOrigin.DotCom;
+            }
+            else
+            {
+                var repo = await apiClient.GetRepository();
+
+                if ((repo.FullName == Name || repo.Id == 0) && apiClient.IsEnterprise())
+                {
+                    return RepositoryOrigin.Enterprise;
+                }
+            }
+
+            return RepositoryOrigin.Other;
         }
 
         const string CommitFormat = "{0}/commit/{1}";

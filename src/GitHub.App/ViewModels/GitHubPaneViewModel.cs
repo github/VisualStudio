@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.Exports;
+using System.Reactive.Linq;
+using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
-using Microsoft.VisualStudio.Shell;
+using GitHub.UI;
 using NullGuard;
 using ReactiveUI;
 
@@ -16,10 +17,12 @@ namespace GitHub.ViewModels
     [Export(typeof(GitHubPaneViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
-    public class GitHubPaneViewModel : NavigatingViewModel<IGitHubPanePage>, IDisposable
+    public class GitHubPaneViewModel : ReactiveObject, IDisposable
     {
         readonly IServiceProvider serviceProvider;
         readonly ITeamExplorerServiceHolder holder;
+        readonly ISimpleApiClientFactory apiFactory;
+        readonly IConnectionManager connectionManager;
         readonly ObservableAsPropertyHelper<ReactiveCommand<object>> refresh;
         ISimpleRepositoryModel activeRepo;
 
@@ -28,14 +31,20 @@ namespace GitHub.ViewModels
         /// </summary>
         [ImportingConstructor]
         public GitHubPaneViewModel(
-            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            ITeamExplorerServiceHolder holder)
+            [Import(typeof(Microsoft.VisualStudio.Shell.SVsServiceProvider))] IServiceProvider serviceProvider,
+            ITeamExplorerServiceHolder holder,
+            ISimpleApiClientFactory apiFactory,
+            IConnectionManager connectionManager,
+            INavigationViewModel<IGitHubPanePage> navigator)
         {
             this.serviceProvider = serviceProvider;
             this.holder = holder;
+            this.apiFactory = apiFactory;
+            this.connectionManager = connectionManager;
+            this.Navigation = navigator;
             holder.Subscribe(this, x => ActiveRepo = x);
 
-            refresh = this.WhenAnyValue(x => x.Content.Refresh).ToProperty(this, x => x.Refresh);
+            refresh = this.WhenAnyValue(x => x.Navigation.Content.Refresh).ToProperty(this, x => x.Refresh);
             this.WhenAnyValue(x => x.ActiveRepo).Subscribe(RepositoryChanged);
         }
 
@@ -47,6 +56,11 @@ namespace GitHub.ViewModels
             get { return activeRepo; }
             private set { this.RaiseAndSetIfChanged(ref activeRepo, value); }
         }
+
+        /// <summary>
+        /// Gets the navigator.
+        /// </summary>
+        public INavigationViewModel<IGitHubPanePage> Navigation { get; }
 
         /// <summary>
         /// Gets a title to display at the top of the pane.
@@ -71,12 +85,39 @@ namespace GitHub.ViewModels
         /// Called when <see cref="ActiveRepo"/> changes.
         /// </summary>
         /// <param name="repo">The new active repo.</param>
-        void RepositoryChanged(ISimpleRepositoryModel repo)
+        async void RepositoryChanged(ISimpleRepositoryModel repo)
         {
-            Clear();
+            Navigation.Clear();
 
-            var vm = serviceProvider.GetExportedValue<INotAGitRepositoryViewModel>();
-            NavigateTo(vm);
+            var origin = RepositoryOrigin.Unknown;
+            var page = default(IGitHubPanePage);
+
+            if (repo != null)
+            {
+                var apiClient = apiFactory.Create(repo.CloneUrl);
+                origin = await repo.GetOrigin(apiClient);
+
+                // HACK
+                var connection = await connectionManager.LookupConnection(repo);
+                var uiController = serviceProvider.GetExportedValue<IUIController>();
+                uiController.Start(connection);
+            }
+
+            switch (origin)
+            {
+                case RepositoryOrigin.DotCom:
+                case RepositoryOrigin.Enterprise:
+                    page = serviceProvider.GetExportedValue<IPullRequestListViewModel>();
+                    break;
+                case RepositoryOrigin.Other:
+                    page = serviceProvider.GetExportedValue<INotAGitHubRepositoryViewModel>();
+                    break;
+                default:
+                    page = serviceProvider.GetExportedValue<INotAGitRepositoryViewModel>();
+                    break;
+            }
+
+            Navigation.NavigateTo(page);
         }
     }
 }

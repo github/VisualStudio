@@ -4,14 +4,14 @@ using Xunit;
 
 namespace UnitTests.GitHub.App.ViewModels
 {
-    public class NavigatingViewModelTests
+    public class NavigationViewModelTests
     {
         public class TheContentProperty
         {
             [Fact]
             public void ContentShouldInitiallyBeNull()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 Assert.Null(target.Content);
             }
@@ -19,7 +19,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ContentShouldBeSetOnNavigatingToPage()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 Assert.Equal("first", target.Content);
@@ -31,7 +31,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ContentShouldBeSetOnNavigatingBack()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 target.NavigateTo("second");
@@ -43,7 +43,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ContentShouldBeSetOnNavigatingForward()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 target.NavigateTo("second");
@@ -56,7 +56,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ContentShouldBeSetWhenReplacingFuture()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 target.NavigateTo("second");
@@ -76,7 +76,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ForwardAndBackCommandsShouldInitiallyBeDisabled()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 Assert.False(target.NavigateBack.CanExecute(null));
                 Assert.False(target.NavigateForward.CanExecute(null));
@@ -85,7 +85,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ForwardAndBackCommandsShouldBeDisabledOnNavigatingToFirstPage()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
 
@@ -96,7 +96,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void BackCommandShouldBeEnabledOnNavigatingToSecondPage()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 target.NavigateTo("second");
@@ -108,7 +108,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ForwardCommandShouldBeEnabledOnNavigatingBack()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 target.NavigateTo("second");
@@ -124,7 +124,7 @@ namespace UnitTests.GitHub.App.ViewModels
             [Fact]
             public void ClearClearsTheContentAndHistory()
             {
-                var target = new NavigatingViewModel<string>();
+                var target = new NavigationViewModel<string>();
 
                 target.NavigateTo("first");
                 target.NavigateTo("second");

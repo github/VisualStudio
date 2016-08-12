@@ -68,7 +68,7 @@
                DockPanel.Dock="Top"
                Style="{StaticResource PaneHorizontalSeparator}" />
 
-        <ContentControl Content="{Binding Content}"/>
+        <ContentControl Content="{Binding Navigation.Content}"/>
 
     </DockPanel>
 </view:GenericGitHubPaneView>

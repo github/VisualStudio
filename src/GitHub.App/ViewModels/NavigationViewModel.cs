@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using NullGuard;
@@ -10,17 +11,19 @@ namespace GitHub.ViewModels
     /// A view model that supports back/forward navigation of an inner content page.
     /// </summary>
     /// <typeparam name="TContent">The type of the content page view model.</typeparam>
+    [Export(typeof(INavigationViewModel<>))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
-    public class NavigatingViewModel<TContent> : ReactiveObject
+    public class NavigationViewModel<TContent> : ReactiveObject, INavigationViewModel<TContent>
     {
         private readonly ReactiveList<TContent> history = new ReactiveList<TContent>();
         private readonly ObservableAsPropertyHelper<TContent> content;
         private int index = -1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NavigatingViewModel{TContent}"/> class.
+        /// Initializes a new instance of the <see cref="NavigationViewModel{TContent}"/> class.
         /// </summary>
-        public NavigatingViewModel()
+        public NavigationViewModel()
         {
             var pos = this.WhenAnyValue(
                 x => x.Index,

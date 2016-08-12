@@ -56,5 +56,7 @@ namespace GitHub.SampleData
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
+
+        ReactiveCommand<object> IGitHubPanePage.Refresh => null;
     }
 }

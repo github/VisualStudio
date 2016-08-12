@@ -100,6 +100,7 @@
     <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
     <Compile Include="ViewModels\IGitHubPanePage.cs" />
+    <Compile Include="ViewModels\INavigationViewModel.cs" />
     <Compile Include="ViewModels\INotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\INotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\ILoggedOutViewModel.cs" />

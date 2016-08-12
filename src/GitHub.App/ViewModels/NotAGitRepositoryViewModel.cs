@@ -18,6 +18,9 @@ namespace GitHub.ViewModels
     [NullGuard(ValidationFlags.None)]
     public class NotAGitRepositoryViewModel : BaseViewModel, INotAGitRepositoryViewModel
     {
+        /// <summary>
+        /// Gets the refresh command. Does nothing here.
+        /// </summary>
         ReactiveCommand<object> IGitHubPanePage.Refresh => null;
     }
 }
