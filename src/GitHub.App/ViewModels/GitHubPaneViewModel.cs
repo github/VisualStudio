@@ -23,6 +23,7 @@ namespace GitHub.ViewModels
         readonly ITeamExplorerServiceHolder holder;
         readonly ISimpleApiClientFactory apiFactory;
         readonly IConnectionManager connectionManager;
+        readonly IRepositoryHosts hosts;
         readonly ObservableAsPropertyHelper<ReactiveCommand<object>> refresh;
         ISimpleRepositoryModel activeRepo;
 
@@ -35,12 +36,14 @@ namespace GitHub.ViewModels
             ITeamExplorerServiceHolder holder,
             ISimpleApiClientFactory apiFactory,
             IConnectionManager connectionManager,
+            IRepositoryHosts hosts,
             INavigationViewModel<IGitHubPanePage> navigator)
         {
             this.serviceProvider = serviceProvider;
             this.holder = holder;
             this.apiFactory = apiFactory;
             this.connectionManager = connectionManager;
+            this.hosts = hosts;
             this.Navigation = navigator;
             holder.Subscribe(this, x => ActiveRepo = x);
 
@@ -56,6 +59,11 @@ namespace GitHub.ViewModels
             get { return activeRepo; }
             private set { this.RaiseAndSetIfChanged(ref activeRepo, value); }
         }
+
+        /// <summary>
+        /// Gets an error message to display.
+        /// </summary>
+        public string ErrorMessage => string.Empty;
 
         /// <summary>
         /// Gets the navigator.
@@ -99,6 +107,10 @@ namespace GitHub.ViewModels
 
                 // HACK
                 var connection = await connectionManager.LookupConnection(repo);
+                var isLoggedIn = await connection.IsLoggedIn(hosts);
+                
+                if (!isLoggedIn) return;
+
                 var uiController = serviceProvider.GetExportedValue<IUIController>();
                 uiController.Start(connection);
             }
@@ -107,7 +119,9 @@ namespace GitHub.ViewModels
             {
                 case RepositoryOrigin.DotCom:
                 case RepositoryOrigin.Enterprise:
-                    page = serviceProvider.GetExportedValue<IPullRequestListViewModel>();
+                    var prList = serviceProvider.GetExportedValue<IPullRequestListViewModel>();
+                    prList.Initialize(null);
+                    page = prList;
                     break;
                 case RepositoryOrigin.Other:
                     page = serviceProvider.GetExportedValue<INotAGitHubRepositoryViewModel>();

@@ -12,7 +12,6 @@
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                  DataContext="{Binding ViewModel}"
                                   mc:Ignorable="d">
 
   <d:DesignProperties.DataContext>

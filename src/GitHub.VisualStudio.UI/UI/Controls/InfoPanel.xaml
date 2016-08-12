@@ -7,6 +7,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             Name="infoPanel"
              Background="Beige"
              d:DataContext="{d:DesignInstance Type=sampleData:InfoPanelDesigner, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -41,7 +42,7 @@
         <TextBlock Margin="8,0"
                    DockPanel.Dock="Top"
                    Foreground="Black"
-                   Text="{Binding Message}"
+                   Text="{Binding Message, ElementName=infoPanel}"
                    TextWrapping="Wrap" />
     </DockPanel>
 </UserControl>

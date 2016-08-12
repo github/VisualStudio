@@ -32,8 +32,6 @@ namespace GitHub.VisualStudio.UI.Controls
         public InfoPanel()
         {
             InitializeComponent();
-
-            this.DataContext = this;
         }
 
         static void UpdateVisibility(DependencyObject d, DependencyPropertyChangedEventArgs e)
