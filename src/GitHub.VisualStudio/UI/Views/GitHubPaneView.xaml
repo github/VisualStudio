@@ -8,6 +8,7 @@
                             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                            xmlns:rxui="clr-namespace:ReactiveUI;assembly=ReactiveUI"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
                             xmlns:control="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
                             Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -37,6 +38,12 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <view:ViewLocator x:Key="ViewLocator"/>
+            <DataTemplate DataType="{x:Type rxui:ReactiveObject}">
+                <ContentControl Content="{Binding Converter={StaticResource ViewLocator}}"/>
+            </DataTemplate>
+            
         </ResourceDictionary>
     </UserControl.Resources>
 
