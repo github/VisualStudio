@@ -4,6 +4,7 @@ using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -13,7 +14,9 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.NotAGitRepository)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class NotAGitRepositoryViewModel : BaseViewModel, INotAGitRepositoryViewModel
+    [NullGuard(ValidationFlags.None)]
+    public class NotAGitRepositoryViewModel : BaseViewModel, INotAGitRepositoryViewModel, IGitHubPanePage
     {
+        public ReactiveCommand<object> Refresh => null;
     }
 }

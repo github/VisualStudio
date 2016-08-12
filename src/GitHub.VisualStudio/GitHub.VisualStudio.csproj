@@ -267,7 +267,6 @@
     <Compile Include="UI\Views\GitHubPaneView.xaml.cs">
       <DependentUpon>GitHubPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Views\GitHubPaneViewModel.cs" />
     <Compile Include="UI\Views\NotAGitRepositoryView.xaml.cs">
       <DependentUpon>NotAGitRepositoryView.xaml</DependentUpon>
     </Compile>

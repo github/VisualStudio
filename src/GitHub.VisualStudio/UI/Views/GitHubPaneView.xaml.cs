@@ -8,33 +8,32 @@ using GitHub.Services;
 using System.Windows.Threading;
 using System.Reactive.Linq;
 using System;
+using System.Windows.Controls;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericGitHubPaneView : SimpleViewUserControl<IGitHubPaneViewModel, GitHubPaneView>
+    public class GenericGitHubPaneView : UserControl
     {
     }
 
-    [ExportView(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-
     public partial class GitHubPaneView : GenericGitHubPaneView
     {
         [ImportingConstructor]
-        public GitHubPaneView(INotificationDispatcher notifications)
+        public GitHubPaneView()
         {
             this.InitializeComponent();
-            this.WhenActivated(d =>
-            {
-                ErrorMessage.Visibility = Visibility.Collapsed;
-                d(notifications.Listen()
-                    .Where(n => n.Type == Notification.NotificationType.Error)
-                    .ObserveOnDispatcher(DispatcherPriority.Normal)
-                    .Subscribe(n =>
-                    {
-                        ErrorMessage.Message = n.Message;
-                    }));
-            });
+            ////this.WhenActivated(d =>
+            ////{
+            ////    ErrorMessage.Visibility = Visibility.Collapsed;
+            ////    d(notifications.Listen()
+            ////        .Where(n => n.Type == Notification.NotificationType.Error)
+            ////        .ObserveOnDispatcher(DispatcherPriority.Normal)
+            ////        .Subscribe(n =>
+            ////        {
+            ////            ErrorMessage.Message = n.Message;
+            ////        }));
+            ////});
         }
     }
 }

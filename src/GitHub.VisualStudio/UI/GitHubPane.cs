@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio;
 using GitHub.App.Factories;
 using NullGuard;
+using GitHub.VisualStudio.UI.Views;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -34,12 +35,6 @@ namespace GitHub.VisualStudio.UI
     {
         const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
 
-        IView View
-        {
-            get { return Content as IView; }
-            set { Content = value; }
-        }
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
         {
@@ -55,25 +50,17 @@ namespace GitHub.VisualStudio.UI
             ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
 
-            var factory = this.GetExportedValue<IUIFactory>();
-            var d = factory.CreateViewAndViewModel(Exports.UIViewType.GitHubPane);
-            // placeholder logic to load the view until the UIController is able to do it for us
-            View = d.View;
-            View.DataContext = d.ViewModel;
+            var viewModel = this.GetExportedValue<GitHubPaneViewModel>();
+            var view = new GitHubPaneView();
+            view.DataContext = viewModel;
+
+            Content = view;
+
+            // HAAACK!
+            this.GetExportedValue<ITeamExplorerServiceHolder>().ServiceProvider = this;
         }
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-            var vm = View.ViewModel as IServiceProviderAware;
-            Debug.Assert(vm != null);
-            vm?.Initialize(this);
-        }
-
-        public void ShowView(ViewWithData data)
-        {
-            View.ViewModel?.Initialize(data);
-        }
+        public GitHubPaneViewModel ViewModel { get; }
 
         [return: AllowNull]
         public static GitHubPane Activate()

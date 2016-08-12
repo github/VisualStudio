@@ -16,52 +16,52 @@
                             d:DesignWidth="300"
                             mc:Ignorable="d">
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-      <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">
-        <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
-        <Setter Property="Height" Value="2" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Template">
-          <Setter.Value>
-            <ControlTemplate TargetType="{x:Type Separator}">
-              <Border Width="{TemplateBinding Width}"
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">
+                <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
+                <Setter Property="Height" Value="2" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Separator}">
+                            <Border Width="{TemplateBinding Width}"
                       Background="{TemplateBinding Background}"
                       BorderBrush="{TemplateBinding Background}"
                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-            </ControlTemplate>
-          </Setter.Value>
-        </Setter>
-      </Style>
-    </ResourceDictionary>
-  </UserControl.Resources>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-  <DockPanel>
+    <DockPanel>
         <control:InfoPanel x:Name="ErrorMessage" Message="{Binding ErrorMessage}" VerticalAlignment="Top" DockPanel.Dock="Top"></control:InfoPanel>
         <StackPanel Margin="6,9,9,5"
                 DockPanel.Dock="Top"
                 Orientation="Horizontal">
-      <TextBlock Margin="0,-5,0,0"
+            <TextBlock Margin="0,-5,0,0"
                  FontSize="14.7"
                  FontWeight="SemiBold"
                  Foreground="{DynamicResource GitHubPaneTitleBrush}"
                  Text="{Binding Title}" />
-      <Separator Margin="5,-2,5,0" Foreground="{DynamicResource GitHubPaneTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
-      <TextBlock Margin="0,-5,0,0"
+            <Separator Margin="5,-2,5,0" Foreground="{DynamicResource GitHubPaneTitleBrush}" Style="{StaticResource TitleVerticalSeparator}" />
+            <TextBlock Margin="0,-5,0,0"
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource GitHubVsGrayText}"
                  Text="{Binding ActiveRepo.Name}" />
-    </StackPanel>
+        </StackPanel>
 
-    <Separator Margin="0,0,0,9"
+        <Separator Margin="0,0,0,9"
                DockPanel.Dock="Top"
                Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <UserControl x:Name="container" Content="{Binding Control}" DockPanel.Dock="Top" />
+        <ContentControl Content="{Binding Content}"/>
 
-  </DockPanel>
+    </DockPanel>
 </view:GenericGitHubPaneView>
