@@ -200,7 +200,6 @@
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\GitHubPaneViewModel.cs" />
-    <Compile Include="ViewModels\IGitHubPanePage.cs" />
     <Compile Include="ViewModels\NavigatingViewModel.cs" />
     <Compile Include="ViewModels\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\NotAGitHubRepositoryViewModel.cs" />

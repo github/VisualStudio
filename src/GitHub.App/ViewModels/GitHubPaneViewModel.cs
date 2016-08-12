@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Shell;
 using NullGuard;
 using ReactiveUI;
 
@@ -16,6 +18,7 @@ namespace GitHub.ViewModels
     [NullGuard(ValidationFlags.None)]
     public class GitHubPaneViewModel : NavigatingViewModel<IGitHubPanePage>, IDisposable
     {
+        readonly IServiceProvider serviceProvider;
         readonly ITeamExplorerServiceHolder holder;
         readonly ObservableAsPropertyHelper<ReactiveCommand<object>> refresh;
         ISimpleRepositoryModel activeRepo;
@@ -24,8 +27,11 @@ namespace GitHub.ViewModels
         /// Initializes a new instance of the <see cref="GitHubPaneViewModel"/> class.
         /// </summary>
         [ImportingConstructor]
-        public GitHubPaneViewModel(ITeamExplorerServiceHolder holder)
+        public GitHubPaneViewModel(
+            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+            ITeamExplorerServiceHolder holder)
         {
+            this.serviceProvider = serviceProvider;
             this.holder = holder;
             holder.Subscribe(this, x => ActiveRepo = x);
 
@@ -68,7 +74,9 @@ namespace GitHub.ViewModels
         void RepositoryChanged(ISimpleRepositoryModel repo)
         {
             Clear();
-            NavigateTo(new NotAGitRepositoryViewModel());
+
+            var vm = serviceProvider.GetExportedValue<INotAGitRepositoryViewModel>();
+            NavigateTo(vm);
         }
     }
 }

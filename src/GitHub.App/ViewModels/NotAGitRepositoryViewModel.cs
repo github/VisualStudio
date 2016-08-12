@@ -12,11 +12,12 @@ namespace GitHub.ViewModels
     /// <summary>
     /// The view model for the "Not a Git repository" view in the GitHub pane.
     /// </summary>
+    [Export(typeof(INotAGitRepositoryViewModel))]
     [ExportViewModel(ViewType = UIViewType.NotAGitRepository)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
-    public class NotAGitRepositoryViewModel : BaseViewModel, INotAGitRepositoryViewModel, IGitHubPanePage
+    public class NotAGitRepositoryViewModel : BaseViewModel, INotAGitRepositoryViewModel
     {
-        public ReactiveCommand<object> Refresh => null;
+        ReactiveCommand<object> IGitHubPanePage.Refresh => null;
     }
 }
