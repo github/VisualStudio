@@ -22,10 +22,23 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
                 d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
+                //d(Done.Subscribe(_ => ClearForm()));
+
             });
+
+            IsVisibleChanged += (s, e) =>
+            {
+                if(!IsVisible)
+                    ClearForm();
+            };
         }
 
         private void Cancel_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ClearForm();
+        }
+
+        private void ClearForm()
         {
             titleText.Text = string.Empty;
             descriptionText.Text = string.Empty;
