@@ -33,11 +33,6 @@ namespace GitHub.VisualStudio.UI.Views
             };
         }
 
-        private void Cancel_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            ClearForm();
-        }
-
         private void ClearForm()
         {
             titleText.Text = string.Empty;
