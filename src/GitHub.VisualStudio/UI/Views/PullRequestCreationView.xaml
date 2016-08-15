@@ -120,7 +120,8 @@
                             PromptText="{x:Static prop:Resources.TitleRequired}"
                             Style="{DynamicResource GitHubVsPromptTextBox}" />
 
-        <ui:PromptTextBox Grid.Row="2"
+        <ui:PromptTextBox   x:Name="descriptionText"
+                            Grid.Row="2"
                             MinHeight="100"
                             Margin="10,5"
                             AcceptsReturn="True"
