@@ -117,22 +117,22 @@ namespace GitHub.ViewModels
 
             githubObs.SelectMany(r =>
             {
-                var branches = Observable.Empty<IBranch>();
+                var b = Observable.Empty<IBranch>();
                 if (r.IsFork)
                 {
-                    branches = repositoryHost.ModelService.GetBranches(r.Parent).Select(x =>
+                    b = repositoryHost.ModelService.GetBranches(r.Parent).Select(x =>
                     {
                         x.DisplayName = x.Id;
                         return x;
                     });
                 }
-                return branches.Concat(repositoryHost.ModelService.GetBranches(r));
+                return b.Concat(repositoryHost.ModelService.GetBranches(r));
             })
             .ToList()
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(x =>
             {
-                BranchesList = new List<IBranch>(x);
+                Branches = x.ToList();
                 Initialized = true;
             });
         }
@@ -179,19 +179,12 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
         }
 
-        List<IBranch> branchesList;
-        List<IBranch> BranchesList
+        IReadOnlyList<IBranch> branches;
+        public IReadOnlyList<IBranch> Branches
         {
-            get { return branchesList; }
-            set
-            {
-                branchesList = value;
-                this.RaisePropertyChanged();
-                this.RaisePropertyChanged(nameof(Branches));
-            }
+            get { return branches; }
+            set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
-
-        public IReadOnlyList<IBranch> Branches => branchesList;
 
         IReactiveCommand<IPullRequestModel> createPullRequest;
         public IReactiveCommand<IPullRequestModel> CreatePullRequest => createPullRequest;
