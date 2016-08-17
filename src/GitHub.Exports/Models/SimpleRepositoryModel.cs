@@ -174,14 +174,18 @@ namespace GitHub.Models
             if (ReferenceEquals(this, obj))
                 return true;
             var other = obj as SimpleRepositoryModel;
-            return other != null && String.Equals(Name, other.Name) && String.Equals(Owner, other.Owner) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
+            return Equals(other);
         }
 
-        bool IEquatable<SimpleRepositoryModel>.Equals(SimpleRepositoryModel other)
+        public bool Equals(SimpleRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return other != null && String.Equals(Name, other.Name) && String.Equals(Owner, other.Owner) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
+            return other != null &&
+                String.Equals(Name, other.Name) &&
+                String.Equals(Owner, other.Owner) &&
+                String.Equals(CloneUrl, other.CloneUrl) &&
+                String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
         internal string DebuggerDisplay => String.Format(

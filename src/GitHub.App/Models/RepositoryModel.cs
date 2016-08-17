@@ -49,17 +49,17 @@ namespace GitHub.Models
             if (ReferenceEquals(this, obj))
                 return true;
             var other = obj as RepositoryModel;
-            return other != null && Id == other.Id;
+            return Equals(other);
         }
 
-        bool IEquatable<IRepositoryModel>.Equals([AllowNull]IRepositoryModel other)
+        public bool Equals([AllowNull]IRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
         }
 
-        bool IEquatable<RepositoryModel>.Equals([AllowNull]RepositoryModel other)
+        public bool Equals([AllowNull]RepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
