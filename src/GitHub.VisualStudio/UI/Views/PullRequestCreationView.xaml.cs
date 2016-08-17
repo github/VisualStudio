@@ -24,17 +24,7 @@ namespace GitHub.VisualStudio.UI.Views
                 d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
             });
 
-            IsVisibleChanged += (s, e) =>
-            {
-                if(!IsVisible)
-                    ClearForm();
-            };
         }
 
-        private void ClearForm()
-        {
-            titleText.Text = string.Empty;
-            descriptionText.Text = string.Empty;
-        }
     }
 }

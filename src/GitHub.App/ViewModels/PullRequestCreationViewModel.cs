@@ -96,8 +96,18 @@ namespace GitHub.ViewModels
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
                     }));
+
+            CancelCommand.Subscribe(_ => ClearForm());
+           
         }
-        
+
+        private void ClearForm()
+        {
+            this.PRTitle = string.Empty;
+            this.Description = string.Empty;
+        }
+
+
         public override void Initialize([AllowNull] ViewWithData data)
         {
             initialized = false;
