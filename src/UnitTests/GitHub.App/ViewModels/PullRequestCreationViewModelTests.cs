@@ -10,6 +10,7 @@ using GitHub.ViewModels;
 using Octokit;
 using GitHub.Api;
 using System.ComponentModel;
+using Rothko;
 
 /// <summary>
 /// All the tests in this class are split in subclasses so that when they run
@@ -115,7 +116,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem());
-        prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Return<string>(null));
+        prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
         Assert.Equal("octokit/master", vm.TargetBranch.DisplayName);
     }

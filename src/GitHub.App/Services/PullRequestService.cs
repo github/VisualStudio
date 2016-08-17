@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using GitHub.Models;
 using System.Reactive.Linq;
-using System.Reactive;
-using GitHub.Extensions.Reactive;
 using Rothko;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,19 +59,16 @@ namespace GitHub.Services
 
             return Observable.Defer(() =>
             {
-                string ret = null;
                 var paths = TemplatePaths.Select(x => Path.Combine(repository.LocalPath, x));
 
                 foreach (var path in paths)
                 {
                     if (os.File.Exists(path))
                     {
-                        try { ret = os.File.ReadAllText(path, Encoding.UTF8); } catch { }
-                        if (ret != null)
-                            break;
+                        try { return Observable.Return(os.File.ReadAllText(path, Encoding.UTF8)); } catch { }
                     }
                 }
-                return Observable.Return(ret);
+                return Observable.Empty<string>();
             });
         }
 

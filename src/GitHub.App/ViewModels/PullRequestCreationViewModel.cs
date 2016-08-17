@@ -10,16 +10,11 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using System.Linq;
 using GitHub.Validation;
-using GitHub.Extensions;
 using GitHub.App;
-using System.Reactive.Subjects;
-using System.Reactive;
 using System.Diagnostics.CodeAnalysis;
 using Octokit;
 using NLog;
 using LibGit2Sharp;
-using System.Reactive.Threading.Tasks;
-using GitHub.Factories;
 
 namespace GitHub.ViewModels
 {
@@ -69,7 +64,7 @@ namespace GitHub.ViewModels
 
             SourceBranch = activeRepo.CurrentBranch;
             service.GetPullRequestTemplate(activeRepo)
-                .Subscribe(x => Description = x ?? String.Empty);
+                .Subscribe(x => Description = x ?? String.Empty, () => Description = Description ?? String.Empty);
 
             this.WhenAnyValue(x => x.Branches)
                 .WhereNotNull()
@@ -80,20 +75,7 @@ namespace GitHub.ViewModels
                         TargetBranch = GitHubRepository.IsFork ? GitHubRepository.Parent.DefaultBranch : GitHubRepository.DefaultBranch;
                 });
 
-            var titleObs = this.WhenAnyValue(x => x.PRTitle);
-            TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
-                .IfNullOrEmpty(Resources.PullRequestCreationTitleValidatorEmpty);
-
-            var branchObs = this.WhenAny(
-                    x => x.TargetBranch,
-                    x => x.SourceBranch,
-                    (target, source) => new { Source = source.Value, Target = target.Value })
-                .Where(_ => Initialized)
-                .Merge(this.WhenAnyValue(x => x.Initialized).Where(x => x).Select(_ => new { Source = SourceBranch, Target = TargetBranch }));
-
-            BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
-                .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
-                .IfTrue(x => x.Source.Name == x.Target.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
+            SetupValidators();
 
             var whenAnyValidationResultChanges = this.WhenAny(
                 x => x.TitleValidator.ValidationResult,
@@ -153,6 +135,24 @@ namespace GitHub.ViewModels
                 BranchesList = new List<IBranch>(x);
                 Initialized = true;
             });
+        }
+
+        void SetupValidators()
+        {
+            var titleObs = this.WhenAnyValue(x => x.PRTitle);
+            TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
+                .IfNullOrEmpty(Resources.PullRequestCreationTitleValidatorEmpty);
+
+            var branchObs = this.WhenAny(
+                    x => x.TargetBranch,
+                    x => x.SourceBranch,
+                    (target, source) => new { Source = source.Value, Target = target.Value })
+                .Where(_ => Initialized)
+                .Merge(this.WhenAnyValue(x => x.Initialized).Where(x => x).Select(_ => new { Source = SourceBranch, Target = TargetBranch }));
+
+            BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
+                .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
+                .IfTrue(x => x.Source.Name == x.Target.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
         }
 
         public IRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
