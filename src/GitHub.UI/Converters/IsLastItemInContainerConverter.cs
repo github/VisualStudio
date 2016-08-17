@@ -14,8 +14,15 @@ namespace GitHub.UI
 			DependencyObject item = (DependencyObject)value;
 			ItemsControl ic = ItemsControl.ItemsControlFromItemContainer(item);
 
-			return ic.ItemContainerGenerator.IndexFromContainer(item) == ic.Items.Count - 1;
-		}
+            if (ic != null && ic.Items != null)
+            {
+                return ic.ItemContainerGenerator.IndexFromContainer(item) == ic.Items.Count - 1;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
