@@ -17,10 +17,10 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository to look at for the remote.</param>
         /// <param name="remote">The name of the remote to look for</param>
-        /// <returns>Returns a <see cref="UriString"/> representing the uri of the "origin" remote normalized to a GitHub repository url or null if none found.</returns>
+        /// <returns>Returns a <see cref="UriString"/> representing the uri of the remote normalized to a GitHub repository url or null if none found.</returns>
         public UriString GetUri(IRepository repository, string remote = "origin")
         {
-            return UriString.ToUriString(GetOriginUri(repository, remote)?.ToRepositoryUrl());
+            return UriString.ToUriString(GetRemoteUri(repository, remote)?.ToRepositoryUrl());
         }
 
         /// <summary>
@@ -56,12 +56,12 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Returns a <see cref="UriString"/> representing the uri of the "origin" remote with no modifications.
+        /// Returns a <see cref="UriString"/> representing the uri of a remote
         /// </summary>
         /// <param name="repo"></param>
         /// <param name="remote">The name of the remote to look for</param>
         /// <returns></returns>
-        public UriString GetOriginUri(IRepository repo, string remote = "origin")
+        public UriString GetRemoteUri(IRepository repo, string remote = "origin")
         {
             return repo
                 ?.Network

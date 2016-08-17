@@ -7,8 +7,8 @@ namespace GitHub.Services
     public interface IGitService
     {
         /// <summary>
-        /// Returns the URL of the remote named "origin" for the specified <see cref="repository"/>. If the repository
-        /// is null or no remote named origin exists, this method returns null
+        /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
+        /// is null or no remote exists, this method returns null
         /// </summary>
         /// <param name="repository">The repository to look at for the remote.</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
@@ -39,10 +39,10 @@ namespace GitHub.Services
         IRepository GetRepository(string path);
 
         /// <summary>
-        /// Returns a <see cref="UriString"/> representing the uri of the "origin" remote with no modifications.
+        /// Returns a <see cref="UriString"/> representing the uri of a remote.
         /// </summary>
         /// <param name="repo"></param>
         /// <returns></returns>
-        UriString GetOriginUri(IRepository repo, string remote = "origin");
+        UriString GetRemoteUri(IRepository repo, string remote = "origin");
     }
 }

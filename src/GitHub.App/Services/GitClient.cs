@@ -85,7 +85,7 @@ namespace GitHub.Services
 
         public IObservable<Remote> GetHttpRemote(IRepository repo, string remote)
         {
-            return Observable.Defer(() => Observable.Return(GitService.GitServiceHelper.GetOriginUri(repo, remote)))
+            return Observable.Defer(() => Observable.Return(GitService.GitServiceHelper.GetRemoteUri(repo, remote)))
                 .Select(uri => new { Remote = uri.IsHypertextTransferProtocol ? remote : remote + "-http", Uri = uri })
                 .Select(r =>
                 {
