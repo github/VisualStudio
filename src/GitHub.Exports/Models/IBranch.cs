@@ -8,8 +8,8 @@ namespace GitHub.Models
     {
         string Id { get; }
         string Name { get; }
-        ISimpleRepositoryModel Repository { get; set; }
-        bool IsTracking { get; set; }
+        ISimpleRepositoryModel Repository { get; }
+        bool IsTracking { get; }
         string DisplayName { get; set; }
     }
 }

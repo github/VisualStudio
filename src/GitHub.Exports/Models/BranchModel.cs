@@ -37,9 +37,9 @@ namespace GitHub.Models
         }
 
         public string Id { get; private set; }
-        public string Name { get; set; }
-        public ISimpleRepositoryModel Repository { get; set; }
-        public bool IsTracking { get; set; }
+        public string Name { get; private set; }
+        public ISimpleRepositoryModel Repository { get; private set; }
+        public bool IsTracking { get; private set; }
         public string DisplayName { get; set; }
 
 
