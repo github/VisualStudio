@@ -532,7 +532,7 @@ namespace GitHub.Collections
             var idx = GetIndexUnfiltered(item);
 
             if (data.TheAction == TheAction.Remove)
-                return new ActionData(TheAction.Remove, original, item, null, idx - 1, idx);
+                return new ActionData(TheAction.Remove, original, item, null, idx, idx);
 
             if (idx >= 0)
             {

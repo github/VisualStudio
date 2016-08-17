@@ -12,6 +12,7 @@ using System.Threading;
 using NUnit.Framework;
 using System.Reactive;
 using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 
 [TestFixture]
 public class TrackingTests : TestBase
@@ -1744,7 +1745,6 @@ public class TrackingTests : TestBase
         col.Dispose();
     }
 
-
     [Test]
     public void Removing()
     {
@@ -1777,7 +1777,8 @@ public class TrackingTests : TestBase
         Add(source, GetThing(8, 8));
         Add(source, GetThing(9, 9));
         Add(source, GetThing(10, 10));
-        evt.WaitOne();
+
+        Assert.True(evt.WaitOne(80));
         evt.Reset();
         CollectionAssert.AreEqual(col, new List<Thing> {
             GetThing(3, 3),
@@ -1787,7 +1788,7 @@ public class TrackingTests : TestBase
 
         expectedCount = 12;
         col.RemoveItem(GetThing(2));
-        evt.WaitOne();
+        Assert.True(evt.WaitOne(40));
         evt.Reset();
         CollectionAssert.AreEqual(col, new List<Thing> {
             GetThing(4, 4),
@@ -1797,7 +1798,7 @@ public class TrackingTests : TestBase
 
         expectedCount = 13;
         col.RemoveItem(GetThing(5));
-        evt.WaitOne();
+        Assert.True(evt.WaitOne(40));
         evt.Reset();
         CollectionAssert.AreEqual(col, new List<Thing> {
             GetThing(4, 4),
@@ -1805,17 +1806,35 @@ public class TrackingTests : TestBase
             GetThing(9, 9),
         });
 
-        col.Filter = null;
+        col.Filter = (item, position, list) => true;
 
         expectedCount = 14;
-        col.RemoveItem(GetThing(100)); // this one won't result in a new element from the observable
-        col.RemoveItem(GetThing(10));
-        evt.WaitOne();
+        col.RemoveItem(GetThing(0));
+        Assert.True(evt.WaitOne(40));
         evt.Reset();
 
         Assert.AreEqual(8, col.Count);
         CollectionAssert.AreEqual(col, new List<Thing> {
-            GetThing(0, 0),
+            GetThing(1, 1),
+            GetThing(3, 3),
+            GetThing(4, 4),
+            GetThing(6, 6),
+            GetThing(7, 7),
+            GetThing(8, 8),
+            GetThing(9, 9),
+            GetThing(10, 10),
+        });
+
+        col.Filter = null;
+
+        expectedCount = 15;
+        col.RemoveItem(GetThing(100)); // this one won't result in a new element from the observable
+        col.RemoveItem(GetThing(10));
+        Assert.True(evt.WaitOne(40));
+        evt.Reset();
+
+        Assert.AreEqual(7, col.Count);
+        CollectionAssert.AreEqual(col, new List<Thing> {
             GetThing(1, 1),
             GetThing(3, 3),
             GetThing(4, 4),
@@ -1824,6 +1843,7 @@ public class TrackingTests : TestBase
             GetThing(8, 8),
             GetThing(9, 9),
         });
+
         col.Dispose();
     }
 
