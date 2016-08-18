@@ -1806,35 +1806,17 @@ public class TrackingTests : TestBase
             GetThing(9, 9),
         });
 
-        col.Filter = (item, position, list) => true;
-
-        expectedCount = 14;
-        col.RemoveItem(GetThing(0));
-        Assert.True(evt.WaitOne(40));
-        evt.Reset();
-
-        Assert.AreEqual(8, col.Count);
-        CollectionAssert.AreEqual(col, new List<Thing> {
-            GetThing(1, 1),
-            GetThing(3, 3),
-            GetThing(4, 4),
-            GetThing(6, 6),
-            GetThing(7, 7),
-            GetThing(8, 8),
-            GetThing(9, 9),
-            GetThing(10, 10),
-        });
-
         col.Filter = null;
 
-        expectedCount = 15;
+        expectedCount = 14;
         col.RemoveItem(GetThing(100)); // this one won't result in a new element from the observable
         col.RemoveItem(GetThing(10));
         Assert.True(evt.WaitOne(40));
         evt.Reset();
 
-        Assert.AreEqual(7, col.Count);
+        Assert.AreEqual(8, col.Count);
         CollectionAssert.AreEqual(col, new List<Thing> {
+            GetThing(0, 0),
             GetThing(1, 1),
             GetThing(3, 3),
             GetThing(4, 4),
@@ -1845,6 +1827,41 @@ public class TrackingTests : TestBase
         });
 
         col.Dispose();
+    }
+
+    [Test]
+    public void RemovingFirstItemWithFilterWorks()
+    {
+        var source = new Subject<Thing>();
+
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Range(0, 5).Select(x => GetThing(x, x)),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
+            (item, position, list) => true);
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 5;
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        Assert.True(evt.WaitOne(40));
+        evt.Reset();
+
+        expectedCount = 6;
+        col.RemoveItem(GetThing(0));
+
+        Assert.True(evt.WaitOne(40));
+        evt.Reset();
+
+        CollectionAssert.AreEqual(col, Enumerable.Range(1, 4).Select(x => GetThing(x, x)));
+
+        col.Dispose();
+
     }
 
     [Test]
