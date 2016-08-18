@@ -98,13 +98,13 @@ namespace GitHub.ViewModels
                     }));
 
             CancelCommand.Subscribe(_ => ClearForm());
-           
         }
 
-        private void ClearForm()
+        void ClearForm()
         {
             this.PRTitle = string.Empty;
             this.Description = string.Empty;
+            TargetBranch = Branches.FirstOrDefault(b => b.Name == "master");
         }
 
 
@@ -112,7 +112,6 @@ namespace GitHub.ViewModels
         {
             initialized = false;
             base.Initialize(data);
-
             this.Title = null;
             this.Description = service.GetPullRequestTemplate(activeRepo) ?? string.Empty;
 
