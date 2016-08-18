@@ -223,6 +223,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Pull Request has been created at [{0}]({1})..
+        /// </summary>
+        internal static string PRCreatedUpstream {
+            get {
+                return ResourceManager.GetString("PRCreatedUpstream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publish repository.
         /// </summary>
         internal static string PublishTitle {

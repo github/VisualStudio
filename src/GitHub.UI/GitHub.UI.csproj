@@ -80,6 +80,8 @@
     <Compile Include="Behaviours\ClosePopupAction.cs" />
     <Compile Include="Behaviours\OpenPopupAction.cs" />
     <Compile Include="Controls\ComboBoxes\LinkDropDown.cs" />
+    <Compile Include="Controls\Markdown.cs" />
+    <Compile Include="Controls\MarkdownViewer.cs" />
     <Compile Include="Controls\Octicons\OcticonPaths.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -241,6 +243,10 @@
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
+      <Project>{6AFE2E2D-6DB0-4430-A2EA-F5F5388D2F78}</Project>
+      <Name>GitHub.Extensions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

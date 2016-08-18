@@ -8,5 +8,7 @@ namespace GitHub.ViewModels
     {
         string ActiveRepoName { get; }
         IView Control { get; }
+        string Message { get; }
+        MessageType MessageType { get; }
     }
 }

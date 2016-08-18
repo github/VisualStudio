@@ -15,6 +15,9 @@ using System.Diagnostics.CodeAnalysis;
 using Octokit;
 using NLog;
 using LibGit2Sharp;
+using System.Globalization;
+using GitHub.Primitives;
+using GitHub.Extensions;
 
 namespace GitHub.ViewModels
 {
@@ -100,13 +103,19 @@ namespace GitHub.ViewModels
                         var error = apiException?.ApiError?.Errors?.FirstOrDefault();
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
-                    }));
+                    }))
+
+            .OnExecuteCompleted(pr =>
+            {
+                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Id,
+                    TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
+            });
+
             isExecuting = CreatePullRequest.IsExecuting.ToProperty(this, x => x.IsExecuting);
 
             this.WhenAnyValue(x => x.Initialized, x => x.GitHubRepository, x => x.Description, x => x.IsExecuting)
                 .Select(x => !(x.Item1 && x.Item2 != null && x.Item3 != null && !x.Item4))
                 .Subscribe(x => IsBusy = x);
-
         }
 
         public override void Initialize(ViewWithData data = null)

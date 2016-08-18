@@ -16,8 +16,18 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="PagePadding" Value="0"/>
+            </Style>
+            <Style x:Key="LinkStyle" TargetType="Hyperlink">
+                <Setter Property="Foreground" Value="{DynamicResource GitHubActionLinkItemBrush}"/>
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -27,21 +37,29 @@
                          Margin="0,0,8,0"
                          VerticalAlignment="Top"
                          DockPanel.Dock="Left"
-                         Foreground="DarkRed"
-                         Icon="alert" />
+                         Foreground="{Binding IconColor}"
+                         Icon="{Binding Icon}"/>
         <ui:OcticonButton Width="16"
-                         Height="16"
-                         Margin="0"
-                         VerticalAlignment="Top"
-                         DockPanel.Dock="Right"
-                         Foreground="Black"
-                         Background="Transparent"
-                         Click="Dismiss_Click"
-                         Icon="x" />
-        <TextBlock Margin="8,0"
-                   DockPanel.Dock="Top"
-                   Foreground="Black"
-                   Text="{Binding Message}"
-                   TextWrapping="Wrap" />
+                          Height="16"
+                          Margin="0"
+                          VerticalAlignment="Top"
+                          Background="Transparent"
+                          Click="Dismiss_Click"
+                          DockPanel.Dock="Right"
+                          Foreground="Black"
+                          Icon="x"/>
+
+        <ui:MarkdownViewer x:Name="document"
+                           Margin="8,0"
+                           VerticalAlignment="Top"
+                           DockPanel.Dock="Top"
+                           DocumentStyle="{StaticResource DocumentStyle}"
+                           Foreground="Black"
+                           LinkStyle="{StaticResource LinkStyle}"
+                           RawContent="{Binding Message}"
+                           HyperlinkCommand="{Binding LinkCommand}"
+                           ScrollViewer.CanContentScroll="False"
+                           ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                           ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
     </DockPanel>
 </UserControl>

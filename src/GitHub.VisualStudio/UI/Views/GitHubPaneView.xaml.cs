@@ -26,13 +26,16 @@ namespace GitHub.VisualStudio.UI.Views
             this.InitializeComponent();
             this.WhenActivated(d =>
             {
-                ErrorMessage.Visibility = Visibility.Collapsed;
+                infoPanel.Visibility = Visibility.Collapsed;
                 d(notifications.Listen()
-                    .Where(n => n.Type == Notification.NotificationType.Error)
                     .ObserveOnDispatcher(DispatcherPriority.Normal)
                     .Subscribe(n =>
                     {
-                        ErrorMessage.Message = n.Message;
+                        if (n.Type == Notification.NotificationType.Error || n.Type == Notification.NotificationType.Warning)
+                            infoPanel.MessageType = MessageType.Warning;
+                        else
+                            infoPanel.MessageType = MessageType.Information;
+                        infoPanel.Message = n.Message;
                     }));
             });
         }
