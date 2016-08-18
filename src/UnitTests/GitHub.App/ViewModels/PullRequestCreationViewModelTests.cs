@@ -93,6 +93,7 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
 
         Assert.Equal(string.Empty, vm.PRTitle);
         Assert.Equal(string.Empty, vm.Description);
+        Assert.Equal("master", vm.TargetBranch.Name);
 
     }
 }
