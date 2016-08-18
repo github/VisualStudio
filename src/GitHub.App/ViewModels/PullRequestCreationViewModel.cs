@@ -96,13 +96,22 @@ namespace GitHub.ViewModels
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
                     }));
+
+            CancelCommand.Subscribe(_ => ClearForm());
+            createPullRequest.Subscribe(_ => ClearForm());
         }
-        
+
+        void ClearForm()
+        {
+            this.PRTitle = string.Empty;
+            this.Description = string.Empty;
+            TargetBranch = Branches.FirstOrDefault(b => b.Name == "master");
+        }
+
         public override void Initialize([AllowNull] ViewWithData data)
         {
             initialized = false;
             base.Initialize(data);
-
             this.Title = null;
             this.Description = service.GetPullRequestTemplate(activeRepo) ?? string.Empty;
 
