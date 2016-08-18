@@ -108,7 +108,6 @@ namespace GitHub.ViewModels
             TargetBranch = Branches.FirstOrDefault(b => b.Name == "master");
         }
 
-
         public override void Initialize([AllowNull] ViewWithData data)
         {
             initialized = false;
