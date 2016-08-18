@@ -98,6 +98,7 @@ namespace GitHub.ViewModels
                     }));
 
             CancelCommand.Subscribe(_ => ClearForm());
+            createPullRequest.Subscribe(_ => ClearForm());
         }
 
         void ClearForm()
