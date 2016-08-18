@@ -61,4 +61,38 @@ public class PullRequestCreationViewModelTests : TempFileBaseClass
 
         Assert.Equal("Test PR template", vm.Description);
     }
+
+
+    [Fact]
+    public async Task FormIsEmptyIfCanceled()
+    {
+        var serviceProvider = Substitutes.ServiceProvider;
+        var service = serviceProvider.GetPullRequestsService();
+        var notifications = Substitute.For<INotificationService>();
+
+        var gitService = serviceProvider.GetGitService();
+        var repo = Substitute.For<IRepository>();
+        repo.Head.Returns(Substitute.For<Branch>());
+        gitService.GetRepo(Arg.Any<string>()).Returns(repo);
+
+        var host = serviceProvider.GetRepositoryHosts().GitHubHost;
+        var ms = Substitute.For<IModelService>();
+        var master = Substitute.For<IBranch>();
+        master.Name.Returns("master");
+        ms.GetBranches(Arg.Any<ISimpleRepositoryModel>()).Returns(Observable.Return(master));
+        host.ModelService.Returns(ms);
+
+        var repository = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
+
+        var vm = new PullRequestCreationViewModel(host, repository, service, notifications);
+        vm.PRTitle = "PR title";
+        vm.Description = "PR Desc";
+        vm.Initialize(null);
+
+        await vm.CancelCommand.ExecuteAsync();
+
+        Assert.Equal(string.Empty, vm.PRTitle);
+        Assert.Equal(string.Empty, vm.Description);
+
+    }
 }
