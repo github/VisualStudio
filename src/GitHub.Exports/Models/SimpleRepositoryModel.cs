@@ -77,9 +77,9 @@ namespace GitHub.Models
             if (CloneUrl == null)
                 return null;
 
-            var sha = HeadSha;
+            var sha = GetLatestPushedSha();
             // this also incidentally checks whether the repo has a valid LocalPath
-            if (String.IsNullOrEmpty(sha))
+            if(String.IsNullOrEmpty(sha))
                 return CloneUrl.ToRepositoryUrl().AbsoluteUri;
 
             if (path != null && Path.IsPathRooted(path))
@@ -109,6 +109,22 @@ namespace GitHub.Models
             }
 
             return new UriString(GenerateUrl(CloneUrl.ToRepositoryUrl().AbsoluteUri, sha, path, startLine, endLine));
+        }
+
+        string GetLatestPushedSha()
+        {
+            var repo = GitService.GitServiceHelper.GetRepository(LocalPath);
+            var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
+
+            foreach(var c in repo.Commits)
+            {
+                if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
+                {
+                    return c.Sha;
+                }
+            }
+
+            return null;
         }
 
         const string CommitFormat = "{0}/commit/{1}";
