@@ -127,7 +127,14 @@ namespace GitHub.Api
 
         public IObservable<Organization> GetOrganizations()
         {
-            return gitHubClient.Organization.GetAllForCurrent();
+            // Organization.GetAllForCurrent doesn't return all of the information we need (we 
+            // need information about the plan the organization is on in order to enable/disable
+            // the "Private Repository" checkbox in the "Create Repository" dialog). To get this
+            // we have to do an Organization.Get on each repository received.
+            return gitHubClient.Organization
+                .GetAllForCurrent()
+                .Select(x => gitHubClient.Organization.Get(x.Login))
+                .Merge();
         }
 
         public IObservable<Repository> GetUserRepositories(RepositoryType repositoryType)

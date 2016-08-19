@@ -107,6 +107,10 @@ namespace GitHub.Services
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
                     TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
+                // TODO: Akavache returns the cached version followed by the fresh version if > 2
+                // minutes have expired from the last request. Here we make sure the latest value is
+                // returned but it's a hack. We really need a better way to cache this stuff.
+                .TakeLast(1)
                 .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
