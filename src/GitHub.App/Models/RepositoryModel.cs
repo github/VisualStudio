@@ -15,6 +15,8 @@ namespace GitHub.Models
             OwnerAccount = ownerAccount;
             IsFork = isFork;
             SetIcon(isPrivate, isFork);
+            // this is an assumption, we'd have to load the repo information from octokit to know for sure
+            // probably not worth it for this ctor
             DefaultBranch = new BranchModel("master", this);
         }
 
