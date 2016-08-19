@@ -27,13 +27,15 @@ namespace GitHub.Services
         readonly IGitClient gitClient;
         readonly IGitService gitService;
         readonly IOperatingSystem os;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os)
+        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os, IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
             this.os = os;
+            this.usageTracker = usageTracker;
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
@@ -88,7 +90,9 @@ namespace GitHub.Services
             if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
-            return await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
+            var ret = await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
+            usageTracker.IncrementUpstreamPullRequestCount();
+            return ret;
         }
 
     }
