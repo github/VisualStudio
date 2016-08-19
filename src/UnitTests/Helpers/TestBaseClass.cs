@@ -41,15 +41,15 @@ public class TestBaseClass : IEntryExitDecorator
         return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
     }
 
-    protected static Repository CreateRepository(string owner, string name, string domain = "github.com")
+    protected static Repository CreateRepository(string owner, string name, string domain = "github.com", long id = 1, Repository parent = null)
     {
         var cloneUrl = "https://" + domain + "/" + owner + "/" + name;
         string notCloneUrl = cloneUrl + "-x";
         return new Repository(notCloneUrl, notCloneUrl, cloneUrl, notCloneUrl, notCloneUrl, notCloneUrl, notCloneUrl,
-            1, CreateOctokitUser(owner),
-            name, "fullname", "description", notCloneUrl, "c#", false, false, 0, 0, "master",
+            id, CreateOctokitUser(owner),
+            name, "fullname", "description", notCloneUrl, "c#", false, parent != null, 0, 0, "master",
             0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow,
-            new RepositoryPermissions(), null, null, true, false, false);
+            new RepositoryPermissions(), parent, null, true, false, false);
     }
 
     protected static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,

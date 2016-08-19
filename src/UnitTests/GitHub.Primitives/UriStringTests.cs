@@ -101,9 +101,9 @@ public class UriStringTests
         }
 
         [Fact]
-        public void EnsuresArgumentNotNull()
+        public void AcceptsNullConversion()
         {
-            Assert.Throws<ArgumentNullException>(() => new UriString(null));
+            Assert.NotNull(new UriString(null));
         }
     }
 

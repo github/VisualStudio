@@ -77,7 +77,8 @@ public class RepositoryModelTests
             var path = Directory.CreateSubdirectory("repo-name");
             gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
             var model = new SimpleRepositoryModel(path.FullName);
-            Assert.Equal("user/repo-name", model.Name);
+            Assert.Equal("repo-name", model.Name);
+            Assert.Equal("user", model.Owner);
         }
     }
 

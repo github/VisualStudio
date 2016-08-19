@@ -10,37 +10,41 @@ using GitHub.Services;
 public class PullRequestServiceTests : TestBaseClass
 {
     [Fact]
-    public async Task CreatePullRequestAllArgsMandatory()
+    public void CreatePullRequestAllArgsMandatory()
     {
         var serviceProvider = Substitutes.ServiceProvider;
-        var service = new PullRequestService();
+        var service = new PullRequestService(Substitute.For<IGitClient>(), serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem());
 
         IRepositoryHost host = null;
-        ISimpleRepositoryModel repository = null;
+        ISimpleRepositoryModel sourceRepo = null;
+        ISimpleRepositoryModel targetRepo = null;
         string title = null;
         string body = null;
         IBranch source = null;
         IBranch target = null;
 
-        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, repository, title, body, source, target));
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
         host = serviceProvider.GetRepositoryHosts().GitHubHost;
-        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, repository, title, body, source, target));
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        repository = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
-        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, repository, title, body, source, target));
+        sourceRepo = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
+
+        targetRepo = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
         title = "a title";
-        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, repository, title, body, source, target));
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
         body = "a body";
-        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, repository, title, body, source, target));
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        source = new BranchModel() { Name = "source" };
-        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, repository, title, body, source, target));
+        source = new BranchModel("source", sourceRepo);
+        Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        target = new BranchModel() { Name = "target" };
-        var pr = await service.CreatePullRequest(host, repository, title, body, source, target);
+        target = new BranchModel("target", targetRepo);
+        var pr = service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body);
 
         Assert.NotNull(pr);
     }

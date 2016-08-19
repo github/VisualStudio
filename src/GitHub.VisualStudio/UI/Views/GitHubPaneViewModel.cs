@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
 using System.Windows.Threading;
+using GitHub.VisualStudio.UI.Controls;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -55,7 +56,8 @@ namespace GitHub.VisualStudio.UI.Views
             this.hosts = hosts;
             syncContext = SynchronizationContext.Current;
             CancelCommand = ReactiveCommand.Create();
-            Title = "GitHub"; 
+            Title = "GitHub";
+            Message = String.Empty;
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -348,13 +350,21 @@ namespace GitHub.VisualStudio.UI.Views
             private set { repositoryOrigin = value; }
         }
 
-        
-        string errorMessage;
+        string message;
         [AllowNull]
-        public string ErrorMessage
+        public string Message
         {
-            [return:AllowNull] get { return errorMessage; }
-            private set { errorMessage = value; this.RaisePropertyChange(); }
+            [return:AllowNull] get { return message; }
+            set { message = value; this.RaisePropertyChange(); }
+        }
+
+        MessageType messageType;
+        [AllowNull]
+        public MessageType MessageType
+        {
+            [return: AllowNull]
+            get { return messageType; }
+            set { messageType = value; this.RaisePropertyChange(); }
         }
 
         public bool? IsGitHubRepo
