@@ -165,7 +165,7 @@ namespace GitHub.ViewModels
 
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
                 .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
-                .IfTrue(x => x.Source.Name == x.Target.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
+                .IfTrue(x => x.Source.Equals(x.Target), Resources.PullRequestSourceAndTargetBranchTheSame);
         }
 
         bool disposed; // To detect redundant calls
