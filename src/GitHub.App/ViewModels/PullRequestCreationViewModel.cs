@@ -18,6 +18,7 @@ using LibGit2Sharp;
 using System.Globalization;
 using GitHub.Primitives;
 using GitHub.Extensions;
+using System.Reactive.Disposables;
 
 namespace GitHub.ViewModels
 {
@@ -25,7 +26,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
@@ -33,6 +34,7 @@ namespace GitHub.ViewModels
         readonly ObservableAsPropertyHelper<bool> isExecuting;
         readonly IRepositoryHost repositoryHost;
         readonly IObservable<IRepositoryModel> githubObs;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
@@ -52,9 +54,11 @@ namespace GitHub.ViewModels
 
             this.repositoryHost = repositoryHost;
 
-            githubObs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
+            var obs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
                 .Select(r => new RepositoryModel(r))
-                .PublishLastAndConnect();
+                .PublishLast();
+            disposables.Add(obs.Connect());
+            githubObs = obs;
 
             githubRepository = githubObs.ToProperty(this, x => x.GitHubRepository);
 
@@ -162,6 +166,24 @@ namespace GitHub.ViewModels
             BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
                 .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
                 .IfTrue(x => x.Source.Name == x.Target.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
+        }
+
+        bool disposed; // To detect redundant calls
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                disposed = true;
+
+                disposables.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public IRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }

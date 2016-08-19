@@ -192,19 +192,5 @@ namespace GitHub.Extensions.Reactive
         {
             return source.Select(items => new ReadOnlyCollection<TResult>(new[] { firstItem }.Concat(items.Select(map)).ToList()));
         }
-
-        public static IObservable<T> PublishAndConnect<T>(this IObservable<T> This)
-        {
-            var ret = This.Publish();
-            ret.Connect();
-            return ret;
-        }
-
-        public static IObservable<T> PublishLastAndConnect<T>(this IObservable<T> This)
-        {
-            var ret = This.PublishLast();
-            ret.Connect();
-            return ret;
-        }
     }
 }
