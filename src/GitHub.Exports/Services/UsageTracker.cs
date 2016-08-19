@@ -122,7 +122,7 @@ namespace GitHub.Services
         public void IncrementUpstreamPullRequestCount()
         {
             var usage = LoadUsage();
-            ++usage.Model.NumberOfClones;
+            ++usage.Model.NumberOfUpstreamPullRequests;
             SaveUsage(usage);
         }
 

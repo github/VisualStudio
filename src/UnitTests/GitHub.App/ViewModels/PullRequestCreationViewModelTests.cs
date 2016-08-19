@@ -115,7 +115,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     public void TargetBranchDisplayNameIncludesRepoOwnerWhenFork()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
-        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
         Assert.Equal("octokit/master", vm.TargetBranch.DisplayName);
@@ -150,7 +150,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var targetBranch = data.TargetBranch;
         var ms = data.ModelService;
 
-        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
 
         vm.Initialize();

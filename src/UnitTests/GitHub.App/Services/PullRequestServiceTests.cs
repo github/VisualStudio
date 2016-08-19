@@ -13,7 +13,7 @@ public class PullRequestServiceTests : TestBaseClass
     public void CreatePullRequestAllArgsMandatory()
     {
         var serviceProvider = Substitutes.ServiceProvider;
-        var service = new PullRequestService(Substitute.For<IGitClient>(), serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem());
+        var service = new PullRequestService(Substitute.For<IGitClient>(), serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
         IRepositoryHost host = null;
         ISimpleRepositoryModel sourceRepo = null;
