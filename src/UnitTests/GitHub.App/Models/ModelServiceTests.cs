@@ -375,7 +375,7 @@ public class ModelServiceTests
 
     public class TheGetPullRequestsMethod : TestBaseClass
     {
-        [Fact]
+        [Fact(Skip = "Pull requests always refresh from the server now. Migrate this test to data that doesn't require constant refreshing.")]
         public async Task NonExpiredIndexReturnsCache()
         {
             var expected = 5;
