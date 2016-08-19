@@ -9,7 +9,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.0.14.4</ApplicationVersion>
+    <ApplicationVersion>2.0.14.5</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
