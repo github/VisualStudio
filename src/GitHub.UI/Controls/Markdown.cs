@@ -1,4 +1,8 @@
-﻿using GitHub.Extensions;
+﻿/*
+ * Based on https://github.com/theunrepentantgeek/Markdown.XAML (e4435c0291)
+ */
+
+using GitHub.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
