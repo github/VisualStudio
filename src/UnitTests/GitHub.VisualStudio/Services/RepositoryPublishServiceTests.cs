@@ -7,6 +7,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Shell.Interop;
 using NSubstitute;
 using Xunit;
+using UnitTests;
 
 public class RepositoryPublishServiceTests
 {
@@ -17,7 +18,7 @@ public class RepositoryPublishServiceTests
         {
             var solution = Substitute.For<IVsSolution>();
             var gitClient = Substitute.For<IGitClient>();
-            var service = new RepositoryPublishService(gitClient, Substitute.For<IVSServices>());
+            var service = new RepositoryPublishService(gitClient, Substitutes.IVSGitServices);
             var newRepository = new Octokit.NewRepository("test");
             var account = Substitute.For<IAccount>();
             account.Login.Returns("monalisa");

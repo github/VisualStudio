@@ -130,6 +130,7 @@
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IUsageTracker.cs" />
+    <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Services.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Services\UsageTracker.cs" />
+    <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
