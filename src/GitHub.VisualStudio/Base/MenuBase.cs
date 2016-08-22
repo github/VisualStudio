@@ -60,7 +60,7 @@ namespace GitHub.VisualStudio
             // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
             if (activeRepo == null)
             {
-                var path = ServiceProvider.GetExportedValue<IVSServices>()?.GetActiveRepoPath() ?? String.Empty;
+                var path = ServiceProvider.GetExportedValue<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
                     activeRepo = !string.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
@@ -96,8 +96,8 @@ namespace GitHub.VisualStudio
 
             if (ActiveRepo == null)
             {
-                var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-                string path = vsservices?.GetActiveRepoPath() ?? String.Empty;
+                var vsGitServices = ServiceProvider.GetExportedValue<IVSGitServices>();
+                string path = vsGitServices?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
                     ActiveRepo = !String.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;

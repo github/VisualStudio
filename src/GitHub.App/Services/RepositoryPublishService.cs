@@ -16,10 +16,10 @@ namespace GitHub.Services
         readonly IRepository activeRepository;
 
         [ImportingConstructor]
-        public RepositoryPublishService(IGitClient gitClient, IVSServices services)
+        public RepositoryPublishService(IGitClient gitClient, IVSGitServices vsGitServices)
         {
             this.gitClient = gitClient;
-            this.activeRepository = services.GetActiveRepo();
+            this.activeRepository = vsGitServices.GetActiveRepo();
         }
 
         public string LocalRepositoryName

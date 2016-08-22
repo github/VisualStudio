@@ -8,23 +8,24 @@
     <License>LICENSE.txt</License>
     <Icon>Resources\logo_32x32@2x.png</Icon>
     <PreviewImage>Resources\preview_200x200.png</PreviewImage>
-    <Tags>GitHub git github.com team explorer</Tags>
+    <Tags>GitHub;git;open source;source control;branch;pull request;team explorer;commit;publish</Tags>
   </Metadata>
   <Installation AllUsers="true">
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,]" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Express_All" Version="[14.0,]" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0,]" />
   </Dependencies>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Rothko" Path="|Rothko|" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Exports" Path="|GitHub.Exports|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Api" Path="|GitHub.Api|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.App" Path="|GitHub.App|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Rothko" Path="|Rothko|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Exports.Reactive" Path="|GitHub.Exports.Reactive|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.App" Path="|GitHub.App|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.14" Path="|GitHub.TeamFoundation.14|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" Path="|GitHub.TeamFoundation.15|" />
   </Assets>

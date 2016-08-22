@@ -24,6 +24,7 @@ namespace GitHub.Services
         readonly IMetricsService client;
         readonly IConnectionManager connectionManager;
         readonly IPackageSettings userSettings;
+        readonly IVSServices vsservices;
         readonly DispatcherTimer timer;
         readonly string storePath;
 
@@ -37,6 +38,7 @@ namespace GitHub.Services
             IProgram program,
             IConnectionManager connectionManager,
             IPackageSettings userSettings,
+            IVSServices vsservices,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             fileExists = (path) => System.IO.File.Exists(path);
@@ -46,6 +48,7 @@ namespace GitHub.Services
 
             this.connectionManager = connectionManager;
             this.userSettings = userSettings;
+            this.vsservices = vsservices;
             this.client = serviceProvider.GetExportedValue<IMetricsService>();
             this.timer = new DispatcherTimer(
                 TimeSpan.FromMinutes(1),
@@ -141,7 +144,7 @@ namespace GitHub.Services
 
             result.Model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
             result.Model.AppVersion = AssemblyVersionInformation.Version;
-            result.Model.VSVersion = GitHub.VisualStudio.Services.VisualStudioVersion;
+            result.Model.VSVersion = vsservices.VSVersion;
 
             return result;
         }
