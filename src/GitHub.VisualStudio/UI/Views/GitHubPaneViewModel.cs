@@ -397,5 +397,9 @@ namespace GitHub.VisualStudio.UI.Views
             }
             base.Dispose(disposing);
         }
+
+        public void Reset()
+        {
+        }
     }
 }

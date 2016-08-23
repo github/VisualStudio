@@ -339,7 +339,8 @@ namespace GitHub.Controllers
                 .OnEntry(tr => RunView(UIViewType.PRCreation, CalculateDirection(tr)))
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
-                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
+                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish))
+                .OnExit(() => Reset());
 
             uiStateMachine.Configure(UIViewType.Login)
                 .OnEntry(tr => RunView(UIViewType.Login, CalculateDirection(tr)))

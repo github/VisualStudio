@@ -189,7 +189,7 @@ namespace GitHub.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        void Reset()
+       public override void Reset()
         {
             this.PRTitle = string.Empty;
             this.Description = string.Empty;

@@ -193,14 +193,17 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     }
 
     [Fact]
-    public void FormClearsOnCancel()
+    public async Task FormClearsOnCancel()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "notmaster", "origin", true, true);
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        vm.Initialize();
         vm.PRTitle = "a title";
         vm.Description = "a description";
-        vm.CancelCommand.ExecuteAsync();
+        vm.TargetBranch = new BranchModel("notmaster", data.TargetRepo);        
+        await vm.CancelCommand.ExecuteAsync();
 
         Assert.Equal("master", vm.TargetBranch.Name);
         Assert.Equal(string.Empty, vm.PRTitle);
@@ -208,14 +211,14 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     }
 
     [Fact]
-    public void FormClearsOnCreation()
+    public async Task FormClearsOnCreation()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "notmaster", "origin", true, true);
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
         vm.PRTitle = "a title";
         vm.Description = "a description";
-        vm.CreatePullRequest.ExecuteAsync();
+        await vm.CreatePullRequest.ExecuteAsync();
 
         Assert.Equal("master", vm.TargetBranch.Name);
         Assert.Equal(string.Empty, vm.PRTitle);

@@ -29,5 +29,9 @@ namespace GitHub.ViewModels
         public virtual void Initialize([AllowNull] ViewWithData data)
         {
         }
+
+        public virtual void Reset()
+        {
+        }
     }
 }
