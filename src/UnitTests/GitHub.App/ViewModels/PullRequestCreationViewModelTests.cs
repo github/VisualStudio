@@ -191,4 +191,14 @@ public class PullRequestCreationViewModelTests : TestBaseClass
 
         Assert.Equal("Test PR template", vm.Description);
     }
+
+    [Fact]
+    public void FormClearsOnCancel()
+    {
+        var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "notmaster", "origin", true, true);
+        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        vm.CancelCommand.ExecuteAsync();
+        Assert.Equal(vm.TargetBranch.Name, "master");
+    }
 }

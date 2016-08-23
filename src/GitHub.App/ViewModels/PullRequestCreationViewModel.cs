@@ -148,6 +148,9 @@ namespace GitHub.ViewModels
                 Branches = x.ToList();
                 Initialized = true;
             });
+
+            CancelCommand.Subscribe(_ => Reset());
+            CreatePullRequest.Subscribe(_ => Reset());
         }
 
         void SetupValidators()
