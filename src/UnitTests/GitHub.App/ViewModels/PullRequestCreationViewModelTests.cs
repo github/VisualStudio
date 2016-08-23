@@ -198,7 +198,27 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "notmaster", "origin", true, true);
         var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
         var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        vm.PRTitle = "a title";
+        vm.Description = "a description";
         vm.CancelCommand.ExecuteAsync();
-        Assert.Equal(vm.TargetBranch.Name, "master");
+
+        Assert.Equal("master", vm.TargetBranch.Name);
+        Assert.Equal(string.Empty, vm.PRTitle);
+        Assert.Equal(string.Empty, vm.Description);
+    }
+
+    [Fact]
+    public void FormClearsOnCreation()
+    {
+        var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "notmaster", "origin", true, true);
+        var prservice = new PullRequestService(data.GitClient, data.GitService, data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var vm = new PullRequestCreationViewModel(data.RepositoryHost, data.ActiveRepo, prservice, data.NotificationService);
+        vm.PRTitle = "a title";
+        vm.Description = "a description";
+        vm.CreatePullRequest.ExecuteAsync();
+
+        Assert.Equal("master", vm.TargetBranch.Name);
+        Assert.Equal(string.Empty, vm.PRTitle);
+        Assert.Equal(string.Empty, vm.Description);
     }
 }
