@@ -340,7 +340,7 @@ namespace GitHub.Controllers
                 .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish))
-                .OnExit(() => Reset());
+                .OnExit(() => ResetViewModel(UIViewType.PRCreation));
 
             uiStateMachine.Configure(UIViewType.Login)
                 .OnEntry(tr => RunView(UIViewType.Login, CalculateDirection(tr)))
@@ -412,6 +412,16 @@ namespace GitHub.Controllers
                     return state;
                 })
                 .Permit(Trigger.Finish, UIViewType.None);
+        }
+
+        void ResetViewModel(UIViewType viewType)
+        {
+            var flowList = GetObjectsForFlow(activeFlow);
+            IUIPair pair;
+            if (flowList.TryGetValue(viewType, out pair))
+            {
+                pair.ViewModel.Reset();
+            }
         }
 
         /// <summary>

@@ -16,6 +16,7 @@ using GitHub.Primitives;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using GitHub.App.Factories;
+using System.Linq;
 
 public class UIControllerTests
 {
@@ -636,6 +637,9 @@ public class UIControllerTests
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.False(success);
+
+                var vm = provider.GetExportFactoryProvider().GetViewModel(GitHub.Exports.UIViewType.PRCreation).Value;
+                Assert.Equal(2, vm.ReceivedCalls().Where(x => x.GetMethodInfo().Name == nameof(IViewModel.Reset)).Count());
             }
         }
 

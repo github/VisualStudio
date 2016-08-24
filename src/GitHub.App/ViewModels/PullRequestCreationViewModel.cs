@@ -120,9 +120,6 @@ namespace GitHub.ViewModels
             this.WhenAnyValue(x => x.Initialized, x => x.GitHubRepository, x => x.Description, x => x.IsExecuting)
                 .Select(x => !(x.Item1 && x.Item2 != null && x.Item3 != null && !x.Item4))
                 .Subscribe(x => IsBusy = x);
-
-            CancelCommand.Subscribe(_ => Reset());
-            CreatePullRequest.Subscribe(_ => Reset());
         }
 
         public override void Initialize(ViewWithData data = null)
