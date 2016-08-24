@@ -637,9 +637,6 @@ public class UIControllerTests
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.False(success);
-
-                var vm = provider.GetExportFactoryProvider().GetViewModel(GitHub.Exports.UIViewType.PRCreation).Value;
-                Assert.Equal(2, vm.ReceivedCalls().Where(x => x.GetMethodInfo().Name == nameof(IViewModel.Reset)).Count());
             }
         }
 
@@ -703,6 +700,65 @@ public class UIControllerTests
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);
+            }
+        }
+
+        [Fact]
+        void ResetIsCalled()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var cm = provider.GetConnectionManager();
+            var cons = new ObservableCollection<IConnection>();
+            cm.Connections.Returns(cons);
+
+            // simulate being logged in
+            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            {
+                var count = 0;
+                bool? success = null;
+                var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
+                uiController.ListenToCompletionState()
+                            .Subscribe(s =>
+                            {
+                                success = s;
+                            });
+                flow.Subscribe(data =>
+                {
+                    var uc = data.View;
+                    switch (++count)
+                    {
+                        case 1:
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
+                            break;
+                        case 2:
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
+                            TriggerCancel(uc);
+                            break;
+                        case 3:
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
+                            break;
+                        case 4:
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
+                            TriggerDone(uc);
+                            break;
+                        case 5:
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+                            TriggerCancel(uc);
+                            break;
+                    }
+                });
+
+                uiController.Start(null);
+                Assert.Equal(5, count);
+
+                var vm = provider.GetExportFactoryProvider().GetViewModel(GitHub.Exports.UIViewType.PRCreation).Value;
+                Assert.Equal(2, vm.ReceivedCalls().Where(x => x.GetMethodInfo().Name == nameof(IViewModel.Reset)).Count());
             }
         }
     }
