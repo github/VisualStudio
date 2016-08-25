@@ -22,6 +22,7 @@ using Rothko;
 using System.Collections.ObjectModel;
 using GitHub.Collections;
 using GitHub.UI;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -152,12 +153,16 @@ namespace GitHub.ViewModels
                     notificationService.ShowError(Resources.RepositoryCloneFailedNoSelectedRepo);
                     return Observable.Return(Unit.Default);
                 }
-                
+
                 // The following is a noop if the directory already exists.
                 operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
 
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath)
-                    .Do(_ => this.usageTracker.IncrementCloneCount());
+                    .ContinueAfter(() =>
+                    {
+                        usageTracker.IncrementCloneCount();
+                        return Observable.Return(Unit.Default);
+                    });
             })
             .SelectMany(_ => _)
             .Catch<Unit, Exception>(e =>

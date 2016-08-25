@@ -153,6 +153,7 @@
       <DependentUpon>IPackageSettings.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings\GitHubConnectSectionState.cs" />
+    <Compile Include="Settings\Guids.cs" />
     <Compile Include="Settings\PullRequestListUIState.cs" />
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
