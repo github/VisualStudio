@@ -605,7 +605,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="$(Buildtype) == 'Internal'">
     <Content Include="..\..\submodules\externalpackages\StartPage\build\GitHub.StartPage.pkgdef">
       <Link>GitHub.StartPage.pkgdef</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
