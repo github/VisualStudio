@@ -15,4 +15,4 @@
 	url = https://github.com/shana/Akavache
 [submodule "script"]
 	path = script
-	url = https://github.com/github/VisualStudioBuildScripts
+	url = git@github.com:github/VisualStudioBuildScripts
