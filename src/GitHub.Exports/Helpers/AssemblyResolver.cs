@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using System.Diagnostics;
+using GitHub.Collections;
 
 namespace GitHub.Helpers
 {
@@ -51,7 +52,7 @@ namespace GitHub.Helpers
             {
                 var requestedName = e.Name.TrimSuffix(".dll", StringComparison.OrdinalIgnoreCase);
                 var name = new AssemblyName(requestedName).Name;
-                if (!ourAssemblies.Contains(name))
+                if (!ourAssemblies.Contains(name, new LambdaComparer<string>((lhs, rhs) => String.Compare(lhs, rhs, StringComparison.OrdinalIgnoreCase))))
                     return null;
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var filename = Path.Combine(path, name + ".dll");
