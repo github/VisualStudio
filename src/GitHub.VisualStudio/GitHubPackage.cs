@@ -82,9 +82,9 @@ namespace GitHub.VisualStudio
     [Guid(StartPagePackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage
     {
-        static Version vsversion;
-        public static Version VSVersion
         const string StartPagePackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
+        Version vsversion;
+        Version VSVersion
         {
             get
             {
