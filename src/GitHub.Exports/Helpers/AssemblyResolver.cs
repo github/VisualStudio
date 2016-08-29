@@ -52,7 +52,7 @@ namespace GitHub.Helpers
             {
                 var requestedName = e.Name.TrimSuffix(".dll", StringComparison.OrdinalIgnoreCase);
                 var name = new AssemblyName(requestedName).Name;
-                if (!ourAssemblies.Contains(name, new LambdaComparer<string>((lhs, rhs) => String.Compare(lhs, rhs, StringComparison.OrdinalIgnoreCase))))
+                if (!ourAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase))
                     return null;
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var filename = Path.Combine(path, name + ".dll");
