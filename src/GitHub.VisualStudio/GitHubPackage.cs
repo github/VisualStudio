@@ -79,11 +79,12 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists)]
-    [Guid("D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53")]
+    [Guid(StartPagePackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage
     {
         static Version vsversion;
         public static Version VSVersion
+        const string StartPagePackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         {
             get
             {
