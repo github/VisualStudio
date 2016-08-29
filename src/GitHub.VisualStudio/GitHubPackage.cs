@@ -79,10 +79,12 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists)]
-    [Guid(StartPagePackageId)]
+    [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage
     {
-        const string StartPagePackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
+        const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
+        const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
+
         Version vsversion;
         Version VSVersion
         {
@@ -117,7 +119,7 @@ namespace GitHub.VisualStudio
             {
                 var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
                 IVsPackage startPagePackage;
-                if (ErrorHandler.Failed(shell?.LoadPackage(new Guid("3b764d23-faf7-486f-94c7-b3accc44a70d"), out startPagePackage) ?? -1))
+                if (ErrorHandler.Failed(shell?.LoadPackage(new Guid(StartPagePreview4PackageId), out startPagePackage) ?? -1))
                 {
                     // ¯\_(ツ)_/¯
                 }
