@@ -14,7 +14,7 @@ namespace GitHub.Collections
         {
         }
 
-        public LambdaComparer(Func<T, T, int> lambdaComparer, Func<T, int> lambdaHash)
+        public LambdaComparer(Func<T, T, int> lambdaComparer, [AllowNull] Func<T, int> lambdaHash)
         {
             this.lambdaComparer = lambdaComparer;
             this.lambdaHash = lambdaHash;
