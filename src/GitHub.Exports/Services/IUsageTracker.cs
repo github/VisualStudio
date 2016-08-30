@@ -1,5 +1,9 @@
-﻿namespace GitHub.Services
+﻿using GitHub.VisualStudio;
+using System.Runtime.InteropServices;
+
+namespace GitHub.Services
 {
+    [Guid(Guids.UsageTrackerId)]
     public interface IUsageTracker
     {
         void IncrementLaunchCount();

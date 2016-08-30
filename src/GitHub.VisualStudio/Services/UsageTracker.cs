@@ -21,12 +21,13 @@ namespace GitHub.Services
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
-        readonly IMetricsService client;
+        IMetricsService client;
         readonly IConnectionManager connectionManager;
-        readonly IPackageSettings userSettings;
+        IPackageSettings userSettings;
         readonly IVSServices vsservices;
         readonly DispatcherTimer timer;
         readonly string storePath;
+        readonly IServiceProvider serviceProvider;
 
         Func<string, bool> fileExists;
         Func<string, Encoding, string> readAllText;
@@ -37,19 +38,18 @@ namespace GitHub.Services
         public UsageTracker(
             IProgram program,
             IConnectionManager connectionManager,
-            IPackageSettings userSettings,
             IVSServices vsservices,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
+
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
             writeAllText = (path, content, encoding) => System.IO.File.WriteAllText(path, content, encoding);
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
             this.connectionManager = connectionManager;
-            this.userSettings = userSettings;
             this.vsservices = vsservices;
-            this.client = serviceProvider.GetExportedValue<IMetricsService>();
             this.timer = new DispatcherTimer(
                 TimeSpan.FromMinutes(1),
                 DispatcherPriority.Background,
@@ -60,15 +60,7 @@ namespace GitHub.Services
                 program.ApplicationName,
                 StoreFileName);
 
-            userSettings.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(userSettings.CollectMetrics))
-                {
-                    UpdateTimer(false);
-                }
-            };
-
-            UpdateTimer(true);
+            RunTimer();
         }
 
         public void IncrementLaunchCount()
@@ -156,25 +148,12 @@ namespace GitHub.Services
             writeAllText(storePath, json, Encoding.UTF8);
         }
 
-        void UpdateTimer(bool initialCall)
+        void RunTimer()
         {
-            // If the method was called due to userSettings.CollectMetrics changing, then send an
-            // opt-in/out message.
-            if (!initialCall && client != null)
-            {
-                if (userSettings.CollectMetrics)
-                    client.SendOptIn();
-                else
-                    client.SendOptOut();
-            }
-
-            // The timer first ticks after 1 minute to allow things to settle down after startup.
+            // The timer first ticks after 3 minutes to allow things to settle down after startup.
             // This will be changed to 8 hours after the first tick by the TimerTick method.
-            timer.Stop();
-            timer.Interval = TimeSpan.FromMinutes(1);
-
-            if (userSettings.CollectMetrics && client != null)
-                timer.Start();
+            timer.Interval = TimeSpan.FromMinutes(3);
+            timer.Start();
         }
 
         async void TimerTick(object sender, EventArgs e)
@@ -184,9 +163,24 @@ namespace GitHub.Services
             // Subsequent timer ticks should occur every 8 hours.
             timer.Interval = TimeSpan.FromHours(8);
 
+            if (userSettings == null)
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                client = serviceProvider.GetExportedValue<IMetricsService>();
+                if (client == null)
+                {
+                    timer.Stop();
+                    return;
+                }
+                userSettings = serviceProvider.GetExportedValue<IPackageSettings>();
+            }
+
+            if (!userSettings.CollectMetrics)
+                return;
+
             try
             {
-                // Every time we increment the launch count we increment both daily and weekly 
+                // Every time we increment the launch count we increment both daily and weekly
                 // launch count but we only submit (and clear) the weekly launch count when we've
                 // transitioned into a new week. We've defined a week by the ISO8601 definition,
                 // i.e. week starting on Monday and ending on Sunday.
@@ -232,7 +226,7 @@ namespace GitHub.Services
         // http://blogs.msdn.com/b/shawnste/archive/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net.aspx
         static int GetIso8601WeekOfYear(DateTimeOffset time)
         {
-            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll 
+            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
             // be the same week# as whatever Thursday, Friday or Saturday are,
             // and we always get those right
             DayOfWeek day = cal.GetDayOfWeek(time.UtcDateTime);
