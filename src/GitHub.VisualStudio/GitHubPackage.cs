@@ -14,6 +14,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Threading;
 using tasks = System.Threading.Tasks;
+using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace GitHub.VisualStudio
 {
@@ -75,6 +76,7 @@ namespace GitHub.VisualStudio
         }
     }
 
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
@@ -126,11 +128,15 @@ namespace GitHub.VisualStudio
             }
         }
 
-        tasks.Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
+        async tasks.Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
         {
-            AssemblyResolver.InitializeAssemblyResolver();
-            var ret = Services.ComponentModel.DefaultExportProvider.GetExportedValueOrDefault<IUIProvider>();
-            return tasks.Task.FromResult((object)ret);
+            if (serviceType == null)
+                return null;
+            string contract = AttributedModelServices.GetContractName(serviceType);
+            var cm = await GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            if (cm == null)
+                return null;
+            return await tasks.Task.Run(() => cm.DefaultExportProvider.GetExportedValueOrDefault<object>(contract));
         }
     }
 }
