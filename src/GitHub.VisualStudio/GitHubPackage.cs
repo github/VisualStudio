@@ -26,7 +26,7 @@ namespace GitHub.VisualStudio
     [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
-    public class GitHubPackage : Package
+    public class GitHubPackage : AsyncPackage
     {
 
         readonly IServiceProvider serviceProvider;
@@ -46,24 +46,23 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        protected override void Initialize()
+        protected override async tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
-            IncrementLaunchCount();
+            var usageTracker = await GetServiceAsync(typeof(IUsageTracker)) as IUsageTracker;
+            await tasks.Task.Run(() => usageTracker.IncrementLaunchCount());
+            var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
 
-            var menus = serviceProvider.GetExportedValue<IMenuProvider>();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
             foreach (var menu in menus.Menus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
 
             foreach (var menu in menus.DynamicMenus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
+
+            await base.InitializeAsync(cancellationToken, progress);
         }
 
-        void IncrementLaunchCount()
-        {
-            var usageTracker = serviceProvider.GetExportedValue<IUsageTracker>();
-            usageTracker.IncrementLaunchCount();
-        }
     }
 
     [Export(typeof(IGitHubClient))]
@@ -79,6 +78,8 @@ namespace GitHub.VisualStudio
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists)]
     [Guid(ServiceProviderPackageId)]
@@ -115,6 +116,8 @@ namespace GitHub.VisualStudio
         protected override async tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             AddService(typeof(IUIProvider), CreateService, true);
+            AddService(typeof(IMenuProvider), CreateService, true);
+            AddService(typeof(IUsageTracker), CreateService, true);
 
             // Load the start page package only for Dev15 Preview 4
             if (VSVersion.Major == 15 && VSVersion.Build == 25618)
