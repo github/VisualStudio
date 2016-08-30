@@ -9,6 +9,5 @@ namespace GitHub.ViewModels
         ICommand Cancel { get; }
         bool IsShowing { get; }
         void Initialize(ViewWithData data);
-        void Reset();
     }
 }

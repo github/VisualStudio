@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
+    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable, IResettable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
@@ -190,7 +190,7 @@ namespace GitHub.ViewModels
         {
             PRTitle = string.Empty;
             Description = string.Empty;
-            TargetBranch = Branches.FirstOrDefault(b => b.Name == TargetBranch.Name);
+            TargetBranch = Branches.FirstOrDefault(b => b == TargetBranch);
         }
 
         public IRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }

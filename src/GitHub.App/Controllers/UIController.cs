@@ -420,7 +420,9 @@ namespace GitHub.Controllers
             IUIPair pair;
             if (flowList.TryGetValue(viewType, out pair))
             {
-                pair.ViewModel.Reset();
+                var vm = pair.ViewModel as IResettable;
+                //TODO:Can I even do this?
+                //vm?.Reset();
             }
         }
 

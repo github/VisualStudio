@@ -158,6 +158,7 @@
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="UI\IResettable.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
