@@ -186,11 +186,11 @@ namespace GitHub.ViewModels
             GC.SuppressFinalize(this);
         }
 
-       public override void Reset()
+        public override void Reset()
         {
-            this.PRTitle = string.Empty;
-            this.Description = string.Empty;
-            TargetBranch = Branches.FirstOrDefault(b => b.Name == "master");
+            PRTitle = string.Empty;
+            Description = string.Empty;
+            TargetBranch = Branches.FirstOrDefault(b => b.Name == TargetBranch.Name);
         }
 
         public IRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
