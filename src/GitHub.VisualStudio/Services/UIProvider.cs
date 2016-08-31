@@ -34,19 +34,56 @@ namespace GitHub.VisualStudio
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProvider serviceProvider;
-        CompositionContainer tempContainer;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
         readonly Version currentVersion;
         bool initializingLogging = false;
 
+        ExportProvider exportProvider = null;
         [AllowNull]
-        public ExportProvider ExportProvider { get; }
+        public ExportProvider ExportProvider
+        {
+            get
+            {
+                if (exportProvider == null)
+                {
+                    var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+                    Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+                    if (componentModel == null)
+                    {
+                        log.Error("Service of type SComponentModel not found");
+                    }
+                    exportProvider = componentModel.DefaultExportProvider;
+
+                    if (ExportProvider == null)
+                    {
+                        log.Error("DefaultExportProvider could not be obtained.");
+                    }
+                }
+                return exportProvider;
+            }
+        }
+
+        CompositionContainer tempContainer;
+        CompositionContainer TempContainer
+        {
+            get
+            {
+                if (tempContainer == null)
+                {
+                    tempContainer = AddToDisposables(new CompositionContainer(new ComposablePartExportProvider()
+                    {
+                        SourceProvider = ExportProvider
+                    }));
+                }
+                return tempContainer;
+            }
+        }
 
         [AllowNull]
         public IServiceProvider GitServiceProvider { get; set; }
 
-        bool Initialized { get { return ExportProvider != null; } }
+        bool Initialized { get { return exportProvider != null; } }
 
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -54,25 +91,6 @@ namespace GitHub.VisualStudio
             this.currentVersion = typeof(UIProvider).Assembly.GetName().Version;
             this.serviceProvider = serviceProvider;
 
-            var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
-            Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
-            if (componentModel == null)
-            {
-                log.Error("Service of type SComponentModel not found");
-                return;
-            }
-            ExportProvider = componentModel.DefaultExportProvider;
-
-            if (ExportProvider == null)
-            {
-                log.Error("DefaultExportProvider could not be obtained.");
-                return;
-            }
-
-            tempContainer = AddToDisposables(new CompositionContainer(new ComposablePartExportProvider()
-            {
-                SourceProvider = ExportProvider
-            }));
             tempParts = new Dictionary<string, OwnedComposablePart>();
         }
 
@@ -96,7 +114,7 @@ namespace GitHub.VisualStudio
             }
 
             string contract = AttributedModelServices.GetContractName(serviceType);
-            var instance = AddToDisposables(tempContainer.GetExportedValueOrDefault<object>(contract));
+            var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
@@ -177,7 +195,7 @@ namespace GitHub.VisualStudio
             var part = batch.AddExportedValue(contract, instance);
             Debug.Assert(part != null, "Adding an exported value must return a non-null part");
             tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
-            tempContainer.Compose(batch);
+            TempContainer.Compose(batch);
         }
 
         /// <summary>
@@ -205,7 +223,7 @@ namespace GitHub.VisualStudio
                 tempParts.Remove(contract);
                 var batch = new CompositionBatch();
                 batch.RemovePart(part.Part);
-                tempContainer.Compose(batch);
+                TempContainer.Compose(batch);
             }
         }
 
