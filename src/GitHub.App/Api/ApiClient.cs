@@ -257,7 +257,11 @@ namespace GitHub.Api
 
         public IObservable<Branch> GetBranches(string owner, string repo)
         {
+#pragma warning disable CS0618
+            // GetAllBranches is obsolete, but don't want to introduce the change to fix the
+            // warning in the PR, so disabling for now.
             return gitHubClient.Repository.GetAllBranches(owner, repo);
+#pragma warning restore
         }
 
         public IObservable<Repository> GetRepository(string owner, string repo)
