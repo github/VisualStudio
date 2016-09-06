@@ -1,9 +1,11 @@
 ﻿using GitHub.Primitives;
-using GitHub.UI;
 using System.ComponentModel;
 
 namespace GitHub.Models
 {
+    /// <summary>
+    /// Represents a locally cloned repository.
+    /// </summary>
     public interface ILocalRepositoryModel : IRepositoryModel, INotifyPropertyChanged
     {
         /// <summary>
@@ -21,6 +23,14 @@ namespace GitHub.Models
         /// </summary>
         void Refresh();
 
+        /// <summary>
+        /// Generates a http(s) url to the repository in the remote server, optionally
+        /// pointing to a specific file and specific line range in it.
+        /// </summary>
+        /// <param name="path">The file to generate an url to. Optional.</param>
+        /// <param name="startLine">A specific line, or (if specifying the <paramref name="endLine"/> as well) the start of a range</param>
+        /// <param name="endLine">The end of a line range on the specified file.</param>
+        /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
         UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1);
     }
 }

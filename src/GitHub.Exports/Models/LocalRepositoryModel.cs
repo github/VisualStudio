@@ -11,11 +11,17 @@ using GitHub.Extensions;
 namespace GitHub.Models
 {
     /// <summary>
-    /// A local repository.
+    /// A locally cloned repository.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class LocalRepositoryModel : RepositoryModelBase, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="name">The repository name.</param>
+        /// <param name="cloneUrl">The repository's clone URL.</param>
+        /// <param name="localPath">The repository's local path.</param>
         public LocalRepositoryModel(string name, UriString cloneUrl, string localPath)
             : base(name, cloneUrl)
         {
@@ -25,6 +31,10 @@ namespace GitHub.Models
             Icon = Octicon.repo;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="path">The repository's local path.</param>
         public LocalRepositoryModel(string path)
             : base(path)
         {
@@ -32,6 +42,9 @@ namespace GitHub.Models
             Icon = Octicon.repo;
         }
 
+        /// <summary>
+        /// Updates the clone URL from the local repository.
+        /// </summary>
         public void Refresh()
         {
             if (LocalPath == null)
@@ -107,8 +120,14 @@ namespace GitHub.Models
             return String.Format(CultureInfo.InvariantCulture, EndLineFormat, ret, endLine);
         }
 
+        /// <summary>
+        /// Gets the local path of the repository.
+        /// </summary>
         public string LocalPath { get; }
 
+        /// <summary>
+        /// Gets the head SHA of the repository.
+        /// </summary>
         public string HeadSha
         {
             get
@@ -118,6 +137,9 @@ namespace GitHub.Models
             }
         }
 
+        /// <summary>
+        /// Gets the current branch of the repository.
+        /// </summary>
         public IBranch CurrentBranch
         {
             get
@@ -126,7 +148,6 @@ namespace GitHub.Models
                 return new BranchModel(repo?.Head, this);
             }
         }
-
 
         /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime

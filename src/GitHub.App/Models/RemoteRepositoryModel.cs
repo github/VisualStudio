@@ -5,9 +5,21 @@ using System.Globalization;
 
 namespace GitHub.Models
 {
+    /// <summary>
+    /// A repository read from the GitHub API.
+    /// </summary>
     public class RemoteRepositoryModel : RepositoryModelBase, IRemoteRepositoryModel,
         IEquatable<RemoteRepositoryModel>, IComparable<RemoteRepositoryModel>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RemoteRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="id">The API ID of the repository.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="cloneUrl">The repository's clone URL.</param>
+        /// <param name="isPrivate">Whether the repository is private.</param>
+        /// <param name="isFork">Whether the repository is a fork.</param>
+        /// <param name="ownerAccount">The repository owner account.</param>
         public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
             : base(name, cloneUrl)
         {
@@ -20,6 +32,10 @@ namespace GitHub.Models
             DefaultBranch = new BranchModel("master", this);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RemoteRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="repository">The source octokit repository.</param>
         public RemoteRepositoryModel(Octokit.Repository repository)
             : base(repository.Name, repository.CloneUrl)
         {
@@ -103,12 +119,39 @@ namespace GitHub.Models
         }
 #endregion
 
+        /// <summary>
+        /// Gets the account that is the ower of the repository.
+        /// </summary>
         public IAccount OwnerAccount { get; }
+
+        /// <summary>
+        /// Gets the repository's API ID.
+        /// </summary>
         public long Id { get; }
+
+        /// <summary>
+        /// Gets the date and time at which the repository was created.
+        /// </summary>
         public DateTimeOffset CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets the repository's last update date and time.
+        /// </summary>
         public DateTimeOffset UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the repository is a fork.
+        /// </summary>
         public bool IsFork { get; }
+
+        /// <summary>
+        /// Gets the repository from which this repository was forked, if any.
+        /// </summary>
         [AllowNull] public IRemoteRepositoryModel Parent { [return: AllowNull] get; }
+
+        /// <summary>
+        /// Gets the default branch for the repository.
+        /// </summary>
         public IBranch DefaultBranch { get; }
 
         internal string DebuggerDisplay
