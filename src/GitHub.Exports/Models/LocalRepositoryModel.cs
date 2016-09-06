@@ -13,16 +13,16 @@ namespace GitHub.Models
     /// A local repository.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class SimpleRepositoryModel : RepositoryModelBase, ISimpleRepositoryModel, IEquatable<SimpleRepositoryModel>
+    public class LocalRepositoryModel : RepositoryModelBase, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
-        public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
+        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath = null)
             : base(name, cloneUrl)
         {
             LocalPath = localPath;
             Icon = Octicon.repo;
         }
 
-        public SimpleRepositoryModel(string path)
+        public LocalRepositoryModel(string path)
             : base(ExtractRepositoryName(path), ExtractCloneUrl(path))
         {
             if (path == null)
@@ -144,11 +144,11 @@ namespace GitHub.Models
         {
             if (ReferenceEquals(this, obj))
                 return true;
-            var other = obj as SimpleRepositoryModel;
+            var other = obj as LocalRepositoryModel;
             return Equals(other);
         }
 
-        public bool Equals(SimpleRepositoryModel other)
+        public bool Equals(LocalRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;

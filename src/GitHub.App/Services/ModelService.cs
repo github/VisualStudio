@@ -125,7 +125,7 @@ namespace GitHub.Services
                  });
         }
 
-        public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
+        public IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetRepositories()
         {
             return GetUserRepositories(RepositoryType.Owner)
                 .TakeLast(1)
@@ -144,7 +144,7 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(ILocalRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
@@ -177,7 +177,7 @@ namespace GitHub.Services
             return collection;
         }
 
-        public ITrackingCollection<IRepositoryModel> GetRepositories(ITrackingCollection<IRepositoryModel> collection)
+        public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
@@ -203,7 +203,7 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel sourceRepository, IRepositoryModelBase targetRepository,
+        public IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
         {
@@ -233,7 +233,7 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
+        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
@@ -241,7 +241,7 @@ namespace GitHub.Services
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
@@ -249,7 +249,7 @@ namespace GitHub.Services
                             "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
                             repositoryType);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] {});
+                        return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
 
@@ -262,14 +262,14 @@ namespace GitHub.Services
                 .Catch<IEnumerable<RepositoryCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<RepositoryCacheItem>()));
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetAllRepositoriesForAllOrganizations()
+        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetAllRepositoriesForAllOrganizations()
         {
             return GetUserOrganizations()
                 .SelectMany(org => org.ToObservable())
                 .SelectMany(org => GetOrganizationRepositories(org.Login).TakeLast(1));
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
+        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetOrganizationRepositories(string organization)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
@@ -278,7 +278,7 @@ namespace GitHub.Services
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
@@ -287,11 +287,11 @@ namespace GitHub.Services
                             "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] {});
+                        return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
 
-        public IObservable<IBranch> GetBranches(IRepositoryModelBase repo)
+        public IObservable<IBranch> GetBranches(IRepositoryModel repo)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));
@@ -322,9 +322,9 @@ namespace GitHub.Services
                 avatarProvider.GetAvatar(accountCacheItem));
         }
 
-        IRepositoryModel Create(RepositoryCacheItem item)
+        IRemoteRepositoryModel Create(RepositoryCacheItem item)
         {
-            return new RepositoryModel(
+            return new RemoteRepositoryModel(
                 item.Id,
                 item.Name,
                 new UriString(item.CloneUrl),

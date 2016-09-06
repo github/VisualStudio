@@ -5,10 +5,10 @@ using System.Globalization;
 
 namespace GitHub.Models
 {
-    public class RepositoryModel : RepositoryModelBase, IRepositoryModel,
-        IEquatable<RepositoryModel>, IComparable<RepositoryModel>
+    public class RemoteRepositoryModel : RepositoryModelBase, IRemoteRepositoryModel,
+        IEquatable<RemoteRepositoryModel>, IComparable<RemoteRepositoryModel>
     {
-        public RepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
             : base(name, cloneUrl)
         {
             Id = id;
@@ -20,7 +20,7 @@ namespace GitHub.Models
             DefaultBranch = new BranchModel("master", this);
         }
 
-        public RepositoryModel(Octokit.Repository repository)
+        public RemoteRepositoryModel(Octokit.Repository repository)
             : base(repository.Name, repository.CloneUrl)
         {
             Id = repository.Id;
@@ -28,13 +28,13 @@ namespace GitHub.Models
             SetIcon(repository.Private, IsFork);
             OwnerAccount = new Account(repository.Owner);
             DefaultBranch = new BranchModel(repository.DefaultBranch, this);
-            Parent = repository.Parent != null ? new RepositoryModel(repository.Parent) : null;
+            Parent = repository.Parent != null ? new RemoteRepositoryModel(repository.Parent) : null;
             if (Parent != null)
                 Parent.DefaultBranch.DisplayName = Parent.DefaultBranch.Id;
         }
 
 #region Equality Things
-        public void CopyFrom(IRepositoryModel other)
+        public void CopyFrom(IRemoteRepositoryModel other)
         {
             if (!Equals(other))
                 throw new ArgumentException("Instance to copy from doesn't match this instance. this:(" + this + ") other:(" + other + ")", nameof(other));
@@ -50,54 +50,54 @@ namespace GitHub.Models
         {
             if (ReferenceEquals(this, obj))
                 return true;
-            var other = obj as RepositoryModel;
+            var other = obj as RemoteRepositoryModel;
             return Equals(other);
         }
 
-        public bool Equals([AllowNull]IRepositoryModel other)
+        public bool Equals([AllowNull]IRemoteRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
         }
 
-        public bool Equals([AllowNull]RepositoryModel other)
+        public bool Equals([AllowNull]RemoteRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
         }
 
-        public int CompareTo([AllowNull]IRepositoryModel other)
+        public int CompareTo([AllowNull]IRemoteRepositoryModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
-        public int CompareTo([AllowNull]RepositoryModel other)
+        public int CompareTo([AllowNull]RemoteRepositoryModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
-        public static bool operator >([AllowNull]RepositoryModel lhs, [AllowNull]RepositoryModel rhs)
+        public static bool operator >([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return lhs?.CompareTo(rhs) > 0;
         }
 
-        public static bool operator <([AllowNull]RepositoryModel lhs, [AllowNull]RepositoryModel rhs)
+        public static bool operator <([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return (object)lhs == null || lhs.CompareTo(rhs) < 0;
         }
 
-        public static bool operator ==([AllowNull]RepositoryModel lhs, [AllowNull]RepositoryModel rhs)
+        public static bool operator ==([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
         {
             return ReferenceEquals(lhs, rhs);
         }
 
-        public static bool operator !=([AllowNull]RepositoryModel lhs, [AllowNull]RepositoryModel rhs)
+        public static bool operator !=([AllowNull]RemoteRepositoryModel lhs, [AllowNull]RemoteRepositoryModel rhs)
         {
             return !(lhs == rhs);
         }
@@ -108,7 +108,7 @@ namespace GitHub.Models
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public bool IsFork { get; }
-        [AllowNull] public IRepositoryModel Parent { [return: AllowNull] get; }
+        [AllowNull] public IRemoteRepositoryModel Parent { [return: AllowNull] get; }
         public IBranch DefaultBranch { get; }
 
         internal string DebuggerDisplay

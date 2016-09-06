@@ -8,13 +8,13 @@ namespace GitHub.Extensions
 {
     public static class SimpleRepositoryModelExtensions
     {
-        public static bool HasCommits(this ISimpleRepositoryModel repository)
+        public static bool HasCommits(this ILocalRepositoryModel repository)
         {
             var repo = GitService.GitServiceHelper.GetRepository(repository.LocalPath);
             return repo?.Commits.Any() ?? false;
         }
 
-        public static bool MightContainSolution(this ISimpleRepositoryModel repository)
+        public static bool MightContainSolution(this ILocalRepositoryModel repository)
         {
             var dir = new DirectoryInfo(repository.LocalPath);
             return dir.EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)

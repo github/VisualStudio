@@ -98,7 +98,7 @@ namespace GitHub.VisualStudio.UI.Views
             if (values.Length != 2 || parameter as string != "FormatRepositoryName")
                 return String.Empty;
 
-            var item = values[0] as ISimpleRepositoryModel;
+            var item = values[0] as ILocalRepositoryModel;
             var context = values[1] as IGitHubConnectSection;
             if (item == null)
                 return String.Empty;
@@ -123,7 +123,7 @@ namespace GitHub.VisualStudio.UI.Views
             if (values.Length != 2 || parameter as string != "IsCurrentRepository")
                 return false;
 
-            var item = values[0] as ISimpleRepositoryModel;
+            var item = values[0] as ILocalRepositoryModel;
             var context = values[1] as IGitAwareItem;
             return context?.ActiveRepoUri == item?.CloneUrl && String.Equals(context?.ActiveRepo?.LocalPath, item?.LocalPath, StringComparison.OrdinalIgnoreCase);
         }

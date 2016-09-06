@@ -19,8 +19,8 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        readonly Dictionary<object, Action<ISimpleRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ISimpleRepositoryModel>>();
-        ISimpleRepositoryModel activeRepo;
+        readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
+        ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
 
         IServiceProvider serviceProvider;
@@ -54,7 +54,7 @@ namespace GitHub.VisualStudio.Base
         }
 
         [AllowNull]
-        public ISimpleRepositoryModel ActiveRepo
+        public ILocalRepositoryModel ActiveRepo
         {
             [return: AllowNull] get { return activeRepo; }
             private set
@@ -70,10 +70,10 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        public void Subscribe(object who, Action<ISimpleRepositoryModel> handler)
+        public void Subscribe(object who, Action<ILocalRepositoryModel> handler)
         {
             bool notificationsExist;
-            ISimpleRepositoryModel repo;
+            ILocalRepositoryModel repo;
             lock(activeRepoHandlers)
             {
                 repo = ActiveRepo;
@@ -181,13 +181,13 @@ namespace GitHub.VisualStudio.Base
             var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel();
             if (repo != ActiveRepo)
                 // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as ISimpleRepositoryModel, repo);
+                syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
         }
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "CloneUrl")
-                ActiveRepo = sender as ISimpleRepositoryModel;
+                ActiveRepo = sender as ILocalRepositoryModel;
         }
 
         public IGitAwareItem HomeSection
@@ -250,9 +250,9 @@ namespace GitHub.VisualStudio.Base
         /// <summary>
         /// Create a SimpleRepositoryModel from a VS git repo object
         /// </summary>
-        public static ISimpleRepositoryModel ToModel(this IGitRepositoryInfo repo)
+        public static ILocalRepositoryModel ToModel(this IGitRepositoryInfo repo)
         {
-            return repo == null ? null : new SimpleRepositoryModel(repo.RepositoryPath);
+            return repo == null ? null : new LocalRepositoryModel(repo.RepositoryPath);
         }
     }
 }

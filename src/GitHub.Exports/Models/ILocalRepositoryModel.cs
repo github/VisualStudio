@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace GitHub.Models
 {
-    public interface ISimpleRepositoryModel : IRepositoryModelBase, INotifyPropertyChanged
+    public interface ILocalRepositoryModel : IRepositoryModel, INotifyPropertyChanged
     {
         /// <summary>
         /// Gets the path to the repository on the filesystem.

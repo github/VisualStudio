@@ -5,7 +5,7 @@ namespace GitHub.Models
 {
     public class BranchModel : IBranch
     {
-        public BranchModel(string name, IRepositoryModelBase repo)
+        public BranchModel(string name, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotEmptyString(name, nameof(name));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
@@ -15,7 +15,7 @@ namespace GitHub.Models
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
-        public BranchModel(Octokit.Branch branch, IRepositoryModelBase repo)
+        public BranchModel(Octokit.Branch branch, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
@@ -25,20 +25,20 @@ namespace GitHub.Models
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
-        public BranchModel(LibGit2Sharp.Branch branch, IRepositoryModelBase repo)
+        public BranchModel(LibGit2Sharp.Branch branch, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
 
             Name = DisplayName = branch.FriendlyName;
-            Repository = branch.IsRemote ? new SimpleRepositoryModel(branch.Remote.Url) : repo;
+            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url) : repo;
             IsTracking = branch.IsTracking;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
         public string Id { get; private set; }
         public string Name { get; private set; }
-        public IRepositoryModelBase Repository { get; private set; }
+        public IRepositoryModel Repository { get; private set; }
         public bool IsTracking { get; private set; }
         public string DisplayName { get; set; }
 

@@ -16,8 +16,8 @@ public class PullRequestServiceTests : TestBaseClass
         var service = new PullRequestService(Substitute.For<IGitClient>(), serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
         IRepositoryHost host = null;
-        ISimpleRepositoryModel sourceRepo = null;
-        ISimpleRepositoryModel targetRepo = null;
+        ILocalRepositoryModel sourceRepo = null;
+        ILocalRepositoryModel targetRepo = null;
         string title = null;
         string body = null;
         IBranch source = null;
@@ -28,10 +28,10 @@ public class PullRequestServiceTests : TestBaseClass
         host = serviceProvider.GetRepositoryHosts().GitHubHost;
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        sourceRepo = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
+        sourceRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        targetRepo = new SimpleRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
+        targetRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"));
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
         title = "a title";

@@ -111,10 +111,10 @@
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
-    <Compile Include="Models\IRepositoryModelBase.cs" />
-    <Compile Include="Models\ISimpleRepositoryModel.cs" />
+    <Compile Include="Models\IRepositoryModel.cs" />
+    <Compile Include="Models\ILocalRepositoryModel.cs" />
     <Compile Include="Models\RepositoryModelBase.cs" />
-    <Compile Include="Models\SimpleRepositoryModel.cs" />
+    <Compile Include="Models\LocalRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Primitives\RelayCommand.cs" />
@@ -171,7 +171,7 @@
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
     <Compile Include="Authentication\AuthenticationResult.cs" />
-    <Compile Include="Models\IRepositoryModel.cs" />
+    <Compile Include="Models\IRemoteRepositoryModel.cs" />
     <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />
     <Compile Include="Primitives\UriString.cs" />

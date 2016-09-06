@@ -69,11 +69,11 @@ namespace GitHub.ViewModels
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
 
-            Repositories = new TrackingCollection<IRepositoryModel>();
+            Repositories = new TrackingCollection<IRemoteRepositoryModel>();
             repositories.ProcessingDelay = TimeSpan.Zero;
-            repositories.Comparer = OrderedComparer<IRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
+            repositories.Comparer = OrderedComparer<IRemoteRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
             repositories.Filter = FilterRepository;
-            repositories.NewerComparer = OrderedComparer<IRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            repositories.NewerComparer = OrderedComparer<IRemoteRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
 
             filterTextIsEnabled = this.WhenAny(x => x.IsLoading, x => x.Value)
                 .Select(x => !x && repositories.UnfilteredCount > 0)
@@ -119,7 +119,7 @@ namespace GitHub.ViewModels
             base.Initialize(data);
 
             IsLoading = true;
-            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRepositoryModel>;
+            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRemoteRepositoryModel>;
             repositories.OriginalCompleted.Subscribe(
                 _ => { }
                 , ex =>
@@ -133,7 +133,7 @@ namespace GitHub.ViewModels
             repositories.Subscribe();
         }
 
-        bool FilterRepository(IRepositoryModel repo, int position, IList<IRepositoryModel> list)
+        bool FilterRepository(IRemoteRepositoryModel repo, int position, IList<IRemoteRepositoryModel> list)
         {
             if (string.IsNullOrWhiteSpace(FilterText))
                 return true;
@@ -232,20 +232,20 @@ namespace GitHub.ViewModels
         /// </summary>
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        TrackingCollection<IRepositoryModel> repositories;
-        public ObservableCollection<IRepositoryModel> Repositories
+        TrackingCollection<IRemoteRepositoryModel> repositories;
+        public ObservableCollection<IRemoteRepositoryModel> Repositories
         {
             [return: AllowNull]
             get { return repositories; }
-            private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRepositoryModel>)value); }
+            private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRemoteRepositoryModel>)value); }
         }
 
-        IRepositoryModel selectedRepository;
+        IRemoteRepositoryModel selectedRepository;
         /// <summary>
         /// Selected repository to clone
         /// </summary>
         [AllowNull]
-        public IRepositoryModel SelectedRepository
+        public IRemoteRepositoryModel SelectedRepository
         {
             [return: AllowNull]
             get { return selectedRepository; }

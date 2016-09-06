@@ -51,11 +51,11 @@ public class SimpleRepositoryModelTests : TempFileBaseClass
         var basePath = Directory.CreateSubdirectory("generate-url-test1-" + testid);
         if (createRootedPath && path != null)
             path = System.IO.Path.Combine(basePath.FullName, path);
-        ISimpleRepositoryModel model = null;
+        ILocalRepositoryModel model = null;
         if (!String.IsNullOrEmpty(baseUrl))
-            model = new SimpleRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
+            model = new LocalRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
         else
-            model = new SimpleRepositoryModel(basePath.FullName);
+            model = new LocalRepositoryModel(basePath.FullName);
         var result = model.GenerateUrl(path, startLine, endLine);
         Assert.Equal(expected, result?.ToString());
     }
