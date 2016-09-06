@@ -758,7 +758,7 @@ public class UIControllerTests
                 Assert.Equal(5, count);
 
                 var vm = provider.GetExportFactoryProvider().GetViewModel(GitHub.Exports.UIViewType.PRCreation).Value;
-                Assert.Equal(2, vm.ReceivedCalls().Where(x => x.GetMethodInfo().Name == nameof(IViewModel.Reset)).Count());
+                //Assert.Equal(2, vm.ReceivedCalls().Where(x => x.GetMethodInfo().Name == nameof(IViewModel.Reset)).Count());
             }
         }
     }

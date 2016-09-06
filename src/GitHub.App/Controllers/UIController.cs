@@ -421,8 +421,7 @@ namespace GitHub.Controllers
             if (flowList.TryGetValue(viewType, out pair))
             {
                 var vm = pair.ViewModel as IResettable;
-                //TODO:Can I even do this?
-                //vm?.Reset();
+                vm?.Reset();
             }
         }
 

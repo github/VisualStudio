@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable, IResettable
+    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
