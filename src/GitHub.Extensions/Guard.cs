@@ -43,7 +43,7 @@ namespace GitHub.Extensions
         /// <param name = "name">The name of the argument.</param>
         public static void ArgumentNotEmptyString(string value, string name)
         {
-            if (value.Length > 0) return;
+            if (value?.Length > 0) return;
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
 #if DEBUG
             if (!InUnitTestRunner())
