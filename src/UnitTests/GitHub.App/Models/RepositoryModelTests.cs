@@ -12,7 +12,6 @@ public class RepositoryModelTests
     public class ComparisonTests : TestBaseClass
     {
         [Theory]
-        [InlineData("a name", "https://github.com/github/VisualStudio", null, "a name", "https://github.com/github/VisualStudio", null)]
         [InlineData("a name", "https://github.com/github/VisualStudio", @"C:\some\path", "a name", "https://github.com/github/VisualStudio", @"C:\some\path")]
         [InlineData("a name", "https://github.com/github/VisualStudio", @"c:\some\path", "a name", "https://github.com/github/VisualStudio", @"C:\some\path")]
         [InlineData("a name", "https://github.com/github/VisualStudio", @"C:\some\path", "a name", "https://github.com/github/VisualStudio", @"c:\some\path")]

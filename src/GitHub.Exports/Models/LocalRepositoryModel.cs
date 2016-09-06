@@ -6,6 +6,7 @@ using System.Linq;
 using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.Services;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
@@ -15,9 +16,11 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class LocalRepositoryModel : RepositoryModelBase, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
-        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath = null)
+        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath)
             : base(name, cloneUrl)
         {
+            Guard.ArgumentNotEmptyString(localPath, nameof(localPath));
+
             LocalPath = localPath;
             Icon = Octicon.repo;
         }
