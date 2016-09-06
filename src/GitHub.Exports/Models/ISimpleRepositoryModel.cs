@@ -4,22 +4,23 @@ using System.ComponentModel;
 
 namespace GitHub.Models
 {
-    public interface ISimpleRepositoryModel : INotifyPropertyChanged
+    public interface ISimpleRepositoryModel : IRepositoryModelBase, INotifyPropertyChanged
     {
-        string Name { get; }
-        UriString CloneUrl { get; }
+        /// <summary>
+        /// Gets the path to the repository on the filesystem.
+        /// </summary>
         string LocalPath { get; }
-        Octicon Icon { get; }
-        string Owner { get; }
+
+        /// <summary>
+        /// Gets the current branch.
+        /// </summary>
         IBranch CurrentBranch { get; }
-
-        void SetIcon(bool isPrivate, bool isFork);
-
 
         /// <summary>
         /// Updates the url information based on the local path
         /// </summary>
         void Refresh();
+
         UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1);
     }
 }

@@ -39,7 +39,7 @@ namespace GitHub.Services
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
-            ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            ISimpleRepositoryModel sourceRepository, IRepositoryModelBase targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body
         )
@@ -75,7 +75,7 @@ namespace GitHub.Services
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
-            ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            ISimpleRepositoryModel sourceRepository, IRepositoryModelBase targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
         {

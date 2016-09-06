@@ -20,10 +20,10 @@ namespace GitHub.Services
         IObservable<LicenseItem> GetLicenses();
         IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
         ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
-        IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+        IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel sourceRepository, IRepositoryModelBase targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body);
-        IObservable<IBranch> GetBranches(ISimpleRepositoryModel repo);
+        IObservable<IBranch> GetBranches(IRepositoryModelBase repo);
         IObservable<Unit> InvalidateAll();
     }
 }

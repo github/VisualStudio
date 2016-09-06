@@ -6,7 +6,7 @@ namespace GitHub.Services
     public interface IPullRequestService
     {
         IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
-            ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            ISimpleRepositoryModel sourceRepository, IRepositoryModelBase targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body);
         IObservable<string> GetPullRequestTemplate(ISimpleRepositoryModel repository);

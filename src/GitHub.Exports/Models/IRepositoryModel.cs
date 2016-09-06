@@ -1,9 +1,10 @@
 ﻿using GitHub.Collections;
 using System;
+using GitHub.UI;
 
 namespace GitHub.Models
 {
-    public interface IRepositoryModel : ISimpleRepositoryModel, ICopyable<IRepositoryModel>,
+    public interface IRepositoryModel : IRepositoryModelBase, ICopyable<IRepositoryModel>,
         IEquatable<IRepositoryModel>, IComparable<IRepositoryModel>
     {
         long Id { get; }

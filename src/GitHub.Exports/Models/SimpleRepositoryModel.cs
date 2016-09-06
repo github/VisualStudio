@@ -5,63 +5,40 @@ using System.IO;
 using System.Linq;
 using GitHub.Primitives;
 using GitHub.UI;
-using GitHub.VisualStudio.Helpers;
 using GitHub.Services;
 
 namespace GitHub.Models
 {
+    /// <summary>
+    /// A local repository.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, IEquatable<SimpleRepositoryModel>
+    public class SimpleRepositoryModel : RepositoryModelBase, ISimpleRepositoryModel, IEquatable<SimpleRepositoryModel>
     {
         public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
+            : base(name, cloneUrl)
         {
-            Name = name;
-            Owner = cloneUrl.Owner;
-            CloneUrl = cloneUrl;
             LocalPath = localPath;
             Icon = Octicon.repo;
         }
 
-        public SimpleRepositoryModel(UriString cloneUrl)
-        {
-            Name = cloneUrl.RepositoryName;
-            Owner = cloneUrl.Owner;
-            CloneUrl = cloneUrl;
-            Icon = Octicon.repo;
-        }
-
         public SimpleRepositoryModel(string path)
+            : base(ExtractRepositoryName(path), ExtractCloneUrl(path))
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
             var dir = new DirectoryInfo(path);
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = GitService.GitServiceHelper.GetUri(path);
-            var name = uri?.RepositoryName ?? dir.Name;
-            Name = name;
-            Owner = uri?.Owner ?? String.Empty;
             LocalPath = path;
-            CloneUrl = uri;
             Icon = Octicon.repo;
-        }
-
-        public void SetIcon(bool isPrivate, bool isFork)
-        {
-            Icon = isPrivate
-                    ? Octicon.@lock
-                    : isFork
-                        ? Octicon.repo_forked
-                        : Octicon.repo;
         }
 
         public void Refresh()
         {
             if (LocalPath == null)
                 return;
-            var uri = GitService.GitServiceHelper.GetUri(LocalPath);
-            if (CloneUrl != uri)
-                CloneUrl = uri;
+            CloneUrl = GitService.GitServiceHelper.GetUri(LocalPath);
         }
 
         /// <summary>
@@ -132,13 +109,7 @@ namespace GitHub.Models
             return String.Format(CultureInfo.InvariantCulture, EndLineFormat, ret, endLine);
         }
 
-        public string Name { get; }
-        public string Owner { get; }
-        UriString cloneUrl;
-        public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
         public string LocalPath { get; }
-        Octicon icon;
-        public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
 
         public string HeadSha
         {
@@ -196,5 +167,24 @@ namespace GitHub.Models
             CloneUrl,
             LocalPath,
             GetHashCode());
+
+        static string ExtractRepositoryName(string path)
+        {
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists)
+                throw new ArgumentException("Path does not exist", nameof(path));
+
+            var uri = GitService.GitServiceHelper.GetUri(path);
+            return uri?.RepositoryName ?? dir.Name;
+        }
+
+        static string ExtractCloneUrl(string path)
+        {
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists)
+                throw new ArgumentException("Path does not exist", nameof(path));
+
+            return GitService.GitServiceHelper.GetUri(path);
+        }
     }
 }

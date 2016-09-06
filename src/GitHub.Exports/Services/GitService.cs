@@ -40,7 +40,7 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Probes for a git repository and if one is found, returns a <see cref="IRepository"/> instance for the
+        /// Probes for a git repository and if one is found, returns a <see cref="IRepositoryModelBase"/> instance for the
         /// repository.
         /// </summary>
         /// <remarks>
@@ -48,7 +48,7 @@ namespace GitHub.Services
         /// walks up the parent directories until it either finds a repository, or reaches the root disk.
         /// </remarks>
         /// <param name="path">The path to start probing</param>
-        /// <returns>An instance of <see cref="IRepository"/> or null</returns>
+        /// <returns>An instance of <see cref="IRepositoryModelBase"/> or null</returns>
         public IRepository GetRepository(string path)
         {
             var repoPath = Repository.Discover(path);

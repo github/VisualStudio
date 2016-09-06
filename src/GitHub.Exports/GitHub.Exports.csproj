@@ -111,7 +111,9 @@
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
+    <Compile Include="Models\IRepositoryModelBase.cs" />
     <Compile Include="Models\ISimpleRepositoryModel.cs" />
+    <Compile Include="Models\RepositoryModelBase.cs" />
     <Compile Include="Models\SimpleRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />

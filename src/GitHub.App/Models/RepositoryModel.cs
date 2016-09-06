@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace GitHub.Models
 {
-    public class RepositoryModel : SimpleRepositoryModel, IRepositoryModel,
+    public class RepositoryModel : RepositoryModelBase, IRepositoryModel,
         IEquatable<RepositoryModel>, IComparable<RepositoryModel>
     {
         public RepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
@@ -116,7 +116,7 @@ namespace GitHub.Models
             get
             {
                 return String.Format(CultureInfo.InvariantCulture,
-                    "{5}\tId: {0} Name: {1} CloneUrl: {2} LocalPath: {3} Account: {4}", Id, Name, CloneUrl, LocalPath, Owner, GetHashCode());
+                    "{4}\tId: {0} Name: {1} CloneUrl: {2} Account: {3}", Id, Name, CloneUrl, Owner, GetHashCode());
             }
         }
     }
