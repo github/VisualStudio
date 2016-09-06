@@ -63,7 +63,7 @@ namespace GitHub.Models
         public UriString CloneUrl
         {
             get { return cloneUrl; }
-            set
+            protected set
             {
                 if (cloneUrl != value)
                 {
