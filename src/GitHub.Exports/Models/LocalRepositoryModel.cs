@@ -23,13 +23,8 @@ namespace GitHub.Models
         }
 
         public LocalRepositoryModel(string path)
-            : base(ExtractRepositoryName(path), ExtractCloneUrl(path))
+            : base(path)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists)
-                throw new ArgumentException("Path does not exist", nameof(path));
             LocalPath = path;
             Icon = Octicon.repo;
         }
@@ -167,24 +162,5 @@ namespace GitHub.Models
             CloneUrl,
             LocalPath,
             GetHashCode());
-
-        static string ExtractRepositoryName(string path)
-        {
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists)
-                throw new ArgumentException("Path does not exist", nameof(path));
-
-            var uri = GitService.GitServiceHelper.GetUri(path);
-            return uri?.RepositoryName ?? dir.Name;
-        }
-
-        static string ExtractCloneUrl(string path)
-        {
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists)
-                throw new ArgumentException("Path does not exist", nameof(path));
-
-            return GitService.GitServiceHelper.GetUri(path);
-        }
     }
 }
