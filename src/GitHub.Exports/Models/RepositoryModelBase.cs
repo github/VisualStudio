@@ -26,6 +26,7 @@ namespace GitHub.Models
             string name,
             UriString cloneUrl)
         {
+            Guard.ArgumentNotEmptyString(name, nameof(name));
             Guard.ArgumentNotNull(cloneUrl, nameof(cloneUrl));
 
             Name = name;
