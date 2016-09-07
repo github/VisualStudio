@@ -7,6 +7,7 @@ using UnitTests;
 using Xunit;
 using GitHub.Primitives;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 [Collection("PackageServiceProvider global data tests")]
 public class SimpleRepositoryModelTests : TempFileBaseClass
@@ -17,6 +18,7 @@ public class SimpleRepositoryModelTests : TempFileBaseClass
         var gitservice = provider.GetGitService();
         var repo = Substitute.For<IRepository>();
         gitservice.GetRepository(Args.String).Returns(repo);
+        gitservice.GetLatestPushedSha(Args.String).Returns(Task.FromResult(sha));
         if(!String.IsNullOrEmpty(sha))
         {
             var refs = Substitute.For<ReferenceCollection>();
@@ -49,7 +51,7 @@ public class SimpleRepositoryModelTests : TempFileBaseClass
     [InlineData(17, true, "https://github.com/foo/bar", "", @"src\dir\file1.cs", -1, 2, "https://github.com/foo/bar")]
     [InlineData(18, true, null, "123123", @"src\dir\file1.cs", 1, 2, null)]
     [InlineData(19, false, "git@github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
-    public void GenerateUrl(int testid, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
+    public async void GenerateUrl(int testid, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
     {
         SetupRepository(sha);
 
@@ -61,7 +63,7 @@ public class SimpleRepositoryModelTests : TempFileBaseClass
             model = new SimpleRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
         else
             model = new SimpleRepositoryModel(basePath.FullName);
-        var result = model.GenerateUrl(path, startLine, endLine);
+        var result = await model.GenerateUrl(path, startLine, endLine);
         Assert.Equal(expected, result?.ToString());
     }
 }
