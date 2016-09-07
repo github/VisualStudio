@@ -74,9 +74,15 @@ namespace GitHub.Services
 
         public Task<string> GetLatestPushedSha(string path)
         {
+            var repo = GetRepository(path);
+
+            if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
+            {
+                return Task.FromResult(repo.Head.Tip.Sha);
+            }           
+
             return Task.Factory.StartNew(() =>
             {
-                var repo = GitService.GitServiceHelper.GetRepository(path);
                 var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
 
                 foreach (var c in repo.Commits)
