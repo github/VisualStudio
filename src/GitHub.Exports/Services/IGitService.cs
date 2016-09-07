@@ -1,6 +1,7 @@
 using GitHub.Models;
 using GitHub.Primitives;
 using LibGit2Sharp;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -44,5 +45,7 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <returns></returns>
         UriString GetRemoteUri(IRepository repo, string remote = "origin");
+
+        Task<string> GetLatestPushedSha(string path);
     }
 }
