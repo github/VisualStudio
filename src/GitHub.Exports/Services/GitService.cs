@@ -4,6 +4,7 @@ using LibGit2Sharp;
 using System;
 using System.Threading.Tasks;
 using GitHub.Models;
+using System.Linq;
 
 namespace GitHub.Services
 {
@@ -70,5 +71,23 @@ namespace GitHub.Services
         }
 
         public static IGitService GitServiceHelper => VisualStudio.Services.DefaultExportProvider.GetExportedValueOrDefault<IGitService>() ?? new GitService();
+
+        public Task<string> GetLatestPushedSha(string path)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var repo = GitService.GitServiceHelper.GetRepository(path);
+                var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
+
+                foreach (var c in repo.Commits)
+                {
+                    if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
+                    {
+                        return c.Sha;
+                    }
+                }
+                return null;
+            });
+        }
     }
 }
