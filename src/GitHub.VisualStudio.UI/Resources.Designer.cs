@@ -698,7 +698,7 @@ namespace GitHub.VisualStudio.UI {
                 return ResourceManager.GetString("TitleRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>

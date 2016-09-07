@@ -121,7 +121,7 @@
     <value>Escolha uma pasta para o seu novo repositório.</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>Clonar um {0} Repositório</value>
+    <value>Clonar um Repositório do {0} </value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>Não foi possível conectar-se ao github.com</value>
@@ -130,7 +130,7 @@
     <value>Criar um GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>Criar um {0} Repositório</value>
+    <value>Criar um Repositório no {0}</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>

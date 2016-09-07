@@ -148,10 +148,10 @@
     <value>Licença</value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>Não tem uma conta?</value>
+    <value>Não tem uma conta? </value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Não tem GitHub Enterprise?</value>
+    <value>Não tem GitHub Enterprise? </value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
     <value>Por gentileza verifique sua conexão de internet e tente novamente.</value>
@@ -262,7 +262,7 @@
     <value>Nome do Arquivo</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>Você não está logado em {0}, portanto certas operações git podem falhar. [Fazer login agora]({1})</value>
+    <value>Você não está logado no {0}, portanto certas operações git podem falhar. [Fazer login agora]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
@@ -295,7 +295,7 @@
     <value>Autenticação de dois fatores</value>
   </data>
   <data name="SignUpLink" xml:space="preserve">
-    <value>Inscrever-se</value>
+    <value>Inscreva-se</value>
   </data>
   <data name="resendCodeButtonToolTip" xml:space="preserve">
     <value>Enviar novamente o código para o dispositivo SMS registrado</value>
@@ -331,13 +331,13 @@
     <value>Issues</value>
   </data>
   <data name="BlurbText" xml:space="preserve">
-    <value>Colaboração poderosa, revisão e gerenciamento para o código aberto e projetos privados.</value>
+    <value>Colaboração eficiente, revisão e gerenciamento para código aberto e projetos privados.</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
     <value>Ignorar git</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>Publique este repositório no GitHub e obtenha colaboração poderosa, revisão e gerenciamento para o código aberto e projetos privados.</value>
+    <value>Publique este repositório no GitHub e tenha colaboração eficiente, revisão e gerenciamento para o código aberto e projetos privados.</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>Não encontramos um repositório git aqui. Abra um projeto git ou clique "Arquivo -&gt; Adicionar ao Controle do Código-Fonte"</value>
