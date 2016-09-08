@@ -127,7 +127,14 @@ namespace GitHub.Api
 
         public IObservable<Organization> GetOrganizations()
         {
-            return gitHubClient.Organization.GetAllForCurrent();
+            // Organization.GetAllForCurrent doesn't return all of the information we need (we 
+            // need information about the plan the organization is on in order to enable/disable
+            // the "Private Repository" checkbox in the "Create Repository" dialog). To get this
+            // we have to do an Organization.Get on each repository received.
+            return gitHubClient.Organization
+                .GetAllForCurrent()
+                .Select(x => gitHubClient.Organization.Get(x.Login))
+                .Merge();
         }
 
         public IObservable<Repository> GetUserRepositories(RepositoryType repositoryType)
@@ -250,7 +257,16 @@ namespace GitHub.Api
 
         public IObservable<Branch> GetBranches(string owner, string repo)
         {
+#pragma warning disable CS0618
+            // GetAllBranches is obsolete, but don't want to introduce the change to fix the
+            // warning in the PR, so disabling for now.
             return gitHubClient.Repository.GetAllBranches(owner, repo);
+#pragma warning restore
+        }
+
+        public IObservable<Repository> GetRepository(string owner, string repo)
+        {
+            return gitHubClient.Repository.Get(owner, repo);
         }
     }
 }

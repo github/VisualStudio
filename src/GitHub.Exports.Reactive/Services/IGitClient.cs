@@ -40,5 +40,7 @@ namespace GitHub.Services
         /// <param name="remoteName">The name of the branch (local and remote)</param>
         /// <returns></returns>
         IObservable<Unit> SetTrackingBranch(IRepository repository, string branchName, string remoteName);
+
+        IObservable<Remote> GetHttpRemote(IRepository repo, string remote);
     }
 }

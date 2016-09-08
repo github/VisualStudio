@@ -33,11 +33,11 @@ namespace UnitTests
        // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
         public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
 
-        public static IVSServices IVSServices
+        public static IVSGitServices IVSGitServices
         {
             get
             {
-                var ret = Substitute.For<IVSServices>();
+                var ret = Substitute.For<IVSGitServices>();
                 ret.GetLocalClonePathFromGitProvider().Returns(@"c:\foo\bar");
                 return ret;
             }
@@ -111,13 +111,14 @@ namespace UnitTests
             Services.PackageServiceProvider = ret;
 
             var os = OperatingSystem;
-            var vs = IVSServices;
-            var clone = cloneService ?? new RepositoryCloneService(os, vs);
+            var vsgit = IVSGitServices;
+            var clone = cloneService ?? new RepositoryCloneService(os, vsgit);
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             //ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
             ret.GetService(typeof(IGitService)).Returns(gitservice);
-            ret.GetService(typeof(IVSServices)).Returns(vs);
+            ret.GetService(typeof(IVSServices)).Returns(Substitute.For<IVSServices>());
+            ret.GetService(typeof(IVSGitServices)).Returns(vsgit);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
@@ -141,6 +142,11 @@ namespace UnitTests
         public static IVSServices GetVSServices(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IVSServices)) as IVSServices;
+        }
+
+        public static IVSGitServices GetVSGitServices(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IVSGitServices)) as IVSGitServices;
         }
 
         public static IGitService GetGitService(this IServiceProvider provider)

@@ -15,6 +15,7 @@
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
                                       DataContext="{Binding ViewModel}"
+                                      IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}"
                                       mc:Ignorable="d">
 
     <d:DesignProperties.DataContext>
@@ -93,7 +94,7 @@
                     <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
                     <ui:LinkDropDown Header="Target Branch"
                                      ItemsSource="{Binding Branches}"
-                                     DisplayMemberPath="Name"
+                                     DisplayMemberPath="DisplayName"
                                      SelectedItem="{Binding TargetBranch}"
                                      ToolTip="Select a branch"
                                      Margin="0,1,0,0"/>

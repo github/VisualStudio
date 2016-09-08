@@ -3,7 +3,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
+using GitHub.Primitives;
 using NullGuard;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.Models
@@ -31,6 +33,19 @@ namespace GitHub.Models
 
             bitmapSource.ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => avatar = x);
+        }
+
+        public Account(Octokit.Account account)
+        {
+            Login = account.Login;
+            IsUser = (account as User) != null;
+            Uri htmlUrl;
+            IsEnterprise = Uri.TryCreate(account.HtmlUrl, UriKind.Absolute, out htmlUrl)
+                && !HostAddress.IsGitHubDotComUri(htmlUrl);
+            PrivateReposInPlan = account.Plan != null ? account.Plan.PrivateRepos : 0;
+            OwnedPrivateRepos = account.OwnedPrivateRepos;
+            IsOnFreePlan = PrivateReposInPlan == 0;
+            HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
         }
 
         public bool IsOnFreePlan { get; private set; }

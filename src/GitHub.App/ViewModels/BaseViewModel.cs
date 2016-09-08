@@ -8,6 +8,7 @@ namespace GitHub.ViewModels
     public class BaseViewModel : ReactiveObject, IReactiveViewModel
     {
         protected ObservableAsPropertyHelper<bool> isShowing;
+        bool isBusy;
 
         public BaseViewModel()
         {
@@ -19,6 +20,11 @@ namespace GitHub.ViewModels
 
         public string Title {[return: AllowNull] get; protected set; }
         public bool IsShowing { get { return isShowing?.Value ?? true; } }
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+        }
 
         public virtual void Initialize([AllowNull] ViewWithData data)
         {

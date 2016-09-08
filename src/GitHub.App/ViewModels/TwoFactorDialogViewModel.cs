@@ -20,7 +20,6 @@ namespace GitHub.ViewModels
     public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
-        bool isBusy;
         bool invalidAuthenticationCode;
         string authenticationCode;
         TwoFactorType twoFactorType;
@@ -146,12 +145,6 @@ namespace GitHub.ViewModels
         public bool ShowErrorMessage
         {
             get { return showErrorMessage.Value; }
-        }
-
-        public bool IsBusy
-        {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
     }
 }

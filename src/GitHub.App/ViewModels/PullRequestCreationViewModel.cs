@@ -10,73 +10,85 @@ using GitHub.Extensions.Reactive;
 using GitHub.UI;
 using System.Linq;
 using GitHub.Validation;
-using GitHub.Extensions;
-using NullGuard;
 using GitHub.App;
-using System.Reactive.Subjects;
-using System.Reactive;
 using System.Diagnostics.CodeAnalysis;
 using Octokit;
 using NLog;
+using LibGit2Sharp;
+using System.Globalization;
+using GitHub.Primitives;
+using GitHub.Extensions;
+using System.Reactive.Disposables;
 
 namespace GitHub.ViewModels
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        readonly ObservableAsPropertyHelper<IRepositoryModel> githubRepository;
+        readonly ObservableAsPropertyHelper<bool> isExecuting;
         readonly IRepositoryHost repositoryHost;
-        readonly ISimpleRepositoryModel activeRepo;
-        readonly IPullRequestService service;
-        readonly Subject<Unit> initializationComplete = new Subject<Unit>();
-        bool initialized;
+        readonly IObservable<IRepositoryModel> githubObs;
+        readonly CompositeDisposable disposables = new CompositeDisposable();
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
              IConnectionRepositoryHostMap connectionRepositoryHostMap, ITeamExplorerServiceHolder teservice,
              IPullRequestService service, INotificationService notifications)
-             : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, service, notifications)
+             : this(connectionRepositoryHostMap?.CurrentRepositoryHost, teservice?.ActiveRepo, service,
+                   notifications)
          {}
 
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
         {
-            this.repositoryHost = repositoryHost;
-            this.activeRepo = activeRepo;
-            this.service = service;
+            Extensions.Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
+            Extensions.Guard.ArgumentNotNull(activeRepo, nameof(activeRepo));
+            Extensions.Guard.ArgumentNotNull(service, nameof(service));
+            Extensions.Guard.ArgumentNotNull(notifications, nameof(notifications));
 
-            var repo = GitService.GitServiceHelper.GetRepo(activeRepo.LocalPath);
-            this.WhenAny(x => x.Branches, x => x.Value)
+            this.repositoryHost = repositoryHost;
+
+            var obs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
+                .Select(r => new RepositoryModel(r))
+                .PublishLast();
+            disposables.Add(obs.Connect());
+            githubObs = obs;
+
+            githubRepository = githubObs.ToProperty(this, x => x.GitHubRepository);
+
+            this.WhenAnyValue(x => x.GitHubRepository)
                 .WhereNotNull()
+                .Subscribe(r =>
+            {
+                TargetBranch = r.IsFork ? r.Parent.DefaultBranch : r.DefaultBranch;
+            });
+
+            SourceBranch = activeRepo.CurrentBranch;
+            service.GetPullRequestTemplate(activeRepo)
+                .Subscribe(x => Description = x ?? String.Empty, () => Description = Description ?? String.Empty);
+
+            this.WhenAnyValue(x => x.Branches)
+                .WhereNotNull()
+                .Where(_ => TargetBranch != null)
                 .Subscribe(x =>
                 {
-                    // what do we do if there's no master?
-                    TargetBranch = x.FirstOrDefault(b => b.Name == "master");
-                    SourceBranch = x.FirstOrDefault(b => b.Name == repo.Head.FriendlyName);
+                    if (!x.Any(t => t.Equals(TargetBranch)))
+                        TargetBranch = GitHubRepository.IsFork ? GitHubRepository.Parent.DefaultBranch : GitHubRepository.DefaultBranch;
                 });
 
-            var titleObs = this.WhenAny(x => x.PRTitle, x => x.Value);
-            TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
-                .IfNullOrEmpty(Resources.PullRequestCreationTitleValidatorEmpty);
-
-            var branchObs = this.WhenAny(
-                x => x.TargetBranch,
-                x => x.SourceBranch,
-                (target, source) => new { Source = source.Value, Target = target.Value })
-                .Where(_ => initialized)
-                .Merge(initializationComplete.Select(_ => new { Source = SourceBranch, Target = TargetBranch }));
-
-            BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
-                .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
-                .IfTrue(x => x.Source.Name == x.Target.Name, Resources.PullRequestSourceAndTargetBranchTheSame);
+            SetupValidators();
 
             var whenAnyValidationResultChanges = this.WhenAny(
                 x => x.TitleValidator.ValidationResult,
                 x => x.BranchValidator.ValidationResult,
-                (x, y) => (x.Value?.IsValid ?? false) && (y.Value?.IsValid ?? false));
+                x => x.IsBusy,
+                (x, y, z) => (x.Value?.IsValid ?? false) && (y.Value?.IsValid ?? false) && !z.Value);
 
             this.WhenAny(x => x.BranchValidator.ValidationResult, x => x.GetValue())
                 .WhereNotNull()
@@ -85,7 +97,7 @@ namespace GitHub.ViewModels
 
             createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service
-                    .CreatePullRequest(repositoryHost, activeRepo, PRTitle, Description ?? String.Empty, SourceBranch, TargetBranch)
+                    .CreatePullRequest(repositoryHost, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
                         log.Error(ex);
@@ -95,42 +107,105 @@ namespace GitHub.ViewModels
                         var error = apiException?.ApiError?.Errors?.FirstOrDefault();
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
-                    }));
+                    }))
+
+            .OnExecuteCompleted(pr =>
+            {
+                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Id,
+                    TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
+            });
+
+            isExecuting = CreatePullRequest.IsExecuting.ToProperty(this, x => x.IsExecuting);
+
+            this.WhenAnyValue(x => x.Initialized, x => x.GitHubRepository, x => x.Description, x => x.IsExecuting)
+                .Select(x => !(x.Item1 && x.Item2 != null && x.Item3 != null && !x.Item4))
+                .Subscribe(x => IsBusy = x);
         }
-        
-        public override void Initialize([AllowNull] ViewWithData data)
+
+        public override void Initialize(ViewWithData data = null)
         {
-            initialized = false;
             base.Initialize(data);
 
-            this.Title = null;
-            this.Description = service.GetPullRequestTemplate(activeRepo) ?? string.Empty;
+            Initialized = false;
 
-            repositoryHost.ModelService.GetBranches(activeRepo)
-                            .ToReadOnlyList()
-                            .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(x =>
-                            {
-                                Branches = x;
-                                initialized = true;
-                                initializationComplete.OnNext(Unit.Default);
-                            });
+            githubObs.SelectMany(r =>
+            {
+                var b = Observable.Empty<IBranch>();
+                if (r.IsFork)
+                {
+                    b = repositoryHost.ModelService.GetBranches(r.Parent).Select(x =>
+                    {
+                        x.DisplayName = x.Id;
+                        return x;
+                    });
+                }
+                return b.Concat(repositoryHost.ModelService.GetBranches(r));
+            })
+            .ToList()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(x =>
+            {
+                Branches = x.ToList();
+                Initialized = true;
+            });
+        }
+
+        void SetupValidators()
+        {
+            var titleObs = this.WhenAnyValue(x => x.PRTitle);
+            TitleValidator = ReactivePropertyValidator.ForObservable(titleObs)
+                .IfNullOrEmpty(Resources.PullRequestCreationTitleValidatorEmpty);
+
+            var branchObs = this.WhenAnyValue(
+                    x => x.Initialized,
+                    x => x.TargetBranch,
+                    x => x.SourceBranch,
+                    (init, target, source) => new { Initialized = init, Source = source, Target = target })
+                .Where(x => x.Initialized);
+
+            BranchValidator = ReactivePropertyValidator.ForObservable(branchObs)
+                .IfTrue(x => x.Source == null, Resources.PullRequestSourceBranchDoesNotExist)
+                .IfTrue(x => x.Source.Equals(x.Target), Resources.PullRequestSourceAndTargetBranchTheSame);
+        }
+
+        bool disposed; // To detect redundant calls
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (disposed) return;
+                disposed = true;
+
+                disposables.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public IRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
+        bool IsExecuting { get { return isExecuting.Value; } }
+
+        bool initialized;
+        bool Initialized
+        {
+            get { return initialized; }
+            set { this.RaiseAndSetIfChanged(ref initialized, value); }
         }
 
         IBranch sourceBranch;
-        [AllowNull]
         public IBranch SourceBranch
         {
-            [return: AllowNull]
             get { return sourceBranch; }
             set { this.RaiseAndSetIfChanged(ref sourceBranch, value); }
         }
 
         IBranch targetBranch;
-        [AllowNull]
         public IBranch TargetBranch
         {
-            [return: AllowNull]
             get { return targetBranch; }
             set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
         }
@@ -138,7 +213,6 @@ namespace GitHub.ViewModels
         IReadOnlyList<IBranch> branches;
         public IReadOnlyList<IBranch> Branches
         {
-            [return: AllowNull]
             get { return branches; }
             set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
@@ -149,7 +223,6 @@ namespace GitHub.ViewModels
         string title;
         public string PRTitle
         {
-            [return: AllowNull]
             get { return title; }
             set { this.RaiseAndSetIfChanged(ref title, value); }
         }
@@ -157,7 +230,6 @@ namespace GitHub.ViewModels
         string description;
         public string Description
         {
-            [return: AllowNull]
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }

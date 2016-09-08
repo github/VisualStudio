@@ -7,6 +7,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell;
+using System.Diagnostics;
+using GitHub.Collections;
 
 namespace GitHub.Helpers
 {
@@ -47,13 +50,15 @@ namespace GitHub.Helpers
         {
             try
             {
-                var name = new AssemblyName(e.Name);
-                if (!ourAssemblies.Contains(name.Name))
+                var requestedName = e.Name.TrimSuffix(".dll", StringComparison.OrdinalIgnoreCase);
+                var name = new AssemblyName(requestedName).Name;
+                if (!ourAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase))
                     return null;
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filename = Path.Combine(path, name.Name + ".dll");
+                var filename = Path.Combine(path, name + ".dll");
                 if (!File.Exists(filename))
                     return null;
+
                 return Assembly.LoadFrom(filename);
             }
             catch (Exception ex)

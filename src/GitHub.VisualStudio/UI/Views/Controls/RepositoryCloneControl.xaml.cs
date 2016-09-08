@@ -70,8 +70,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
                 var repo = item as IRepositoryModel;
-                Debug.Assert(repo.Owner != null, "Repository owner cannot be null, did something get changed in the RepositoryModel ctor?");
-                var name = repo.Owner.Login;
+                var name = repo.Owner;
                 RepositoryGroup group;
 
                 if (!owner.groups.TryGetValue(name, out group))

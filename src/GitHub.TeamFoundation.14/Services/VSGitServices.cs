@@ -9,17 +9,15 @@ using GitHub.Models;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
-using System.Diagnostics;
 using GitHub.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IVSServices))]
+    [Export(typeof(IVSGitServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class VSServices : IVSServices
+    public class VSGitServices : IVSGitServices
     {
         readonly IUIProvider serviceProvider;
 
@@ -32,7 +30,7 @@ namespace GitHub.Services
         IGitExt gitExtService;
 
         [ImportingConstructor]
-        public VSServices(IUIProvider serviceProvider)
+        public VSGitServices(IUIProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -72,8 +70,8 @@ namespace GitHub.Services
         {
             var repo = GetRepoFromVS();
             return repo != null
-                ? serviceProvider.GetService<IGitService>().GetRepo(repo.RepositoryPath)
-                : serviceProvider.GetSolution().GetRepoFromSolution();
+                ? serviceProvider.GetService<IGitService>().GetRepository(repo.RepositoryPath)
+                : serviceProvider.GetSolution().GetRepositoryFromSolution();
         }
 
         public string GetActiveRepoPath()
@@ -83,7 +81,7 @@ namespace GitHub.Services
             if (repo != null)
                 ret = repo.RepositoryPath;
             if (ret == null)
-                ret = serviceProvider.GetSolution().GetRepoFromSolution()?.Info?.Path;
+                ret = serviceProvider.GetSolution().GetRepositoryFromSolution()?.Info?.Path;
             return ret ?? String.Empty;
         }
 
@@ -103,40 +101,6 @@ namespace GitHub.Services
         public string SetDefaultProjectPath(string path)
         {
             return RegistryHelper.SetDefaultProjectPath(path);
-        }
-
-        public void ActivityLogMessage(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log message to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogError(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log error to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogWarning(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
-            }
         }
     }
 }
