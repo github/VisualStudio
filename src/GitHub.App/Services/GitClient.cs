@@ -92,7 +92,7 @@ namespace GitHub.Services
                 var remote = repository.Network.Remotes["origin"];
                 var result = new List<Branch>();
 
-                // Get the ref from the remote that match 'branchName'.
+                // Get the ref from the remote that matches 'branchName'.
                 var remoteRef = repository.Network.ListReferences(remote)
                     .Where(x => x.CanonicalName == canonicalBranchName)
                     .SingleOrDefault();
