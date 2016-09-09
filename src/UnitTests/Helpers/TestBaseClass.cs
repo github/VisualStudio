@@ -66,24 +66,19 @@ public class TestBaseClass : IEntryExitDecorator
 
     protected class TempDirectory : IDisposable
     {
-        ITestOutputHelper output;
-
-        public TempDirectory(ITestOutputHelper output = null)
+        public TempDirectory()
         {
-            this.output = output;
             var f = Path.GetTempFileName();
             var name = Path.GetFileNameWithoutExtension(f);
             File.Delete(f);
             Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
             Directory.Create();
-            output?.WriteLine("Created " + Directory);
         }
 
         public DirectoryInfo Directory { get; }
 
         public void Dispose()
         {
-            output?.WriteLine("Deleted " + Directory);
             Directory.Delete(true);
         }
     }
