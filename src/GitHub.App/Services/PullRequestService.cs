@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GitHub.Models;
 using LibGit2Sharp;
@@ -17,6 +18,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
+        static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z_'\-]", RegexOptions.ECMAScript);
+
         static readonly string[] TemplatePaths = new[]
         {
             "PULL_REQUEST_TEMPLATE.md",
@@ -56,12 +59,14 @@ namespace GitHub.Services
             return PushAndCreatePR(host, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
-        public void Checkout(ISimpleRepositoryModel repository, IPullRequestModel pullRequest, string localBranch)
+        public async Task Checkout(ISimpleRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            var repo = GitService.GitServiceHelper.GetRepository(repository.LocalPath);
-            var refspec = $"refs/pull/{pullRequest.Number}/head:refs/heads/{localBranch}";
-            repo.Network.Fetch(repo.Network.Remotes["origin"], new[] { refspec }, new FetchOptions());
-            repo.Checkout(localBranch);
+            var repo = gitService.GetRepository(repository.LocalPath);
+            var localBranch = await GetPullRequestBranchName(repo, pullRequest);
+            var remoteBranch = $"refs/pull/{pullRequest.Number}/head";
+            var refspec = $"{remoteBranch}:{localBranch}";
+            await gitClient.Fetch(repo, "origin", refspec);
+            await gitClient.Checkout(repo, localBranch);
         }
 
         public IObservable<string> GetPullRequestTemplate(ISimpleRepositoryModel repository)
@@ -83,6 +88,32 @@ namespace GitHub.Services
             });
         }
 
+        /// <summary>
+        /// Given a repository and a pull request returns the name of a local branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request.</param>
+        /// <returns>The local branch name.</returns>
+        /// <remarks>
+        /// This method first tries to find an existing tracking branch that tracks the pull request. If
+        /// that is found it returns this branch's canonical name. If not, it generates a name based on the
+        /// pull request name and number and returns the canonical name of the branch to create.
+        /// </remarks>
+        async Task<string> GetPullRequestBranchName(IRepository repository, IPullRequestModel pullRequest)
+        {
+            var branch = $"refs/pull/{pullRequest.Number}/head";
+            var existing = await gitClient.GetTrackingBranch(repository, branch).DefaultIfEmpty();
+
+            if (existing != null)
+            {
+                return existing.CanonicalName;
+            }
+            else
+            {
+                return $"refs/heads/pr/{pullRequest.Number}-{GetSafeBranchName(pullRequest.Title)}";
+            }
+        }
+
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
             ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
@@ -102,6 +133,18 @@ namespace GitHub.Services
             var ret = await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
             usageTracker.IncrementUpstreamPullRequestCount();
             return ret;
+        }
+
+        /// <summary>
+        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
+        /// </summary>
+        static string GetSafeBranchName(string name)
+        {
+            return InvalidBranchCharsRegex
+                .Replace(name, "-")
+                .Replace("--", "-")
+                .Replace("'", "")
+                .ToLower();
         }
     }
 }

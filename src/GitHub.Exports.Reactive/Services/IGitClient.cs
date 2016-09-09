@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using LibGit2Sharp;
 
@@ -22,6 +23,31 @@ namespace GitHub.Services
         /// <param name="remoteName">The name of the remote</param>
         /// <returns></returns>
         IObservable<Unit> Fetch(IRepository repository, string remoteName);
+
+        /// <summary>
+        /// Fetches from the remote, using custom refspecs.
+        /// </summary>
+        /// <param name="repository">The repository to pull</param>
+        /// <param name="remoteName">The name of the remote</param>
+        /// <param name="refspecs">The custom refspecs</param>
+        /// <returns></returns>
+        IObservable<Unit> Fetch(IRepository repository, string remoteName, params string[] refspecs);
+
+        /// <summary>
+        /// Checks out a branch.
+        /// </summary>
+        /// <param name="repository">The repository to checkout to.</param>
+        /// <param name="branch">The name of the branch</param>
+        /// <returns></returns>
+        IObservable<Unit> Checkout(IRepository repository, string branchName);
+
+        /// <summary>
+        /// Gets the local branches that track the specified remote branch
+        /// </summary>
+        /// <param name="repository">The repository to check</param>
+        /// <param name="canonicalBranchName">The canonical name of the remote branch</param>
+        /// <returns></returns>
+        IObservable<Branch> GetTrackingBranch(IRepository repository, string canonicalBranchName);
 
         /// <summary>
         /// Sets the specified remote to the specified URL.

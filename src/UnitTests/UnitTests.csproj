@@ -108,6 +108,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -195,6 +196,11 @@
     <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="Helpers\TestLoginCache.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Substitutes.cs" />
     <Compile Include="TestDoubles\FakeCommitLog.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
@@ -210,6 +216,7 @@
     <Compile Include="XUnit\STATestCase.cs" />
     <Compile Include="XUnit\STATheoryAttribute.cs" />
     <Compile Include="XUnit\STATheoryDiscoverer.cs" />
+    <None Include="Resources\test_get_tracking_branch.zip" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
@@ -298,6 +305,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

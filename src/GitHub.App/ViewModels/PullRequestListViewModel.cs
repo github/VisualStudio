@@ -252,7 +252,8 @@ namespace GitHub.ViewModels
             Debug.Assert(parameter != null, "Null parameter passed to OnCheckoutPullRequest");
 
             var pr = (IPullRequestModel)parameter;
-            prService.Checkout(repository, pr, $"pr/{pr.Number}");
+            
+            prService.Checkout(repository, pr);
             return Task.FromResult(ProgressState.Success);
         }
 

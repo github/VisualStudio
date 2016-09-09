@@ -54,7 +54,7 @@ public class SimpleRepositoryModelTests : TestBaseClass
     [InlineData(19, false, "git@github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
     public void GenerateUrl(int testid, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
     {
-        using (var temp = new TempDirectory(output))
+        using (var temp = new TempDirectory())
         {
             SetupRepository(sha);
 

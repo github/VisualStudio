@@ -4,6 +4,7 @@ using Octokit;
 using System;
 using System.IO;
 using Xunit.Abstractions;
+using System.IO.Compression;
 
 /// <summary>
 /// This base class will get its methods called by the most-derived
@@ -80,6 +81,25 @@ public class TestBaseClass : IEntryExitDecorator
         public void Dispose()
         {
             Directory.Delete(true);
+        }
+    }
+
+    protected class TempRepository : TempDirectory
+    {
+        public TempRepository(string name, byte[] repositoryZip)
+            : base()
+        {
+            var outputZip = Path.Combine(Directory.FullName, name + ".zip");
+            var outputDir = Path.Combine(Directory.FullName, name);
+            var repositoryPath = Path.Combine(outputDir, name);
+            File.WriteAllBytes(outputZip, repositoryZip);
+            ZipFile.ExtractToDirectory(outputZip, outputDir);
+            Repository = new LibGit2Sharp.Repository(repositoryPath);
+        }
+
+        public LibGit2Sharp.Repository Repository
+        {
+            get;
         }
     }
 }
