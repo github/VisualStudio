@@ -74,6 +74,24 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<Branch> GetBranchStartsWith(IRepository repository, string s)
+        {
+            return Observable.Defer(() =>
+            {
+                var result = new List<Branch>();
+
+                foreach (var branch in repository.Branches)
+                {
+                    if (branch.FriendlyName.StartsWith(s))
+                    {
+                        result.Add(branch);
+                    }
+                }
+
+                return result.ToObservable();
+            });
+        }
+
         public IObservable<Branch> GetTrackingBranch(IRepository repository, string canonicalBranchName)
         {
             Extensions.Guard.ArgumentNotNull(repository, nameof(repository));

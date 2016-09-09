@@ -93,16 +93,18 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request.</param>
-        /// <returns>The local branch name.</returns>
+        /// <returns>The canonical name of the local branch.</returns>
         /// <remarks>
         /// This method first tries to find an existing tracking branch that tracks the pull request. If
-        /// that is found it returns this branch's canonical name. If not, it generates a name based on the
-        /// pull request name and number and returns the canonical name of the branch to create.
+        /// that is found it returns this branch's canonical name. If not, it tries to find a branch whose
+        /// name begins with "pr/{number}". Finally, if no branch is found it generates a name based on 
+        /// the pull request name and number. It returns the canonical name of the branch.
         /// </remarks>
         async Task<string> GetPullRequestBranchName(IRepository repository, IPullRequestModel pullRequest)
         {
             var branch = $"refs/pull/{pullRequest.Number}/head";
-            var existing = await gitClient.GetTrackingBranch(repository, branch).DefaultIfEmpty();
+            var existing = await gitClient.GetTrackingBranch(repository, branch).DefaultIfEmpty() ??
+                await gitClient.GetBranchStartsWith(repository, "pr/" + pullRequest.Number).DefaultIfEmpty();
 
             if (existing != null)
             {
