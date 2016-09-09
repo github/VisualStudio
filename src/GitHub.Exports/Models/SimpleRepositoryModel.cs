@@ -16,8 +16,17 @@ namespace GitHub.Models
         public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
         {
             Name = name;
+            Owner = cloneUrl.Owner;
             CloneUrl = cloneUrl;
             LocalPath = localPath;
+            Icon = Octicon.repo;
+        }
+
+        public SimpleRepositoryModel(UriString cloneUrl)
+        {
+            Name = cloneUrl.RepositoryName;
+            Owner = cloneUrl.Owner;
+            CloneUrl = cloneUrl;
             Icon = Octicon.repo;
         }
 
@@ -29,8 +38,9 @@ namespace GitHub.Models
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
             var uri = GitService.GitServiceHelper.GetUri(path);
-            var name = uri?.NameWithOwner ?? dir.Name;
+            var name = uri?.RepositoryName ?? dir.Name;
             Name = name;
+            Owner = uri?.Owner ?? String.Empty;
             LocalPath = path;
             CloneUrl = uri;
             Icon = Octicon.repo;
@@ -123,6 +133,7 @@ namespace GitHub.Models
         }
 
         public string Name { get; }
+        public string Owner { get; }
         UriString cloneUrl;
         public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
         public string LocalPath { get; }
@@ -133,10 +144,20 @@ namespace GitHub.Models
         {
             get
             {
-                var repo = GitService.GitServiceHelper.GetRepo(LocalPath);
+                var repo = GitService.GitServiceHelper.GetRepository(LocalPath);
                 return repo?.Commits.FirstOrDefault()?.Sha ?? String.Empty;
             }
         }
+
+        public IBranch CurrentBranch
+        {
+            get
+            {
+                var repo = GitService.GitServiceHelper.GetRepository(LocalPath);
+                return new BranchModel(repo?.Head, this);
+            }
+        }
+
 
         /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
@@ -145,7 +166,7 @@ namespace GitHub.Models
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return (Name?.GetHashCode() ?? 0) ^ (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
+            return 17 * 23 + (Name?.GetHashCode() ?? 0) * 23 + (Owner?.GetHashCode() ?? 0) * 23 + (LocalPath?.TrimEnd('\\').ToUpperInvariant().GetHashCode() ?? 0);
         }
 
         public override bool Equals(object obj)
@@ -153,19 +174,24 @@ namespace GitHub.Models
             if (ReferenceEquals(this, obj))
                 return true;
             var other = obj as SimpleRepositoryModel;
-            return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
+            return Equals(other);
         }
 
-        bool IEquatable<SimpleRepositoryModel>.Equals(SimpleRepositoryModel other)
+        public bool Equals(SimpleRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return other != null && String.Equals(Name, other.Name) && String.Equals(CloneUrl, other.CloneUrl) && String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
+            return other != null &&
+                String.Equals(Name, other.Name) &&
+                String.Equals(Owner, other.Owner) &&
+                String.Equals(CloneUrl, other.CloneUrl) &&
+                String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
         internal string DebuggerDisplay => String.Format(
             CultureInfo.InvariantCulture,
-            "{3}\tName: {0} CloneUrl: {1} LocalPath: {2}",
+            "{4}\tOwner: {0} Name: {1} CloneUrl: {2} LocalPath: {3}",
+            Owner,
             Name,
             CloneUrl,
             LocalPath,

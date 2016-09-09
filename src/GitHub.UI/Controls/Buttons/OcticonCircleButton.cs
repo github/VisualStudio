@@ -68,13 +68,6 @@ namespace GitHub.UI
             set { SetValue(IconSizeProperty, value); }
         }
 
-        public Geometry Data
-        {
-            [return: AllowNull]
-            get { return (Geometry)GetValue(Path.DataProperty); }
-            set { SetValue(Path.DataProperty, value); }
-        }
-
         static OcticonCircleButton()
         {
             Path.DataProperty.AddOwner(typeof(OcticonCircleButton));

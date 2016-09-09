@@ -24,6 +24,7 @@ namespace GitHub.Services
         readonly IMetricsService client;
         readonly IConnectionManager connectionManager;
         readonly IPackageSettings userSettings;
+        readonly IVSServices vsservices;
         readonly DispatcherTimer timer;
         readonly string storePath;
 
@@ -37,15 +38,34 @@ namespace GitHub.Services
             IProgram program,
             IConnectionManager connectionManager,
             IPackageSettings userSettings,
+            IVSServices vsservices,
             [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             fileExists = (path) => System.IO.File.Exists(path);
-            readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
-            writeAllText = (path, content, encoding) => System.IO.File.WriteAllText(path, content, encoding);
+            readAllText = (path, encoding) =>
+            {
+                try
+                {
+                    return System.IO.File.ReadAllText(path, encoding);
+                }
+                catch
+                {
+                    return null;
+                }
+            };
+            writeAllText = (path, content, encoding) =>
+            {
+                try
+                {
+                    System.IO.File.WriteAllText(path, content, encoding);
+                }
+                catch {}
+            };
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
             this.connectionManager = connectionManager;
             this.userSettings = userSettings;
+            this.vsservices = vsservices;
             this.client = serviceProvider.GetExportedValue<IMetricsService>();
             this.timer = new DispatcherTimer(
                 TimeSpan.FromMinutes(1),
@@ -122,7 +142,7 @@ namespace GitHub.Services
         public void IncrementUpstreamPullRequestCount()
         {
             var usage = LoadUsage();
-            ++usage.Model.NumberOfClones;
+            ++usage.Model.NumberOfUpstreamPullRequests;
             SaveUsage(usage);
         }
 
@@ -135,13 +155,22 @@ namespace GitHub.Services
 
         UsageStore LoadUsage()
         {
-            var result = fileExists(storePath) ?
-                SimpleJson.DeserializeObject<UsageStore>(readAllText(storePath, Encoding.UTF8)) :
-                new UsageStore { Model = new UsageModel() };
+            var json = fileExists(storePath) ? readAllText(storePath, Encoding.UTF8) : null;
+            UsageStore result = null;
+            try
+            {
+                result = json != null ?
+                    SimpleJson.DeserializeObject<UsageStore>(json) :
+                    new UsageStore { Model = new UsageModel() };
+            }
+            catch
+            {
+                result = new UsageStore { Model = new UsageModel() };
+            }
 
             result.Model.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
             result.Model.AppVersion = AssemblyVersionInformation.Version;
-            result.Model.VSVersion = GitHub.VisualStudio.Services.VisualStudioVersion;
+            result.Model.VSVersion = vsservices.VSVersion;
 
             return result;
         }

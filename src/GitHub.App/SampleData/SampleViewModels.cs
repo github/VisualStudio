@@ -496,6 +496,7 @@ namespace GitHub.SampleData
 
     public class InfoPanelDesigner
     {
-        public string Message => "This is an informational message for the info panel to test things in design mode.";
+        public string Message => "This is an informational message for the [info panel](link) to test things in design mode.";
+        public MessageType MessageType => MessageType.Information;
     }
 }

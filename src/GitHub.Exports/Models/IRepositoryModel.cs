@@ -7,8 +7,11 @@ namespace GitHub.Models
         IEquatable<IRepositoryModel>, IComparable<IRepositoryModel>
     {
         long Id { get; }
-        IAccount Owner { get; }
+        IAccount OwnerAccount { get; }
         DateTimeOffset CreatedAt { get; }
         DateTimeOffset UpdatedAt { get; }
+        bool IsFork { get; }
+        IRepositoryModel Parent { get; }
+        IBranch DefaultBranch { get; }
     }
 }

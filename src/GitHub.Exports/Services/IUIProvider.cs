@@ -3,9 +3,11 @@ using System.ComponentModel.Composition.Hosting;
 using GitHub.Models;
 using GitHub.UI;
 using System.Windows.Controls;
+using System.Runtime.InteropServices;
 
 namespace GitHub.Services
 {
+    [Guid("76909E1A-9D58-41AB-8957-C26B9550787B")]
     public interface IUIProvider : IServiceProvider
     {
         ExportProvider ExportProvider { get; }

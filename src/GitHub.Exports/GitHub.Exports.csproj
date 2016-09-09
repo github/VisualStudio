@@ -100,11 +100,13 @@
     <Compile Include="Factories\IUIFactory.cs" />
     <Compile Include="Factories\IUIPair.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helpers\AssemblyResolver.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
     <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
     <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
+    <Compile Include="Models\BranchModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IUsageTracker.cs" />
+    <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="Services\Services.cs" />
@@ -143,16 +146,19 @@
     <Compile Include="Authentication\AuthenticationResultExtensions.cs" />
     <Compile Include="Extensions\ServiceProviderExtensions.cs" />
     <Compile Include="Services\UsageTracker.cs" />
+    <Compile Include="Services\VSServices.cs" />
     <Compile Include="Settings\generated\IPackageSettings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IPackageSettings.tt</DependentUpon>
     </Compile>
     <Compile Include="Settings\GitHubConnectSectionState.cs" />
+    <Compile Include="Settings\Guids.cs" />
     <Compile Include="Settings\PullRequestListUIState.cs" />
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\Octicon.cs" />

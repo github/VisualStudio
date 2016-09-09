@@ -12,10 +12,28 @@ namespace GitHub.Models
             : base(name, cloneUrl)
         {
             Id = id;
-            Owner = ownerAccount;
+            OwnerAccount = ownerAccount;
+            IsFork = isFork;
             SetIcon(isPrivate, isFork);
+            // this is an assumption, we'd have to load the repo information from octokit to know for sure
+            // probably not worth it for this ctor
+            DefaultBranch = new BranchModel("master", this);
         }
 
+        public RepositoryModel(Octokit.Repository repository)
+            : base(repository.Name, repository.CloneUrl)
+        {
+            Id = repository.Id;
+            IsFork = repository.Fork;
+            SetIcon(repository.Private, IsFork);
+            OwnerAccount = new Account(repository.Owner);
+            DefaultBranch = new BranchModel(repository.DefaultBranch, this);
+            Parent = repository.Parent != null ? new RepositoryModel(repository.Parent) : null;
+            if (Parent != null)
+                Parent.DefaultBranch.DisplayName = Parent.DefaultBranch.Id;
+        }
+
+#region Equality Things
         public void CopyFrom(IRepositoryModel other)
         {
             if (!Equals(other))
@@ -33,17 +51,17 @@ namespace GitHub.Models
             if (ReferenceEquals(this, obj))
                 return true;
             var other = obj as RepositoryModel;
-            return other != null && Id == other.Id;
+            return Equals(other);
         }
 
-        bool IEquatable<IRepositoryModel>.Equals([AllowNull]IRepositoryModel other)
+        public bool Equals([AllowNull]IRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
         }
 
-        bool IEquatable<RepositoryModel>.Equals([AllowNull]RepositoryModel other)
+        public bool Equals([AllowNull]RepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
@@ -83,11 +101,15 @@ namespace GitHub.Models
         {
             return !(lhs == rhs);
         }
+#endregion
 
-        public IAccount Owner { get; }
+        public IAccount OwnerAccount { get; }
         public long Id { get; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
+        public bool IsFork { get; }
+        [AllowNull] public IRepositoryModel Parent { [return: AllowNull] get; }
+        public IBranch DefaultBranch { get; }
 
         internal string DebuggerDisplay
         {

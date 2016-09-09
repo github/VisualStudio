@@ -22,13 +22,13 @@ namespace GitHub.Services
 
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
-        readonly IVSServices vsservices;
+        readonly IVSGitServices vsGitServices;
 
         [ImportingConstructor]
-        public RepositoryCloneService(IOperatingSystem operatingSystem, IVSServices vsservices)
+        public RepositoryCloneService(IOperatingSystem operatingSystem, IVSGitServices vsGitServices)
         {
             this.operatingSystem = operatingSystem;
-            this.vsservices = vsservices;
+            this.vsGitServices = vsGitServices;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
@@ -48,7 +48,7 @@ namespace GitHub.Services
                 try
                 {
                     // this will throw if it can't find it
-                    vsservices.Clone(cloneUrl, path, true);
+                    vsGitServices.Clone(cloneUrl, path, true);
                 }
                 catch (Exception ex)
                 {
@@ -62,7 +62,7 @@ namespace GitHub.Services
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
-            var ret = vsservices.GetLocalClonePathFromGitProvider();
+            var ret = vsGitServices.GetLocalClonePathFromGitProvider();
             return !string.IsNullOrEmpty(ret)
                 ? operatingSystem.Environment.ExpandEnvironmentVariables(ret)
                 : fallbackPath;

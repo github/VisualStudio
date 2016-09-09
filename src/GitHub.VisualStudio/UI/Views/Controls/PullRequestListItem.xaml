@@ -48,16 +48,15 @@
           </StackPanel>
       </Grid>
 
-      <Button x:Name="title"
+      <ui:GitHubActionLink x:Name="title"
             Grid.Row="0"
             Grid.Column="1"
             Grid.ColumnSpan="2"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="{DynamicResource GitHubVsToolWindowText}"
+            TextTrimming="CharacterEllipsis"
             Margin="0,-3,5,0"
-            FontSize="{DynamicResource {x:Static vsui:VsFonts.Environment122PercentFontSizeKey}}"
-            Style="{StaticResource ActionLinkButton}"
             Content="{Binding Title}"
             ToolTip="{Binding Title}"
             Command="{Binding OpenPR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"

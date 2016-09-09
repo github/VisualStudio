@@ -35,7 +35,7 @@ public class GitClientTests
             await gitClient.Push(repository, "master", "origin");
 
             repository.Network.DidNotReceive()
-                .Push(Args.Remote, Args.String, Args.String);
+                .Push(Args.LibgGit2Remote, Args.String, Args.String);
         }
     }
 

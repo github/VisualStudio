@@ -41,7 +41,7 @@
   </UserControl.Resources>
 
   <DockPanel>
-        <control:InfoPanel x:Name="ErrorMessage" Message="{Binding ErrorMessage}" VerticalAlignment="Top" DockPanel.Dock="Top"></control:InfoPanel>
+        <control:InfoPanel x:Name="infoPanel" MessageType="{Binding MessageType}" Message="{Binding Message}" VerticalAlignment="Top" DockPanel.Dock="Top"></control:InfoPanel>
         <StackPanel Margin="6,9,9,5"
                 DockPanel.Dock="Top"
                 Orientation="Horizontal">

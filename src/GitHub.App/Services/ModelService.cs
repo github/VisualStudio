@@ -107,6 +107,10 @@ namespace GitHub.Services
                 hostCache.GetAndRefreshObject(user.Login + "|orgs",
                     () => apiClient.GetOrganizations().Select(AccountCacheItem.Create).ToList(),
                     TimeSpan.FromMinutes(2), TimeSpan.FromDays(7)))
+                // TODO: Akavache returns the cached version followed by the fresh version if > 2
+                // minutes have expired from the last request. Here we make sure the latest value is
+                // returned but it's a hack. We really need a better way to cache this stuff.
+                .TakeLast(1)
                 .Catch<IEnumerable<AccountCacheItem>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
@@ -163,8 +167,8 @@ namespace GitHub.Services
                             try { collection.RemoveItem(Create(item)); }
                             catch (ObjectDisposedException) { }
                         },
-                        TimeSpan.FromMinutes(5),
-                        TimeSpan.FromDays(1))
+                        TimeSpan.Zero,
+                        TimeSpan.FromDays(7))
                 )
                 .Select(Create)
             );
@@ -199,19 +203,26 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel repository, string title, string body, IBranch source, IBranch target)
+        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            IBranch sourceBranch, IBranch targetBranch,
+            string title, string body)
         {
             var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repository.Name));
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, targetRepository.Owner, targetRepository.Name));
 
             return Observable.Defer(() => keyobs
                 .SelectMany(key =>
                     hostCache.PutAndUpdateIndex(key, () =>
-                        apiClient.CreatePullRequest(new NewPullRequest(title, source.Name, target.Name) { Body = body },
-                                    repository.CloneUrl.Owner,
-                                    repository.CloneUrl.RepositoryName)
-                                 .Select(PullRequestCacheItem.Create),
-                    TimeSpan.FromMinutes(30))
+                        apiClient.CreatePullRequest(
+                                new NewPullRequest(title,
+                                                   string.Format(CultureInfo.InvariantCulture, "{0}:{1}", sourceRepository.Owner, sourceBranch.Name),
+                                                   targetBranch.Name)
+                                                   { Body = body },
+                                targetRepository.Owner,
+                                targetRepository.Name)
+                            .Select(PullRequestCacheItem.Create)
+                        ,
+                        TimeSpan.FromMinutes(30))
                 )
                 .Select(Create)
             );
@@ -287,7 +298,7 @@ namespace GitHub.Services
 
             return Observable.Defer(() => keyobs
                     .SelectMany(key => apiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
-                .Select(Create);
+                .Select(x => new BranchModel(x, repo));
         }
 
         static GitIgnoreItem Create(GitIgnoreCacheItem item)
@@ -339,11 +350,6 @@ namespace GitHub.Services
                 CommentCount = prCacheItem.CommentCount,
                 IsOpen = prCacheItem.IsOpen
             };
-        }
-
-        IBranch Create(Branch branch)
-        {
-            return new BranchModel(branch);
         }
 
 

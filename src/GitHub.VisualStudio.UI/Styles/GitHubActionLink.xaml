@@ -8,10 +8,11 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Focusable" Value="True" />
     <Setter Property="Foreground" Value="{DynamicResource GitHubActionLinkItemBrush}" />
+    <Setter Property="TextTrimming" Value="None" />
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="Button">
-          <TextBlock>
+        <ControlTemplate TargetType="{x:Type ui:GitHubActionLink}">
+          <TextBlock TextTrimming="{TemplateBinding TextTrimming}">
             <Hyperlink Command="{TemplateBinding Command}"
                        CommandParameter="{TemplateBinding CommandParameter}"
                        Foreground="{TemplateBinding Foreground}">

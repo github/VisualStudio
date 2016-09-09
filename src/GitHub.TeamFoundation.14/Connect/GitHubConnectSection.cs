@@ -277,8 +277,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     }
                     else if (prefix == "c:")
                     {
-                        var vsservices = ServiceProvider.GetExportedValue<IVSServices>();
-                        vsservices.SetDefaultProjectPath(newrepo.LocalPath);
+                        var vsGitServices = ServiceProvider.GetExportedValue<IVSGitServices>();
+                        vsGitServices.SetDefaultProjectPath(newrepo.LocalPath);
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
                             ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                     }

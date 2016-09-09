@@ -60,7 +60,6 @@ public class RepositoryModelTests
         public void NoRemoteUrl()
         {
             var provider = Substitutes.ServiceProvider;
-            Services.PackageServiceProvider = provider;
             var gitservice = provider.GetGitService();
             var repo = Substitute.For<IRepository>();
             var path = Directory.CreateSubdirectory("repo-name");
@@ -73,13 +72,13 @@ public class RepositoryModelTests
         public void WithRemoteUrl()
         {
             var provider = Substitutes.ServiceProvider;
-            Services.PackageServiceProvider = provider;
             var gitservice = provider.GetGitService();
             var repo = Substitute.For<IRepository>();
             var path = Directory.CreateSubdirectory("repo-name");
             gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
             var model = new SimpleRepositoryModel(path.FullName);
-            Assert.Equal("user/repo-name", model.Name);
+            Assert.Equal("repo-name", model.Name);
+            Assert.Equal("user", model.Owner);
         }
     }
 

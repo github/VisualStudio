@@ -193,6 +193,8 @@ namespace GitHub.Collections
         bool resetting = false;
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
+        readonly CompositeDisposable pumpDisposables = new CompositeDisposable();
+
         readonly IScheduler scheduler;
         readonly List<T> original = new List<T>();
 #if DEBUG
@@ -434,7 +436,7 @@ namespace GitHub.Collections
                 throw new InvalidOperationException("No source observable has been set. Call Listen or pass an observable to the constructor");
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
-            disposables.Add(source.Subscribe());
+            pumpDisposables.Add(source.Subscribe());
             StartQueue();
             return this;
         }
@@ -445,7 +447,7 @@ namespace GitHub.Collections
                 throw new InvalidOperationException("No source observable has been set. Call Listen or pass an observable to the constructor");
             if (disposed)
                 throw new ObjectDisposedException("TrackingCollection");
-            disposables.Add(source.Subscribe(onNext, onCompleted));
+            pumpDisposables.Add(source.Subscribe(onNext, onCompleted));
             StartQueue();
             return this;
         }
@@ -504,8 +506,8 @@ namespace GitHub.Collections
 
         int StartQueue()
         {
-            disposables.Add(cachePump.Connect());
-            disposables.Add(dataPump.Connect());
+            pumpDisposables.Add(cachePump.Connect());
+            pumpDisposables.Add(dataPump.Connect());
             signalNeedData.OnNext(Unit.Default);
             return 0;
         }
@@ -530,7 +532,7 @@ namespace GitHub.Collections
             var idx = GetIndexUnfiltered(item);
 
             if (data.TheAction == TheAction.Remove)
-                return new ActionData(TheAction.Remove, original, item, null, idx - 1, idx);
+                return new ActionData(TheAction.Remove, original, item, null, idx, idx);
 
             if (idx >= 0)
             {
@@ -1161,6 +1163,7 @@ namespace GitHub.Collections
 
             resetting = true;
 
+            pumpDisposables.Clear();
             disposables.Clear();
             originalSourceIsCompleted = false;
             signalOriginalSourceCompletion = false;
@@ -1184,6 +1187,7 @@ namespace GitHub.Collections
                 if (!disposed)
                 {
                     disposed = true;
+                    pumpDisposables.Dispose();
                     disposables.Dispose();
                     cache = null;
                 }

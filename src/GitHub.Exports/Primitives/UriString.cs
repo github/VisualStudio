@@ -29,8 +29,7 @@ namespace GitHub.Primitives
 
         public UriString(string uriString) : base(NormalizePath(uriString))
         {
-            if (uriString == null) throw new ArgumentNullException(nameof(uriString), "Cannot create a null UriString");
-            if (uriString.Length == 0) return;
+            if (uriString == null || uriString.Length == 0) return;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out url))
             {
                 if (!url.IsFile)

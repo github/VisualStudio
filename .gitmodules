@@ -16,3 +16,6 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
+[submodule "submodules/externalpackages/StartPage"]
+	path = submodules/externalpackages/StartPage
+	url = git@github.com:editor-tools/StartPage.git

@@ -2,6 +2,7 @@
 using GitHub.Authentication;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using NSubstitute;
 using Rothko;
@@ -32,11 +33,11 @@ namespace UnitTests
        // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
         public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
 
-        public static IVSServices IVSServices
+        public static IVSGitServices IVSGitServices
         {
             get
             {
-                var ret = Substitute.For<IVSServices>();
+                var ret = Substitute.For<IVSGitServices>();
                 ret.GetLocalClonePathFromGitProvider().Returns(@"c:\foo\bar");
                 return ret;
             }
@@ -65,6 +66,7 @@ namespace UnitTests
         public static IConnectionManager ConnectionManager { get { return Substitute.For<IConnectionManager>(); } }
         public static ITwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<ITwoFactorChallengeHandler>(); } }
         public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
+        public static IPullRequestService PullRequestService { get { return Substitute.For<IPullRequestService>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
@@ -106,15 +108,17 @@ namespace UnitTests
             cc.ComposeExportedValue(gitservice);
             ((IComponentModel)cm).DefaultExportProvider.Returns(cc);
             ret.GetService(typeof(SComponentModel)).Returns(cm);
+            Services.PackageServiceProvider = ret;
 
             var os = OperatingSystem;
-            var vs = IVSServices;
-            var clone = cloneService ?? new RepositoryCloneService(os, vs);
+            var vsgit = IVSGitServices;
+            var clone = cloneService ?? new RepositoryCloneService(os, vsgit);
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             //ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
             ret.GetService(typeof(IGitService)).Returns(gitservice);
-            ret.GetService(typeof(IVSServices)).Returns(vs);
+            ret.GetService(typeof(IVSServices)).Returns(Substitute.For<IVSServices>());
+            ret.GetService(typeof(IVSGitServices)).Returns(vsgit);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
@@ -126,6 +130,7 @@ namespace UnitTests
             ret.GetService(typeof(IAvatarProvider)).Returns(avatarProvider);
             ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
             ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
+            ret.GetService(typeof(IPullRequestService)).Returns(PullRequestService);
             return ret;
         }
 
@@ -137,6 +142,11 @@ namespace UnitTests
         public static IVSServices GetVSServices(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IVSServices)) as IVSServices;
+        }
+
+        public static IVSGitServices GetVSGitServices(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IVSGitServices)) as IVSGitServices;
         }
 
         public static IGitService GetGitService(this IServiceProvider provider)
@@ -196,6 +206,11 @@ namespace UnitTests
         public static IGistPublishService GetGistPublishService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IGistPublishService)) as IGistPublishService;
+        }
+
+        public static IPullRequestService GetPullRequestsService(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IPullRequestService)) as IPullRequestService;
         }
     }
 }
