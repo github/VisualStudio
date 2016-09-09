@@ -3,6 +3,7 @@ using GitHub.Models;
 using Octokit;
 using System;
 using System.IO;
+using Xunit.Abstractions;
 
 /// <summary>
 /// This base class will get its methods called by the most-derived
@@ -62,25 +63,28 @@ public class TestBaseClass : IEntryExitDecorator
             commentCount, reviewCommentCount, 0, 0, 0, 0,
             null, false);
     }
-}
 
-public class TempFileBaseClass : TestBaseClass
-{
-    public DirectoryInfo Directory { get; set; }
-
-    public override void OnEntry()
+    protected class TempDirectory : IDisposable
     {
-        var f = Path.GetTempFileName();
-        var name = Path.GetFileNameWithoutExtension(f);
-        File.Delete(f);
-        Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
-        Directory.Create();
-        base.OnEntry();
-    }
+        ITestOutputHelper output;
 
-    public override void OnExit()
-    {
-        Directory.Delete(true);
-        base.OnExit();
+        public TempDirectory(ITestOutputHelper output = null)
+        {
+            this.output = output;
+            var f = Path.GetTempFileName();
+            var name = Path.GetFileNameWithoutExtension(f);
+            File.Delete(f);
+            Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
+            Directory.Create();
+            output?.WriteLine("Created " + Directory);
+        }
+
+        public DirectoryInfo Directory { get; }
+
+        public void Dispose()
+        {
+            output?.WriteLine("Deleted " + Directory);
+            Directory.Delete(true);
+        }
     }
 }
