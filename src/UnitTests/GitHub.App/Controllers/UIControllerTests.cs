@@ -60,9 +60,13 @@ public class UIControllerTests
         protected void SetupViewModel<VM>(IExportFactoryProvider factory, GitHub.Exports.UIViewType type)
             where VM : class, IViewModel
         {
-            var v = Substitute.For<VM, INotifyPropertyChanged>();
-            var e = new ExportLifetimeContext<IViewModel>(v, () => { });
+            VM viewModel;
+            if (type == GitHub.Exports.UIViewType.PRCreation)
+                viewModel = Substitute.For<VM, INotifyPropertyChanged, IResettable>();
+            else
+                viewModel = Substitute.For<VM, INotifyPropertyChanged>();
 
+            var e = new ExportLifetimeContext<IViewModel>(viewModel, () => { });
             factory.GetViewModel(type).Returns(e);
         }
 
