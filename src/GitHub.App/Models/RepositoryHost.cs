@@ -125,6 +125,8 @@ namespace GitHub.Models
                 .SelectMany(_ => GetUserFromApi())
                 .Catch<UserAndScopes, ApiException>(firstTryEx =>
                 {
+                    LogError(firstTryEx, usernameOrEmail);
+
                     var exception = firstTryEx as AuthorizationException;
                     if (isEnterprise
                         && exception != null
@@ -201,6 +203,31 @@ namespace GitHub.Models
                 .PublishAsync();
         }
 
+        void LogError(ApiException ex, string usernameOrEmail)
+        {
+            var msg = ex.Message;
+            var apiex = ex as AuthorizationException;
+            if (apiex != null)
+            {
+                msg += Environment.NewLine;
+                msg += apiex.ApiError.Message;
+                if (apiex.ApiError.Errors != null)
+                {
+                    foreach (var err in apiex.ApiError.Errors)
+                    {
+                        msg += Environment.NewLine;
+                        msg += err.Message;
+                    }
+                }
+            }
+            log.Info(CultureInfo.InvariantCulture, "Log in to {0} host '{1}' with username '{2}': {3}",
+                Address.WebUri.Host,
+                Address.ApiUri,
+                usernameOrEmail,
+                msg
+            );
+        }
+
         public IObservable<Unit> LogOut()
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
@@ -260,11 +287,6 @@ namespace GitHub.Models
                         SupportsGist = userAndScopes.Scopes?.Contains("gist") ?? true;
                         IsLoggedIn = true;
                     }
-
-                    log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                        userAndScopes?.User?.Login ?? "(null)",
-                        hostAddress.ApiUri,
-                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
         }
 
