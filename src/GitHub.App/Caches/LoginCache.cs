@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using NLog;
 
