@@ -3,8 +3,9 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using LibGit2Sharp;
+using GitHub.Extensions;
 using GitHub.Primitives;
+using LibGit2Sharp;
 
 namespace GitHub.Services
 {

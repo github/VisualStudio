@@ -17,6 +17,7 @@ using ReactiveUI;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
