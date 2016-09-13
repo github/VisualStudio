@@ -18,6 +18,7 @@ using System.Reactive.Threading.Tasks;
 using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
+using GitHub.Extensions;
 
 namespace GitHub.Api
 {

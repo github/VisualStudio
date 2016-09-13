@@ -37,7 +37,7 @@ namespace GitHub.Extensions
         }
 
         /// <summary>
-        ///   Checks a string argument to ensure it isn't null or empty.
+        /// Checks a string argument to ensure it isn't null or empty.
         /// </summary>
         /// <param name = "value">The argument value to check.</param>
         /// <param name = "name">The name of the argument.</param>

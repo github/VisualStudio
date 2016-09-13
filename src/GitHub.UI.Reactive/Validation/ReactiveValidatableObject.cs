@@ -10,6 +10,7 @@ using System.Reflection;
 using ReactiveUI;
 using NullGuard;
 using GitHub.Services;
+using GitHub.Extensions;
 
 namespace GitHub.Validation
 {

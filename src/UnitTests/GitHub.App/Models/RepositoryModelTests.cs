@@ -53,31 +53,37 @@ public class RepositoryModelTests
     }
 
     [Collection("PackageServiceProvider global data tests")]
-    public class PathConstructorTests : TempFileBaseClass
+    public class PathConstructorTests : TestBaseClass
     {
         [Fact]
         public void NoRemoteUrl()
         {
-            var provider = Substitutes.ServiceProvider;
-            var gitservice = provider.GetGitService();
-            var repo = Substitute.For<IRepository>();
-            var path = Directory.CreateSubdirectory("repo-name");
-            gitservice.GetUri(path.FullName).Returns((UriString)null);
-            var model = new LocalRepositoryModel(path.FullName);
-            Assert.Equal("repo-name", model.Name);
+            using (var temp = new TempDirectory())
+            {
+                var provider = Substitutes.ServiceProvider;
+                var gitservice = provider.GetGitService();
+                var repo = Substitute.For<IRepository>();
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+                gitservice.GetUri(path.FullName).Returns((UriString)null);
+                var model = new LocalRepositoryModel(path.FullName);
+                Assert.Equal("repo-name", model.Name);
+            }
         }
 
         [Fact]
         public void WithRemoteUrl()
         {
-            var provider = Substitutes.ServiceProvider;
-            var gitservice = provider.GetGitService();
-            var repo = Substitute.For<IRepository>();
-            var path = Directory.CreateSubdirectory("repo-name");
-            gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-            var model = new LocalRepositoryModel(path.FullName);
-            Assert.Equal("repo-name", model.Name);
-            Assert.Equal("user", model.Owner);
+            using (var temp = new TempDirectory())
+            {
+                var provider = Substitutes.ServiceProvider;
+                var gitservice = provider.GetGitService();
+                var repo = Substitute.For<IRepository>();
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+                gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
+                var model = new LocalRepositoryModel(path.FullName);
+                Assert.Equal("repo-name", model.Name);
+                Assert.Equal("user", model.Owner);
+            }
         }
     }
 
