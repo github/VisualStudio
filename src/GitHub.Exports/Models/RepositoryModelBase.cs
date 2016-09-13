@@ -76,7 +76,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the name of the owner of the repository, taken from the clone URL.
         /// </summary>
-        public string Owner => CloneUrl.Owner;
+        public string Owner => CloneUrl?.Owner ?? string.Empty;
 
         /// <summary>
         /// Gets an icon for the repository that displays its private and fork state.
