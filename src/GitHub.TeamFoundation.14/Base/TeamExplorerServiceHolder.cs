@@ -248,7 +248,7 @@ namespace GitHub.VisualStudio.Base
     static class IGitRepositoryInfoExtensions
     {
         /// <summary>
-        /// Create a SimpleRepositoryModel from a VS git repo object
+        /// Create a LocalRepositoryModel from a VS git repo object
         /// </summary>
         public static ILocalRepositoryModel ToModel(this IGitRepositoryInfo repo)
         {

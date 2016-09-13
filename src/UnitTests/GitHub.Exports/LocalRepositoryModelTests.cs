@@ -8,7 +8,7 @@ using Xunit;
 using GitHub.Primitives;
 
 [Collection("PackageServiceProvider global data tests")]
-public class SimpleRepositoryModelTests : TempFileBaseClass
+public class LocalRepositoryModelTests : TempFileBaseClass
 {
     static void SetupRepository(string sha)
     {

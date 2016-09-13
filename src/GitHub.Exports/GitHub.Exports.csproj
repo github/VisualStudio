@@ -103,7 +103,7 @@
     <Compile Include="Helpers\AssemblyResolver.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
-    <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
+    <Compile Include="Extensions\LocalRepositoryModelExtensions.cs" />
     <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />

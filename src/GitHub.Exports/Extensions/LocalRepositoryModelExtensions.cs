@@ -6,7 +6,7 @@ using GitHub.Services;
 
 namespace GitHub.Extensions
 {
-    public static class SimpleRepositoryModelExtensions
+    public static class LocalRepositoryModelExtensions
     {
         public static bool HasCommits(this ILocalRepositoryModel repository)
         {
