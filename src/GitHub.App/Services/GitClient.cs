@@ -115,47 +115,6 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Branch> GetTrackingBranch(IRepository repository, string canonicalBranchName)
-        {
-            Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(canonicalBranchName, nameof(canonicalBranchName));
-
-            // TODO: Does this need to be run async?
-            return Observable.Defer(() =>
-            {
-                // TODO: Assuming remote is called "origin" here. This may not be the case.
-                // TODO: Locally checked out branch tracking the PR might not be marked as a tracking branch.
-                //       We know were the PR is coming from, so can set up the remote, fetch, and then scan 
-                //       the local branches that aren’t tracking remote branches and check if any of their
-                //       heads match the PR head. This is where we probably would want to ask the user if 
-                //       they want to use that branch for working on the PR, and if yes, we set it to properly
-                //       track the remote branch for fetching
-                var remote = repository.Network.Remotes["origin"];
-                var result = new List<Branch>();
-
-                // Get the ref from the remote that matches 'branchName'.
-                var remoteRef = repository.Network.ListReferences(remote)
-                    .Where(x => x.CanonicalName == canonicalBranchName)
-                    .SingleOrDefault();
-
-                if (remoteRef != null)
-                {
-                    foreach (var branch in repository.Branches)
-                    {
-                        if (!branch.IsRemote && branch.IsTracking && branch.TrackedBranch.Tip != null)
-                        {
-                            if (branch.TrackedBranch.Tip.Sha == remoteRef.TargetIdentifier)
-                            {
-                                result.Add(branch);
-                            }
-                        }
-                    }
-                }
-
-                return result.ToObservable();
-            });
-        }
-
         public IObservable<Unit> SetRemote(IRepository repository, string remoteName, Uri url)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));

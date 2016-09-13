@@ -82,36 +82,4 @@ public class GitClientTests
             branches.Received().Update(localBranch, Arg.Any<Action<BranchUpdater>>());
         }
     }
-
-    public class TheGetTrackingBranchMethod : TestBaseClass
-    {
-        public static readonly byte[] RepositoryBinary = UnitTests.Properties.Resources.test_get_tracking_branch;
-        public const string RepositoryBinaryName = nameof(UnitTests.Properties.Resources.test_get_tracking_branch);
-
-        [Fact]
-        public async void FindsUpToDateTrackingBranch()
-        {
-            using (var temp = new TempRepository(RepositoryBinaryName, RepositoryBinary))
-            {
-                var target = new GitClient(Substitute.For<IGitHubCredentialProvider>());
-                var result = await target.GetTrackingBranch(temp.Repository, "refs/pull/1/head").DefaultIfEmpty();
-
-                Assert.NotNull(result);
-                Assert.Equal("refs/heads/pr-1", result.CanonicalName);
-            }
-        }
-
-        [Fact]
-        public async void FindsNotUpToDateTrackingBranch()
-        {
-            using (var temp = new TempRepository(RepositoryBinaryName, RepositoryBinary))
-            {
-                var target = new GitClient(Substitute.For<IGitHubCredentialProvider>());
-                var result = await target.GetTrackingBranch(temp.Repository, "refs/pull/2/head").DefaultIfEmpty();
-
-                Assert.NotNull(result);
-                Assert.Equal("refs/heads/pr-2", result.CanonicalName);
-            }
-        }
-    }
 }

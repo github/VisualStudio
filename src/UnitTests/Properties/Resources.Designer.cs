@@ -59,15 +59,5 @@ namespace UnitTests.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] test_get_tracking_branch {
-            get {
-                object obj = ResourceManager.GetObject("test_get_tracking_branch", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

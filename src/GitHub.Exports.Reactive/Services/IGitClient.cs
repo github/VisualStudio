@@ -58,14 +58,6 @@ namespace GitHub.Services
         IObservable<Unit> Pull(IRepository repository);
 
         /// <summary>
-        /// Gets the local branches that track the specified remote branch
-        /// </summary>
-        /// <param name="repository">The repository to check</param>
-        /// <param name="canonicalBranchName">The canonical name of the remote branch</param>
-        /// <returns></returns>
-        IObservable<Branch> GetTrackingBranch(IRepository repository, string canonicalBranchName);
-
-        /// <summary>
         /// Gets all local branches whose name starts with the specified string.
         /// </summary>
         /// <param name="repository">The repository.</param>

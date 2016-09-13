@@ -217,7 +217,6 @@
     <Compile Include="XUnit\STATestCase.cs" />
     <Compile Include="XUnit\STATheoryAttribute.cs" />
     <Compile Include="XUnit\STATheoryDiscoverer.cs" />
-    <None Include="Resources\test_get_tracking_branch.zip" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
@@ -311,6 +310,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
