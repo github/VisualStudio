@@ -75,6 +75,13 @@ namespace GitHub.Services
         IObservable<Unit> SetRemote(IRepository repository, string remoteName, Uri url);
 
         /// <summary>
+        /// Ensures that there's a fetch ref for pull requests in the specified repository.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        IObservable<Unit> EnsurePullRequestsFetchRefExists(IRepository repository);
+
+        /// <summary>
         /// Sets the remote branch that the local branch tracks
         /// </summary>
         /// <param name="repository">The repository to set</param>

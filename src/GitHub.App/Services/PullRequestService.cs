@@ -65,15 +65,9 @@ namespace GitHub.Services
 
         public async Task Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            // NOTE: This currently requires a fetch refspec to be manually added to .git/config:
-            //
-            //     fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
-            //
-            // As described here: https://gist.github.com/piscisaureus/3342247
-            // It seems that currently libgit2sharp can't be used to add additional fetch refspecs.
             var repo = gitService.GetRepository(repository.LocalPath);
             var prCloneUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
-            var prRef = $"refs/remotes/origin/pull/{pullRequest.Number}";
+            var prRef = $"refs/remotes/vspullrequests/pull/{pullRequest.Number}";
 
             if (pullRequest.Head == null || pullRequest.Base == null)
             {
@@ -82,6 +76,8 @@ namespace GitHub.Services
                 return;
             }
 
+            await gitClient.EnsurePullRequestsFetchRefExists(repo);
+            await gitClient.Fetch(repo, "vspullrequests");
             await gitClient.Fetch(repo, "origin");
 
             if (prCloneUrl.ToRepositoryUrl() == repository.CloneUrl.ToRepositoryUrl())

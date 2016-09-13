@@ -128,6 +128,17 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<Unit> EnsurePullRequestsFetchRefExists(IRepository repository)
+        {
+            return Observable.Defer(() =>
+            {
+                var origin = repository.Network.Remotes["origin"];
+                repository.Config.Set("remote.vspullrequests.url", origin.Url);
+                repository.Config.Set("remote.vspullrequests.fetch", "+refs/pull/*/head:refs/remotes/vspullrequests/pull/*");
+                return Observable.Return(Unit.Default);
+            });
+        }
+
         public IObservable<Unit> SetTrackingBranch(IRepository repository, string branchName, string remoteName)
         {
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
