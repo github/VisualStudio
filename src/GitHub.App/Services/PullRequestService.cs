@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -146,7 +147,7 @@ namespace GitHub.Services
                 .Replace(name, "-")
                 .Replace("--", "-")
                 .Replace("'", "")
-                .ToLower();
+                .ToLower(CultureInfo.CurrentCulture);
         }
     }
 }

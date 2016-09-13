@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using LibGit2Sharp;
 using GitHub.Primitives;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace GitHub.Services
 {
@@ -82,7 +83,7 @@ namespace GitHub.Services
 
                 foreach (var branch in repository.Branches)
                 {
-                    if (branch.FriendlyName.StartsWith(s))
+                    if (branch.FriendlyName.StartsWith(s, StringComparison.Ordinal))
                     {
                         result.Add(branch);
                     }
@@ -181,7 +182,7 @@ namespace GitHub.Services
 
         private static bool IsCanonical(string s)
         {
-            return s.StartsWith("refs/");
+            return s.StartsWith("refs/", StringComparison.Ordinal);
         }
     }
 }
