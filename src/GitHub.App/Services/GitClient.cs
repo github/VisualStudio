@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using LibGit2Sharp;
+using GitHub.Extensions;
 using GitHub.Primitives;
-using System.Collections.Generic;
-using System.Globalization;
+using LibGit2Sharp;
 
 namespace GitHub.Services
 {

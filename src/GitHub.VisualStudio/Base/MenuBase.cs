@@ -20,7 +20,7 @@ namespace GitHub.VisualStudio
 
         protected IServiceProvider ServiceProvider { get { return serviceProvider; } }
 
-        protected ISimpleRepositoryModel ActiveRepo { get; private set; }
+        protected ILocalRepositoryModel ActiveRepo { get; private set; }
 
         protected ISimpleApiClient simpleApiClient;
 
@@ -54,7 +54,7 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        protected ISimpleRepositoryModel GetActiveRepo()
+        protected ILocalRepositoryModel GetActiveRepo()
         {
             var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>()?.ActiveRepo;
             // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
@@ -63,7 +63,7 @@ namespace GitHub.VisualStudio
                 var path = ServiceProvider.GetExportedValue<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
-                    activeRepo = !string.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
+                    activeRepo = !string.IsNullOrEmpty(path) ? new LocalRepositoryModel(path) : null;
                 }
                 catch (Exception ex)
                 {
@@ -100,7 +100,7 @@ namespace GitHub.VisualStudio
                 string path = vsGitServices?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
-                    ActiveRepo = !String.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
+                    ActiveRepo = !String.IsNullOrEmpty(path) ? new LocalRepositoryModel(path) : null;
                 }
                 catch (Exception ex)
                 {

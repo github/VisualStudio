@@ -9,11 +9,11 @@ using GitHub.Primitives;
 using Xunit.Abstractions;
 
 [Collection("PackageServiceProvider global data tests")]
-public class SimpleRepositoryModelTests : TestBaseClass
+public class LocalRepositoryModelTests : TestBaseClass
 {
     ITestOutputHelper output;
 
-    public SimpleRepositoryModelTests(ITestOutputHelper output)
+    public LocalRepositoryModelTests(ITestOutputHelper output)
     {
         this.output = output;
     }
@@ -52,6 +52,8 @@ public class SimpleRepositoryModelTests : TestBaseClass
     [InlineData(17, true, "https://github.com/foo/bar", "", @"src\dir\file1.cs", -1, 2, "https://github.com/foo/bar")]
     [InlineData(18, true, null, "123123", @"src\dir\file1.cs", 1, 2, null)]
     [InlineData(19, false, "git@github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
+    [InlineData(20, false, "git@github.com/foo/bar", "123123", @"src\dir\File1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/File1.cs")]
+    [InlineData(21, false, "git@github.com/foo/bar", "123123", @"src\dir\ThisIsFile1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/ThisIsFile1.cs")]
     public void GenerateUrl(int testid, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
     {
         using (var temp = new TempDirectory())
@@ -61,11 +63,11 @@ public class SimpleRepositoryModelTests : TestBaseClass
             var basePath = temp.Directory.CreateSubdirectory("generate-url-test1-" + testid);
             if (createRootedPath && path != null)
                 path = System.IO.Path.Combine(basePath.FullName, path);
-            ISimpleRepositoryModel model = null;
+            ILocalRepositoryModel model = null;
             if (!String.IsNullOrEmpty(baseUrl))
-                model = new SimpleRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
+                model = new LocalRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
             else
-                model = new SimpleRepositoryModel(basePath.FullName);
+                model = new LocalRepositoryModel(basePath.FullName);
             var result = model.GenerateUrl(path, startLine, endLine);
             Assert.Equal(expected, result?.ToString());
         }

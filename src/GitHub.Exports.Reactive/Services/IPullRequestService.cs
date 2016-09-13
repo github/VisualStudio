@@ -6,13 +6,13 @@ namespace GitHub.Services
 {
     public interface IPullRequestService
     {
-        Task Checkout(ISimpleRepositoryModel repository, IPullRequestModel pullRequest);
+        Task Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
-            ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body);
 
-        IObservable<string> GetPullRequestTemplate(ISimpleRepositoryModel repository);
+        IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }
 }

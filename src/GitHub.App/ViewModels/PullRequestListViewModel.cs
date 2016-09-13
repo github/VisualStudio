@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
     {
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
-        readonly ISimpleRepositoryModel repository;
+        readonly ILocalRepositoryModel repository;
         readonly IPullRequestService prService;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
@@ -45,7 +45,7 @@ namespace GitHub.ViewModels
 
         public PullRequestListViewModel(
             IRepositoryHost repositoryHost,
-            ISimpleRepositoryModel repository,
+            ILocalRepositoryModel repository,
             IPullRequestService prService,
             IPackageSettings settings)
         {

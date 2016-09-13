@@ -44,7 +44,7 @@ namespace GitHub.Services
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IRepositoryHost host,
-            ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body
         )
@@ -60,7 +60,7 @@ namespace GitHub.Services
             return PushAndCreatePR(host, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
-        public async Task Checkout(ISimpleRepositoryModel repository, IPullRequestModel pullRequest)
+        public async Task Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
             var localBranch = await GetPullRequestBranchName(repo, pullRequest);
@@ -70,7 +70,7 @@ namespace GitHub.Services
             await gitClient.Checkout(repo, localBranch);
         }
 
-        public IObservable<string> GetPullRequestTemplate(ISimpleRepositoryModel repository)
+        public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
         {
             Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
 
@@ -118,7 +118,7 @@ namespace GitHub.Services
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
-            ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
         {

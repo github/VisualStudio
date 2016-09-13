@@ -48,7 +48,7 @@ namespace GitHub.VisualStudio.Base
             Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
         }
 
-        void UpdateRepo(ISimpleRepositoryModel repo)
+        void UpdateRepo(ILocalRepositoryModel repo)
         {
             var changed = ActiveRepo != repo;
             ActiveRepo = repo;

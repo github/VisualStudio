@@ -5,63 +5,51 @@ using System.IO;
 using System.Linq;
 using GitHub.Primitives;
 using GitHub.UI;
-using GitHub.VisualStudio.Helpers;
 using GitHub.Services;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
+    /// <summary>
+    /// A locally cloned repository.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class SimpleRepositoryModel : NotificationAwareObject, ISimpleRepositoryModel, IEquatable<SimpleRepositoryModel>
+    public class LocalRepositoryModel : RepositoryModelBase, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
-        public SimpleRepositoryModel(string name, UriString cloneUrl, string localPath = null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="name">The repository name.</param>
+        /// <param name="cloneUrl">The repository's clone URL.</param>
+        /// <param name="localPath">The repository's local path.</param>
+        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath)
+            : base(name, cloneUrl)
         {
-            Name = name;
-            Owner = cloneUrl.Owner;
-            CloneUrl = cloneUrl;
+            Guard.ArgumentNotEmptyString(localPath, nameof(localPath));
+
             LocalPath = localPath;
             Icon = Octicon.repo;
         }
 
-        public SimpleRepositoryModel(UriString cloneUrl)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="path">The repository's local path.</param>
+        public LocalRepositoryModel(string path)
+            : base(path)
         {
-            Name = cloneUrl.RepositoryName;
-            Owner = cloneUrl.Owner;
-            CloneUrl = cloneUrl;
-            Icon = Octicon.repo;
-        }
-
-        public SimpleRepositoryModel(string path)
-        {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists)
-                throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = GitService.GitServiceHelper.GetUri(path);
-            var name = uri?.RepositoryName ?? dir.Name;
-            Name = name;
-            Owner = uri?.Owner ?? String.Empty;
             LocalPath = path;
-            CloneUrl = uri;
             Icon = Octicon.repo;
         }
 
-        public void SetIcon(bool isPrivate, bool isFork)
-        {
-            Icon = isPrivate
-                    ? Octicon.@lock
-                    : isFork
-                        ? Octicon.repo_forked
-                        : Octicon.repo;
-        }
-
+        /// <summary>
+        /// Updates the clone URL from the local repository.
+        /// </summary>
         public void Refresh()
         {
             if (LocalPath == null)
                 return;
-            var uri = GitService.GitServiceHelper.GetUri(LocalPath);
-            if (CloneUrl != uri)
-                CloneUrl = uri;
+            CloneUrl = GitService.GitServiceHelper.GetUri(LocalPath);
         }
 
         /// <summary>
@@ -132,14 +120,14 @@ namespace GitHub.Models
             return String.Format(CultureInfo.InvariantCulture, EndLineFormat, ret, endLine);
         }
 
-        public string Name { get; }
-        public string Owner { get; }
-        UriString cloneUrl;
-        public UriString CloneUrl { get { return cloneUrl; } set { cloneUrl = value; this.RaisePropertyChange(); } }
+        /// <summary>
+        /// Gets the local path of the repository.
+        /// </summary>
         public string LocalPath { get; }
-        Octicon icon;
-        public Octicon Icon { get { return icon; } set { icon = value; this.RaisePropertyChange(); } }
 
+        /// <summary>
+        /// Gets the head SHA of the repository.
+        /// </summary>
         public string HeadSha
         {
             get
@@ -149,6 +137,9 @@ namespace GitHub.Models
             }
         }
 
+        /// <summary>
+        /// Gets the current branch of the repository.
+        /// </summary>
         public IBranch CurrentBranch
         {
             get
@@ -157,7 +148,6 @@ namespace GitHub.Models
                 return new BranchModel(repo?.Head, this);
             }
         }
-
 
         /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
@@ -173,11 +163,11 @@ namespace GitHub.Models
         {
             if (ReferenceEquals(this, obj))
                 return true;
-            var other = obj as SimpleRepositoryModel;
+            var other = obj as LocalRepositoryModel;
             return Equals(other);
         }
 
-        public bool Equals(SimpleRepositoryModel other)
+        public bool Equals(LocalRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;

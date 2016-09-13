@@ -18,7 +18,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void SelectingAssigneeShouldTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
@@ -34,7 +34,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void ResettingAssigneeToNoneShouldNotTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
@@ -56,7 +56,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void SelectingAuthorShouldTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
@@ -72,7 +72,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void ResettingAuthorToNoneShouldNotTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
@@ -110,7 +110,7 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestCollection[0].Returns(pullRequest);
 
             modelService.GetPullRequests(
-                Arg.Any<ISimpleRepositoryModel>(),
+                Arg.Any<ILocalRepositoryModel>(),
                 Arg.Any<ITrackingCollection<IPullRequestModel>>())
                .Returns(pullRequestCollection);
             result.ModelService.Returns(modelService);

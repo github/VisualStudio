@@ -173,7 +173,7 @@
     <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
     <Compile Include="Models\RepositoryHost.cs" />
     <Compile Include="Models\RepositoryHosts.cs" />
-    <Compile Include="Models\RepositoryModel.cs" />
+    <Compile Include="Models\RemoteRepositoryModel.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Factories\ApiClientFactory.cs" />

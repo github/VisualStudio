@@ -12,6 +12,6 @@ namespace GitHub.Models
         string Username { get; }
         IObservable<IConnection> Login();
         void Logout();
-        ObservableCollection<ISimpleRepositoryModel> Repositories { get; }
+        ObservableCollection<ILocalRepositoryModel> Repositories { get; }
     }
 }
