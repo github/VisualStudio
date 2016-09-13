@@ -75,6 +75,28 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<Unit> Merge(IRepository repository, string refToMerge)
+        {
+            Guard.ArgumentNotEmptyString(refToMerge, nameof(refToMerge));
+
+            return Observable.Defer(() =>
+            {
+                var signature = repository.Config.BuildSignature(DateTimeOffset.Now);
+                repository.Merge(refToMerge, signature);
+                return Observable.Return(Unit.Default);
+            });
+        }
+
+        public IObservable<Unit> Pull(IRepository repository)
+        {
+            return Observable.Defer(() =>
+            {
+                var signature = repository.Config.BuildSignature(DateTimeOffset.Now);
+                repository.Network.Pull(signature, new PullOptions());
+                return Observable.Return(Unit.Default);
+            });
+        }
+
         public IObservable<Branch> GetBranchStartsWith(IRepository repository, string s)
         {
             return Observable.Defer(() =>

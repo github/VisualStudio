@@ -9,7 +9,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Primitives;
 using LibGit2Sharp;
+using NLog;
 using Rothko;
 
 namespace GitHub.Services
@@ -20,6 +22,7 @@ namespace GitHub.Services
     public class PullRequestService : IPullRequestService
     {
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z_'\-]", RegexOptions.ECMAScript);
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         static readonly string[] TemplatePaths = new[]
         {
@@ -62,12 +65,52 @@ namespace GitHub.Services
 
         public async Task Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
+            // NOTE: This currently requires a fetch refspec to be manually added to .git/config:
+            //
+            //     fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+            //
+            // As described here: https://gist.github.com/piscisaureus/3342247
+            // It seems that currently libgit2sharp can't be used to add additional fetch refspecs.
             var repo = gitService.GetRepository(repository.LocalPath);
-            var localBranch = await GetPullRequestBranchName(repo, pullRequest);
-            var remoteBranch = $"refs/pull/{pullRequest.Number}/head";
-            var refspec = $"{remoteBranch}:{localBranch}";
-            await gitClient.Fetch(repo, "origin", refspec);
-            await gitClient.Checkout(repo, localBranch);
+            var prCloneUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
+            var prRef = $"refs/remotes/origin/pull/{pullRequest.Number}";
+
+            if (pullRequest.Head == null || pullRequest.Base == null)
+            {
+                log.Warn("Could not check out PR: IPullRequestModel.Head or Base were null. " +
+                    "Assuming that they came from an old version's cache so ignoring.");
+                return;
+            }
+
+            await gitClient.Fetch(repo, "origin");
+
+            if (prCloneUrl.ToRepositoryUrl() == repository.CloneUrl.ToRepositoryUrl())
+            {
+                // The PR comes from the repository, so just check out the branch.
+                await gitClient.Checkout(repo, pullRequest.Head.Ref);
+                await gitClient.Pull(repo);
+            }
+            else
+            {
+                // The PR comes from a fork.
+                var localBranch = await GetPullRequestBranch(repo, pullRequest);
+
+                if (localBranch.Existing == null)
+                {
+                    // There's no existing local branch. Use a refspec to fetch the PR and create a new local
+                    // branch for us.
+                    var refspec = $"{prRef}:{localBranch.NewBranchName}";
+                    await gitClient.Fetch(repo, "origin", refspec);
+                    await gitClient.Checkout(repo, localBranch.NewBranchName);
+                }
+                else
+                {
+                    // There's an existing local branch. This may have local changes that have been committed
+                    // since the last time it was fetched, so merge the remote ref into this branch.
+                    await gitClient.Checkout(repo, localBranch.Existing.CanonicalName);
+                    await gitClient.Merge(repo, prRef);
+                }
+            }
         }
 
         public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
@@ -90,30 +133,29 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Given a repository and a pull request returns the name of a local branch.
+        /// Given a repository and a pull request returns either an existing local branch or the name of
+        /// a branch to create.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request.</param>
         /// <returns>The canonical name of the local branch.</returns>
         /// <remarks>
-        /// This method first tries to find an existing tracking branch that tracks the pull request. If
-        /// that is found it returns this branch's canonical name. If not, it tries to find a branch whose
-        /// name begins with "pr/{number}". Finally, if no branch is found it generates a name based on 
-        /// the pull request name and number. It returns the canonical name of the branch.
+        /// This method tries to find a branch whose name begins with "pr/{number}". If no branch is found it
+        /// generates a branch name based on the pull request name and number.
         /// </remarks>
-        async Task<string> GetPullRequestBranchName(IRepository repository, IPullRequestModel pullRequest)
+        async Task<NewOrExistingBranch> GetPullRequestBranch(IRepository repository, IPullRequestModel pullRequest)
         {
             var branch = $"refs/pull/{pullRequest.Number}/head";
-            var existing = await gitClient.GetTrackingBranch(repository, branch).DefaultIfEmpty() ??
-                await gitClient.GetBranchStartsWith(repository, "pr/" + pullRequest.Number).DefaultIfEmpty();
+            var existing = await gitClient.GetBranchStartsWith(repository, "pr/" + pullRequest.Number).DefaultIfEmpty();
 
             if (existing != null)
             {
-                return existing.CanonicalName;
+                return new NewOrExistingBranch(existing);
             }
             else
             {
-                return $"refs/heads/pr/{pullRequest.Number}-{GetSafeBranchName(pullRequest.Title)}";
+                var branchName = $"refs/heads/pr/{pullRequest.Number}-{GetSafeBranchName(pullRequest.Title)}";
+                return new NewOrExistingBranch(branchName);
             }
         }
 
@@ -148,6 +190,22 @@ namespace GitHub.Services
                 .Replace("--", "-")
                 .Replace("'", "")
                 .ToLower(CultureInfo.CurrentCulture);
+        }
+
+        class NewOrExistingBranch
+        {
+            public NewOrExistingBranch(Branch existing)
+            {
+                Existing = existing;
+            }
+
+            public NewOrExistingBranch(string newBranchName)
+            {
+                NewBranchName = newBranchName;
+            }
+
+            public Branch Existing { get; }
+            public string NewBranchName { get; }
         }
     }
 }

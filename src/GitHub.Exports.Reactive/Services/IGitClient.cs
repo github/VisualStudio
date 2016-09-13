@@ -43,6 +43,21 @@ namespace GitHub.Services
         IObservable<Unit> Checkout(IRepository repository, string branchName);
 
         /// <summary>
+        /// Merges a ref into the current branch.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="refToMerge">The ref to merge into the current branch</param>
+        /// <param name="signature">The signature of who is performing the merge</param>
+        /// <returns></returns>
+        IObservable<Unit> Merge(IRepository repository, string refToMerge);
+
+        /// <summary>
+        /// Carries out a pull on the current branch.
+        /// </summary>
+        /// <returns></returns>
+        IObservable<Unit> Pull(IRepository repository);
+
+        /// <summary>
         /// Gets the local branches that track the specified remote branch
         /// </summary>
         /// <param name="repository">The repository to check</param>
@@ -79,3 +94,4 @@ namespace GitHub.Services
         IObservable<Remote> GetHttpRemote(IRepository repo, string remote);
     }
 }
+ 
