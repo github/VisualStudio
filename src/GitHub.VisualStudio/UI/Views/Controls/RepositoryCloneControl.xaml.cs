@@ -50,7 +50,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             };
         }
 
-        ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRepositoryModel> repositories)
+        ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRemoteRepositoryModel> repositories)
         {
             var view = new ListCollectionView((IList)repositories);
             Debug.Assert(view.GroupDescriptions != null, "view.GroupDescriptions is null");
@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
-                var repo = item as IRepositoryModel;
+                var repo = item as IRemoteRepositoryModel;
                 var name = repo.Owner;
                 RepositoryGroup group;
 

@@ -41,7 +41,7 @@ namespace GitHub.Extensions
                     .Where(c => hosts.LookupHost(c.HostAddress).IsLoggedIn);
         }
 
-        public static IObservable<IConnection> LookupConnection(this IConnectionManager cm, ISimpleRepositoryModel repository)
+        public static IObservable<IConnection> LookupConnection(this IConnectionManager cm, ILocalRepositoryModel repository)
         {
             return Observable.Return(repository?.CloneUrl != null
                 ? cm.Connections.FirstOrDefault(c => c.HostAddress.Equals(HostAddress.Create(repository.CloneUrl)))

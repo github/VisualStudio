@@ -9,11 +9,11 @@ using GitHub.Primitives;
 using Xunit.Abstractions;
 
 [Collection("PackageServiceProvider global data tests")]
-public class SimpleRepositoryModelTests : TestBaseClass
+public class LocalRepositoryModelTests : TestBaseClass
 {
     ITestOutputHelper output;
 
-    public SimpleRepositoryModelTests(ITestOutputHelper output)
+    public LocalRepositoryModelTests(ITestOutputHelper output)
     {
         this.output = output;
     }
@@ -63,11 +63,11 @@ public class SimpleRepositoryModelTests : TestBaseClass
             var basePath = temp.Directory.CreateSubdirectory("generate-url-test1-" + testid);
             if (createRootedPath && path != null)
                 path = System.IO.Path.Combine(basePath.FullName, path);
-            ISimpleRepositoryModel model = null;
+            ILocalRepositoryModel model = null;
             if (!String.IsNullOrEmpty(baseUrl))
-                model = new SimpleRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
+                model = new LocalRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
             else
-                model = new SimpleRepositoryModel(basePath.FullName);
+                model = new LocalRepositoryModel(basePath.FullName);
             var result = model.GenerateUrl(path, startLine, endLine);
             Assert.Equal(expected, result?.ToString());
         }

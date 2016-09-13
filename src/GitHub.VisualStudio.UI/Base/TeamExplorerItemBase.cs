@@ -70,7 +70,7 @@ namespace GitHub.VisualStudio.Base
 
         void SubscribeToRepoChanges()
         {
-            holder.Subscribe(this, (ISimpleRepositoryModel repo) =>
+            holder.Subscribe(this, (ILocalRepositoryModel repo) =>
             {
                 var changed = ActiveRepo != repo;
                 ActiveRepo = repo;

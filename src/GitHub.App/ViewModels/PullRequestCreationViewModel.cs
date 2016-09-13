@@ -30,10 +30,10 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly ObservableAsPropertyHelper<IRepositoryModel> githubRepository;
+        readonly ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
         readonly ObservableAsPropertyHelper<bool> isExecuting;
         readonly IRepositoryHost repositoryHost;
-        readonly IObservable<IRepositoryModel> githubObs;
+        readonly IObservable<IRemoteRepositoryModel> githubObs;
         readonly CompositeDisposable disposables = new CompositeDisposable();
 
         [ImportingConstructor]
@@ -44,7 +44,7 @@ namespace GitHub.ViewModels
                    notifications)
          {}
 
-        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ISimpleRepositoryModel activeRepo,
+        public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ILocalRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
         {
             Extensions.Guard.ArgumentNotNull(repositoryHost, nameof(repositoryHost));
@@ -55,7 +55,7 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
 
             var obs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
-                .Select(r => new RepositoryModel(r))
+                .Select(r => new RemoteRepositoryModel(r))
                 .PublishLast();
             disposables.Add(obs.Connect());
             githubObs = obs;
@@ -186,7 +186,7 @@ namespace GitHub.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        public IRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
+        public IRemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
         bool IsExecuting { get { return isExecuting.Value; } }
 
         bool initialized;
