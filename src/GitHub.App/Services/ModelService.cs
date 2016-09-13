@@ -348,7 +348,9 @@ namespace GitHub.Services
                 prCacheItem.UpdatedAt)
             {
                 CommentCount = prCacheItem.CommentCount,
-                IsOpen = prCacheItem.IsOpen
+                IsOpen = prCacheItem.IsOpen,
+                Base = prCacheItem.Base,
+                Head = prCacheItem.Head,
             };
         }
 
@@ -447,6 +449,8 @@ namespace GitHub.Services
                 IsOpen = pr.State == ItemState.Open;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
+                Base = pr.Base;
+                Head = pr.Head;
             }
 
             [AllowNull]
@@ -460,6 +464,10 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public bool IsOpen { get; set; }
+            [AllowNull]
+            public GitReference Base { [return: AllowNull] get; set; }
+            [AllowNull]
+            public GitReference Head { [return: AllowNull] get; set; }
         }
     }
 }

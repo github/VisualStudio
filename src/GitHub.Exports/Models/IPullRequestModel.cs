@@ -1,5 +1,6 @@
 ﻿using System;
 using GitHub.Collections;
+using Octokit;
 
 namespace GitHub.Models
 {
@@ -15,5 +16,7 @@ namespace GitHub.Models
         DateTimeOffset UpdatedAt { get; }
         IAccount Author { get; }
         IAccount Assignee { get; }
+        GitReference Base { get; }
+        GitReference Head { get; }
     }
 }
