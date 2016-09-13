@@ -122,12 +122,6 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICommand Reset
-        {
-            get;
-            private set;
-        }
-
         public string SafeRepositoryName
         {
             get;
