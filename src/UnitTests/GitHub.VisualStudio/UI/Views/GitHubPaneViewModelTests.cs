@@ -33,13 +33,13 @@ public class GitHubPaneViewModelTests : TestBaseClass
         repositoryHosts.IsLoggedInToAnyHost.Returns(true);
 
         var teamExplorerServiceHolder = Substitute.For<ITeamExplorerServiceHolder>();
-        var activeRepo = Substitute.For<ISimpleRepositoryModel>();
+        var activeRepo = Substitute.For<ILocalRepositoryModel>();
         activeRepo.CloneUrl.Returns(new UriString("https://github.com/foo/foo"));
         teamExplorerServiceHolder
-            .When(_ => _.Subscribe(Arg.Any<object>(), Arg.Any<Action<ISimpleRepositoryModel>>()))
+            .When(_ => _.Subscribe(Arg.Any<object>(), Arg.Any<Action<ILocalRepositoryModel>>()))
             .Do(_ =>
             {
-                var invokeAction = _.Arg<Action<ISimpleRepositoryModel>>();
+                var invokeAction = _.Arg<Action<ILocalRepositoryModel>>();
                 invokeAction(activeRepo);
             });
 
