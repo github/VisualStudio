@@ -7,6 +7,7 @@ using UnitTests;
 using Xunit;
 using GitHub.Primitives;
 using Xunit.Abstractions;
+using System.Collections.Generic;
 
 [Collection("PackageServiceProvider global data tests")]
 public class LocalRepositoryModelTests : TestBaseClass
@@ -25,7 +26,11 @@ public class LocalRepositoryModelTests : TestBaseClass
         var repo = Substitute.For<IRepository>();
         gitservice.GetRepository(Args.String).Returns(repo);
         if (!String.IsNullOrEmpty(sha))
-        {
+        {            
+            var refs = Substitute.For<ReferenceCollection>();
+            var refrence = Substitute.For<Reference>();
+            refs.ReachableFrom(Arg.Any<IEnumerable<Reference>>(), Arg.Any<IEnumerable<Commit>>()).Returns(new Reference[] { refrence });
+            repo.Refs.Returns(refs);
             var commit = Substitute.For<Commit>();
             commit.Sha.Returns(sha);
             repo.Commits.Returns(new FakeCommitLog { commit });
