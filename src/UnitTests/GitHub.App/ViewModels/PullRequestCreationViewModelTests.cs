@@ -40,10 +40,10 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     struct TestData
     {
         public IServiceProvider ServiceProvider;
-        public ISimpleRepositoryModel ActiveRepo;
+        public ILocalRepositoryModel ActiveRepo;
         public LibGit2Sharp.IRepository L2Repo;
-        public ISimpleRepositoryModel SourceRepo;
-        public ISimpleRepositoryModel TargetRepo;
+        public IRepositoryModel SourceRepo;
+        public IRepositoryModel TargetRepo;
         public IBranch SourceBranch;
         public IBranch TargetBranch;
         public IGitClient GitClient;
@@ -69,7 +69,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var ms = Substitute.For<IModelService>();
 
         // this is the local repo instance that is available via TeamExplorerServiceHolder and friends
-        var activeRepo = Substitute.For<ISimpleRepositoryModel>();
+        var activeRepo = Substitute.For<ILocalRepositoryModel>();
         activeRepo.LocalPath.Returns("");
         activeRepo.Name.Returns(repoName);
         activeRepo.CloneUrl.Returns(new GitHub.Primitives.UriString("http://github.com/" + sourceRepoOwner + "/" + repoName));
@@ -80,7 +80,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
             githubRepoParent = CreateRepository(targetRepoOwner, repoName, id: 1);
         var githubRepo = CreateRepository(sourceRepoOwner, repoName, id: 2, parent: githubRepoParent);
         var sourceBranch = new BranchModel(sourceBranchName, activeRepo);
-        var sourceRepo = new RepositoryModel(githubRepo);
+        var sourceRepo = new RemoteRepositoryModel(githubRepo);
         var targetRepo = targetRepoOwner == sourceRepoOwner ? sourceRepo : sourceRepo.Parent;
         var targetBranch = targetBranchName != targetRepo.DefaultBranch.Name ? new BranchModel(targetBranchName, targetRepo) : targetRepo.DefaultBranch;
 

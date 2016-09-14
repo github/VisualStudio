@@ -20,7 +20,7 @@ namespace GitHub.TeamFoundation
             return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(TEGitKey + "\\" + path, true);
         }
 
-        internal static IEnumerable<ISimpleRepositoryModel> PokeTheRegistryForRepositoryList()
+        internal static IEnumerable<ILocalRepositoryModel> PokeTheRegistryForRepositoryList()
         {
             using (var key = OpenGitKey("Repositories"))
             {
@@ -32,7 +32,7 @@ namespace GitHub.TeamFoundation
                         {
                             var path = subkey?.GetValue("Path") as string;
                             if (path != null && Directory.Exists(path))
-                                return new SimpleRepositoryModel(path);
+                                return new LocalRepositoryModel(path);
                         }
                         catch (Exception)
                         {
