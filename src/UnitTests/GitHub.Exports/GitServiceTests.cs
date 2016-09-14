@@ -6,6 +6,7 @@ using Xunit;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class GitServiceTests : TestBaseClass
 {
@@ -33,5 +34,24 @@ public class GitServiceTests : TestBaseClass
 
         var gitservice = new GitService();
         Assert.Equal(expected, gitservice.GetUri(repository)?.ToString());
+    }
+
+    [Theory]
+    [InlineData("file:///C:/dev/exp/foo", "123321", "123321")]
+    public async void TheLatestSha(string path, string tipSha, string expected)
+    {
+        var origin = Substitute.For<Remote>();
+        origin.Url.Returns(path);
+        var repository = Substitute.For<IRepository>();
+        repository.Network.Remotes["origin"].Returns(origin);
+
+        //var basePath = Directory.CreateSubdirectory("generate-url-test1-" + testid);
+        //if (createRootedPath && path != null)
+        //  path = System.IO.Path.Combine(basePath.FullName, path);
+
+        var gitservice = new GitService();
+        gitservice.GetRepository(Args.String).Returns(repository);
+
+        Assert.Equal(expected, await gitservice.GetLatestPushedSha(path));
     }
 }
