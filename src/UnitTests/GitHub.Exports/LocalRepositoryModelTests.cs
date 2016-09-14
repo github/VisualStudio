@@ -54,7 +54,7 @@ public class LocalRepositoryModelTests : TestBaseClass
     [InlineData(19, false, "git@github.com/foo/bar", "123123", @"src\dir\file1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/file1.cs")]
     [InlineData(20, false, "git@github.com/foo/bar", "123123", @"src\dir\File1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/File1.cs")]
     [InlineData(21, false, "git@github.com/foo/bar", "123123", @"src\dir\ThisIsFile1.cs", -1, -1, "https://github.com/foo/bar/blob/123123/src/dir/ThisIsFile1.cs")]
-    public void GenerateUrl(int testid, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
+    public async void GenerateUrl(int testid, bool createRootedPath, string baseUrl, string sha, string path, int startLine, int endLine, string expected)
     {
         using (var temp = new TempDirectory())
         {
@@ -68,7 +68,7 @@ public class LocalRepositoryModelTests : TestBaseClass
                 model = new LocalRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
             else
                 model = new LocalRepositoryModel(basePath.FullName);
-            var result = model.GenerateUrl(path, startLine, endLine);
+            var result = await model.GenerateUrl(path, startLine, endLine);
             Assert.Equal(expected, result?.ToString());
         }
     }
