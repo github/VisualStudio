@@ -66,7 +66,7 @@ namespace GitHub.Models
             if (CloneUrl == null)
                 return null;
 
-            var sha = await GitService.GitServiceHelper.GetLatestPushedSha(path);
+            var sha = path != null ? await GitService.GitServiceHelper.GetLatestPushedSha(path) : HeadSha;
             // this also incidentally checks whether the repo has a valid LocalPath
             if (String.IsNullOrEmpty(sha))
                 return CloneUrl.ToRepositoryUrl().AbsoluteUri;
