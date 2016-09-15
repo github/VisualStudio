@@ -83,12 +83,12 @@ namespace GitHub.Services
 
             return Observable.Defer(() =>
             {
-                var remoteBranchName = "refs/remotes/" + remoteName + "/" + branchName;
+                var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
                 var remoteBranch = repository.Branches[remoteBranchName];
                 // if it's null, it's because nothing was pushed
                 if (remoteBranch != null)
                 {
-                    var localBranchName = "refs/heads/" + branchName;
+                    var localBranchName = IsCanonical(branchName) ? branchName : "refs/heads/" + branchName;
                     var localBranch = repository.Branches[localBranchName];
                     repository.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
                 }
@@ -107,6 +107,11 @@ namespace GitHub.Services
                         ret = repo.Network.Remotes.Add(r.Remote, UriString.ToUriString(r.Uri.ToRepositoryUrl()));
                     return ret;
                 });
+        }
+
+        static bool IsCanonical(string s)
+        {
+            return s.StartsWith("refs/", StringComparison.Ordinal);
         }
     }
 }
