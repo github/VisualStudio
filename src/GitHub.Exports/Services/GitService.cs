@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using GitHub.Models;
 using System.Linq;
+using GitHub.Extensions;
 
 namespace GitHub.Services
 {
@@ -72,8 +73,15 @@ namespace GitHub.Services
 
         public static IGitService GitServiceHelper => VisualStudio.Services.DefaultExportProvider.GetExportedValueOrDefault<IGitService>() ?? new GitService();
 
+        /// <summary>
+        /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
+        /// been found in any remote branches or the current local branch. 
+        /// </summary>
+        /// <param name="path">The local path of the file. This cannot be null.</param>
+        /// <returns></returns>
         public Task<string> GetLatestPushedSha(string path)
         {
+            Guard.ArgumentNotNull(path, nameof(path));
             var repo = GetRepository(path);
 
             if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
