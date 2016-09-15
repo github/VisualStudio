@@ -7,6 +7,7 @@ using GitHub.Primitives;
 using GitHub.UI;
 using GitHub.Services;
 using GitHub.Extensions;
+using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
@@ -60,12 +61,12 @@ namespace GitHub.Models
         /// <param name="startLine">A specific line, or (if specifying the <paramref name="endLine"/> as well) the start of a range</param>
         /// <param name="endLine">The end of a line range on the specified file.</param>
         /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
-        public UriString GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        public async Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
         {
             if (CloneUrl == null)
                 return null;
 
-            var sha = HeadSha;
+            var sha = await GitService.GitServiceHelper.GetLatestPushedSha(path ?? LocalPath);
             // this also incidentally checks whether the repo has a valid LocalPath
             if (String.IsNullOrEmpty(sha))
                 return CloneUrl.ToRepositoryUrl().AbsoluteUri;

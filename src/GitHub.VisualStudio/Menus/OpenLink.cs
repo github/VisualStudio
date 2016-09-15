@@ -31,7 +31,7 @@ namespace GitHub.VisualStudio.Menus
             if (!isgithub)
                 return;
 
-            var link = GenerateLink();
+            var link = await GenerateLink();
             if (link == null)
                 return;
             var browser = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
