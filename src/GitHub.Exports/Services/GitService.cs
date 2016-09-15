@@ -77,12 +77,15 @@ namespace GitHub.Services
         /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
         /// been found in any remote branches or the current local branch. 
         /// </summary>
-        /// <param name="path">The local path of the file. This cannot be null.</param>
+        /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
         /// <returns></returns>
         public Task<string> GetLatestPushedSha(string path)
         {
             Guard.ArgumentNotNull(path, nameof(path));
             var repo = GetRepository(path);
+
+            if (repo == null)
+                return null;
 
             if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
             {

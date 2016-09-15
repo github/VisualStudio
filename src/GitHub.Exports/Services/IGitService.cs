@@ -46,6 +46,12 @@ namespace GitHub.Services
         /// <returns></returns>
         UriString GetRemoteUri(IRepository repo, string remote = "origin");
 
+        /// <summary>
+        /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
+        /// been found in any remote branches or the current local branch. 
+        /// </summary>
+        /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
+        /// <returns></returns>
         Task<string> GetLatestPushedSha(string path);
     }
 }
