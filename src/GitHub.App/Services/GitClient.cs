@@ -97,7 +97,7 @@ namespace GitHub.Services
                 });
         }
 
-        private static bool IsCanonical(string s)
+        static bool IsCanonical(string s)
         {
             return s.StartsWith("refs/", StringComparison.Ordinal);
         }
