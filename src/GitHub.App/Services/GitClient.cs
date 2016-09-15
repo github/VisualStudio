@@ -51,6 +51,18 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<Unit> Fetch(IRepository repository, string remoteName, params string[] refspecs)
+        {
+            Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
+
+            return Observable.Defer(() =>
+            {
+                var remote = repository.Network.Remotes[remoteName];
+                repository.Network.Fetch(remote, refspecs, fetchOptions);
+                return Observable.Return(Unit.Default);
+            });
+        }
+
         public IObservable<Unit> SetRemote(IRepository repository, string remoteName, Uri url)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));

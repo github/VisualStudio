@@ -24,6 +24,15 @@ namespace GitHub.Services
         IObservable<Unit> Fetch(IRepository repository, string remoteName);
 
         /// <summary>
+        /// Fetches from the remote, using custom refspecs.
+        /// </summary>
+        /// <param name="repository">The repository to pull</param>
+        /// <param name="remoteName">The name of the remote</param>
+        /// <param name="refspecs">The custom refspecs</param>
+        /// <returns></returns>
+        IObservable<Unit> Fetch(IRepository repository, string remoteName, params string[] refspecs);
+
+        /// <summary>
         /// Sets the specified remote to the specified URL.
         /// </summary>
         /// <param name="repository">The repository to set</param>
