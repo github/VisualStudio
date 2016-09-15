@@ -23,7 +23,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     {
         var l2remote = Substitute.For<LibGit2Sharp.Remote>();
         l2remote.Name.Returns(remote);
-        gitClient.GetHttpRemote(Args.LibGit2Repo, Args.String).Returns(Observable.Return(l2remote));
+        gitClient.GetHttpRemote(Args.LibGit2Repo, Args.String).Returns(Task.FromResult(l2remote));
 
         var l2repo = Substitute.For<LibGit2Sharp.IRepository>();
         var l2branchcol = Substitute.For<LibGit2Sharp.BranchCollection>();
