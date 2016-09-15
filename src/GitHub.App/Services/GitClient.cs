@@ -29,43 +29,48 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            if (repository.Head?.Commits != null && repository.Head.Commits.Any())
+            return Task.Factory.StartNew(() =>
             {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
-            }
-
-            return Task.FromResult<object>(null);
+                if (repository.Head?.Commits != null && repository.Head.Commits.Any())
+                {
+                    var remote = repository.Network.Remotes[remoteName];
+                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
+                }
+            });
         }
 
         public Task Fetch(IRepository repository, string remoteName)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            var remote = repository.Network.Remotes[remoteName];
-            repository.Network.Fetch(remote, fetchOptions);
-
-            return Task.FromResult<object>(null);
+            return Task.Factory.StartNew(() =>
+            {
+                var remote = repository.Network.Remotes[remoteName];
+                repository.Network.Fetch(remote, fetchOptions);
+            });
         }
 
         public Task Fetch(IRepository repository, string remoteName, params string[] refspecs)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            var remote = repository.Network.Remotes[remoteName];
-            repository.Network.Fetch(remote, refspecs, fetchOptions);
-
-            return Task.FromResult<object>(null);
+            return Task.Factory.StartNew(() =>
+            {
+                var remote = repository.Network.Remotes[remoteName];
+                repository.Network.Fetch(remote, refspecs, fetchOptions);
+            });
         }
 
         public Task SetRemote(IRepository repository, string remoteName, Uri url)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            repository.Config.Set("remote." + remoteName + ".url", url.ToString());
-            repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
+            return Task.Factory.StartNew(() =>
+            {
 
-            return Task.FromResult<object>(null);
+                repository.Config.Set("remote." + remoteName + ".url", url.ToString());
+                repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
+            });
         }
 
         public Task SetTrackingBranch(IRepository repository, string branchName, string remoteName)
@@ -73,27 +78,32 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
-            var remoteBranch = repository.Branches[remoteBranchName];
-            // if it's null, it's because nothing was pushed
-            if (remoteBranch != null)
+            return Task.Factory.StartNew(() =>
             {
-                var localBranchName = IsCanonical(branchName) ? branchName : "refs/heads/" + branchName;
-                var localBranch = repository.Branches[localBranchName];
-                repository.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
-            }
-
-            return Task.FromResult<object>(null);
+                var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
+                var remoteBranch = repository.Branches[remoteBranchName];
+                // if it's null, it's because nothing was pushed
+                if (remoteBranch != null)
+                {
+                    var localBranchName = IsCanonical(branchName) ? branchName : "refs/heads/" + branchName;
+                    var localBranch = repository.Branches[localBranchName];
+                    repository.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
+                }
+            });
         }
 
         public Task<Remote> GetHttpRemote(IRepository repo, string remote)
         {
-            var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
-            var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
-            var ret = repo.Network.Remotes[remoteName];
-            if (ret == null)
-                ret = repo.Network.Remotes.Add(remoteName, UriString.ToUriString(uri.ToRepositoryUrl()));
-            return Task.FromResult(ret);
+            return Task.Factory.StartNew(() =>
+            {
+
+                var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
+                var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
+                var ret = repo.Network.Remotes[remoteName];
+                if (ret == null)
+                    ret = repo.Network.Remotes.Add(remoteName, UriString.ToUriString(uri.ToRepositoryUrl()));
+                return ret;
+            });
         }
 
         static bool IsCanonical(string s)
