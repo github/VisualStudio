@@ -5,6 +5,7 @@ using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using System.Diagnostics;
 using GitHub.SampleData;
+using Octokit;
 
 namespace GitHub.Models
 {
@@ -35,6 +36,8 @@ namespace GitHub.Models
             HasNewComments = other.HasNewComments;
             IsOpen = other.IsOpen;
             Assignee = other.Assignee;
+            Base = other.Base;
+            Head = other.Head;
         }
 
         public override bool Equals([AllowNull]object obj)
@@ -131,6 +134,8 @@ namespace GitHub.Models
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
+        [AllowNull] public GitReference Base { [return: AllowNull] get; set; }
+        [AllowNull] public GitReference Head { [return: AllowNull] get; set; }
 
         IAccount assignee;
         [AllowNull]

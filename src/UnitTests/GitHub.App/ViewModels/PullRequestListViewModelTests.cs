@@ -19,8 +19,9 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
+            var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -34,8 +35,9 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
+            var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -55,8 +57,9 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
+            var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;
@@ -70,8 +73,9 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var repositoryHost = CreateRepositoryHost();
             var repository = Substitute.For<ILocalRepositoryModel>();
+            var prService = Substitute.For<IPullRequestService>();
             var settings = CreateSettings();
-            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
+            var prViewModel = new PullRequestListViewModel(repositoryHost, repository, prService, settings);
 
             prViewModel.Initialize(null);
             prViewModel.PullRequests.Received(1).Filter = AnyFilter;

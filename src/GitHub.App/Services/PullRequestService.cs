@@ -1,13 +1,18 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using GitHub.Models;
 using System.Reactive.Linq;
-using Rothko;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using GitHub.Models;
+using GitHub.Primitives;
+using LibGit2Sharp;
+using NLog;
+using Rothko;
 
 namespace GitHub.Services
 {
@@ -16,6 +21,9 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
+        static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z_'\-]", RegexOptions.ECMAScript);
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         static readonly string[] TemplatePaths = new[]
         {
             "PULL_REQUEST_TEMPLATE.md",
@@ -55,6 +63,52 @@ namespace GitHub.Services
             return PushAndCreatePR(host, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
+        public async Task Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        {
+            var repo = gitService.GetRepository(repository.LocalPath);
+            var prCloneUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
+            var prRef = $"refs/remotes/vspullrequests/pull/{pullRequest.Number}";
+
+            if (pullRequest.Head == null || pullRequest.Base == null)
+            {
+                log.Warn("Could not check out PR: IPullRequestModel.Head or Base were null. " +
+                    "Assuming that they came from an old version's cache so ignoring.");
+                return;
+            }
+
+            await gitClient.EnsurePullRequestsFetchRefExists(repo);
+            await gitClient.Fetch(repo, "vspullrequests");
+            await gitClient.Fetch(repo, "origin");
+
+            if (prCloneUrl.ToRepositoryUrl() == repository.CloneUrl.ToRepositoryUrl())
+            {
+                // The PR comes from the repository, so just check out the branch.
+                await gitClient.Checkout(repo, pullRequest.Head.Ref);
+                await gitClient.Pull(repo);
+            }
+            else
+            {
+                // The PR comes from a fork.
+                var localBranch = await GetPullRequestBranch(repo, pullRequest);
+
+                if (localBranch.Existing == null)
+                {
+                    // There's no existing local branch. Use a refspec to fetch the PR and create a new local
+                    // branch for us.
+                    var refspec = $"{prRef}:{localBranch.NewBranchName}";
+                    await gitClient.Fetch(repo, "origin", refspec);
+                    await gitClient.Checkout(repo, localBranch.NewBranchName);
+                }
+                else
+                {
+                    // There's an existing local branch. This may have local changes that have been committed
+                    // since the last time it was fetched, so merge the remote ref into this branch.
+                    await gitClient.Checkout(repo, localBranch.Existing.CanonicalName);
+                    await gitClient.Merge(repo, prRef);
+                }
+            }
+        }
+
         public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
         {
             Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
@@ -72,6 +126,33 @@ namespace GitHub.Services
                 }
                 return Observable.Empty<string>();
             });
+        }
+
+        /// <summary>
+        /// Given a repository and a pull request returns either an existing local branch or the name of
+        /// a branch to create.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request.</param>
+        /// <returns>The canonical name of the local branch.</returns>
+        /// <remarks>
+        /// This method tries to find a branch whose name begins with "pr/{number}". If no branch is found it
+        /// generates a branch name based on the pull request name and number.
+        /// </remarks>
+        async Task<NewOrExistingBranch> GetPullRequestBranch(IRepository repository, IPullRequestModel pullRequest)
+        {
+            var branch = $"refs/pull/{pullRequest.Number}/head";
+            var existing = await gitClient.GetBranchStartsWith(repository, "pr/" + pullRequest.Number).DefaultIfEmpty();
+
+            if (existing != null)
+            {
+                return new NewOrExistingBranch(existing);
+            }
+            else
+            {
+                var branchName = $"refs/heads/pr/{pullRequest.Number}-{GetSafeBranchName(pullRequest.Title)}";
+                return new NewOrExistingBranch(branchName);
+            }
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
@@ -95,5 +176,32 @@ namespace GitHub.Services
             return ret;
         }
 
+        /// <summary>
+        /// Given a repository name, returns a safe version with invalid characters replaced with dashes.
+        /// </summary>
+        static string GetSafeBranchName(string name)
+        {
+            return InvalidBranchCharsRegex
+                .Replace(name, "-")
+                .Replace("--", "-")
+                .Replace("'", "")
+                .ToLower(CultureInfo.CurrentCulture);
+        }
+
+        class NewOrExistingBranch
+        {
+            public NewOrExistingBranch(Branch existing)
+            {
+                Existing = existing;
+            }
+
+            public NewOrExistingBranch(string newBranchName)
+            {
+                NewBranchName = newBranchName;
+            }
+
+            public Branch Existing { get; }
+            public string NewBranchName { get; }
+        }
     }
 }

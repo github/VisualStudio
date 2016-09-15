@@ -51,6 +51,7 @@
       <ui:GitHubActionLink x:Name="title"
             Grid.Row="0"
             Grid.Column="1"
+            Grid.ColumnSpan="2"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="{DynamicResource GitHubVsToolWindowText}"
@@ -142,6 +143,13 @@
           </TextBlock.ToolTip>
         </TextBlock>
       </Grid>
+
+      <ui:GitHubActionLink Grid.Row="1" 
+                           Grid.Column="2"
+                           Command="{Binding DataContext.CheckoutPullRequest, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+                           CommandParameter="{Binding}">
+          Checkout
+      </ui:GitHubActionLink>
     </Grid>
   </DataTemplate>
 </ResourceDictionary>

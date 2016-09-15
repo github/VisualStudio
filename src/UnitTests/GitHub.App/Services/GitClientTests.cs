@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Services;
+using GitHub.VisualStudio.UI;
 using LibGit2Sharp;
 using NSubstitute;
 using Xunit;
