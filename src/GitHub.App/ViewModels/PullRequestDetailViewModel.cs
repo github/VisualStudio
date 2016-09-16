@@ -16,6 +16,8 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
+        int number;
+        IAccount author;
         string body;
 
         [ImportingConstructor]
@@ -32,6 +34,20 @@ namespace GitHub.ViewModels
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+
+            OpenOnGitHub = ReactiveCommand.Create();
+        }
+
+        public int Number
+        {
+            get { return number; }
+            private set { this.RaiseAndSetIfChanged(ref number, value); }
+        }
+
+        public IAccount Author
+        {
+            get { return author; }
+            private set { this.RaiseAndSetIfChanged(ref author, value); }
         }
 
         public string Body
@@ -39,6 +55,8 @@ namespace GitHub.ViewModels
             get { return body; }
             private set { this.RaiseAndSetIfChanged(ref body, value); }
         }
+
+        public ReactiveCommand<object> OpenOnGitHub { get; }
 
         public override void Initialize([AllowNull] ViewWithData data)
         {
@@ -51,7 +69,9 @@ namespace GitHub.ViewModels
 
         void Load(IPullRequestDetailModel model)
         {
+            Number = model.Number;
             Title = model.Title;
+            Author = model.Author;
             Body = model.Body;
         }
     }

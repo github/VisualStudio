@@ -1,7 +1,14 @@
-﻿namespace GitHub.ViewModels
+﻿using GitHub.Models;
+using ReactiveUI;
+
+namespace GitHub.ViewModels
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
     public interface IPullRequestDetailViewModel : IViewModel
     {
+        int Number { get; }
+        IAccount Author { get; }
+        string Body { get; }
+
+        ReactiveCommand<object> OpenOnGitHub { get; }
     }
 }

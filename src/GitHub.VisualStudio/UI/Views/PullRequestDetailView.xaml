@@ -38,16 +38,44 @@
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="16"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.RowSpan="2" Grid.Column="0" Margin="0 0 10 0">
+            <Grid.OpacityMask>
+                <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
+            </Grid.OpacityMask>
+            <Border Name="avatarMask" Background="White" CornerRadius="3" />
+            <Image x:Name="avatar"
+                   Width="48"
+                   Height="48"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Source="{Binding Author.Avatar}" />
+        </Grid>
+
         <TextBlock Grid.Row="0" 
+                   Grid.Column="1"
                    Text="{Binding Title}"
                    FontSize="16"
                    TextTrimming="CharacterEllipsis"/>
-        
+
+        <Button Grid.Column="1"
+                Grid.Row="1"
+                Command="{Binding OpenOnGitHub}"
+                Content="{Binding Number}"
+                FontFamily="Segoe UI"
+                HorizontalAlignment="Left"
+                Style="{StaticResource HashtagActionLink}" />
+
         <ui:MarkdownViewer Grid.Row="2"
+                           Grid.ColumnSpan="2"
+                           Margin="0 16"
                            DocumentStyle="{StaticResource DocumentStyle}"
                            RawContent="{Binding Body}"
                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>

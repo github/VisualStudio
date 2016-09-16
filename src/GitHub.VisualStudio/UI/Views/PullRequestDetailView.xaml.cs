@@ -1,8 +1,10 @@
-﻿using GitHub.Exports;
+﻿using System;
+using System.ComponentModel.Composition;
+using GitHub.Exports;
+using GitHub.Extensions;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
-using System.ComponentModel.Composition;
-using System.Windows.Controls;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -20,7 +22,16 @@ namespace GitHub.VisualStudio.UI.Views
 
             this.WhenActivated(d =>
             {
+                d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
             });
+        }
+
+        void DoOpenOnGitHub()
+        {
+            var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+            var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+            var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Number);
+            browser.OpenUrl(url);
         }
     }
 }
