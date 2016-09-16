@@ -45,7 +45,6 @@ namespace GitHub.VisualStudio.UI.Views
         protected void NotifyOpen(ViewWithData id)
         {
             open.OnNext(id);
-            open.OnCompleted();
         }
 
         protected void NotifyCreate()
