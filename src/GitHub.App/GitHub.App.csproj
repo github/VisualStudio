@@ -127,6 +127,7 @@
     <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
+    <Compile Include="Models\PullRequestDetailModel.cs" />
     <Compile Include="Models\PullRequestModel.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

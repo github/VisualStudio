@@ -22,6 +22,5 @@ namespace GitHub.VisualStudio.UI.Views
             {
             });
         }
-
     }
 }

@@ -6,27 +6,50 @@
                                     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignHeight="300"
                                     d:DesignWidth="300"
                                     mc:Ignorable="d">
-  <d:DesignProperties.DataContext>
-    <Binding>
-      <Binding.Source>
-        <sampleData:PullRequestDetailViewModelDesigner />
-      </Binding.Source>
-    </Binding>
-  </d:DesignProperties.DataContext>
+    <d:DesignProperties.DataContext>
+        <Binding>
+            <Binding.Source>
+                <sampleData:PullRequestDetailViewModelDesigner />
+            </Binding.Source>
+        </Binding>
+    </d:DesignProperties.DataContext>
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="PagePadding" Value="0"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-  <Grid />
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" 
+                   Text="{Binding Title}"
+                   FontSize="16"
+                   TextTrimming="CharacterEllipsis"/>
+        
+        <ui:MarkdownViewer Grid.Row="2"
+                           DocumentStyle="{StaticResource DocumentStyle}"
+                           RawContent="{Binding Body}"
+                           ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+    </Grid>
 </local:GenericPullRequestDetailView>
