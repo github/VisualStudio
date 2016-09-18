@@ -209,6 +209,53 @@ public class RepositoryCloneViewModelTests
         }
     }
 
+    public class TheFilterTextEnabledProperty : TestBaseClass
+    {
+        [Fact]
+        public void IsTrueInitially()
+        {
+            var repoSubject = new Subject<IRemoteRepositoryModel>();
+            var col = TrackingCollection.Create(repoSubject);
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>()).Returns(_ => col);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+
+            var vm = new RepositoryCloneViewModel(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<INotificationService>(),
+                Substitute.For<IUsageTracker>());
+
+            Assert.False(vm.LoadingFailed);
+            Assert.True(vm.FilterTextIsEnabled);
+        }
+
+        [Fact]
+        public void IsFalseIfLoadingReposFails()
+        {
+            var repoSubject = new Subject<IRemoteRepositoryModel>();
+            var col = TrackingCollection.Create(repoSubject);
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>()).Returns(_ => col);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = GetVM(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<INotificationService>(),
+                Substitute.For<IUsageTracker>());
+
+            Assert.False(vm.LoadingFailed);
+
+            repoSubject.OnError(new InvalidOperationException("Doh!"));
+
+            Assert.True(vm.LoadingFailed);
+            Assert.False(vm.FilterTextIsEnabled);
+            repoSubject.OnCompleted();
+        }
+    }
+
     public class TheLoadingFailedProperty : TestBaseClass
     {
         [Fact]
