@@ -254,6 +254,27 @@ public class RepositoryCloneViewModelTests
             Assert.False(vm.FilterTextIsEnabled);
             repoSubject.OnCompleted();
         }
+
+        [Fact]
+        public void IsFalseWhenLoadingCompleteNotFailedAndNoRepositories()
+        {
+            var repoSubject = new Subject<IRemoteRepositoryModel>();
+            var col = TrackingCollection.Create(repoSubject);
+            var repositoryHost = Substitute.For<IRepositoryHost>();
+            repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>()).Returns(_ => col);
+
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var vm = GetVM(
+                repositoryHost,
+                cloneService,
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<INotificationService>(),
+                Substitute.For<IUsageTracker>());
+
+            repoSubject.OnCompleted();
+
+            Assert.False(vm.FilterTextIsEnabled);
+        }
     }
 
     public class TheLoadingFailedProperty : TestBaseClass
