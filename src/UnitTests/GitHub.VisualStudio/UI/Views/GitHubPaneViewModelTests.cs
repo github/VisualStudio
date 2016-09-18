@@ -19,16 +19,14 @@ using Xunit;
 
 public class GitHubPaneViewModelTests : TestBaseClass
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly IUIController uiController;
-    private readonly FakeMenuCommandService menuCommandService;
-    private readonly GitHubPaneViewModel viewModel;
-    private UIViewType lastUiControllerJump;
+    readonly IServiceProvider serviceProvider;
+    readonly IUIController uiController;
+    readonly FakeMenuCommandService menuCommandService;
+    readonly GitHubPaneViewModel viewModel;
+    UIViewType lastUiControllerJump;
 
     public GitHubPaneViewModelTests()
     {
-        #region Start tests already logged in with an active repo.
-
         var repositoryHosts = Substitutes.RepositoryHosts;
         repositoryHosts.IsLoggedInToAnyHost.Returns(true);
 
@@ -36,10 +34,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
         var activeRepo = Substitute.For<ILocalRepositoryModel>();
         activeRepo.CloneUrl.Returns(new UriString("https://github.com/foo/foo"));
         teamExplorerServiceHolder
-            .When(_ => _.Subscribe(Arg.Any<object>(), Arg.Any<Action<ILocalRepositoryModel>>()))
-            .Do(_ =>
+            .When(x => x.Subscribe(Arg.Any<object>(), Arg.Any<Action<ILocalRepositoryModel>>()))
+            .Do(x =>
             {
-                var invokeAction = _.Arg<Action<ILocalRepositoryModel>>();
+                var invokeAction = x.Arg<Action<ILocalRepositoryModel>>();
                 invokeAction(activeRepo);
             });
 
@@ -56,26 +54,19 @@ public class GitHubPaneViewModelTests : TestBaseClass
         host.IsLoggedIn.Returns(true);
         repositoryHosts.LookupHost(connectionHostAddress).Returns(host);
 
-        #endregion
-
-        #region Wire up service/UI provider.
-
         serviceProvider = Substitutes.GetFullyMockedServiceProvider();
         menuCommandService = new FakeMenuCommandService();
         serviceProvider.GetService(typeof(IMenuCommandService)).Returns(menuCommandService);
 
-        // TODO: Maybe could avoid cast by making a new interface that inherits IServiceProvider and IUIProvider
         var uiProvider = serviceProvider as IUIProvider;
         uiProvider.TryGetService(typeof(IUIProvider)).Returns(serviceProvider);
-
-        #endregion
 
         uiController = Substitute.For<IUIController>();
         uiController.CurrentFlow.Returns(UIControllerFlow.PullRequests);
         uiController.SelectedFlow.Returns(UIControllerFlow.PullRequests);
         uiController
-            .When(_ => _.Jump(Arg.Any<ViewWithData>()))
-            .Do(_ => lastUiControllerJump = _.Arg<ViewWithData>().ViewType);
+            .When(x => x.Jump(Arg.Any<ViewWithData>()))
+            .Do(x => lastUiControllerJump = x.Arg<ViewWithData>().ViewType);
 
         var exportFactoryProvider = Substitutes.ExportFactoryProvider;
         uiProvider.TryGetService(typeof(IExportFactoryProvider)).Returns(exportFactoryProvider);
@@ -112,10 +103,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
     private void RunSteps(IEnumerable<NavStep> steps)
     {
         var observableSteps = steps
-            .Select(_ => new LoadData
+            .Select(x => new LoadData
             {
-                Direction = _.Direction,
-                Data = new ViewWithData() { ViewType = _.ViewType },
+                Direction = x.Direction,
+                Data = new ViewWithData() { ViewType = x.ViewType },
                 View = Substitute.For<IView>()
             })
             .ToObservable();
