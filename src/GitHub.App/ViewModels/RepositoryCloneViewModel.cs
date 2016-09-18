@@ -77,6 +77,7 @@ namespace GitHub.ViewModels
 
             filterTextIsEnabled = this.WhenAny(x => x.IsLoading, x => x.LoadingFailed, 
                 (loading, loadingFailed) => !loadingFailed.Value)
+                .Select(x => x || repositories.UnfilteredCount > 0)
                 .ToProperty(this, x => x.FilterTextIsEnabled, initialValue: true);
 
             this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed,
