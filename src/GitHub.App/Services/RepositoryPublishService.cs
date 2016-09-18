@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using LibGit2Sharp;
@@ -38,11 +39,16 @@ namespace GitHub.Services
             IApiClient apiClient)
         {
             return Observable.Defer(() => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                         .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = activeRepository }))
-                    .SelectMany(repo => gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl)).Select(_ => repo))
-                    .SelectMany(repo => gitClient.Push(repo.LocalRepo, "master", "origin").Select(_ => repo))
-                    .SelectMany(repo => gitClient.Fetch(repo.LocalRepo, "origin").Select(_ => repo))
-                    .SelectMany(repo => gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin").Select(_ => repo.RemoteRepo));
+                                     .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = activeRepository }))
+                             .Select(async repo =>
+                             {
+                                 await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl));
+                                 await gitClient.Push(repo.LocalRepo, "master", "origin");
+                                 await gitClient.Fetch(repo.LocalRepo, "origin");
+                                 await gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin");
+                                 return repo.RemoteRepo;
+                             })
+                            .Select(t => t.Result);
         }
     }
 }
