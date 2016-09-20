@@ -111,7 +111,7 @@
       - [ ] Team Explorer Connect page: GitHub invitation section appears in Hosted Service Providers with Connect.. and Sign up links
 
 # In GitHub pane (logged in)
-- [ ] Go to Team Explorer > Home > Pull Requests
+- [ ] **Go to Team Explorer > Home > Pull Requests**
       - [ ] List of pull requests is displayed.
       - [ ] Pane title displays "GitHub | (current repository)""
       - [ ] Selected pane tab title (on the bottom) displays "GitHub"
@@ -119,12 +119,19 @@
       - [ ] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
       - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
       - [ ] "Create New" Link button displayed.
-- [ ] Click on Create New button
-      - [ ] Pane title displays "GitHub | (current repository)""
+- [ ] **Click on Create New button**
+      - [ ] Pane title displays "GitHub | (current repository)"
       - [ ] Selected pane tab title (on the bottom) displays "GitHub"
       - [ ] Create Pull Request button is disabled.
-      - [ ] List of pull requests is displayed.
-      - [ ] List of pull requests is displayed.
+      - [ ] Default/target branch name is displayed to the left of the arrow (<)
+      - [ ] Source branch is displayed to the right of the arrow
+      - [ ] Default/target branch is a dropdown of all branches
+      - [ ] Clicking on Cancel button navigates back to the pull request list
+- [ ] **Fill out pull request Title**
+      - [ ] Create Pull Request button is enabled.
+      - [ ] ...
+
+
 
 # Connections
 - [ ] **Login to GitHub.com, then click on the "Manage Connections" header and "Connect to GitHub"**
