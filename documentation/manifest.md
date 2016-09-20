@@ -118,7 +118,9 @@
       - [ ] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
       - [ ] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
       - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
-      - [ ] "Create New" Link button displayed.
+      - [ ] "Create New" Link button is displayed
+      - [ ] Clicking on a pull request title opens browser window to pull request on .com
+      - [ ] Clicking on a pull request number opens browser window to pull request on .com
 - [ ] **Click on Create New button**
       - [ ] Pane title displays "GitHub | (current repository)"
       - [ ] Selected pane tab title (on the bottom) displays "GitHub"
@@ -129,7 +131,25 @@
       - [ ] Clicking on Cancel button navigates back to the pull request list
 - [ ] **Fill out pull request Title**
       - [ ] Create Pull Request button is enabled.
-      - [ ] ...
+- [ ] **Click on Create Pull Request**
+      - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
+      - [ ] Pull request list is displayed with new pull request (that was just created) at the top of the list
+
+# In VS text/code Editor (logged in to GitHub) [GIST, can this be done logged out???]
+- [ ] **Highlight code or text within solution, then right click.**
+      - [ ] GitHub context menu is visible
+      - [ ] "Create a GitHub Gist" is visible     
+      - [ ] Open on Github is visible if code is hosted on GitHub repository
+      - [ ] Copy link to clipboard is visible if code is hosted on GitHub repository
+- [ ] **Click "Create a GitHub Gist"**
+      - [ ] Create gist dialog appears
+      - [ ] File name textbox populated with name of file that highlighted source code came from
+      - [ ] Private Gist checkbox unchecked
+      - [ ] Create button enabled
+      - [ ] Clearing file name textbox disables the Create button
+- [ ] **Click create button**
+      - [ ] Dialog disappears
+      - [ ]
 
 
 
