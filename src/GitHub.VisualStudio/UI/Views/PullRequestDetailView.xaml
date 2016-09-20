@@ -172,7 +172,7 @@
 
                 <!-- PR Body -->
                 <ui:MarkdownViewer Grid.Column="2" Grid.Row="1"
-                                   Margin="2 6"
+                                   Margin="2 6 10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
