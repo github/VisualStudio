@@ -220,7 +220,7 @@ public class RepositoryCloneViewModelTests
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>()).Returns(_ => col);
             var cloneService = Substitute.For<IRepositoryCloneService>();
 
-            var vm = new RepositoryCloneViewModel(
+            var vm = GetVM(
                 repositoryHost,
                 cloneService,
                 Substitute.For<IOperatingSystem>(),
