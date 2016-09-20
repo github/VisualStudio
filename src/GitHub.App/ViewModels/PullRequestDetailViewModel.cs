@@ -16,9 +16,15 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
-        int number;
+        PullRequestState state;
+        string sourceBranchDisplayName;
+        string targetBranchDisplayName;
+        int commitCount;
+        int filesChangedCount;
         IAccount author;
+        DateTimeOffset createdAt;
         string body;
+        int number;
 
         [ImportingConstructor]
         PullRequestDetailViewModel(
@@ -38,6 +44,36 @@ namespace GitHub.ViewModels
             OpenOnGitHub = ReactiveCommand.Create();
         }
 
+        public PullRequestState State
+        {
+            get { return state; }
+            private set { this.RaiseAndSetIfChanged(ref state, value); }
+        }
+
+        public string SourceBranchDisplayName
+        {
+            get { return sourceBranchDisplayName; }
+            private set { this.RaiseAndSetIfChanged(ref sourceBranchDisplayName, value); }
+        }
+
+        public string TargetBranchDisplayName
+        {
+            get { return targetBranchDisplayName; }
+            private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        public int CommitCount
+        {
+            get { return commitCount; }
+            private set { this.RaiseAndSetIfChanged(ref commitCount, value); }
+        }
+
+        public int FilesChangedCount
+        {
+            get { return filesChangedCount; }
+            private set { this.RaiseAndSetIfChanged(ref filesChangedCount, value); }
+        }
+
         public int Number
         {
             get { return number; }
@@ -48,6 +84,12 @@ namespace GitHub.ViewModels
         {
             get { return author; }
             private set { this.RaiseAndSetIfChanged(ref author, value); }
+        }
+
+        public DateTimeOffset CreatedAt
+        {
+            get { return createdAt; }
+            private set { this.RaiseAndSetIfChanged(ref createdAt, value); }
         }
 
         public string Body
@@ -69,10 +111,32 @@ namespace GitHub.ViewModels
 
         void Load(IPullRequestDetailModel model)
         {
-            Number = model.Number;
+            State = CreatePullRequestState(model);
+            SourceBranchDisplayName = model.SourceBranchLabel;
+            TargetBranchDisplayName = model.TargetBranchLabel;
+            CommitCount = model.CommitCount;
+            FilesChangedCount = model.FilesChangedCount;
             Title = model.Title;
+            Number = model.Number;
             Author = model.Author;
+            CreatedAt = model.CreatedAt;
             Body = model.Body;
+        }
+
+        static PullRequestState CreatePullRequestState(IPullRequestDetailModel model)
+        {
+            if (model.IsOpen)
+            {
+                return new PullRequestState(true, "Open");
+            }
+            else if (model.Merged)
+            {
+                return new PullRequestState(false, "Merged");
+            }
+            else
+            {
+                return new PullRequestState(false, "Closed");
+            }
         }
     }
 }

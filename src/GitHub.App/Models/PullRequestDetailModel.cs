@@ -15,6 +15,10 @@ namespace GitHub.Models
         {
         }
 
+        public string SourceBranchLabel { get; set; }
+        public string TargetBranchLabel { get; set; }
+        public int CommitCount { get; set; }
+        public int FilesChangedCount { get; set; }
         public string Body { get; set; } = string.Empty;
     }
 }

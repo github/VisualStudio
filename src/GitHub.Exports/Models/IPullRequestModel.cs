@@ -10,6 +10,7 @@ namespace GitHub.Models
         string Title { get; }
         int CommentCount { get; }
         bool IsOpen { get; }
+        bool Merged { get; }
         bool HasNewComments { get; }
         DateTimeOffset CreatedAt { get; }
         DateTimeOffset UpdatedAt { get; }

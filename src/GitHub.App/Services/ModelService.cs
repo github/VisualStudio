@@ -355,7 +355,8 @@ namespace GitHub.Services
                 prCacheItem.UpdatedAt)
             {
                 CommentCount = prCacheItem.CommentCount,
-                IsOpen = prCacheItem.IsOpen
+                IsOpen = prCacheItem.IsOpen,
+                Merged = prCacheItem.Merged,
             };
         }
 
@@ -371,6 +372,11 @@ namespace GitHub.Services
             {
                 CommentCount = pr.Comments + pr.ReviewComments,
                 IsOpen = pr.State == ItemState.Open,
+                Merged = pr.Merged,
+                SourceBranchLabel = pr.Head.Label,
+                TargetBranchLabel = pr.Base.Label,
+                CommitCount = pr.Commits,
+                FilesChangedCount = pr.ChangedFiles,
                 Body = pr.Body,
             };
         }
@@ -467,6 +473,7 @@ namespace GitHub.Services
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
                 IsOpen = pr.State == ItemState.Open;
+                Merged = pr.Merged;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
             }
@@ -482,6 +489,7 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public bool IsOpen { get; set; }
+            public bool Merged { get; set; }
         }
     }
 }
