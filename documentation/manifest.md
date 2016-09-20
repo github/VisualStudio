@@ -21,7 +21,7 @@
               - [ ] Connect dialog disappears
               - [ ] GitHub invitation section in Connect page disappears
               - [ ] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
-                
+
 # In Team Explorer Connect page (logged in)
   - [ ] **Click on Clone action link**
       - [ ] Clone dialog appears
@@ -38,7 +38,7 @@
   - [ ] **Select a repository and click Clone**
       - [ ] Clone dialog disappears
       - [ ] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
-      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed. 
+      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed.
       - [ ] Repository shows up in the "Local Git Repositories" list
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
       - [ ] Team Explorer view changes to Home page
@@ -83,9 +83,9 @@
         - [ ] Progress bar appears above Synchronization title
         - [ ] Team Explorer view changes to Home page
         - [ ] Notification appears: "Repository published successfully"
-        - [ ] Publish a private repo and verify on .com that it's private 
-- [ ] **Project section (Home button)*** 
-    - [ ] Click on "Home" icon 
+        - [ ] Publish a private repo and verify on .com that it's private
+- [ ] **Project section (Home button)***
+    - [ ] Click on "Home" icon
         - [ ] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
         - [ ] Verify Pulse button navigates to Pulse page on Github.com
         - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
@@ -109,7 +109,23 @@
       - [ ] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Login links
     - [ ]  Disconnect from TFS (right click on project and "Remove"
       - [ ] Team Explorer Connect page: GitHub invitation section appears in Hosted Service Providers with Connect.. and Sign up links
-      
+
+# In GitHub pane (logged in)
+- [ ] Go to Team Explorer > Home > Pull Requests
+      - [ ] List of pull requests is displayed.
+      - [ ] Pane title displays "GitHub | (current repository)""
+      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
+      - [ ] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
+      - [ ] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
+      - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
+      - [ ] "Create New" Link button displayed.
+- [ ] Click on Create New button
+      - [ ] Pane title displays "GitHub | (current repository)""
+      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
+      - [ ] Create Pull Request button is disabled.
+      - [ ] List of pull requests is displayed.
+      - [ ] List of pull requests is displayed.
+
 # Connections
 - [ ] **Login to GitHub.com, then click on the "Manage Connections" header and "Connect to GitHub"**
       - [ ] Login dialog appears
