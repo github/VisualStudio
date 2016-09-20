@@ -135,6 +135,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SampleData\AccountDesigner.cs" />
+    <Compile Include="SampleData\LocalRepositoryModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
     <Compile Include="SampleData\LoggedOutViewModelDesigner.cs" />

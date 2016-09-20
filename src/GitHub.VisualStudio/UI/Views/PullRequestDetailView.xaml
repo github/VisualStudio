@@ -9,8 +9,8 @@
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     DataContext="{Binding ViewModel}"
-                                    d:DesignHeight="300"
-                                    d:DesignWidth="300"
+                                    d:DesignWidth="356"
+                                    d:DesignHeight="515"
                                     mc:Ignorable="d">
     <d:DesignProperties.DataContext>
         <Binding>
@@ -26,6 +26,17 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="Separator1" TargetType="Rectangle">
+                <Setter Property="Fill" Value="#D3D1E6"/>
+                <Setter Property="Height" Value="2"/>
+            </Style>
+
+            <Style x:Key="Separator2" TargetType="Rectangle">
+                <Setter Property="Fill" Value="#E2E6EE"/>
+                <Setter Property="Height" Value="2"/>
+            </Style>
+
             <Style x:Key="DocumentStyle" TargetType="FlowDocument">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="12"/>
@@ -35,11 +46,16 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Margin="4">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- PR Title and number-->
+            <RowDefinition Height="2"/> 
+            <RowDefinition Height="Auto"/> <!-- PR Details -->
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="Auto"/> <!-- Author and open time-->
+            <RowDefinition Height="*"/>    <!-- Body -->
+            <RowDefinition Height="Auto"/> <!-- View on github link -->
+            <RowDefinition Height="*"/>    <!-- Files changed -->
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -47,37 +63,84 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.RowSpan="2" Grid.Column="0" Margin="0 0 10 0">
+        <!-- PR Title and number -->
+        <DockPanel Grid.Row="0" 
+                   Grid.ColumnSpan="2"
+                   Margin="10">
+            <TextBlock DockPanel.Dock="Right"
+                       FontSize="9pt"
+                       Foreground="Gray"
+                       Margin="4 4 0 0"
+                       Text="{Binding Number, StringFormat=#{0}}"
+                       VerticalAlignment="Top"/>
+            <TextBlock Text="{Binding Title}"
+                   FontSize="12pt"
+                   TextWrapping="Wrap"/>
+        </DockPanel>
+
+        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Separator1}"/>
+
+        <!-- PR Details -->
+        <ui:OcticonImage Grid.Row="2" Grid.Column="0" Margin="8" Icon="git_pull_request"/>
+        <StackPanel Grid.Row="2" Grid.Column="1">
+            <StackPanel Orientation="Horizontal" Margin="6">
+                <!-- PR Open/Closed/Merged state -->
+                <TextBlock Background="#6CC644" Foreground="White" Padding="14 4" Margin="0 0 12 0">Open</TextBlock>
+                
+                <!-- Target < Source branch -->
+                <TextBlock Text="{Binding TargetBranch.DisplayName}" VerticalAlignment="Center"/>
+                <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 3 3 0"/>
+                <TextBlock Text="{Binding SourceBranch.DisplayName}" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <Rectangle Style="{StaticResource Separator2}" Margin="4 0"/>
+
+            <StackPanel Orientation="Horizontal" Margin="6">
+                <!-- Commit count-->
+                <ui:OcticonImage Icon="git_commit" Margin="0 1 0 0"/>
+                <TextBlock Margin="2 0" Text="{Binding CommitCount, StringFormat={}{0} commits}"/>
+                
+                <!-- File change count -->
+                <ui:OcticonImage Icon="diff" Margin="28 0 0 0"/>
+                <TextBlock Margin="2 0" Text="{Binding FilesChangedCount, StringFormat={}{0} files changed}"/>
+            </StackPanel>
+
+            <Rectangle Style="{StaticResource Separator2}" Margin="4 0"/>
+
+            <Button Margin="6"
+                    Style="{StaticResource GitHubVsButton}">
+                Checkout pull request
+            </Button>
+        </StackPanel>
+
+        <Rectangle Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Separator1}"/>
+
+        <!-- Author avatar -->
+        <Grid Grid.Row="4" Grid.Column="0" VerticalAlignment="Top" Margin="0 8">
             <Grid.OpacityMask>
                 <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
             </Grid.OpacityMask>
-            <Border Name="avatarMask" Background="White" CornerRadius="3" />
+            <Border Name="avatarMask" Background="White" CornerRadius="3" Width="24" />
             <Image x:Name="avatar"
-                   Width="48"
-                   Height="48"
+                   Width="24"
+                   Height="24"
                    RenderOptions.BitmapScalingMode="HighQuality"
                    Source="{Binding Author.Avatar}" />
         </Grid>
 
-        <TextBlock Grid.Row="0" 
-                   Grid.Column="1"
-                   Text="{Binding Title}"
-                   FontSize="16"
-                   TextTrimming="CharacterEllipsis"/>
-
-        <Button Grid.Column="1"
-                Grid.Row="1"
-                Command="{Binding OpenOnGitHub}"
-                Content="{Binding Number}"
-                FontFamily="Segoe UI"
-                HorizontalAlignment="Left"
-                Style="{StaticResource HashtagActionLink}" />
-
-        <ui:MarkdownViewer Grid.Row="2"
-                           Grid.ColumnSpan="2"
-                           Margin="0 16"
+        <!-- Author and open time -->
+        <TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Margin="6">
+            <Run FontWeight="Bold" Text="{Binding Author.Login}"/>
+            <Run Text="{Binding OpenTimeFriendly, StringFormat={}opened {0} ago}"/>
+        </TextBlock>
+        
+        <!-- PR Body -->
+        <ui:MarkdownViewer Grid.Row="5" Grid.Column="1"
                            DocumentStyle="{StaticResource DocumentStyle}"
                            RawContent="{Binding Body}"
                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+        <!-- View on github link -->
+        <ui:GitHubActionLink Grid.Row="6" Grid.Column="1">View conversation on GitHub</ui:GitHubActionLink>
     </Grid>
 </local:GenericPullRequestDetailView>

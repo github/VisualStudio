@@ -60,9 +60,9 @@ namespace GitHub.ViewModels
 
         public override void Initialize([AllowNull] ViewWithData data)
         {
-            var number = (int)data.Data;
+            var prNumber = (int)data.Data;
             IsBusy = true;
-            repositoryHost.ModelService.GetPullRequest(repository, number)
+            repositoryHost.ModelService.GetPullRequest(repository, prNumber)
                 .Finally(() => IsBusy = false)
                 .Subscribe(Load);
         }
