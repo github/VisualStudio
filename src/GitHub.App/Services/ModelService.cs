@@ -177,13 +177,6 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestDetailModel> GetPullRequest(ILocalRepositoryModel repo, int number)
-        {
-            // TODO: Cache if we want to.
-            return apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number)
-                .Select(CreateDetail);
-        }
-
         public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
         {
             var keyobs = GetUserFromCache()
@@ -357,27 +350,6 @@ namespace GitHub.Services
                 CommentCount = prCacheItem.CommentCount,
                 IsOpen = prCacheItem.IsOpen,
                 Merged = prCacheItem.Merged,
-            };
-        }
-
-        IPullRequestDetailModel CreateDetail(PullRequest pr)
-        {
-            return new PullRequestDetailModel(
-                pr.Number,
-                pr.Title,
-                Create(new AccountCacheItem(pr.User)),
-                pr.Assignee != null ? Create(new AccountCacheItem(pr.Assignee)) : null,
-                pr.CreatedAt,
-                pr.UpdatedAt)
-            {
-                CommentCount = pr.Comments + pr.ReviewComments,
-                IsOpen = pr.State == ItemState.Open,
-                Merged = pr.Merged,
-                SourceBranchLabel = pr.Head.Label,
-                TargetBranchLabel = pr.Base.Label,
-                CommitCount = pr.Commits,
-                FilesChangedCount = pr.ChangedFiles,
-                Body = pr.Body,
             };
         }
 

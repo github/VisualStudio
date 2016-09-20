@@ -6,6 +6,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using NullGuard;
+using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -104,32 +105,32 @@ namespace GitHub.ViewModels
         {
             var prNumber = (int)data.Data;
             IsBusy = true;
-            repositoryHost.ModelService.GetPullRequest(repository, prNumber)
+            repositoryHost.ApiClient.GetPullRequest(repository.Owner, repository.CloneUrl.RepositoryName, prNumber)
                 .Finally(() => IsBusy = false)
                 .Subscribe(Load);
         }
 
-        void Load(IPullRequestDetailModel model)
+        void Load(PullRequest pullRequest)
         {
-            State = CreatePullRequestState(model);
-            SourceBranchDisplayName = GetBranchDisplayName(model.SourceBranchLabel);
-            TargetBranchDisplayName = GetBranchDisplayName(model.TargetBranchLabel);
-            CommitCount = model.CommitCount;
-            FilesChangedCount = model.FilesChangedCount;
-            Title = model.Title;
-            Number = model.Number;
-            Author = model.Author;
-            CreatedAt = model.CreatedAt;
-            Body = model.Body;
+            State = CreatePullRequestState(pullRequest);
+            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
+            CommitCount = pullRequest.Commits;
+            FilesChangedCount = pullRequest.ChangedFiles;
+            Title = pullRequest.Title;
+            Number = pullRequest.Number;
+            Author = new Models.Account(pullRequest.User);
+            CreatedAt = pullRequest.CreatedAt;
+            Body = pullRequest.Body;
         }
 
-        static PullRequestState CreatePullRequestState(IPullRequestDetailModel model)
+        static PullRequestState CreatePullRequestState(PullRequest pullRequest)
         {
-            if (model.IsOpen)
+            if (pullRequest.State == ItemState.Open)
             {
                 return new PullRequestState(true, "Open");
             }
-            else if (model.Merged)
+            else if (pullRequest.Merged)
             {
                 return new PullRequestState(false, "Merged");
             }

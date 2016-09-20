@@ -9,7 +9,7 @@ using GitHub.SampleData;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class PullRequestModel : NotificationAwareObject, IPullRequestModel,
+    public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel,
         IEquatable<PullRequestModel>,
         IComparable<PullRequestModel>
     {

@@ -111,7 +111,6 @@
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
-    <Compile Include="Models\IPullRequestDetailModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
     <Compile Include="Models\RepositoryModelBase.cs" />
