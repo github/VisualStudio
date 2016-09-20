@@ -112,8 +112,8 @@ namespace GitHub.ViewModels
         void Load(IPullRequestDetailModel model)
         {
             State = CreatePullRequestState(model);
-            SourceBranchDisplayName = model.SourceBranchLabel;
-            TargetBranchDisplayName = model.TargetBranchLabel;
+            SourceBranchDisplayName = GetBranchDisplayName(model.SourceBranchLabel);
+            TargetBranchDisplayName = GetBranchDisplayName(model.TargetBranchLabel);
             CommitCount = model.CommitCount;
             FilesChangedCount = model.FilesChangedCount;
             Title = model.Title;
@@ -137,6 +137,13 @@ namespace GitHub.ViewModels
             {
                 return new PullRequestState(false, "Closed");
             }
+        }
+
+        string GetBranchDisplayName(string targetBranchLabel)
+        {
+            var parts = targetBranchLabel.Split(':');
+            var owner = parts[0];
+            return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
         }
     }
 }
