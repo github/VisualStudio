@@ -205,6 +205,8 @@
     <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestDirectoryViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestFileViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />

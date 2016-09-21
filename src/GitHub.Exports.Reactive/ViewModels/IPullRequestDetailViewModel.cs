@@ -15,6 +15,7 @@ namespace GitHub.ViewModels
         DateTimeOffset CreatedAt { get; }
         int Number { get; }
         string Body { get; }
+        IReactiveList<IPullRequestChangeNode> Changes { get; }
 
         ReactiveCommand<object> OpenOnGitHub { get; }
     }
