@@ -8,10 +8,11 @@
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
+                                    xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
-                                    d:DesignHeight="515"
+                                    d:DesignHeight="640"
                                     mc:Ignorable="d">
     <d:DesignProperties.DataContext>
         <Binding>
@@ -169,7 +170,7 @@
                 <!-- Author and open time -->
                 <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0 6">
                     <Run FontWeight="Bold" Text="{Binding Author.Login}"/>
-                    <Run Text="{Binding CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}}"/>
+                    <Run Text="{Binding CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
                 </TextBlock>
 
                 <!-- PR Body -->
@@ -191,34 +192,36 @@
                                  Icon="diff"/>
 
                 <!-- Files changed -->
-                <Expander Grid.Column="2" Grid.Row="3" IsExpanded="True">
-                    <Expander.Header>
-                        <TextBlock FontWeight="Bold" Text="{Binding ChangeCount, StringFormat=Changes ({0})}"/>
-                    </Expander.Header>
-                    <TreeView ItemsSource="{Binding Changes}" BorderThickness="0">
-                        <TreeView.ItemContainerStyle>
-                            <Style TargetType="TreeViewItem">
-                                <Setter Property="IsExpanded" Value="True"/>
-                            </Style>
-                        </TreeView.ItemContainerStyle>
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
+                <te:SectionControl Grid.Column="2" Grid.Row="3"
+                                   IsExpanded="True"
+                                   HeaderText="{Binding ChangeCount, StringFormat=Changes ({0})}"
+                                   Margin="0 5 10 0">
+                    <te:SectionControl.Content>
+                        <TreeView ItemsSource="{Binding Changes}" BorderThickness="0">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="True"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
                                                       ItemsSource="{Binding Children}">
-                                <StackPanel Orientation="Horizontal">
-                                    <!-- TODO: Use the right icon here -->
-                                    <ui:OcticonImage Icon="briefcase" Margin="4"/>
-                                    <TextBlock Text="{Binding DirectoryName}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </HierarchicalDataTemplate>
-                            <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:OcticonImage Icon="file_code" Margin="4"/>
-                                    <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </TreeView.Resources>
-                    </TreeView>
-                </Expander>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- TODO: Use the right icon here -->
+                                        <ui:OcticonImage Icon="briefcase" Margin="4"/>
+                                        <TextBlock Text="{Binding DirectoryName}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+                                <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:OcticonImage Icon="file_code" Margin="4"/>
+                                        <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
+                    </te:SectionControl.Content>
+                </te:SectionControl>
             </Grid>
         </ScrollViewer>
 

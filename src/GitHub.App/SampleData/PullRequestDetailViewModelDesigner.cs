@@ -39,6 +39,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
             modelsDir.Files.Add(oldBranchModel);
             gitHubDir.Directories.Add(modelsDir);
 
+            ChangeCount = 3;
             Changes = new ReactiveList<IPullRequestChangeNode>();
             Changes.Add(gitHubDir);
         }
@@ -52,6 +53,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public DateTimeOffset CreatedAt { get; }
         public int Number { get; }
         public string Body { get; }
+        public int ChangeCount { get; }
         public IReactiveList<IPullRequestChangeNode> Changes { get; }
 
         public ReactiveCommand<object> OpenOnGitHub { get; }
