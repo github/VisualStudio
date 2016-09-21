@@ -5,6 +5,7 @@ using GitHub.Extensions;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
+using GitHub.VisualStudio.UI.Helpers;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -19,6 +20,9 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestDetailView()
         {
             InitializeComponent();
+
+            bodyMarkdown.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
+            changesSection.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
 
             this.WhenActivated(d =>
             {

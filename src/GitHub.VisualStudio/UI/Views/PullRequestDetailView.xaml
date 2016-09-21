@@ -174,7 +174,8 @@
                 </TextBlock>
 
                 <!-- PR Body -->
-                <ui:MarkdownViewer Grid.Column="2" Grid.Row="1"
+                <ui:MarkdownViewer Name="bodyMarkdown"
+                                   Grid.Column="2" Grid.Row="1"
                                    Margin="2 6 10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
@@ -192,7 +193,8 @@
                                  Icon="diff"/>
 
                 <!-- Files changed -->
-                <te:SectionControl Grid.Column="2" Grid.Row="3"
+                <te:SectionControl Name="changesSection" 
+                                   Grid.Column="2" Grid.Row="3"
                                    IsExpanded="True"
                                    HeaderText="{Binding ChangeCount, StringFormat=Changes ({0})}"
                                    Margin="0 5 10 0">

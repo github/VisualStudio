@@ -7,6 +7,7 @@ using GitHub.Services;
 using GitHub.Models;
 using System;
 using System.Windows.Input;
+using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -17,33 +18,9 @@ namespace GitHub.VisualStudio.UI.Views
             InitializeComponent();
 
             DataContextChanged += (s, e) => ViewModel = e.NewValue as IGitHubConnectSection;
-            repositories.PreviewMouseWheel += Repositories_PreviewMouseWheel;
+            repositories.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
 
-        void Repositories_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            try
-            {
-                if (!e.Handled)
-                {
-                    var uIElement = base.Parent as UIElement;
-
-                    if (uIElement != null)
-                    {
-                        e.Handled = true;
-                        uIElement.RaiseEvent(new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
-                        {
-                            RoutedEvent = UIElement.MouseWheelEvent,
-                            Source = this
-                        });
-                    }
-                }
-            }
-            catch
-            {
-                // TODO: Add trace logging: event handler called - who knows what can happen!
-            }
-        }
         void cloneLink_Click(object sender, RoutedEventArgs e)
         {
             cloneLink.IsEnabled = false;
