@@ -1,6 +1,7 @@
 ﻿using System;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
@@ -18,7 +19,11 @@ namespace UnitTests.GitHub.App.ViewModels
             var repository = Substitute.For<ILocalRepositoryModel>();
             repository.CloneUrl.Returns(new UriString(Uri.ToString()));
 
-            var target = new PullRequestDetailViewModel(Substitute.For<IRepositoryHost>(), repository);
+            var target = new PullRequestDetailViewModel(
+                Substitute.For<IRepositoryHost>(),
+                repository,
+                Substitute.For<IAvatarProvider>());
+
             var files = new[]
             {
                 new PullRequestFile(string.Empty, "readme.md", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),

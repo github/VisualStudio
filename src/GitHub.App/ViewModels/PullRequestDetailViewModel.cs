@@ -4,6 +4,8 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Windows.Media.Imaging;
+using GitHub.Caches;
 using GitHub.Exports;
 using GitHub.Models;
 using GitHub.Services;
@@ -21,6 +23,7 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
+        readonly IAvatarProvider avatarProvider;
         PullRequestState state;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -35,17 +38,20 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
-            ITeamExplorerServiceHolder teservice)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo)
+            ITeamExplorerServiceHolder teservice,
+            IAvatarProvider avatarProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, avatarProvider)
         {
         }
 
         public PullRequestDetailViewModel(
             IRepositoryHost repositoryHost,
-            ILocalRepositoryModel repository)
+            ILocalRepositoryModel repository,
+            IAvatarProvider avatarProvider)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.avatarProvider = avatarProvider;
 
             OpenOnGitHub = ReactiveCommand.Create();
         }
@@ -139,7 +145,7 @@ namespace GitHub.ViewModels
             FilesChangedCount = pullRequest.ChangedFiles;
             Title = pullRequest.Title;
             Number = pullRequest.Number;
-            Author = new Models.Account(pullRequest.User);
+            Author = new Models.Account(pullRequest.User, GetAvatar(pullRequest.User));
             CreatedAt = pullRequest.CreatedAt;
             Body = pullRequest.Body;
             ChangeCount = files.Count;
@@ -212,6 +218,12 @@ namespace GitHub.ViewModels
             var parts = targetBranchLabel.Split(':');
             var owner = parts[0];
             return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
+        }
+
+        IObservable<BitmapSource> GetAvatar(User user)
+        {
+            return avatarProvider.GetAvatar(new AccountCacheItem(user))
+                .Do(_ => { });
         }
     }
 }
