@@ -168,9 +168,13 @@ namespace GitHub.ViewModels
 
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
-            ChangedFilesList.AddRange(CreateChangedFilesList(files));
 
             // WPF doesn't support AddRange here so iterate through the changes.
+            foreach (var change in CreateChangedFilesList(files))
+            {
+                ChangedFilesList.Add(change);
+            }
+
             foreach (var change in CreateChangedFilesTree(ChangedFilesList).Children)
             {
                 ChangedFilesTree.Add(change);

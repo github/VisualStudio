@@ -42,6 +42,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
             ChangedFilesCount = 3;
             ChangedFilesTree = new ReactiveList<IPullRequestChangeNode>();
             ChangedFilesTree.Add(gitHubDir);
+
+            ChangedFilesList = new ReactiveList<IPullRequestFileViewModel>();
+            ChangedFilesList.Add(concurrentRepositoryConnection);
+            ChangedFilesList.Add(itrackingBranch);
+            ChangedFilesList.Add(oldBranchModel);
         }
 
         public PullRequestState State { get; }

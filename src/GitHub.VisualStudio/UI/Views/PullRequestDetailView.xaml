@@ -202,29 +202,60 @@
                                    HeaderText="{Binding ChangedFilesCount, StringFormat=Changes ({0})}"
                                    Margin="0 5 10 0">
                     <te:SectionControl.Content>
-                        <TreeView ItemsSource="{Binding ChangedFilesTree}" BorderThickness="0">
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="TreeViewItem">
-                                    <Setter Property="IsExpanded" Value="True"/>
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                            <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
+                        <Grid>
+                            <!-- Tree View -->
+                            <TreeView ItemsSource="{Binding ChangedFilesTree}" BorderThickness="0">
+                                <TreeView.Style>
+                                    <Style TargetType="TreeView">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="ListView">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TreeView.Style>
+                                <TreeView.ItemContainerStyle>
+                                    <Style TargetType="TreeViewItem">
+                                        <Setter Property="IsExpanded" Value="True"/>
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                                <TreeView.Resources>
+                                    <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
                                                           ItemsSource="{Binding Children}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <!-- TODO: Use the right icon here -->
-                                        <ui:OcticonImage Icon="briefcase" Margin="4"/>
-                                        <TextBlock Text="{Binding DirectoryName}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                                <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:OcticonImage Icon="file_code" Margin="4"/>
-                                        <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </TreeView.Resources>
-                        </TreeView>
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- TODO: Use the right icon here -->
+                                            <ui:OcticonImage Icon="briefcase" Margin="4"/>
+                                            <TextBlock Text="{Binding DirectoryName}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </HierarchicalDataTemplate>
+                                    <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:OcticonImage Icon="file_code" Margin="4"/>
+                                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </TreeView.Resources>
+                            </TreeView>
+
+                            <!-- List View -->
+                            <ListView ItemsSource="{Binding ChangedFilesList}" BorderThickness="0">
+                                <ListView.Style>
+                                    <Style TargetType="ListView">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="TreeView">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListView.Style>
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding FileName}"/>
+                                        <GridViewColumn Header="Path" Width="120" DisplayMemberBinding="{Binding Path}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Grid>
                     </te:SectionControl.Content>
                 </te:SectionControl>
             </Grid>
