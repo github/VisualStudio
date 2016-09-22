@@ -185,7 +185,7 @@
                                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
 
                 <!-- View on github link -->
-                <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6">
+                <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
