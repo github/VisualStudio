@@ -17,6 +17,15 @@ public class FakeMenuCommandService : IMenuCommandService
         addedCommands.Add(command);
     }
 
+    public void ExecuteCommand(int commandId)
+    {
+        var command = addedCommands.Find(_ => _.CommandID.ID == commandId);
+        if (command != null)
+        {
+            command.Invoke();
+        }
+    }
+
     public void AddVerb(DesignerVerb verb)
     {
         throw new NotImplementedException();
