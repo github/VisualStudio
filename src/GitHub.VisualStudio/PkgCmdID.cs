@@ -2,7 +2,7 @@
 // MUST match PkgCmdID.h
 namespace GitHub.VisualStudio
 {
-    static class PkgCmdIDList
+    public static class PkgCmdIDList
     {
         public const int addConnectionCommand = 0x110;
         public const int idGitHubToolbar = 0x1120;
