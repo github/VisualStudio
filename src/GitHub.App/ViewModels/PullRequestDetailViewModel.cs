@@ -34,6 +34,7 @@ namespace GitHub.ViewModels
         string body;
         int number;
         int changeCount;
+        ChangedFilesView changedFilesView;
 
         [ImportingConstructor]
         PullRequestDetailViewModel(
@@ -54,6 +55,13 @@ namespace GitHub.ViewModels
             this.avatarProvider = avatarProvider;
 
             OpenOnGitHub = ReactiveCommand.Create();
+
+            ToggleChangedFilesView = ReactiveCommand.Create();
+            ToggleChangedFilesView.Subscribe(_ =>
+            {
+                ChangedFilesView = ChangedFilesView == ChangedFilesView.TreeView ?
+                    ChangedFilesView.ListView : ChangedFilesView.TreeView;
+            });
         }
 
         public PullRequestState State
@@ -110,15 +118,23 @@ namespace GitHub.ViewModels
             private set { this.RaiseAndSetIfChanged(ref body, value); }
         }
 
-        public int ChangeCount
+        public int ChangedFilesCount
         {
             get { return changeCount; }
             private set { this.RaiseAndSetIfChanged(ref changeCount, value); }
         }
 
-        public IReactiveList<IPullRequestChangeNode> Changes { get; } = new ReactiveList<IPullRequestChangeNode>();
+        public ChangedFilesView ChangedFilesView
+        {
+            get { return changedFilesView; }
+            set { this.RaiseAndSetIfChanged(ref changedFilesView, value); }
+        }
+
+        public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
+        public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileViewModel>();
 
         public ReactiveCommand<object> OpenOnGitHub { get; }
+        public ReactiveCommand<object> ToggleChangedFilesView { get; }
 
         public override void Initialize([AllowNull] ViewWithData data)
         {
@@ -148,14 +164,16 @@ namespace GitHub.ViewModels
             Author = new Models.Account(pullRequest.User, GetAvatar(pullRequest.User));
             CreatedAt = pullRequest.CreatedAt;
             Body = pullRequest.Body;
-            ChangeCount = files.Count;
+            ChangedFilesCount = files.Count;
 
-            Changes.Clear();
+            ChangedFilesTree.Clear();
+            ChangedFilesList.Clear();
+            ChangedFilesList.AddRange(CreateChangedFilesList(files));
 
             // WPF doesn't support AddRange here so iterate through the changes.
-            foreach (var change in CreateTree(files).Children)
+            foreach (var change in CreateChangedFilesTree(ChangedFilesList).Children)
             {
-                Changes.Add(change);
+                ChangedFilesTree.Add(change);
             }
         }
 
@@ -175,16 +193,20 @@ namespace GitHub.ViewModels
             }
         }
 
-        static IPullRequestDirectoryViewModel CreateTree(IList<PullRequestFile> files)
+        static IEnumerable<IPullRequestFileViewModel> CreateChangedFilesList(IList<PullRequestFile> files)
+        {
+            return files.Select(x => new PullRequestFileViewModel(x.FileName, x.Status == "added", x.Status == "deleted"));
+        }
+
+        static IPullRequestDirectoryViewModel CreateChangedFilesTree(IEnumerable<IPullRequestFileViewModel> files)
         {
             var dirs = new Dictionary<string, PullRequestDirectoryViewModel>
             {
                 { string.Empty, new PullRequestDirectoryViewModel(string.Empty) }
             };
 
-            foreach (var f in files)
+            foreach (var file in files)
             {
-                var file = new PullRequestFileViewModel(f.FileName, f.Status == "added", f.Status == "deleted");
                 var dir = GetDirectory(file.Path, dirs);
                 dir.Files.Add(file);
             }

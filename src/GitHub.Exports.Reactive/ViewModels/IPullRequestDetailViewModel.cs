@@ -4,6 +4,12 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
+    public enum ChangedFilesView
+    {
+        TreeView,
+        ListView,
+    }
+
     public interface IPullRequestDetailViewModel : IViewModel, IHasBusy
     {
         PullRequestState State { get; }
@@ -15,9 +21,12 @@ namespace GitHub.ViewModels
         DateTimeOffset CreatedAt { get; }
         int Number { get; }
         string Body { get; }
-        int ChangeCount { get; }
-        IReactiveList<IPullRequestChangeNode> Changes { get; }
+        int ChangedFilesCount { get; }
+        ChangedFilesView ChangedFilesView { get; set; }
+        IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
+        IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
 
         ReactiveCommand<object> OpenOnGitHub { get; }
+        ReactiveCommand<object> ToggleChangedFilesView { get; }
     }
 }

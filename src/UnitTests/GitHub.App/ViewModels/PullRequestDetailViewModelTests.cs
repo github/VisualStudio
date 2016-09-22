@@ -35,9 +35,9 @@ namespace UnitTests.GitHub.App.ViewModels
 
             target.Load(CreatePullRequest(), files);
 
-            Assert.Equal(3, target.Changes.Count);
+            Assert.Equal(3, target.ChangedFilesTree.Count);
 
-            var dir1 = (PullRequestDirectoryViewModel)target.Changes[0];
+            var dir1 = (PullRequestDirectoryViewModel)target.ChangedFilesTree[0];
             Assert.Equal("dir1", dir1.DirectoryName);
             Assert.Equal(2, dir1.Files.Count);
             Assert.Equal(1, dir1.Directories.Count);
@@ -47,12 +47,12 @@ namespace UnitTests.GitHub.App.ViewModels
             Assert.Equal(1, dir1a.Files.Count);
             Assert.Equal(0, dir1a.Directories.Count);
 
-            var dir2 = (PullRequestDirectoryViewModel)target.Changes[1];
+            var dir2 = (PullRequestDirectoryViewModel)target.ChangedFilesTree[1];
             Assert.Equal("dir2", dir2.DirectoryName);
             Assert.Equal(1, dir2.Files.Count);
             Assert.Equal(0, dir2.Directories.Count);
 
-            var readme = (PullRequestFileViewModel)target.Changes[2];
+            var readme = (PullRequestFileViewModel)target.ChangedFilesTree[2];
             Assert.Equal("readme.md", readme.FileName);
         }
 

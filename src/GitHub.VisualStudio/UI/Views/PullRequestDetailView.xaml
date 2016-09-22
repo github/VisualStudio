@@ -199,10 +199,10 @@
                 <te:SectionControl Name="changesSection" 
                                    Grid.Column="2" Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangeCount, StringFormat=Changes ({0})}"
+                                   HeaderText="{Binding ChangedFilesCount, StringFormat=Changes ({0})}"
                                    Margin="0 5 10 0">
                     <te:SectionControl.Content>
-                        <TreeView ItemsSource="{Binding Changes}" BorderThickness="0">
+                        <TreeView ItemsSource="{Binding ChangedFilesTree}" BorderThickness="0">
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="TreeViewItem">
                                     <Setter Property="IsExpanded" Value="True"/>
@@ -210,7 +210,7 @@
                             </TreeView.ItemContainerStyle>
                             <TreeView.Resources>
                                 <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
-                                                      ItemsSource="{Binding Children}">
+                                                          ItemsSource="{Binding Children}">
                                     <StackPanel Orientation="Horizontal">
                                         <!-- TODO: Use the right icon here -->
                                         <ui:OcticonImage Icon="briefcase" Margin="4"/>
