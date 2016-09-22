@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface IPullRequestDetailViewModel : IViewModel
+    public interface IPullRequestDetailViewModel : IViewModel, IHasBusy
     {
         PullRequestState State { get; }
         string SourceBranchDisplayName { get; }

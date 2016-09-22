@@ -180,6 +180,10 @@
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
+      <Project>{1CE2D235-8072-4649-BA5A-CFB1AF8776E0}</Project>
+      <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1a1da411-8d1f-4578-80a6-04576bea2dc5}</Project>
       <Name>GitHub.App</Name>

@@ -5,7 +5,7 @@ using GitHub.UI;
 
 namespace GitHub.ViewModels
 {
-    public class BaseViewModel : ReactiveObject, IReactiveViewModel
+    public class BaseViewModel : ReactiveObject, IReactiveViewModel, IHasBusy
     {
         protected ObservableAsPropertyHelper<bool> isShowing;
         string title;

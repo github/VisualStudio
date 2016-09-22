@@ -7,13 +7,15 @@
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                                    xmlns:uir="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                                     xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
                                     d:DesignHeight="640"
-                                    mc:Ignorable="d">
+                                    mc:Ignorable="d"
+                                    Style="{DynamicResource BusyStateView}">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
@@ -22,11 +24,12 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <UserControl.Resources>
+    <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="Separator1" TargetType="Rectangle">
@@ -60,7 +63,7 @@
                 </Style.Triggers>
             </Style>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Control.Resources>
 
     <DockPanel Grid.IsSharedSizeScope="True">
         <!-- PR Title and number -->
