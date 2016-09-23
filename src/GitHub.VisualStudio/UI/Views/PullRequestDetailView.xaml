@@ -47,6 +47,13 @@
                 <Setter Property="PagePadding" Value="0"/>
             </Style>
 
+            <Style TargetType="GridViewColumnHeader">
+                <Style.Setters>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                </Style.Setters>
+            </Style>
+            
             <!-- TODO Fix this: here we change the color of TextBlock depending on the label.
                  It's a hack, it will break with localization -->
             <Style x:Key="StateIndicator" TargetType="TextBlock">
@@ -204,12 +211,12 @@
                     <te:SectionControl.Content>
                         <Grid>
                             <!-- Tree View -->
-                            <TreeView ItemsSource="{Binding ChangedFilesTree}" BorderThickness="0">
+                            <TreeView ItemsSource="{Binding ChangedFilesTree}" BorderThickness="0" Margin="0 6 0 0">
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ChangedFilesView}" Value="ListView">
-                                                <Setter Property="Visibility" Value="Hidden"/>
+                                                <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -238,20 +245,29 @@
                             </TreeView>
 
                             <!-- List View -->
-                            <ListView ItemsSource="{Binding ChangedFilesList}" BorderThickness="0">
+                            <ListView ItemsSource="{Binding ChangedFilesList}" BorderThickness="0" Margin="0 6 0 0">
                                 <ListView.Style>
                                     <Style TargetType="ListView">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ChangedFilesView}" Value="TreeView">
-                                                <Setter Property="Visibility" Value="Hidden"/>
+                                                <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </ListView.Style>
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding FileName}"/>
-                                        <GridViewColumn Header="Path" Width="120" DisplayMemberBinding="{Binding Path}"/>
+                                        <GridViewColumn Header="Name" Width="Auto">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <ui:OcticonImage Icon="file_code" Margin="0 0 4 0"/>
+                                                        <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding Path}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
