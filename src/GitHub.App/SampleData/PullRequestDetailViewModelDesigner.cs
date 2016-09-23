@@ -16,7 +16,6 @@ namespace GitHub.SampleData
             SourceBranchDisplayName = "shana/error-handling";
             TargetBranchDisplayName = "master";
             CommitCount = 9;
-            FilesChangedCount = 4;
             Author = new AccountDesigner { Login = "shana", IsUser = true };
             CreatedAt = DateTime.Now.Subtract(TimeSpan.FromDays(3));
             Number = 419;
@@ -53,7 +52,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string SourceBranchDisplayName { get; }
         public string TargetBranchDisplayName { get; }
         public int CommitCount { get; }
-        public int FilesChangedCount { get; }
         public IAccount Author { get; }
         public DateTimeOffset CreatedAt { get; }
         public int Number { get; }

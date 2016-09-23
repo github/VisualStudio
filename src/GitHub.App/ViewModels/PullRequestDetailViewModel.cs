@@ -16,6 +16,9 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
+    /// <summary>
+    /// A view model which displays the details of a pull request.
+    /// </summary>
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
@@ -28,7 +31,6 @@ namespace GitHub.ViewModels
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
         int commitCount;
-        int filesChangedCount;
         IAccount author;
         DateTimeOffset createdAt;
         string body;
@@ -37,6 +39,12 @@ namespace GitHub.ViewModels
         ChangedFilesView changedFilesView;
         OpenChangedFileAction openChangedFileAction;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
+        /// </summary>
+        /// <param name="connectionRepositoryHostMap">The connection repository host map.</param>
+        /// <param name="teservice">The team explorer service.</param>
+        /// <param name="avatarProvider">The avatar provider.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
@@ -46,6 +54,12 @@ namespace GitHub.ViewModels
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
+        /// </summary>
+        /// <param name="repositoryHost">The repository host.</param>
+        /// <param name="teservice">The team explorer service.</param>
+        /// <param name="avatarProvider">The avatar provider.</param>
         public PullRequestDetailViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
@@ -72,85 +86,134 @@ namespace GitHub.ViewModels
             });
         }
 
+        /// <summary>
+        /// Gets the state of the pull request, e.g. Open, Closed, Merged.
+        /// </summary>
         public PullRequestState State
         {
             get { return state; }
             private set { this.RaiseAndSetIfChanged(ref state, value); }
         }
 
+        /// <summary>
+        /// Gets a string describing how to display the pull request's source branch.
+        /// </summary>
         public string SourceBranchDisplayName
         {
             get { return sourceBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref sourceBranchDisplayName, value); }
         }
 
+        /// <summary>
+        /// Gets a string describing how to display the pull request's target branch.
+        /// </summary>
         public string TargetBranchDisplayName
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
         }
 
+        /// <summary>
+        /// Gets the number of commits in the pull request.
+        /// </summary>
         public int CommitCount
         {
             get { return commitCount; }
             private set { this.RaiseAndSetIfChanged(ref commitCount, value); }
         }
 
-        public int FilesChangedCount
-        {
-            get { return filesChangedCount; }
-            private set { this.RaiseAndSetIfChanged(ref filesChangedCount, value); }
-        }
-
+        /// <summary>
+        /// Gets the pull request number.
+        /// </summary>
         public int Number
         {
             get { return number; }
             private set { this.RaiseAndSetIfChanged(ref number, value); }
         }
 
+        /// <summary>
+        /// Gets the account that submitted the pull request.
+        /// </summary>
         public IAccount Author
         {
             get { return author; }
             private set { this.RaiseAndSetIfChanged(ref author, value); }
         }
 
+        /// <summary>
+        /// Gets the date and time at which the pull request was created.
+        /// </summary>
         public DateTimeOffset CreatedAt
         {
             get { return createdAt; }
             private set { this.RaiseAndSetIfChanged(ref createdAt, value); }
         }
 
+        /// <summary>
+        /// Gets the pull request body.
+        /// </summary>
         public string Body
         {
             get { return body; }
             private set { this.RaiseAndSetIfChanged(ref body, value); }
         }
 
+        /// <summary>
+        /// Gets the number of files that have been changed in the pull request.
+        /// </summary>
         public int ChangedFilesCount
         {
             get { return changeCount; }
             private set { this.RaiseAndSetIfChanged(ref changeCount, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value describing how changed files are displayed in a view.
+        /// </summary>
         public ChangedFilesView ChangedFilesView
         {
             get { return changedFilesView; }
             set { this.RaiseAndSetIfChanged(ref changedFilesView, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value describing how files are opened when double clicked.
+        /// </summary>
         public OpenChangedFileAction OpenChangedFileAction
         {
             get { return openChangedFileAction; }
             set { this.RaiseAndSetIfChanged(ref openChangedFileAction, value); }
         }
 
+        /// <summary>
+        /// Gets the changed files as a tree.
+        /// </summary>
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
+
+        /// <summary>
+        /// Gets the changed files as a flat list.
+        /// </summary>
         public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileViewModel>();
 
+        /// <summary>
+        /// Gets a command that opens the pull request on GitHub.
+        /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
+
+        /// <summary>
+        /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
+        /// </summary>
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
+
+        /// <summary>
+        /// Gets a command that toggles the <see cref="OpenChangedFileAction"/> property.
+        /// </summary>
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
+        /// <summary>
+        /// Initializes the view model with new data.
+        /// </summary>
+        /// <param name="data"></param>
         public override void Initialize([AllowNull] ViewWithData data)
         {
             var prNumber = (int)data.Data;
@@ -167,13 +230,17 @@ namespace GitHub.ViewModels
                 .Subscribe(x => Load(x.PullRequest, x.Files));
         }
 
+        /// <summary>
+        /// Loads the view model from octokit models.
+        /// </summary>
+        /// <param name="pullRequest">The pull request model.</param>
+        /// <param name="files">The pull request's changed files.</param>
         public void Load(PullRequest pullRequest, IList<PullRequestFile> files)
         {
             State = CreatePullRequestState(pullRequest);
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
             CommitCount = pullRequest.Commits;
-            FilesChangedCount = pullRequest.ChangedFiles;
             Title = pullRequest.Title;
             Number = pullRequest.Number;
             Author = new Models.Account(pullRequest.User, GetAvatar(pullRequest.User));
