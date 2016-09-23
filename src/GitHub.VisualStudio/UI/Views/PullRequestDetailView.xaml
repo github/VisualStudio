@@ -207,7 +207,31 @@
                                    Grid.Column="2" Grid.Row="3"
                                    IsExpanded="True"
                                    HeaderText="{Binding ChangedFilesCount, StringFormat=Changes ({0})}"
-                                   Margin="0 5 10 0">
+                                   Margin="0 5 10 0"
+                                   ContextMenuService.IsEnabled="False">
+                    <te:SectionControl.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Open File as Default Action"/>
+                            <Separator/>
+                            <MenuItem Command="{Binding ToggleChangedFilesView}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="TreeView">
+                                                <Setter Property="Header" Value="Switch to List View"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="ListView">
+                                                <Setter Property="Header" Value="Switch to Tree View"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                                <MenuItem.Icon>
+                                    <ui:OcticonPath Icon="list_unordered" Fill="Black" Height="16"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </te:SectionControl.ContextMenu>
                     <te:SectionControl.Content>
                         <Grid>
                             <!-- Tree View -->

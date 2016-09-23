@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -39,7 +41,12 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
             });
+
+            OpenChangesOptionsMenu = ReactiveCommand.Create();
+            OpenChangesOptionsMenu.Subscribe(DoOpenChangesOptionsMenu);
         }
+
+        public ReactiveCommand<object> OpenChangesOptionsMenu { get; }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
@@ -67,15 +74,16 @@ namespace GitHub.VisualStudio.UI.Views
 
                 var command = commandCtor.Invoke(new object[]
                 {
-                    ViewModel.ToggleChangedFilesView,
-                    "Switch to List View",
+                    OpenChangesOptionsMenu,
+                    "Options",
                     new DrawingBrush
                     {                        
                         Drawing = new GeometryDrawing
                         {
                             Brush = Brushes.Black,
-                            Geometry = OcticonPath.GetGeometryForIcon(Octicon.list_unordered),
+                            Geometry = OcticonPath.GetGeometryForIcon(Octicon.three_bars),
                         },
+                        Viewport = new Rect(0.1, 0.1, 0.8, 0.8),
                     },
                 });
 
@@ -90,6 +98,16 @@ namespace GitHub.VisualStudio.UI.Views
             var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Number);
             browser.OpenUrl(url);
+        }
+
+        void DoOpenChangesOptionsMenu(dynamic o)
+        {
+            var menu = changesSection.ContextMenu;
+            menu.DataContext = DataContext;
+            menu.Placement = PlacementMode.Absolute;
+            menu.HorizontalOffset = o.MenuX;
+            menu.VerticalOffset = o.MenuY;
+            menu.IsOpen = true;
         }
     }
 }
