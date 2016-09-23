@@ -35,6 +35,7 @@ namespace GitHub.ViewModels
         int number;
         int changeCount;
         ChangedFilesView changedFilesView;
+        OpenChangedFileAction openChangedFileAction;
 
         [ImportingConstructor]
         PullRequestDetailViewModel(
@@ -61,6 +62,13 @@ namespace GitHub.ViewModels
             {
                 ChangedFilesView = ChangedFilesView == ChangedFilesView.TreeView ?
                     ChangedFilesView.ListView : ChangedFilesView.TreeView;
+            });
+
+            ToggleOpenChangedFileAction = ReactiveCommand.Create();
+            ToggleOpenChangedFileAction.Subscribe(_ =>
+            {
+                OpenChangedFileAction = OpenChangedFileAction == OpenChangedFileAction.Diff ?
+                    OpenChangedFileAction.Open : OpenChangedFileAction.Diff;
             });
         }
 
@@ -130,11 +138,18 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref changedFilesView, value); }
         }
 
+        public OpenChangedFileAction OpenChangedFileAction
+        {
+            get { return openChangedFileAction; }
+            set { this.RaiseAndSetIfChanged(ref openChangedFileAction, value); }
+        }
+
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
         public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileViewModel>();
 
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
+        public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         public override void Initialize([AllowNull] ViewWithData data)
         {

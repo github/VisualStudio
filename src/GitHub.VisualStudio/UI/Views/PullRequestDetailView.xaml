@@ -211,7 +211,20 @@
                                    ContextMenuService.IsEnabled="False">
                     <te:SectionControl.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Open File as Default Action"/>
+                            <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
+                                                <Setter Property="Header" Value="Compare File as Default Action"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
+                                                <Setter Property="Header" Value="Open File as Default Action"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
                             <Separator/>
                             <MenuItem Command="{Binding ToggleChangedFilesView}">
                                 <MenuItem.Style>
@@ -232,6 +245,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </te:SectionControl.ContextMenu>
+                    
                     <te:SectionControl.Content>
                         <Grid>
                             <!-- Tree View -->

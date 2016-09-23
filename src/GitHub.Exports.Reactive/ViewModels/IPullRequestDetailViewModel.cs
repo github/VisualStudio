@@ -10,6 +10,12 @@ namespace GitHub.ViewModels
         ListView,
     }
 
+    public enum OpenChangedFileAction
+    {
+        Diff,
+        Open
+    }
+
     public interface IPullRequestDetailViewModel : IViewModel, IHasBusy
     {
         PullRequestState State { get; }
@@ -23,10 +29,12 @@ namespace GitHub.ViewModels
         string Body { get; }
         int ChangedFilesCount { get; }
         ChangedFilesView ChangedFilesView { get; set; }
+        OpenChangedFileAction OpenChangedFileAction { get; set; }
         IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
         IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
 
         ReactiveCommand<object> OpenOnGitHub { get; }
         ReactiveCommand<object> ToggleChangedFilesView { get; }
+        ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
     }
 }

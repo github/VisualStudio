@@ -60,10 +60,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string Body { get; }
         public int ChangedFilesCount { get; }
         public ChangedFilesView ChangedFilesView { get; set; }
+        public OpenChangedFileAction OpenChangedFileAction { get; set; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
         public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
 
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
+        public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
     }
 }
