@@ -32,12 +32,8 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="Separator1" TargetType="Rectangle">
-                <Setter Property="Fill" Value="#D3D1E6"/>
-            </Style>
-
-            <Style x:Key="Separator2" TargetType="Rectangle">
-                <Setter Property="Fill" Value="#E2E6EE"/>
+            <Style x:Key="Separator" TargetType="Rectangle">
+                <Setter Property="Fill" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
             </Style>
 
             <Style x:Key="DocumentStyle" TargetType="FlowDocument">
@@ -48,10 +44,12 @@
             </Style>
 
             <Style TargetType="GridViewColumnHeader">
-                <Style.Setters>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                </Style.Setters>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            </Style>
+
+            <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
+                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
             </Style>
             
             <!-- TODO Fix this: here we change the color of TextBlock depending on the label.
@@ -87,7 +85,7 @@
                        TextWrapping="Wrap"/>
         </DockPanel>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator1}" Height="2"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
 
         <!-- PR Overview -->
         <Grid DockPanel.Dock="Top">
@@ -124,7 +122,7 @@
                            ToolTip="{Binding SourceBranchDisplayName}"/>
             </StackPanel>
 
-            <Rectangle Grid.Column="2" Grid.Row="1" Margin="-2 0 0 0" Style="{StaticResource Separator2}"/>
+            <Rectangle Grid.Column="2" Grid.Row="1" Margin="-2 0 0 0" Style="{StaticResource Separator}"/>
 
             <!-- Commit and files changed count -->
             <StackPanel Grid.Column="2" Grid.Row="2" Orientation="Horizontal" Margin="0 6">
@@ -136,10 +134,10 @@
                 <ui:OcticonImage Icon="diff" Margin="28 0 2 0"/>
                 <TextBlock Margin="2 0"
                            VerticalAlignment="Center"
-                           Text="{Binding FilesChangedCount, StringFormat={}{0} files changed}"/>
+                           Text="{Binding ChangedFilesCount, StringFormat={}{0} files changed}"/>
             </StackPanel>
 
-            <Rectangle Grid.Column="2" Grid.Row="3" Margin="-2 0 0 0" Style="{StaticResource Separator2}"/>
+            <Rectangle Grid.Column="2" Grid.Row="3" Margin="-2 0 0 0" Style="{StaticResource Separator}"/>
 
             <Button Grid.Column="2" Grid.Row="4" Margin="0 6"
                     Style="{StaticResource GitHubVsButton}">
@@ -147,7 +145,7 @@
             </Button>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator1}" Height="2"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid>
@@ -249,7 +247,10 @@
                     <te:SectionControl.Content>
                         <Grid>
                             <!-- Tree View -->
-                            <TreeView ItemsSource="{Binding ChangedFilesTree}" BorderThickness="0" Margin="0 6 0 0">
+                            <TreeView ItemsSource="{Binding ChangedFilesTree}" 
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Margin="0 6 0 0">
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
                                         <Style.Triggers>
@@ -262,6 +263,7 @@
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="IsExpanded" Value="True"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
                                     </Style>
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.Resources>
@@ -269,21 +271,24 @@
                                                           ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
                                             <!-- TODO: Use the right icon here -->
-                                            <ui:OcticonImage Icon="briefcase" Margin="4"/>
-                                            <TextBlock Text="{Binding DirectoryName}" VerticalAlignment="Center"/>
+                                            <ui:OcticonImage Icon="briefcase" Foreground="{DynamicResource GitHubVsWindowText}"/>
+                                            <TextBlock Text="{Binding DirectoryName}" Margin="4 0" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:OcticonImage Icon="file_code" Margin="4"/>
-                                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                            <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
+                                            <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
                             </TreeView>
 
                             <!-- List View -->
-                            <ListView ItemsSource="{Binding ChangedFilesList}" BorderThickness="0" Margin="0 6 0 0">
+                            <ListView ItemsSource="{Binding ChangedFilesList}"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Margin="0 6 0 0" >
                                 <ListView.Style>
                                     <Style TargetType="ListView">
                                         <Style.Triggers>
@@ -293,6 +298,11 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ListView.Style>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="Name" Width="Auto">

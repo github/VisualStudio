@@ -80,9 +80,9 @@ namespace GitHub.VisualStudio.UI.Views
                     {                        
                         Drawing = new GeometryDrawing
                         {
-                            Brush = Brushes.Black,
+                            Brush = (Brush)FindResource("GitHubVsWindowText"),
                             Geometry = OcticonPath.GetGeometryForIcon(Octicon.three_bars),
-                        },
+                        },                        
                         Viewport = new Rect(0.1, 0.1, 0.8, 0.8),
                     },
                 });
