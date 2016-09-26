@@ -81,7 +81,7 @@
                        Text="{Binding Number, StringFormat=#{0}}"
                        VerticalAlignment="Top"/>
             <TextBlock Text="{Binding Title}"
-                       FontSize="12pt"
+                       FontSize="10pt"
                        TextWrapping="Wrap"/>
         </DockPanel>
 
