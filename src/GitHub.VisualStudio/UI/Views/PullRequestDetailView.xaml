@@ -97,9 +97,9 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/> <!-- Open/closed state and branches -->
-                <RowDefinition Height="2"/>
+                <RowDefinition Height="1"/>
                 <RowDefinition Height="Auto"/> <!-- Commit and files changed count -->
-                <RowDefinition Height="2"/>
+                <RowDefinition Height="1"/>
                 <RowDefinition Height="Auto"/> <!-- Checkout button -->
             </Grid.RowDefinitions>
             
