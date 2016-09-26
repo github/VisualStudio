@@ -57,13 +57,13 @@
             <Style x:Key="StateIndicator" TargetType="TextBlock">
                 <Style.Triggers>
                     <Trigger Property="Text" Value="Open">
-                        <Setter Property="Background" Value="#6CC644"/>
+                        <Setter Property="Foreground" Value="#6CC644"/>
                     </Trigger>
                     <Trigger Property="Text" Value="Closed">
-                        <Setter Property="Background" Value="#BD2C00"/>
+                        <Setter Property="Foreground" Value="#BD2C00"/>
                     </Trigger>
                     <Trigger Property="Text" Value="Merged">
-                        <Setter Property="Background" Value="#6E5494"/>
+                        <Setter Property="Foreground" Value="#6E5494"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -111,8 +111,8 @@
 
             <!-- Open/closed state and branches -->
             <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
-                <TextBlock Padding="14 4" Margin="0 0 12 0"
-                           Foreground="White"
+                <TextBlock Margin="0 0 12 0"
+                           FontWeight="Bold"
                            Text="{Binding State}"
                            Style="{StaticResource StateIndicator}"/>
 
