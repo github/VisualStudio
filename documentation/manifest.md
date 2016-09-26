@@ -132,10 +132,10 @@
 - [ ] **Fill out pull request Title**
       - [ ] Create Pull Request button is enabled.
 - [ ] **Click on Create Pull Request**
-      - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
       - [ ] Pull request list is displayed with new pull request (that was just created) at the top of the list
+      - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
 
-# In VS text/code Editor (logged in to GitHub) [GIST, can this be done logged out???]
+# In VS text/code Editor (logged in to GitHub)
 - [ ] **Highlight code or text within solution, then right click.**
       - [ ] GitHub context menu is visible
       - [ ] "Create a GitHub Gist" is visible     
@@ -149,9 +149,8 @@
       - [ ] Clearing file name textbox disables the Create button
 - [ ] **Click create button**
       - [ ] Dialog disappears
-      - [ ]
-
-
+      - [ ] Default browser navigates to newly created Gist
+      - [ ] Create private gist and verify it's private on .com browser navigates to newly created Gist
 
 # Connections
 - [ ] **Login to GitHub.com, then click on the "Manage Connections" header and "Connect to GitHub"**
