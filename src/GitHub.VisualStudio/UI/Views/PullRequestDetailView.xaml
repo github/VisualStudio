@@ -114,6 +114,7 @@
                 <TextBlock Margin="0 0 12 0"
                            FontWeight="Bold"
                            Text="{Binding State}"
+                           VerticalAlignment="Center"
                            Style="{StaticResource StateIndicator}"/>
 
                 <TextBlock Text="{Binding TargetBranchDisplayName}" VerticalAlignment="Center"/>
