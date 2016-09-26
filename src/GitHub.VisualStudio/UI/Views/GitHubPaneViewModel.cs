@@ -279,8 +279,8 @@ namespace GitHub.VisualStudio.UI.Views
         void GoForward(ViewWithData data)
         {
             currentNavItem++;
-            if (currentNavItem < navStack.Count - 1)
-                navStack.RemoveRange(currentNavItem, navStack.Count - 1 - currentNavItem);
+            if (currentNavItem < navStack.Count)
+                navStack.RemoveRange(currentNavItem, navStack.Count - currentNavItem);
             navStack.Add(data);
         }
 
