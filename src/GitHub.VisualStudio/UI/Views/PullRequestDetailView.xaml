@@ -163,14 +163,14 @@
                 </Grid.RowDefinitions>
 
                 <!-- Author avatar -->
-                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" Margin="0 8">
+                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0 6 0 3">
                     <Grid.OpacityMask>
                         <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
                     </Grid.OpacityMask>
-                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="24" />
+                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
                     <Image x:Name="avatar"
-                           Width="24"
-                           Height="24"
+                           Width="20"
+                           Height="20"
                            RenderOptions.BitmapScalingMode="HighQuality"
                            Source="{Binding Author.Avatar}" />
                 </Grid>
