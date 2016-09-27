@@ -155,7 +155,7 @@
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
