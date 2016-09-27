@@ -119,7 +119,7 @@
                            Style="{StaticResource StateIndicator}"/>
 
                 <TextBlock Text="{Binding TargetBranchDisplayName}" VerticalAlignment="Center"/>
-                <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 0 3 0"/>
+                <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 3 3 0"/>
                 <TextBlock Text="{Binding SourceBranchDisplayName}" VerticalAlignment="Center" 
                            ToolTip="{Binding SourceBranchDisplayName}"/>
             </StackPanel>
