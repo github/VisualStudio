@@ -23,7 +23,9 @@ namespace GitHub.SampleData
 
 ViewModels are responsible for handling the UI on the view they control, but they shouldn't be handling UI for things outside of the view. In this case, we're showing errors in VS outside the view, and that should be handled by the section that is hosting the view.
 
-This requires that errors be propagated from the viewmodel to the view and from there to the host via the IView interface, since hosts don't usually know what they're hosting.";
+This requires that errors be propagated from the viewmodel to the view and from there to the host via the IView interface, since hosts don't usually know what they're hosting.
+
+![An image](https://cloud.githubusercontent.com/assets/1174461/18882991/5dd35648-8496-11e6-8735-82c3a182e8b4.png)";
 
             var gitHubDir = new PullRequestDirectoryViewModel("GitHub");
             var modelsDir = new PullRequestDirectoryViewModel("Models");

@@ -41,6 +41,14 @@
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="TextAlignment" Value="Left"/>
                 <Setter Property="PagePadding" Value="0"/>
+
+                <Style.Resources>
+                    <Style TargetType="Image">
+                        <Setter Property="Stretch" Value="UniformToFill" />
+                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="MaxWidth" Value="{Binding ActualWidth, ElementName=bodyMarkdown}" />
+                    </Style>
+                </Style.Resources>
             </Style>
 
             <Style TargetType="GridViewColumnHeader">
@@ -147,7 +155,7 @@
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
@@ -187,7 +195,7 @@
                                    Margin="2 6 10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
-                                   ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                                   ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- View on github link -->
                 <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
