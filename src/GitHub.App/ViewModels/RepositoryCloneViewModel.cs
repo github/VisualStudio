@@ -75,12 +75,12 @@ namespace GitHub.ViewModels
             repositories.Filter = FilterRepository;
             repositories.NewerComparer = OrderedComparer<IRemoteRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
 
-            filterTextIsEnabled = this.WhenAny(x => x.IsLoading, x => x.Value)
-                .Select(x => !x && repositories.UnfilteredCount > 0)
+            filterTextIsEnabled = this.WhenAny(x => x.IsLoading,
+                loading => loading.Value || repositories.UnfilteredCount > 0 && !LoadingFailed)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
-            this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
-                , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
+            this.WhenAny(x => x.IsLoading, x => x.LoadingFailed,
+                (loading, failed) => !loading.Value && !failed.Value && repositories.UnfilteredCount == 0)
                 .Subscribe(x => NoRepositoriesFound = x);
 
             this.WhenAny(x => x.FilterText, x => x.Value)
