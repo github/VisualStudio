@@ -46,7 +46,7 @@
                     <Style TargetType="Image">
                         <Setter Property="Stretch" Value="UniformToFill" />
                         <Setter Property="StretchDirection" Value="DownOnly" />
-                        <Setter Property="MaxWidth" Value="{Binding ActualWidth, ElementName=bodyMarkdown}" />
+                        <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
                     </Style>
                 </Style.Resources>
             </Style>
