@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using GitHub.Models;
+using LibGit2Sharp;
 
 namespace GitHub.Services
 {
@@ -43,6 +44,14 @@ namespace GitHub.Services
         /// <param name="pullRequestNumber">The pull request number.</param>
         /// <returns></returns>
         IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, int number);
+
+        /// <summary>
+        /// Gets the history divergence between the current HEAD and the specified pull request.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequestNumber">The pull request number.</param>
+        /// <returns></returns>
+        IObservable<HistoryDivergence> CalculateHistoryDivergance(ILocalRepositoryModel repository, int pullRequestNumber);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }

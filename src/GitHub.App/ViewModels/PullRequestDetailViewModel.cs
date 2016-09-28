@@ -299,7 +299,6 @@ namespace GitHub.ViewModels
                     repositoryHost.ApiClient.GetPullRequestFiles(repository.Owner, repository.CloneUrl.RepositoryName, prNumber).ToList(),
                     (pr, files) => new { PullRequest = pr, Files = files })
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Finally(() => IsBusy = false)
                 .Subscribe(x => Load(x.PullRequest, x.Files).Forget());
         }
 
@@ -347,7 +346,21 @@ namespace GitHub.ViewModels
             
             if (localBranches.Contains(repository.CurrentBranch))
             {
-                CheckoutMode = CheckoutMode.UpToDate;
+                var divergence = await pullRequestsService.CalculateHistoryDivergance(repository, Number);
+
+                if (divergence.BehindBy == null)
+                {
+                    CheckoutMode = CheckoutMode.Fetch;
+                }
+                if (divergence.BehindBy == 0)
+                {
+                    CheckoutMode = CheckoutMode.UpToDate;
+                }
+                else
+                {
+                    CheckoutMode = CheckoutMode.NeedsPull;
+                    CommitsBehind = divergence.BehindBy.Value;
+                }
             }
             else if (localBranches.Count > 0)
             {
@@ -357,6 +370,8 @@ namespace GitHub.ViewModels
             {
                 CheckoutMode = CheckoutMode.Fetch;
             }
+
+            IsBusy = false;
         }
 
         static PullRequestState CreatePullRequestState(PullRequest pullRequest)

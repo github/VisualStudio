@@ -93,6 +93,30 @@ namespace GitHub.Services
             return "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
         }
 
+        public IObservable<HistoryDivergence> CalculateHistoryDivergance(ILocalRepositoryModel repository, int pullRequestNumber)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+
+                EnsurePullRefSpecExists(repo);
+                await gitClient.Fetch(repo, "origin");
+
+                var pullRef = repo.Refs[$"refs/remotes/origin/pr/{pullRequestNumber}"] as DirectReference;
+                var commit = pullRef?.Target as Commit;
+
+                if (commit != null)
+                {
+                    var result = repo.ObjectDatabase.CalculateHistoryDivergence(repo.Head.Tip, commit);
+                    return Observable.Return(result);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Could not find pull request ref.");
+                }
+            });
+        }
+
         public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, int number)
         {
             return Observable.Defer(() =>
@@ -118,7 +142,6 @@ namespace GitHub.Services
         {
             var repo = gitService.GetRepository(repository.LocalPath);
             var configKey = $"branch.{BranchNameToConfigKey(localBranchName)}.ghfvs-pr";
-
             await gitClient.Fetch(repo, "origin", new[] { $"refs/pull/{pullRequestNumber}/head:{localBranchName}" });
             await gitClient.Checkout(repo, localBranchName);
             await gitClient.SetConfig(repo, configKey, pullRequestNumber.ToString());
@@ -152,6 +175,18 @@ namespace GitHub.Services
             var ret = await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
             usageTracker.IncrementUpstreamPullRequestCount();
             return ret;
+        }
+
+        void EnsurePullRefSpecExists(IRepository repo)
+        {
+            var spec = "+refs/pull/*/head:refs/remotes/origin/pr/*";
+            var origin = repo.Network.Remotes["origin"];
+            var existing = origin.FetchRefSpecs.FirstOrDefault(x => x.Specification == spec);
+
+            if (existing == null)
+            {
+                repo.Network.Remotes.Update(origin, x => x.FetchRefSpecs.Add(spec));
+            }
         }
 
         static string GetSafeBranchName(string name)
