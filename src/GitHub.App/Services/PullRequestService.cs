@@ -8,6 +8,12 @@ using Rothko;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using GitHub.Primitives;
+using System.Text.RegularExpressions;
+using System.Globalization;
+using System.Reactive;
+using System.Collections.Generic;
+using LibGit2Sharp;
 
 namespace GitHub.Services
 {
@@ -16,6 +22,9 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
+        static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
+        static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
+
         static readonly string[] TemplatePaths = new[]
         {
             "PULL_REQUEST_TEMPLATE.md",
@@ -74,6 +83,56 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<Unit> FetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
+        {
+            return DoFetchAndCheckout(repository, pullRequestNumber, localBranchName).ToObservable();
+        }
+
+        public string GetDefaultLocalBranchName(int pullRequestNumber, string pullRequestTitle)
+        {
+            return "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
+        }
+
+        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, int number)
+        {
+            return Observable.Defer(() =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var result = GetLocalBranchesInternal(repo, number).Select(x => new BranchModel(x, repository));
+                return result.ToObservable();
+            });
+        }
+
+        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, int number)
+        {
+            return Observable.Defer(() =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var branch = GetLocalBranchesInternal(repo, number).First();
+                gitClient.Checkout(repo, branch);
+                return Observable.Empty<Unit>();
+            });
+        }
+
+        async Task DoFetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
+        {
+            var repo = gitService.GetRepository(repository.LocalPath);
+            var configKey = $"branch.{BranchNameToConfigKey(localBranchName)}.ghfvs-pr";
+
+            await gitClient.Fetch(repo, "origin", new[] { $"refs/pull/{pullRequestNumber}/head:{localBranchName}" });
+            await gitClient.Checkout(repo, localBranchName);
+            await gitClient.SetConfig(repo, configKey, pullRequestNumber.ToString());
+        }
+
+        IEnumerable<string> GetLocalBranchesInternal(IRepository repository, int number)
+        {
+            var pr = number.ToString();
+            return repository.Config
+                .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
+                .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
+                .Select(x => x.Branch);
+        }
+
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
@@ -95,5 +154,23 @@ namespace GitHub.Services
             return ret;
         }
 
+        static string GetSafeBranchName(string name)
+        {
+            var before = InvalidBranchCharsRegex.Replace(name, "-");
+
+            for (;;)
+            {
+                string after = before.Replace("--", "-");
+
+                if (after == before)
+                {
+                    return before.ToLower(CultureInfo.InvariantCulture);
+                }
+
+                before = after;
+            }
+        }
+
+        static string BranchNameToConfigKey(string name) => name.Replace("/", ".");
     }
 }

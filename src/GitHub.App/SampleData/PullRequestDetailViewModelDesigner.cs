@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
@@ -48,6 +49,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
             ChangedFilesList.Add(concurrentRepositoryConnection);
             ChangedFilesList.Add(itrackingBranch);
             ChangedFilesList.Add(oldBranchModel);
+
+            CheckoutMode = CheckoutMode.Fetch;
         }
 
         public PullRequestState State { get; }
@@ -63,7 +66,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public OpenChangedFileAction OpenChangedFileAction { get; set; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
         public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
+        public CheckoutMode CheckoutMode { get; set; }
+        public string CheckoutError { get; set; }
+        public int CommitsBehind { get; set; }
 
+        public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }

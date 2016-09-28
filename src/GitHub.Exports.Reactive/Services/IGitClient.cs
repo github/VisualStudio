@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitHub.Models;
 using LibGit2Sharp;
 
 namespace GitHub.Services
@@ -31,6 +33,23 @@ namespace GitHub.Services
         /// <param name="refspecs">The custom refspecs</param>
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
+
+        /// <summary>
+        /// Checks out a branch.
+        /// </summary>
+        /// <param name="repository">The repository to carry out the checkout on</param>
+        /// <param name="branchName">The name of the branch</param>
+        /// <returns></returns>
+        Task Checkout(IRepository repository, string branchName);
+
+        /// <summary>
+        /// Sets the configuration key to the specified value in the local config.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="key">The configuration key. Keys are in the form 'section.name'.</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        Task SetConfig(IRepository repository, string key, string value);
 
         /// <summary>
         /// Sets the specified remote to the specified URL.

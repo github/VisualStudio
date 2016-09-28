@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -34,6 +35,32 @@ namespace GitHub.ViewModels
         /// Opening the file opens the file in a text editor.
         /// </summary>
         Open
+    }
+
+    /// <summary>
+    /// Describes how a pull request will be checked out.
+    /// </summary>
+    public enum CheckoutMode
+    {
+        /// <summary>
+        /// The pull request branch is checked out and up-to-date.
+        /// </summary>
+        UpToDate,
+
+        /// <summary>
+        /// The pull request branch is checked out but needs updating.
+        /// </summary>
+        NeedsPull,
+
+        /// <summary>
+        /// A local branch exists for the pull request but it is not the current branch.
+        /// </summary>
+        Switch,
+
+        /// <summary>
+        /// No local branch exists for the pull request.
+        /// </summary>
+        Fetch,
     }
 
     /// <summary>
@@ -105,6 +132,27 @@ namespace GitHub.ViewModels
         /// Gets the changed files as a flat list.
         /// </summary>
         IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
+
+        /// <summary>
+        /// Gets the checkout mode for the pull request.
+        /// </summary>
+        CheckoutMode CheckoutMode { get; }
+
+        /// <summary>
+        /// Gets the error message to be displayed below the checkout button.
+        /// </summary>
+        string CheckoutError { get; }
+
+        /// <summary>
+        /// Gets the number of commits that the current branch is behind the PR when <see cref="CheckoutMode"/>
+        /// is <see cref="CheckoutMode.NeedsPull"/>.
+        /// </summary>
+        int CommitsBehind { get; }
+
+        /// <summary>
+        /// Gets a command that checks out the pull request locally.
+        /// </summary>
+        ReactiveCommand<Unit> Checkout { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.

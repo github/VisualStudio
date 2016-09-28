@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using GitHub.Caches;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
+using LibGit2Sharp;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
@@ -26,6 +33,8 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
+        readonly IGitService gitService;
+        readonly IPullRequestService pullRequestsService;
         readonly IAvatarProvider avatarProvider;
         PullRequestState state;
         string sourceBranchDisplayName;
@@ -38,19 +47,31 @@ namespace GitHub.ViewModels
         int changeCount;
         ChangedFilesView changedFilesView;
         OpenChangedFileAction openChangedFileAction;
+        bool uncommittedChanges;
+        CheckoutMode checkoutMode;
+        string checkoutError;
+        int commitsBehind;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
         /// <param name="connectionRepositoryHostMap">The connection repository host map.</param>
         /// <param name="teservice">The team explorer service.</param>
+        /// <param name="gitService">The git service.</param>
+        /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
+            IGitService gitService,
+            IPullRequestService pullRequestsService,
             IAvatarProvider avatarProvider)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, teservice.ActiveRepo, avatarProvider)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost,
+                  teservice.ActiveRepo,
+                  gitService,
+                  pullRequestsService,
+                  avatarProvider)
         {
         }
 
@@ -59,15 +80,25 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="repositoryHost">The repository host.</param>
         /// <param name="teservice">The team explorer service.</param>
+        /// <param name="gitService">The git service.</param>
+        /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         public PullRequestDetailViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
+            IGitService gitService,
+            IPullRequestService pullRequestsService,
             IAvatarProvider avatarProvider)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.gitService = gitService;
+            this.pullRequestsService = pullRequestsService;
             this.avatarProvider = avatarProvider;
+
+            Checkout = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UncommittedChanges, x => !x),
+                DoCheckout);
 
             OpenOnGitHub = ReactiveCommand.Create();
 
@@ -186,6 +217,43 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether there are uncommitted changes blocking a checkout.
+        /// </summary>
+        public bool UncommittedChanges
+        {
+            get { return uncommittedChanges; }
+            private set { this.RaiseAndSetIfChanged(ref uncommittedChanges, value); }
+        }
+
+        /// <summary>
+        /// Gets the checkout mode for the pull request.
+        /// </summary>
+        public CheckoutMode CheckoutMode
+        {
+            get { return checkoutMode; }
+            private set { this.RaiseAndSetIfChanged(ref checkoutMode, value); }
+        }
+
+        /// <summary>
+        /// Gets the error message to be displayed below the checkout button.
+        /// </summary>
+        public string CheckoutError
+        {
+            get { return checkoutError; }
+            private set { this.RaiseAndSetIfChanged(ref checkoutError, value); }
+        }
+
+        /// <summary>
+        /// Gets the number of commits that the current branch is behind the PR when <see cref="CheckoutMode"/>
+        /// is <see cref="CheckoutMode.NeedsPull"/>.
+        /// </summary>
+        public int CommitsBehind
+        {
+            get { return commitsBehind; }
+            private set { this.RaiseAndSetIfChanged(ref commitsBehind, value); }
+        }
+
+        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
@@ -194,6 +262,11 @@ namespace GitHub.ViewModels
         /// Gets the changed files as a flat list.
         /// </summary>
         public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileViewModel>();
+
+        /// <summary>
+        /// Gets a command that checks out the pull request locally.
+        /// </summary>
+        public ReactiveCommand<Unit> Checkout { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
@@ -227,7 +300,7 @@ namespace GitHub.ViewModels
                     (pr, files) => new { PullRequest = pr, Files = files })
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Finally(() => IsBusy = false)
-                .Subscribe(x => Load(x.PullRequest, x.Files));
+                .Subscribe(x => Load(x.PullRequest, x.Files).Forget());
         }
 
         /// <summary>
@@ -235,7 +308,7 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="pullRequest">The pull request model.</param>
         /// <param name="files">The pull request's changed files.</param>
-        public void Load(PullRequest pullRequest, IList<PullRequestFile> files)
+        public async Task Load(PullRequest pullRequest, IList<PullRequestFile> files)
         {
             State = CreatePullRequestState(pullRequest);
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
@@ -243,7 +316,7 @@ namespace GitHub.ViewModels
             CommitCount = pullRequest.Commits;
             Title = pullRequest.Title;
             Number = pullRequest.Number;
-            Author = new Models.Account(pullRequest.User, GetAvatar(pullRequest.User));
+            Author = new Models.Account(pullRequest.User, avatarProvider.GetAvatar(new AccountCacheItem(pullRequest.User)));
             CreatedAt = pullRequest.CreatedAt;
             Body = pullRequest.Body;
             ChangedFilesCount = files.Count;
@@ -260,6 +333,29 @@ namespace GitHub.ViewModels
             foreach (var change in CreateChangedFilesTree(ChangedFilesList).Children)
             {
                 ChangedFilesTree.Add(change);
+            }
+
+            var repo = gitService.GetRepository(repository.LocalPath);
+            UncommittedChanges = repo.RetrieveStatus().IsDirty;
+
+            if (UncommittedChanges)
+            {
+                CheckoutError = "Cannot check out: you have uncommitted changes";
+            }
+
+            var localBranches = await pullRequestsService.GetLocalBranches(repository, Number).ToList();
+            
+            if (localBranches.Contains(repository.CurrentBranch))
+            {
+                CheckoutMode = CheckoutMode.UpToDate;
+            }
+            else if (localBranches.Count > 0)
+            {
+                CheckoutMode = CheckoutMode.Switch;
+            }
+            else
+            {
+                CheckoutMode = CheckoutMode.Fetch;
             }
         }
 
@@ -328,10 +424,40 @@ namespace GitHub.ViewModels
             return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
         }
 
-        IObservable<BitmapSource> GetAvatar(User user)
+        IObservable<Unit> DoCheckout(object unused)
         {
-            return avatarProvider.GetAvatar(new AccountCacheItem(user))
-                .Do(_ => { });
+            switch (CheckoutMode)
+            {
+                case CheckoutMode.Switch:
+                    return SwitchToBranch();
+                case CheckoutMode.Fetch:
+                    return FetchAndCheckout();
+                default:
+                    Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");
+                    return Observable.Empty<Unit>();
+            }
+        }
+
+        IObservable<Unit> SwitchToBranch()
+        {
+            return pullRequestsService.SwitchToBranch(repository, Number)
+                .Catch<Unit, Exception>(ex =>
+                {
+                    CheckoutError = ex.Message;
+                    return Observable.Empty<Unit>();
+                });
+        }
+
+        IObservable<Unit> FetchAndCheckout()
+        {
+            var branchName = pullRequestsService.GetDefaultLocalBranchName(Number, Title);
+
+            return pullRequestsService.FetchAndCheckout(repository, Number, branchName)
+                .Catch<Unit, Exception>(ex =>
+                {
+                    CheckoutError = ex.Message;
+                    return Observable.Empty<Unit>();
+                });
         }
     }
 }

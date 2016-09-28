@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -14,7 +15,7 @@ namespace UnitTests.GitHub.App.ViewModels
         static readonly Uri Uri = new Uri("http://foo");
 
         [Fact]
-        public void ShouldCreateChangesTree()
+        public async Task ShouldCreateChangesTree()
         {
             var repository = Substitute.For<ILocalRepositoryModel>();
             repository.CloneUrl.Returns(new UriString(Uri.ToString()));
@@ -22,6 +23,8 @@ namespace UnitTests.GitHub.App.ViewModels
             var target = new PullRequestDetailViewModel(
                 Substitute.For<IRepositoryHost>(),
                 repository,
+                Substitute.For<IGitService>(),
+                Substitute.For<IPullRequestService>(),
                 Substitute.For<IAvatarProvider>());
 
             var files = new[]
@@ -33,7 +36,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 new PullRequestFile(string.Empty, "dir2/f4.cs", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
             };
 
-            target.Load(CreatePullRequest(), files);
+            await target.Load(CreatePullRequest(), files);
 
             Assert.Equal(3, target.ChangedFilesTree.Count);
 
