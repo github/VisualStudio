@@ -352,7 +352,7 @@ namespace GitHub.ViewModels
                 {
                     CheckoutMode = CheckoutMode.Fetch;
                 }
-                if (divergence.BehindBy == 0)
+                else if (divergence.BehindBy == 0)
                 {
                     CheckoutMode = CheckoutMode.UpToDate;
                 }
