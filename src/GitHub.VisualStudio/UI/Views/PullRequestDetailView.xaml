@@ -187,7 +187,7 @@
 
                 <!-- Branch checked out and neds pull -->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="sync" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run>Your local branch is behind by</Run>
                     <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
                     <Hyperlink Command="{Binding Checkout}">Update</Hyperlink>
