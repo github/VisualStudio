@@ -346,7 +346,7 @@ namespace GitHub.ViewModels
             
             if (localBranches.Contains(repository.CurrentBranch))
             {
-                var divergence = await pullRequestsService.CalculateHistoryDivergance(repository, Number);
+                var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Number);
 
                 if (divergence.BehindBy == null)
                 {

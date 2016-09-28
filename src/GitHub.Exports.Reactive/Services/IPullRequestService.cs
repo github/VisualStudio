@@ -51,7 +51,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequestNumber">The pull request number.</param>
         /// <returns></returns>
-        IObservable<HistoryDivergence> CalculateHistoryDivergance(ILocalRepositoryModel repository, int pullRequestNumber);
+        IObservable<HistoryDivergence> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }

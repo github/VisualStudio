@@ -93,7 +93,7 @@ namespace GitHub.Services
             return "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
         }
 
-        public IObservable<HistoryDivergence> CalculateHistoryDivergance(ILocalRepositoryModel repository, int pullRequestNumber)
+        public IObservable<HistoryDivergence> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
         {
             return Observable.Defer(async () =>
             {
