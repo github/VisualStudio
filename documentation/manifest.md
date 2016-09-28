@@ -1,4 +1,8 @@
 # First Launch
+- **Start page is displayed by default on first launch**
+  - **Click on GitHub link on start page under Open > Checkout from**
+    - [ ] Team Explorer Window exposed
+    - [ ] Clone a GitHub Repository dialog visible
   - **If last solution was in a git repo hosted on GitHub**
     - **Team Explorer Home page shows:**
       - [ ] GitHub header, repo information
@@ -21,9 +25,6 @@
               - [ ] Connect dialog disappears
               - [ ] GitHub invitation section in Connect page disappears
               - [ ] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
-
-# Start Page (logged in)
-
 
 # In Team Explorer Connect page (logged in)
   - [ ] **Click on Clone action link**
