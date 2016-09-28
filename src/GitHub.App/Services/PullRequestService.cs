@@ -130,7 +130,7 @@ namespace GitHub.Services
             return repository.Config
                 .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
                 .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
-                .Select(x => x.Branch);
+                .Select(x => ConfigKeyToBranchName(x.Branch));
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
@@ -172,5 +172,7 @@ namespace GitHub.Services
         }
 
         static string BranchNameToConfigKey(string name) => name.Replace("/", ".");
+
+        static string ConfigKeyToBranchName(string name) => name.Replace(".", "/");
     }
 }
