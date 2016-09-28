@@ -41,6 +41,14 @@
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="TextAlignment" Value="Left"/>
                 <Setter Property="PagePadding" Value="0"/>
+
+                <Style.Resources>
+                    <Style TargetType="Image">
+                        <Setter Property="Stretch" Value="UniformToFill" />
+                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="MaxWidth" Value="{Binding ActualWidth, ElementName=bodyMarkdown}" />
+                    </Style>
+                </Style.Resources>
             </Style>
 
             <Style TargetType="GridViewColumnHeader">
@@ -165,14 +173,14 @@
                 </Grid.RowDefinitions>
 
                 <!-- Author avatar -->
-                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" Margin="0 8">
+                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0 6 0 3">
                     <Grid.OpacityMask>
                         <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
                     </Grid.OpacityMask>
-                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="24" />
+                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
                     <Image x:Name="avatar"
-                           Width="24"
-                           Height="24"
+                           Width="20"
+                           Height="20"
                            RenderOptions.BitmapScalingMode="HighQuality"
                            Source="{Binding Author.Avatar}" />
                 </Grid>
@@ -189,7 +197,7 @@
                                    Margin="2 6 10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
-                                   ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                                   ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- View on github link -->
                 <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
