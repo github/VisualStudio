@@ -160,7 +160,7 @@ namespace GitHub.Services
         async Task DoFetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
-            var configKey = $"branch.{BranchNameToConfigKey(localBranchName)}.ghfvs-pr";
+            var configKey = $"branch.{localBranchName}.ghfvs-pr";
             await gitClient.Fetch(repo, "origin", new[] { $"refs/pull/{pullRequestNumber}/head:{localBranchName}" });
             await gitClient.Checkout(repo, localBranchName);
             await gitClient.SetConfig(repo, configKey, pullRequestNumber.ToString());
@@ -172,7 +172,7 @@ namespace GitHub.Services
             return repository.Config
                 .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
                 .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
-                .Select(x => ConfigKeyToBranchName(x.Branch));
+                .Select(x => x.Branch);
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
@@ -224,9 +224,5 @@ namespace GitHub.Services
                 before = after;
             }
         }
-
-        static string BranchNameToConfigKey(string name) => name.Replace("/", ".");
-
-        static string ConfigKeyToBranchName(string name) => name.Replace(".", "/");
     }
 }
