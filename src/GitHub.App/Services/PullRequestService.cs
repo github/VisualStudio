@@ -149,7 +149,7 @@ namespace GitHub.Services
 
         IEnumerable<string> GetLocalBranchesInternal(IRepository repository, int number)
         {
-            var pr = number.ToString();
+            var pr = number.ToString(CultureInfo.InvariantCulture);
             return repository.Config
                 .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
                 .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
@@ -199,7 +199,7 @@ namespace GitHub.Services
 
                 if (after == before)
                 {
-                    return before.ToLower(CultureInfo.InvariantCulture);
+                    return before.ToLower(CultureInfo.CurrentCulture);
                 }
 
                 before = after;
