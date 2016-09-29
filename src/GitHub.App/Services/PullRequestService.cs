@@ -149,12 +149,33 @@ namespace GitHub.Services
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest)
         {
-            return Observable.Defer(() =>
+            return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var branch = GetLocalBranchesInternal(repo, repository.CloneUrl, pullRequest).First();
-                gitClient.Fetch(repo, "origin");
-                gitClient.Checkout(repo, branch);
+                var branchName = GetLocalBranchesInternal(repo, repository.CloneUrl, pullRequest).First();
+
+                await gitClient.Fetch(repo, "origin");
+
+                var branch = repo.Branches[branchName];
+
+                if (branch == null)
+                {
+                    var trackedBranchName = $"refs/remotes/origin/" + branchName;
+                    var trackedBranch = repo.Branches[trackedBranchName];
+
+                    if (trackedBranch != null)
+                    {
+                        branch = repo.CreateBranch(branchName, trackedBranch.Tip);
+                        await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
+                    }
+                }
+
+                await gitClient.Checkout(repo, branchName);
+
                 return Observable.Empty<Unit>();
             });
         }
