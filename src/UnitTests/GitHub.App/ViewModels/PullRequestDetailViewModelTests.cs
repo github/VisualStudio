@@ -207,8 +207,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received()
-                .FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/123");
+            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/123");
         }
 
         [Fact]
@@ -224,8 +223,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received()
-                .SwitchToBranch(Arg.Any<ILocalRepositoryModel>(), 1);
+            var unused = target.Item2.Received().SwitchToBranch(Arg.Any<ILocalRepositoryModel>(), 1);
         }
 
         [Fact]
@@ -241,8 +239,28 @@ namespace UnitTests.GitHub.App.ViewModels
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received()
-                .FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+        }
+
+        [Fact]
+        public async Task CheckoutInvalidStateShouldCallService()
+        {
+            var target = CreateTargetAndService(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                aheadBy: 1);
+
+            target.Item2.GetDefaultLocalBranchName(Arg.Any<ILocalRepositoryModel>(), 1, Arg.Any<string>())
+                .Returns(Observable.Return("pr/1-foo"));
+
+            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.InvalidState, target.Item1.CheckoutMode);
+
+            target.Item1.Checkout.Execute(null);
+
+            var unused = target.Item2.Received().UnmarkLocalBranch(Arg.Any<ILocalRepositoryModel>());
+            unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
         }
 
         PullRequestDetailViewModel CreateTarget(

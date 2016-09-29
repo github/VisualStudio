@@ -113,11 +113,20 @@ namespace GitHub.Services
             });
         }
 
+        public Task UnsetConfig(IRepository repository, string key)
+        {
+            Guard.ArgumentNotEmptyString(key, nameof(key));
+
+            return Task.Factory.StartNew(() =>
+            {
+                repository.Config.Unset(key);
+            });
+        }
+
         public Task<Remote> GetHttpRemote(IRepository repo, string remote)
         {
             return Task.Factory.StartNew(() =>
             {
-
                 var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
                 var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
                 var ret = repo.Network.Remotes[remoteName];

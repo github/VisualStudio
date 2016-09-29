@@ -69,6 +69,14 @@ namespace GitHub.Services
         /// <returns></returns>
         Task SetTrackingBranch(IRepository repository, string branchName, string remoteName);
 
+        /// <summary>
+        /// Unsets the configuration key in the local config.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="key">The configuration key. Keys are in the form 'section.name'.</param>
+        /// <returns></returns>
+        Task UnsetConfig(IRepository repository, string key);
+
         Task<Remote> GetHttpRemote(IRepository repo, string remote);
     }
 }

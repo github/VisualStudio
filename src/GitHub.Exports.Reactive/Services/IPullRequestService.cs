@@ -60,6 +60,13 @@ namespace GitHub.Services
         /// <returns></returns>
         IObservable<HistoryDivergence> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
 
+        /// <summary>
+        /// Removes any association between the current branch and a pull request.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository);
+
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }
 }

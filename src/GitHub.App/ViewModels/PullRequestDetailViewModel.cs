@@ -466,6 +466,12 @@ namespace GitHub.ViewModels
                 case CheckoutMode.Switch:
                     operation = pullRequestsService.SwitchToBranch(repository, Number);
                     break;
+                case CheckoutMode.InvalidState:
+                    operation = pullRequestsService
+                        .UnmarkLocalBranch(repository)
+                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Number, Title))
+                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
+                    break;
                 default:
                     Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");
                     operation = Observable.Empty<Unit>();
