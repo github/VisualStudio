@@ -142,9 +142,15 @@ namespace GitHub.Services
             return Observable.Defer(() =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var result = GetLocalBranchesInternal(repo, repository.CloneUrl, pullRequest).Select(x => new BranchModel(x, repository));
+                var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
                 return result.ToObservable();
             });
+        }
+
+        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, PullRequest pullRequest)
+        {
+            var sourceUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
+            return sourceUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest)
@@ -152,7 +158,7 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var branchName = GetLocalBranchesInternal(repo, repository.CloneUrl, pullRequest).First();
+                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).First();
 
                 await gitClient.Fetch(repo, "origin");
 
@@ -200,11 +206,12 @@ namespace GitHub.Services
             await gitClient.SetConfig(repo, configKey, pullRequestNumber.ToString());
         }
 
-        IEnumerable<string> GetLocalBranchesInternal(IRepository repository, UriString cloneUrl, PullRequest pullRequest)
+        IEnumerable<string> GetLocalBranchesInternal(
+            ILocalRepositoryModel localRepository,
+            IRepository repository,
+            PullRequest pullRequest)
         {
-            var sourceUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
-
-            if (sourceUrl.ToRepositoryUrl() == cloneUrl.ToRepositoryUrl())
+            if (!IsPullRequestFromFork(localRepository, pullRequest))
             {
                 return new[] { pullRequest.Head.Ref };
             }

@@ -19,9 +19,8 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" 
-                                                               CommitsBehind="2"
-                                                               CheckoutDisabledMessage="Cannot update branch as your working directory has uncommitted changes."/>
+                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="Push" 
+                                                               CommitsBehind="2"/>
             </Binding.Source>
         </Binding>
     </d:DesignProperties.DataContext>
@@ -231,6 +230,22 @@
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutMode}" Value="InvalidState">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Local branch is checked out but needs pushing-->
+                <TextBlock TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="info" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <Run BaselineAlignment="Top">Local changes can be pushed.</Run>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Push">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>

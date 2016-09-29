@@ -93,7 +93,7 @@ namespace GitHub.ViewModels
             var canCheckout = this.WhenAnyValue(
                 x => x.CheckoutMode,
                 x => x.CheckoutDisabledMessage,
-                (mode, disabled) => mode != CheckoutMode.UpToDate && disabled == null);
+                (mode, disabled) => mode != CheckoutMode.UpToDate && mode != CheckoutMode.Push && disabled == null);
             Checkout = ReactiveCommand.CreateAsyncObservable(canCheckout, DoCheckout);
 
             OpenOnGitHub = ReactiveCommand.Create();
@@ -337,9 +337,14 @@ namespace GitHub.ViewModels
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Number);
 
-                if (divergence.BehindBy == null || divergence.AheadBy > 0)
+                if (divergence.BehindBy == null)
                 {
                     CheckoutMode = CheckoutMode.InvalidState;
+                }
+                else if (divergence.AheadBy > 0)
+                {
+                    CheckoutMode = pullRequestsService.IsPullRequestFromFork(repository, pullRequest) ?
+                        CheckoutMode.InvalidState : CheckoutMode.Push;
                 }
                 else if (divergence.BehindBy == 0)
                 {

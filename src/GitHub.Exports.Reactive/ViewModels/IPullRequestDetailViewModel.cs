@@ -63,8 +63,14 @@ namespace GitHub.ViewModels
         Fetch,
 
         /// <summary>
-        /// The checked out branch is marked as the branch for the pull request, but there are
-        /// local commits or the branch shares no history.
+        /// The checked out branch is the branch from which the pull request comes, and the are
+        /// local changes, so invite the user to push.
+        /// </summary>
+        Push,
+
+        /// <summary>
+        /// The checked out branch is marked as the branch for a pull request from a fork, but
+        /// there are local commits or the branch shares no history.
         /// </summary>
         InvalidState,
     }

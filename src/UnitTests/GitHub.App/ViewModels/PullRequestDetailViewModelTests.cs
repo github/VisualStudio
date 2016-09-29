@@ -164,11 +164,26 @@ namespace UnitTests.GitHub.App.ViewModels
         }
 
         [Fact]
-        public async Task CheckoutModeShouldBeInvalidStateWhenHasLocalCommits()
+        public async Task CheckoutModeShouldBePush()
         {
             var target = CreateTarget(
                 currentBranch: "pr/123",
                 existingPrBranch: "pr/123",
+                prFromFork: false,
+                aheadBy: 1);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Push, target.CheckoutMode);
+            Assert.False(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutModeShouldBeInvalidStateWhenBranchFromForkHasLocalCommits()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                prFromFork: true,
                 aheadBy: 1,
                 behindBy: 2);
             await target.Load(CreatePullRequest(), new PullRequestFile[0]);
@@ -183,6 +198,7 @@ namespace UnitTests.GitHub.App.ViewModels
             var target = CreateTarget(
                 currentBranch: "pr/123",
                 existingPrBranch: "pr/123",
+                prFromFork: true,
                 aheadBy: 1,
                 behindBy: 2,
                 dirty: true);
@@ -267,6 +283,7 @@ namespace UnitTests.GitHub.App.ViewModels
         PullRequestDetailViewModel CreateTarget(
             string currentBranch = "master",
             string existingPrBranch = null,
+            bool prFromFork = false,
             bool dirty = false,
             int aheadBy = 0,
             int behindBy = 0)
@@ -274,6 +291,7 @@ namespace UnitTests.GitHub.App.ViewModels
             return CreateTargetAndService(
                 currentBranch: currentBranch,
                 existingPrBranch: existingPrBranch,
+                prFromFork: prFromFork,
                 dirty: dirty,
                 aheadBy: aheadBy,
                 behindBy: behindBy).Item1;
@@ -282,6 +300,7 @@ namespace UnitTests.GitHub.App.ViewModels
         Tuple<PullRequestDetailViewModel, IPullRequestService> CreateTargetAndService(
             string currentBranch = "master",
             string existingPrBranch = null,
+            bool prFromFork = false,
             bool dirty = false,
             int aheadBy = 0,
             int behindBy = 0)
@@ -305,6 +324,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     .Returns(Observable.Empty<IBranch>());
             }
 
+            pullRequestService.IsPullRequestFromFork(repository, Arg.Any<PullRequest>()).Returns(prFromFork);
             pullRequestService.CleanForCheckout(repository).Returns(Observable.Return(!dirty));
 
             var divergence = Substitute.For<HistoryDivergence>();

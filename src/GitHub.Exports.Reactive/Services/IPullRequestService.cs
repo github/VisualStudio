@@ -46,6 +46,14 @@ namespace GitHub.Services
         IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest);
 
         /// <summary>
+        /// Determines whether the specified pull request is from a fork.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <returns></returns>
+        bool IsPullRequestFromFork(ILocalRepositoryModel repository, PullRequest pullRequest);
+
+        /// <summary>
         /// Switches to an existing branch for the specified pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>
