@@ -8,6 +8,7 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Shell;
 using NLog;
 using NullGuard;
 using Octokit;
