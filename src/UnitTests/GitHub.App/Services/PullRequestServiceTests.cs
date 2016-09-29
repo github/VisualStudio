@@ -1,14 +1,16 @@
-﻿using System.Reactive.Linq;
-using System.Threading.Tasks;
-using NSubstitute;
-using Xunit;
-using UnitTests;
-using GitHub.Models;
-using System;
-using GitHub.Services;
-using Rothko;
-using LibGit2Sharp;
+﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Services;
+using LibGit2Sharp;
+using NSubstitute;
+using Octokit;
+using Rothko;
+using UnitTests;
+using Xunit;
 
 public class PullRequestServiceTests : TestBaseClass
 {
@@ -94,13 +96,92 @@ public class PullRequestServiceTests : TestBaseClass
         }
     }
 
+    public class TheGetLocalBranchesMethod
+    {
+        [Fact]
+        public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepository()
+        {
+            var service = new PullRequestService(
+                Substitute.For<IGitClient>(),
+                MockGitService(),
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IUsageTracker>());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar"));
+
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest());
+
+            Assert.Equal("source", result.Name);
+        }
+
+        [Fact]
+        public async Task ShouldReturnMarkedBranchForPullRequestFromFork()
+        {
+            var repo = Substitute.For<IRepository>();
+            var config = Substitute.For<Configuration>();
+
+            var configEntry1 = Substitute.For<ConfigurationEntry<string>>();
+            configEntry1.Key.Returns("branch.pr/1-foo.ghfvs-pr");
+            configEntry1.Value.Returns("1");
+            var configEntry2 = Substitute.For<ConfigurationEntry<string>>();
+            configEntry2.Key.Returns("branch.pr/2-bar.ghfvs-pr");
+            configEntry2.Value.Returns("2");
+
+            config.GetEnumerator().Returns(new List<ConfigurationEntry<string>>
+            {
+                configEntry1,
+                configEntry2,
+            }.GetEnumerator());
+
+            repo.Config.Returns(config);
+
+            var service = new PullRequestService(
+                Substitute.For<IGitClient>(),
+                MockGitService(repo),
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IUsageTracker>());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://github.com/baz/bar"));
+
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest());
+
+            Assert.Equal("pr/1-foo", result.Name);
+        }
+
+        static PullRequest CreatePullRequest()
+        {
+            var uri = new Uri("http://github.com/foo/bar.git");
+            var repository = CreateRepository("foo", "bar");
+            var user = CreateUserAndScopes("foo").User;
+
+            return new PullRequest(
+                uri, uri, uri, uri, uri, uri,
+                1, ItemState.Open, "PR 1", string.Empty,
+                DateTimeOffset.Now, DateTimeOffset.Now, null, null,
+                new GitReference(string.Empty, "foo:bar", "source", string.Empty, user, repository),
+                new GitReference(string.Empty, "foo:baz", "dest", string.Empty, user, repository),
+                user, user,
+                true, null,
+                0, 0, 0, 0, 0, 0, null, false);
+        }
+
+        static IGitService MockGitService(IRepository repository = null)
+        {
+            var result = Substitute.For<IGitService>();
+            result.GetRepository(Arg.Any<string>()).Returns(repository ?? Substitute.For<IRepository>());
+            return result;
+        }
+    }
+
     static BranchCollection MockBranches(params string[] names)
     {
         var result = Substitute.For<BranchCollection>();
 
         foreach (var name in names)
         {
-            var branch = Substitute.For<Branch>();
+            var branch = Substitute.For<LibGit2Sharp.Branch>();
             branch.CanonicalName.Returns("refs/heads/" + name);
             result[name].Returns(branch);
         }
