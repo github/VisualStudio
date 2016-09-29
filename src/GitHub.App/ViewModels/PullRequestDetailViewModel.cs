@@ -465,7 +465,7 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> FetchAndCheckout()
         {
-            var branchName = pullRequestsService.GetDefaultLocalBranchName(Number, Title);
+            var branchName = pullRequestsService.GetDefaultLocalBranchName(repository, Number, Title);
 
             return pullRequestsService.FetchAndCheckout(repository, Number, branchName)
                 .Catch<Unit, Exception>(ex =>

@@ -88,9 +88,19 @@ namespace GitHub.Services
             return DoFetchAndCheckout(repository, pullRequestNumber, localBranchName).ToObservable();
         }
 
-        public string GetDefaultLocalBranchName(int pullRequestNumber, string pullRequestTitle)
+        public string GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
         {
-            return "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
+            var initial = "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
+            var current = initial;
+            var repo = gitService.GetRepository(repository.LocalPath);
+            var index = 2;
+
+            while (repo.Branches[current] != null)
+            {
+                current = initial + '-' + index++;
+            }
+
+            return current;
         }
 
         public IObservable<HistoryDivergence> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
