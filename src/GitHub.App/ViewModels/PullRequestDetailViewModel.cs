@@ -451,38 +451,32 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoCheckout(object unused)
         {
+            IObservable<Unit> operation = null;
+
             switch (CheckoutMode)
             {
-                case CheckoutMode.Switch:
-                    return SwitchToBranch();
+                case CheckoutMode.NeedsPull:
+                    operation = pullRequestsService.FetchAndCheckout(repository, Number, repository.CurrentBranch.Name);
+                    break;
                 case CheckoutMode.Fetch:
-                    return FetchAndCheckout();
+                    operation = pullRequestsService
+                        .GetDefaultLocalBranchName(repository, Number, Title)
+                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
+                    break;
+                case CheckoutMode.Switch:
+                    operation = pullRequestsService.SwitchToBranch(repository, Number);
+                    break;
                 default:
                     Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");
-                    return Observable.Empty<Unit>();
+                    operation = Observable.Empty<Unit>();
+                    break;
             }
-        }
 
-        IObservable<Unit> SwitchToBranch()
-        {
-            return pullRequestsService.SwitchToBranch(repository, Number)
-                .Catch<Unit, Exception>(ex =>
-                {
-                    CheckoutError = ex.Message;
-                    return Observable.Empty<Unit>();
-                });
-        }
-
-        IObservable<Unit> FetchAndCheckout()
-        {
-            var branchName = pullRequestsService.GetDefaultLocalBranchName(repository, Number, Title);
-
-            return pullRequestsService.FetchAndCheckout(repository, Number, branchName)
-                .Catch<Unit, Exception>(ex =>
-                {
-                    CheckoutError = ex.Message;
-                    return Observable.Empty<Unit>();
-                });
+            return operation.Catch<Unit, Exception>(ex =>
+            {
+                CheckoutError = ex.Message;
+                return Observable.Empty<Unit>();
+            });
         }
     }
 }

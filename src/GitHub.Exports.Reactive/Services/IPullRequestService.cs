@@ -35,7 +35,7 @@ namespace GitHub.Services
         /// <param name="pullRequestNumber">The pull request number.</param>
         /// <param name="pullRequestTitle">The pull request title.</param>
         /// <returns></returns>
-        string GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle);
+        IObservable<string> GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle);
 
         /// <summary>
         /// Gets the local branches that exist for the specified pull request.

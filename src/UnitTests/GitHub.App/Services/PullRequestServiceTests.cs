@@ -55,7 +55,7 @@ public class PullRequestServiceTests : TestBaseClass
     public class TheGetDefaultLocalBranchNameMethod
     {
         [Fact]
-        public void ShouldReturnCorrectDefaultLocalBranchName()
+        public async Task ShouldReturnCorrectDefaultLocalBranchName()
         {
             var service = new PullRequestService(
                 Substitute.For<IGitClient>(),
@@ -64,12 +64,12 @@ public class PullRequestServiceTests : TestBaseClass
                 Substitute.For<IUsageTracker>());
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
-            var result = service.GetDefaultLocalBranchName(localRepo, 123, "Pull requests can be \"named\" all sorts of thing's (sic)");
+            var result = await service.GetDefaultLocalBranchName(localRepo, 123, "Pull requests can be \"named\" all sorts of thing's (sic)");
             Assert.Equal("pr/123-pull-requests-can-be-named-all-sorts-of-thing-s-sic-", result);
         }
 
         [Fact]
-        public void DefaultLocalBranchNameShouldNotClashWithExistingBranchNames()
+        public async Task DefaultLocalBranchNameShouldNotClashWithExistingBranchNames()
         {
             var service = new PullRequestService(
                 Substitute.For<IGitClient>(),
@@ -78,7 +78,7 @@ public class PullRequestServiceTests : TestBaseClass
                 Substitute.For<IUsageTracker>());
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
-            var result = service.GetDefaultLocalBranchName(localRepo, 123, "foo1");
+            var result = await service.GetDefaultLocalBranchName(localRepo, 123, "foo1");
             Assert.Equal("pr/123-foo1-3", result);
         }
 

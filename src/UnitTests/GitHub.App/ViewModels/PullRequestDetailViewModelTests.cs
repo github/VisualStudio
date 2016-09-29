@@ -193,7 +193,74 @@ namespace UnitTests.GitHub.App.ViewModels
             Assert.False(target.Checkout.CanExecute(null));
         }
 
+        [Fact]
+        public async Task CheckoutNeedsPullShouldCallService()
+        {
+            var target = CreateTargetAndService(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                behindBy: 3);
+
+            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.NeedsPull, target.Item1.CheckoutMode);
+
+            target.Item1.Checkout.Execute(null);
+
+            var unused = target.Item2.Received()
+                .FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/123");
+        }
+
+        [Fact]
+        public async Task CheckoutSwitchShouldCallService()
+        {
+            var target = CreateTargetAndService(
+                currentBranch: "master",
+                existingPrBranch: "pr/123");
+
+            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Switch, target.Item1.CheckoutMode);
+
+            target.Item1.Checkout.Execute(null);
+
+            var unused = target.Item2.Received()
+                .SwitchToBranch(Arg.Any<ILocalRepositoryModel>(), 1);
+        }
+
+        [Fact]
+        public async Task CheckoutFetchShouldCallService()
+        {
+            var target = CreateTargetAndService(currentBranch: "master");
+            target.Item2.GetDefaultLocalBranchName(Arg.Any<ILocalRepositoryModel>(), 1, Arg.Any<string>())
+                .Returns(Observable.Return("pr/1-foo"));
+
+            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Fetch, target.Item1.CheckoutMode);
+
+            target.Item1.Checkout.Execute(null);
+
+            var unused = target.Item2.Received()
+                .FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+        }
+
         PullRequestDetailViewModel CreateTarget(
+            string currentBranch = "master",
+            string existingPrBranch = null,
+            bool dirty = false,
+            int aheadBy = 0,
+            int behindBy = 0)
+        {
+            return CreateTargetAndService(
+                currentBranch: currentBranch,
+                existingPrBranch: existingPrBranch,
+                dirty: dirty,
+                aheadBy: aheadBy,
+                behindBy: behindBy).Item1;
+        }
+
+        Tuple<PullRequestDetailViewModel, IPullRequestService> CreateTargetAndService(
             string currentBranch = "master",
             string existingPrBranch = null,
             bool dirty = false,
@@ -227,11 +294,13 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())
                 .Returns(Observable.Return(divergence));
 
-            return new PullRequestDetailViewModel(
+            var vm = new PullRequestDetailViewModel(
                 Substitute.For<IRepositoryHost>(),
                 repository,
                 pullRequestService,
                 Substitute.For<IAvatarProvider>());
+
+            return Tuple.Create(vm, pullRequestService);
         }
 
         PullRequest CreatePullRequest(string body = "PR Body")
