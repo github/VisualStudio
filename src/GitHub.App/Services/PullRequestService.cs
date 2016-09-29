@@ -210,7 +210,7 @@ namespace GitHub.Services
 
         static string GetSafeBranchName(string name)
         {
-            var before = InvalidBranchCharsRegex.Replace(name, "-");
+            var before = InvalidBranchCharsRegex.Replace(name, "-").TrimEnd('-');
 
             for (;;)
             {
