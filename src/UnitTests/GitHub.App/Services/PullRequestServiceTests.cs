@@ -65,7 +65,7 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "Pull requests can be \"named\" all sorts of thing's (sic)");
-            Assert.Equal("pr/123-pull-requests-can-be-named-all-sorts-of-thing-s-sic-", result);
+            Assert.Equal("pr/123-pull-requests-can-be-named-all-sorts-of-thing-s-sic", result);
         }
 
         [Fact]
