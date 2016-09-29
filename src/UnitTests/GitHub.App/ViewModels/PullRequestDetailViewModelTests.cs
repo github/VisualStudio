@@ -17,6 +17,16 @@ namespace UnitTests.GitHub.App.ViewModels
         static readonly Uri Uri = new Uri("http://foo");
 
         [Fact]
+        public async Task ShouldUsePlaceholderBodyIfNoneExists()
+        {
+            var target = CreateTarget();
+
+            await target.Load(CreatePullRequest(body: string.Empty), new PullRequestFile[0]);
+
+            Assert.Equal("*No description provided.*", target.Body);
+        }
+
+        [Fact]
         public async Task ShouldCreateChangesTree()
         {
             var target = CreateTarget();
@@ -224,14 +234,14 @@ namespace UnitTests.GitHub.App.ViewModels
                 Substitute.For<IAvatarProvider>());
         }
 
-        PullRequest CreatePullRequest()
+        PullRequest CreatePullRequest(string body = "PR Body")
         {
             var repository = CreateRepository("foo", "bar");
             var user = CreateUserAndScopes("foo").User;
 
             return new PullRequest(
                 Uri, Uri, Uri, Uri, Uri, Uri,
-                1, ItemState.Open, "PR 1", string.Empty,
+                1, ItemState.Open, "PR 1", body,
                 DateTimeOffset.Now, DateTimeOffset.Now, null, null,
                 new GitReference(string.Empty, "foo:bar", "bar", string.Empty, user, repository),
                 new GitReference(string.Empty, "foo:baz", "baz", string.Empty, user, repository),

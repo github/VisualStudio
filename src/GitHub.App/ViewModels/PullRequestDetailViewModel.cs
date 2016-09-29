@@ -312,7 +312,7 @@ namespace GitHub.ViewModels
             Number = pullRequest.Number;
             Author = new Models.Account(pullRequest.User, avatarProvider.GetAvatar(new AccountCacheItem(pullRequest.User)));
             CreatedAt = pullRequest.CreatedAt;
-            Body = pullRequest.Body;
+            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
             ChangedFilesCount = files.Count;
 
             ChangedFilesTree.Clear();
