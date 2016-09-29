@@ -187,7 +187,7 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- Branch checked out and neds pull -->
+                <!-- Branch checked out and needs pull -->
                 <TextBlock TextWrapping="Wrap">
                     <ui:OcticonImage Icon="sync" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run>Your local branch is behind by</Run>
@@ -214,6 +214,23 @@
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutMode}" Value="Switch">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Local branch is checked out but is in an invalid state -->
+                <TextBlock TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <Run BaselineAlignment="Top">The pull request branch has local changes.</Run>
+                    <Hyperlink Command="{Binding Checkout}">Checkout to a new branch</Hyperlink>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CheckoutMode}" Value="InvalidState">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>

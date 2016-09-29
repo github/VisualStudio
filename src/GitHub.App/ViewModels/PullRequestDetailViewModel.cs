@@ -335,9 +335,9 @@ namespace GitHub.ViewModels
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Number);
 
-                if (divergence.BehindBy == null)
+                if (divergence.BehindBy == null || divergence.AheadBy > 0)
                 {
-                    CheckoutMode = CheckoutMode.Fetch;
+                    CheckoutMode = CheckoutMode.InvalidState;
                 }
                 else if (divergence.BehindBy == 0)
                 {
@@ -413,6 +413,7 @@ namespace GitHub.ViewModels
                 case CheckoutMode.Switch:
                     return "switch branches";
                 case CheckoutMode.Fetch:
+                case CheckoutMode.InvalidState:
                     return "checkout pull request";
                 default:
                     Debug.Fail("Invalid CheckoutMode in GetCheckoutModeDescription");

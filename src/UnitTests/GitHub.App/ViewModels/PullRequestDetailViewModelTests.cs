@@ -153,10 +153,41 @@ namespace UnitTests.GitHub.App.ViewModels
             Assert.False(target.Checkout.CanExecute(null));
         }
 
+        [Fact]
+        public async Task CheckoutModeShouldBeInvalidStateWhenHasLocalCommits()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                aheadBy: 1,
+                behindBy: 2);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.InvalidState, target.CheckoutMode);
+            Assert.True(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutDisabledMessageShouldBeSetWhenInvalidStateAndWorkingDirectoryDirty()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                aheadBy: 1,
+                behindBy: 2,
+                dirty: true);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.InvalidState, target.CheckoutMode);
+            Assert.Equal("Cannot checkout pull request as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
+            Assert.False(target.Checkout.CanExecute(null));
+        }
+
         PullRequestDetailViewModel CreateTarget(
             string currentBranch = "master",
             string existingPrBranch = null,
             bool dirty = false,
+            int aheadBy = 0,
             int behindBy = 0)
         {
             var repository = Substitute.For<ILocalRepositoryModel>();
@@ -181,6 +212,7 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.CleanForCheckout(repository).Returns(Observable.Return(!dirty));
 
             var divergence = Substitute.For<HistoryDivergence>();
+            divergence.AheadBy.Returns(aheadBy);
             divergence.BehindBy.Returns(behindBy);
             pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())
                 .Returns(Observable.Return(divergence));

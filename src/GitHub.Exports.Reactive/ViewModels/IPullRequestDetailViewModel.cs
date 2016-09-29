@@ -61,6 +61,12 @@ namespace GitHub.ViewModels
         /// No local branch exists for the pull request.
         /// </summary>
         Fetch,
+
+        /// <summary>
+        /// The checked out branch is marked as the branch for the pull request, but there are
+        /// local commits or the branch shares no history.
+        /// </summary>
+        InvalidState,
     }
 
     /// <summary>
