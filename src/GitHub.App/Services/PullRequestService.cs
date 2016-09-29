@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
+using PullRequest =  Octokit.PullRequest;
 
 namespace GitHub.Services
 {
@@ -136,22 +137,23 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, int number)
+        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest)
         {
             return Observable.Defer(() =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var result = GetLocalBranchesInternal(repo, number).Select(x => new BranchModel(x, repository));
+                var result = GetLocalBranchesInternal(repo, repository.CloneUrl, pullRequest).Select(x => new BranchModel(x, repository));
                 return result.ToObservable();
             });
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, int number)
+        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest)
         {
             return Observable.Defer(() =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var branch = GetLocalBranchesInternal(repo, number).First();
+                var branch = GetLocalBranchesInternal(repo, repository.CloneUrl, pullRequest).First();
+                gitClient.Fetch(repo, "origin");
                 gitClient.Checkout(repo, branch);
                 return Observable.Empty<Unit>();
             });
@@ -177,13 +179,22 @@ namespace GitHub.Services
             await gitClient.SetConfig(repo, configKey, pullRequestNumber.ToString());
         }
 
-        IEnumerable<string> GetLocalBranchesInternal(IRepository repository, int number)
+        IEnumerable<string> GetLocalBranchesInternal(IRepository repository, UriString cloneUrl, PullRequest pullRequest)
         {
-            var pr = number.ToString(CultureInfo.InvariantCulture);
-            return repository.Config
-                .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
-                .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
-                .Select(x => x.Branch);
+            var sourceUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
+
+            if (sourceUrl.ToRepositoryUrl() == cloneUrl.ToRepositoryUrl())
+            {
+                return new[] { pullRequest.Head.Ref };
+            }
+            else
+            {
+                var pr = pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+                return repository.Config
+                    .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
+                    .Select(x => x.Branch);
+            }
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,

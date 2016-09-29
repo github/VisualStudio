@@ -35,6 +35,7 @@ namespace GitHub.ViewModels
         readonly ILocalRepositoryModel repository;
         readonly IPullRequestService pullRequestsService;
         readonly IAvatarProvider avatarProvider;
+        PullRequest model;
         PullRequestState state;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -304,6 +305,7 @@ namespace GitHub.ViewModels
         /// <param name="files">The pull request's changed files.</param>
         public async Task Load(PullRequest pullRequest, IList<PullRequestFile> files)
         {
+            model = pullRequest;
             State = CreatePullRequestState(pullRequest);
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
@@ -329,7 +331,7 @@ namespace GitHub.ViewModels
                 ChangedFilesTree.Add(change);
             }
 
-            var localBranches = await pullRequestsService.GetLocalBranches(repository, Number).ToList();
+            var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
             
             if (localBranches.Contains(repository.CurrentBranch))
             {
@@ -464,7 +466,7 @@ namespace GitHub.ViewModels
                         .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
                     break;
                 case CheckoutMode.Switch:
-                    operation = pullRequestsService.SwitchToBranch(repository, Number);
+                    operation = pullRequestsService.SwitchToBranch(repository, model);
                     break;
                 case CheckoutMode.InvalidState:
                     operation = pullRequestsService

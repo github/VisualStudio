@@ -216,14 +216,15 @@ namespace UnitTests.GitHub.App.ViewModels
             var target = CreateTargetAndService(
                 currentBranch: "master",
                 existingPrBranch: "pr/123");
+            var pr = CreatePullRequest();
 
-            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Item1.Load(pr, new PullRequestFile[0]);
 
             Assert.Equal(CheckoutMode.Switch, target.Item1.CheckoutMode);
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received().SwitchToBranch(Arg.Any<ILocalRepositoryModel>(), 1);
+            var unused = target.Item2.Received().SwitchToBranch(Arg.Any<ILocalRepositoryModel>(), pr);
         }
 
         [Fact]
@@ -295,12 +296,12 @@ namespace UnitTests.GitHub.App.ViewModels
             if (existingPrBranch != null)
             {
                 var existingBranchModel = new BranchModel(existingPrBranch, repository);
-                pullRequestService.GetLocalBranches(repository, Arg.Any<int>())
+                pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequest>())
                     .Returns(Observable.Return(existingBranchModel));
             }
             else
             {
-                pullRequestService.GetLocalBranches(repository, Arg.Any<int>())
+                pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequest>())
                     .Returns(Observable.Empty<IBranch>());
             }
 

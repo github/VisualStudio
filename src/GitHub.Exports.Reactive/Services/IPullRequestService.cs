@@ -2,6 +2,7 @@
 using System.Reactive;
 using GitHub.Models;
 using LibGit2Sharp;
+using Octokit;
 
 namespace GitHub.Services
 {
@@ -40,17 +41,17 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the local branches that exist for the specified pull request.
         /// </summary>
-        /// <param name="pullRequestNumber">The pull request number.</param>
+        /// <param name="pullRequest">The octokit pull request details.</param>
         /// <returns></returns>
-        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, int number);
+        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest);
 
         /// <summary>
         /// Switches to an existing branch for the specified pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="pullRequestNumber">The pull request number.</param>
+        /// <param name="pullRequest">The octokit pull request details.</param>
         /// <returns></returns>
-        IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, int number);
+        IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest);
 
         /// <summary>
         /// Gets the history divergence between the current HEAD and the specified pull request.
