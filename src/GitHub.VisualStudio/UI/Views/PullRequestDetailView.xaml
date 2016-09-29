@@ -19,7 +19,9 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" CommitsBehind="2"/>
+                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" 
+                                                               CommitsBehind="2"
+                                                               CheckoutDisabledMessage="Cannot update branch as your working directory has uncommitted changes."/>
             </Binding.Source>
         </Binding>
     </d:DesignProperties.DataContext>
@@ -213,6 +215,21 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutMode}" Value="Switch">
                                     <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Checkout disabled message -->
+                <TextBlock Margin="0 4" TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <Run Text="{Binding CheckoutDisabledMessage}"/>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

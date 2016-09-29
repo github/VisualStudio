@@ -69,6 +69,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public CheckoutMode CheckoutMode { get; set; }
         public string CheckoutError { get; set; }
         public int CommitsBehind { get; set; }
+        public string CheckoutDisabledMessage { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }

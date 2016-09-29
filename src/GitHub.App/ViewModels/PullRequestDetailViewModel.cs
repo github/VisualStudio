@@ -33,7 +33,6 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
-        readonly IGitService gitService;
         readonly IPullRequestService pullRequestsService;
         readonly IAvatarProvider avatarProvider;
         PullRequestState state;
@@ -47,29 +46,26 @@ namespace GitHub.ViewModels
         int changeCount;
         ChangedFilesView changedFilesView;
         OpenChangedFileAction openChangedFileAction;
-        bool uncommittedChanges;
         CheckoutMode checkoutMode;
         string checkoutError;
         int commitsBehind;
+        string checkoutDisabledMessage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
         /// <param name="connectionRepositoryHostMap">The connection repository host map.</param>
         /// <param name="teservice">The team explorer service.</param>
-        /// <param name="gitService">The git service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IGitService gitService,
             IPullRequestService pullRequestsService,
             IAvatarProvider avatarProvider)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost,
                   teservice.ActiveRepo,
-                  gitService,
                   pullRequestsService,
                   avatarProvider)
         {
@@ -80,25 +76,24 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="repositoryHost">The repository host.</param>
         /// <param name="teservice">The team explorer service.</param>
-        /// <param name="gitService">The git service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         public PullRequestDetailViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
-            IGitService gitService,
             IPullRequestService pullRequestsService,
             IAvatarProvider avatarProvider)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
-            this.gitService = gitService;
             this.pullRequestsService = pullRequestsService;
             this.avatarProvider = avatarProvider;
 
-            Checkout = ReactiveCommand.CreateAsyncObservable(
-                this.WhenAnyValue(x => x.UncommittedChanges, x => !x),
-                DoCheckout);
+            var canCheckout = this.WhenAnyValue(
+                x => x.CheckoutMode,
+                x => x.CheckoutDisabledMessage,
+                (mode, disabled) => mode != CheckoutMode.UpToDate && disabled == null);
+            Checkout = ReactiveCommand.CreateAsyncObservable(canCheckout, DoCheckout);
 
             OpenOnGitHub = ReactiveCommand.Create();
 
@@ -217,15 +212,6 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether there are uncommitted changes blocking a checkout.
-        /// </summary>
-        public bool UncommittedChanges
-        {
-            get { return uncommittedChanges; }
-            private set { this.RaiseAndSetIfChanged(ref uncommittedChanges, value); }
-        }
-
-        /// <summary>
         /// Gets the checkout mode for the pull request.
         /// </summary>
         public CheckoutMode CheckoutMode
@@ -251,6 +237,15 @@ namespace GitHub.ViewModels
         {
             get { return commitsBehind; }
             private set { this.RaiseAndSetIfChanged(ref commitsBehind, value); }
+        }
+
+        /// <summary>
+        /// Gets a message indicating the why the <see cref="Checkout"/> command is disabled.
+        /// </summary>
+        public string CheckoutDisabledMessage
+        {
+            get { return checkoutDisabledMessage; }
+            private set { this.RaiseAndSetIfChanged(ref checkoutDisabledMessage, value); }
         }
 
         /// <summary>
@@ -334,14 +329,6 @@ namespace GitHub.ViewModels
                 ChangedFilesTree.Add(change);
             }
 
-            var repo = gitService.GetRepository(repository.LocalPath);
-            UncommittedChanges = repo.RetrieveStatus().IsDirty;
-
-            if (UncommittedChanges)
-            {
-                CheckoutError = "Cannot check out: you have uncommitted changes";
-            }
-
             var localBranches = await pullRequestsService.GetLocalBranches(repository, Number).ToList();
             
             if (localBranches.Contains(repository.CurrentBranch))
@@ -370,6 +357,12 @@ namespace GitHub.ViewModels
             {
                 CheckoutMode = CheckoutMode.Fetch;
             }
+
+            var clean = await pullRequestsService.CleanForCheckout(repository);
+
+            CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate) ?
+                $"Cannot {GetCheckoutModeDescription(CheckoutMode)} as your working directory has uncommitted changes." :
+                null;
 
             IsBusy = false;
         }
@@ -409,6 +402,22 @@ namespace GitHub.ViewModels
             }
 
             return dirs[string.Empty];
+        }
+
+        static string GetCheckoutModeDescription(CheckoutMode checkoutMode)
+        {
+            switch (checkoutMode)
+            {
+                case CheckoutMode.NeedsPull:
+                    return "update branch";
+                case CheckoutMode.Switch:
+                    return "switch branches";
+                case CheckoutMode.Fetch:
+                    return "checkout pull request";
+                default:
+                    Debug.Fail("Invalid CheckoutMode in GetCheckoutModeDescription");
+                    return null;
+            }
         }
 
         static PullRequestDirectoryViewModel GetDirectory(string path, Dictionary<string, PullRequestDirectoryViewModel> dirs)

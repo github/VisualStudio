@@ -13,6 +13,13 @@ namespace GitHub.Services
             string title, string body);
 
         /// <summary>
+        /// Checks whether the specified repository is in a clean state that will allow a checkout.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        IObservable<bool> CleanForCheckout(ILocalRepositoryModel repository);
+
+        /// <summary>
         /// Fetches a pull request to a local branch and checks out the branch.
         /// </summary>
         /// <param name="repository">The repository.</param>

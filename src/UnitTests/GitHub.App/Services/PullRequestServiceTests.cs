@@ -82,7 +82,7 @@ public class PullRequestServiceTests : TestBaseClass
             Assert.Equal("pr/123-foo1-3", result);
         }
 
-        private static IGitService MockGitService()
+        static IGitService MockGitService()
         {
             var repository = Substitute.For<IRepository>();
             var branches = MockBranches("pr/123-foo1", "pr/123-foo1-2");
@@ -94,7 +94,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
     }
 
-    private static BranchCollection MockBranches(params string[] names)
+    static BranchCollection MockBranches(params string[] names)
     {
         var result = Substitute.For<BranchCollection>();
 

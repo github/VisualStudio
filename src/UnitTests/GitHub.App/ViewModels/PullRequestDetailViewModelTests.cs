@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
+using LibGit2Sharp;
 using NSubstitute;
 using Octokit;
 using Xunit;
@@ -17,16 +19,7 @@ namespace UnitTests.GitHub.App.ViewModels
         [Fact]
         public async Task ShouldCreateChangesTree()
         {
-            var repository = Substitute.For<ILocalRepositoryModel>();
-            repository.CloneUrl.Returns(new UriString(Uri.ToString()));
-
-            var target = new PullRequestDetailViewModel(
-                Substitute.For<IRepositoryHost>(),
-                repository,
-                Substitute.For<IGitService>(),
-                Substitute.For<IPullRequestService>(),
-                Substitute.For<IAvatarProvider>());
-
+            var target = CreateTarget();
             var files = new[]
             {
                 new PullRequestFile(string.Empty, "readme.md", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
@@ -57,6 +50,146 @@ namespace UnitTests.GitHub.App.ViewModels
 
             var readme = (PullRequestFileViewModel)target.ChangedFilesTree[2];
             Assert.Equal("readme.md", readme.FileName);
+        }
+
+        [Fact]
+        public async Task CheckoutModeShouldBeUpToDate()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123");
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.UpToDate, target.CheckoutMode);
+            Assert.False(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutDisabledMessageShouldBeNullWhenUpToDateEvenWhenWorkingDirectoryDirty()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                dirty: true);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.UpToDate, target.CheckoutMode);
+            Assert.Null(target.CheckoutDisabledMessage);
+        }
+
+        [Fact]
+        public async Task CheckoutModeShouldBeNeedsPull()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                behindBy: 3);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.NeedsPull, target.CheckoutMode);
+            Assert.Equal(3, target.CommitsBehind);
+            Assert.True(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutDisabledMessageShouldBeSetWhenNeedsPullAndWorkingDirectoryDirty()
+        {
+            var target = CreateTarget(
+                currentBranch: "pr/123",
+                existingPrBranch: "pr/123",
+                behindBy: 3,
+                dirty: true);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.NeedsPull, target.CheckoutMode);
+            Assert.Equal("Cannot update branch as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
+            Assert.False(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutModeShouldBeSwitch()
+        {
+            var target = CreateTarget(
+                currentBranch: "master",
+                existingPrBranch: "pr/123");
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Switch, target.CheckoutMode);
+            Assert.True(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutDisabledMessageShouldBeSetWhenNeedsSwitchAndWorkingDirectoryDirty()
+        {
+            var target = CreateTarget(
+                currentBranch: "master",
+                existingPrBranch: "pr/123",
+                dirty: true);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Switch, target.CheckoutMode);
+            Assert.Equal("Cannot switch branches as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
+            Assert.False(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutModeShouldBeFetch()
+        {
+            var target = CreateTarget(currentBranch: "master");
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Fetch, target.CheckoutMode);
+            Assert.True(target.Checkout.CanExecute(null));
+        }
+
+        [Fact]
+        public async Task CheckoutDisabledMessageShouldBeSetWhenNeedsFetchAndWorkingDirectoryDirty()
+        {
+            var target = CreateTarget(currentBranch: "master", dirty: true);
+            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+
+            Assert.Equal(CheckoutMode.Fetch, target.CheckoutMode);
+            Assert.Equal("Cannot checkout pull request as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
+            Assert.False(target.Checkout.CanExecute(null));
+        }
+
+        PullRequestDetailViewModel CreateTarget(
+            string currentBranch = "master",
+            string existingPrBranch = null,
+            bool dirty = false,
+            int behindBy = 0)
+        {
+            var repository = Substitute.For<ILocalRepositoryModel>();
+            var currentBranchModel = new BranchModel(currentBranch, repository);
+            repository.CurrentBranch.Returns(currentBranchModel);
+            repository.CloneUrl.Returns(new UriString(Uri.ToString()));
+
+            var pullRequestService = Substitute.For<IPullRequestService>();
+
+            if (existingPrBranch != null)
+            {
+                var existingBranchModel = new BranchModel(existingPrBranch, repository);
+                pullRequestService.GetLocalBranches(repository, Arg.Any<int>())
+                    .Returns(Observable.Return(existingBranchModel));
+            }
+            else
+            {
+                pullRequestService.GetLocalBranches(repository, Arg.Any<int>())
+                    .Returns(Observable.Empty<IBranch>());
+            }
+
+            pullRequestService.CleanForCheckout(repository).Returns(Observable.Return(!dirty));
+
+            var divergence = Substitute.For<HistoryDivergence>();
+            divergence.BehindBy.Returns(behindBy);
+            pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())
+                .Returns(Observable.Return(divergence));
+
+            return new PullRequestDetailViewModel(
+                Substitute.For<IRepositoryHost>(),
+                repository,
+                pullRequestService,
+                Substitute.For<IAvatarProvider>());
         }
 
         PullRequest CreatePullRequest()

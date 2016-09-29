@@ -150,6 +150,11 @@ namespace GitHub.ViewModels
         int CommitsBehind { get; }
 
         /// <summary>
+        /// Gets a message indicating the why the <see cref="Checkout"/> command is disabled.
+        /// </summary>
+        string CheckoutDisabledMessage { get; }
+
+        /// <summary>
         /// Gets a command that checks out the pull request locally.
         /// </summary>
         ReactiveCommand<Unit> Checkout { get; }
