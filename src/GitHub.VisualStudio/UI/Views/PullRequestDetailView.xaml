@@ -13,7 +13,7 @@
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
-                                    d:DesignHeight="640"
+                                    d:DesignHeight="780"
                                     mc:Ignorable="d"
                                     Style="{DynamicResource BusyStateView}">
     <d:DesignProperties.DataContext>
@@ -400,7 +400,8 @@
                             <TreeView ItemsSource="{Binding ChangedFilesTree}" 
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      Margin="0 6 0 0">
+                                      Margin="0 6 0 0"
+                                      MouseDoubleClick="FileListMouseDoubleClick">
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
                                         <Style.Triggers>
@@ -422,13 +423,13 @@
                                         <StackPanel Orientation="Horizontal">
                                             <!-- TODO: Use the right icon here -->
                                             <ui:OcticonImage Icon="briefcase" Foreground="{DynamicResource GitHubVsWindowText}"/>
-                                            <TextBlock Text="{Binding DirectoryName}" Margin="4 0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
-                                            <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
@@ -438,7 +439,8 @@
                             <ListView ItemsSource="{Binding ChangedFilesList}"
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      Margin="0 6 0 0" >
+                                      Margin="0 6 0 0"
+                                      MouseDoubleClick="FileListMouseDoubleClick">
                                 <ListView.Style>
                                     <Style TargetType="ListView">
                                         <Style.Triggers>
