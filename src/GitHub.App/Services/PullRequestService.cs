@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
+using PullRequest =  Octokit.PullRequest;
 
 namespace GitHub.Services
 {
@@ -83,14 +84,33 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<bool> CleanForCheckout(ILocalRepositoryModel repository)
+        {
+            var repo = gitService.GetRepository(repository.LocalPath);
+            return Observable.Return(!repo.RetrieveStatus().IsDirty);
+        }
+
         public IObservable<Unit> FetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
         {
             return DoFetchAndCheckout(repository, pullRequestNumber, localBranchName).ToObservable();
         }
 
-        public string GetDefaultLocalBranchName(int pullRequestNumber, string pullRequestTitle)
+        public IObservable<string> GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
         {
-            return "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
+            return Observable.Defer(() =>
+            {
+                var initial = "pr/" + pullRequestNumber + "-" + GetSafeBranchName(pullRequestTitle);
+                var current = initial;
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var index = 2;
+
+                while (repo.Branches[current] != null)
+                {
+                    current = initial + '-' + index++;
+                }
+
+                return Observable.Return(current);
+            });
         }
 
         public IObservable<HistoryDivergence> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
@@ -117,43 +137,92 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, int number)
+        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest)
         {
             return Observable.Defer(() =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var result = GetLocalBranchesInternal(repo, number).Select(x => new BranchModel(x, repository));
+                var result = GetLocalBranchesInternal(repository, repo, pullRequest).Select(x => new BranchModel(x, repository));
                 return result.ToObservable();
             });
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, int number)
+        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, PullRequest pullRequest)
         {
-            return Observable.Defer(() =>
+            var sourceUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
+            return sourceUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+        }
+
+        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest)
+        {
+            return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var branch = GetLocalBranchesInternal(repo, number).First();
-                gitClient.Checkout(repo, branch);
+                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).First();
+
+                await gitClient.Fetch(repo, "origin");
+
+                var branch = repo.Branches[branchName];
+
+                if (branch == null)
+                {
+                    var trackedBranchName = $"refs/remotes/origin/" + branchName;
+                    var trackedBranch = repo.Branches[trackedBranchName];
+
+                    if (trackedBranch != null)
+                    {
+                        branch = repo.CreateBranch(branchName, trackedBranch.Tip);
+                        await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
+                    }
+                }
+
+                await gitClient.Checkout(repo, branchName);
+
                 return Observable.Empty<Unit>();
+            });
+        }
+
+        public IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var configKey = $"branch.{repo.Head.FriendlyName}.ghfvs-pr";
+                await gitClient.UnsetConfig(repo, configKey);
+                return Observable.Return(Unit.Default);
             });
         }
 
         async Task DoFetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
-            var configKey = $"branch.{BranchNameToConfigKey(localBranchName)}.ghfvs-pr";
+            var configKey = $"branch.{localBranchName}.ghfvs-pr";
             await gitClient.Fetch(repo, "origin", new[] { $"refs/pull/{pullRequestNumber}/head:{localBranchName}" });
             await gitClient.Checkout(repo, localBranchName);
             await gitClient.SetConfig(repo, configKey, pullRequestNumber.ToString());
         }
 
-        IEnumerable<string> GetLocalBranchesInternal(IRepository repository, int number)
+        IEnumerable<string> GetLocalBranchesInternal(
+            ILocalRepositoryModel localRepository,
+            IRepository repository,
+            PullRequest pullRequest)
         {
-            var pr = number.ToString();
-            return repository.Config
-                .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
-                .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
-                .Select(x => ConfigKeyToBranchName(x.Branch));
+            if (!IsPullRequestFromFork(localRepository, pullRequest))
+            {
+                return new[] { pullRequest.Head.Ref };
+            }
+            else
+            {
+                var pr = pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+                return repository.Config
+                    .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Branch) && x.Value == pr)
+                    .Select(x => x.Branch);
+            }
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IRepositoryHost host,
@@ -191,7 +260,7 @@ namespace GitHub.Services
 
         static string GetSafeBranchName(string name)
         {
-            var before = InvalidBranchCharsRegex.Replace(name, "-");
+            var before = InvalidBranchCharsRegex.Replace(name, "-").TrimEnd('-');
 
             for (;;)
             {
@@ -199,15 +268,11 @@ namespace GitHub.Services
 
                 if (after == before)
                 {
-                    return before.ToLower(CultureInfo.InvariantCulture);
+                    return before.ToLower(CultureInfo.CurrentCulture);
                 }
 
                 before = after;
             }
         }
-
-        static string BranchNameToConfigKey(string name) => name.Replace("/", ".");
-
-        static string ConfigKeyToBranchName(string name) => name.Replace(".", "/");
     }
 }

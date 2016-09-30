@@ -33,9 +33,9 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
-        readonly IGitService gitService;
         readonly IPullRequestService pullRequestsService;
         readonly IAvatarProvider avatarProvider;
+        PullRequest model;
         PullRequestState state;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -47,29 +47,26 @@ namespace GitHub.ViewModels
         int changeCount;
         ChangedFilesView changedFilesView;
         OpenChangedFileAction openChangedFileAction;
-        bool uncommittedChanges;
         CheckoutMode checkoutMode;
         string checkoutError;
         int commitsBehind;
+        string checkoutDisabledMessage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
         /// <param name="connectionRepositoryHostMap">The connection repository host map.</param>
         /// <param name="teservice">The team explorer service.</param>
-        /// <param name="gitService">The git service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IGitService gitService,
             IPullRequestService pullRequestsService,
             IAvatarProvider avatarProvider)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost,
                   teservice.ActiveRepo,
-                  gitService,
                   pullRequestsService,
                   avatarProvider)
         {
@@ -80,27 +77,28 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="repositoryHost">The repository host.</param>
         /// <param name="teservice">The team explorer service.</param>
-        /// <param name="gitService">The git service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         public PullRequestDetailViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
-            IGitService gitService,
             IPullRequestService pullRequestsService,
             IAvatarProvider avatarProvider)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
-            this.gitService = gitService;
             this.pullRequestsService = pullRequestsService;
             this.avatarProvider = avatarProvider;
 
-            Checkout = ReactiveCommand.CreateAsyncObservable(
-                this.WhenAnyValue(x => x.UncommittedChanges, x => !x),
-                DoCheckout);
+            var canCheckout = this.WhenAnyValue(
+                x => x.CheckoutMode,
+                x => x.CheckoutDisabledMessage,
+                (mode, disabled) => mode != CheckoutMode.UpToDate && mode != CheckoutMode.Push && disabled == null);
+            Checkout = ReactiveCommand.CreateAsyncObservable(canCheckout, DoCheckout);
 
             OpenOnGitHub = ReactiveCommand.Create();
+            OpenFile = ReactiveCommand.Create();
+            OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x));
 
             ToggleChangedFilesView = ReactiveCommand.Create();
             ToggleChangedFilesView.Subscribe(_ =>
@@ -115,6 +113,8 @@ namespace GitHub.ViewModels
                 OpenChangedFileAction = OpenChangedFileAction == OpenChangedFileAction.Diff ?
                     OpenChangedFileAction.Open : OpenChangedFileAction.Diff;
             });
+
+            ViewOpenFile = ReactiveCommand.Create();
         }
 
         /// <summary>
@@ -217,15 +217,6 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether there are uncommitted changes blocking a checkout.
-        /// </summary>
-        public bool UncommittedChanges
-        {
-            get { return uncommittedChanges; }
-            private set { this.RaiseAndSetIfChanged(ref uncommittedChanges, value); }
-        }
-
-        /// <summary>
         /// Gets the checkout mode for the pull request.
         /// </summary>
         public CheckoutMode CheckoutMode
@@ -254,6 +245,15 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets a message indicating the why the <see cref="Checkout"/> command is disabled.
+        /// </summary>
+        public string CheckoutDisabledMessage
+        {
+            get { return checkoutDisabledMessage; }
+            private set { this.RaiseAndSetIfChanged(ref checkoutDisabledMessage, value); }
+        }
+
+        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
@@ -274,6 +274,16 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
+        /// Gets a command that opens the specified file according to <see cref="ChangedFilesView"/>.
+        /// </summary>
+        /// <remarks>
+        /// An <see cref="IPullRequestFileViewModel"/> should be passed as the parameter to this command's
+        /// Execute method. It triggers <see cref="ViewOpenFile"/> or <see cref="ViewCompareFiles"/> which
+        /// should be handled by the view to implement opening or comparing the file.
+        /// </remarks>
+        public ReactiveCommand<object> OpenFile { get; }
+
+        /// <summary>
         /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
         /// </summary>
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
@@ -282,6 +292,14 @@ namespace GitHub.ViewModels
         /// Gets a command that toggles the <see cref="OpenChangedFileAction"/> property.
         /// </summary>
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
+
+        /// <summary>
+        /// Gets a command that informs the view that the specified file should be opened.
+        /// </summary>
+        /// <remarks>
+        /// The parameter passed is a string detailing the full path to the file.
+        /// </remarks>
+        public ReactiveCommand<object> ViewOpenFile { get; }
 
         /// <summary>
         /// Initializes the view model with new data.
@@ -309,6 +327,7 @@ namespace GitHub.ViewModels
         /// <param name="files">The pull request's changed files.</param>
         public async Task Load(PullRequest pullRequest, IList<PullRequestFile> files)
         {
+            model = pullRequest;
             State = CreatePullRequestState(pullRequest);
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
@@ -317,7 +336,7 @@ namespace GitHub.ViewModels
             Number = pullRequest.Number;
             Author = new Models.Account(pullRequest.User, avatarProvider.GetAvatar(new AccountCacheItem(pullRequest.User)));
             CreatedAt = pullRequest.CreatedAt;
-            Body = pullRequest.Body;
+            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
             ChangedFilesCount = files.Count;
 
             ChangedFilesTree.Clear();
@@ -334,15 +353,7 @@ namespace GitHub.ViewModels
                 ChangedFilesTree.Add(change);
             }
 
-            var repo = gitService.GetRepository(repository.LocalPath);
-            UncommittedChanges = repo.RetrieveStatus().IsDirty;
-
-            if (UncommittedChanges)
-            {
-                CheckoutError = "Cannot check out: you have uncommitted changes";
-            }
-
-            var localBranches = await pullRequestsService.GetLocalBranches(repository, Number).ToList();
+            var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
             
             if (localBranches.Contains(repository.CurrentBranch))
             {
@@ -350,7 +361,12 @@ namespace GitHub.ViewModels
 
                 if (divergence.BehindBy == null)
                 {
-                    CheckoutMode = CheckoutMode.Fetch;
+                    CheckoutMode = CheckoutMode.InvalidState;
+                }
+                else if (divergence.AheadBy > 0)
+                {
+                    CheckoutMode = pullRequestsService.IsPullRequestFromFork(repository, pullRequest) ?
+                        CheckoutMode.InvalidState : CheckoutMode.Push;
                 }
                 else if (divergence.BehindBy == 0)
                 {
@@ -370,6 +386,12 @@ namespace GitHub.ViewModels
             {
                 CheckoutMode = CheckoutMode.Fetch;
             }
+
+            var clean = await pullRequestsService.CleanForCheckout(repository);
+
+            CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate) ?
+                $"Cannot {GetCheckoutModeDescription(CheckoutMode)} as your working directory has uncommitted changes." :
+                null;
 
             IsBusy = false;
         }
@@ -411,6 +433,23 @@ namespace GitHub.ViewModels
             return dirs[string.Empty];
         }
 
+        static string GetCheckoutModeDescription(CheckoutMode checkoutMode)
+        {
+            switch (checkoutMode)
+            {
+                case CheckoutMode.NeedsPull:
+                    return "update branch";
+                case CheckoutMode.Switch:
+                    return "switch branches";
+                case CheckoutMode.Fetch:
+                case CheckoutMode.InvalidState:
+                    return "checkout pull request";
+                default:
+                    Debug.Fail("Invalid CheckoutMode in GetCheckoutModeDescription");
+                    return null;
+            }
+        }
+
         static PullRequestDirectoryViewModel GetDirectory(string path, Dictionary<string, PullRequestDirectoryViewModel> dirs)
         {
             PullRequestDirectoryViewModel dir;
@@ -441,38 +480,45 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoCheckout(object unused)
         {
+            IObservable<Unit> operation = null;
+
             switch (CheckoutMode)
             {
-                case CheckoutMode.Switch:
-                    return SwitchToBranch();
+                case CheckoutMode.NeedsPull:
+                    operation = pullRequestsService.FetchAndCheckout(repository, Number, repository.CurrentBranch.Name);
+                    break;
                 case CheckoutMode.Fetch:
-                    return FetchAndCheckout();
+                    operation = pullRequestsService
+                        .GetDefaultLocalBranchName(repository, Number, Title)
+                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
+                    break;
+                case CheckoutMode.Switch:
+                    operation = pullRequestsService.SwitchToBranch(repository, model);
+                    break;
+                case CheckoutMode.InvalidState:
+                    operation = pullRequestsService
+                        .UnmarkLocalBranch(repository)
+                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Number, Title))
+                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
+                    break;
                 default:
                     Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");
-                    return Observable.Empty<Unit>();
+                    operation = Observable.Empty<Unit>();
+                    break;
             }
+
+            return operation.Catch<Unit, Exception>(ex =>
+            {
+                CheckoutError = ex.Message;
+                return Observable.Empty<Unit>();
+            });
         }
 
-        IObservable<Unit> SwitchToBranch()
+        void DoOpenFile(IPullRequestFileViewModel x)
         {
-            return pullRequestsService.SwitchToBranch(repository, Number)
-                .Catch<Unit, Exception>(ex =>
-                {
-                    CheckoutError = ex.Message;
-                    return Observable.Empty<Unit>();
-                });
-        }
-
-        IObservable<Unit> FetchAndCheckout()
-        {
-            var branchName = pullRequestsService.GetDefaultLocalBranchName(Number, Title);
-
-            return pullRequestsService.FetchAndCheckout(repository, Number, branchName)
-                .Catch<Unit, Exception>(ex =>
-                {
-                    CheckoutError = ex.Message;
-                    return Observable.Empty<Unit>();
-                });
+            // TODO: Handle diffing files accoring to OpenChangedFileAction and getting a file from another branch etc.
+            var fullPath = Path.Combine(repository.LocalPath, x.Path, x.FileName);
+            ViewOpenFile.Execute(fullPath);
         }
     }
 }

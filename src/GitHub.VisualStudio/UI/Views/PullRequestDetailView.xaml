@@ -13,13 +13,15 @@
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
-                                    d:DesignHeight="640"
+                                    d:DesignHeight="780"
                                     mc:Ignorable="d"
                                     Style="{DynamicResource BusyStateView}">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" CommitsBehind="2"/>
+                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" 
+                                                               CommitsBehind="2"
+                                                               CheckoutDisabledMessage="Cannot update branch as your working directory has uncommitted changes."/>
             </Binding.Source>
         </Binding>
     </d:DesignProperties.DataContext>
@@ -78,6 +80,17 @@
 
             <Style x:Key="CheckoutMessage" TargetType="TextBlock">
                 <Setter Property="Margin" Value="0 4"/>
+            </Style>
+
+            <!-- Hyperlink has no Visibility property, sigh. Hack around this by making the text 
+                 transparent and 1 px in size. -->
+            <Style x:Key="HyperlinkHiddenWhenDisabled" TargetType="Hyperlink">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Foreground" Value="Transparent"/>
+                        <Setter Property="FontSize" Value="1"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
         </ResourceDictionary>
     </Control.Resources>
@@ -185,12 +198,12 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- Branch checked out and neds pull -->
+                <!-- Branch checked out and needs pull -->
                 <TextBlock TextWrapping="Wrap">
                     <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run>Your local branch is behind by</Run>
                     <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
-                    <Hyperlink Command="{Binding Checkout}">Update</Hyperlink>
+                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Update</Hyperlink>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -206,13 +219,61 @@
                 <!-- Local branch exists but is not checked out -->
                 <TextBlock TextWrapping="Wrap">
                     <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
-                    <Hyperlink Command="{Binding Checkout}">Switch branch</Hyperlink>
+                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutMode}" Value="Switch">
                                     <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Local branch is checked out but is in an invalid state -->
+                <TextBlock TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <Run BaselineAlignment="Top">The pull request branch has local changes.</Run>
+                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Checkout to a new branch</Hyperlink>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CheckoutMode}" Value="InvalidState">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Local branch is checked out but needs pushing-->
+                <TextBlock TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="info" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <Run BaselineAlignment="Top">Local changes can be pushed.</Run>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Push">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Checkout disabled message -->
+                <TextBlock Margin="0 4" TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <Run Text="{Binding CheckoutDisabledMessage}"/>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -339,7 +400,8 @@
                             <TreeView ItemsSource="{Binding ChangedFilesTree}" 
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      Margin="0 6 0 0">
+                                      Margin="0 6 0 0"
+                                      MouseDoubleClick="FileListMouseDoubleClick">
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
                                         <Style.Triggers>
@@ -361,13 +423,13 @@
                                         <StackPanel Orientation="Horizontal">
                                             <!-- TODO: Use the right icon here -->
                                             <ui:OcticonImage Icon="briefcase" Foreground="{DynamicResource GitHubVsWindowText}"/>
-                                            <TextBlock Text="{Binding DirectoryName}" Margin="4 0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
-                                            <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
@@ -377,7 +439,8 @@
                             <ListView ItemsSource="{Binding ChangedFilesList}"
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      Margin="0 6 0 0" >
+                                      Margin="0 6 0 0"
+                                      MouseDoubleClick="FileListMouseDoubleClick">
                                 <ListView.Style>
                                     <Style TargetType="ListView">
                                         <Style.Triggers>
