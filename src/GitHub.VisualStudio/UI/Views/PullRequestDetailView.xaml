@@ -19,8 +19,9 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="Push" 
-                                                               CommitsBehind="2"/>
+                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" 
+                                                               CommitsBehind="2"
+                                                               CheckoutDisabledMessage="Cannot update branch as your working directory has uncommitted changes."/>
             </Binding.Source>
         </Binding>
     </d:DesignProperties.DataContext>
@@ -79,6 +80,17 @@
 
             <Style x:Key="CheckoutMessage" TargetType="TextBlock">
                 <Setter Property="Margin" Value="0 4"/>
+            </Style>
+
+            <!-- Hyperlink has no Visibility property, sigh. Hack around this by making the text 
+                 transparent and 1 px in size. -->
+            <Style x:Key="HyperlinkHiddenWhenDisabled" TargetType="Hyperlink">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Foreground" Value="Transparent"/>
+                        <Setter Property="FontSize" Value="1"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
         </ResourceDictionary>
     </Control.Resources>
@@ -191,7 +203,7 @@
                     <ui:OcticonImage Icon="sync" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run>Your local branch is behind by</Run>
                     <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
-                    <Hyperlink Command="{Binding Checkout}">Update</Hyperlink>
+                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Update</Hyperlink>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -207,7 +219,7 @@
                 <!-- Local branch exists but is not checked out -->
                 <TextBlock TextWrapping="Wrap">
                     <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
-                    <Hyperlink Command="{Binding Checkout}">Switch branch</Hyperlink>
+                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -224,7 +236,7 @@
                 <TextBlock TextWrapping="Wrap">
                     <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">The pull request branch has local changes.</Run>
-                    <Hyperlink Command="{Binding Checkout}">Checkout to a new branch</Hyperlink>
+                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Checkout to a new branch</Hyperlink>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                             <Setter Property="Visibility" Value="Collapsed"/>
