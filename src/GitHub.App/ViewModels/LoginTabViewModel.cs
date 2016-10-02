@@ -22,6 +22,8 @@ namespace GitHub.ViewModels
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public abstract class LoginTabViewModel : ReactiveObject
     {
+        static readonly ILogger log = Log.ForContext<LoginTabViewModel>();
+
         protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
         {
             RepositoryHosts = repositoryHosts;
@@ -44,7 +46,7 @@ namespace GitHub.ViewModels
             {
                 if (ex.IsCriticalException()) return;
 
-                Log.Information(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
+                log.Information(ex, "Error logging into '{BaseUri}' as '{UsernameOrEmail}'", BaseUri, UsernameOrEmail);
                 if (ex is Octokit.ForbiddenException)
                 {
                     UserError.Throw(new UserError(Resources.LoginFailedForbiddenMessage));

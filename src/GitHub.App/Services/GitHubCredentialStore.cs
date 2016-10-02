@@ -12,6 +12,7 @@ namespace GitHub.Services
 {
     public class GitHubCredentialStore : ICredentialStore
     {
+        static readonly ILogger log = Log.ForContext<GitHubCredentialStore>();
         readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
 
@@ -32,7 +33,8 @@ namespace GitHub.Services
         {
             if (loginInfo == LoginCache.EmptyLoginInfo)
             {
-                Log.Debug("Could not retrieve login info from the secure cache '{CredentialCacheKeyHost}'", hostAddress.CredentialCacheKeyHost);
+                log.Debug("Could not retrieve login info from the secure cache '{CredentialCacheKeyHost}'",
+                    hostAddress.CredentialCacheKeyHost);
                 return Credentials.Anonymous;
             }
 

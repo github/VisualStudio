@@ -91,6 +91,8 @@ namespace GitHub.VisualStudio
             public ComposablePart Part { get; set; }
         }
 
+        static readonly ILogger log = Log.ForContext<UIProvider>();
+
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProvider serviceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
@@ -144,14 +146,14 @@ namespace GitHub.VisualStudio
             Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
             if (componentModel == null)
             {
-                Log.Error("Service of type SComponentModel not found");
+                log.Error("Service of type SComponentModel not found");
                 return;
             }
 
             ExportProvider = componentModel.DefaultExportProvider;
             if (ExportProvider == null)
             {
-                Log.Error("DefaultExportProvider could not be obtained.");
+                log.Error("DefaultExportProvider could not be obtained.");
             }
         }
 
@@ -163,13 +165,8 @@ namespace GitHub.VisualStudio
                 initializingLogging = true;
                 try
                 {
-                    var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "extension-{Date}.log");
-
-                    Log.Logger = new LoggerConfiguration()
-                        .WriteTo.RollingFile(logPath)
-                        .CreateLogger();
-
-                    Log.Information("Logging Configured");
+                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
+                    logging.Configure();
                 }
                 catch
                 {
@@ -309,7 +306,7 @@ namespace GitHub.VisualStudio
             var ui = currentUIFlow?.Value;
             if (ui == null)
             {
-                Log.Error("UIProvider:ListenToCompletionState:Cannot call ListenToCompletionState without calling SetupUI first");
+                log.Error("UIProvider:ListenToCompletionState:Cannot call ListenToCompletionState without calling SetupUI first");
 #if DEBUG
                 throw new InvalidOperationException("Cannot call ListenToCompletionState without calling SetupUI first");
 #endif
@@ -322,7 +319,7 @@ namespace GitHub.VisualStudio
             Debug.Assert(windowController != null, "WindowController is null, did you forget to call SetupUI?");
             if (windowController == null)
             {
-                Log.Error("WindowController is null, cannot run UI.");
+                log.Error("WindowController is null, cannot run UI.");
                 return;
             }
             try
@@ -331,7 +328,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                Log.Error("WindowController ShowModal failed. {ex}", ex);
+                log.Error(ex, "WindowController ShowModal failed.");
             }
         }
 
@@ -344,7 +341,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                Log.Error("WindowController ShowModal failed for {controllerFlow}. {ex}", controllerFlow, ex);
+                log.Error(ex, "WindowController ShowModal failed for {controllerFlow}.", controllerFlow);
             }
         }
 
@@ -366,7 +363,7 @@ namespace GitHub.VisualStudio
             }
             catch (Exception ex)
             {
-                Log.Error("Failed to dispose UI. {ex}", ex);
+                log.Error(ex, "Failed to dispose UI.");
             }
         }
 

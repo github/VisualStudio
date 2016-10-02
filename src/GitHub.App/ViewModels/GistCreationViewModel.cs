@@ -19,6 +19,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
+        static readonly ILogger log = Log.ForContext<GistCreationViewModel>();
+
         readonly IApiClient apiClient;
         readonly ObservableAsPropertyHelper<IAccount> account;
         readonly IGistPublishService gistPublishService;
@@ -81,7 +83,7 @@ namespace GitHub.ViewModels
                 {
                     if (!ex.IsCriticalException())
                     {
-                        Log.Error(ex, "Error Creating Gist");
+                        log.Error(ex, "Error Creating Gist");
                         var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.GistCreateFailed);
                         notificationService.ShowError(error);
                     }

@@ -21,6 +21,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LogoutRequiredViewModel : BaseViewModel, ILogoutRequiredViewModel
     {
+        static readonly ILogger log = Log.ForContext<LogoutRequiredViewModel>();
+
         readonly IRepositoryHosts repositoryHosts;
         readonly INotificationService notificationService;
 
@@ -60,7 +62,7 @@ namespace GitHub.ViewModels
                 {
                     if (!ex.IsCriticalException())
                     {
-                        Log.Error(ex, "Logout Error");
+                        log.Error(ex, "Logout Error");
                         var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.LogoutFailed);
                         notificationService.ShowError(error);
                     }

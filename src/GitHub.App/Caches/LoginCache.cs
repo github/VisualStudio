@@ -15,6 +15,7 @@ namespace GitHub.Caches
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class LoginCache : ILoginCache
     {
+        static readonly ILogger log = Log.ForContext<LoginCache>();
         readonly ISharedCache cache;
 
         static readonly LoginInfo empty = new LoginInfo("", "");
@@ -46,13 +47,13 @@ namespace GitHub.Caches
 
         public IObservable<Unit> EraseLogin(HostAddress hostAddress)
         {
-            Log.Information("Erasing the git credential cache for host '{CredentialCacheKeyHost}'", hostAddress.CredentialCacheKeyHost);
+            log.Information("Erasing the git credential cache for host {CredentialCacheKeyHost}", hostAddress.CredentialCacheKeyHost);
             return cache.Secure.EraseLogin(hostAddress.CredentialCacheKeyHost);
         }
 
         public IObservable<Unit> Flush()
         {
-            Log.Information("Flushing the login cache");
+            log.Information("Flushing the login cache");
             return cache.Secure.Flush();
         }
 

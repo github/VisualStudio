@@ -23,6 +23,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryPublishViewModel : RepositoryFormViewModel, IRepositoryPublishViewModel
     {
+        static readonly ILogger log = Log.ForContext<RepositoryPublishViewModel>();
+
         readonly IRepositoryHosts hosts;
         readonly IRepositoryPublishService repositoryPublishService;
         readonly INotificationService notificationService;
@@ -157,7 +159,7 @@ namespace GitHub.ViewModels
                 {
                     if (!ex.IsCriticalException())
                     {
-                        Log.Error(ex, "Error Publishing Repository");
+                        log.Error(ex, "Error Publishing Repository");
                         var error = new PublishRepositoryUserError(ex.Message);
                         notificationService.ShowError((error.ErrorMessage + Environment.NewLine + error.ErrorCauseOrResolution).TrimEnd());
                     }

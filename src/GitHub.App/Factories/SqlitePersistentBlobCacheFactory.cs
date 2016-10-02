@@ -14,6 +14,7 @@ namespace GitHub.Factories
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class SqlitePersistentBlobCacheFactory : IBlobCacheFactory
     {
+        static readonly ILogger log = Log.ForContext<SqlitePersistentBlobCacheFactory>();
         Dictionary<string, IBlobCache> cache = new Dictionary<string, IBlobCache>();
 
         public IBlobCache CreateBlobCache(string path)
@@ -30,7 +31,7 @@ namespace GitHub.Factories
             }
             catch(Exception ex)
             {
-                Log.Error(ex, "Error while creating SQLitePersistentBlobCache for {path}.", path);
+                log.Error(ex, "Error while creating SQLitePersistentBlobCache for {path}.", path);
                 return new InMemoryBlobCache();
             }
         }

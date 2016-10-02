@@ -20,6 +20,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
+        static readonly ILogger log = Log.ForContext<RepositoryCloneService>();
+
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
@@ -56,7 +58,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Could not clone {cloneUrl} to {path}", cloneUrl, path);
+                    log.Error(ex, "Could not clone {cloneUrl} to {path}", cloneUrl, path);
                     throw;
                 }
                 

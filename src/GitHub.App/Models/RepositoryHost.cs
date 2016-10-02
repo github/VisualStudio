@@ -24,6 +24,7 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
+        static readonly ILogger log = Log.ForContext<RepositoryHosts>();
         static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
@@ -77,7 +78,7 @@ namespace GitHub.Models
                 {
                     if (ex is AuthorizationException)
                     {
-                        Log.Warning(ex, "Got an authorization exception");
+                        log.Warning(ex, "Got an authorization exception");
                     }
                     return Observable.Return<UserAndScopes>(null);
                 })
@@ -204,18 +205,18 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            Log.Information("Logged off of host '{ApiUri}'", hostAddress.ApiUri);
+            log.Information("Logged off of host '{ApiUri}'", hostAddress.ApiUri);
 
             return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
                 {
-                    Log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways.");
+                    log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways.");
                     return Observable.Return(Unit.Default);
                 })
                 .SelectMany(_ => ModelService.InvalidateAll())
                 .Catch<Unit, Exception>(e =>
                 {
-                    Log.Warning(e, "ASSERT! Failed to invaldiate caches");
+                    log.Warning(e, "ASSERT! Failed to invaldiate caches");
                     return Observable.Return(Unit.Default);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -260,10 +261,10 @@ namespace GitHub.Models
                         IsLoggedIn = true;
                     }
 
-                    Log.Information("Log in from cache for login '{Login}' to host '{ApiUri}' {IsSuccess}",
-                        userAndScopes?.User?.Login,
+                    log.Information("Log in from cache for login {Login} to host {ApiUri} {IsSuccess:l}",
+                        userAndScopes?.User?.Login ?? "(null)",
                         hostAddress.ApiUri,
-                        result.IsSuccess());
+                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
         }
 

@@ -30,6 +30,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
+        static readonly ILogger log = Log.ForContext<RepositoryCloneViewModel>();
+
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
@@ -125,7 +127,7 @@ namespace GitHub.ViewModels
                 {
                     LoadingFailed = true;
                     IsLoading = false;
-                    Log.Error(ex, "Error while loading repositories");
+                    log.Error(ex, "Error while loading repositories");
                 },
                 () => IsLoading = false
             );
@@ -209,7 +211,7 @@ namespace GitHub.ViewModels
                 catch (Exception e)
                 {
                     // TODO: We really should limit this to exceptions we know how to handle.
-                    Log.Error(e, "Failed to set base repository path. {@0}",
+                    log.Error(e, "Failed to set base repository path. {@repository}",
                         new { localBaseRepositoryPath, BaseRepositoryPath, directory });
                 }
             }, RxApp.MainThreadScheduler);

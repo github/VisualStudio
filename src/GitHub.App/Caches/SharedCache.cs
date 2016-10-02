@@ -16,6 +16,7 @@ namespace GitHub.Caches
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
+        static readonly ILogger log = Log.ForContext<SharedCache>();
 
         static SharedCache()
         {
@@ -25,7 +26,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                Log.Error(e, "Error while running the static inializer for SharedCache");
+                log.Error(e, "Error while running the static inializer for SharedCache");
             }
         }
 
@@ -44,7 +45,7 @@ namespace GitHub.Caches
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e, "Failed to set up secure cache.");
+                    log.Error(e, "Failed to set up secure cache.");
                     secureCache = new InMemoryBlobCache();
                 }
             }
@@ -103,7 +104,7 @@ namespace GitHub.Caches
             }
             catch (Exception e)
             {
-                Log.Error(e, string.Format(CultureInfo.InvariantCulture, "Failed to set the {0} cache.", cacheName));
+                log.Error(e, "Failed to set the {cacheName} cache.", cacheName);
                 return new InMemoryBlobCache();
             }
         }

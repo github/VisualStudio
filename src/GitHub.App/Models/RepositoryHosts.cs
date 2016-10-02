@@ -23,6 +23,7 @@ namespace GitHub.Models
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryHosts : ReactiveObject, IRepositoryHosts
     {
+        static readonly ILogger log = Log.ForContext<RepositoryHosts>();
         public static DisconnectedRepositoryHost DisconnectedRepositoryHost = new DisconnectedRepositoryHost();
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;
@@ -45,7 +46,7 @@ namespace GitHub.Models
                 .Catch<Uri, KeyNotFoundException>(_ => Observable.Return<Uri>(null))
                 .Catch<Uri, Exception>(ex =>
                 {
-                    Log.Warning(ex, "Failed to get Enterprise host URI from cache.");
+                    log.Warning(ex, "Failed to get Enterprise host URI from cache.");
                     return Observable.Return<Uri>(null);
                 })
                 .WhereNotNull()
@@ -66,7 +67,7 @@ namespace GitHub.Models
                             .InvalidateObject<Uri>(EnterpriseHostApiBaseUriCacheKey)
                             .Catch<Unit, Exception>(ex =>
                             {
-                                Log.Warning(ex, "Failed to invalidate enterprise host uri");
+                                log.Warning(ex, "Failed to invalidate enterprise host uri");
                                 return Observable.Return(Unit.Default);
                             });
                     }
@@ -75,7 +76,7 @@ namespace GitHub.Models
                         .InsertObject(EnterpriseHostApiBaseUriCacheKey, enterpriseHost.Address.ApiUri)
                         .Catch<Unit, Exception>(ex =>
                         {
-                            Log.Warning(ex, "Failed to persist enterprise host uri");
+                            log.Warning(ex, "Failed to persist enterprise host uri");
                             return Observable.Return(Unit.Default);
                         });
                 });
@@ -148,11 +149,11 @@ namespace GitHub.Models
                 .Do(result =>
                 {
                     bool successful = result.IsSuccess();
-                    Log.Information("Log in to {3} host '{ApiUri}' with username '{usernameOrEmail}' {successful}",
+                    log.Information("Log in to {host} host '{ApiUri}' with username '{usernameOrEmail}' {successful}",
+                        isDotCom ? "GitHub.com" : address.WebUri.Host,
                         address.ApiUri,
                         usernameOrEmail,
-                        successful,
-                        isDotCom ? "GitHub.com" : address.WebUri.Host
+                        successful ? "SUCCEEDED" : "FAILED"
                     );
                     if (successful)
                     {
@@ -231,7 +232,7 @@ namespace GitHub.Models
                 }
                 catch (Exception e)
                 {
-                    Log.Warning(e, "Exception occured while disposing RepositoryHosts");
+                    log.Warning(e, "Exception occured while disposing RepositoryHosts");
                 }
                 disposed = true;
             }

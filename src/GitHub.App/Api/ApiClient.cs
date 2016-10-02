@@ -26,6 +26,7 @@ namespace GitHub.Api
     {
         const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
+        static readonly ILogger log = Log.ForContext<ApiClient>();
         static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         readonly IObservableGitHubClient gitHubClient;
@@ -83,7 +84,7 @@ namespace GitHub.Api
             }
             else
             {
-                Log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
+                log.Error("Error reading scopes: /user succeeded but {ScopesHeader} was not present.", ScopesHeader);
             }
 
             return new UserAndScopes(response.Body, scopes);
@@ -174,7 +175,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                Log.Error("IMPOSSIBLE! Generating Sha256 hash caused an exception.", e);
+                log.Error(e, "IMPOSSIBLE! Generating Sha256 hash caused an exception.");
                 return null;
             }
         }
@@ -192,14 +193,14 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                Log.Information("Failed to retrieve host name using `DNS.GetHostName`.", e);
+                log.Information(e, "Failed to retrieve host name using `DNS.GetHostName`.");
                 try
                 {
                     return Environment.MachineName;
                 }
                 catch (Exception ex)
                 {
-                    Log.Information("Failed to retrieve host name using `Environment.MachineName`.", ex);
+                    log.Information(ex, "Failed to retrieve host name using `Environment.MachineName`.");
                     return "(unknown)";
                 }
             }
@@ -220,7 +221,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                Log.Information("Could not retrieve MAC address. Fallback to using machine name.", e);
+                log.Information(e, "Could not retrieve MAC address. Fallback to using machine name.");
                 return GetMachineNameSafe();
             }
         }
