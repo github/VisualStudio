@@ -20,8 +20,6 @@ namespace GitHub.Caches
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class ImageCache : IImageCache
     {
-        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
-
         public const string ImageCacheFileName = "images.cache.db";
         readonly IObservable<IBlobCache> cacheFactory;
         readonly Lazy<IImageDownloader> imageDownloader;
@@ -159,7 +157,7 @@ namespace GitHub.Caches
                 .SelectMany(Observable.Defer(() => blobCache.Insert(key, new byte[] { 1 })))
                 .Catch<Unit, Exception>(ex =>
                 {
-                    log.Error("Could not vacuum image cache", ex);
+                    //log.Error("Could not vacuum image cache", ex);
                     return Observable.Return(Unit.Default);
                 })
                 .AsCompletion();

@@ -6,7 +6,8 @@ using System.Reactive.Linq;
 using Akavache;
 using GitHub.Extensions;
 using GitHub.Primitives;
-using NLog;
+using Serilog;
+using Serilog.Core;
 
 namespace GitHub.Caches
 {
@@ -14,7 +15,6 @@ namespace GitHub.Caches
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class LoginCache : ILoginCache
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly ISharedCache cache;
 
         static readonly LoginInfo empty = new LoginInfo("", "");
@@ -46,14 +46,13 @@ namespace GitHub.Caches
 
         public IObservable<Unit> EraseLogin(HostAddress hostAddress)
         {
-            log.Info(CultureInfo.CurrentCulture, "Erasing the git credential cache for host '{0}'",
-                hostAddress.CredentialCacheKeyHost);
+            Log.Information("Erasing the git credential cache for host '{CredentialCacheKeyHost}'", hostAddress.CredentialCacheKeyHost);
             return cache.Secure.EraseLogin(hostAddress.CredentialCacheKeyHost);
         }
 
         public IObservable<Unit> Flush()
         {
-            log.Info("Flushing the login cache");
+            Log.Information("Flushing the login cache");
             return cache.Secure.Flush();
         }
 

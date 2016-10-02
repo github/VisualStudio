@@ -8,7 +8,6 @@ using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using GitHub.Primitives;
-using NLog;
 using NullGuard;
 using Octokit;
 using Octokit.Reactive;
@@ -19,6 +18,7 @@ using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Extensions;
+using Serilog;
 
 namespace GitHub.Api
 {
@@ -26,7 +26,6 @@ namespace GitHub.Api
     {
         const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
         static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         readonly IObservableGitHubClient gitHubClient;
@@ -84,7 +83,7 @@ namespace GitHub.Api
             }
             else
             {
-                log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
+                Log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
             }
 
             return new UserAndScopes(response.Body, scopes);
@@ -175,7 +174,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Error("IMPOSSIBLE! Generating Sha256 hash caused an exception.", e);
+                Log.Error("IMPOSSIBLE! Generating Sha256 hash caused an exception.", e);
                 return null;
             }
         }
@@ -193,14 +192,14 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Info("Failed to retrieve host name using `DNS.GetHostName`.", e);
+                Log.Information("Failed to retrieve host name using `DNS.GetHostName`.", e);
                 try
                 {
                     return Environment.MachineName;
                 }
                 catch (Exception ex)
                 {
-                    log.Info("Failed to retrieve host name using `Environment.MachineName`.", ex);
+                    Log.Information("Failed to retrieve host name using `Environment.MachineName`.", ex);
                     return "(unknown)";
                 }
             }
@@ -221,7 +220,7 @@ namespace GitHub.Api
             }
             catch (Exception e)
             {
-                log.Info("Could not retrieve MAC address. Fallback to using machine name.", e);
+                Log.Information("Could not retrieve MAC address. Fallback to using machine name.", e);
                 return GetMachineNameSafe();
             }
         }

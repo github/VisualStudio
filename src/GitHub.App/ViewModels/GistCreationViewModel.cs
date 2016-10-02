@@ -8,10 +8,10 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
-using NLog;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -19,8 +19,6 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-
         readonly IApiClient apiClient;
         readonly ObservableAsPropertyHelper<IAccount> account;
         readonly IGistPublishService gistPublishService;
@@ -83,7 +81,7 @@ namespace GitHub.ViewModels
                 {
                     if (!ex.IsCriticalException())
                     {
-                        log.Error(ex);
+                        Log.Error(ex, "Error Creating Gist");
                         var error = StandardUserErrors.GetUserFriendlyErrorMessage(ex, ErrorType.GistCreateFailed);
                         notificationService.ShowError(error);
                     }

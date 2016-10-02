@@ -11,20 +11,19 @@ using GitHub.Caches;
 using GitHub.Extensions.Reactive;
 using GitHub.Primitives;
 using GitHub.Services;
-using NLog;
 using Octokit;
 using ReactiveUI;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
 using GitHub.Extensions;
+using Serilog;
 
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
         static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
@@ -78,7 +77,7 @@ namespace GitHub.Models
                 {
                     if (ex is AuthorizationException)
                     {
-                        log.Warn("Got an authorization exception", ex);
+                        Log.Warning(ex, "Got an authorization exception");
                     }
                     return Observable.Return<UserAndScopes>(null);
                 })
@@ -205,18 +204,18 @@ namespace GitHub.Models
         {
             if (!IsLoggedIn) return Observable.Return(Unit.Default);
 
-            log.Info(CultureInfo.InvariantCulture, "Logged off of host '{0}'", hostAddress.ApiUri);
+            Log.Information("Logged off of host '{ApiUri}'", hostAddress.ApiUri);
 
             return loginCache.EraseLogin(Address)
                 .Catch<Unit, Exception>(e =>
                 {
-                    log.Warn("ASSERT! Failed to erase login. Going to invalidate cache anyways.", e);
+                    Log.Warning(e, "ASSERT! Failed to erase login. Going to invalidate cache anyways.");
                     return Observable.Return(Unit.Default);
                 })
                 .SelectMany(_ => ModelService.InvalidateAll())
                 .Catch<Unit, Exception>(e =>
                 {
-                    log.Warn("ASSERT! Failed to invaldiate caches", e);
+                    Log.Warning(e, "ASSERT! Failed to invaldiate caches");
                     return Observable.Return(Unit.Default);
                 })
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -261,10 +260,10 @@ namespace GitHub.Models
                         IsLoggedIn = true;
                     }
 
-                    log.Info("Log in from cache for login '{0}' to host '{1}' {2}",
-                        userAndScopes?.User?.Login ?? "(null)",
+                    Log.Information("Log in from cache for login '{Login}' to host '{ApiUri}' {IsSuccess}",
+                        userAndScopes?.User?.Login,
                         hostAddress.ApiUri,
-                        result.IsSuccess() ? "SUCCEEDED" : "FAILED");
+                        result.IsSuccess());
                 });
         }
 

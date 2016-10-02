@@ -13,9 +13,9 @@ using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Primitives;
-using NLog;
 using NullGuard;
 using Octokit;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -24,8 +24,6 @@ namespace GitHub.Services
     public class ModelService : IModelService
     {
         public const string PRPrefix = "pr";
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-
         readonly IApiClient apiClient;
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
@@ -49,7 +47,7 @@ namespace GitHub.Services
                 .Select(Create)
                 .Catch<GitIgnoreItem, Exception>(e =>
                 {
-                    log.Info("Failed to retrieve GitIgnoreTemplates", e);
+                    Log.Information("Failed to retrieve GitIgnoreTemplates", e);
                     return Observable.Empty<GitIgnoreItem>();
                 });
         }
@@ -66,7 +64,7 @@ namespace GitHub.Services
                 .Select(Create)
                 .Catch<LicenseItem, Exception>(e =>
                 {
-                    log.Info("Failed to retrieve licenses", e);
+                    Log.Information("Failed to retrieve licenses", e);
                     return Observable.Empty<LicenseItem>();
                 });
         }
@@ -116,12 +114,12 @@ namespace GitHub.Services
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
-                        log.Error("Retrieve user organizations failed because user is not stored in the cache.", (Exception)e);
+                        Log.Error(e, "Retrieve user organizations failed because user is not stored in the cache.");
                         return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                     })
                  .Catch<IEnumerable<AccountCacheItem>, Exception>(e =>
                  {
-                     log.Error("Retrieve user organizations failed.", e);
+                     Log.Error(e, "Retrieve user organizations failed.");
                      return Observable.Return(Enumerable.Empty<AccountCacheItem>());
                  });
         }
@@ -265,7 +263,7 @@ namespace GitHub.Services
                         string message = string.Format(CultureInfo.InvariantCulture,
                             "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
                             repositoryType);
-                        log.Error(message, e);
+                        Log.Error(e, message);
                         return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
@@ -303,7 +301,7 @@ namespace GitHub.Services
                             CultureInfo.InvariantCulture,
                             "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
-                        log.Error(message, e);
+                        Log.Error(e, message);
                         return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
