@@ -267,10 +267,10 @@
 
                 <!-- Checkout disabled message -->
                 <TextBlock Margin="0 4" TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run Text="{Binding CheckoutDisabledMessage}"/>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="Red" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
