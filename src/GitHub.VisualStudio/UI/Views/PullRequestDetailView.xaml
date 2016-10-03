@@ -82,6 +82,10 @@
                 <Setter Property="Margin" Value="0 4"/>
             </Style>
 
+            <Style x:Key="CheckoutErrorMessage" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="Red" />
+            </Style>
+
             <!-- Hyperlink has no Visibility property, sigh. Hack around this by making the text 
                  transparent and 1 px in size. -->
             <Style x:Key="HyperlinkHiddenWhenDisabled" TargetType="Hyperlink">
@@ -269,8 +273,7 @@
                 <TextBlock Margin="0 4" TextWrapping="Wrap">
                     <Run Text="{Binding CheckoutDisabledMessage}"/>
                     <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="Red" />
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
