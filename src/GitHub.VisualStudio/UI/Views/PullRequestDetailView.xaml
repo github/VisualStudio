@@ -222,6 +222,7 @@
 
                 <!-- Local branch exists but is not checked out -->
                 <TextBlock TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
                     <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
                     <TextBlock.Style>
@@ -270,7 +271,7 @@
                 </TextBlock>
 
                 <!-- Checkout disabled message -->
-                <TextBlock Margin="0 4" TextWrapping="Wrap">
+                <TextBlock Margin="0 0 0 4" TextWrapping="Wrap">
                     <Run Text="{Binding CheckoutDisabledMessage}"/>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
