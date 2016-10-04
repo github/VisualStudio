@@ -82,6 +82,10 @@
                 <Setter Property="Margin" Value="0 4"/>
             </Style>
 
+            <Style x:Key="CheckoutErrorMessage" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="Red" />
+            </Style>
+
             <!-- Hyperlink has no Visibility property, sigh. Hack around this by making the text 
                  transparent and 1 px in size. -->
             <Style x:Key="HyperlinkHiddenWhenDisabled" TargetType="Hyperlink">
@@ -200,7 +204,7 @@
 
                 <!-- Branch checked out and needs pull -->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="sync" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run>Your local branch is behind by</Run>
                     <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
                     <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Update</Hyperlink>
@@ -218,6 +222,7 @@
 
                 <!-- Local branch exists but is not checked out -->
                 <TextBlock TextWrapping="Wrap">
+                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
                     <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
                     <TextBlock.Style>
@@ -266,11 +271,10 @@
                 </TextBlock>
 
                 <!-- Checkout disabled message -->
-                <TextBlock Margin="0 4" TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                <TextBlock Margin="0 0 0 4" TextWrapping="Wrap">
                     <Run Text="{Binding CheckoutDisabledMessage}"/>
                     <TextBlock.Style>
-                        <Style TargetType="TextBlock">
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -421,8 +425,7 @@
                                     <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
                                                           ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
-                                            <!-- TODO: Use the right icon here -->
-                                            <ui:OcticonImage Icon="briefcase" Foreground="{DynamicResource GitHubVsWindowText}"/>
+                                            <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
