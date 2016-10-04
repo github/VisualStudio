@@ -267,6 +267,9 @@ namespace UnitTests.GitHub.App.ViewModels
                 existingPrBranch: "pr/123",
                 aheadBy: 1);
 
+            target.Item2.IsPullRequestFromFork(
+                Arg.Any<ILocalRepositoryModel>(),
+                Arg.Any<PullRequest>()).Returns(true);
             target.Item2.GetDefaultLocalBranchName(Arg.Any<ILocalRepositoryModel>(), 1, Arg.Any<string>())
                 .Returns(Observable.Return("pr/1-foo"));
 
