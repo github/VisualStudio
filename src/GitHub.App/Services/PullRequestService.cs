@@ -84,7 +84,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> CleanForCheckout(ILocalRepositoryModel repository)
+        public IObservable<bool> IsCleanForCheckout(ILocalRepositoryModel repository)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
             return Observable.Return(!repo.RetrieveStatus().IsDirty);

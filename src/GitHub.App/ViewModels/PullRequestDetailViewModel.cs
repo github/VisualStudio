@@ -97,8 +97,8 @@ namespace GitHub.ViewModels
             Checkout = ReactiveCommand.CreateAsyncObservable(canCheckout, DoCheckout);
 
             OpenOnGitHub = ReactiveCommand.Create();
-            OpenFile = ReactiveCommand.Create();
-            OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x));
+            ActivateItem = ReactiveCommand.Create();
+            ActivateItem.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x));
 
             ToggleChangedFilesView = ReactiveCommand.Create();
             ToggleChangedFilesView.Subscribe(_ =>
@@ -281,7 +281,7 @@ namespace GitHub.ViewModels
         /// Execute method. It triggers <see cref="ViewOpenFile"/> or <see cref="ViewCompareFiles"/> which
         /// should be handled by the view to implement opening or comparing the file.
         /// </remarks>
-        public ReactiveCommand<object> OpenFile { get; }
+        public ReactiveCommand<object> ActivateItem { get; }
 
         /// <summary>
         /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
@@ -387,7 +387,7 @@ namespace GitHub.ViewModels
                 CheckoutMode = CheckoutMode.Fetch;
             }
 
-            var clean = await pullRequestsService.CleanForCheckout(repository);
+            var clean = await pullRequestsService.IsCleanForCheckout(repository);
 
             CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate) ?
                 $"Cannot {GetCheckoutModeDescription(CheckoutMode)} as your working directory has uncommitted changes." :

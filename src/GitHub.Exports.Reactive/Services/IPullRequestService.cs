@@ -18,7 +18,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
-        IObservable<bool> CleanForCheckout(ILocalRepositoryModel repository);
+        IObservable<bool> IsCleanForCheckout(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Fetches a pull request to a local branch and checks out the branch.

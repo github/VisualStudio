@@ -122,7 +122,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (file != null)
             {
-                ViewModel.OpenFile.Execute(file);
+                ViewModel.ActivateItem.Execute(file);
             }
         }
     }

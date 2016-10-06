@@ -328,7 +328,7 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             pullRequestService.IsPullRequestFromFork(repository, Arg.Any<PullRequest>()).Returns(prFromFork);
-            pullRequestService.CleanForCheckout(repository).Returns(Observable.Return(!dirty));
+            pullRequestService.IsCleanForCheckout(repository).Returns(Observable.Return(!dirty));
 
             var divergence = Substitute.For<HistoryDivergence>();
             divergence.AheadBy.Returns(aheadBy);

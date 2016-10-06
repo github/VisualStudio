@@ -184,7 +184,7 @@ namespace GitHub.ViewModels
         /// Execute method. It triggers <see cref="ViewOpenFile"/> or <see cref="ViewCompareFiles"/> which
         /// should be handled by the view to implement opening or comparing the file.
         /// </remarks>
-        ReactiveCommand<object> OpenFile { get; }
+        ReactiveCommand<object> ActivateItem { get; }
 
         /// <summary>
         /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
