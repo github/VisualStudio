@@ -30,6 +30,12 @@ namespace GitHub.Services
         IObservable<Unit> FetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName);
 
         /// <summary>
+        /// Carries out a pull on the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        IObservable<Unit> Pull(ILocalRepositoryModel repository);
+
+        /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.
         /// </summary>
         /// <param name="repository">The repository.</param>

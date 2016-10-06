@@ -90,6 +90,16 @@ namespace GitHub.Services
             return Observable.Return(!repo.RetrieveStatus().IsDirty);
         }
 
+        public IObservable<Unit> Pull(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(() =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var refspec = string.Format(CultureInfo.InvariantCulture, "{0}:{0}", repo.Head.FriendlyName);
+                return gitClient.Fetch(repo, "origin", new[] { refspec }).ToObservable();
+            });
+        }
+
         public IObservable<Unit> FetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
         {
             return DoFetchAndCheckout(repository, pullRequestNumber, localBranchName).ToObservable();

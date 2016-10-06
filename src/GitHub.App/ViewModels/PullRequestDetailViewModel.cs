@@ -485,7 +485,7 @@ namespace GitHub.ViewModels
             switch (CheckoutMode)
             {
                 case CheckoutMode.NeedsPull:
-                    operation = pullRequestsService.FetchAndCheckout(repository, Number, repository.CurrentBranch.Name);
+                    operation = pullRequestsService.Pull(repository);
                     break;
                 case CheckoutMode.Fetch:
                     operation = pullRequestsService
