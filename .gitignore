@@ -16,9 +16,11 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+build/
 
 # Roslyn cache directories
 *.ide/
+.vs/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -97,6 +99,7 @@ _TeamCity*
 # NCrunch
 _NCrunch_*
 .*crunch*.local.xml
+*.ncrunch*
 
 # MightyMoose
 *.mm.*
@@ -236,3 +239,4 @@ WiX.Toolset.DummyFile.txt
 nunit-UnitTests.xml
 nunit-TrackingCollectionTests.xml
 GitHubVS.sln.DotSettings
+**/generated/*.cs

@@ -1,0 +1,16 @@
+<ResourceDictionary 
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+  <SolidColorBrush x:Key="GitHubVsToolWindowText" Color="{DynamicResource VsColor.ToolWindowText}" />
+  <SolidColorBrush x:Key="GitHubVsToolWindowBackground" Color="{DynamicResource VsColor.ToolWindowBackground}" />
+  <SolidColorBrush x:Key="GitHubVsGrayText" Color="{DynamicResource VsColor.GrayText}" />
+  <SolidColorBrush x:Key="GitHubVsCommandBarHover" Color="{DynamicResource VsColor.CommandBarHover}" />
+  <SolidColorBrush x:Key="GitHubVsCommandBarSelectedBorder" Color="{DynamicResource VsColor.CommandBarSelectedBorder}" />
+  <SolidColorBrush x:Key="GitHubVsSearchBoxBackground" Color="{DynamicResource VsColor.SearchBoxBackground}" />
+  <SolidColorBrush x:Key="GitHubVsWindowText" Color="{DynamicResource VsColor.WindowText}" />
+  <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="{DynamicResource VsColor.BrandedUIBorder}" />
+  <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="{DynamicResource VsColor.BrandedUIBackground}" />
+  <SolidColorBrush x:Key="GitHubVsComboBoxPopupBorder" Color="{DynamicResource VsColor.ComboBoxPopupBorder}" />
+</ResourceDictionary>

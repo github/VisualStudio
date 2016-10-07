@@ -8,16 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows.Controls;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using NullGuard;
 using NLog;
-using System.Reactive.Linq;
-using GitHub.Infrastructure;
-using System.Windows.Controls;
+using NullGuard;
 
 namespace GitHub.VisualStudio
 {
@@ -25,24 +25,26 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class UIProvider : IUIProvider, IDisposable
     {
+        class OwnedComposablePart
+        {
+            public object Owner { get; set; }
+            public ComposablePart Part { get; set; }
+        }
+
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProvider serviceProvider;
         CompositionContainer tempContainer;
-        readonly Dictionary<string, ComposablePart> tempParts;
+        readonly Dictionary<string, OwnedComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
         readonly Version currentVersion;
         bool initializingLogging = false;
 
         [AllowNull]
-        public ExportProvider ExportProvider { get; private set; }
+        public ExportProvider ExportProvider { get; }
 
-        IServiceProvider gitServiceProvider;
         [AllowNull]
-        public IServiceProvider GitServiceProvider {
-            get { return gitServiceProvider; }
-            set { gitServiceProvider = value; }
-        }
+        public IServiceProvider GitServiceProvider { get; set; }
 
         bool Initialized { get { return ExportProvider != null; } }
 
@@ -71,7 +73,7 @@ namespace GitHub.VisualStudio
             {
                 SourceProvider = ExportProvider
             }));
-            tempParts = new Dictionary<string, ComposablePart>();
+            tempParts = new Dictionary<string, OwnedComposablePart>();
         }
 
         [return: AllowNull]
@@ -85,7 +87,7 @@ namespace GitHub.VisualStudio
                 initializingLogging = true;
                 try
                 {
-                    var logging = TryGetService<ILoggingConfiguration>();
+                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
                     logging.Configure();
                 }
                 catch
@@ -107,14 +109,21 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
-            if (gitServiceProvider != null)
+            if (GitServiceProvider != null)
             {
-                instance = gitServiceProvider.GetService(serviceType);
+                instance = GitServiceProvider.GetService(serviceType);
                 if (instance != null)
                     return instance;
             }
 
             return null;
+        }
+
+        [return: AllowNull]
+        public object TryGetService(string typename)
+        {
+            var type = Type.GetType(typename, false, true);
+            return TryGetService(type);
         }
 
         public object GetService(Type serviceType)
@@ -133,6 +142,7 @@ namespace GitHub.VisualStudio
             return (T)GetService(typeof(T));
         }
 
+        [return: AllowNull]
         public T TryGetService<T>() where T : class
         {
             return TryGetService(typeof(T)) as T;
@@ -144,12 +154,12 @@ namespace GitHub.VisualStudio
             return GetService<T>() as Ret;
         }
 
-        public void AddService<T>(T instance)
+        public void AddService<T>(object owner, T instance)
         {
-            AddService(typeof(T), instance);
+            AddService(typeof(T), owner, instance);
         }
 
-        public void AddService(Type t, object instance)
+        public void AddService(Type t, object owner, object instance)
         {
             if (!Initialized)
             {
@@ -157,16 +167,26 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            var batch = new CompositionBatch();
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+
+            // we want to remove stale instances of a service, if they exist, regardless of who put them there
+            RemoveService(t, null);
+
+            var batch = new CompositionBatch();
             var part = batch.AddExportedValue(contract, instance);
             Debug.Assert(part != null, "Adding an exported value must return a non-null part");
-            tempParts.Add(contract, part);
+            tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
             tempContainer.Compose(batch);
         }
 
-        public void RemoveService(Type t)
+        /// <summary>
+        /// Removes a service from the catalog
+        /// </summary>
+        /// <param name="t">The type we want to remove</param>
+        /// <param name="owner">The owner, which either has to match what was passed to AddService,
+        /// or if it's null, the service will be removed without checking for ownership</param>
+        public void RemoveService(Type t, [AllowNull] object owner)
         {
             if (!Initialized)
             {
@@ -177,29 +197,30 @@ namespace GitHub.VisualStudio
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
-            ComposablePart part; 
-
+            OwnedComposablePart part; 
             if (tempParts.TryGetValue(contract, out part))
             {
+                if (owner != null && part.Owner != owner)
+                    return;
                 tempParts.Remove(contract);
                 var batch = new CompositionBatch();
-                batch.RemovePart(part);
+                batch.RemovePart(part.Part);
                 tempContainer.Compose(batch);
             }
         }
 
         UI.WindowController windowController;
-        public IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
+        public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
             if (!Initialized)
             {
                 log.Error("ExportProvider is not initialized, cannot setup UI.");
-                return Observable.Return<UserControl>(null);
+                return Observable.Empty<LoadData>();
             }
 
             StopUI();
 
-            var factory = GetService<IExportFactoryProvider>();
+            var factory = TryGetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
             currentUIFlow = factory.UIControllerFactory.CreateExport();
             var disposable = currentUIFlow;
             var ui = currentUIFlow.Value;
@@ -207,7 +228,7 @@ namespace GitHub.VisualStudio
             windowController = new UI.WindowController(creation);
             windowController.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             windowController.Closed += StopUIFlowWhenWindowIsClosedByUser;
-            creation.Subscribe((c) => {}, () =>
+            creation.Subscribe(c => {}, () =>
             {
                 windowController.Closed -= StopUIFlowWhenWindowIsClosedByUser;
                 windowController.Close();
@@ -218,6 +239,19 @@ namespace GitHub.VisualStudio
             });
             ui.Start(connection);
             return creation;
+        }
+
+        public IObservable<bool> ListenToCompletionState()
+        {
+            var ui = currentUIFlow?.Value;
+            if (ui == null)
+            {
+                log.Error("UIProvider:ListenToCompletionState:Cannot call ListenToCompletionState without calling SetupUI first");
+#if DEBUG
+                throw new InvalidOperationException("Cannot call ListenToCompletionState without calling SetupUI first");
+#endif
+            }
+            return ui?.ListenToCompletionState() ?? Observable.Return(false);
         }
 
         public void RunUI()
@@ -315,7 +349,7 @@ namespace GitHub.VisualStudio
 
                 StopUI();
                 if (disposables != null)
-				    disposables.Dispose();
+                    disposables.Dispose();
                 disposables = null;
                 if (tempContainer != null)
                     tempContainer.Dispose();

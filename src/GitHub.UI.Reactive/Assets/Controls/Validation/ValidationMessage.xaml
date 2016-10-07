@@ -33,7 +33,7 @@
                             <ui:OcticonPath
                                 x:Name="icon"
                                 Icon="{TemplateBinding Icon}"
-                                Height="1024"
+                                Height="16"
                                 Fill="{TemplateBinding Fill}"/>
                         </Viewbox>
                         <TextBlock Grid.Column="1" Text="{TemplateBinding Text}"
@@ -68,7 +68,8 @@
         <Grid
             ToolTip="{Binding ElementName=adornerPlaceholder, Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}"
             Background="Transparent"
-            Cursor="IBeam">
+            Cursor="IBeam"
+            IsHitTestVisible="False">
             
             <AdornedElementPlaceholder
                 Name="adornerPlaceholder"
@@ -84,7 +85,7 @@
                     x:Name="icon"
                     Icon="stop"
                     Fill="{StaticResource GitHubErrorAdornmentBrush}"
-                    Height="1024" />
+                    Height="16" />
             </Viewbox>
         </Grid>
     </ControlTemplate>

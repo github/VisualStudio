@@ -3,16 +3,24 @@ using System.Globalization;
 using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
+using System.Diagnostics;
+using GitHub.SampleData;
 
 namespace GitHub.Models
 {
-    public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel,
+        IEquatable<PullRequestModel>,
+        IComparable<PullRequestModel>
     {
-        public PullRequestModel(int number, string title, IAccount author, DateTimeOffset createdAt, DateTimeOffset? updatedAt = null)
+        public PullRequestModel(int number, string title,
+            IAccount author, [AllowNull]IAccount assignee,
+            DateTimeOffset createdAt, DateTimeOffset? updatedAt = null)
         {
             Number = number;
             Title = title;
             Author = author;
+            Assignee = assignee;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt ?? CreatedAt;
         }
@@ -25,6 +33,8 @@ namespace GitHub.Models
             UpdatedAt = other.UpdatedAt;
             CommentCount = other.CommentCount;
             HasNewComments = other.HasNewComments;
+            IsOpen = other.IsOpen;
+            Assignee = other.Assignee;
         }
 
         public override bool Equals([AllowNull]object obj)
@@ -37,7 +47,7 @@ namespace GitHub.Models
 
         public override int GetHashCode()
         {
-            return Number;
+            return Number.GetHashCode();
         }
 
         bool IEquatable<IPullRequestModel>.Equals([AllowNull]IPullRequestModel other)
@@ -47,7 +57,19 @@ namespace GitHub.Models
             return other != null && Number == other.Number;
         }
 
+        bool IEquatable<PullRequestModel>.Equals([AllowNull]PullRequestModel other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+            return other != null && Number == other.Number;
+        }
+
         public int CompareTo([AllowNull]IPullRequestModel other)
+        {
+            return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
+        }
+
+        public int CompareTo([AllowNull]PullRequestModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
@@ -68,7 +90,7 @@ namespace GitHub.Models
 
         public static bool operator ==([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
         {
-            return Equals(lhs, rhs) && ((object)lhs == null || lhs.CompareTo(rhs) == 0);
+            return ReferenceEquals(lhs, rhs);
         }
 
         public static bool operator !=([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
@@ -83,6 +105,13 @@ namespace GitHub.Models
         {
             get { return title; }
             set { title = value; this.RaisePropertyChange(); }
+        }
+
+        bool isOpen;
+        public bool IsOpen
+        {
+            get { return isOpen; }
+            set { isOpen = value; this.RaisePropertyChange(); }
         }
 
         int commentCount;
@@ -103,11 +132,27 @@ namespace GitHub.Models
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
 
+        IAccount assignee;
+        [AllowNull]
+        public IAccount Assignee
+        {
+            [return: AllowNull]
+            get { return assignee; }
+            set { assignee = value; this.RaisePropertyChange(); }
+        }
 
         [return: AllowNull] // nullguard thinks a string.Format can return null. sigh.
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, "id:{0} title:{1} created:{2:u} updated:{3:u}", Number, Title, CreatedAt, UpdatedAt);
+        }
+
+        internal string DebuggerDisplay
+        {
+            get
+            {
+                return string.Format(CultureInfo.InvariantCulture, "id:{0} title:{1} created:{2:u} updated:{3:u}", Number, Title, CreatedAt, UpdatedAt);
+            }
         }
     }
 }

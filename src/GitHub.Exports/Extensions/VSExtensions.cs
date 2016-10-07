@@ -7,14 +7,14 @@ namespace GitHub.Extensions
 {
     public static class ISolutionExtensions
     {
-        public static IRepository GetRepoFromSolution(this IVsSolution solution)
+        public static IRepository GetRepositoryFromSolution(this IVsSolution solution)
         {
             string solutionDir, solutionFile, userFile;
             if (!ErrorHandler.Succeeded(solution.GetSolutionInfo(out solutionDir, out solutionFile, out userFile)))
                 return null;
             if (solutionDir == null)
                 return null;
-            return GitService.GitServiceHelper.GetRepo(solutionDir);
+            return GitService.GitServiceHelper.GetRepository(solutionDir);
         }
     }
 }
