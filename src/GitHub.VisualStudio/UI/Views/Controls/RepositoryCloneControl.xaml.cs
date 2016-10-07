@@ -16,6 +16,8 @@ using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
 using System.ComponentModel.Composition;
+using GitHub.Services;
+using System.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
@@ -29,28 +31,17 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class RepositoryCloneControl : GenericRepositoryCloneControl
     {
+        readonly Dictionary<string, RepositoryGroup> groups = new Dictionary<string, RepositoryGroup>();
+
         public RepositoryCloneControl()
         {
             InitializeComponent();
 
-            DataContextChanged += (s, e) => ViewModel = e.NewValue as IRepositoryCloneViewModel;
-
             this.WhenActivated(d =>
             {
-                d(this.OneWayBind(ViewModel, vm => vm.IsLoading, v => v.loadingProgressBar.Visibility));
-                d(this.OneWayBind(ViewModel, vm => vm.LoadingFailed, v => v.loadingFailedPanel.Visibility));
-                d(this.OneWayBind(ViewModel, vm => vm.NoRepositoriesFound, v => v.noRepositoriesMessage.Visibility));
-                d(this.OneWayBind(ViewModel, vm => vm.FilteredRepositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
-                d(this.Bind(ViewModel, vm => vm.SelectedRepository, v => v.repositoryList.SelectedItem));
-                d(this.Bind(ViewModel, vm => vm.BaseRepositoryPath, v => v.clonePath.Text));
-                d(this.OneWayBind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
-                d(this.BindCommand(ViewModel, vm => vm.BrowseForDirectory, v => v.browsePathButton));
-                d(this.BindCommand(ViewModel, vm => vm.CloneCommand, v => v.cloneButton));
-                d(this.OneWayBind(ViewModel, vm => vm.FilterTextIsEnabled, v => v.filterText.IsEnabled));
-                d(this.Bind(ViewModel, vm => vm.FilterText, v => v.filterText.Text));
+                d(this.OneWayBind(ViewModel, vm => vm.Repositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
                 d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
-                d(ViewModel.LoadRepositoriesCommand.ExecuteAsync().Subscribe());
-                ViewModel.CloneCommand.Subscribe(_ => NotifyDone());
+                d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
             });
             IsVisibleChanged += (s, e) =>
             {
@@ -59,24 +50,58 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             };
         }
 
-        static ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRepositoryModel> repositories)
+        ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRemoteRepositoryModel> repositories)
         {
             var view = new ListCollectionView((IList)repositories);
             Debug.Assert(view.GroupDescriptions != null, "view.GroupDescriptions is null");
-            view.GroupDescriptions.Add(new RepositoryGroupDescription());
+            view.GroupDescriptions.Add(new RepositoryGroupDescription(this));
             return view;
         }
 
         class RepositoryGroupDescription : GroupDescription
         {
-            public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
+            readonly RepositoryCloneControl owner;
+
+            public RepositoryGroupDescription(RepositoryCloneControl owner)
             {
-                return ((IRepositoryModel)item).Owner.Login;
+                this.owner = owner;
             }
 
-            public override bool NamesMatch(object groupName, object itemName)
+            public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
-                return string.Equals((string)groupName, (string)itemName);
+                var repo = item as IRemoteRepositoryModel;
+                var name = repo.Owner;
+                RepositoryGroup group;
+
+                if (!owner.groups.TryGetValue(name, out group))
+                {
+                    group = new RepositoryGroup(name, owner.groups.Count == 0);
+
+                    if (owner.groups.Count == 1)
+                        owner.groups.Values.First().IsExpanded = false;
+                    owner.groups.Add(name, group);
+                }
+
+                return group;
+            }
+        }
+
+        class RepositoryGroup : ReactiveObject
+        {
+            bool isExpanded;
+
+            public RepositoryGroup(string header, bool isExpanded)
+            {
+                Header = header;
+                this.isExpanded = isExpanded;
+            }
+
+            public string Header { get; }
+
+            public bool IsExpanded
+            {
+                get { return isExpanded; }
+                set { this.RaiseAndSetIfChanged(ref isExpanded, value); }
             }
         }
     }

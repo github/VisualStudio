@@ -77,16 +77,8 @@ namespace GitHub.Services
             return apiAccount.IsUser ? DefaultUserBitmapImage : DefaultOrgBitmapImage;
         }
 
-        bool disposed;
         protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (disposed) return;
-                imageCache.Dispose();
-                disposed = true;
-            }
-        }
+        {}
 
         public void Dispose()
         {

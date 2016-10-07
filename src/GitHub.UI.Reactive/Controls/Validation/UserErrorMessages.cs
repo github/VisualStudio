@@ -46,7 +46,7 @@ namespace GitHub.UI
             };
         }
 
-        public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0,10,7,0)));
+        public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0,0,8,0)));
         public Thickness IconMargin
         {
             [return: AllowNull]
@@ -106,18 +106,14 @@ namespace GitHub.UI
             Justification = "We're registering a handler for a type so this is appropriate.")]
         public IDisposable RegisterHandler<TUserError>(IObservable<bool> clearWhen) where TUserError : UserError
         {
-            if (IsVisible)
+            return UserError.RegisterHandler<TUserError>(userError =>
             {
-                return UserError.RegisterHandler<TUserError>(userError =>
-                {
-                    UserError = userError;
-                    return clearWhen
-                        .Skip(1)
-                        .Do(_ => UserError = null)
-                        .Select(x => RecoveryOptionResult.CancelOperation);
-                });
-            }
-            return Disposable.Empty;
+                UserError = userError;
+                return clearWhen
+                    .Skip(1)
+                    .Do(_ => UserError = null)
+                    .Select(x => RecoveryOptionResult.CancelOperation);
+            });
         }
     }
 }

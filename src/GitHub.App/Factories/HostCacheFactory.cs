@@ -39,5 +39,14 @@ namespace GitHub.Factories
 
         IOperatingSystem OperatingSystem { get { return operatingSystem.Value; } }
         IBlobCacheFactory BlobCacheFactory { get { return blobCacheFactory.Value; } }
+
+        protected virtual void Dispose(bool disposing)
+        {}
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

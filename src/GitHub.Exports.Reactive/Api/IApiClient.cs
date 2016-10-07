@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 
@@ -9,7 +10,8 @@ namespace GitHub.Api
     {
         HostAddress HostAddress { get; }
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
-        IObservable<User> GetUser();
+        IObservable<Gist> CreateGist(NewGist newGist);
+        IObservable<UserAndScopes> GetUser();
         IObservable<Organization> GetOrganizations();
         /// <summary>
         /// Retrieves all repositories that belong to this user.
@@ -31,5 +33,9 @@ namespace GitHub.Api
         IObservable<LicenseMetadata> GetLicenses();
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
         IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name);
+        IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo);
+        IObservable<Branch> GetBranches(string owner, string repo);
+        IObservable<Repository> GetRepositories();
+        IObservable<Repository> GetRepository(string owner, string repo);
     }
 }

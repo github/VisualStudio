@@ -28,16 +28,6 @@ namespace GitHub.UI
                 FrameworkPropertyMetadataOptions.AffectsMeasure | 
                 FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
-            "Icon", typeof(Octicon), typeof(OcticonCircleButton),
-            new FrameworkPropertyMetadata(defaultValue: Octicon.mark_github, flags:
-                FrameworkPropertyMetadataOptions.AffectsArrange |
-                FrameworkPropertyMetadataOptions.AffectsMeasure |
-                FrameworkPropertyMetadataOptions.AffectsRender,
-                propertyChangedCallback: OnIconChanged
-            )
-        );
-
         public bool ShowSpinner
         {
             get { return (bool)GetValue(ShowSpinnerProperty); }
@@ -76,20 +66,6 @@ namespace GitHub.UI
         {
             get { return (double)GetValue(IconSizeProperty); }
             set { SetValue(IconSizeProperty, value); }
-        }
-
-        public Octicon Icon
-        {
-            [return: AllowNull]
-            get { return (Octicon)GetValue(OcticonPath.IconProperty); }
-            set { SetValue(OcticonPath.IconProperty, value); }
-        }
-
-        public Geometry Data
-        {
-            [return: AllowNull]
-            get { return (Geometry)GetValue(Path.DataProperty); }
-            set { SetValue(Path.DataProperty, value); }
         }
 
         static OcticonCircleButton()

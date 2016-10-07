@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reactive.Linq;
+using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Info;
@@ -19,7 +20,6 @@ namespace GitHub.ViewModels
     public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
-        bool isBusy;
         bool invalidAuthenticationCode;
         string authenticationCode;
         TwoFactorType twoFactorType;
@@ -41,7 +41,6 @@ namespace GitHub.ViewModels
                 (code, busy) => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6 && !busy.Value);
 
             OkCommand = ReactiveCommand.Create(canVerify);
-            CancelCommand = ReactiveCommand.Create();
             NavigateLearnMore = ReactiveCommand.Create();
             NavigateLearnMore.Subscribe(x => browser.OpenUrl(GitHubUrls.TwoFactorLearnMore));
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
@@ -146,12 +145,6 @@ namespace GitHub.ViewModels
         public bool ShowErrorMessage
         {
             get { return showErrorMessage.Value; }
-        }
-
-        public bool IsBusy
-        {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
     }
 }

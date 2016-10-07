@@ -1,5 +1,4 @@
-﻿using NullGuard;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,9 +6,10 @@ using System.Linq;
 
 namespace GitHub.Extensions
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public static class Guard
     {
-        public static void ArgumentNotNull([AllowNull]object value, string name)
+        public static void ArgumentNotNull(object value, string name)
         {
             if (value != null) return;
             string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
@@ -37,13 +37,13 @@ namespace GitHub.Extensions
         }
 
         /// <summary>
-        ///   Checks a string argument to ensure it isn't null or empty.
+        /// Checks a string argument to ensure it isn't null or empty.
         /// </summary>
         /// <param name = "value">The argument value to check.</param>
         /// <param name = "name">The name of the argument.</param>
         public static void ArgumentNotEmptyString(string value, string name)
         {
-            if (value.Length > 0) return;
+            if (value?.Length > 0) return;
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
 #if DEBUG
             if (!InUnitTestRunner())

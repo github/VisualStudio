@@ -16,6 +16,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Viewbox
@@ -25,8 +26,9 @@
                             HorizontalAlignment="Right"
                             Width="16"
                             Height="16">
-                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="1024" Fill="{TemplateBinding Fill}" />
+                            <ui:OcticonPath x:Name="icon" Icon="{TemplateBinding Icon}" Height="16" Fill="{TemplateBinding Fill}" />
                         </Viewbox>
+
                         <ContentControl Grid.Column="1" Content="{Binding}">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type rxui:UserError}">
@@ -41,6 +43,25 @@
                                 </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
+
+                        <ItemsControl Grid.Column="2" 
+                                      ItemsSource="{Binding RecoveryOptions}"
+                                      VerticalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="4,0,0,0">
+                                        <Hyperlink Command="{Binding}">
+                                            <TextBlock Text="{Binding CommandName}"/>
+                                        </Hyperlink>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Grid>
                     
                     <ControlTemplate.Resources>

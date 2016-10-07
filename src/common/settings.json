@@ -1,0 +1,15 @@
+﻿{
+    "settings": [
+    {
+        "name": "CollectMetrics",
+        "type": "bool",
+        "default": 'true'
+    },
+    {
+        "name": "UIState",
+        "type": "object",
+        "typename": "UIState",
+        "default": 'null'
+    }
+    ]
+}

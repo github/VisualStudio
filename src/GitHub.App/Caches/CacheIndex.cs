@@ -10,6 +10,11 @@ namespace GitHub.Caches
 {
     public class CacheIndex
     {
+        public const string PRPrefix = "index:pr";
+        public const string RepoPrefix = "index:repos";
+        public const string GitIgnoresPrefix = "index:ignores";
+        public const string LicensesPrefix = "index:licenses";
+
         public static CacheIndex Create(string key)
         {
             return new CacheIndex { IndexKey = key };
@@ -21,6 +26,15 @@ namespace GitHub.Caches
             OldKeys = new List<string>();
         }
 
+        public CacheIndex Add(string indexKey, CacheItem item)
+        {
+            var k = string.Format(CultureInfo.InvariantCulture, "{0}|{1}", IndexKey, item.Key);
+            if (!Keys.Contains(k))
+                Keys.Add(k);
+            UpdatedAt = DateTimeOffset.UtcNow;
+            return this;
+        }
+
         public IObservable<CacheIndex> AddAndSave(IBlobCache cache, string indexKey, CacheItem item,
             DateTimeOffset? absoluteExpiration = null)
         {
@@ -29,7 +43,7 @@ namespace GitHub.Caches
                 Keys.Add(k);
             UpdatedAt = DateTimeOffset.UtcNow;
             return cache.InsertObject(IndexKey, this, absoluteExpiration)
-                        .Select(x => this);
+                .Select(x => this);
         }
 
         public static IObservable<CacheIndex> AddAndSaveToIndex(IBlobCache cache, string indexKey, CacheItem item,
@@ -47,15 +61,19 @@ namespace GitHub.Caches
                 .Select(x => index));
         }
 
-        public IObservable<CacheIndex> Clear(IBlobCache cache, string indexKey, DateTimeOffset? absoluteExpiration = null)
+        public CacheIndex Clear()
         {
             OldKeys = Keys.ToList();
             Keys.Clear();
             UpdatedAt = DateTimeOffset.UtcNow;
-            return cache
-                .InvalidateObject<CacheIndex>(indexKey)
-                .SelectMany(_ => cache.InsertObject(indexKey, this, absoluteExpiration))
-                .Select(_ => this);
+            return this;
+        }
+
+        public IObservable<CacheIndex> Save(IBlobCache cache,
+            DateTimeOffset? absoluteExpiration = null)
+        {
+            return cache.InsertObject(IndexKey, this, absoluteExpiration)
+                .Select(x => this);
         }
 
         [AllowNull]
