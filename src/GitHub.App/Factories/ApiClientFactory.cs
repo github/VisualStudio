@@ -18,11 +18,10 @@ namespace GitHub.Factories
         readonly ProductHeaderValue productHeader;
 
         [ImportingConstructor]
-        public ApiClientFactory(ILoginCache loginCache, IProgram program, ILoggingConfiguration config)
+        public ApiClientFactory(ILoginCache loginCache, IProgram program)
         {
             LoginCache = loginCache;
             productHeader = program.ProductHeader;
-            config.Configure();
         }
 
         public IApiClient Create(HostAddress hostAddress)

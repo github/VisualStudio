@@ -11,10 +11,15 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
 using GitHub.Helpers;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
+using GitHub.Info;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 using GitHub.VisualStudio.Menus;
+using Rothko;
+using Serilog;
+using Environment = System.Environment;
 
 namespace GitHub.VisualStudio
 {
@@ -134,6 +139,16 @@ namespace GitHub.VisualStudio
 
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            var environment = new Rothko.Environment();
+            var logPath = Path.Combine(environment.GetLocalGitHubApplicationDataPath(), "extension.log");
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.WithThreadId()
+                .WriteTo.File(logPath,
+                    fileSizeLimitBytes: 2L * 1024L * 1024L,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message}{NewLine}{Exception}")
+                .CreateLogger();
+
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);

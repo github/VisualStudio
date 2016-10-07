@@ -98,7 +98,6 @@ namespace GitHub.VisualStudio
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
         readonly Version currentVersion;
-        bool initializingLogging = false;
 
         public ExportProvider ExportProvider { get; private set; }
 
@@ -160,21 +159,6 @@ namespace GitHub.VisualStudio
         [return: AllowNull]
         public object TryGetService(Type serviceType)
         {
-            if (!initializingLogging)
-            {
-                initializingLogging = true;
-                try
-                {
-                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
-                    logging.Configure();
-                }
-                catch
-                {
-#if DEBUG
-                    throw;
-#endif
-                }
-            }
 
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
