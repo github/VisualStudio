@@ -134,6 +134,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SampleData\AccountDesigner.cs" />
+    <Compile Include="SampleData\LocalRepositoryModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
     <Compile Include="SampleData\LoggedOutViewModelDesigner.cs" />
@@ -204,6 +205,8 @@
     <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestDirectoryViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestFileViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />

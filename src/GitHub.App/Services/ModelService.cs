@@ -348,10 +348,10 @@ namespace GitHub.Services
                 prCacheItem.UpdatedAt)
             {
                 CommentCount = prCacheItem.CommentCount,
-                IsOpen = prCacheItem.IsOpen
+                IsOpen = prCacheItem.IsOpen,
+                Merged = prCacheItem.Merged,
             };
         }
-
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
@@ -445,6 +445,7 @@ namespace GitHub.Services
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
                 IsOpen = pr.State == ItemState.Open;
+                Merged = pr.Merged;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
             }
@@ -460,6 +461,7 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public bool IsOpen { get; set; }
+            public bool Merged { get; set; }
         }
     }
 }

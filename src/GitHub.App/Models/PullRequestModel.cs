@@ -130,6 +130,7 @@ namespace GitHub.Models
 
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
+        public bool Merged { get; set; }
         public IAccount Author { get; set; }
 
         IAccount assignee;
