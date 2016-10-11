@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Media.Imaging;
@@ -16,8 +18,10 @@ namespace UnitTests.GitHub.App.Models
         public void CopyFromDoesNotLoseAvatar()
         {
             //A function that will return this image in an observable after X seconds
-            var image = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
-            Func<int, IObservable<BitmapImage>> generateObservable = seconds =>
+            var userImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
+            var orgImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
+
+            Func<int, BitmapImage, IObservable<BitmapImage>> generateObservable = (seconds, image) =>
             {
                 return Observable.Generate(
                     initialState: 0, 
@@ -33,8 +37,7 @@ namespace UnitTests.GitHub.App.Models
             const string login = "foo";
             const int initialOwnedPrivateRepositoryCount = 1;
 
-            var createdAt = DateTime.Now;
-            var initialAccount = new Account(login, true, false, initialOwnedPrivateRepositoryCount, 0, generateObservable(0));
+            var initialAccount = new Account(login, true, false, initialOwnedPrivateRepositoryCount, 0, generateObservable(0, userImage));
 
             //Creating the test collection
             var col = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(), OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
@@ -56,14 +59,24 @@ namespace UnitTests.GitHub.App.Models
 
             //Demonstrating that the avatar is present
             Assert.NotNull(col[0].Avatar);
+            Assert.Equal(true, BitmapImageExtensions.IsEqual(col[0].Avatar, userImage));
 
             //Creating an observable that will return in one second
-            var updatedBitmapSourceObservable = generateObservable(1);
+            var updatedBitmapSourceObservable = generateObservable(1, orgImage);
 
             //Creating an account update with an observable
             const int updatedOwnedPrivateRepositoryCount = 2;
 
             var updatedAccount = new Account(login, true, false, updatedOwnedPrivateRepositoryCount, 0, updatedBitmapSourceObservable);
+
+            //Adding a listener to check for the changing of the Avatar property
+            initialAccount.Changed.Subscribe(args =>
+            {
+                if (args.PropertyName == "Avatar")
+                {
+                    evt.Set();
+                }
+            });
 
             //Updating the accout in the collection
             col.AddItem(updatedAccount);
@@ -71,11 +84,6 @@ namespace UnitTests.GitHub.App.Models
             //Waiting for the collection to process the update
             evt.WaitOne();
             evt.Reset();
-
-            updatedBitmapSourceObservable.Subscribe(bitmapImage =>
-            {
-                evt.Set();
-            });
 
             //Waiting for the delayed bitmap image observable
             evt.WaitOne();
@@ -89,6 +97,44 @@ namespace UnitTests.GitHub.App.Models
 
             //CopyFrom() should not cause a race condition here
             Assert.NotNull(col[0].Avatar);
+            Assert.Equal(true, BitmapImageExtensions.IsEqual((col[0].Avatar as BitmapImage), orgImage));
+        }
+    }
+
+    public static class BitmapImageExtensions
+    {
+        //http://stackoverflow.com/questions/15558107/quickest-way-to-compare-two-bitmapimages-to-check-if-they-are-different-in-wpf
+
+        public static bool IsEqual(BitmapSource image1, BitmapSource image2)
+        {
+            if (image1 == null || image2 == null)
+            {
+                return false;
+            }
+            return ToBytes(image1).SequenceEqual(ToBytes(image2));
+        }
+
+        public static byte[] ToBytes(BitmapSource image)
+        {
+            byte[] data = new byte[] { };
+            if (image != null)
+            {
+                try
+                {
+                    var encoder = new BmpBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(image));
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        encoder.Save(ms);
+                        data = ms.ToArray();
+                    }
+                    return data;
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            return data;
         }
     }
 }
