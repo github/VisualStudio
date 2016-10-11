@@ -108,22 +108,26 @@
                        TextWrapping="Wrap">
 
                 <Run Text="{Binding Title}" />
-                <Run Foreground="Gray" Text="{Binding Number, StringFormat=#{0}}" />
             </TextBlock>
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" Margin="8 2 8 8">
             <!-- Branch state ( Open | Closed | Merged ) -->
-            <TextBlock Margin="0 0 6 0"
-                       FontWeight="Bold"
+            <TextBlock FontWeight="Bold"
                        Text="{Binding State}"
                        VerticalAlignment="Center"
                        Style="{StaticResource StateIndicator}"/>
 
-            <TextBlock Text="|" Opacity="0.5" Foreground="Gray"/>
+            <TextBlock Text="|" VerticalAlignment="Center" Margin="6 0" Opacity="0.5" Foreground="Gray"/>
+
+            <!-- Pull request number -->
+            <TextBlock Foreground="Gray" Text="{Binding Number, StringFormat=#{0}}" />
+
+            <TextBlock Text="|" VerticalAlignment="Center" Margin="6 0" Opacity="0.5" Foreground="Gray"/>
+
             <!-- Author and open time -->
-            <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="6 0 0 0">
-                <Run Text="{Binding Author.Login}"/>
+            <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center">
+                <Run FontWeight="Bold" Text="{Binding Author.Login}"/>
                 <Run Text="{Binding CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
             </TextBlock>
         </DockPanel>
