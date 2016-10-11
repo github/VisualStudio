@@ -15,6 +15,8 @@ namespace GitHub.Models
     {
         BitmapSource avatar;
 
+        IObservable<BitmapSource> BitmapSource;
+        private IDisposable _bitmapSourceSubscription;
         public Account(
             string login,
             bool isUser,
@@ -30,8 +32,10 @@ namespace GitHub.Models
             PrivateReposInPlan = privateRepositoryInPlanCount;
             IsOnFreePlan = privateRepositoryInPlanCount == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+            BitmapSource = bitmapSource;
 
-            bitmapSource.ObserveOn(RxApp.MainThreadScheduler)
+            _bitmapSourceSubscription = bitmapSource
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Avatar = x);
         }
 
@@ -80,6 +84,16 @@ namespace GitHub.Models
             IsOnFreePlan = other.IsOnFreePlan;
             HasMaximumPrivateRepositories = other.HasMaximumPrivateRepositories;
             Avatar = other.Avatar;
+
+            var otherAccount = other as Account;
+            if (otherAccount != null)
+            {
+                _bitmapSourceSubscription.Dispose();
+
+                _bitmapSourceSubscription = otherAccount.BitmapSource
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => Avatar = x);
+            }
         }
 
         public override bool Equals([AllowNull]object obj)
