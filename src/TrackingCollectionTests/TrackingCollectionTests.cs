@@ -429,8 +429,8 @@ public class TrackingTests : TestBase
         var count = 0;
         var total = 1000;
 
-        var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).ToList());
+        var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).Reverse().ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).Reverse().ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -464,7 +464,7 @@ public class TrackingTests : TestBase
 
         Assert.AreEqual(total, count);
         Assert.AreEqual(total, col.Count);
-        CollectionAssert.AreEqual(col, list2.Reverse<Thing>());
+        CollectionAssert.AreEqual(col, list2);
 
         col.Dispose();
     }
