@@ -539,7 +539,7 @@ namespace GitHub.Collections
                 var old = list[idx];
                 if (newer != null)
                 {
-                    // the object is "older" than the one we have, ignore it
+                    // the object is not "newer" than the one we have, ignore it
                     if (newer(item, old) >= 0)
                         return new ActionData(TheAction.Ignore, list, item, null, idx, idx);
                 }
