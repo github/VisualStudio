@@ -59,7 +59,8 @@ namespace UnitTests.GitHub.App.Models
 
             //Demonstrating that the avatar is present
             Assert.NotNull(col[0].Avatar);
-            Assert.Equal(true, BitmapImageExtensions.IsEqual(col[0].Avatar, userImage));
+            Assert.True(BitmapSourcesAreEqual(col[0].Avatar, userImage));
+            Assert.False(BitmapSourcesAreEqual(col[0].Avatar, orgImage));
 
             //Creating an observable that will return in one second
             var updatedBitmapSourceObservable = generateObservable(1, orgImage);
@@ -97,24 +98,21 @@ namespace UnitTests.GitHub.App.Models
 
             //CopyFrom() should not cause a race condition here
             Assert.NotNull(col[0].Avatar);
-            Assert.Equal(true, BitmapImageExtensions.IsEqual((col[0].Avatar as BitmapImage), orgImage));
+            Assert.True(BitmapSourcesAreEqual(col[0].Avatar, orgImage));
+            Assert.False(BitmapSourcesAreEqual(col[0].Avatar, userImage));
         }
-    }
 
-    public static class BitmapImageExtensions
-    {
-        //http://stackoverflow.com/questions/15558107/quickest-way-to-compare-two-bitmapimages-to-check-if-they-are-different-in-wpf
-
-        public static bool IsEqual(BitmapSource image1, BitmapSource image2)
+        public static bool BitmapSourcesAreEqual(BitmapSource image1, BitmapSource image2)
         {
             if (image1 == null || image2 == null)
             {
                 return false;
             }
-            return ToBytes(image1).SequenceEqual(ToBytes(image2));
+
+            return BitmapSourceToBytes(image1).SequenceEqual(BitmapSourceToBytes(image2));
         }
 
-        public static byte[] ToBytes(BitmapSource image)
+        public static byte[] BitmapSourceToBytes(BitmapSource image)
         {
             byte[] data = new byte[] { };
             if (image != null)
@@ -134,6 +132,7 @@ namespace UnitTests.GitHub.App.Models
                 {
                 }
             }
+
             return data;
         }
     }
