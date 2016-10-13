@@ -20,6 +20,16 @@ namespace GitHub.VisualStudio
         {
             StartLine = EndLine = -1;
             Name = Services.Dte2?.ActiveDocument?.FullName;
+            var projectItem = Services.Dte2?.ActiveDocument?.ProjectItem;
+
+            for (short i = 0; i < 20; i++)
+            {
+                if (!Name.Equals(projectItem.FileNames[i]) && Name.Equals(projectItem.FileNames[i].ToLower(System.Globalization.CultureInfo.CurrentCulture)))
+                {
+                    Name = projectItem.FileNames[i];
+                    return;
+                }                
+            }
 
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
             Debug.Assert(textManager != null, "No SVsTextManager service available");
