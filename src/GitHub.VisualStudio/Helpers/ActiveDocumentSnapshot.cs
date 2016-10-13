@@ -22,15 +22,11 @@ namespace GitHub.VisualStudio
             Name = Services.Dte2?.ActiveDocument?.FullName;
             var projectItem = Services.Dte2?.ActiveDocument?.ProjectItem;
 
-            for (short i = 0; i < 20; i++)
+            if ((String.Compare(Name, projectItem.FileNames[1], StringComparison.Ordinal) != 0) && (String.Compare(Name, projectItem.FileNames[1], StringComparison.OrdinalIgnoreCase) == 0))
             {
-                if (!Name.Equals(projectItem.FileNames[i]) && Name.Equals(projectItem.FileNames[i].ToLower(System.Globalization.CultureInfo.CurrentCulture)))
-                {
-                    Name = projectItem.FileNames[i];
-                    return;
-                }                
-            }
-
+                Name = projectItem.FileNames[1];
+            }                
+            
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
             Debug.Assert(textManager != null, "No SVsTextManager service available");
             if (textManager == null)
