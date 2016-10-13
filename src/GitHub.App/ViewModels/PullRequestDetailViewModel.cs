@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using GitHub.Caches;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using LibGit2Sharp;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
@@ -387,6 +383,27 @@ namespace GitHub.ViewModels
             IsBusy = false;
         }
 
+        /// <summary>
+        /// Gets the full path to a file or directory in the changes tree.
+        /// </summary>
+        /// <param name="node">The file or directory node.</param>
+        /// <returns>The full path of the file or directory.</returns>
+        public string GetFullPath(IPullRequestChangeNode node)
+        {
+            return Path.Combine(repository.LocalPath, node.Path);
+        }
+
+        /// <summary>
+        /// Gets the before and after files needed for viewing a diff.
+        /// </summary>
+        /// <param name="file">The changed file.</param>
+        /// <returns>A tuple containing the full path to the before and after files.</returns>
+        public async Task<Tuple<string, string>> GetFilesForDiff(IPullRequestFileViewModel file)
+        {
+            var baseFileName = await pullRequestsService.GetBaseFile(repository, model, file.Path);
+            return Tuple.Create(baseFileName, GetFullPath(file));
+        }
+
         static PullRequestState CreatePullRequestState(PullRequest pullRequest)
         {
             if (pullRequest.State == ItemState.Open)
@@ -405,7 +422,7 @@ namespace GitHub.ViewModels
 
         static IEnumerable<IPullRequestFileViewModel> CreateChangedFilesList(IList<PullRequestFile> files)
         {
-            return files.Select(x => new PullRequestFileViewModel(x.FileName, x.Status == "added", x.Status == "deleted"));
+            return files.Select(x => new PullRequestFileViewModel(x.FileName, GetChangeType(x.Status)));
         }
 
         static IPullRequestDirectoryViewModel CreateChangedFilesTree(IEnumerable<IPullRequestFileViewModel> files)
@@ -417,11 +434,25 @@ namespace GitHub.ViewModels
 
             foreach (var file in files)
             {
-                var dir = GetDirectory(file.Path, dirs);
+                var dirName = Path.GetDirectoryName(file.Path);
+                var dir = GetDirectory(dirName, dirs);
                 dir.Files.Add(file);
             }
 
             return dirs[string.Empty];
+        }
+
+        private static FileChangeType GetChangeType(string status)
+        {
+            switch (status)
+            {
+                case "added":
+                    return FileChangeType.Added;
+                case "deleted":
+                    return FileChangeType.Deleted;
+                default:
+                    return FileChangeType.Changed;
+            }
         }
 
         static string GetCheckoutModeDescription(CheckoutMode checkoutMode)

@@ -82,6 +82,15 @@ namespace GitHub.Services
         /// <returns></returns>
         IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository);
 
+        /// <summary>
+        /// Gets the base file for a diff on a file in the pull request.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <param name="fileName">The filename relative to the repository root.</param>
+        /// <returns>The path to the base file.</returns>
+        IObservable<string> GetBaseFile(ILocalRepositoryModel repository, PullRequest pullRequest, string fileName);
+
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }
 }

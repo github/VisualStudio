@@ -207,6 +207,33 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<string> GetBaseFile(ILocalRepositoryModel repository, PullRequest pullRequest, string fileName)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var targetBranch = repo.Branches[pullRequest.Base.Ref];
+                var blob = targetBranch.Tip[fileName]?.Target as Blob;
+
+                if (blob == null)
+                {
+                    throw new NotFoundException($"The file was not found in the base branch: '{fileName}'.");
+                }
+
+                var tempFile = Path.Combine(
+                    Path.GetTempPath(),
+                    Guid.NewGuid().ToString() + Path.GetExtension(fileName));
+
+                using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
+                using (var destination = File.OpenWrite(tempFile))
+                {
+                    await source.CopyToAsync(destination);
+                }
+
+                return Observable.Return(tempFile);
+            });
+        }
+
         async Task DoFetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName)
         {
             var repo = gitService.GetRepository(repository.LocalPath);

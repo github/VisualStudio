@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -15,6 +16,7 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.UI.Helpers;
+using Microsoft.VisualStudio.Shell.Interop;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -110,13 +112,49 @@ namespace GitHub.VisualStudio.UI.Views
             menu.IsOpen = true;
         }
 
+        void DoOpenFile(IPullRequestFileViewModel file)
+        {
+            var fileName = ViewModel.GetFullPath(file);
+            Services.Dte.ItemOperations.OpenFile(fileName);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "file")]
+        async Task DoDiffFile(IPullRequestFileViewModel file)
+        {
+            var fileNames = await ViewModel.GetFilesForDiff(file);
+            var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
+            var rightLabel = $"{file.FileName};PR {ViewModel.Number}";
+
+            Services.DifferenceService.OpenComparisonWindow2(
+                fileNames.Item1,
+                fileNames.Item2,
+                $"{leftLabel} vs {rightLabel}",
+                file.Path,
+                leftLabel,
+                rightLabel,
+                string.Empty,
+                string.Empty,
+                0);
+        }
+
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
-
-            if (file != null)
+            if (ViewModel.CheckoutMode == CheckoutMode.UpToDate)
             {
-                // TODO: Implement open/diff.
+                var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
+
+                if (file != null)
+                {
+                    switch (ViewModel.OpenChangedFileAction)
+                    {
+                        case OpenChangedFileAction.Open:
+                            DoOpenFile(file);
+                            break;
+                        case OpenChangedFileAction.Diff:
+                            DoDiffFile(file).Forget();
+                            break;
+                    }
+                }
             }
         }
     }

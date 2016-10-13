@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
@@ -31,9 +32,9 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var gitHubDir = new PullRequestDirectoryViewModel("GitHub");
             var modelsDir = new PullRequestDirectoryViewModel("Models");
             var repositoriesDir = new PullRequestDirectoryViewModel("Repositories");
-            var itrackingBranch = new PullRequestFileViewModel(@"GitHub\Models\ITrackingBranch.cs", false, false);
-            var oldBranchModel = new PullRequestFileViewModel(@"GitHub\Models\OldBranchModel.cs", false, false);
-            var concurrentRepositoryConnection = new PullRequestFileViewModel(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", false, true);
+            var itrackingBranch = new PullRequestFileViewModel(@"GitHub\Models\ITrackingBranch.cs", FileChangeType.Changed);
+            var oldBranchModel = new PullRequestFileViewModel(@"GitHub\Models\OldBranchModel.cs", FileChangeType.Changed);
+            var concurrentRepositoryConnection = new PullRequestFileViewModel(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", FileChangeType.Deleted);
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);
@@ -78,5 +79,20 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
+
+        /// <summary>
+        /// Gets the full path to a file or directory in the changes tree.
+        /// </summary>
+        /// <param name="node">The file or directory node.</param>
+        /// <returns>The full path of the file or directory.</returns>
+        public string GetFullPath(IPullRequestChangeNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Tuple<string, string>> GetFilesForDiff(IPullRequestFileViewModel file)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
