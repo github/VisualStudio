@@ -448,8 +448,8 @@ namespace GitHub.ViewModels
             {
                 case "added":
                     return FileChangeType.Added;
-                case "deleted":
-                    return FileChangeType.Deleted;
+                case "removed":
+                    return FileChangeType.Removed;
                 default:
                     return FileChangeType.Changed;
             }

@@ -444,7 +444,29 @@
                                                     ContextMenu="{StaticResource FileContextMenu}"
                                                     Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
-                                            <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ChangeType}" Value="Removed">
+                                                                <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock Text="[add]" VerticalAlignment="Center" Opacity="0.5">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ChangeType}" Value="Added">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
@@ -477,7 +499,29 @@
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal">
                                                         <ui:OcticonImage Icon="file_code" Margin="0 0 4 0"/>
-                                                        <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding ChangeType}" Value="Removed">
+                                                                            <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <TextBlock Text="[add]" VerticalAlignment="Center" Opacity="0.5">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding ChangeType}" Value="Added">
+                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </GridViewColumn.CellTemplate>

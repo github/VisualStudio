@@ -33,8 +33,8 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var modelsDir = new PullRequestDirectoryViewModel("Models");
             var repositoriesDir = new PullRequestDirectoryViewModel("Repositories");
             var itrackingBranch = new PullRequestFileViewModel(@"GitHub\Models\ITrackingBranch.cs", FileChangeType.Changed);
-            var oldBranchModel = new PullRequestFileViewModel(@"GitHub\Models\OldBranchModel.cs", FileChangeType.Changed);
-            var concurrentRepositoryConnection = new PullRequestFileViewModel(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", FileChangeType.Deleted);
+            var oldBranchModel = new PullRequestFileViewModel(@"GitHub\Models\OldBranchModel.cs", FileChangeType.Added);
+            var concurrentRepositoryConnection = new PullRequestFileViewModel(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", FileChangeType.Removed);
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);

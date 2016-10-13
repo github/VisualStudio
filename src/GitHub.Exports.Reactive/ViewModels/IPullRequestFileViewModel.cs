@@ -18,7 +18,7 @@
         /// <summary>
         /// The file was deleted.
         /// </summary>
-        Deleted,
+        Removed,
     }
 
     /// <summary>
