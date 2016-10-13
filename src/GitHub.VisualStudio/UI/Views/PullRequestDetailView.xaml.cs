@@ -141,7 +141,9 @@ namespace GitHub.VisualStudio.UI.Views
                 rightLabel,
                 string.Empty,
                 string.Empty,
-                0);
+                (int)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
+                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary |
+                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
         }
 
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
