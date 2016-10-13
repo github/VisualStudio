@@ -137,36 +137,29 @@ namespace GitHub.Services
 
         public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
-            if (repository.Head.Tip.Sha == commitSha && repository.RetrieveStatus()[fileName].State == FileStatus.Unaltered)
+            var commit = repository.Lookup<Commit>(commitSha);
+            var blob = commit[fileName]?.Target as Blob;
+
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
+            var tempFile = Path.Combine(tempDir, tempFileName);
+
+            Directory.CreateDirectory(tempDir);
+
+            if (blob != null)
             {
-                return Path.Combine(repository.Info.Path, fileName);
+                using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
+                using (var destination = File.OpenWrite(tempFile))
+                {
+                    await source.CopyToAsync(destination);
+                }
             }
             else
             {
-                var commit = repository.Lookup<Commit>(commitSha);
-                var blob = commit[fileName]?.Target as Blob;
-
-                var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-                var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
-                var tempFile = Path.Combine(tempDir, tempFileName);
-
-                Directory.CreateDirectory(tempDir);
-
-                if (blob != null)
-                {
-                    using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
-                    using (var destination = File.OpenWrite(tempFile))
-                    {
-                        await source.CopyToAsync(destination);
-                    }
-                }
-                else
-                {
-                    File.Create(tempFile).Dispose();
-                }
-
-                return tempFile;
+                File.Create(tempFile).Dispose();
             }
+
+            return tempFile;
         }
 
         static bool IsCanonical(string s)
