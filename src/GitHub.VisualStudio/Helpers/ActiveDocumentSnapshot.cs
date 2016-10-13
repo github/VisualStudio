@@ -19,7 +19,7 @@ namespace GitHub.VisualStudio
         public ActiveDocumentSnapshot([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             StartLine = EndLine = -1;
-            Name = Services.Dte2?.ActiveDocument?.ProjectItem.Name;
+            Name = Services.Dte2?.ActiveDocument?.FullName;
 
             var textManager = serviceProvider.GetService(typeof(SVsTextManager)) as IVsTextManager;
             Debug.Assert(textManager != null, "No SVsTextManager service available");
