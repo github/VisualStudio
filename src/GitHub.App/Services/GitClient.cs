@@ -146,9 +146,11 @@ namespace GitHub.Services
                 var commit = repository.Lookup<Commit>(commitSha);
                 var blob = commit[fileName]?.Target as Blob;
 
-                var tempFile = Path.Combine(
-                    Path.GetTempPath(),
-                    Guid.NewGuid().ToString() + Path.GetExtension(fileName));
+                var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
+                var tempFile = Path.Combine(tempDir, tempFileName);
+
+                Directory.CreateDirectory(tempDir);
 
                 if (blob != null)
                 {
