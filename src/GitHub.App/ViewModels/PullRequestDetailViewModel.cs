@@ -282,7 +282,7 @@ namespace GitHub.ViewModels
         /// Gets a command that opens a <see cref="IPullRequestFileViewModel"/>.
         /// </summary>
         public ReactiveCommand<object> OpenFile { get; }
- 
+
         /// <summary>
         /// Gets a command that diffs a <see cref="IPullRequestFileViewModel"/>.
         /// </summary>

@@ -215,19 +215,21 @@ namespace GitHub.Services
                 var targetBranch = repo.Branches[pullRequest.Base.Ref];
                 var blob = targetBranch.Tip[fileName]?.Target as Blob;
 
-                if (blob == null)
-                {
-                    throw new NotFoundException($"The file was not found in the base branch: '{fileName}'.");
-                }
-
                 var tempFile = Path.Combine(
                     Path.GetTempPath(),
                     Guid.NewGuid().ToString() + Path.GetExtension(fileName));
 
-                using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
-                using (var destination = File.OpenWrite(tempFile))
+                if (blob != null)
                 {
-                    await source.CopyToAsync(destination);
+                    using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
+                    using (var destination = File.OpenWrite(tempFile))
+                    {
+                        await source.CopyToAsync(destination);
+                    }
+                }
+                else
+                {
+                    File.Create(tempFile).Dispose();
                 }
 
                 return Observable.Return(tempFile);

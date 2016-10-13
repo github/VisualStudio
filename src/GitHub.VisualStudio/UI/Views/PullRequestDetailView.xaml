@@ -400,11 +400,21 @@
                     
                     <te:SectionControl.Content>
                         <Grid>
+                            <Grid.Resources>
+                                <!-- We have to do contortions to get to the PullRequestDetailViewModel which contains the OpenFile and DiffFile
+                                     commands: the control which hosts the context menu must have the PullRequestDetailViewModel as its tag,
+                                     which is then set as the tag on the ContextMenu which is finally reacable from the MenuItem. -->
+                                <ContextMenu x:Key="FileContextMenu" Tag="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Mode=Self}}">
+                                    <MenuItem Header="Open File" Command="{Binding Tag.OpenFile, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ContextMenu}}}" CommandParameter="{Binding}"/>
+                                    <MenuItem Header="Compare File" Command="{Binding Tag.DiffFile, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ContextMenu}}}" CommandParameter="{Binding}"/>
+                                </ContextMenu>
+                            </Grid.Resources>
                             <!-- Tree View -->
-                            <TreeView ItemsSource="{Binding ChangedFilesTree}" 
+                            <TreeView ItemsSource="{Binding ChangedFilesTree}"
                                       Background="Transparent"
                                       BorderThickness="0"
                                       Margin="0 6 0 0"
+                                      MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
@@ -423,14 +433,16 @@
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.Resources>
                                     <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
-                                                          ItemsSource="{Binding Children}">
+                                                              ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
-                                        <StackPanel Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal"
+                                                    ContextMenu="{StaticResource FileContextMenu}"
+                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
                                             <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>

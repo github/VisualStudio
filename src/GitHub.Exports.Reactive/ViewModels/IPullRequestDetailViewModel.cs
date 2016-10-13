@@ -197,6 +197,7 @@ namespace GitHub.ViewModels
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
 
+        /// <summary>
         /// Gets the full path to a file or directory in the changes tree.
         /// </summary>
         /// <param name="node">The file or directory node.</param>

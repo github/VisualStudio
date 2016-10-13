@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,7 @@ using GitHub.Extensions;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
+using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
 using Microsoft.VisualStudio.Shell.Interop;
 using ReactiveUI;
@@ -42,6 +44,8 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
+                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x)));
+                d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileViewModel)x).Forget()));
             });
 
             OpenChangesOptionsMenu = ReactiveCommand.Create();
@@ -114,47 +118,61 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenFile(IPullRequestFileViewModel file)
         {
-            var fileName = ViewModel.GetFullPath(file);
-            Services.Dte.ItemOperations.OpenFile(fileName);
+            if (ViewModel.CheckoutMode == CheckoutMode.UpToDate)
+            {
+                var fileName = ViewModel.GetFullPath(file);
+                Services.Dte.ItemOperations.OpenFile(fileName);
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "file")]
         async Task DoDiffFile(IPullRequestFileViewModel file)
         {
-            var fileNames = await ViewModel.GetFilesForDiff(file);
-            var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-            var rightLabel = $"{file.FileName};PR {ViewModel.Number}";
+            if (ViewModel.CheckoutMode == CheckoutMode.UpToDate)
+            {
+                var fileNames = await ViewModel.GetFilesForDiff(file);
+                var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = $"{file.FileName};PR {ViewModel.Number}";
 
-            Services.DifferenceService.OpenComparisonWindow2(
-                fileNames.Item1,
-                fileNames.Item2,
-                $"{leftLabel} vs {rightLabel}",
-                file.Path,
-                leftLabel,
-                rightLabel,
-                string.Empty,
-                string.Empty,
-                0);
+                Services.DifferenceService.OpenComparisonWindow2(
+                    fileNames.Item1,
+                    fileNames.Item2,
+                    $"{leftLabel} vs {rightLabel}",
+                    file.Path,
+                    leftLabel,
+                    rightLabel,
+                    string.Empty,
+                    string.Empty,
+                    0);
+            }
         }
 
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (ViewModel.CheckoutMode == CheckoutMode.UpToDate)
-            {
-                var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
+            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
 
-                if (file != null)
+            if (file != null)
+            {
+                switch (ViewModel.OpenChangedFileAction)
                 {
-                    switch (ViewModel.OpenChangedFileAction)
-                    {
-                        case OpenChangedFileAction.Open:
-                            DoOpenFile(file);
-                            break;
-                        case OpenChangedFileAction.Diff:
-                            DoDiffFile(file).Forget();
-                            break;
-                    }
+                    case OpenChangedFileAction.Open:
+                        DoOpenFile(file);
+                        break;
+                    case OpenChangedFileAction.Diff:
+                        DoDiffFile(file).Forget();
+                        break;
                 }
+            }
+        }
+
+        private void FileListMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = (e.OriginalSource as Visual)?.GetSelfAndVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
+            
+            if (item != null)
+            {
+                // Select tree view item on right click.
+                item.IsSelected = true;
             }
         }
     }
