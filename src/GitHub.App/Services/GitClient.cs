@@ -156,7 +156,7 @@ namespace GitHub.Services
             }
             else
             {
-                File.Create(tempFile).Dispose();
+                File.CreateText(tempFile).Dispose();
             }
 
             return tempFile;
