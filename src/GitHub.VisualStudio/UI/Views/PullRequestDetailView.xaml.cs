@@ -44,7 +44,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
-                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x)));
+                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x).Forget()));
                 d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileViewModel)x).Forget()));
             });
 
@@ -116,35 +116,32 @@ namespace GitHub.VisualStudio.UI.Views
             menu.IsOpen = true;
         }
 
-        void DoOpenFile(IPullRequestFileViewModel file)
+        async Task DoOpenFile(IPullRequestFileViewModel file)
         {
-            if (ViewModel.CheckoutMode == CheckoutMode.UpToDate)
-            {
-                var fileName = ViewModel.GetFullPath(file);
-                Services.Dte.ItemOperations.OpenFile(fileName);
-            }
+            var fileName = await ViewModel.ExtractFile(file);
+            var window = Services.Dte.ItemOperations.OpenFile(fileName);
+
+            // If the file we extracted isn't the current file on disk, make the window read-only.
+            window.Document.ReadOnly = fileName != file.Path;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "file")]
         async Task DoDiffFile(IPullRequestFileViewModel file)
         {
-            if (ViewModel.CheckoutMode == CheckoutMode.UpToDate)
-            {
-                var fileNames = await ViewModel.GetFilesForDiff(file);
-                var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-                var rightLabel = $"{file.FileName};PR {ViewModel.Number}";
+            var fileNames = await ViewModel.ExtractDiffFiles(file);
+            var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
+            var rightLabel = $"{file.FileName};PR {ViewModel.Number}";
 
-                Services.DifferenceService.OpenComparisonWindow2(
-                    fileNames.Item1,
-                    fileNames.Item2,
-                    $"{leftLabel} vs {rightLabel}",
-                    file.Path,
-                    leftLabel,
-                    rightLabel,
-                    string.Empty,
-                    string.Empty,
-                    0);
-            }
+            Services.DifferenceService.OpenComparisonWindow2(
+                fileNames.Item1,
+                fileNames.Item2,
+                $"{leftLabel} vs {rightLabel}",
+                file.Path,
+                leftLabel,
+                rightLabel,
+                string.Empty,
+                string.Empty,
+                0);
         }
 
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -156,7 +153,7 @@ namespace GitHub.VisualStudio.UI.Views
                 switch (ViewModel.OpenChangedFileAction)
                 {
                     case OpenChangedFileAction.Open:
-                        DoOpenFile(file);
+                        DoOpenFile(file).Forget();
                         break;
                     case OpenChangedFileAction.Diff:
                         DoDiffFile(file).Forget();

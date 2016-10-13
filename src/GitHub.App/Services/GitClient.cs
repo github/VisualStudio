@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -134,6 +133,38 @@ namespace GitHub.Services
                     ret = repo.Network.Remotes.Add(remoteName, UriString.ToUriString(uri.ToRepositoryUrl()));
                 return ret;
             });
+        }
+
+        public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
+        {
+            if (repository.Head.Tip.Sha == commitSha && repository.RetrieveStatus()[fileName].State == FileStatus.Unaltered)
+            {
+                return Path.Combine(repository.Info.Path, fileName);
+            }
+            else
+            {
+                var commit = repository.Lookup<Commit>(commitSha);
+                var blob = commit[fileName]?.Target as Blob;
+
+                var tempFile = Path.Combine(
+                    Path.GetTempPath(),
+                    Guid.NewGuid().ToString() + Path.GetExtension(fileName));
+
+                if (blob != null)
+                {
+                    using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
+                    using (var destination = File.OpenWrite(tempFile))
+                    {
+                        await source.CopyToAsync(destination);
+                    }
+                }
+                else
+                {
+                    File.Create(tempFile).Dispose();
+                }
+
+                return tempFile;
+            }
         }
 
         static bool IsCanonical(string s)

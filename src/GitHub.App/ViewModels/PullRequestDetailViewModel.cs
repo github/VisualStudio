@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Caches;
 using GitHub.Exports;
@@ -384,13 +385,13 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the full path to a file or directory in the changes tree.
+        /// Gets the specified file as it appears in the pull request.
         /// </summary>
         /// <param name="node">The file or directory node.</param>
-        /// <returns>The full path of the file or directory.</returns>
-        public string GetFullPath(IPullRequestChangeNode node)
+        /// <returns>The path to the extracted file.</returns>
+        public Task<string> ExtractFile(IPullRequestFileViewModel node)
         {
-            return Path.Combine(repository.LocalPath, node.Path);
+            return pullRequestsService.ExtractFile(repository, model.Head.Sha, node.Path).ToTask();
         }
 
         /// <summary>
@@ -398,10 +399,9 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="file">The changed file.</param>
         /// <returns>A tuple containing the full path to the before and after files.</returns>
-        public async Task<Tuple<string, string>> GetFilesForDiff(IPullRequestFileViewModel file)
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileViewModel file)
         {
-            var baseFileName = await pullRequestsService.GetBaseFile(repository, model, file.Path);
-            return Tuple.Create(baseFileName, GetFullPath(file));
+            return pullRequestsService.ExtractDiffFiles(repository, model, file.Path).ToTask();
         }
 
         static PullRequestState CreatePullRequestState(PullRequest pullRequest)

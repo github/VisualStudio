@@ -78,5 +78,14 @@ namespace GitHub.Services
         Task UnsetConfig(IRepository repository, string key);
 
         Task<Remote> GetHttpRemote(IRepository repo, string remote);
+
+        /// <summary>
+        /// Extracts a file at a specified commit from the repository.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="fileName">The path to the file, relative to the repository.</param>
+        /// <returns>The filename of the extracted file.</returns>
+        Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
     }
 }

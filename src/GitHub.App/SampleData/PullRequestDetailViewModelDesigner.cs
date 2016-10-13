@@ -79,17 +79,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
 
-        /// <summary>
-        /// Gets the full path to a file or directory in the changes tree.
-        /// </summary>
-        /// <param name="node">The file or directory node.</param>
-        /// <returns>The full path of the file or directory.</returns>
-        public string GetFullPath(IPullRequestChangeNode node)
+        public Task<string> ExtractFile(IPullRequestFileViewModel node)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Tuple<string, string>> GetFilesForDiff(IPullRequestFileViewModel file)
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileViewModel file)
         {
             throw new NotImplementedException();
         }

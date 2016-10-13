@@ -207,32 +207,26 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> GetBaseFile(ILocalRepositoryModel repository, PullRequest pullRequest, string fileName)
+        public IObservable<string> ExtractFile(ILocalRepositoryModel repository, string commitSha, string fileName)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var targetBranch = repo.Branches[pullRequest.Base.Ref];
-                var blob = targetBranch.Tip[fileName]?.Target as Blob;
+                await gitClient.Fetch(repo, "origin");
+                var result= await gitClient.ExtractFile(repo, commitSha, fileName);
+                return Observable.Return(result);
+            });
+        }
 
-                var tempFile = Path.Combine(
-                    Path.GetTempPath(),
-                    Guid.NewGuid().ToString() + Path.GetExtension(fileName));
-
-                if (blob != null)
-                {
-                    using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
-                    using (var destination = File.OpenWrite(tempFile))
-                    {
-                        await source.CopyToAsync(destination);
-                    }
-                }
-                else
-                {
-                    File.Create(tempFile).Dispose();
-                }
-
-                return Observable.Return(tempFile);
+        public IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, PullRequest pullRequest, string fileName)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                await gitClient.Fetch(repo, "origin");
+                var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
+                var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName);
+                return Observable.Return(Tuple.Create(left, right));
             });
         }
 
