@@ -368,10 +368,10 @@
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
-                                                <Setter Property="Header" Value="Compare File as Default Action"/>
+                                                <Setter Property="Header" Value="Open File as Default Action"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
-                                                <Setter Property="Header" Value="Open File as Default Action"/>
+                                                <Setter Property="Header" Value="Compare File as Default Action"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
