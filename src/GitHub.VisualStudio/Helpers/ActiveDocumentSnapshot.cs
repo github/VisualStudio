@@ -22,7 +22,7 @@ namespace GitHub.VisualStudio
             Name = Services.Dte2?.ActiveDocument?.FullName;
             var projectItem = Services.Dte2?.ActiveDocument?.ProjectItem;
 
-            if ((String.Compare(Name, projectItem.FileNames[1], StringComparison.Ordinal) != 0) && (String.Compare(Name, projectItem.FileNames[1], StringComparison.OrdinalIgnoreCase) == 0))
+            if ((String.Compare(Name, projectItem.FileNames[1], StringComparison.OrdinalIgnoreCase) == 0))
             {
                 Name = projectItem.FileNames[1];
             }                
