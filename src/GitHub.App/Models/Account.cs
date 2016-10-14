@@ -32,7 +32,7 @@ namespace GitHub.Models
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
 
             bitmapSource.ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => avatar = x);
+                .Subscribe(x => Avatar = x);
         }
 
         public Account(Octokit.Account account)
