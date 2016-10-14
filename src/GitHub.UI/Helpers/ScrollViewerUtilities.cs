@@ -4,7 +4,7 @@ using System.Windows.Input;
 namespace GitHub.VisualStudio.UI.Helpers
 {
     /// <summary>
-    /// Utilties for fixing WPF's broken ScrollViewer.
+    /// Utilities for fixing WPF's broken ScrollViewer.
     /// </summary>
     public static class ScrollViewerUtilities
     {
