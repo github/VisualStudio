@@ -1,4 +1,8 @@
 # First Launch
+- **Start page is displayed by default on first launch**
+  - **Click on GitHub link on start page under Open > Checkout from**
+    - [ ] Team Explorer Window exposed
+    - [ ] Clone a GitHub Repository dialog visible
   - **If last solution was in a git repo hosted on GitHub**
     - **Team Explorer Home page shows:**
       - [ ] GitHub header, repo information
@@ -21,7 +25,7 @@
               - [ ] Connect dialog disappears
               - [ ] GitHub invitation section in Connect page disappears
               - [ ] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
-                
+
 # In Team Explorer Connect page (logged in)
   - [ ] **Click on Clone action link**
       - [ ] Clone dialog appears
@@ -38,7 +42,7 @@
   - [ ] **Select a repository and click Clone**
       - [ ] Clone dialog disappears
       - [ ] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
-      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed. 
+      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed.
       - [ ] Repository shows up in the "Local Git Repositories" list
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
       - [ ] Team Explorer view changes to Home page
@@ -83,9 +87,9 @@
         - [ ] Progress bar appears above Synchronization title
         - [ ] Team Explorer view changes to Home page
         - [ ] Notification appears: "Repository published successfully"
-        - [ ] Publish a private repo and verify on .com that it's private 
-- [ ] **Project section (Home button)*** 
-    - [ ] Click on "Home" icon 
+        - [ ] Publish a private repo and verify on .com that it's private
+- [ ] **Project section (Home button)***
+    - [ ] Click on "Home" icon
         - [ ] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
         - [ ] Verify Pulse button navigates to Pulse page on Github.com
         - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
@@ -109,7 +113,116 @@
       - [ ] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Login links
     - [ ]  Disconnect from TFS (right click on project and "Remove"
       - [ ] Team Explorer Connect page: GitHub invitation section appears in Hosted Service Providers with Connect.. and Sign up links
-      
+
+# In GitHub pane (logged into GitHub)
+- [ ] **Go to Team Explorer > Home > Pull Requests**
+      - [ ] List of pull requests is displayed.
+      - [ ] Pane title displays "GitHub | (current repository)"
+      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
+      - [ ] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
+      - [ ] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
+      - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
+      - [ ] Filter author selection displays recent pull request authors
+      - [ ] "Create New" Link button is displayed
+      - [ ] Clicking on a pull request title opens browser window to pull request on .com
+      - [ ] Clicking on a pull request number opens browser window to pull request on .com
+- [ ] **Create a new branch (can alternatively make commits on an existing branch)**
+- [ ] **Switch Git context to new branch**
+- [ ] **Click on Create New button**
+      - [ ] Pane title displays "GitHub | (current repository)"
+      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
+      - [ ] Create Pull Request button is disabled.
+      - [ ] Default/target branch name is displayed to the left of the arrow (<)
+      - [ ] Source branch is displayed to the right of the arrow
+      - [ ] Default/target branch is a dropdown of all branches
+      - [ ] Clicking on Cancel button navigates back to the pull request list
+      - [ ] Setting the target and source branch as the same branches disables the "Create Pull Request" button and displays an error message at the top of pane
+- [ ] **Fill out pull request Title**
+      - [ ] "Create Pull Request" button is enabled.
+- [ ] **Click on Create Pull Request**
+      - [ ] Pull request list is displayed with new pull request (that was just created) at the top of the list
+      - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
+      - [ ] Verify all non pushed commits prior to pull request creation have been pushed and exist on .com
+
+
+# In VS text/code Editor (logged in to GitHub, open a file that is hosted on Github)
+- [ ] **Highlight code or text within solution, then right click.**
+      - [ ] GitHub context menu is visible
+      - [ ] Open on Github is visible if code is hosted on GitHub repository
+      - [ ] Copy link to clipboard is visible if code is hosted on GitHub repository
+      - [ ] "Create a GitHub Gist" is visible (repo independent)    
+- [ ] **Click "Open on GitHub"**
+      - [ ] Default browser navigates to last pushed commit on GitHub repo and highlights lines that were highlighted in editor.
+- [ ] **Click "Copy link to clipboard"**
+      - [ ] Pasting into browser pastes a link to the last pushed commit on GitHub repo and highlights lines that were highlighted in editor.        
+- [ ] **Click "Create a GitHub Gist"**
+      - [ ] Create gist dialog appears
+      - [ ] File name textbox populated with name of file that highlighted source code came from
+      - [ ] Private Gist checkbox unchecked
+      - [ ] Create button enabled
+      - [ ] Clearing file name textbox disables the Create button
+- [ ] **Click create button**
+      - [ ] Dialog disappears
+      - [ ] Default browser navigates to newly created Gist
+      - [ ] Create private gist and verify it's private on .com
+
+# In VS text/code Editor (NOT logged in to GitHub, open a file that is hosted on Github)
+- [ ] **Highlight code or text within solution, then right click.**
+      - [ ] GitHub context menu is visible
+      - [ ] Open on Github is visible
+      - [ ] Copy link to clipboard is visible
+      - [ ] "Create a GitHub Gist" is visible (repo independent)    
+- [ ] **Click "Open on GitHub"**
+      - [ ] Default browser navigates to last pushed commit on GitHub repo and highlights lines that were highlighted in editor.
+- [ ] **Click "Copy link to clipboard"**
+      - [ ] Pasting into browser pastes a link to the last pushed commit on GitHub repo and highlights lines that were highlighted in editor.        
+- [ ] **Click "Create a GitHub Gist"**
+      - [ ] "Connect to GitHub" dialog appears
+      - [ ] Create gist dialog appears (after logging in)
+      - [ ] File name textbox populated with name of file that highlighted source code came from
+      - [ ] Private Gist checkbox unchecked
+      - [ ] Create button enabled
+      - [ ] Clearing file name textbox disables the Create button
+- [ ] **Click create button**
+      - [ ] Dialog disappears
+      - [ ] Default browser navigates to newly created Gist
+      - [ ] Create private gist and verify it's private on .com
+
+# In VS text/code Editor (logged in to GitHub, open a file that is NOT hosted on Github)
+- [ ] **Highlight code or text within solution, then right click.**
+      - [ ] GitHub context menu is visible
+      - [ ] Open on Github is NOT visible
+      - [ ] Copy link to clipboard is NOT visible
+      - [ ] "Create a GitHub Gist" is visible (repo independent)    
+- [ ] **Click "Create a GitHub Gist"**
+      - [ ] Create gist dialog appears
+      - [ ] File name textbox populated with name of file that highlighted source code came from
+      - [ ] Private Gist checkbox unchecked
+      - [ ] Create button enabled
+      - [ ] Clearing file name textbox disables the Create button
+- [ ] **Click create button**
+      - [ ] Dialog disappears
+      - [ ] Default browser navigates to newly created Gist
+      - [ ] Create private gist and verify it's private on .com browser navigates to newly created Gist
+
+# In VS text/code Editor (NOT logged in to GitHub, open a file that is NOT hosted on Github)
+- [ ] **Highlight code or text within solution, then right click.**
+      - [ ] GitHub context menu is visible
+      - [ ] Open on Github is NOT visible
+      - [ ] Copy link to clipboard is NOT visible
+      - [ ] "Create a GitHub Gist" is visible (repo independent)    
+- [ ] **Click "Create a GitHub Gist"**
+      - [ ] "Connect to GitHub" dialog appears
+      - [ ] Create gist dialog appears (after logging in)
+      - [ ] File name textbox populated with name of file that highlighted source code came from
+      - [ ] Private Gist checkbox unchecked
+      - [ ] Create button enabled
+      - [ ] Clearing file name textbox disables the Create button
+- [ ] **Click create button**
+      - [ ] Dialog disappears
+      - [ ] Default browser navigates to newly created Gist
+      - [ ] Create private gist and verify it's private on .com browser navigates to newly created Gist
+
 # Connections
 - [ ] **Login to GitHub.com, then click on the "Manage Connections" header and "Connect to GitHub"**
       - [ ] Login dialog appears
