@@ -177,16 +177,6 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that opens the specified file according to <see cref="ChangedFilesView"/>.
-        /// </summary>
-        /// <remarks>
-        /// An <see cref="IPullRequestFileViewModel"/> should be passed as the parameter to this command's
-        /// Execute method. It triggers <see cref="ViewOpenFile"/> or <see cref="ViewCompareFiles"/> which
-        /// should be handled by the view to implement opening or comparing the file.
-        /// </remarks>
-        ReactiveCommand<object> ActivateItem { get; }
-
-        /// <summary>
         /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
         /// </summary>
         ReactiveCommand<object> ToggleChangedFilesView { get; }
@@ -197,11 +187,13 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         /// <summary>
-        /// Gets a command that informs the view that the specified file should be opened.
+        /// Gets a command that opens a <see cref="IPullRequestFileViewModel"/>.
         /// </summary>
-        /// <remarks>
-        /// The parameter passed is a string detailing the full path to the file.
-        /// </remarks>
-        ReactiveCommand<object> ViewOpenFile { get; }
+        ReactiveCommand<object> OpenFile { get; }
+
+        /// <summary>
+        /// Gets a command that diffs a <see cref="IPullRequestFileViewModel"/>.
+        /// </summary>
+        ReactiveCommand<object> DiffFile { get; }
     }
 }

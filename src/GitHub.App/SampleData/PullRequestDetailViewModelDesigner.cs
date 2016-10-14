@@ -76,6 +76,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> ActivateItem { get; }
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
-        public ReactiveCommand<object> ViewOpenFile { get; }
+        public ReactiveCommand<object> OpenFile { get; }
+        public ReactiveCommand<object> DiffFile { get; }
     }
 }
