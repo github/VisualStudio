@@ -14,9 +14,9 @@ namespace GitHub.Models
     public class Account : ReactiveObject, IAccount
     {
         BitmapSource avatar;
+        IObservable<BitmapSource> bitmapSource;
+        IDisposable bitmapSourceSubscription;
 
-        IObservable<BitmapSource> BitmapSource;
-        private IDisposable _bitmapSourceSubscription;
         public Account(
             string login,
             bool isUser,
@@ -32,9 +32,9 @@ namespace GitHub.Models
             PrivateReposInPlan = privateRepositoryInPlanCount;
             IsOnFreePlan = privateRepositoryInPlanCount == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
-            BitmapSource = bitmapSource;
+            this.bitmapSource = bitmapSource;
 
-            _bitmapSourceSubscription = bitmapSource
+            bitmapSourceSubscription = bitmapSource
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Avatar = x);
         }
@@ -88,9 +88,9 @@ namespace GitHub.Models
             var otherAccount = other as Account;
             if (otherAccount != null)
             {
-                _bitmapSourceSubscription.Dispose();
+                bitmapSourceSubscription.Dispose();
 
-                _bitmapSourceSubscription = otherAccount.BitmapSource
+                bitmapSourceSubscription = otherAccount.bitmapSource
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => Avatar = x);
             }
