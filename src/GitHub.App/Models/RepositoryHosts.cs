@@ -145,7 +145,11 @@ namespace GitHub.Models
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
             return host.LogIn(usernameOrEmail, password)
-                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                .Catch<AuthenticationResult, Exception>(exception =>
+                {
+                    log.Error(exception, "Error logging in to {host} host '{ApiUri}' with username '{usernameOrEmail}'", host, address.ApiUri, usernameOrEmail);
+                    return Observable.Throw<AuthenticationResult>(exception);
+                })
                 .Do(result =>
                 {
                     bool successful = result.IsSuccess();
