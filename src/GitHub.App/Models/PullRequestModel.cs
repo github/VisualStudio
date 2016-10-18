@@ -4,23 +4,22 @@ using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
 using NullGuard;
 using System.Diagnostics;
-using GitHub.SampleData;
+using System.Collections.Generic;
 
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [NullGuard(ValidationFlags.None)]
     public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel,
         IEquatable<PullRequestModel>,
         IComparable<PullRequestModel>
     {
-        public PullRequestModel(int number, string title,
-            IAccount author, [AllowNull]IAccount assignee,
+        public PullRequestModel(int number, string title, IAccount author,
             DateTimeOffset createdAt, DateTimeOffset? updatedAt = null)
         {
             Number = number;
             Title = title;
             Author = author;
-            Assignee = assignee;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt ?? CreatedAt;
         }
@@ -30,10 +29,10 @@ namespace GitHub.Models
             if (!Equals(other))
                 throw new ArgumentException("Instance to copy from doesn't match this instance. this:(" + this + ") other:(" + other + ")", nameof(other));
             Title = other.Title;
+            State = other.State;
             UpdatedAt = other.UpdatedAt;
             CommentCount = other.CommentCount;
             HasNewComments = other.HasNewComments;
-            IsOpen = other.IsOpen;
             Assignee = other.Assignee;
         }
 
@@ -107,18 +106,29 @@ namespace GitHub.Models
             set { title = value; this.RaisePropertyChange(); }
         }
 
-        bool isOpen;
-        public bool IsOpen
+        PullRequestStateEnum status;
+        public PullRequestStateEnum State
         {
-            get { return isOpen; }
-            set { isOpen = value; this.RaisePropertyChange(); }
+            get { return status; }
+            set { status = value; this.RaisePropertyChange(); this.RaisePropertyChange(nameof(IsOpen)); }
         }
+
+        // TODO: Remove these property once maintainer workflow has been merged to master.
+        public bool IsOpen => State == PullRequestStateEnum.Open;
+        public bool Merged => State == PullRequestStateEnum.Merged;
 
         int commentCount;
         public int CommentCount
         {
             get { return commentCount; }
             set { commentCount = value; this.RaisePropertyChange(); }
+        }
+
+        int commitCount;
+        public int CommitCount
+        {
+            get { return commitCount; }
+            set { commitCount = value; this.RaisePropertyChange(); }
         }
 
         bool hasNewComments;
@@ -128,10 +138,19 @@ namespace GitHub.Models
             set { hasNewComments = value; this.RaisePropertyChange(); }
         }
 
+        string body;
+        public string Body
+        {
+            get { return body; }
+            set { body = value; this.RaisePropertyChange(); }
+        }
+
+        public GitReferenceModel Base { get; set; }
+        public GitReferenceModel Head { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
-        public bool Merged { get; set; }
         public IAccount Author { get; set; }
+        public IList<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
 
         IAccount assignee;
         [AllowNull]

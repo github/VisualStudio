@@ -21,7 +21,7 @@ namespace UnitTests.GitHub.App.ViewModels
         {
             var target = CreateTarget();
 
-            await target.Load(CreatePullRequest(body: string.Empty), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest(body: string.Empty));
 
             Assert.Equal("*No description provided.*", target.Body);
         }
@@ -30,16 +30,18 @@ namespace UnitTests.GitHub.App.ViewModels
         public async Task ShouldCreateChangesTree()
         {
             var target = CreateTarget();
-            var files = new[]
+            var pr = CreatePullRequest();
+
+            pr.ChangedFiles = new[]
             {
-                new PullRequestFile(string.Empty, "readme.md", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
-                new PullRequestFile(string.Empty, "dir1/f1.cs", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
-                new PullRequestFile(string.Empty, "dir1/f2.cs", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
-                new PullRequestFile(string.Empty, "dir1/dir1a/f3.cs", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
-                new PullRequestFile(string.Empty, "dir2/f4.cs", "added", 1, 0, 0, Uri, Uri, Uri, string.Empty),
+                new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
+                new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Modified),
+                new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Modified),
+                new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
+                new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
             };
 
-            await target.Load(CreatePullRequest(), files);
+            await target.Load(pr);
 
             Assert.Equal(3, target.ChangedFilesTree.Count);
 
@@ -68,7 +70,7 @@ namespace UnitTests.GitHub.App.ViewModels
             var target = CreateTarget(
                 currentBranch: "pr/123",
                 existingPrBranch: "pr/123");
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.UpToDate, target.CheckoutMode);
             Assert.False(target.Checkout.CanExecute(null));
@@ -81,7 +83,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 currentBranch: "pr/123",
                 existingPrBranch: "pr/123",
                 dirty: true);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.UpToDate, target.CheckoutMode);
             Assert.Null(target.CheckoutDisabledMessage);
@@ -94,7 +96,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 currentBranch: "pr/123",
                 existingPrBranch: "pr/123",
                 behindBy: 3);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.NeedsPull, target.CheckoutMode);
             Assert.Equal(3, target.CommitsBehind);
@@ -109,7 +111,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 existingPrBranch: "pr/123",
                 behindBy: 3,
                 dirty: true);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.NeedsPull, target.CheckoutMode);
             Assert.Equal("Cannot update branch as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
@@ -122,7 +124,7 @@ namespace UnitTests.GitHub.App.ViewModels
             var target = CreateTarget(
                 currentBranch: "master",
                 existingPrBranch: "pr/123");
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.Switch, target.CheckoutMode);
             Assert.True(target.Checkout.CanExecute(null));
@@ -135,7 +137,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 currentBranch: "master",
                 existingPrBranch: "pr/123",
                 dirty: true);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.Switch, target.CheckoutMode);
             Assert.Equal("Cannot switch branches as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
@@ -146,7 +148,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public async Task CheckoutModeShouldBeFetch()
         {
             var target = CreateTarget(currentBranch: "master");
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.Fetch, target.CheckoutMode);
             Assert.True(target.Checkout.CanExecute(null));
@@ -156,7 +158,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public async Task CheckoutDisabledMessageShouldBeSetWhenNeedsFetchAndWorkingDirectoryDirty()
         {
             var target = CreateTarget(currentBranch: "master", dirty: true);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.Fetch, target.CheckoutMode);
             Assert.Equal("Cannot checkout pull request as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
@@ -171,7 +173,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 existingPrBranch: "pr/123",
                 prFromFork: false,
                 aheadBy: 1);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.Push, target.CheckoutMode);
             Assert.False(target.Checkout.CanExecute(null));
@@ -186,7 +188,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 prFromFork: true,
                 aheadBy: 1,
                 behindBy: 2);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.InvalidState, target.CheckoutMode);
             Assert.True(target.Checkout.CanExecute(null));
@@ -202,7 +204,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 aheadBy: 1,
                 behindBy: 2,
                 dirty: true);
-            await target.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.InvalidState, target.CheckoutMode);
             Assert.Equal("Cannot checkout pull request as your working directory has uncommitted changes.", target.CheckoutDisabledMessage);
@@ -217,13 +219,13 @@ namespace UnitTests.GitHub.App.ViewModels
                 existingPrBranch: "pr/123",
                 behindBy: 3);
 
-            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Item1.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.NeedsPull, target.Item1.CheckoutMode);
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/123");
+            var unused = target.Item2.Received().Pull(Arg.Any<ILocalRepositoryModel>());
         }
 
         [Fact]
@@ -234,7 +236,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 existingPrBranch: "pr/123");
             var pr = CreatePullRequest();
 
-            await target.Item1.Load(pr, new PullRequestFile[0]);
+            await target.Item1.Load(pr);
 
             Assert.Equal(CheckoutMode.Switch, target.Item1.CheckoutMode);
 
@@ -250,13 +252,13 @@ namespace UnitTests.GitHub.App.ViewModels
             target.Item2.GetDefaultLocalBranchName(Arg.Any<ILocalRepositoryModel>(), 1, Arg.Any<string>())
                 .Returns(Observable.Return("pr/1-foo"));
 
-            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Item1.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.Fetch, target.Item1.CheckoutMode);
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Model.Number, "pr/1-foo");
         }
 
         [Fact]
@@ -269,18 +271,18 @@ namespace UnitTests.GitHub.App.ViewModels
 
             target.Item2.IsPullRequestFromFork(
                 Arg.Any<ILocalRepositoryModel>(),
-                Arg.Any<PullRequest>()).Returns(true);
+                Arg.Any<IPullRequestModel>()).Returns(true);
             target.Item2.GetDefaultLocalBranchName(Arg.Any<ILocalRepositoryModel>(), 1, Arg.Any<string>())
                 .Returns(Observable.Return("pr/1-foo"));
 
-            await target.Item1.Load(CreatePullRequest(), new PullRequestFile[0]);
+            await target.Item1.Load(CreatePullRequest());
 
             Assert.Equal(CheckoutMode.InvalidState, target.Item1.CheckoutMode);
 
             target.Item1.Checkout.Execute(null);
 
             var unused = target.Item2.Received().UnmarkLocalBranch(Arg.Any<ILocalRepositoryModel>());
-            unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+            unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Model.Number, "pr/1-foo");
         }
 
         PullRequestDetailViewModel CreateTarget(
@@ -318,16 +320,16 @@ namespace UnitTests.GitHub.App.ViewModels
             if (existingPrBranch != null)
             {
                 var existingBranchModel = new BranchModel(existingPrBranch, repository);
-                pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequest>())
+                pullRequestService.GetLocalBranches(repository, Arg.Any<IPullRequestModel>())
                     .Returns(Observable.Return(existingBranchModel));
             }
             else
             {
-                pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequest>())
+                pullRequestService.GetLocalBranches(repository, Arg.Any<IPullRequestModel>())
                     .Returns(Observable.Empty<IBranch>());
             }
 
-            pullRequestService.IsPullRequestFromFork(repository, Arg.Any<PullRequest>()).Returns(prFromFork);
+            pullRequestService.IsPullRequestFromFork(repository, Arg.Any<IPullRequestModel>()).Returns(prFromFork);
             pullRequestService.IsCleanForCheckout(repository).Returns(Observable.Return(!dirty));
 
             var divergence = Substitute.For<HistoryDivergence>();
@@ -337,28 +339,24 @@ namespace UnitTests.GitHub.App.ViewModels
                 .Returns(Observable.Return(divergence));
 
             var vm = new PullRequestDetailViewModel(
-                Substitute.For<IRepositoryHost>(),
                 repository,
-                pullRequestService,
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IModelService>(),
+                pullRequestService);
 
             return Tuple.Create(vm, pullRequestService);
         }
 
-        PullRequest CreatePullRequest(string body = "PR Body")
+        PullRequestModel CreatePullRequest(string body = "PR Body")
         {
-            var repository = CreateRepository("foo", "bar");
-            var user = CreateUserAndScopes("foo").User;
+            var author = Substitute.For<IAccount>();
 
-            return new PullRequest(
-                Uri, Uri, Uri, Uri, Uri, Uri,
-                1, ItemState.Open, "PR 1", body,
-                DateTimeOffset.Now, DateTimeOffset.Now, null, null,
-                new GitReference(string.Empty, "foo:bar", "bar", string.Empty, user, repository),
-                new GitReference(string.Empty, "foo:baz", "baz", string.Empty, user, repository),
-                user, user,
-                true, null,
-                0, 0, 0, 0, 0, 0, null, false);
+            return new PullRequestModel(1, "PR 1", author, DateTimeOffset.Now)
+            {
+                State = PullRequestStateEnum.Open,
+                Body = string.Empty,
+                Head = new GitReferenceModel { Label = "foo:baz", Ref = "source", RepositoryCloneUrl = "https://github.com/foo/bar.git" },
+                Base = new GitReferenceModel { Label = "foo:bar", Ref = "source", RepositoryCloneUrl = "https://github.com/foo/bar.git" },
+            };
         }
     }
 }

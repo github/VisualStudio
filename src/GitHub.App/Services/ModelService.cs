@@ -23,6 +23,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
+        public const string PRPrefix = "pr";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IApiClient apiClient;
@@ -175,6 +176,22 @@ namespace GitHub.Services
 
             collection.Listen(source);
             return collection;
+        }
+
+        public IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number)
+        {
+            return Observable.Defer(() =>
+            {
+                return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
+                        Observable.CombineLatest(
+                            apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
+                            apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            (pr, files) => new { PullRequest = pr, Files = files })
+                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, x.Files)),
+                        TimeSpan.Zero,
+                        TimeSpan.FromDays(7))
+                    .Select(Create);
+            });
         }
 
         public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
@@ -343,13 +360,20 @@ namespace GitHub.Services
                 prCacheItem.Number,
                 prCacheItem.Title,
                 Create(prCacheItem.Author),
-                prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
                 prCacheItem.CreatedAt,
                 prCacheItem.UpdatedAt)
             {
+                Assignee = prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
+                Base = prCacheItem.Base ?? new GitReferenceModel(),
+                Body = prCacheItem.Body ?? string.Empty,
+                ChangedFiles = prCacheItem.ChangedFiles.Select(x => (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Status)).ToList(),
                 CommentCount = prCacheItem.CommentCount,
-                IsOpen = prCacheItem.IsOpen,
-                Merged = prCacheItem.Merged,
+                CommitCount = prCacheItem.CommitCount,
+                CreatedAt = prCacheItem.CreatedAt,
+                Head = prCacheItem.Head ?? new GitReferenceModel(),
+                State = prCacheItem.State.HasValue ? 
+                    prCacheItem.State.Value : 
+                    prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,                
             };
         }
 
@@ -427,41 +451,98 @@ namespace GitHub.Services
             public DateTimeOffset UpdatedAt { get; set; }
         }
 
+        [NullGuard(ValidationFlags.None)]
         public class PullRequestCacheItem : CacheItem
         {
             public static PullRequestCacheItem Create(PullRequest pr)
             {
-                return new PullRequestCacheItem(pr);
+                return new PullRequestCacheItem(pr, new PullRequestFile[0]);
+            }
+
+            public static PullRequestCacheItem Create(PullRequest pr, IList<PullRequestFile> files)
+            {
+                return new PullRequestCacheItem(pr, files);
             }
 
             public PullRequestCacheItem() {}
+
             public PullRequestCacheItem(PullRequest pr)
+                : this(pr, new PullRequestFile[0])
+            {
+            }
+
+            public PullRequestCacheItem(PullRequest pr, IList<PullRequestFile> files)
             {
                 Title = pr.Title;
                 Number = pr.Number;
+                Base = new GitReferenceModel { Label = pr.Base.Label, Ref = pr.Base.Ref, RepositoryCloneUrl = pr.Base.Repository.CloneUrl };
+                Head = new GitReferenceModel { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl };
                 CommentCount = pr.Comments + pr.ReviewComments;
+                CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
                 Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
+                Body = pr.Body;
+                ChangedFiles = files.Select(x => new PullRequestFileCacheItem(x)).ToList();
+                State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
                 Merged = pr.Merged;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
             }
 
-            [AllowNull]
-            public string Title {[return: AllowNull] get; set; }
+            public string Title {get; set; }
             public int Number { get; set; }
+            public GitReferenceModel Base { get; set; }
+            public GitReferenceModel Head { get; set; }
             public int CommentCount { get; set; }
-            [AllowNull]
-            public AccountCacheItem Author {[return: AllowNull] get; set; }
-            [AllowNull]
-            public AccountCacheItem Assignee { [return: AllowNull] get; set; }
+            public int CommitCount { get; set; }
+            public AccountCacheItem Author { get; set; }
+            public AccountCacheItem Assignee { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
-            public bool IsOpen { get; set; }
-            public bool Merged { get; set; }
+            public string Body { get; set; }
+            public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
+
+            // Nullable for compatibility with old caches.
+            public PullRequestStateEnum? State { get; set; }
+
+            // This fields exists only for compatibility with old caches. The State property should be used.
+            public bool? IsOpen { get; set; }
+            public bool? Merged { get; set; }
+
+            static PullRequestStateEnum GetState(PullRequest pullRequest)
+            {
+                if (pullRequest.State == ItemState.Open)
+                {
+                    return PullRequestStateEnum.Open;
+                }
+                else if (pullRequest.Merged)
+                {
+                    return PullRequestStateEnum.Merged;
+                }
+                else
+                {
+                    return PullRequestStateEnum.Closed;
+                }
+            }
+        }
+
+        public class PullRequestFileCacheItem
+        {
+            public PullRequestFileCacheItem()
+            {
+            }
+
+            public PullRequestFileCacheItem(PullRequestFile file)
+            {
+                FileName = file.FileName;
+                Status = (PullRequestFileStatus)Enum.Parse(typeof(PullRequestFileStatus), file.Status, true);
+            }
+
+            public string FileName { get; set; }
+            public PullRequestFileStatus Status { get; set; }
         }
     }
 }

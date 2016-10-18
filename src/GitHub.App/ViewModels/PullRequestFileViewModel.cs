@@ -1,20 +1,19 @@
 ﻿using System;
+using GitHub.Models;
 
 namespace GitHub.ViewModels
 {
     public class PullRequestFileViewModel : IPullRequestFileViewModel
     {
-        public PullRequestFileViewModel(string fullPath, bool added, bool deleted)
+        public PullRequestFileViewModel(string fullPath, PullRequestFileStatus status)
         {
-            Added = added;
-            Deleted = deleted;
             FileName = System.IO.Path.GetFileName(fullPath);
             Path = System.IO.Path.GetDirectoryName(fullPath);
+            Status = status;
         }
 
-        public bool Added { get; }
-        public bool Deleted { get; }
         public string FileName { get; }
         public string Path { get; }
+        public PullRequestFileStatus Status { get; }
     }
 }
