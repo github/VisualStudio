@@ -103,7 +103,9 @@
         <!-- PR Title and number -->
         <DockPanel DockPanel.Dock="Top"
                    Margin="8 4 8 0">
-            <TextBlock FontSize="10pt"
+            <ui:OcticonImage Icon="git_pull_request" Margin="0 2 2 0 " VerticalAlignment="Top" />
+
+            <TextBlock FontSize="15px"
                        VerticalAlignment="Top"
                        TextWrapping="Wrap">
 
@@ -121,7 +123,7 @@
             <TextBlock Text="|" VerticalAlignment="Center" Margin="6 0" Opacity="0.5" Foreground="Gray"/>
 
             <!-- Pull request number -->
-            <TextBlock Foreground="Gray" Text="{Binding Number, StringFormat=#{0}}" />
+            <TextBlock Text="{Binding Number, StringFormat=#{0}}" />
 
             <TextBlock Text="|" VerticalAlignment="Center" Margin="6 0" Opacity="0.5" Foreground="Gray"/>
 
@@ -154,7 +156,7 @@
             <ui:OcticonImage Grid.Column="0"
                              Margin="8"
                              VerticalAlignment="Top"
-                             Icon="git_pull_request"/>
+                             Icon="git_branch"/>
 
             <!-- Open/closed state and branches -->
             <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
@@ -329,15 +331,15 @@
 
                 <!-- PR Body -->
                 <ui:MarkdownViewer Name="bodyMarkdown"
-                                   Grid.Column="1" Grid.Row="1"
-                                   Grid.ColumnSpan="2"
-                                   Margin="2 6 10 6"
+                                   Grid.Column="0" Grid.Row="1"
+                                   Grid.ColumnSpan="3"
+                                   Margin="10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- View on github link -->
-                <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
+                <ui:GitHubActionLink Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Margin="10 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
