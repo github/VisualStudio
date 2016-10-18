@@ -102,18 +102,18 @@
     <DockPanel Grid.IsSharedSizeScope="True">
         <!-- PR Title and number -->
         <DockPanel DockPanel.Dock="Top"
-                   Margin="8 4 8 8">
-            <TextBlock Text="{Binding Model.Title}"
+                   Margin="8 4 8 0">
+            <TextBlock TextWrapping="Wrap"
                        FontSize="10pt">
-                <ui:OcticonImage Icon="git_pull_request" VerticalAlignment="Top" />
-                <Run Text="{Binding Title}" />
+                <ui:OcticonImage Icon="git_pull_request" VerticalAlignment="Center" />
+                <Run Text="{Binding Model.Title}" />
             </TextBlock>
         </DockPanel>
 
-        <DockPanel DockPanel.Dock="Top" Margin="8 2 8 8">
+        <DockPanel DockPanel.Dock="Top" Margin="8 0 8 8">
             <!-- Branch state ( Open | Closed | Merged ) -->
             <TextBlock FontWeight="Bold"
-                       Text="{Binding State}"
+                       Text="{Binding Model.State}"
                        VerticalAlignment="Center"
                        Style="{StaticResource StateIndicator}"/>
 
@@ -159,11 +159,6 @@
 
             <!-- Open/closed state and branches -->
             <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
-                <TextBlock Margin="0 0 12 0"
-                           FontWeight="Bold"
-                           Text="{Binding Model.State}"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource StateIndicator}"/>
                 <TextBlock Text="{Binding TargetBranchDisplayName}" VerticalAlignment="Center"/>
                 <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 3 3 0"/>
                 <TextBlock Text="{Binding SourceBranchDisplayName}" VerticalAlignment="Center" 
