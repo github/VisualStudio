@@ -26,21 +26,14 @@ namespace GitHub.ViewModels
     [NullGuard(ValidationFlags.None)]
     public class PullRequestDetailViewModel : BaseViewModel, IPullRequestDetailViewModel
     {
-        readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
         IPullRequestModel model;
-        PullRequestStateEnum state;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
-        int commitCount;
-        IAccount author;
-        DateTimeOffset createdAt;
         string body;
-        int number;
-        int changeCount;
-        ChangedFilesView changedFilesView;
+        ChangedFilesViewType changedFilesViewType;
         OpenChangedFileAction openChangedFileAction;
         CheckoutMode checkoutMode;
         string checkoutError;
@@ -59,8 +52,7 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost,
-                  teservice.ActiveRepo,
+            : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
                   pullRequestsService)
         {
@@ -74,12 +66,10 @@ namespace GitHub.ViewModels
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         public PullRequestDetailViewModel(
-            IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestService pullRequestsService)
         {
-            this.repositoryHost = repositoryHost;
             this.repository = repository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
@@ -95,8 +85,8 @@ namespace GitHub.ViewModels
             ToggleChangedFilesView = ReactiveCommand.Create();
             ToggleChangedFilesView.Subscribe(_ =>
             {
-                ChangedFilesView = ChangedFilesView == ChangedFilesView.TreeView ?
-                    ChangedFilesView.ListView : ChangedFilesView.TreeView;
+                ChangedFilesViewType = ChangedFilesViewType == ChangedFilesViewType.TreeView ?
+                    ChangedFilesViewType.ListView : ChangedFilesViewType.TreeView;
             });
 
             ToggleOpenChangedFileAction = ReactiveCommand.Create();
@@ -111,12 +101,12 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the state of the pull request, e.g. Open, Closed, Merged.
+        /// Gets the underlying pull request model.
         /// </summary>
-        public PullRequestStateEnum State
+        public IPullRequestModel Model
         {
-            get { return state; }
-            private set { this.RaiseAndSetIfChanged(ref state, value); }
+            get { return model; }
+            private set { this.RaiseAndSetIfChanged(ref model, value); }
         }
 
         /// <summary>
@@ -138,42 +128,6 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the number of commits in the pull request.
-        /// </summary>
-        public int CommitCount
-        {
-            get { return commitCount; }
-            private set { this.RaiseAndSetIfChanged(ref commitCount, value); }
-        }
-
-        /// <summary>
-        /// Gets the pull request number.
-        /// </summary>
-        public int Number
-        {
-            get { return number; }
-            private set { this.RaiseAndSetIfChanged(ref number, value); }
-        }
-
-        /// <summary>
-        /// Gets the account that submitted the pull request.
-        /// </summary>
-        public IAccount Author
-        {
-            get { return author; }
-            private set { this.RaiseAndSetIfChanged(ref author, value); }
-        }
-
-        /// <summary>
-        /// Gets the date and time at which the pull request was created.
-        /// </summary>
-        public DateTimeOffset CreatedAt
-        {
-            get { return createdAt; }
-            private set { this.RaiseAndSetIfChanged(ref createdAt, value); }
-        }
-
-        /// <summary>
         /// Gets the pull request body.
         /// </summary>
         public string Body
@@ -183,21 +137,12 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the number of files that have been changed in the pull request.
-        /// </summary>
-        public int ChangedFilesCount
-        {
-            get { return changeCount; }
-            private set { this.RaiseAndSetIfChanged(ref changeCount, value); }
-        }
-
-        /// <summary>
         /// Gets or sets a value describing how changed files are displayed in a view.
         /// </summary>
-        public ChangedFilesView ChangedFilesView
+        public ChangedFilesViewType ChangedFilesViewType
         {
-            get { return changedFilesView; }
-            set { this.RaiseAndSetIfChanged(ref changedFilesView, value); }
+            get { return changedFilesViewType; }
+            set { this.RaiseAndSetIfChanged(ref changedFilesViewType, value); }
         }
 
         /// <summary>
@@ -267,7 +212,7 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
+        /// Gets a command that toggles the <see cref="ChangedFilesViewType"/> property.
         /// </summary>
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
 
@@ -308,17 +253,10 @@ namespace GitHub.ViewModels
         /// <param name="files">The pull request's changed files.</param>
         public async Task Load(IPullRequestModel pullRequest)
         {
-            model = pullRequest;
-            State = pullRequest.State;
+            Model = pullRequest;
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
-            CommitCount = pullRequest.CommitCount;
-            Title = pullRequest.Title;
-            Number = pullRequest.Number;
-            Author = pullRequest.Author;
-            CreatedAt = pullRequest.CreatedAt;
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
-            ChangedFilesCount = pullRequest.ChangedFiles.Count;
 
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
@@ -338,7 +276,7 @@ namespace GitHub.ViewModels
             
             if (localBranches.Contains(repository.CurrentBranch))
             {
-                var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Number);
+                var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
 
                 if (divergence.BehindBy == null)
                 {
@@ -454,17 +392,17 @@ namespace GitHub.ViewModels
                     break;
                 case CheckoutMode.Fetch:
                     operation = pullRequestsService
-                        .GetDefaultLocalBranchName(repository, Number, Title)
-                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
+                        .GetDefaultLocalBranchName(repository, Model.Number, Title)
+                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
                     break;
                 case CheckoutMode.Switch:
-                    operation = pullRequestsService.SwitchToBranch(repository, model);
+                    operation = pullRequestsService.SwitchToBranch(repository, Model);
                     break;
                 case CheckoutMode.InvalidState:
                     operation = pullRequestsService
                         .UnmarkLocalBranch(repository)
-                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Number, Title))
-                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Number, x));
+                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Title))
+                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
                     break;
                 default:
                     Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");

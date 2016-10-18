@@ -9,6 +9,7 @@ using System.Collections.Generic;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [NullGuard(ValidationFlags.None)]
     public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel,
         IEquatable<PullRequestModel>,
         IComparable<PullRequestModel>

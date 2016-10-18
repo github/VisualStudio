@@ -12,14 +12,17 @@ namespace GitHub.SampleData
     {
         public PullRequestDetailViewModelDesigner()
         {
-            Title = "Error handling/bubbling from viewmodels to views to viewhosts";
-            State = PullRequestStateEnum.Open;
+            Model = new PullRequestModel(419, 
+                "Error handling/bubbling from viewmodels to views to viewhosts",
+                 new AccountDesigner { Login = "shana", IsUser = true },
+                 DateTime.Now.Subtract(TimeSpan.FromDays(3)))
+            {
+                State = PullRequestStateEnum.Open,
+                CommitCount = 9,
+            };
+
             SourceBranchDisplayName = "shana/error-handling";
             TargetBranchDisplayName = "master";
-            CommitCount = 9;
-            Author = new AccountDesigner { Login = "shana", IsUser = true };
-            CreatedAt = DateTime.Now.Subtract(TimeSpan.FromDays(3));
-            Number = 419;
             Body = @"Adds a way to surface errors from the view model to the view so that view hosts can get to them.
 
 ViewModels are responsible for handling the UI on the view they control, but they shouldn't be handling UI for things outside of the view. In this case, we're showing errors in VS outside the view, and that should be handled by the section that is hosting the view.
@@ -41,7 +44,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
             modelsDir.Files.Add(oldBranchModel);
             gitHubDir.Directories.Add(modelsDir);
 
-            ChangedFilesCount = 3;
             ChangedFilesTree = new ReactiveList<IPullRequestChangeNode>();
             ChangedFilesTree.Add(gitHubDir);
 
@@ -53,16 +55,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
             CheckoutMode = CheckoutMode.Fetch;
         }
 
-        public PullRequestStateEnum State { get; }
+        public IPullRequestModel Model { get; }
         public string SourceBranchDisplayName { get; }
         public string TargetBranchDisplayName { get; }
-        public int CommitCount { get; }
-        public IAccount Author { get; }
-        public DateTimeOffset CreatedAt { get; }
-        public int Number { get; }
         public string Body { get; }
-        public int ChangedFilesCount { get; }
-        public ChangedFilesView ChangedFilesView { get; set; }
+        public ChangedFilesViewType ChangedFilesViewType { get; set; }
         public OpenChangedFileAction OpenChangedFileAction { get; set; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
         public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }

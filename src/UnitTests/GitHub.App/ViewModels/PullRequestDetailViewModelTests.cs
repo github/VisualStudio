@@ -258,7 +258,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
             target.Item1.Checkout.Execute(null);
 
-            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+            var unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Model.Number, "pr/1-foo");
         }
 
         [Fact]
@@ -282,7 +282,7 @@ namespace UnitTests.GitHub.App.ViewModels
             target.Item1.Checkout.Execute(null);
 
             var unused = target.Item2.Received().UnmarkLocalBranch(Arg.Any<ILocalRepositoryModel>());
-            unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Number, "pr/1-foo");
+            unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Model.Number, "pr/1-foo");
         }
 
         PullRequestDetailViewModel CreateTarget(
@@ -339,7 +339,6 @@ namespace UnitTests.GitHub.App.ViewModels
                 .Returns(Observable.Return(divergence));
 
             var vm = new PullRequestDetailViewModel(
-                Substitute.For<IRepositoryHost>(),
                 repository,
                 Substitute.For<IModelService>(),
                 pullRequestService);

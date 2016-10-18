@@ -180,9 +180,6 @@ namespace GitHub.Services
 
         public IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number)
         {
-            var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name));
-
             return Observable.Defer(() =>
             {
                 return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>

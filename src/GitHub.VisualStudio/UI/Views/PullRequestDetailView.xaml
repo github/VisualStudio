@@ -107,9 +107,9 @@
                        FontSize="9pt"
                        Foreground="Gray"
                        Margin="4 2 0 0"
-                       Text="{Binding Number, StringFormat=#{0}}"
+                       Text="{Binding Model.Number, StringFormat=#{0}}"
                        VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Title}"
+            <TextBlock Text="{Binding Model.Title}"
                        FontSize="10pt"
                        VerticalAlignment="Top"
                        TextWrapping="Wrap"/>
@@ -143,7 +143,7 @@
             <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
                 <TextBlock Margin="0 0 12 0"
                            FontWeight="Bold"
-                           Text="{Binding State}"
+                           Text="{Binding Model.State}"
                            VerticalAlignment="Center"
                            Style="{StaticResource StateIndicator}"/>
 
@@ -160,12 +160,12 @@
                 <ui:OcticonImage Icon="git_commit" Margin="0 1 2 0"/>
                 <TextBlock Margin="2 0"
                            VerticalAlignment="Center"
-                           Text="{Binding CommitCount, StringFormat={}{0} commits}"/>
+                           Text="{Binding Model.CommitCount, StringFormat={}{0} commits}"/>
 
                 <ui:OcticonImage Icon="diff" Margin="28 0 2 0"/>
                 <TextBlock Margin="2 0"
                            VerticalAlignment="Center"
-                           Text="{Binding ChangedFilesCount, StringFormat={}{0} files changed}"/>
+                           Text="{Binding Model.ChangedFiles.Count, StringFormat={}{0} files changed}"/>
             </StackPanel>
 
             <Rectangle Grid.Column="2" Grid.Row="3" Margin="-2 0 0 0" Style="{StaticResource Separator}"/>
@@ -326,13 +326,13 @@
                            Width="20"
                            Height="20"
                            RenderOptions.BitmapScalingMode="HighQuality"
-                           Source="{Binding Author.Avatar}" />
+                           Source="{Binding Model.Author.Avatar}" />
                 </Grid>
 
                 <!-- Author and open time -->
                 <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0 6">
-                    <Run FontWeight="Bold" Text="{Binding Author.Login}"/>
-                    <Run Text="{Binding CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+                    <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
+                    <Run Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
                 </TextBlock>
 
                 <!-- PR Body -->
@@ -409,7 +409,7 @@
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="ListView">
+                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -447,7 +447,7 @@
                                 <ListView.Style>
                                     <Style TargetType="ListView">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="TreeView">
+                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
