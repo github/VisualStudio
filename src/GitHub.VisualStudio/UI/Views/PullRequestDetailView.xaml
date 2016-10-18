@@ -104,10 +104,8 @@
         <DockPanel DockPanel.Dock="Top"
                    Margin="8 4 8 0">
             <TextBlock TextWrapping="Wrap"
-                       FontSize="10pt">
-                <ui:OcticonImage Icon="git_pull_request" />
-                <Run Text="{Binding Model.Title}" />
-            </TextBlock>
+                       FontSize="10pt"
+                       Text="{Binding Model.Title}" />
         </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" Margin="8 0 8 8">
