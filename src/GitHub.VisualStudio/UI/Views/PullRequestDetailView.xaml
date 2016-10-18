@@ -103,12 +103,12 @@
         <!-- PR Title and number -->
         <DockPanel DockPanel.Dock="Top"
                    Margin="8 4 8 0">
-            <ui:OcticonImage Icon="git_pull_request" Margin="0 2 2 0 " VerticalAlignment="Top" />
 
             <TextBlock FontSize="15px"
                        VerticalAlignment="Top"
                        TextWrapping="Wrap">
 
+                <ui:OcticonImage Icon="git_pull_request" VerticalAlignment="Top" />
                 <Run Text="{Binding Title}" />
             </TextBlock>
         </DockPanel>
