@@ -354,7 +354,7 @@
                 <te:SectionControl Name="changesSection" 
                                    Grid.Column="2" Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangedFilesCount, StringFormat=Changes ({0})}"
+                                   HeaderText="{Binding ChangedFilesCount, StringFormat=Files changed ({0})}"
                                    Margin="0 5 10 0"
                                    ContextMenuService.IsEnabled="False">
                     <te:SectionControl.ContextMenu>
