@@ -40,7 +40,6 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
-                d(ViewModel.ViewOpenFile.Subscribe(x => DoOpenFile((string)x)));
             });
 
             OpenChangesOptionsMenu = ReactiveCommand.Create();
@@ -111,18 +110,13 @@ namespace GitHub.VisualStudio.UI.Views
             menu.IsOpen = true;
         }
 
-        void DoOpenFile(string fileName)
-        {
-            Services.Dte.ItemOperations.OpenFile(fileName);
-        }
-
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
 
             if (file != null)
             {
-                ViewModel.ActivateItem.Execute(file);
+                // TODO: Implement open/diff.
             }
         }
     }
