@@ -23,6 +23,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
+        public const string PRPrefix = "pr";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IApiClient apiClient;
@@ -184,12 +185,14 @@ namespace GitHub.Services
 
             return Observable.Defer(() =>
             {
-                // TODO: This needs to go via the cache.
-                return Observable.CombineLatest(
-                    apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
-                    apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
-                    (pr, files) => new { PullRequest = pr, Files = files })
-                    .Select(x => PullRequestCacheItem.Create(x.PullRequest, x.Files))
+                return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
+                        Observable.CombineLatest(
+                            apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
+                            apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            (pr, files) => new { PullRequest = pr, Files = files })
+                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, x.Files)),
+                        TimeSpan.Zero,
+                        TimeSpan.FromDays(7))
                     .Select(Create);
             });
         }
@@ -364,13 +367,13 @@ namespace GitHub.Services
                 prCacheItem.UpdatedAt)
             {
                 Assignee = prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
-                Base = prCacheItem.Base,
-                Body = prCacheItem.Body,
+                Base = prCacheItem.Base ?? new GitReferenceModel(),
+                Body = prCacheItem.Body ?? string.Empty,
                 ChangedFiles = prCacheItem.ChangedFiles.Select(x => (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Status)).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
-                Head = prCacheItem.Head,
+                Head = prCacheItem.Head ?? new GitReferenceModel(),
                 State = prCacheItem.State.HasValue ? 
                     prCacheItem.State.Value : 
                     prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,                
