@@ -105,7 +105,7 @@
                    Margin="8 4 8 0">
             <TextBlock TextWrapping="Wrap"
                        FontSize="10pt">
-                <ui:OcticonImage Icon="git_pull_request" VerticalAlignment="Center" />
+                <ui:OcticonImage Icon="git_pull_request" />
                 <Run Text="{Binding Model.Title}" />
             </TextBlock>
         </DockPanel>
