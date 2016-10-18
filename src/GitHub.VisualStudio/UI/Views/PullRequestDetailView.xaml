@@ -321,7 +321,6 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Author and open time -->
                     <RowDefinition Height="Auto"/> <!-- PR body -->
                     <RowDefinition Height="Auto"/> <!-- View on github link -->
                     <RowDefinition Height="Auto"/> <!-- Files changed -->
@@ -329,7 +328,7 @@
 
                 <!-- PR Body -->
                 <ui:MarkdownViewer Name="bodyMarkdown"
-                                   Grid.Column="0" Grid.Row="1"
+                                   Grid.Column="0" Grid.Row="0"
                                    Grid.ColumnSpan="3"
                                    Margin="10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
@@ -337,12 +336,12 @@
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- View on github link -->
-                <ui:GitHubActionLink Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Margin="10 6" Command="{Binding OpenOnGitHub}">
+                <ui:GitHubActionLink Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Margin="10 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
                 <!-- Files changed Icon in left margin -->
-                <ui:OcticonImage Grid.Column="0" Grid.Row="3"
+                <ui:OcticonImage Grid.Column="0" Grid.Row="2"
                                  Margin="8"
                                  VerticalAlignment="Top"
                                  Icon="diff"/>
