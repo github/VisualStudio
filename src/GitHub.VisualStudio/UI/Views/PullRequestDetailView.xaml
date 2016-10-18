@@ -136,8 +136,10 @@
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
 
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
         <!-- PR Overview -->
-        <Grid DockPanel.Dock="Top">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
                 <ColumnDefinition Width="6" SharedSizeGroup="LeftMarginSpace"/>
@@ -312,9 +314,8 @@
             </StackPanel>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
-
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Rectangle Style="{StaticResource Separator}" Height="2"/>
+            
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
@@ -473,6 +474,7 @@
                     </te:SectionControl.Content>
                 </te:SectionControl>
             </Grid>
+            </StackPanel>
         </ScrollViewer>
 
     </DockPanel>
