@@ -83,7 +83,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the state of the pull request, e.g. Open, Closed, Merged.
         /// </summary>
-        PullRequestState State { get; }
+        PullRequestStateEnum State { get; }
 
         /// <summary>
         /// Gets a string describing how to display the pull request's source branch.

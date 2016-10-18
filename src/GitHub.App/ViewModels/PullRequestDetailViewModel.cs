@@ -2,21 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using GitHub.Caches;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
-using LibGit2Sharp;
 using NullGuard;
 using Octokit;
 using ReactiveUI;
@@ -33,10 +28,10 @@ namespace GitHub.ViewModels
     {
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
+        readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
-        readonly IAvatarProvider avatarProvider;
-        PullRequest model;
-        PullRequestState state;
+        IPullRequestModel model;
+        PullRequestStateEnum state;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
         int commitCount;
@@ -63,12 +58,11 @@ namespace GitHub.ViewModels
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPullRequestService pullRequestsService,
-            IAvatarProvider avatarProvider)
+            IPullRequestService pullRequestsService)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost,
                   teservice.ActiveRepo,
-                  pullRequestsService,
-                  avatarProvider)
+                  connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                  pullRequestsService)
         {
         }
 
@@ -82,13 +76,13 @@ namespace GitHub.ViewModels
         public PullRequestDetailViewModel(
             IRepositoryHost repositoryHost,
             ILocalRepositoryModel repository,
-            IPullRequestService pullRequestsService,
-            IAvatarProvider avatarProvider)
+            IModelService modelService,
+            IPullRequestService pullRequestsService)
         {
             this.repositoryHost = repositoryHost;
             this.repository = repository;
+            this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
-            this.avatarProvider = avatarProvider;
 
             var canCheckout = this.WhenAnyValue(
                 x => x.CheckoutMode,
@@ -119,7 +113,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the state of the pull request, e.g. Open, Closed, Merged.
         /// </summary>
-        public PullRequestState State
+        public PullRequestStateEnum State
         {
             get { return state; }
             private set { this.RaiseAndSetIfChanged(ref state, value); }
@@ -302,13 +296,9 @@ namespace GitHub.ViewModels
 
             IsBusy = true;
 
-            // TODO: Catch errors.
-            Observable.CombineLatest(
-                    repositoryHost.ApiClient.GetPullRequest(repository.Owner, repository.CloneUrl.RepositoryName, prNumber),
-                    repositoryHost.ApiClient.GetPullRequestFiles(repository.Owner, repository.CloneUrl.RepositoryName, prNumber).ToList(),
-                    (pr, files) => new { PullRequest = pr, Files = files })
+            modelService.GetPullRequest(repository, prNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => Load(x.PullRequest, x.Files).Forget());
+                .Subscribe(x => Load(x).Forget());
         }
 
         /// <summary>
@@ -316,25 +306,25 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="pullRequest">The pull request model.</param>
         /// <param name="files">The pull request's changed files.</param>
-        public async Task Load(PullRequest pullRequest, IList<PullRequestFile> files)
+        public async Task Load(IPullRequestModel pullRequest)
         {
             model = pullRequest;
-            State = CreatePullRequestState(pullRequest);
+            State = pullRequest.State;
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
-            CommitCount = pullRequest.Commits;
+            CommitCount = pullRequest.CommitCount;
             Title = pullRequest.Title;
             Number = pullRequest.Number;
-            Author = new Models.Account(pullRequest.User, avatarProvider.GetAvatar(new AccountCacheItem(pullRequest.User)));
+            Author = pullRequest.Author;
             CreatedAt = pullRequest.CreatedAt;
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
-            ChangedFilesCount = files.Count;
+            ChangedFilesCount = pullRequest.ChangedFiles.Count;
 
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
 
             // WPF doesn't support AddRange here so iterate through the changes.
-            foreach (var change in CreateChangedFilesList(files))
+            foreach (var change in CreateChangedFilesList(pullRequest.ChangedFiles))
             {
                 ChangedFilesList.Add(change);
             }
@@ -387,25 +377,9 @@ namespace GitHub.ViewModels
             IsBusy = false;
         }
 
-        static PullRequestState CreatePullRequestState(PullRequest pullRequest)
+        static IEnumerable<IPullRequestFileViewModel> CreateChangedFilesList(IList<IPullRequestFileModel> files)
         {
-            if (pullRequest.State == ItemState.Open)
-            {
-                return new PullRequestState(true, "Open");
-            }
-            else if (pullRequest.Merged)
-            {
-                return new PullRequestState(false, "Merged");
-            }
-            else
-            {
-                return new PullRequestState(false, "Closed");
-            }
-        }
-
-        static IEnumerable<IPullRequestFileViewModel> CreateChangedFilesList(IList<PullRequestFile> files)
-        {
-            return files.Select(x => new PullRequestFileViewModel(x.FileName, x.Status == "added", x.Status == "deleted"));
+            return files.Select(x => new PullRequestFileViewModel(x.FileName, x.Status));
         }
 
         static IPullRequestDirectoryViewModel CreateChangedFilesTree(IEnumerable<IPullRequestFileViewModel> files)

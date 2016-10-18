@@ -423,7 +423,7 @@
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.Resources>
                                     <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
-                                                          ItemsSource="{Binding Children}">
+                                                              ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>

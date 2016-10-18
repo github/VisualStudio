@@ -147,7 +147,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest)
+        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             return Observable.Defer(() =>
             {
@@ -157,13 +157,12 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, PullRequest pullRequest)
+        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            var sourceUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
-            return sourceUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+            return pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest)
+        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -219,7 +218,7 @@ namespace GitHub.Services
         IEnumerable<string> GetLocalBranchesInternal(
             ILocalRepositoryModel localRepository,
             IRepository repository,
-            PullRequest pullRequest)
+            IPullRequestModel pullRequest)
         {
             if (!IsPullRequestFromFork(localRepository, pullRequest))
             {

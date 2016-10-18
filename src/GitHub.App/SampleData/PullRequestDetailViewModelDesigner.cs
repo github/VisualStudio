@@ -13,7 +13,7 @@ namespace GitHub.SampleData
         public PullRequestDetailViewModelDesigner()
         {
             Title = "Error handling/bubbling from viewmodels to views to viewhosts";
-            State = new PullRequestState { Name = "Open", IsOpen = true };
+            State = PullRequestStateEnum.Open;
             SourceBranchDisplayName = "shana/error-handling";
             TargetBranchDisplayName = "master";
             CommitCount = 9;
@@ -31,9 +31,9 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var gitHubDir = new PullRequestDirectoryViewModel("GitHub");
             var modelsDir = new PullRequestDirectoryViewModel("Models");
             var repositoriesDir = new PullRequestDirectoryViewModel("Repositories");
-            var itrackingBranch = new PullRequestFileViewModel(@"GitHub\Models\ITrackingBranch.cs", false, false);
-            var oldBranchModel = new PullRequestFileViewModel(@"GitHub\Models\OldBranchModel.cs", false, false);
-            var concurrentRepositoryConnection = new PullRequestFileViewModel(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", false, true);
+            var itrackingBranch = new PullRequestFileViewModel(@"GitHub\Models\ITrackingBranch.cs", PullRequestFileStatus.Modified);
+            var oldBranchModel = new PullRequestFileViewModel(@"GitHub\Models\OldBranchModel.cs", PullRequestFileStatus.Removed);
+            var concurrentRepositoryConnection = new PullRequestFileViewModel(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", PullRequestFileStatus.Added);
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);
@@ -53,7 +53,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
             CheckoutMode = CheckoutMode.Fetch;
         }
 
-        public PullRequestState State { get; }
+        public PullRequestStateEnum State { get; }
         public string SourceBranchDisplayName { get; }
         public string TargetBranchDisplayName { get; }
         public int CommitCount { get; }
