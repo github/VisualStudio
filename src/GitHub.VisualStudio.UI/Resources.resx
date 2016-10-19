@@ -150,6 +150,9 @@
   <data name="CancelLink" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="gistCreatedMessage" xml:space="preserve">
+    <value>Gist created</value>
+  </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
     <value>Failed to create gist</value>
   </data>

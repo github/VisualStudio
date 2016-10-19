@@ -286,6 +286,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Gist created.
+        /// </summary>
+        public static string gistCreatedMessage {
+            get {
+                return ResourceManager.GetString("gistCreatedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to create gist.
         /// </summary>
         public static string gistCreationFailedMessage {
