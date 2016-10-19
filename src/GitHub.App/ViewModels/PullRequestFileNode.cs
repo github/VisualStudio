@@ -3,9 +3,9 @@ using GitHub.Models;
 
 namespace GitHub.ViewModels
 {
-    public class PullRequestFileViewModel : IPullRequestFileViewModel
+    public class PullRequestFileNode : IPullRequestFileNode
     {
-        public PullRequestFileViewModel(string fullPath, PullRequestFileStatus status)
+        public PullRequestFileNode(string fullPath, PullRequestFileStatus status)
         {
             FileName = System.IO.Path.GetFileName(fullPath);
             Path = System.IO.Path.GetDirectoryName(fullPath);

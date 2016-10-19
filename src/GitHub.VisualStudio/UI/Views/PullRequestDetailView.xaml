@@ -422,14 +422,14 @@
                                     </Style>
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.Resources>
-                                    <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
+                                    <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryNode}"
                                                               ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
+                                    <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
                                             <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>

@@ -112,7 +112,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
+            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
 
             if (file != null)
             {
