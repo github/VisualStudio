@@ -21,7 +21,7 @@ namespace UnitTests.GitHub.App.Models
             var userImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png");
             var orgImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
 
-            var bitmapImageObservable = new Subject<BitmapImage>();
+            var initialBitmapImageSubject = new Subject<BitmapImage>();
 
             var collectionEvent = new ManualResetEvent(false);
             var avatarPropertyEvent = new ManualResetEvent(false);
@@ -30,7 +30,7 @@ namespace UnitTests.GitHub.App.Models
             const string login = "foo";
             const int initialOwnedPrivateRepositoryCount = 1;
 
-            var initialAccount = new Account(login, true, false, initialOwnedPrivateRepositoryCount, 0, bitmapImageObservable);
+            var initialAccount = new Account(login, true, false, initialOwnedPrivateRepositoryCount, 0, initialBitmapImageSubject);
 
             //Creating the test collection
             var col = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(), OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
@@ -63,7 +63,8 @@ namespace UnitTests.GitHub.App.Models
             });
 
             //Providing the first avatar
-            bitmapImageObservable.OnNext(userImage);
+            initialBitmapImageSubject.OnNext(userImage);
+            initialBitmapImageSubject.OnCompleted();
 
             //Waiting for the avatar to be added
             avatarPropertyEvent.WaitOne();
@@ -76,7 +77,8 @@ namespace UnitTests.GitHub.App.Models
 
             //Creating an account update
             const int updatedOwnedPrivateRepositoryCount = 2;
-            var updatedAccount = new Account(login, true, false, updatedOwnedPrivateRepositoryCount, 0, bitmapImageObservable);
+            var updatedBitmapImageSubject = new Subject<BitmapImage>();
+            var updatedAccount = new Account(login, true, false, updatedOwnedPrivateRepositoryCount, 0, updatedBitmapImageSubject);
 
             //Updating the account in the collection
             col.AddItem(updatedAccount);
@@ -86,7 +88,8 @@ namespace UnitTests.GitHub.App.Models
             collectionEvent.Reset();
 
             //Providing the second avatar
-            bitmapImageObservable.OnNext(orgImage);
+            updatedBitmapImageSubject.OnNext(orgImage);
+            updatedBitmapImageSubject.OnCompleted();
 
             //Waiting for the delayed bitmap image observable
             avatarPropertyEvent.WaitOne();
