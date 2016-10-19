@@ -142,12 +142,7 @@ namespace GitHub.VisualStudio
             var environment = new Rothko.Environment();
             var logPath = Path.Combine(environment.GetLocalGitHubApplicationDataPath(), "extension.log");
 
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.WithThreadId()
-                .WriteTo.File(logPath,
-                    fileSizeLimitBytes: 2L * 1024L * 1024L,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff}|{Level}|Thread:{ThreadId}|{SourceContext}|{Message}{NewLine}{Exception}")
-                .CreateLogger();
+            LoggingConfiguration.InitializeLogging(logPath);
 
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);

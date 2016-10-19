@@ -313,6 +313,8 @@
     </Compile>
     <Compile Include="Helpers\VisualTreeExtensions.cs" />
     <Compile Include="Menus\MenuBase.cs" />
+    <Compile Include="Base\MenuBase.cs" />
+    <Compile Include="LoggingConfiguration.cs" />
     <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
