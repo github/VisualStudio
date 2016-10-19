@@ -2,7 +2,7 @@
 
 namespace GitHub.ViewModels
 {
-    public interface IPullRequestFileViewModel : IPullRequestChangeNode
+    public interface IPullRequestFileNode : IPullRequestChangeNode
     {
         string FileName { get; }
         PullRequestFileStatus Status { get; }

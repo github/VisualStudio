@@ -118,7 +118,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the changed files as a flat list.
         /// </summary>
-        IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
+        IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
 
         /// <summary>
         /// Gets the checkout mode for the pull request.
@@ -162,12 +162,12 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileViewModel"/>.
+        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         ReactiveCommand<object> OpenFile { get; }
 
         /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileViewModel"/>.
+        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
     }

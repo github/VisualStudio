@@ -199,7 +199,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the changed files as a flat list.
         /// </summary>
-        public IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileViewModel>();
+        public IReactiveList<IPullRequestFileNode> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileNode>();
 
         /// <summary>
         /// Gets a command that checks out the pull request locally.
@@ -222,12 +222,12 @@ namespace GitHub.ViewModels
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileViewModel"/>.
+        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         public ReactiveCommand<object> OpenFile { get; }
  
         /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileViewModel"/>.
+        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         public ReactiveCommand<object> DiffFile { get; }
 
@@ -315,16 +315,16 @@ namespace GitHub.ViewModels
             IsBusy = false;
         }
 
-        static IEnumerable<IPullRequestFileViewModel> CreateChangedFilesList(IList<IPullRequestFileModel> files)
+        static IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IList<IPullRequestFileModel> files)
         {
-            return files.Select(x => new PullRequestFileViewModel(x.FileName, x.Status));
+            return files.Select(x => new PullRequestFileNode(x.FileName, x.Status));
         }
 
-        static IPullRequestDirectoryViewModel CreateChangedFilesTree(IEnumerable<IPullRequestFileViewModel> files)
+        static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
         {
-            var dirs = new Dictionary<string, PullRequestDirectoryViewModel>
+            var dirs = new Dictionary<string, PullRequestDirectoryNode>
             {
-                { string.Empty, new PullRequestDirectoryViewModel(string.Empty) }
+                { string.Empty, new PullRequestDirectoryNode(string.Empty) }
             };
 
             foreach (var file in files)
@@ -353,16 +353,16 @@ namespace GitHub.ViewModels
             }
         }
 
-        static PullRequestDirectoryViewModel GetDirectory(string path, Dictionary<string, PullRequestDirectoryViewModel> dirs)
+        static PullRequestDirectoryNode GetDirectory(string path, Dictionary<string, PullRequestDirectoryNode> dirs)
         {
-            PullRequestDirectoryViewModel dir;
+            PullRequestDirectoryNode dir;
 
             if (!dirs.TryGetValue(path, out dir))
             {
                 var parentPath = Path.GetDirectoryName(path);
                 var parentDir = GetDirectory(parentPath, dirs);
 
-                dir = new PullRequestDirectoryViewModel(path);
+                dir = new PullRequestDirectoryNode(path);
 
                 if (!parentDir.Directories.Any(x => x.DirectoryName == dir.DirectoryName))
                 {

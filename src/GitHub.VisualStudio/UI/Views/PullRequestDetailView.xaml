@@ -348,12 +348,12 @@
                 <te:SectionControl Name="changesSection" 
                                    Grid.Column="2" Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding Model.ChangedFiles.Count, StringFormat=Files changed ({0})}"
+                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat=Changes ({0})}"
                                    Margin="0 5 10 0"
                                    ContextMenuService.IsEnabled="False">
                     <te:SectionControl.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
+                            <MenuItem Command="{Binding ToggleOpenChangedFileAction}" Visibility="Collapsed">
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
@@ -367,15 +367,15 @@
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
-                            <Separator/>
+                            <Separator Visibility="Collapsed"/>
                             <MenuItem Command="{Binding ToggleChangedFilesView}">
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="TreeView">
+                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
                                                 <Setter Property="Header" Value="Switch to List View"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding ChangedFilesView}" Value="ListView">
+                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
                                                 <Setter Property="Header" Value="Switch to Tree View"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -412,14 +412,14 @@
                                     </Style>
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.Resources>
-                                    <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryViewModel}"
+                                    <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryNode}"
                                                               ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:PullRequestFileViewModel}">
+                                    <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
                                             <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>

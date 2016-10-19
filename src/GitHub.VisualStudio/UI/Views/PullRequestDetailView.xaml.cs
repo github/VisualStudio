@@ -103,16 +103,19 @@ namespace GitHub.VisualStudio.UI.Views
         void DoOpenChangesOptionsMenu(dynamic o)
         {
             var menu = changesSection.ContextMenu;
+            var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero);
+            var scaleX = g.DpiX / 96.0;
+            var scaleY = g.DpiY / 96.0;
             menu.DataContext = DataContext;
             menu.Placement = PlacementMode.Absolute;
-            menu.HorizontalOffset = o.MenuX;
-            menu.VerticalOffset = o.MenuY;
+            menu.HorizontalOffset = o.MenuX / scaleX;
+            menu.VerticalOffset = o.MenuY / scaleY;
             menu.IsOpen = true;
         }
 
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
+            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
 
             if (file != null)
             {
