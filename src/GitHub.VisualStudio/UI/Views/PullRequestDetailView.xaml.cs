@@ -83,7 +83,7 @@ namespace GitHub.VisualStudio.UI.Views
                             Brush = (Brush)FindResource("GitHubVsWindowText"),
                             Geometry = OcticonPath.GetGeometryForIcon(Octicon.three_bars),
                         },                        
-                        Viewport = new Rect(0.1, 0.1, 0.8, 0.8),
+                        Viewport = new Rect(0.25, 0.25, 0.5, 0.5),
                     },
                 });
 
