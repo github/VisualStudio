@@ -266,7 +266,7 @@
 
                 <!-- Local branch is checked out but needs pushing-->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="info" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="info" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">Local changes can be pushed.</Run>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
