@@ -129,10 +129,11 @@
             </TextBlock>
         </DockPanel>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="1"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical">
+            <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="1"/>
         <!-- PR Overview -->
         <Grid>
             <Grid.ColumnDefinitions>
