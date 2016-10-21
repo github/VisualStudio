@@ -158,8 +158,8 @@ public class PullRequestServiceTests : TestBaseClass
             {
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel { Label = "foo:baz", Ref = "source", RepositoryCloneUrl = "https://github.com/foo/bar.git" },
-                Base = new GitReferenceModel { Label = "foo:bar", Ref = "source", RepositoryCloneUrl = "https://github.com/foo/bar.git" },
+                Head = new GitReferenceModel("source", "foo:baz", "https://github.com/foo/bar.git"),
+                Base = new GitReferenceModel("dest", "foo:bar", "https://github.com/foo/bar.git"),
             };
         }
 
