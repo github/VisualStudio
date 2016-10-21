@@ -14,7 +14,8 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
-using PullRequest =  Octokit.PullRequest;
+using PullRequest = Octokit.PullRequest;
+using System.Diagnostics;
 
 namespace GitHub.Services
 {
@@ -167,29 +168,34 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).First();
+                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                await gitClient.Fetch(repo, "origin");
+                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
 
-                var branch = repo.Branches[branchName];
-
-                if (branch == null)
+                if (branchName != null)
                 {
-                    var trackedBranchName = $"refs/remotes/origin/" + branchName;
-                    var trackedBranch = repo.Branches[trackedBranchName];
+                    await gitClient.Fetch(repo, "origin");
 
-                    if (trackedBranch != null)
+                    var branch = repo.Branches[branchName];
+
+                    if (branch == null)
                     {
-                        branch = repo.CreateBranch(branchName, trackedBranch.Tip);
-                        await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                        var trackedBranchName = $"refs/remotes/origin/" + branchName;
+                        var trackedBranch = repo.Branches[trackedBranchName];
+
+                        if (trackedBranch != null)
+                        {
+                            branch = repo.CreateBranch(branchName, trackedBranch.Tip);
+                            await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
+                        }
                     }
-                    else
-                    {
-                        throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
-                    }
+
+                    await gitClient.Checkout(repo, branchName);
                 }
-
-                await gitClient.Checkout(repo, branchName);
 
                 return Observable.Empty<Unit>();
             });
