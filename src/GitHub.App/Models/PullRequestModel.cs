@@ -154,6 +154,7 @@ namespace GitHub.Models
         }
 
         public GitReferenceModel Base { get; set; }
+        [AllowNull]
         public GitReferenceModel Head { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }

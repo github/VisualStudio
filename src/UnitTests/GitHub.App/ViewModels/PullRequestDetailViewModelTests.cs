@@ -285,6 +285,20 @@ namespace UnitTests.GitHub.App.ViewModels
             unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Model.Number, "pr/1-foo");
         }
 
+        [Fact]
+        public async Task ShouldAcceptNullHead()
+        {
+            var target = CreateTarget();
+            var model = CreatePullRequest();
+
+            // PullRequest.Head can be null for example if a user deletes the repository after creating the PR.
+            model.Head = null;
+
+            await target.Load(model);
+
+            Assert.Equal("[Invalid]", target.SourceBranchDisplayName);
+        }
+
         PullRequestDetailViewModel CreateTarget(
             string currentBranch = "master",
             string existingPrBranch = null,

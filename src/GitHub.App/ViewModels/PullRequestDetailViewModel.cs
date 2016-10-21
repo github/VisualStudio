@@ -254,7 +254,7 @@ namespace GitHub.ViewModels
         public async Task Load(IPullRequestModel pullRequest)
         {
             Model = pullRequest;
-            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head.Label);
+            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
 
@@ -376,9 +376,16 @@ namespace GitHub.ViewModels
 
         string GetBranchDisplayName(string targetBranchLabel)
         {
-            var parts = targetBranchLabel.Split(':');
-            var owner = parts[0];
-            return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
+            if (targetBranchLabel != null)
+            {
+                var parts = targetBranchLabel.Split(':');
+                var owner = parts[0];
+                return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
+            }
+            else
+            {
+                return "[Invalid]";
+            }
         }
 
         IObservable<Unit> DoCheckout(object unused)

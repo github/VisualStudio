@@ -370,7 +370,7 @@ namespace GitHub.Services
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
-                Head = prCacheItem.Head ?? new GitReferenceModel(),
+                Head = prCacheItem.Head,
                 State = prCacheItem.State.HasValue ? 
                     prCacheItem.State.Value : 
                     prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,                
@@ -476,7 +476,9 @@ namespace GitHub.Services
                 Title = pr.Title;
                 Number = pr.Number;
                 Base = new GitReferenceModel { Label = pr.Base.Label, Ref = pr.Base.Ref, RepositoryCloneUrl = pr.Base.Repository.CloneUrl };
-                Head = new GitReferenceModel { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl };
+                Head = pr.Head != null ?
+                    new GitReferenceModel { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl } :
+                    null;
                 CommentCount = pr.Comments + pr.ReviewComments;
                 CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
