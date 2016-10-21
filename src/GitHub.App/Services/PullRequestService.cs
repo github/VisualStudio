@@ -255,7 +255,7 @@ namespace GitHub.Services
             return ret;
         }
 
-        void EnsurePullRefSpecExists(IRepository repo)
+        static void EnsurePullRefSpecExists(IRepository repo)
         {
             var spec = "+refs/pull/*/head:refs/remotes/origin/pr/*";
             var origin = repo.Network.Remotes["origin"];
