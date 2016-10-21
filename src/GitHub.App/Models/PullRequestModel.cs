@@ -110,7 +110,15 @@ namespace GitHub.Models
         public PullRequestStateEnum State
         {
             get { return status; }
-            set { status = value; this.RaisePropertyChange(); this.RaisePropertyChange(nameof(IsOpen)); }
+            set
+            {
+                status = value;
+                this.RaisePropertyChange();
+
+                // TODO: These notifications will be removed once maintainer workflow has been merged to master.
+                this.RaisePropertyChange(nameof(IsOpen));
+                this.RaisePropertyChange(nameof(Merged));
+            }
         }
 
         // TODO: Remove these property once maintainer workflow has been merged to master.
