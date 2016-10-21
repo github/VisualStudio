@@ -158,7 +158,7 @@ namespace GitHub.Models
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
-        public IList<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
+        public IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
 
         IAccount assignee;
         [AllowNull]

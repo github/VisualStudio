@@ -315,7 +315,7 @@ namespace GitHub.ViewModels
             IsBusy = false;
         }
 
-        static IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IList<IPullRequestFileModel> files)
+        static IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
         {
             return files.Select(x => new PullRequestFileNode(x.FileName, x.Status));
         }

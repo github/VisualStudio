@@ -187,7 +187,7 @@ namespace GitHub.Services
                             apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
                             apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
                             (pr, files) => new { PullRequest = pr, Files = files })
-                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, x.Files)),
+                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, (IReadOnlyList<PullRequestFile>)x.Files)),
                         TimeSpan.Zero,
                         TimeSpan.FromDays(7))
                     .Select(Create);
@@ -459,7 +459,7 @@ namespace GitHub.Services
                 return new PullRequestCacheItem(pr, new PullRequestFile[0]);
             }
 
-            public static PullRequestCacheItem Create(PullRequest pr, IList<PullRequestFile> files)
+            public static PullRequestCacheItem Create(PullRequest pr, IReadOnlyList<PullRequestFile> files)
             {
                 return new PullRequestCacheItem(pr, files);
             }
@@ -471,7 +471,7 @@ namespace GitHub.Services
             {
             }
 
-            public PullRequestCacheItem(PullRequest pr, IList<PullRequestFile> files)
+            public PullRequestCacheItem(PullRequest pr, IReadOnlyList<PullRequestFile> files)
             {
                 Title = pr.Title;
                 Number = pr.Number;

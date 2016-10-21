@@ -31,6 +31,6 @@ namespace GitHub.Models
         DateTimeOffset UpdatedAt { get; }
         IAccount Author { get; }
         IAccount Assignee { get; }
-        IList<IPullRequestFileModel> ChangedFiles { get; }
+        IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; }
     }
 }
