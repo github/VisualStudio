@@ -152,10 +152,10 @@ namespace GitHub.Caches
         static IObservable<Unit> VacuumIfNecessary(IBlobCache blobCache, bool force = false)
         {
             const string key = "__Vacuumed";
-            var vauumInterval = TimeSpan.FromDays(30);
+            var vacuumInterval = TimeSpan.FromDays(30);
 
             return Observable.Defer(() => blobCache.GetCreatedAt(key))
-                .Where(lastVacuum => force || !lastVacuum.HasValue || blobCache.Scheduler.Now - lastVacuum.Value > vauumInterval)
+                .Where(lastVacuum => force || !lastVacuum.HasValue || blobCache.Scheduler.Now - lastVacuum.Value > vacuumInterval)
                 .SelectMany(Observable.Defer(blobCache.Vacuum))
                 .SelectMany(Observable.Defer(() => blobCache.Insert(key, new byte[] { 1 })))
                 .Catch<Unit, Exception>(ex =>
