@@ -51,10 +51,7 @@ public class ImageCacheTests
             //Using the image cache to force initialization
             imageCache.GetImage(new Uri("https://fake/"))
                 .Catch(Observable.Return<BitmapImage>(null))
-                .Subscribe(source =>
-                {
-                    evt.Set();
-                });
+                .Subscribe(source => { evt.Set(); });
 
             evt.WaitOne();
             evt.Reset();
@@ -95,10 +92,7 @@ public class ImageCacheTests
             //Using the image cache to force initialization
             imageCache.GetImage(new Uri("https://fake/"))
                 .Catch(Observable.Return<BitmapImage>(null))
-                .Subscribe(source =>
-                {
-                    evt.Set();
-                });
+                .Subscribe(source => { evt.Set(); });
 
             evt.WaitOne();
             evt.Reset();
@@ -113,17 +107,14 @@ public class ImageCacheTests
             //Using the image cache to force initialization
             imageCache.GetImage(new Uri("https://fake/"))
                 .Catch(Observable.Return<BitmapImage>(null))
-                .Subscribe(source =>
-                {
-                    evt.Set();
-                });
+                .Subscribe(source => { evt.Set(); });
 
             evt.WaitOne();
             evt.Reset();
 
             //Demonstrating the cache was vacuumed and the vacuumed key was set
             cache.Received().Vacuum();
-            cache.Received().Insert(Arg.Is(vacuumedKey), Arg.Any<byte[]>(), Arg.Is((DateTimeOffset?)null));
+            cache.Received().Insert(Arg.Is(vacuumedKey), Arg.Any<byte[]>(), Arg.Is((DateTimeOffset?) null));
         }
     }
 
@@ -189,6 +180,95 @@ public class ImageCacheTests
 
             //Demonstrating the item is no longer in the cache
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await cache.Get("https://fake/"));
+        }
+
+        [Fact]
+        public async Task WhenLoadingOneToTwoDayOldItemFromCacheRefresh()
+        {
+            var evt = new ManualResetEvent(false);
+
+            var testScheduler = new TestScheduler();
+            var startTestTime = DateTimeOffset.Now;
+            testScheduler.AdvanceTo(startTestTime.Ticks);
+
+            //Creating a memory cache with a TestScheduler
+            var cache = new InMemoryBlobCache(testScheduler);
+
+            //Creating a cache factory that returns the cache
+            var cacheFactory = Substitute.For<IBlobCacheFactory>();
+            cacheFactory.CreateBlobCache(Args.String).Returns(cache);
+
+            //Creating an image downloader that returns a single pixel
+            var singlePixel = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
+            var imageUri = new Uri("https://example.com/poop.gif");
+
+            //Creating an image downloader that returns a single pixel
+            var imageDownloader = Substitute.For<IImageDownloader>();
+            imageDownloader.DownloadImageBytes(imageUri)
+                .Returns(Observable.Return(singlePixel));
+
+            //Creating the image cache
+            var imageCache = new ImageCache(cacheFactory, Substitute.For<IEnvironment>(),
+                new Lazy<IImageDownloader>(() => imageDownloader));
+
+            //Attempting to retrieving the image
+            BitmapSource retrieved = null;
+            imageCache.GetImage(imageUri)
+                .Subscribe(source =>
+                {
+                    retrieved = source;
+                    evt.Set();
+                });
+
+            testScheduler.AdvanceBy(200);
+            evt.WaitOne();
+            evt.Reset();
+
+            //Demonstrating the value is not null
+            Assert.NotNull(retrieved);
+
+            //Demonstrating DownloadImageBytes was called once
+            imageDownloader.Received(1).DownloadImageBytes(Arg.Any<Uri>());
+
+            //Moving forward three days in time
+            var updatedTestTime = startTestTime.AddDays(3);
+            testScheduler.AdvanceTo(updatedTestTime.Ticks);
+
+            retrieved = null;
+            //Demonstrating the item is still in the cache
+            imageCache.GetImage(imageUri)
+                .Subscribe(source =>
+                {
+                    retrieved = source;
+                    evt.Set();
+                });
+
+            testScheduler.AdvanceBy(200);
+            evt.WaitOne();
+            evt.Reset();
+
+            //Getting the time the object was cached at
+            DateTimeOffset? cacheAt = null;
+            cache.GetObjectCreatedAt<Byte[]>(imageUri.ToString())
+                .Subscribe(offset =>
+                {
+                    cacheAt = offset;
+                    evt.Set();
+                });
+
+            testScheduler.AdvanceBy(200);
+            evt.WaitOne();
+            evt.Reset();
+
+            //Demonstrating the value is not null
+            Assert.NotNull(retrieved);
+
+            //Demonstrating the item was cached again at the updated test time
+            Assert.NotNull(cacheAt);
+            Assert.True(new DateTimeOffset(updatedTestTime.DateTime, TimeSpan.Zero) <= cacheAt.Value);
+
+            //Demonstrating DownloadImageBytes was called twice, which also shows refresh action
+            imageDownloader.Received(2).DownloadImageBytes(Arg.Any<Uri>());
         }
 
         [Fact]

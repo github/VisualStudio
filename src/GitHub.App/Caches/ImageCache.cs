@@ -73,7 +73,7 @@ namespace GitHub.Caches
                 lock (random)
                 {
                     // Between 1 and 2 days.
-                    refreshInterval = TimeSpan.FromSeconds(random.Next(86400, 172800));
+                    refreshInterval = TimeSpan.FromSeconds(random.Next(60*60*24, 60*60*24*2));
                 }
 
                 var ret = new ReplaySubject<BitmapSource>(1);
