@@ -6,6 +6,7 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.Factories
@@ -14,7 +15,7 @@ namespace GitHub.Factories
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class SqlitePersistentBlobCacheFactory : IBlobCacheFactory
     {
-        static readonly ILogger log = Log.ForContext<SqlitePersistentBlobCacheFactory>();
+        static readonly ILogger log = LogManager.ForContext<SqlitePersistentBlobCacheFactory>();
         Dictionary<string, IBlobCache> cache = new Dictionary<string, IBlobCache>();
 
         public IBlobCache CreateBlobCache(string path)

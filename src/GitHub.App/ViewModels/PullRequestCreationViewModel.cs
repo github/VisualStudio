@@ -18,6 +18,7 @@ using System.Globalization;
 using GitHub.Primitives;
 using GitHub.Extensions;
 using System.Reactive.Disposables;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.ViewModels
@@ -28,7 +29,7 @@ namespace GitHub.ViewModels
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
     {
-        static readonly ILogger log = Log.ForContext<PullRequestCreationViewModel>();
+        static readonly ILogger log = LogManager.ForContext<PullRequestCreationViewModel>();
 
         readonly ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
         readonly ObservableAsPropertyHelper<bool> isExecuting;

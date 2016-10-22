@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Extensions;
+using GitHub.Infrastructure;
 using Microsoft.VisualStudio.Shell;
 using Serilog;
 using Rothko;
@@ -20,7 +21,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
-        static readonly ILogger log = Log.ForContext<RepositoryCloneService>();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCloneService>();
 
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;

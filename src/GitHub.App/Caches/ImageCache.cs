@@ -11,6 +11,7 @@ using Akavache;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
+using GitHub.Infrastructure;
 using GitHub.Services;
 using Rothko;
 using Serilog;
@@ -21,7 +22,7 @@ namespace GitHub.Caches
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class ImageCache : IImageCache
     {
-        static readonly ILogger log = Log.ForContext<ImageCache>();
+        static readonly ILogger log = LogManager.ForContext<ImageCache>();
 
         public const string ImageCacheFileName = "images.cache.db";
         readonly IObservable<IBlobCache> cacheFactory;

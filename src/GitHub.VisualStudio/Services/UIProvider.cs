@@ -91,7 +91,7 @@ namespace GitHub.VisualStudio
             public ComposablePart Part { get; set; }
         }
 
-        static readonly ILogger log = Log.ForContext<UIProvider>();
+        static readonly ILogger log = LogManager.ForContext<UIProvider>();
 
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProvider serviceProvider;

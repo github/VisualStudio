@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Akavache;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
+using GitHub.Infrastructure;
 using GitHub.Primitives;
 using Octokit;
 using Serilog;
@@ -12,7 +13,7 @@ namespace GitHub.Services
 {
     public class GitHubCredentialStore : ICredentialStore
     {
-        static readonly ILogger log = Log.ForContext<GitHubCredentialStore>();
+        static readonly ILogger log = LogManager.ForContext<GitHubCredentialStore>();
         readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
 

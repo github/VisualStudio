@@ -6,6 +6,7 @@ using GitHub.Api;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using NullGuard;
@@ -19,7 +20,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
     {
-        static readonly ILogger log = Log.ForContext<GistCreationViewModel>();
+        static readonly ILogger log = LogManager.ForContext<GistCreationViewModel>();
 
         readonly IApiClient apiClient;
         readonly ObservableAsPropertyHelper<IAccount> account;

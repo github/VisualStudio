@@ -12,6 +12,7 @@ using GitHub.Authentication;
 using GitHub.Caches;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
+using GitHub.Infrastructure;
 using GitHub.Primitives;
 using NullGuard;
 using ReactiveUI;
@@ -23,7 +24,7 @@ namespace GitHub.Models
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class RepositoryHosts : ReactiveObject, IRepositoryHosts
     {
-        static readonly ILogger log = Log.ForContext<RepositoryHosts>();
+        static readonly ILogger log = LogManager.ForContext<RepositoryHosts>();
         public static DisconnectedRepositoryHost DisconnectedRepositoryHost = new DisconnectedRepositoryHost();
         public const string EnterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
         readonly ObservableAsPropertyHelper<bool> isLoggedInToAnyHost;

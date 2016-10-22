@@ -139,11 +139,6 @@ namespace GitHub.VisualStudio
 
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            var environment = new Rothko.Environment();
-            var logPath = Path.Combine(environment.GetLocalGitHubApplicationDataPath(), "extension.log");
-
-            LoggingConfiguration.InitializeLogging(logPath);
-
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);

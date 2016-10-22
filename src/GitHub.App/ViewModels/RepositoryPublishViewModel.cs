@@ -9,6 +9,7 @@ using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UserErrors;
@@ -23,7 +24,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryPublishViewModel : RepositoryFormViewModel, IRepositoryPublishViewModel
     {
-        static readonly ILogger log = Log.ForContext<RepositoryPublishViewModel>();
+        static readonly ILogger log = LogManager.ForContext<RepositoryPublishViewModel>();
 
         readonly IRepositoryHosts hosts;
         readonly IRepositoryPublishService repositoryPublishService;

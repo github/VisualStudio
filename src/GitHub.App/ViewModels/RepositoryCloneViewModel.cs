@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using GitHub.Collections;
 using GitHub.UI;
 using GitHub.Extensions.Reactive;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.ViewModels
@@ -30,7 +31,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
     {
-        static readonly ILogger log = Log.ForContext<RepositoryCloneViewModel>();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCloneViewModel>();
 
         readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;

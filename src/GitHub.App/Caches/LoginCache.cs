@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
 using GitHub.Extensions;
+using GitHub.Infrastructure;
 using GitHub.Primitives;
 using Serilog;
 using Serilog.Core;
@@ -15,7 +16,7 @@ namespace GitHub.Caches
     [PartCreationPolicy(CreationPolicy.Shared)]
     public sealed class LoginCache : ILoginCache
     {
-        static readonly ILogger log = Log.ForContext<LoginCache>();
+        static readonly ILogger log = LogManager.ForContext<LoginCache>();
         readonly ISharedCache cache;
 
         static readonly LoginInfo empty = new LoginInfo("", "");

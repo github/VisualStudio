@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using Akavache;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.Caches
@@ -16,7 +17,7 @@ namespace GitHub.Caches
     public class SharedCache : ISharedCache
     {
         const string enterpriseHostApiBaseUriCacheKey = "enterprise-host-api-base-uri";
-        static readonly ILogger log = Log.ForContext<SharedCache>();
+        static readonly ILogger log = LogManager.ForContext<SharedCache>();
 
         static SharedCache()
         {

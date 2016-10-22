@@ -17,6 +17,7 @@ using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
 using GitHub.Extensions;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.Models
@@ -24,7 +25,7 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RepositoryHost : ReactiveObject, IRepositoryHost
     {
-        static readonly ILogger log = Log.ForContext<RepositoryHosts>();
+        static readonly ILogger log = LogManager.ForContext<RepositoryHosts>();
         static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;

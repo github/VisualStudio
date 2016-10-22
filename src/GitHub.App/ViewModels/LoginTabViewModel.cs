@@ -9,6 +9,7 @@ using GitHub.Authentication;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Info;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -22,7 +23,7 @@ namespace GitHub.ViewModels
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public abstract class LoginTabViewModel : ReactiveObject
     {
-        static readonly ILogger log = Log.ForContext<LoginTabViewModel>();
+        static readonly ILogger log = LogManager.ForContext<LoginTabViewModel>();
 
         protected LoginTabViewModel(IRepositoryHosts repositoryHosts, IVisualStudioBrowser browser)
         {

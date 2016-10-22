@@ -21,6 +21,7 @@ using Octokit;
 using ReactiveUI;
 using Rothko;
 using GitHub.Collections;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.ViewModels
@@ -29,7 +30,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCreationViewModel : RepositoryFormViewModel, IRepositoryCreationViewModel
     {
-        static readonly ILogger log = Log.ForContext<RepositoryCreationViewModel>();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCreationViewModel>();
 
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;

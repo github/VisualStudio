@@ -18,6 +18,7 @@ using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Extensions;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.Api
@@ -26,7 +27,7 @@ namespace GitHub.Api
     {
         const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
-        static readonly ILogger log = Log.ForContext<ApiClient>();
+        static readonly ILogger log = LogManager.ForContext<ApiClient>();
         static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         readonly IObservableGitHubClient gitHubClient;

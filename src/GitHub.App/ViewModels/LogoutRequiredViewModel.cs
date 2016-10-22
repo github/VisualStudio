@@ -13,6 +13,7 @@ using NullGuard;
 using ReactiveUI;
 using System.Diagnostics;
 using System.Globalization;
+using GitHub.Infrastructure;
 using Serilog;
 
 namespace GitHub.ViewModels
@@ -21,7 +22,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LogoutRequiredViewModel : BaseViewModel, ILogoutRequiredViewModel
     {
-        static readonly ILogger log = Log.ForContext<LogoutRequiredViewModel>();
+        static readonly ILogger log = LogManager.ForContext<LogoutRequiredViewModel>();
 
         readonly IRepositoryHosts repositoryHosts;
         readonly INotificationService notificationService;

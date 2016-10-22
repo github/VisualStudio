@@ -11,6 +11,7 @@ using GitHub.Caches;
 using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Primitives;
 using NullGuard;
@@ -23,7 +24,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
-        static readonly ILogger log = Log.ForContext<ModelService>();
+        static readonly ILogger log = LogManager.ForContext<ModelService>();
 
         public const string PRPrefix = "pr";
         readonly IApiClient apiClient;
