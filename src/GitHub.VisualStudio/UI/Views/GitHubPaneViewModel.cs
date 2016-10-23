@@ -22,12 +22,14 @@ using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
 using System.Windows.Threading;
 using GitHub.VisualStudio.UI.Controls;
+using GitHub.Helpers;
+using System.ComponentModel;
 
 namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel
+    public class GitHubPaneViewModel : TeamExplorerItemBase, IGitHubPaneViewModel, ICanBeBusy
     {
         const UIControllerFlow DefaultControllerFlow = UIControllerFlow.PullRequests;
 
@@ -93,7 +95,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             base.Initialize(serviceProvider);
 
-            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());
+            hosts.WhenAnyValue(x => x.IsLoggedInToAnyHost).Subscribe(_ => Reload().Forget());            
         }
 
         public void Initialize([AllowNull] ViewWithData data)
@@ -321,6 +323,34 @@ namespace GitHub.VisualStudio.UI.Views
             UpdateToolbar();
         }
 
+        void SwitchTrackingIsBusy(IView oldView, IView newView)
+        {
+            var canBeBusyOld = oldView?.ViewModel as ICanBeBusy;
+            var propertyChangedOld = canBeBusyOld as INotifyPropertyChanged;
+            if (propertyChangedOld != null)
+            {
+                propertyChangedOld.PropertyChanged -= isBusyChangedEvent;
+            }
+
+            var canBeBusy = newView?.ViewModel as ICanBeBusy;
+            var propertyChanged = canBeBusy as INotifyPropertyChanged;
+            if (propertyChanged != null)
+            {
+                propertyChanged.PropertyChanged += isBusyChangedEvent;
+            }
+
+            var newVal = canBeBusy?.IsBusy ?? false;
+            this.IsBusy = newVal;
+        }
+
+        void isBusyChangedEvent(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(ICanBeBusy.IsBusy))
+            {
+                this.IsBusy = (sender as ICanBeBusy)?.IsBusy ?? false;
+            }
+        }
+
         string title;
         [AllowNull]
         public string Title
@@ -333,7 +363,19 @@ namespace GitHub.VisualStudio.UI.Views
         public IView Control
         {
             [return: AllowNull] get { return control; }
-            set { control = value; this.RaisePropertyChange(); }
+            set
+            {
+                SwitchTrackingIsBusy(control, value);
+                control = value;
+                this.RaisePropertyChange();
+            }
+        }
+
+        bool isBusy = false;
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { isBusy = value; this.RaisePropertyChange(); }
         }
 
         bool isLoggedIn;
