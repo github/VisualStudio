@@ -19,19 +19,22 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
+        readonly IUIContextFactory uiContextFactory;
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
 
         IServiceProvider serviceProvider;
         IGitExt gitService;
-        UIContext gitUIContext;
+        IUIContextWrapper gitUIContext;
 
         // ActiveRepositories PropertyChanged event comes in on a non-main thread
         readonly SynchronizationContext syncContext;
 
-        public TeamExplorerServiceHolder()
+        [ImportingConstructor]
+        public TeamExplorerServiceHolder(IUIContextFactory uiContextFactory)
         {
+            this.uiContextFactory = uiContextFactory;
             syncContext = SynchronizationContext.Current;
         }
 
@@ -48,7 +51,7 @@ namespace GitHub.VisualStudio.Base
                 serviceProvider = value;
                 if (serviceProvider == null)
                     return;
-                GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                GitUIContext = GitUIContext ?? uiContextFactory.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
                 UIContextChanged(GitUIContext?.IsActive ?? false, false);
             }
         }
@@ -118,7 +121,7 @@ namespace GitHub.VisualStudio.Base
 
         public void Refresh()
         {
-            GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+            GitUIContext = GitUIContext ?? uiContextFactory.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
             UIContextChanged(GitUIContext?.IsActive ?? false, true);
         }
 
@@ -211,7 +214,7 @@ namespace GitHub.VisualStudio.Base
         }
 
         [AllowNull]
-        UIContext GitUIContext
+        IUIContextWrapper GitUIContext
         {
             [return: AllowNull]
             get { return gitUIContext; }

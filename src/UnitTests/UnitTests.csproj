@@ -188,6 +188,7 @@
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.TeamFoundation.14\TeamExplorerNavigationItemBaseTests.cs" />
+    <Compile Include="GitHub.TeamFoundation.14\TeamExplorerServiceHolderTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
