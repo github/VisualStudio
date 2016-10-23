@@ -7,6 +7,8 @@ using System.Windows.Input;
 using GitHub.ViewModels;
 using NullGuard;
 using ReactiveUI;
+using GitHub.Helpers;
+using System.ComponentModel;
 
 namespace GitHub.UI
 {
@@ -45,7 +47,7 @@ namespace GitHub.UI
         {
             if (disposed)
                 return;
-
+            
             close.OnNext(null);
             close.OnCompleted();
         }
@@ -98,6 +100,40 @@ namespace GitHub.UI
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
             "ViewModel", typeof(TInterface), typeof(TImplementor), new PropertyMetadata(null));
+
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(e);
+
+            if(e.Property == ViewModelProperty)
+            {
+                if (e.OldValue is ICanBeBusy)
+                {
+                    if (e.OldValue is INotifyPropertyChanged)
+                    {
+                        ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= ViewModelBusyChanged;
+                    }
+                }
+                if (e.NewValue is ICanBeBusy)
+                {
+                    if (e.NewValue is INotifyPropertyChanged)
+                    {
+                        ((INotifyPropertyChanged)e.NewValue).PropertyChanged += ViewModelBusyChanged;
+                    }
+                }
+            }
+        }
+
+        void ViewModelBusyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(ICanBeBusy.IsBusy))
+            {
+                if (sender is ICanBeBusy)
+                {
+                    this.NotifyIsBusy(((ICanBeBusy)sender).IsBusy);
+                }
+            }
+        }
 
         [AllowNull]
         object IViewFor.ViewModel

@@ -8,6 +8,7 @@
                             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                            xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
                             xmlns:control="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
                             Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -41,6 +42,7 @@
   </UserControl.Resources>
 
   <DockPanel>
+        <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={ui:BooleanToVisibilityConverter}}" VerticalAlignment="Top" DockPanel.Dock="Top"/>
         <control:InfoPanel x:Name="infoPanel" MessageType="{Binding MessageType}" Message="{Binding Message}" VerticalAlignment="Top" DockPanel.Dock="Top"></control:InfoPanel>
         <StackPanel Margin="6,9,9,5"
                 DockPanel.Dock="Top"
@@ -61,7 +63,7 @@
                DockPanel.Dock="Top"
                Style="{StaticResource PaneHorizontalSeparator}" />
 
-    <UserControl x:Name="container" Content="{Binding Control}" DockPanel.Dock="Top" />
+        <UserControl x:Name="container" Content="{Binding Control}" DockPanel.Dock="Top" IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}" />
 
   </DockPanel>
 </view:GenericGitHubPaneView>

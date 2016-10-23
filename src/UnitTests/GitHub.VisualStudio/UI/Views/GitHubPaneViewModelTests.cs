@@ -16,6 +16,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using UnitTests;
 using Xunit;
+using System.Windows.Input;
+using GitHub.ViewModels;
+using System.ComponentModel;
 
 public class GitHubPaneViewModelTests : TestBaseClass
 {
@@ -100,6 +103,40 @@ public class GitHubPaneViewModelTests : TestBaseClass
         Assert.Equal(UIViewType.PRList, lastUiControllerJump);
     }
 
+    [Fact]
+    public void ProxyIsBusyFromViewModel_WhenICanBeBusy()
+    {
+        var hostedViewModel = new CanBeBusyBasicViewModel();
+        var view = Substitute.For<IView>();
+        view.ViewModel.Returns(hostedViewModel);
+        viewModel.Control = view;
+
+        Assert.False(viewModel.IsBusy);
+
+        //ensure we make an change of value atleast once
+        hostedViewModel.IsBusy = false;
+        hostedViewModel.IsBusy = true;
+
+        Assert.True(viewModel.IsBusy);
+    }
+
+    [Fact]
+    public void DoNotProxyIsBusyFromViewModel_WhenNotICanBeBusy()
+    {
+        var hostedViewModel = new BasicViewModel();
+        var view = Substitute.For<IView>();
+        view.ViewModel.Returns(hostedViewModel);
+        viewModel.Control = view;
+
+        Assert.False(viewModel.IsBusy);
+
+        //ensure we make an change of value atleast once
+        hostedViewModel.IsBusy = false;
+        hostedViewModel.IsBusy = true;
+
+        Assert.False(viewModel.IsBusy);
+    }
+
     private void RunSteps(IEnumerable<NavStep> steps)
     {
         var observableSteps = steps
@@ -126,5 +163,44 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
         public LoadDirection Direction { get; private set; }
         public UIViewType ViewType { get; private set; }
+    }
+
+    private class CanBeBusyBasicViewModel : BasicViewModel, GitHub.ViewModels.ICanBeBusy
+    {
+    }
+
+    private class BasicViewModel : NotificationAwareObject, GitHub.ViewModels.IViewModel
+    {
+        ICommand cancel;
+        public ICommand Cancel
+        {
+            get { return cancel; }
+            set { cancel = value; this.RaisePropertyChanged(); }
+        }
+
+        bool isBusy;
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { isBusy = value; this.RaisePropertyChanged(); }
+        }
+
+        bool isShowing;
+        public bool IsShowing
+        {
+            get { return isShowing; }
+            set { isShowing = value; this.RaisePropertyChanged(); }
+        }
+
+        string title;
+        public string Title
+        {
+            get { return title; }
+            set { title = value; this.RaisePropertyChanged(); }
+        }
+
+        public void Initialize(ViewWithData data)
+        {
+        }
     }
 }
