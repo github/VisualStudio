@@ -22,7 +22,7 @@ public class ImageCacheTests
     public class TheConstructor : TestBaseClass
     {
         [Fact]
-        public async Task VacuumsIfNoVacuumKeyIsPresent()
+        public void VacuumsIfNoVacuumKeyIsPresent()
         {
             const string vacuumedKey = "__Vacuumed";
             var evt = new ManualResetEvent(false);
@@ -58,11 +58,11 @@ public class ImageCacheTests
 
             //Demonstrating the cache was vacuumed and the vacuumed key was set
             cache.Received().Vacuum();
-            cache.Received().Insert(Arg.Is(vacuumedKey), Arg.Any<byte[]>(), Arg.Is((DateTimeOffset?) null));
+            cache.Received().Insert(Arg.Is(vacuumedKey), Arg.Any<byte[]>(), Arg.Is((DateTimeOffset?)null));
         }
 
         [Fact]
-        public async Task VacuumsOnceEvery30Days()
+        public void VacuumsOnceEvery30Days()
         {
             const string vacuumedKey = "__Vacuumed";
             var evt = new ManualResetEvent(false);
@@ -114,7 +114,7 @@ public class ImageCacheTests
 
             //Demonstrating the cache was vacuumed and the vacuumed key was set
             cache.Received().Vacuum();
-            cache.Received().Insert(Arg.Is(vacuumedKey), Arg.Any<byte[]>(), Arg.Is((DateTimeOffset?) null));
+            cache.Received().Insert(Arg.Is(vacuumedKey), Arg.Any<byte[]>(), Arg.Is((DateTimeOffset?)null));
         }
     }
 
@@ -183,7 +183,7 @@ public class ImageCacheTests
         }
 
         [Fact]
-        public async Task WhenLoadingOneToTwoDayOldItemFromCacheRefresh()
+        public void WhenLoadingOneToTwoDayOldItemFromCacheRefresh()
         {
             var evt = new ManualResetEvent(false);
 
