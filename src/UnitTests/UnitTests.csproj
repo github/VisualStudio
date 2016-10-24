@@ -108,6 +108,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
@@ -187,6 +188,8 @@
     <Compile Include="GitHub.Extensions\GuardTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
+    <Compile Include="GitHub.TeamFoundation.14\TeamExplorerNavigationItemBaseTests.cs" />
+    <Compile Include="GitHub.TeamFoundation.14\TeamExplorerServiceHolderTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />

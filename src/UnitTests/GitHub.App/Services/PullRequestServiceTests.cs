@@ -6,6 +6,7 @@ using UnitTests;
 using GitHub.Models;
 using System;
 using GitHub.Services;
+using Rothko;
 
 public class PullRequestServiceTests : TestBaseClass
 {
@@ -14,6 +15,7 @@ public class PullRequestServiceTests : TestBaseClass
     {
         var serviceProvider = Substitutes.ServiceProvider;
         var service = new PullRequestService(Substitute.For<IGitClient>(), serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var os = new OperatingSystemFacade();
 
         IRepositoryHost host = null;
         ILocalRepositoryModel sourceRepo = null;
@@ -28,10 +30,10 @@ public class PullRequestServiceTests : TestBaseClass
         host = serviceProvider.GetRepositoryHosts().GitHubHost;
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        sourceRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path");
+        sourceRepo = new LocalRepositoryModel(os, "name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path");
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
-        targetRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path");
+        targetRepo = new LocalRepositoryModel(os, "name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path");
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(host, sourceRepo, targetRepo, source, target, title, body));
 
         title = "a title";

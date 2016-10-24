@@ -8,6 +8,7 @@ using GitHub.UI;
 using GitHub.Services;
 using GitHub.Extensions;
 using System.Threading.Tasks;
+using Rothko;
 
 namespace GitHub.Models
 {
@@ -17,17 +18,20 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class LocalRepositoryModel : RepositoryModelBase, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
+        IOperatingSystem os;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
         /// </summary>
         /// <param name="name">The repository name.</param>
         /// <param name="cloneUrl">The repository's clone URL.</param>
         /// <param name="localPath">The repository's local path.</param>
-        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath)
+        public LocalRepositoryModel(IOperatingSystem os, string name, UriString cloneUrl, string localPath)
             : base(name, cloneUrl)
         {
             Guard.ArgumentNotEmptyString(localPath, nameof(localPath));
 
+            this.os = os;
             LocalPath = localPath;
             Icon = Octicon.repo;
         }
@@ -36,8 +40,8 @@ namespace GitHub.Models
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
         /// </summary>
         /// <param name="path">The repository's local path.</param>
-        public LocalRepositoryModel(string path)
-            : base(path)
+        public LocalRepositoryModel(IOperatingSystem os, string path)
+            : base(os, path)
         {
             LocalPath = path;
             Icon = Octicon.repo;
@@ -146,7 +150,7 @@ namespace GitHub.Models
             get
             {
                 var repo = GitService.GitServiceHelper.GetRepository(LocalPath);
-                return new BranchModel(repo?.Head, this);
+                return new BranchModel(this.os, repo?.Head, this);
             }
         }
 

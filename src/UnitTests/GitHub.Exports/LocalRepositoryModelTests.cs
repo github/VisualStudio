@@ -9,6 +9,7 @@ using GitHub.Primitives;
 using Xunit.Abstractions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Rothko;
 
 [Collection("PackageServiceProvider global data tests")]
 public class LocalRepositoryModelTests : TestBaseClass
@@ -68,13 +69,14 @@ public class LocalRepositoryModelTests : TestBaseClass
             SetupRepository(sha);
 
             var basePath = temp.Directory.CreateSubdirectory("generate-url-test1-" + testid);
+            var os = new OperatingSystemFacade();
             if (createRootedPath && path != null)
                 path = System.IO.Path.Combine(basePath.FullName, path);
             ILocalRepositoryModel model = null;
             if (!String.IsNullOrEmpty(baseUrl))
-                model = new LocalRepositoryModel("bar", new UriString(baseUrl), basePath.FullName);
+                model = new LocalRepositoryModel(os, "bar", new UriString(baseUrl), basePath.FullName);
             else
-                model = new LocalRepositoryModel(basePath.FullName);
+                model = new LocalRepositoryModel(os, basePath.FullName);
             var result = await model.GenerateUrl(path, startLine, endLine);
             Assert.Equal(expected, result?.ToString());
         }

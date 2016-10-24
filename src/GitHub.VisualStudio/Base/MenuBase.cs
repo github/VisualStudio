@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using NullGuard;
 using GitHub.UI;
+using Rothko;
 
 namespace GitHub.VisualStudio
 {
@@ -63,7 +64,8 @@ namespace GitHub.VisualStudio
                 var path = ServiceProvider.GetExportedValue<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
-                    activeRepo = !string.IsNullOrEmpty(path) ? new LocalRepositoryModel(path) : null;
+                    var os = new OperatingSystemFacade();
+                    activeRepo = !string.IsNullOrEmpty(path) ? new LocalRepositoryModel(os, path) : null;
                 }
                 catch (Exception ex)
                 {
@@ -100,7 +102,8 @@ namespace GitHub.VisualStudio
                 string path = vsGitServices?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
-                    ActiveRepo = !String.IsNullOrEmpty(path) ? new LocalRepositoryModel(path) : null;
+                    var os = new OperatingSystemFacade();
+                    ActiveRepo = !String.IsNullOrEmpty(path) ? new LocalRepositoryModel(os, path) : null;
                 }
                 catch (Exception ex)
                 {

@@ -18,6 +18,7 @@ using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using Rothko;
 
 namespace GitHub.SampleData
 {
@@ -456,13 +457,14 @@ namespace GitHub.SampleData
     {
         public GitHubConnectSectionDesigner()
         {
+            var os = new OperatingSystemFacade();
             Repositories = new ObservableCollection<ILocalRepositoryModel>();
-            Repositories.Add(new LocalRepositoryModel("octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\octokit.net"));
-            Repositories.Add(new LocalRepositoryModel("cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\cefsharp"));
-            Repositories.Add(new LocalRepositoryModel("git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\git-lfs"));
-            Repositories.Add(new LocalRepositoryModel("another octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\another-octokit.net"));
-            Repositories.Add(new LocalRepositoryModel("some cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\something-else"));
-            Repositories.Add(new LocalRepositoryModel("even more git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\A different path"));
+            Repositories.Add(new LocalRepositoryModel(os, "octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\octokit.net"));
+            Repositories.Add(new LocalRepositoryModel(os, "cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\cefsharp"));
+            Repositories.Add(new LocalRepositoryModel(os, "git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\git-lfs"));
+            Repositories.Add(new LocalRepositoryModel(os, "another octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\another-octokit.net"));
+            Repositories.Add(new LocalRepositoryModel(os, "some cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\something-else"));
+            Repositories.Add(new LocalRepositoryModel(os, "even more git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\A different path"));
         }
 
         public ObservableCollection<ILocalRepositoryModel> Repositories
