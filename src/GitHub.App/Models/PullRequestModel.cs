@@ -110,7 +110,15 @@ namespace GitHub.Models
         public PullRequestStateEnum State
         {
             get { return status; }
-            set { status = value; this.RaisePropertyChange(); this.RaisePropertyChange(nameof(IsOpen)); }
+            set
+            {
+                status = value;
+                this.RaisePropertyChange();
+
+                // TODO: These notifications will be removed once maintainer workflow has been merged to master.
+                this.RaisePropertyChange(nameof(IsOpen));
+                this.RaisePropertyChange(nameof(Merged));
+            }
         }
 
         // TODO: Remove these property once maintainer workflow has been merged to master.
@@ -146,11 +154,12 @@ namespace GitHub.Models
         }
 
         public GitReferenceModel Base { get; set; }
+        [AllowNull]
         public GitReferenceModel Head { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
-        public IList<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
+        public IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
 
         IAccount assignee;
         [AllowNull]

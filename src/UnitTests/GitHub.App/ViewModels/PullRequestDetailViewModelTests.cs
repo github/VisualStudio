@@ -285,6 +285,20 @@ namespace UnitTests.GitHub.App.ViewModels
             unused = target.Item2.Received().FetchAndCheckout(Arg.Any<ILocalRepositoryModel>(), target.Item1.Model.Number, "pr/1-foo");
         }
 
+        [Fact]
+        public async Task ShouldAcceptNullHead()
+        {
+            var target = CreateTarget();
+            var model = CreatePullRequest();
+
+            // PullRequest.Head can be null for example if a user deletes the repository after creating the PR.
+            model.Head = null;
+
+            await target.Load(model);
+
+            Assert.Equal("[Invalid]", target.SourceBranchDisplayName);
+        }
+
         PullRequestDetailViewModel CreateTarget(
             string currentBranch = "master",
             string existingPrBranch = null,
@@ -354,8 +368,8 @@ namespace UnitTests.GitHub.App.ViewModels
             {
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel { Label = "foo:baz", Ref = "source", RepositoryCloneUrl = "https://github.com/foo/bar.git" },
-                Base = new GitReferenceModel { Label = "foo:bar", Ref = "source", RepositoryCloneUrl = "https://github.com/foo/bar.git" },
+                Head = new GitReferenceModel("source", "foo:baz", "https://github.com/foo/bar.git"),
+                Base = new GitReferenceModel("dest", "foo:bar", "https://github.com/foo/bar.git"),
             };
         }
     }

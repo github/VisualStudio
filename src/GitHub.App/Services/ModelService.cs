@@ -187,7 +187,7 @@ namespace GitHub.Services
                             apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
                             apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
                             (pr, files) => new { PullRequest = pr, Files = files })
-                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, x.Files)),
+                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, (IReadOnlyList<PullRequestFile>)x.Files)),
                         TimeSpan.Zero,
                         TimeSpan.FromDays(7))
                     .Select(Create);
@@ -354,6 +354,11 @@ namespace GitHub.Services
             };
         }
 
+        private GitReferenceModel Create(GitReferenceCacheItem item)
+        {
+            return item != null ? new GitReferenceModel(item.Ref, item.Label, item.RepositoryCloneUrl) : null;
+        }
+
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
         {
             return new PullRequestModel(
@@ -364,13 +369,13 @@ namespace GitHub.Services
                 prCacheItem.UpdatedAt)
             {
                 Assignee = prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
-                Base = prCacheItem.Base ?? new GitReferenceModel(),
+                Base = Create(prCacheItem.Base),
                 Body = prCacheItem.Body ?? string.Empty,
                 ChangedFiles = prCacheItem.ChangedFiles.Select(x => (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Status)).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
-                Head = prCacheItem.Head ?? new GitReferenceModel(),
+                Head = Create(prCacheItem.Head),
                 State = prCacheItem.State.HasValue ? 
                     prCacheItem.State.Value : 
                     prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,                
@@ -459,7 +464,7 @@ namespace GitHub.Services
                 return new PullRequestCacheItem(pr, new PullRequestFile[0]);
             }
 
-            public static PullRequestCacheItem Create(PullRequest pr, IList<PullRequestFile> files)
+            public static PullRequestCacheItem Create(PullRequest pr, IReadOnlyList<PullRequestFile> files)
             {
                 return new PullRequestCacheItem(pr, files);
             }
@@ -471,12 +476,12 @@ namespace GitHub.Services
             {
             }
 
-            public PullRequestCacheItem(PullRequest pr, IList<PullRequestFile> files)
+            public PullRequestCacheItem(PullRequest pr, IReadOnlyList<PullRequestFile> files)
             {
                 Title = pr.Title;
                 Number = pr.Number;
-                Base = new GitReferenceModel { Label = pr.Base.Label, Ref = pr.Base.Ref, RepositoryCloneUrl = pr.Base.Repository.CloneUrl };
-                Head = new GitReferenceModel { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl };
+                Base = new GitReferenceCacheItem { Label = pr.Base.Label, Ref = pr.Base.Ref, RepositoryCloneUrl = pr.Base.Repository.CloneUrl };
+                Head = pr.Head != null ? new GitReferenceCacheItem { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl } : null;
                 CommentCount = pr.Comments + pr.ReviewComments;
                 CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
@@ -494,8 +499,8 @@ namespace GitHub.Services
 
             public string Title {get; set; }
             public int Number { get; set; }
-            public GitReferenceModel Base { get; set; }
-            public GitReferenceModel Head { get; set; }
+            public GitReferenceCacheItem Base { get; set; }
+            public GitReferenceCacheItem Head { get; set; }
             public int CommentCount { get; set; }
             public int CommitCount { get; set; }
             public AccountCacheItem Author { get; set; }
@@ -529,6 +534,7 @@ namespace GitHub.Services
             }
         }
 
+        [NullGuard(ValidationFlags.None)]
         public class PullRequestFileCacheItem
         {
             public PullRequestFileCacheItem()
@@ -543,6 +549,14 @@ namespace GitHub.Services
 
             public string FileName { get; set; }
             public PullRequestFileStatus Status { get; set; }
+        }
+
+        [NullGuard(ValidationFlags.None)]
+        public class GitReferenceCacheItem
+        {
+            public string Ref { get; set; }
+            public string Label { get; set; }
+            public string RepositoryCloneUrl { get; set; }
         }
     }
 }
