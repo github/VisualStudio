@@ -14,6 +14,8 @@ namespace GitHub.Models
     public class Account : ReactiveObject, IAccount
     {
         BitmapSource avatar;
+        IObservable<BitmapSource> bitmapSource;
+        IDisposable bitmapSourceSubscription;
 
         public Account(
             string login,
@@ -30,8 +32,10 @@ namespace GitHub.Models
             PrivateReposInPlan = privateRepositoryInPlanCount;
             IsOnFreePlan = privateRepositoryInPlanCount == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+            this.bitmapSource = bitmapSource;
 
-            bitmapSource.ObserveOn(RxApp.MainThreadScheduler)
+            bitmapSourceSubscription = bitmapSource
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Avatar = x);
         }
 
@@ -87,6 +91,16 @@ namespace GitHub.Models
             IsOnFreePlan = other.IsOnFreePlan;
             HasMaximumPrivateRepositories = other.HasMaximumPrivateRepositories;
             Avatar = other.Avatar;
+
+            var otherAccount = other as Account;
+            if (otherAccount != null)
+            {
+                bitmapSourceSubscription.Dispose();
+
+                bitmapSourceSubscription = otherAccount.bitmapSource
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => Avatar = x);
+            }
         }
 
         public override bool Equals([AllowNull]object obj)
