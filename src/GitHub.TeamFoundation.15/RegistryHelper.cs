@@ -30,8 +30,9 @@ namespace GitHub.TeamFoundation
                         try
                         {
                             var path = subkey?.GetValue("Path") as string;
+                            var os = new Rothko.OperatingSystemFacade();
                             if (path != null)
-                                return new LocalRepositoryModel(path);
+                                return new LocalRepositoryModel(os, path);
                         }
                         catch (Exception)
                         {

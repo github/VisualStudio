@@ -4,6 +4,7 @@ using GitHub.Services;
 using GitHub.VisualStudio;
 using LibGit2Sharp;
 using NSubstitute;
+using Rothko;
 using UnitTests;
 using Xunit;
 
@@ -20,8 +21,9 @@ public class RepositoryModelTests
         [InlineData("a name", "https://github.com/github/VisualStudio", @"C:\some\path\", "a name", "https://github.com/github/VisualStudio", @"c:\some\path\")]
         public void SameContentEqualsTrue(string name1, string url1, string path1, string name2, string url2, string path2)
         {
-            var a = new LocalRepositoryModel(name1, new UriString(url1), path1);
-            var b = new LocalRepositoryModel(name2, new UriString(url2), path2);
+            var os = new OperatingSystemFacade();
+            var a = new LocalRepositoryModel(os, name1, new UriString(url1), path1);
+            var b = new LocalRepositoryModel(os, name2, new UriString(url2), path2);
             Assert.Equal(a, b);
             Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
@@ -64,8 +66,9 @@ public class RepositoryModelTests
                 var gitservice = provider.GetGitService();
                 var repo = Substitute.For<IRepository>();
                 var path = temp.Directory.CreateSubdirectory("repo-name");
+                var os = new OperatingSystemFacade();
                 gitservice.GetUri(path.FullName).Returns((UriString)null);
-                var model = new LocalRepositoryModel(path.FullName);
+                var model = new LocalRepositoryModel(os, path.FullName);
                 Assert.Equal("repo-name", model.Name);
             }
         }
@@ -79,8 +82,9 @@ public class RepositoryModelTests
                 var gitservice = provider.GetGitService();
                 var repo = Substitute.For<IRepository>();
                 var path = temp.Directory.CreateSubdirectory("repo-name");
+                var os = new OperatingSystemFacade();
                 gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-                var model = new LocalRepositoryModel(path.FullName);
+                var model = new LocalRepositoryModel(os, path.FullName);
                 Assert.Equal("repo-name", model.Name);
                 Assert.Equal("user", model.Owner);
             }

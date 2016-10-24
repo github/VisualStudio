@@ -31,8 +31,9 @@ namespace GitHub.TeamFoundation
                         try
                         {
                             var path = subkey?.GetValue("Path") as string;
+                            var os = new Rothko.OperatingSystemFacade();
                             if (path != null && Directory.Exists(path))
-                                return new LocalRepositoryModel(path);
+                                return new LocalRepositoryModel(os, path);
                         }
                         catch (Exception)
                         {

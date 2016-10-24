@@ -5,6 +5,7 @@ using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.UI;
+using Rothko;
 
 namespace GitHub.Models
 {
@@ -40,11 +41,11 @@ namespace GitHub.Models
         /// The path to the local repository from which repository name and clone URL will be
         /// extracted.
         /// </param>
-        protected RepositoryModelBase(string path)
+        protected RepositoryModelBase(IOperatingSystem os, string path)
         {
             Guard.ArgumentNotNull(path, nameof(path));
 
-            var dir = new DirectoryInfo(path);
+            var dir = os.Directory.GetDirectory(path);
             if (!dir.Exists)
                 throw new ArgumentException("Path does not exist", nameof(path));
             var uri = GitService.GitServiceHelper.GetUri(path);

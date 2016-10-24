@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Rothko;
 
 namespace GitHub.Models
 {
@@ -25,13 +26,13 @@ namespace GitHub.Models
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
-        public BranchModel(LibGit2Sharp.Branch branch, IRepositoryModel repo)
+        public BranchModel(IOperatingSystem os, LibGit2Sharp.Branch branch, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
 
             Name = DisplayName = branch.FriendlyName;
-            Repository = branch.IsRemote ? new LocalRepositoryModel(branch.Remote.Url) : repo;
+            Repository = branch.IsRemote ? new LocalRepositoryModel(os, branch.Remote.Url) : repo;
             IsTracking = branch.IsTracking;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }

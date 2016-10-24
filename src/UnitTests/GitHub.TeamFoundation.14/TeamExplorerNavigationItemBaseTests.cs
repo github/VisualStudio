@@ -10,6 +10,7 @@ using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using NSubstitute;
 using Octokit;
+using Rothko;
 using Xunit;
 
 namespace UnitTests.GitHub.TeamFoundation._14
@@ -31,12 +32,13 @@ namespace UnitTests.GitHub.TeamFoundation._14
         {
             var apiFactory = CreateApiClientFactory();
             var holder = Substitute.For<ITeamExplorerServiceHolder>();
+            var os = new OperatingSystemFacade();
             Action<ILocalRepositoryModel> updateMethod = null;
             holder.Subscribe(Arg.Any<object>(), Arg.Do<Action<ILocalRepositoryModel>>(x => updateMethod = x));
 
             var target = new TestNavigationItem(apiFactory, holder, Octicon.alert);
-            var repo1 = new LocalRepositoryModel("repo1", new UriString("https://github.com/bar"), @"c:\foo\bar");
-            var repo2 = new LocalRepositoryModel("repo1", new UriString("https://github.com/baz"), @"c:\foo\bar");
+            var repo1 = new LocalRepositoryModel(os, "repo1", new UriString("https://github.com/bar"), @"c:\foo\bar");
+            var repo2 = new LocalRepositoryModel(os, "repo1", new UriString("https://github.com/baz"), @"c:\foo\bar");
 
             updateMethod(repo1);
             updateMethod(repo2);
@@ -49,12 +51,13 @@ namespace UnitTests.GitHub.TeamFoundation._14
         {
             var apiFactory = CreateApiClientFactory();
             var holder = Substitute.For<ITeamExplorerServiceHolder>();
+            var os = new OperatingSystemFacade();
             Action<ILocalRepositoryModel> updateMethod = null;
             holder.Subscribe(Arg.Any<object>(), Arg.Do<Action<ILocalRepositoryModel>>(x => updateMethod = x));
 
             var target = new TestNavigationItem(apiFactory, holder, Octicon.alert);
-            var repo1 = new LocalRepositoryModel("repo1", new UriString("https://github.com/bar"), @"c:\foo\bar");
-            var repo2 = new LocalRepositoryModel("repo1", new UriString("https://github.com/bar"), @"c:\foo\bar");
+            var repo1 = new LocalRepositoryModel(os, "repo1", new UriString("https://github.com/bar"), @"c:\foo\bar");
+            var repo2 = new LocalRepositoryModel(os, "repo1", new UriString("https://github.com/bar"), @"c:\foo\bar");
 
             updateMethod(repo1);
             updateMethod(repo2);

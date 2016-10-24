@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using GitHub.Models;
+using Rothko;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -21,6 +22,7 @@ namespace GitHub.VisualStudio.Base
     {
         readonly IUIContextFactory uiContextFactory;
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
+        readonly IOperatingSystem os;
         ILocalRepositoryModel activeRepo;
         bool activeRepoNotified = false;
 
@@ -32,9 +34,10 @@ namespace GitHub.VisualStudio.Base
         readonly SynchronizationContext syncContext;
 
         [ImportingConstructor]
-        public TeamExplorerServiceHolder(IUIContextFactory uiContextFactory)
+        public TeamExplorerServiceHolder(IUIContextFactory uiContextFactory, IOperatingSystem os)
         {
             this.uiContextFactory = uiContextFactory;
+            this.os = os;
             syncContext = SynchronizationContext.Current;
         }
 
@@ -62,13 +65,15 @@ namespace GitHub.VisualStudio.Base
             [return: AllowNull] get { return activeRepo; }
             private set
             {
-                if (activeRepo == value)
-                    return;
-                if (activeRepo != null)
-                    activeRepo.PropertyChanged -= ActiveRepoPropertyChanged;
-                activeRepo = value;
-                if (activeRepo != null)
-                    activeRepo.PropertyChanged += ActiveRepoPropertyChanged;
+                if (!Equals(activeRepo, value))
+                {
+                    if (activeRepo != null)
+                        activeRepo.PropertyChanged -= ActiveRepoPropertyChanged;
+                    activeRepo = value;
+                    if (activeRepo != null)
+                        activeRepo.PropertyChanged += ActiveRepoPropertyChanged;
+                }
+
                 NotifyActiveRepo();
             }
         }
@@ -165,7 +170,7 @@ namespace GitHub.VisualStudio.Base
                             if (repos == null)
                                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
                         }
-                        return repos?.FirstOrDefault()?.ToModel();
+                        return repos?.FirstOrDefault()?.ToModel(os);
                     });
             }
             else
@@ -181,10 +186,9 @@ namespace GitHub.VisualStudio.Base
             if (service == null)
                 return;
 
-            var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel();
-            if (repo != ActiveRepo)
-                // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
+            var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel(os);
+            // so annoying that this is on the wrong thread
+            syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
         }
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -253,9 +257,9 @@ namespace GitHub.VisualStudio.Base
         /// <summary>
         /// Create a LocalRepositoryModel from a VS git repo object
         /// </summary>
-        public static ILocalRepositoryModel ToModel(this IGitRepositoryInfo repo)
+        public static ILocalRepositoryModel ToModel(this IGitRepositoryInfo repo, IOperatingSystem os)
         {
-            return repo == null ? null : new LocalRepositoryModel(repo.RepositoryPath);
+            return repo == null ? null : new LocalRepositoryModel(os, repo.RepositoryPath);
         }
     }
 }
