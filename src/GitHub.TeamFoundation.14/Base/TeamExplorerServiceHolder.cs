@@ -59,13 +59,15 @@ namespace GitHub.VisualStudio.Base
             [return: AllowNull] get { return activeRepo; }
             private set
             {
-                if (Equals(activeRepo, value))
-                    return;
-                if (activeRepo != null)
-                    activeRepo.PropertyChanged -= ActiveRepoPropertyChanged;
-                activeRepo = value;
-                if (activeRepo != null)
-                    activeRepo.PropertyChanged += ActiveRepoPropertyChanged;
+                if (!Equals(activeRepo, value))
+                {
+                    if (activeRepo != null)
+                        activeRepo.PropertyChanged -= ActiveRepoPropertyChanged;
+                    activeRepo = value;
+                    if (activeRepo != null)
+                        activeRepo.PropertyChanged += ActiveRepoPropertyChanged;
+                }
+
                 NotifyActiveRepo();
             }
         }
@@ -179,9 +181,8 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel();
-            if (!Equals(repo, ActiveRepo))
-                // so annoying that this is on the wrong thread
-                syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
+            // so annoying that this is on the wrong thread
+            syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
         }
 
         void ActiveRepoPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

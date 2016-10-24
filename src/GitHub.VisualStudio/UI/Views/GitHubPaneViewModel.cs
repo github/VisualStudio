@@ -109,12 +109,16 @@ namespace GitHub.VisualStudio.UI.Views
             if (!initialized)
                 return;
 
-            if (!changed)
-                return;
-
-            Stop();
-            RepositoryOrigin = RepositoryOrigin.Unknown;
-            Reload().Forget();
+            if (changed)
+            {
+                Stop();
+                RepositoryOrigin = RepositoryOrigin.Unknown;
+                Reload().Forget();
+            }
+            else
+            {
+                Control.ViewModel.Initialize(null);
+            }
         }
 
         /// <summary>

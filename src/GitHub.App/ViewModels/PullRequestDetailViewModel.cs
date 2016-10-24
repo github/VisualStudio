@@ -237,13 +237,26 @@ namespace GitHub.ViewModels
         /// <param name="data"></param>
         public override void Initialize([AllowNull] ViewWithData data)
         {
-            var prNumber = (int)data.Data;
-
             IsBusy = true;
 
-            modelService.GetPullRequest(repository, prNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => Load(x).Forget());
+            if (data != null)
+            {
+                // If data was passed, then it's the PR number.
+                var prNumber = (int)data?.Data;
+                modelService.GetPullRequest(repository, prNumber)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => Load(x).Forget());
+            }
+            else if (model != null)
+            {
+                // If no data was passed, then we're doing a reload due to a change in git state.
+                Load(model).Forget();
+            }
+            else
+            {
+                Debug.Fail("PullRequestDetailViewModel.Initialize(null) was called to refresh the pane before it " +
+                    "was called with data.");
+            }
         }
 
         /// <summary>
