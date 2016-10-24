@@ -308,7 +308,7 @@ namespace GitHub.ViewModels
 
             var clean = await pullRequestsService.IsCleanForCheckout(repository);
 
-            CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate) ?
+            CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate && CheckoutMode != CheckoutMode.Push) ?
                 $"Cannot {GetCheckoutModeDescription(CheckoutMode)} as your working directory has uncommitted changes." :
                 null;
 
