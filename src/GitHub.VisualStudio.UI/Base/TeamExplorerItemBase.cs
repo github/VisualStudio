@@ -72,9 +72,9 @@ namespace GitHub.VisualStudio.Base
         {
             holder.Subscribe(this, (ILocalRepositoryModel repo) =>
             {
-                var changed = !Equals(ActiveRepo, repo);
+                var switchedToNewRepo = !Equals(ActiveRepo, repo);
                 ActiveRepo = repo;
-                RepoChanged(changed);
+                RepoChanged(switchedToNewRepo);
             });
         }
 
@@ -85,7 +85,7 @@ namespace GitHub.VisualStudio.Base
                 holder.ClearServiceProvider(ServiceProvider);
         }
 
-        protected virtual void RepoChanged(bool changed)
+        protected virtual void RepoChanged(bool switchedToNewRepo)
         {
             var repo = ActiveRepo;
             if (repo != null)

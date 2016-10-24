@@ -73,9 +73,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             Setup();
         }
 
-        protected override void RepoChanged(bool changed)
+        protected override void RepoChanged(bool switchedToNewRepo)
         {
-            base.RepoChanged(changed);
+            base.RepoChanged(switchedToNewRepo);
             Setup();
         }
 

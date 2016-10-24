@@ -102,14 +102,14 @@ namespace GitHub.VisualStudio.UI.Views
             Reload(data).Forget();
         }
 
-        protected override void RepoChanged(bool changed)
+        protected override void RepoChanged(bool switchedToNewRepo)
         {
-            base.RepoChanged(changed);
+            base.RepoChanged(switchedToNewRepo);
 
             if (!initialized)
                 return;
 
-            if (changed)
+            if (switchedToNewRepo)
             {
                 Stop();
                 RepositoryOrigin = RepositoryOrigin.Unknown;

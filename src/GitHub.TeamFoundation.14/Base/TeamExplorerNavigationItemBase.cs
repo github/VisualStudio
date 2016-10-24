@@ -50,9 +50,9 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateRepo(ILocalRepositoryModel repo)
         {
-            var changed = !Equals(ActiveRepo, repo);
+            var switchedToNewRepo = !Equals(ActiveRepo, repo);
             ActiveRepo = repo;
-            RepoChanged(changed);
+            RepoChanged(switchedToNewRepo);
             Invalidate();
         }
 
