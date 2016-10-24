@@ -52,6 +52,13 @@ namespace GitHub.Models
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
         }
 
+        public Account(Octokit.Account account, IObservable<BitmapSource> bitmapSource)
+            : this(account)
+        {
+            bitmapSource.ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => Avatar = x);
+        }
+
         public bool IsOnFreePlan { get; private set; }
 
         public bool HasMaximumPrivateRepositories { get; private set; }

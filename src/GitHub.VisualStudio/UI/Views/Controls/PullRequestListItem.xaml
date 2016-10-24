@@ -107,7 +107,7 @@
         </Grid.ColumnDefinitions>
         <Button x:Name="prHashtagLink"
                 Grid.Column="0"
-                Command="{Binding OpenPR, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+                Command="{Binding OpenPROnGitHub, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
                 CommandParameter="{Binding Number}"
                 Content="{Binding Number}"
                 FontFamily="Segoe UI"

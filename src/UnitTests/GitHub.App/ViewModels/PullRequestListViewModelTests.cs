@@ -99,8 +99,8 @@ namespace UnitTests.GitHub.App.ViewModels
                 1,
                 "PR1",
                 new Account("foo", true, false, 1, 0, bitmapSource),
-                new Account("foo", true, false, 1, 0, bitmapSource),
                 DateTimeOffset.MinValue);
+            pullRequest.Assignee = new Account("foo", true, false, 1, 0, bitmapSource);
 
             var pullRequestCollection = Substitute.For<ITrackingCollection<IPullRequestModel>>();
             pullRequestCollection[0].Returns(pullRequest);
