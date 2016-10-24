@@ -59,7 +59,7 @@ namespace GitHub.VisualStudio.Base
             [return: AllowNull] get { return activeRepo; }
             private set
             {
-                if (activeRepo == value)
+                if (Equals(activeRepo, value))
                     return;
                 if (activeRepo != null)
                     activeRepo.PropertyChanged -= ActiveRepoPropertyChanged;
@@ -91,7 +91,7 @@ namespace GitHub.VisualStudio.Base
             // if the active repo hasn't changed and there's notifications queued up,
             // notify the subscriber. If the repo has changed, the set above will trigger
             // notifications so we don't have to do it here.
-            if (repo == ActiveRepo && notificationsExist)
+            if (Equals(repo, ActiveRepo) && notificationsExist)
                 handler(repo);
         }
 
@@ -179,7 +179,7 @@ namespace GitHub.VisualStudio.Base
                 return;
 
             var repo = service.ActiveRepositories.FirstOrDefault()?.ToModel();
-            if (repo != ActiveRepo)
+            if (!Equals(repo, ActiveRepo))
                 // so annoying that this is on the wrong thread
                 syncContext.Post(r => ActiveRepo = r as ILocalRepositoryModel, repo);
         }
