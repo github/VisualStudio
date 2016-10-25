@@ -107,10 +107,12 @@
     <Compile Include="Helpers\SettingsStore.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />
+    <Compile Include="Models\GitReferenceModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
+    <Compile Include="Models\IPullRequestFileModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
     <Compile Include="Models\RepositoryModelBase.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="ViewModels\IHasBusy.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />

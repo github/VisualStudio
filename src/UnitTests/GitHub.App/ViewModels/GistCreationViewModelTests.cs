@@ -13,6 +13,7 @@ using Xunit;
 using System.Reactive.Linq;
 using GitHub.Models;
 using ReactiveUI;
+using GitHub.SampleData;
 
 public class GistCreationViewModelTests
 {
@@ -64,6 +65,12 @@ public class GistCreationViewModelTests
 
             var actual = vm.CreateGist.CanExecute(null);
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Foo()
+        {
+            var x = new PullRequestDetailViewModelDesigner();
         }
     }
 }
