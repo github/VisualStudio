@@ -15,11 +15,12 @@ namespace GitHub.Extensions
             string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
 #if DEBUG
             if (!InUnitTestRunner())
-            {
                 Debug.Fail(message);
-            }
-#endif
+            else
+                throw new ArgumentNullException(name, message);
+#else
             throw new ArgumentNullException(name, message);
+#endif
         }
 
         public static void ArgumentNonNegative(int value, string name)
@@ -29,11 +30,12 @@ namespace GitHub.Extensions
             var message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must be non-negative", name);
 #if DEBUG
             if (!InUnitTestRunner())
-            {
                 Debug.Fail(message);
-            }
-#endif
+            else
+                throw new ArgumentException(message, name);
+#else
             throw new ArgumentException(message, name);
+#endif
         }
 
         /// <summary>
@@ -47,11 +49,12 @@ namespace GitHub.Extensions
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
 #if DEBUG
             if (!InUnitTestRunner())
-            {
                 Debug.Fail(message);
-            }
-#endif
+            else
+                throw new ArgumentException(message, name);
+#else
             throw new ArgumentException(message, name);
+#endif
         }
 
         public static void ArgumentInRange(int value, int minValue, string name)
@@ -64,11 +67,12 @@ namespace GitHub.Extensions
                 minValue);
 #if DEBUG
             if (!InUnitTestRunner())
-            {
                 Debug.Fail(message);
-            }
-#endif
+            else
+                throw new ArgumentOutOfRangeException(name, message);
+#else
             throw new ArgumentOutOfRangeException(name, message);
+#endif
         }
 
         public static void ArgumentInRange(int value, int minValue, int maxValue, string name)
@@ -82,11 +86,12 @@ namespace GitHub.Extensions
                 maxValue);
 #if DEBUG
             if (!InUnitTestRunner())
-            {
                 Debug.Fail(message);
-            }
-#endif
+            else
+                throw new ArgumentOutOfRangeException(name, message);
+#else
             throw new ArgumentOutOfRangeException(name, message);
+#endif
         }
 
         // Borrowed from Splat.
