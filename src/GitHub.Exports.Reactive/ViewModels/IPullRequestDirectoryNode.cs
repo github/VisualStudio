@@ -5,7 +5,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a directory node in a pull request changes tree.
     /// </summary>
-    public interface IPullRequestDirectoryViewModel : IPullRequestChangeNode
+    public interface IPullRequestDirectoryNode : IPullRequestChangeNode
     {
         /// <summary>
         /// Gets the name of the directory without path information.

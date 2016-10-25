@@ -14,7 +14,8 @@ using System.Globalization;
 using System.Reactive;
 using System.Collections.Generic;
 using LibGit2Sharp;
-using PullRequest =  Octokit.PullRequest;
+using PullRequest = Octokit.PullRequest;
+using System.Diagnostics;
 
 namespace GitHub.Services
 {
@@ -147,7 +148,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest)
+        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             return Observable.Defer(() =>
             {
@@ -157,40 +158,44 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, PullRequest pullRequest)
+        public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            var sourceUrl = new UriString(pullRequest.Head.Repository.CloneUrl);
-            return sourceUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+            return pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest)
+        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).First();
+                var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                await gitClient.Fetch(repo, "origin");
+                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
 
-                var branch = repo.Branches[branchName];
-
-                if (branch == null)
+                if (branchName != null)
                 {
-                    var trackedBranchName = $"refs/remotes/origin/" + branchName;
-                    var trackedBranch = repo.Branches[trackedBranchName];
+                    await gitClient.Fetch(repo, "origin");
 
-                    if (trackedBranch != null)
+                    var branch = repo.Branches[branchName];
+
+                    if (branch == null)
                     {
-                        branch = repo.CreateBranch(branchName, trackedBranch.Tip);
-                        await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                        var trackedBranchName = $"refs/remotes/origin/" + branchName;
+                        var trackedBranch = repo.Branches[trackedBranchName];
+
+                        if (trackedBranch != null)
+                        {
+                            branch = repo.CreateBranch(branchName, trackedBranch.Tip);
+                            await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
+                        }
                     }
-                    else
-                    {
-                        throw new InvalidOperationException($"Could not find branch '{trackedBranchName}'.");
-                    }
+
+                    await gitClient.Checkout(repo, branchName);
                 }
-
-                await gitClient.Checkout(repo, branchName);
 
                 return Observable.Empty<Unit>();
             });
@@ -218,7 +223,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, PullRequest pullRequest, string fileName)
+        public IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName)
         {
             return Observable.Defer(async () =>
             {
@@ -242,7 +247,7 @@ namespace GitHub.Services
         IEnumerable<string> GetLocalBranchesInternal(
             ILocalRepositoryModel localRepository,
             IRepository repository,
-            PullRequest pullRequest)
+            IPullRequestModel pullRequest)
         {
             if (!IsPullRequestFromFork(localRepository, pullRequest))
             {
@@ -279,7 +284,7 @@ namespace GitHub.Services
             return ret;
         }
 
-        void EnsurePullRefSpecExists(IRepository repo)
+        static void EnsurePullRefSpecExists(IRepository repo)
         {
             var spec = "+refs/pull/*/head:refs/remotes/origin/pr/*";
             var origin = repo.Network.Remotes["origin"];

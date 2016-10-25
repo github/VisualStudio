@@ -150,21 +150,17 @@ public class PullRequestServiceTests : TestBaseClass
             Assert.Equal("pr/1-foo", result.Name);
         }
 
-        static PullRequest CreatePullRequest()
+        static IPullRequestModel CreatePullRequest()
         {
-            var uri = new Uri("http://github.com/foo/bar.git");
-            var repository = CreateRepository("foo", "bar");
-            var user = CreateUserAndScopes("foo").User;
+            var author = Substitute.For<IAccount>();
 
-            return new PullRequest(
-                uri, uri, uri, uri, uri, uri,
-                1, ItemState.Open, "PR 1", string.Empty,
-                DateTimeOffset.Now, DateTimeOffset.Now, null, null,
-                new GitReference(string.Empty, "foo:bar", "source", string.Empty, user, repository),
-                new GitReference(string.Empty, "foo:baz", "dest", string.Empty, user, repository),
-                user, user,
-                true, null,
-                0, 0, 0, 0, 0, 0, null, false);
+            return new PullRequestModel(1, "PR 1", author, DateTimeOffset.Now)
+            {
+                State = PullRequestStateEnum.Open,
+                Body = string.Empty,
+                Head = new GitReferenceModel("source", "foo:baz", "sha", "https://github.com/foo/bar.git"),
+                Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
+            };
         }
 
         static IGitService MockGitService(IRepository repository = null)

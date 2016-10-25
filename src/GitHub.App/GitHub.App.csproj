@@ -127,6 +127,7 @@
     <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
+    <Compile Include="Models\PullRequestFileModel.cs" />
     <Compile Include="Models\PullRequestModel.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -205,8 +206,8 @@
     <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
-    <Compile Include="ViewModels\PullRequestDirectoryViewModel.cs" />
-    <Compile Include="ViewModels\PullRequestFileViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestDirectoryNode.cs" />
+    <Compile Include="ViewModels\PullRequestFileNode.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />

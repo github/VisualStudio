@@ -49,7 +49,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="pullRequest">The octokit pull request details.</param>
         /// <returns></returns>
-        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequest pullRequest);
+        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
         /// Determines whether the specified pull request is from a fork.
@@ -57,7 +57,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The octokit pull request details.</param>
         /// <returns></returns>
-        bool IsPullRequestFromFork(ILocalRepositoryModel repository, PullRequest pullRequest);
+        bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
         /// Switches to an existing branch for the specified pull request.
@@ -65,7 +65,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The octokit pull request details.</param>
         /// <returns></returns>
-        IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequest pullRequest);
+        IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
         /// Gets the history divergence between the current HEAD and the specified pull request.
@@ -98,7 +98,7 @@ namespace GitHub.Services
         /// <param name="pullRequest">The octokit pull request details.</param>
         /// <param name="fileName">The filename relative to the repository root.</param>
         /// <returns>The filenames of the left and right files for the diff.</returns>
-        IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, PullRequest pullRequest, string fileName);
+        IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }

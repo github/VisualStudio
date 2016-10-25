@@ -7,18 +7,18 @@ namespace GitHub.ViewModels
     /// <summary>
     /// A directory node in a pull request changes tree.
     /// </summary>
-    public class PullRequestDirectoryViewModel : IPullRequestDirectoryViewModel
+    public class PullRequestDirectoryNode : IPullRequestDirectoryNode
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PullRequestDirectoryViewModel"/> class.
+        /// Initializes a new instance of the <see cref="PullRequestDirectoryNode"/> class.
         /// </summary>
         /// <param name="path">The path to the directory, relative to the repository.</param>
-        public PullRequestDirectoryViewModel(string path)
+        public PullRequestDirectoryNode(string fullPath)
         {
-            DirectoryName = System.IO.Path.GetFileName(path);
-            Path = path;
-            Directories = new List<IPullRequestDirectoryViewModel>();
-            Files = new List<IPullRequestFileViewModel>();
+            DirectoryName = System.IO.Path.GetFileName(fullPath);
+            Path = fullPath;
+            Directories = new List<IPullRequestDirectoryNode>();
+            Files = new List<IPullRequestFileNode>();
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the directory children of the node.
         /// </summary>
-        public IList<IPullRequestDirectoryViewModel> Directories { get; }
+        public IList<IPullRequestDirectoryNode> Directories { get; }
 
         /// <summary>
         /// Gets the file children of the node.
         /// </summary>
-        public IList<IPullRequestFileViewModel> Files { get; }
+        public IList<IPullRequestFileNode> Files { get; }
 
         /// <summary>
         /// Gets the children of the directory.

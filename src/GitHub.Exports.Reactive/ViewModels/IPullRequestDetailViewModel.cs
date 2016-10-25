@@ -9,7 +9,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Describes how changed files are displayed in a the pull request details view.
     /// </summary>
-    public enum ChangedFilesView
+    public enum ChangedFilesViewType
     {
         /// <summary>
         /// The files are displayed as a tree.
@@ -82,9 +82,9 @@ namespace GitHub.ViewModels
     public interface IPullRequestDetailViewModel : IViewModel, IHasBusy
     {
         /// <summary>
-        /// Gets the state of the pull request, e.g. Open, Closed, Merged.
+        /// Gets the underlying pull request model.
         /// </summary>
-        PullRequestState State { get; }
+        IPullRequestModel Model { get; }
 
         /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
@@ -97,39 +97,14 @@ namespace GitHub.ViewModels
         string TargetBranchDisplayName { get; }
 
         /// <summary>
-        /// Gets the number of commits in the pull request.
-        /// </summary>
-        int CommitCount { get; }
-
-        /// <summary>
-        /// Gets the pull request number.
-        /// </summary>
-        int Number { get; }
-
-        /// <summary>
-        /// Gets the account that submitted the pull request.
-        /// </summary>
-        IAccount Author { get; }
-
-        /// <summary>
-        /// Gets the date and time at which the pull request was created.
-        /// </summary>
-        DateTimeOffset CreatedAt { get; }
-
-        /// <summary>
         /// Gets the pull request body.
         /// </summary>
         string Body { get; }
 
         /// <summary>
-        /// Gets the number of files that have been changed in the pull request.
-        /// </summary>
-        int ChangedFilesCount { get; }
-
-        /// <summary>
         /// Gets or sets a value describing how changed files are displayed in a view.
         /// </summary>
-        ChangedFilesView ChangedFilesView { get; set; }
+        ChangedFilesViewType ChangedFilesViewType { get; set; }
 
         /// <summary>
         /// Gets or sets a value describing how files are opened when double clicked.
@@ -144,7 +119,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the changed files as a flat list.
         /// </summary>
-        IReactiveList<IPullRequestFileViewModel> ChangedFilesList { get; }
+        IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
 
         /// <summary>
         /// Gets the checkout mode for the pull request.
@@ -178,7 +153,7 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> OpenOnGitHub { get; }
 
         /// <summary>
-        /// Gets a command that toggles the <see cref="ChangedFilesView"/> property.
+        /// Gets a command that toggles the <see cref="ChangedFilesViewType"/> property.
         /// </summary>
         ReactiveCommand<object> ToggleChangedFilesView { get; }
 
@@ -188,12 +163,12 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         /// <summary>
-        /// Gets a command that opens a <see cref="IPullRequestFileViewModel"/>.
+        /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         ReactiveCommand<object> OpenFile { get; }
 
         /// <summary>
-        /// Gets a command that diffs a <see cref="IPullRequestFileViewModel"/>.
+        /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
 
@@ -202,13 +177,13 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="node">The file or directory node.</param>
         /// <returns>The path to the extracted file.</returns>
-        Task<string> ExtractFile(IPullRequestFileViewModel node);
+        Task<string> ExtractFile(IPullRequestChangeNode node);
 
         /// <summary>
         /// Gets the before and after files needed for viewing a diff.
         /// </summary>
         /// <param name="file">The changed file.</param>
         /// <returns>A tuple containing the full path to the before and after files.</returns>
-        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileViewModel file);
+        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestChangeNode file);
     }
 }

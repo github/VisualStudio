@@ -44,8 +44,8 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
-                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileViewModel)x).Forget()));
-                d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileViewModel)x).Forget()));
+                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x).Forget()));
+                d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x).Forget()));
             });
 
             OpenChangesOptionsMenu = ReactiveCommand.Create();
@@ -102,21 +102,24 @@ namespace GitHub.VisualStudio.UI.Views
         {
             var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
             var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
-            var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Number);
+            var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);
         }
 
         void DoOpenChangesOptionsMenu(dynamic o)
         {
             var menu = changesSection.ContextMenu;
+            var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero);
+            var scaleX = g.DpiX / 96.0;
+            var scaleY = g.DpiY / 96.0;
             menu.DataContext = DataContext;
             menu.Placement = PlacementMode.Absolute;
-            menu.HorizontalOffset = o.MenuX;
-            menu.VerticalOffset = o.MenuY;
+            menu.HorizontalOffset = o.MenuX / scaleX;
+            menu.VerticalOffset = o.MenuY / scaleY;
             menu.IsOpen = true;
         }
 
-        async Task DoOpenFile(IPullRequestFileViewModel file)
+        async Task DoOpenFile(IPullRequestFileNode file)
         {
             var fileName = await ViewModel.ExtractFile(file);
             var window = Services.Dte.ItemOperations.OpenFile(fileName);
@@ -126,11 +129,11 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "file")]
-        async Task DoDiffFile(IPullRequestFileViewModel file)
+        async Task DoDiffFile(IPullRequestFileNode file)
         {
             var fileNames = await ViewModel.ExtractDiffFiles(file);
             var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-            var rightLabel = $"{file.FileName};PR {ViewModel.Number}";
+            var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
 
             Services.DifferenceService.OpenComparisonWindow2(
                 fileNames.Item1,
@@ -148,7 +151,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileViewModel;
+            var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
 
             if (file != null)
             {
