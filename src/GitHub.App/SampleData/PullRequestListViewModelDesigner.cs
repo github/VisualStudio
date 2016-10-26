@@ -20,16 +20,26 @@ namespace GitHub.SampleData
             var prs = new TrackingCollection<IPullRequestModel>(Observable.Empty<IPullRequestModel>());
             prs.Add(new PullRequestModel(399, "Let's try doing this differently",
                 new AccountDesigner { Login = "shana", IsUser = true },
-                new AccountDesigner { Login = "shana", IsUser = true },
-                DateTimeOffset.Now - TimeSpan.FromDays(1)));
+                DateTimeOffset.Now - TimeSpan.FromDays(1))
+            {
+                Assignee = new AccountDesigner { Login = "shana", IsUser = true },
+            });
             prs.Add(new PullRequestModel(389, "Build system upgrade",
-                new AccountDesigner { Login = "haacked", IsUser = true },
                 new AccountDesigner { Login = "shana", IsUser = true },
-                DateTimeOffset.Now - TimeSpan.FromMinutes(2)) { CommentCount = 4, HasNewComments = false });
+                DateTimeOffset.Now - TimeSpan.FromMinutes(2))
+            {
+                CommentCount = 4,
+                HasNewComments = false,
+                Assignee = new AccountDesigner { Login = "haacked", IsUser = true },
+            });
             prs.Add(new PullRequestModel(409, "Fix publish button style and a really, really long name for this thing... OMG look how long this name is yusssss",
-                new AccountDesigner { Login = "shana", IsUser = true },
-                new AccountDesigner { Login = "Haacked", IsUser = true },
-                DateTimeOffset.Now - TimeSpan.FromHours(5)) { CommentCount = 27, HasNewComments = true });
+                new AccountDesigner { Login = "shana", IsUser = true },                
+                DateTimeOffset.Now - TimeSpan.FromHours(5))
+            {
+                CommentCount = 27,
+                HasNewComments = true,
+                Assignee = new AccountDesigner { Login = "Haacked", IsUser = true },
+            });
             PullRequests = prs;
 
             States = new List<PullRequestState> {

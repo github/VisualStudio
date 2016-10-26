@@ -90,7 +90,7 @@
 
   </UserControl.Resources>
 
-  <DockPanel Margin="6,0,6,0">
+  <DockPanel Margin="6,6,6,0">
 
     <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
       <Grid.ColumnDefinitions>

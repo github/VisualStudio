@@ -28,14 +28,17 @@ namespace GitHub.VisualStudio.UI.Views
 
             OpenPR = new RelayCommand(x =>
             {
+                NotifyOpen(new ViewWithData { Data = x });
+            });
+
+            OpenPROnGitHub = new RelayCommand(x =>
+            {
                 var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
                 var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
                 var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + x);
                 browser.OpenUrl(url);
-
-                // Replace with this when we're ready to hook up the detail view
-                //NotifyOpen(x);
             });
+
             CreatePR = new RelayCommand(x => NotifyCreate());
 
             this.WhenActivated(d =>
@@ -46,11 +49,12 @@ namespace GitHub.VisualStudio.UI.Views
         public IObservable<ViewWithData> Open { get { return open; } }
         public IObservable<ViewWithData> Create { get { return create; } }
         public ICommand OpenPR { get; set; }
+        public ICommand OpenPROnGitHub { get; set; }
         public ICommand CreatePR { get; set; }
+
         protected void NotifyOpen(ViewWithData id)
         {
             open.OnNext(id);
-            open.OnCompleted();
         }
 
         protected void NotifyCreate()
