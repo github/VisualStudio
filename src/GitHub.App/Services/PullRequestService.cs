@@ -160,7 +160,7 @@ namespace GitHub.Services
 
         public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            return pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+            return pullRequest.Head.RepositoryCloneUrl?.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)

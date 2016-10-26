@@ -492,7 +492,7 @@ namespace GitHub.Services
                     Label = pr.Head.Label,
                     Ref = pr.Head.Ref,
                     Sha = pr.Head.Sha,
-                    RepositoryCloneUrl = pr.Head.Repository.CloneUrl
+                    RepositoryCloneUrl = pr.Head.Repository?.CloneUrl
                 } : null;
                 CommentCount = pr.Comments + pr.ReviewComments;
                 CommitCount = pr.Commits;

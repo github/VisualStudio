@@ -14,8 +14,7 @@ namespace GitHub.Models
         {
             Guard.ArgumentNotEmptyString(@ref, nameof(@ref));
             Guard.ArgumentNotEmptyString(label, nameof(label));
-            Guard.ArgumentNotNull(repositoryCloneUri, nameof(repositoryCloneUri));
-            Guard.ArgumentNotEmptyString(repositoryCloneUri.ToString(), nameof(repositoryCloneUri));
+            Guard.ArgumentNotEmptyString(sha, nameof(sha));
 
             Ref = @ref;
             Label = label;
