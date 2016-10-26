@@ -182,7 +182,17 @@ namespace GitHub.Services
             timer.Start();
         }
 
-        async void TimerTick(object sender, EventArgs e)
+        void TimerTick(object sender, EventArgs e)
+        {
+            TimerTick()
+                .Catch(ex =>
+                {
+                    //log.Warn("Failed submitting usage data", ex);
+                })
+                .Forget();
+        }
+
+        async Task TimerTick()
         {
             Debug.Assert(client != null, "TimerTick should not be triggered when there is no IMetricsService");
 
@@ -204,30 +214,23 @@ namespace GitHub.Services
             if (!userSettings.CollectMetrics)
                 return;
 
-            try
-            {
-                // Every time we increment the launch count we increment both daily and weekly
-                // launch count but we only submit (and clear) the weekly launch count when we've
-                // transitioned into a new week. We've defined a week by the ISO8601 definition,
-                // i.e. week starting on Monday and ending on Sunday.
-                var usage = LoadUsage();
-                var lastDate = usage.LastUpdated;
-                var currentDate = DateTimeOffset.Now;
-                var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
-                var includeMonthly = lastDate.Month != currentDate.Month;
+            // Every time we increment the launch count we increment both daily and weekly
+            // launch count but we only submit (and clear) the weekly launch count when we've
+            // transitioned into a new week. We've defined a week by the ISO8601 definition,
+            // i.e. week starting on Monday and ending on Sunday.
+            var usage = LoadUsage();
+            var lastDate = usage.LastUpdated;
+            var currentDate = DateTimeOffset.Now;
+            var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
+            var includeMonthly = lastDate.Month != currentDate.Month;
 
-                // Only send stats once a day.
-                if (lastDate.Date != currentDate.Date)
-                {
-                    await SendUsage(usage.Model, includeWeekly, includeMonthly);
-                    ClearCounters(usage.Model, includeWeekly, includeMonthly);
-                    usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
-                    SaveUsage(usage);
-                }
-            }
-            catch //(Exception ex)
+            // Only send stats once a day.
+            if (lastDate.Date != currentDate.Date)
             {
-                //log.Warn("Failed submitting usage data", ex);
+                await SendUsage(usage.Model, includeWeekly, includeMonthly);
+                ClearCounters(usage.Model, includeWeekly, includeMonthly);
+                usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
+                SaveUsage(usage);
             }
         }
 

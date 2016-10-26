@@ -225,7 +225,7 @@ namespace GitHub.VisualStudio.UI.Views
                     break;
             }
             
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
             disposables.Add(uiflow);

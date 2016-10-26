@@ -1,23 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using GitHub.Services;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 
 namespace GitHub.VisualStudio.Menus
 {
-    [Export(typeof(IMenuProvider))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class MenuProvider : IMenuProvider
     {
         public IReadOnlyCollection<IMenuHandler> Menus { get; }
 
         public IReadOnlyCollection<IDynamicMenuHandler> DynamicMenus { get; }
 
-        [ImportingConstructor]
-        public MenuProvider([ImportMany] IEnumerable<IMenuHandler> menus, [ImportMany] IEnumerable<IDynamicMenuHandler> dynamicMenus)
+        public MenuProvider(IUIProvider serviceProvider)
         {
-            Menus = new ReadOnlyCollection<IMenuHandler>(menus.ToList());
-            DynamicMenus = new ReadOnlyCollection<IDynamicMenuHandler>(dynamicMenus.ToList());
+            Menus = new List<IMenuHandler>
+            {
+                new AddConnection(serviceProvider),
+                new OpenPullRequests(),
+                new ShowGitHubPane()
+            };
+
+            DynamicMenus = new List<IDynamicMenuHandler>
+            {
+                new CopyLink(serviceProvider),
+                new CreateGist(serviceProvider),
+                new OpenLink(serviceProvider)
+            };
         }
     }
 }

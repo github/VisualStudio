@@ -1,27 +1,17 @@
-﻿using Microsoft.VisualStudio.Shell;
-using System;
-using System.ComponentModel.Composition;
-using System.Windows;
-using GitHub.Extensions;
-using GitHub.Services;
+﻿using GitHub.Services;
 using GitHub.VisualStudio.UI;
 using NullGuard;
-using GitHub.Api;
+using System;
+using System.Windows;
 
 namespace GitHub.VisualStudio.Menus
 {
-    [Export(typeof(IDynamicMenuHandler))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class CopyLink : LinkMenuBase, IDynamicMenuHandler
     {
-        readonly IUsageTracker usageTracker;
 
-        [ImportingConstructor]
-        public CopyLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            IUsageTracker usageTracker, ISimpleApiClientFactory apiFactory)
-            : base(serviceProvider, apiFactory)
+        public CopyLink(IUIProvider serviceProvider)
+            : base(serviceProvider)
         {
-            this.usageTracker = usageTracker;
         }
 
         public Guid Guid => GuidList.guidContextMenuSet;
@@ -39,13 +29,13 @@ namespace GitHub.VisualStudio.Menus
             try
             {
                 Clipboard.SetText(link);
-                var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
+                var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
-                this.usageTracker.IncrementLinkToGitHubCount();
+                UsageTracker.IncrementLinkToGitHubCount();
             }
             catch
             {
-                var ns = ServiceProvider.GetExportedValue<IStatusBarNotificationService>();
+                var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.Error_FailedToCopyToClipboard);
             }
         }

@@ -342,7 +342,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
             notifications.AddListener(teServices);
 
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
             uiProvider.GitServiceProvider = ServiceProvider;
             uiProvider.SetupUI(controllerFlow, SectionConnection);
             uiProvider.ListenToCompletionState()

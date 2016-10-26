@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows.Controls;
 using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
@@ -18,6 +17,10 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NLog;
 using NullGuard;
+using System.Threading;
+using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.VisualStudio
 {
@@ -39,30 +42,7 @@ namespace GitHub.VisualStudio
         readonly Version currentVersion;
         bool initializingLogging = false;
 
-        ExportProvider exportProvider = null;
-        [AllowNull]
-        public ExportProvider ExportProvider
-        {
-            get
-            {
-                if (exportProvider == null)
-                {
-                    var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
-                    Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
-                    if (componentModel == null)
-                    {
-                        log.Error("Service of type SComponentModel not found");
-                    }
-                    exportProvider = componentModel.DefaultExportProvider;
-
-                    if (ExportProvider == null)
-                    {
-                        log.Error("DefaultExportProvider could not be obtained.");
-                    }
-                }
-                return exportProvider;
-            }
-        }
+        public ExportProvider ExportProvider { get; }
 
         CompositionContainer tempContainer;
         CompositionContainer TempContainer
@@ -83,7 +63,7 @@ namespace GitHub.VisualStudio
         [AllowNull]
         public IServiceProvider GitServiceProvider { get; set; }
 
-        bool Initialized { get { return exportProvider != null; } }
+        public bool Initialized { get { return ExportProvider != null; } }
 
         [ImportingConstructor]
         public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
@@ -92,13 +72,39 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
 
             tempParts = new Dictionary<string, OwnedComposablePart>();
+
+            var asyncProvider = serviceProvider as IAsyncServiceProvider;
+            IComponentModel componentModel = null;
+            if (asyncProvider != null)
+            {
+                componentModel = asyncProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            }
+            else
+            {
+                componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+            }
+
+            Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+            if (componentModel == null)
+            {
+                log.Error("Service of type SComponentModel not found");
+            }
+
+            ExportProvider = componentModel.DefaultExportProvider;
+            if (ExportProvider == null)
+            {
+                log.Error("DefaultExportProvider could not be obtained.");
+            }
         }
 
         [return: AllowNull]
         public object TryGetService(Type serviceType)
         {
             if (!Initialized)
+            {
+                log.Error("ExportProvider is not initialized, cannot add service.");
                 return null;
+            }
 
             if (!initializingLogging && log.Factory.Configuration == null)
             {
@@ -118,7 +124,19 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
-            instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
+            instance = TryGetServiceOnMainThread(serviceType, contract);
+            if (instance == null)
+            {
+                // we need to log these things
+            }
+            return instance;
+        }
+
+        async Task<object> TryGetServiceOnMainThread(Type serviceType, string contract)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var instance = AddToDisposables(ExportProvider.GetExportedValues<object>(contract).FirstOrDefault(x => contract.StartsWith("github.", StringComparison.OrdinalIgnoreCase) ? x.GetType().Assembly.GetName().Version == currentVersion : true));
 
             if (instance != null)
                 return instance;
@@ -127,12 +145,9 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
-            if (GitServiceProvider != null)
-            {
-                instance = GitServiceProvider.GetService(serviceType);
-                if (instance != null)
-                    return instance;
-            }
+            instance = GitServiceProvider?.GetService(serviceType);
+            if (instance != null)
+                return instance;
 
             return null;
         }

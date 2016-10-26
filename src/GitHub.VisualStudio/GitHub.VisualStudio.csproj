@@ -11,6 +11,7 @@
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <ApplicationVersion>2.0.15.2</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
+    <GenerateVsixV3>true</GenerateVsixV3>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -276,7 +277,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Base\MenuBase.cs" />
+    <Compile Include="Menus\MenuBase.cs" />
     <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
@@ -659,18 +660,33 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup Condition="$(Buildtype) == 'Internal'">
-    <Content Include="..\..\submodules\externalpackages\StartPage\build\GitHub.StartPage.pkgdef">
-      <Link>GitHub.StartPage.pkgdef</Link>
+    <Content Include="..\..\submodules\externalpackages\StartPage\preview4\build\GitHub.StartPage.Preview4.pkgdef">
+      <Link>GitHub.StartPage.Preview4.pkgdef</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\submodules\externalpackages\StartPage\build\GitHub.StartPage.dll">
-      <Link>GitHub.StartPage.dll</Link>
+    <Content Include="..\..\submodules\externalpackages\StartPage\preview4\build\GitHub.StartPage.Preview4.dll">
+      <Link>GitHub.StartPage.Preview4.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\submodules\externalpackages\StartPage\build\GitHub.StartPage.pdb">
-      <Link>GitHub.StartPage.pdb</Link>
+    <Content Include="..\..\submodules\externalpackages\StartPage\preview4\build\GitHub.StartPage.Preview4.pdb">
+      <Link>GitHub.StartPage.Preview4.pdb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.pkgdef">
+      <Link>GitHub.StartPage.Preview5.pkgdef</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.dll">
+      <Link>GitHub.StartPage.Preview5.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.pdb">
+      <Link>GitHub.StartPage.Preview5.pdb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

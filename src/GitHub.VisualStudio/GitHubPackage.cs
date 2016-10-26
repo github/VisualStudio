@@ -10,15 +10,17 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Octokit;
 using GitHub.Helpers;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Threading;
-using tasks = System.Threading.Tasks;
+using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
+using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.ComponentModelHost;
+using GitHub.VisualStudio.Menus;
 
 namespace GitHub.VisualStudio
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -29,6 +31,7 @@ namespace GitHub.VisualStudio
     public class GitHubPackage : AsyncPackage
     {
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
 
         static GitHubPackage()
@@ -46,10 +49,12 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
         }
 
-        protected override async tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            var usageTracker = await GetServiceAsync(typeof(IUsageTracker)) as IUsageTracker;
-            await tasks.Task.Run(() => usageTracker.IncrementLaunchCount());
+            await base.InitializeAsync(cancellationToken, progress);
+
+            //var usageTracker = await GetServiceAsync(typeof(IUsageTracker)) as IUsageTracker;
+            //usageTracker.IncrementLaunchCount();
             var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -59,8 +64,6 @@ namespace GitHub.VisualStudio
 
             foreach (var menu in menus.DynamicMenus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
-
-            await base.InitializeAsync(cancellationToken, progress);
         }
 
     }
@@ -75,10 +78,32 @@ namespace GitHub.VisualStudio
         }
     }
 
+    //[NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
+    //[PackageRegistration(UseManagedResourcesOnly = true)]
+    //[ProvideAutoLoad(MenuLoadingContextId)]
+    //[ProvideUIContextRule(MenuLoadingContextId, 
+    //    name: "GitHub context menus",
+    //    expression: "FileOpen",
+    //    termNames: new[] { "FileOpen" },
+    //    termValues: new[] { "ActiveEditorContentType:CSharp" }
+    //)]
+    //[Guid(MenuRegistrationPackageId)]
+    //public sealed class MenuRegistrationPackage : Package
+    //{
+    //    const string MenuRegistrationPackageId = "E37D3B17-2255-4144-9802-349530796693";
+    //    const string MenuLoadingContextId = "F2CC8C27-AF24-4BA6-80BC-4819A0E8844F";
+
+    //    protected override void Initialize()
+    //    {
+    //        base.Initialize();
+
+
+    //    }
+    //}
+
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
     [ProvideAutoLoad(UIContextGuids.SolutionExists)]
@@ -87,6 +112,7 @@ namespace GitHub.VisualStudio
     {
         const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
+        const string StartPagePreview5PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
 
         Version vsversion;
         Version VSVersion
@@ -113,33 +139,57 @@ namespace GitHub.VisualStudio
             }
         }
 
-        protected override async tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             AddService(typeof(IUIProvider), CreateService, true);
-            AddService(typeof(IMenuProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
+            AddService(typeof(IMenuProvider), CreateService, true);
 
-            // Load the start page package only for Dev15 Preview 4
-            if (VSVersion.Major == 15 && VSVersion.Build == 25618)
+            if (VSVersion.Major == 15)
             {
-                var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
-                IVsPackage startPagePackage;
-                if (ErrorHandler.Failed(shell?.LoadPackage(new Guid(StartPagePreview4PackageId), out startPagePackage) ?? -1))
+                // Load the start page package only for Dev15 Preview 4
+                if (VSVersion.Build == 25618)
                 {
-                    // ¯\_(ツ)_/¯
+                    var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
+                    IVsPackage startPagePackage;
+                    if (ErrorHandler.Failed(shell?.LoadPackage(new Guid(StartPagePreview4PackageId), out startPagePackage) ?? -1))
+                    {
+                        // ¯\_(ツ)_/¯
+                    }
+                }
+                // Load the start page package only for Dev15 Preview 5
+                else if (VSVersion.Build == 25807)
+                {
+                    var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
+                    IVsPackage startPagePackage;
+                    if (ErrorHandler.Failed(shell?.LoadPackage(new Guid(StartPagePreview5PackageId), out startPagePackage) ?? -1))
+                    {
+                        // ¯\_(ツ)_/¯
+                    }
                 }
             }
         }
 
-        async tasks.Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
+        async Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
         {
             if (serviceType == null)
                 return null;
-            string contract = AttributedModelServices.GetContractName(serviceType);
-            var cm = await GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
-            if (cm == null)
-                return null;
-            return await tasks.Task.Run(() => cm.DefaultExportProvider.GetExportedValueOrDefault<object>(contract));
+
+            if (serviceType == typeof(IUIProvider))
+            {
+                return new UIProvider(this);
+            }
+            else if (serviceType == typeof(IMenuProvider))
+            {
+                var sp = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
+                return new MenuProvider(sp);
+            }
+            // go the mef route
+            else
+            {
+                var sp = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
+                return sp.TryGetService(serviceType);
+            }
         }
     }
 }
