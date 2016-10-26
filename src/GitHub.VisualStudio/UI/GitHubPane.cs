@@ -44,14 +44,12 @@ namespace GitHub.VisualStudio.UI
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
-
-            // Set the image that will appear on the tab of the window frame
-            // when docked with an other window
-            // The resource ID correspond to the one defined in the resx file
-            // while the Index is the offset in the bitmap strip. Each image in
-            // the strip being 16x16.
-            BitmapResourceID = 301;
-            BitmapIndex = 1;
+            
+            BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
+            {
+                Guid = GuidList.guidImageMoniker,
+                Id = 1
+            };
             ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
 
