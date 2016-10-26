@@ -128,7 +128,6 @@ namespace GitHub.VisualStudio.UI.Views
             window.Document.ReadOnly = fileName != file.Path;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "file")]
         async Task DoDiffFile(IPullRequestFileNode file)
         {
             var fileNames = await ViewModel.ExtractDiffFiles(file);
@@ -149,7 +148,7 @@ namespace GitHub.VisualStudio.UI.Views
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
         }
 
-        private void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
 
@@ -167,7 +166,7 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        private void FileListMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        void FileListMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var item = (e.OriginalSource as Visual)?.GetSelfAndVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
             

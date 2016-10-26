@@ -218,7 +218,7 @@ namespace GitHub.Services
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
-                var result= await gitClient.ExtractFile(repo, commitSha, fileName);
+                var result = await gitClient.ExtractFile(repo, commitSha, fileName);
                 return Observable.Return(result);
             });
         }
