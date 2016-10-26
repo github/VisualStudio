@@ -451,7 +451,8 @@
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ChangeType}" Value="Removed">
+                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                <Setter Property="Foreground" Value="Red"/>
                                                                 <Setter Property="TextDecorations" Value="Strikethrough"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
