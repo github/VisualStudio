@@ -16,7 +16,7 @@ namespace GitHub.ViewModels
         public PullRequestFileNode(string path, PullRequestFileStatus status)
         {
             FileName = System.IO.Path.GetFileName(path);
-            Path = path;
+            Path = System.IO.Path.GetDirectoryName(path);
             Status = status;
         }
 
@@ -26,7 +26,7 @@ namespace GitHub.ViewModels
         public string FileName { get; }
 
         /// <summary>
-        /// Gets the path to the file, relative to the root of the repository.
+        /// Gets the path to the file (not including the filename), relative to the root of the repository.
         /// </summary>
         public string Path { get; }
 

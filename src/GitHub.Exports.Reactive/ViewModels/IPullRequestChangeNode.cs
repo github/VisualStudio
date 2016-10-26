@@ -8,7 +8,8 @@ namespace GitHub.ViewModels
     public interface IPullRequestChangeNode
     {
         /// <summary>
-        /// Gets the path to the file or directory, relative to the root of the repository.
+        /// Gets the path to the file (not including the filename) or directory, relative to the
+        /// root of the repository.
         /// </summary>
         string Path { get; }
     }

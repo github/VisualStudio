@@ -175,15 +175,15 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the specified file as it appears in the pull request.
         /// </summary>
-        /// <param name="node">The file or directory node.</param>
+        /// <param name="file">The file or directory node.</param>
         /// <returns>The path to the extracted file.</returns>
-        Task<string> ExtractFile(IPullRequestChangeNode node);
+        Task<string> ExtractFile(IPullRequestFileNode file);
 
         /// <summary>
         /// Gets the before and after files needed for viewing a diff.
         /// </summary>
         /// <param name="file">The changed file.</param>
         /// <returns>A tuple containing the full path to the before and after files.</returns>
-        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestChangeNode file);
+        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
     }
 }
