@@ -322,7 +322,7 @@ namespace GitHub.ViewModels
         /// <returns>The path to the extracted file.</returns>
         public Task<string> ExtractFile(IPullRequestFileNode file)
         {
-            var path = Path.Combine(file.Path, file.FileName);
+            var path = Path.Combine(file.DirectoryPath, file.FileName);
             return pullRequestsService.ExtractFile(repository, model.Head.Sha, path).ToTask();
         }
 
@@ -333,7 +333,7 @@ namespace GitHub.ViewModels
         /// <returns>A tuple containing the full path to the before and after files.</returns>
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
-            var path = Path.Combine(file.Path, file.FileName);
+            var path = Path.Combine(file.DirectoryPath, file.FileName);
             return pullRequestsService.ExtractDiffFiles(repository, model, path).ToTask();
         }
 
@@ -351,7 +351,7 @@ namespace GitHub.ViewModels
 
             foreach (var file in files)
             {
-                var dir = GetDirectory(file.Path, dirs);
+                var dir = GetDirectory(file.DirectoryPath, dirs);
                 dir.Files.Add(file);
             }
 

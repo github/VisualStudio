@@ -51,8 +51,8 @@ namespace UnitTests.GitHub.App.ViewModels
             Assert.Equal(1, dir1.Directories.Count);
             Assert.Equal("f1.cs", dir1.Files[0].FileName);
             Assert.Equal("f2.cs", dir1.Files[1].FileName);
-            Assert.Equal("dir1", dir1.Files[0].Path);
-            Assert.Equal("dir1", dir1.Files[1].Path);
+            Assert.Equal("dir1", dir1.Files[0].DirectoryPath);
+            Assert.Equal("dir1", dir1.Files[1].DirectoryPath);
 
             var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
             Assert.Equal("dir1a", dir1a.DirectoryName);

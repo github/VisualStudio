@@ -125,7 +125,7 @@ namespace GitHub.VisualStudio.UI.Views
             var window = Services.Dte.ItemOperations.OpenFile(fileName);
 
             // If the file we extracted isn't the current file on disk, make the window read-only.
-            window.Document.ReadOnly = fileName != file.Path;
+            window.Document.ReadOnly = fileName != file.DirectoryPath;
         }
 
         async Task DoDiffFile(IPullRequestFileNode file)
@@ -138,7 +138,7 @@ namespace GitHub.VisualStudio.UI.Views
                 fileNames.Item1,
                 fileNames.Item2,
                 $"{leftLabel} vs {rightLabel}",
-                file.Path,
+                file.DirectoryPath,
                 leftLabel,
                 rightLabel,
                 string.Empty,

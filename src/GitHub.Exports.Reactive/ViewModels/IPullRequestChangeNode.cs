@@ -11,6 +11,6 @@ namespace GitHub.ViewModels
         /// Gets the path to the file (not including the filename) or directory, relative to the
         /// root of the repository.
         /// </summary>
-        string Path { get; }
+        string DirectoryPath { get; }
     }
 }

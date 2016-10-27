@@ -16,7 +16,7 @@ namespace GitHub.ViewModels
         public PullRequestDirectoryNode(string fullPath)
         {
             DirectoryName = System.IO.Path.GetFileName(fullPath);
-            Path = fullPath;
+            DirectoryPath = fullPath;
             Directories = new List<IPullRequestDirectoryNode>();
             Files = new List<IPullRequestFileNode>();
         }
@@ -27,9 +27,9 @@ namespace GitHub.ViewModels
         public string DirectoryName { get; }
 
         /// <summary>
-        /// Gets the path to the directory, relative to the root of the repository.
+        /// Gets the full directory path, relative to the root of the repository.
         /// </summary>
-        public string Path { get; }
+        public string DirectoryPath { get; }
 
         /// <summary>
         /// Gets the directory children of the node.
