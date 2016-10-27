@@ -356,7 +356,7 @@ namespace GitHub.Services
 
         private GitReferenceModel Create(GitReferenceCacheItem item)
         {
-            return item != null ? new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl) : null;
+            return new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl);
         }
 
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
