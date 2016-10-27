@@ -337,9 +337,9 @@ namespace GitHub.ViewModels
             return pullRequestsService.ExtractDiffFiles(repository, model, path).ToTask();
         }
 
-        static IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
+        IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
         {
-            return files.Select(x => new PullRequestFileNode(x.FileName, x.Status));
+            return files.Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status));
         }
 
         static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)

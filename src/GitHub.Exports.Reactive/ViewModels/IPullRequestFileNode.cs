@@ -10,6 +10,11 @@ namespace GitHub.ViewModels
         string FileName { get; }
 
         /// <summary>
+        /// Gets the path to display in the "Path" column of the changed files list.
+        /// </summary>
+        string DisplayPath { get; }
+
+        /// <summary>
         /// Gets the type of change that was made to the file.
         /// </summary>
         PullRequestFileStatus Status { get; }

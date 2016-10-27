@@ -529,7 +529,7 @@
                                                 </DataTemplate>
                                             </GridViewColumn.CellTemplate>
                                         </GridViewColumn>
-                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding DirectoryPath}"/>
+                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding DisplayPath}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
