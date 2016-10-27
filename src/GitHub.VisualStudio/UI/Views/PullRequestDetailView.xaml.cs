@@ -176,5 +176,40 @@ namespace GitHub.VisualStudio.UI.Views
                 item.IsSelected = true;
             }
         }
+
+        void ListView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            ApplyContextMenuBinding<ListViewItem>(sender, e);
+        }
+
+        void TreeView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            ApplyContextMenuBinding<TreeViewItem>(sender, e);
+        }
+        
+        void ApplyContextMenuBinding<TItem>(object sender, ContextMenuEventArgs e) where TItem : Control
+        {
+            var container = (Control)sender;
+            var item = (e.OriginalSource as Visual)?.GetSelfAndVisualAncestors().OfType<TItem>().FirstOrDefault();
+
+            e.Handled = true;
+
+            if (item != null)
+            {
+                var fileNode = item.DataContext as IPullRequestFileNode;
+
+                if (fileNode != null)
+                {
+                    container.ContextMenu.DataContext = this.DataContext;
+
+                    foreach (var menuItem in container.ContextMenu.Items.OfType<MenuItem>())
+                    {
+                        menuItem.CommandParameter = fileNode;
+                    }
+
+                    e.Handled = false;
+                }
+            }
+        }
     }
 }

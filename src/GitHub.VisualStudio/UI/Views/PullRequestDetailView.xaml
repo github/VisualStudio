@@ -401,16 +401,18 @@
                     <te:SectionControl.Content>
                         <Grid>
                             <Grid.Resources>
-                                <!-- We have to do contortions to get to the PullRequestDetailViewModel which contains the OpenFile and DiffFile
-                                     commands: the control which hosts the context menu must have the PullRequestDetailViewModel as its tag,
-                                     which is then set as the tag on the ContextMenu which is finally reacable from the MenuItem. -->
-                                <ContextMenu x:Key="FileContextMenu" Tag="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Mode=Self}}">
-                                    <MenuItem Header="Open File" Command="{Binding Tag.OpenFile, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ContextMenu}}}" CommandParameter="{Binding}"/>
-                                    <MenuItem Header="Compare File" Command="{Binding Tag.DiffFile, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ContextMenu}}}" CommandParameter="{Binding}"/>
+                                <!-- When invoked from the TreeView and the ListView we programmatically bind the 
+                                     DataContext and update the CommandParameter to the changed file -->
+                                <ContextMenu x:Key="FileContextMenu">
+                                    <MenuItem Header="Open File" Command="{Binding OpenFile }"/>
+                                    <MenuItem Header="Compare File" Command="{Binding DiffFile }"/>
                                 </ContextMenu>
                             </Grid.Resources>
+                            
                             <!-- Tree View -->
                             <TreeView ItemsSource="{Binding ChangedFilesTree}"
+                                      ContextMenuOpening="TreeView_ContextMenuOpening"
+                                      ContextMenu="{StaticResource FileContextMenu}"
                                       Background="Transparent"
                                       BorderThickness="0"
                                       Margin="0 6 0 0"
@@ -441,7 +443,6 @@
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
-                                                    ContextMenu="{StaticResource FileContextMenu}"
                                                     Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
                                             <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
                                             <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
@@ -476,7 +477,9 @@
                             <ListView ItemsSource="{Binding ChangedFilesList}"
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      Margin="0 6 0 0"
+                                      Margin="0 6 0 0"                                      
+                                      ContextMenuOpening="ListView_ContextMenuOpening"
+                                      ContextMenu="{StaticResource FileContextMenu}"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <ListView.Style>
                                     <Style TargetType="ListView">
@@ -497,9 +500,7 @@
                                         <GridViewColumn Header="Name" Width="Auto">
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                ContextMenu="{StaticResource FileContextMenu}"
-                                                                Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
+                                                    <StackPanel Orientation="Horizontal">
                                                         <ui:OcticonImage Icon="file_code" Margin="0 0 4 0"/>
                                                         <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
                                                             <TextBlock.Style>
