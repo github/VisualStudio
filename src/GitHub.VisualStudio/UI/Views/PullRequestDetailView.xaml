@@ -11,6 +11,7 @@
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                                     xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                    Foreground="{DynamicResource GitHubVsWindowText}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
                                     d:DesignHeight="780"
@@ -55,6 +56,7 @@
 
             <Style TargetType="GridViewColumnHeader">
                 <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
             </Style>
 

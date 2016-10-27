@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -78,17 +79,24 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(commandType));
 
+                var iconDrawing = new GeometryDrawing
+                {
+                    Geometry = OcticonPath.GetGeometryForIcon(Octicon.three_bars),
+                };
+
+                // I can't find a way to bind a DynamicResource to GeometryDrawing.Path, so bind the brush we
+                // want to this.Foreground and bind GeometryDrawing.Path to that.
+                var brushBinding = new Binding(nameof(Foreground));
+                brushBinding.Source = this;
+                BindingOperations.SetBinding(iconDrawing, GeometryDrawing.BrushProperty, brushBinding);
+
                 var command = commandCtor.Invoke(new object[]
                 {
                     OpenChangesOptionsMenu,
                     "Options",
                     new DrawingBrush
                     {                        
-                        Drawing = new GeometryDrawing
-                        {
-                            Brush = (Brush)FindResource("GitHubVsWindowText"),
-                            Geometry = OcticonPath.GetGeometryForIcon(Octicon.three_bars),
-                        },                        
+                        Drawing = iconDrawing,                        
                         Viewport = new Rect(0.1, 0.1, 0.8, 0.8),
                     },
                 });
