@@ -145,8 +145,7 @@ namespace GitHub.Extensions
             }
             return s.Substring(0, pos) + newValue + s.Substring(pos + oldValue.Length);
         }
-
-
+        
         public static Int32 ToInt32(this string s)
         {
             Int32 val;
