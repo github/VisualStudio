@@ -487,13 +487,13 @@ namespace GitHub.Services
                     Sha = pr.Base.Sha,
                     RepositoryCloneUrl = pr.Base.Repository.CloneUrl,
                 };
-                Head = pr.Head != null ? new GitReferenceCacheItem
+                Head = new GitReferenceCacheItem
                 {
                     Label = pr.Head.Label,
                     Ref = pr.Head.Ref,
                     Sha = pr.Head.Sha,
                     RepositoryCloneUrl = pr.Head.Repository?.CloneUrl
-                } : null;
+                };
                 CommentCount = pr.Comments + pr.ReviewComments;
                 CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
