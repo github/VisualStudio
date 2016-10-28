@@ -108,6 +108,10 @@ namespace GitHub.ViewModels
 
             pullRequests.OriginalCompleted
                 .ObserveOn(RxApp.MainThreadScheduler)
+                .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex => {
+                    //TODO handle the auth exception here
+                    return Observable.Empty<System.Reactive.Unit>();
+                })
                 .Subscribe(_ =>
                 {
                     if (listSettings.SelectedAuthor != null)
