@@ -111,9 +111,9 @@ namespace GitHub.ViewModels
 
             .OnExecuteCompleted(pr =>
             {
-                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Id,
-                    TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
-            });
+				notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name,
+					TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
+			});
 
             isExecuting = CreatePullRequest.IsExecuting.ToProperty(this, x => x.IsExecuting);
 
