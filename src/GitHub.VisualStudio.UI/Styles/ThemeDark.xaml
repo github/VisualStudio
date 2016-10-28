@@ -19,6 +19,8 @@
   <Color x:Key="GitHubPaneTitleColor">#FFFFFFFF</Color>
   <SolidColorBrush x:Key="GitHubPaneTitleBrush" Color="{StaticResource GitHubPaneTitleColor}" />
 
+  <SolidColorBrush x:Key="GitHubDeletedFileBrush" Color="Red"></SolidColorBrush>
+
   <SolidColorBrush x:Key="GitHubPrimaryGreenBrush" Color="#FF6CC644" />
   <SolidColorBrush x:Key="GitHubPrimaryOrangeBrush" Color="#FFC9510C" />
 
@@ -46,7 +48,7 @@
 
   <SolidColorBrush x:Key="GitHubComboBoxBackgroundBrush" Color="#FF1B1B1C" />
   <SolidColorBrush x:Key="GitHubComboBoxBorderBrush" Color="#FF434346" />
-
+  
   <SolidColorBrush x:Key="GitHubTabItemSelectedBorder" Color="#FF3F3F46" />
 
   <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FF87C3FC" />

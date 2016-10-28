@@ -452,7 +452,7 @@
                                                     <Style TargetType="TextBlock">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}" Value="Removed">
-                                                                <Setter Property="Foreground" Value="Red"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
                                                                 <Setter Property="TextDecorations" Value="Strikethrough"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
