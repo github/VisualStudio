@@ -673,6 +673,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sign in....
+        /// </summary>
+        public static string SignInCallToAction {
+            get {
+                return ResourceManager.GetString("SignInCallToAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign In.
         /// </summary>
         public static string SignInLink {

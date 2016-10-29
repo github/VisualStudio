@@ -28,5 +28,15 @@ namespace GitHub.VisualStudio.UI.Views
                 "ViewModel",
                 typeof(IGitHubHomeSection),
                 typeof(GitHubHomeContent));
+
+        void signIn_Click(object sender, RoutedEventArgs e)
+        {
+            signIn.IsEnabled = false;
+            ViewModel.Login();
+            signIn.IsEnabled = true;
+            // move focus away from sign-in control as its probabaly going to be 
+            // hidden now, prevents ghost focus border remaining after sign-in
+            Focus();
+        }
     }
 }

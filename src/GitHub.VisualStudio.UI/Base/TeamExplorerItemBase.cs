@@ -107,10 +107,10 @@ namespace GitHub.VisualStudio.Base
             var uri = ActiveRepoUri;
             if (uri == null)
                 return RepositoryOrigin.Other;
-
+            
             Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
             SimpleApiClient = apiFactory.Create(uri);
-
+            
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
 
             if (isdotcom)
@@ -134,6 +134,23 @@ namespace GitHub.VisualStudio.Base
         {
             var origin = await GetRepositoryOrigin();
             return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
+        }
+
+        protected bool IsUserAuthenticated()
+        {
+            if (SimpleApiClient == null)
+            {
+                if (ActiveRepo == null)
+                    return false;
+
+                var uri = ActiveRepoUri;
+                if (uri == null)
+                    return false;
+
+                SimpleApiClient = apiFactory.Create(uri);
+            }
+
+            return SimpleApiClient?.IsAuthenticated() ?? false;
         }
 
         bool disposed;

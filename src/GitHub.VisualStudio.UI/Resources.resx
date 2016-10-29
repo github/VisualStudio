@@ -345,4 +345,7 @@
   <data name="SignInLink" xml:space="preserve">
     <value>Sign In</value>
   </data>
+  <data name="SignInCallToAction" xml:space="preserve">
+    <value>Sign in...</value>
+  </data>
 </root>

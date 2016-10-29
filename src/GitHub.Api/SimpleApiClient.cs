@@ -46,6 +46,13 @@ namespace GitHub.Api
                 return repositoryCache;
             return await GetRepositoryInternal();
         }
+        
+        public bool IsAuthenticated()
+        {
+            // this doesn't account for auth revoke on the server but its much faster 
+            // than doing the API hit.
+            return client.Connection.Credentials?.Login != null;
+        }
 
         async Task<Repository> GetRepositoryInternal()
         {
