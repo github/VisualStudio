@@ -235,7 +235,7 @@ public class SimpleApiClientTests
         }
     }
 
-        private static Repository CreateRepository(int id, bool hasWiki)
+    private static Repository CreateRepository(int id, bool hasWiki)
     {
         return new Repository("", "", "", "", "", "", "",
             id, new User(), "", "", "", "", "", false, false, 0, 0, "",
