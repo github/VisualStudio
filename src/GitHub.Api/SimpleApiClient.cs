@@ -51,7 +51,8 @@ namespace GitHub.Api
         {
             // this doesn't account for auth revoke on the server but its much faster 
             // than doing the API hit.
-            return client.Connection.Credentials?.Login != null;
+            var authType = client.Connection.Credentials?.AuthenticationType ?? AuthenticationType.Anonymous;
+            return authType != AuthenticationType.Anonymous;
         }
 
         async Task<Repository> GetRepositoryInternal()
