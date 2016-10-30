@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 {
     [TeamExplorerSection(GitHubHomeSectionId, TeamExplorerPageIds.Home, 10)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection 
+    public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 
