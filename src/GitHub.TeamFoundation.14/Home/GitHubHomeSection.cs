@@ -35,9 +35,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             IsVisible = false;
 
             base.RepoChanged(changed);
-            
+
             IsVisible = await IsAGitHubRepo();
-          
+
             if (IsVisible)
             {
                 RepoName = ActiveRepoName;
