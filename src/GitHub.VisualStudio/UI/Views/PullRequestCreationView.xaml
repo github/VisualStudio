@@ -11,6 +11,8 @@
                                       xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                       xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                       xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                                      xmlns:conv="clr-namespace:GitHub.UI.Converters;assembly=GitHub.UI"
+                                      xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -71,6 +73,8 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <conv:BranchNameConverter x:Key="BranchNameConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -94,10 +98,15 @@
                     <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
                     <ui:LinkDropDown Header="Target Branch"
                                      ItemsSource="{Binding Branches}"
-                                     DisplayMemberPath="DisplayName"
                                      SelectedItem="{Binding TargetBranch}"
                                      ToolTip="Select a branch"
-                                     Margin="0,1,0,0"/>
+                                     Margin="0,1,0,0">
+                        <ui:LinkDropDown.ItemTemplate>
+                            <DataTemplate DataType="models:BranchModel">
+                                <TextBlock Text="{Binding Converter={StaticResource BranchNameConverter}}"></TextBlock>
+                            </DataTemplate>
+                        </ui:LinkDropDown.ItemTemplate>
+                    </ui:LinkDropDown>
                     <ui:OcticonImage Height="13"
                                      Margin="5,2,3,0"
                                      VerticalAlignment="Center"

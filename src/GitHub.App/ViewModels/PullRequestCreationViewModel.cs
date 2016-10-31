@@ -67,11 +67,6 @@ namespace GitHub.ViewModels
                 .Subscribe(r =>
             {
                 TargetBranch = r.IsFork ? r.Parent.DefaultBranch : r.DefaultBranch;
-
-                if (r.IsFork)
-                {
-                    TargetBranch.DisplayName = TargetBranch.DisplayName.ReplaceFirstOccurence("/", ":");
-                }
             });
 
             SourceBranch = activeRepo.CurrentBranch;
@@ -140,7 +135,6 @@ namespace GitHub.ViewModels
                 {
                     b = repositoryHost.ModelService.GetBranches(r.Parent).Select(x =>
                     {
-                        x.DisplayName = x.Id.ReplaceFirstOccurence("/", ":");
                         return x;
                     });
                 }
