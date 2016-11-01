@@ -103,7 +103,14 @@
                                      Margin="0,1,0,0">
                         <ui:LinkDropDown.ItemTemplate>
                             <DataTemplate DataType="models:BranchModel">
-                                <TextBlock Text="{Binding Converter={StaticResource BranchNameConverter}}"></TextBlock>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource BranchNameConverter}">
+                                            <Binding/>
+                                            <Binding Path="ViewModel.GitHubRepository" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestCreationView}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </DataTemplate>
                         </ui:LinkDropDown.ItemTemplate>
                     </ui:LinkDropDown>
