@@ -103,6 +103,7 @@ namespace GitHub.VisualStudio
 
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
@@ -177,7 +178,9 @@ namespace GitHub.VisualStudio
 
             if (serviceType == typeof(IUIProvider))
             {
-                return new UIProvider(this);
+                var result = new UIProvider(this);
+                await result.Initialize();
+                return result;
             }
             else if (serviceType == typeof(IMenuProvider))
             {

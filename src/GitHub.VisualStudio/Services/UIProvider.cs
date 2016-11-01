@@ -42,7 +42,7 @@ namespace GitHub.VisualStudio
         readonly Version currentVersion;
         bool initializingLogging = false;
 
-        public ExportProvider ExportProvider { get; }
+        public ExportProvider ExportProvider { get; private set; }
 
         CompositionContainer tempContainer;
         CompositionContainer TempContainer
@@ -72,12 +72,15 @@ namespace GitHub.VisualStudio
             this.serviceProvider = serviceProvider;
 
             tempParts = new Dictionary<string, OwnedComposablePart>();
+        }
 
+        public async Task Initialize()
+        {
             var asyncProvider = serviceProvider as IAsyncServiceProvider;
             IComponentModel componentModel = null;
             if (asyncProvider != null)
             {
-                componentModel = asyncProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+                componentModel = await asyncProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
             }
             else
             {
