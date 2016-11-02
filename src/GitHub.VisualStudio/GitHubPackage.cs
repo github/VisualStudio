@@ -14,8 +14,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.VisualStudio.Threading;
-using Microsoft.VisualStudio.ComponentModelHost;
 using GitHub.VisualStudio.Menus;
 
 namespace GitHub.VisualStudio
@@ -52,9 +50,15 @@ namespace GitHub.VisualStudio
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await base.InitializeAsync(cancellationToken, progress);
+            await EnsurePackageLoaded(new Guid(ServiceProviderPackage.ServiceProviderPackageId));
 
             //var usageTracker = await GetServiceAsync(typeof(IUsageTracker)) as IUsageTracker;
             //usageTracker.IncrementLaunchCount();
+            InitializeMenus().Forget();
+        }
+
+        async Task InitializeMenus()
+        {
             var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -64,6 +68,16 @@ namespace GitHub.VisualStudio
 
             foreach (var menu in menus.DynamicMenus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, menu.CanShow, () => menu.Activate());
+        }
+
+        async Task EnsurePackageLoaded(Guid packageGuid)
+        {
+            var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
+            if (shell  != null)
+            {
+                IVsPackage vsPackage;
+                ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref packageGuid, out vsPackage));
+            }
         }
 
     }
@@ -111,7 +125,7 @@ namespace GitHub.VisualStudio
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage
     {
-        const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
+        public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
         const string StartPagePreview5PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
 
@@ -178,7 +192,7 @@ namespace GitHub.VisualStudio
 
             if (serviceType == typeof(IUIProvider))
             {
-                var result = new UIProvider(this);
+                var result = new GitHubServiceProvider(this);
                 await result.Initialize();
                 return result;
             }
