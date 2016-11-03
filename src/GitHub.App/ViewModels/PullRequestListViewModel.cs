@@ -117,7 +117,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
                 {
-                    log.Error(ex, "Error Processing PullRequests");
+                    log.Error(ex, "Authorization error listing pull requests");
                     return repositoryHost.LogOut();
                 })
                 .Catch<System.Reactive.Unit, Octokit.NotFoundException>(ex =>
