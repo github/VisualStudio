@@ -28,7 +28,10 @@ namespace GitHub.Infrastructure
 
         static Lazy<Logger> Logger { get; } = new Lazy<Logger>(CreateLogger);
 
+        //Violates CA1004 - Generic methods should provide type parameter
+        #pragma warning disable CA1004
         public static ILogger ForContext<T>() => Logger.Value.ForContext<T>();
+        #pragma warning restore CA1004
 
         public static ILogger ForContext(Type type) => Logger.Value.ForContext(type);
     }
