@@ -6,6 +6,7 @@ using System;
 
 namespace GitHub.VisualStudio.Menus
 {
+    [ExportMenu(MenuType = MenuType.OpenPullRequests)]
     public class OpenPullRequests : MenuBase, IMenuHandler
     {
         public Guid Guid => GuidList.guidGitHubCmdSet;
