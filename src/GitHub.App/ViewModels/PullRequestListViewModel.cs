@@ -10,12 +10,14 @@ using System.Windows.Threading;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
 using NullGuard;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -23,6 +25,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestListViewModel>();
+
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
@@ -113,7 +117,7 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
                 {
-                    // TODO: Do some decent logging here
+                    log.Error(ex, "Error Processing PullRequests");
                     return repositoryHost.LogOut();
                 })
                 .Catch<System.Reactive.Unit, Octokit.NotFoundException>(ex =>
