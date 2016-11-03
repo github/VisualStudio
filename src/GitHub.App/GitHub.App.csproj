@@ -161,7 +161,6 @@
     <Compile Include="Extensions\EnvironmentExtensions.cs" />
     <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Infrastructure\LoggingConfiguration.cs" />
     <Compile Include="Models\PullRequestFileModel.cs" />
     <Compile Include="Infrastructure\LogManager.cs" />
     <Compile Include="Models\PullRequestModel.cs" />
