@@ -154,35 +154,12 @@ namespace GitHub.VisualStudio
             }
         }
 
-        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
-
-            if (VSVersion.Major == 15)
-            {
-                // Load the start page package only for Dev15 Preview 4
-                if (VSVersion.Build == 25618)
-                {
-                    var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
-                    IVsPackage startPagePackage;
-                    if (ErrorHandler.Failed(shell?.LoadPackage(new Guid(StartPagePreview4PackageId), out startPagePackage) ?? -1))
-                    {
-                        // ¯\_(ツ)_/¯
-                    }
-                }
-                // Load the start page package only for Dev15 Preview 5
-                else if (VSVersion.Build == 25807)
-                {
-                    var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
-                    IVsPackage startPagePackage;
-                    if (ErrorHandler.Failed(shell?.LoadPackage(new Guid(StartPagePreview5PackageId), out startPagePackage) ?? -1))
-                    {
-                        // ¯\_(ツ)_/¯
-                    }
-                }
-            }
+            return Task.FromResult<object>(null);
         }
 
         async Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
