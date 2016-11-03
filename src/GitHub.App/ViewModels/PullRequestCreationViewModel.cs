@@ -108,6 +108,7 @@ namespace GitHub.ViewModels
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
                     }))
+                    
             .OnExecuteCompleted(pr =>
             {
                 notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name,
