@@ -62,7 +62,7 @@ namespace GitHub.UI
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-            UpdateLinkText();
+           UpdateLinkText();
         }
 
         private static void HeaderChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -76,7 +76,7 @@ namespace GitHub.UI
             if (SelectedItem != null)
             {
                 var item = SelectedItem;
-
+                
                 // HACK: The correct way to do this is to use a ContentPresenter in the control
                 // template to display the link text and do a:
                 //
@@ -87,9 +87,18 @@ namespace GitHub.UI
                 // will work as long as DisplayMemberPath is just a property name, which is
                 // all we need right now.
                 if (string.IsNullOrWhiteSpace(DisplayMemberPath))
-                {
-                    LinkText = item.ToString();
+                {                   
+                    if (ItemTemplate == null)
+                    {
+                        LinkText = item.ToString();
+                    }
+
+                    else
+                    {
+                        
+                    }
                 }
+
                 else
                 {
                     var property = item.GetType().GetProperty(DisplayMemberPath);
