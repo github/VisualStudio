@@ -136,16 +136,6 @@ namespace GitHub.Extensions
             return s.Substring(1, s.Length - 2);
         }
 
-        public static string ReplaceFirstOccurence(this string s, string oldValue, string newValue)
-        {
-            int pos = s.IndexOf(oldValue, StringComparison.CurrentCulture);
-            if (pos < 0)
-            {
-                return s;
-            }
-            return s.Substring(0, pos) + newValue + s.Substring(pos + oldValue.Length);
-        }
-        
         public static Int32 ToInt32(this string s)
         {
             Int32 val;
