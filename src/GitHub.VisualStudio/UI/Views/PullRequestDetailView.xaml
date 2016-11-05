@@ -446,7 +446,18 @@
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
                                                     Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
-                                            <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
+                                            <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}">
+                                                <ui:OcticonImage.Style>
+                                                    <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
+                                                                <!--<Setter Property="Foreground" Value="Red"/>-->
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:OcticonImage.Style>
+                                            </ui:OcticonImage>
                                             <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">

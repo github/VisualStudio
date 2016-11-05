@@ -19,6 +19,7 @@
   <Color x:Key="GitHubPaneTitleColor">#FFFFFFFF</Color>
   <SolidColorBrush x:Key="GitHubPaneTitleBrush" Color="{StaticResource GitHubPaneTitleColor}" />
 
+  <SolidColorBrush x:Key="GitHubDeletedFileIconBrush" Color="Red"></SolidColorBrush>
   <SolidColorBrush x:Key="GitHubDeletedFileBrush" Color="{DynamicResource VsColor.GrayText}"></SolidColorBrush>
 
   <SolidColorBrush x:Key="GitHubPrimaryGreenBrush" Color="#FF6CC644" />
