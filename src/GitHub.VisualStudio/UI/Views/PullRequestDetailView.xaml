@@ -449,6 +449,7 @@
                                             <ui:OcticonImage Icon="file_code">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
+                                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}" Value="Removed">
                                                                 <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
