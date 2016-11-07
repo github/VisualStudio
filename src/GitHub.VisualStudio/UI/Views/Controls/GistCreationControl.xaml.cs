@@ -45,6 +45,10 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     {
                         var browser = serviceProvider.GetExportedValue<IVisualStudioBrowser>();
                         browser?.OpenUrl(new Uri(gist.HtmlUrl));
+
+                        var ns = serviceProvider.GetExportedValue<IStatusBarNotificationService>();
+                        ns?.ShowMessage(UI.Resources.gistCreatedMessage);
+
                         NotifyDone();
                     });
 

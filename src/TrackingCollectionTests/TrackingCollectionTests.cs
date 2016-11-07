@@ -378,7 +378,7 @@ public class TrackingTests : TestBase
         var total = 1000;
 
         var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 2")).ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),

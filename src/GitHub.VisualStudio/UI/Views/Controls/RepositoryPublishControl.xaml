@@ -24,7 +24,6 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
         
-        <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}"/>
         <Style x:Key="VSStyledCheckBox" BasedOn="{StaticResource VsCheckBoxStyleKey}" TargetType="{x:Type CheckBox}">
             <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}"/>
             <Setter Property="Background" Value="{DynamicResource GitHubVsToolWindowBackground}"/>
@@ -149,7 +148,7 @@
             Margin="0,8,0,0"
             HorizontalAlignment="Left"
             IsDefault="True"
-            Style="{StaticResource VSStyledButton}">
+            Style="{StaticResource GitHubVsButton}">
       <TextBlock Text="{x:Static prop:Resources.publishText}" />
     </Button>
 

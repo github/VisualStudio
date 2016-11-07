@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
@@ -61,13 +62,33 @@ namespace GitHub.Services
             });
         }
 
+        public Task Checkout(IRepository repository, string branchName)
+        {
+            Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
+
+            return Task.Factory.StartNew(() =>
+            {
+                repository.Checkout(branchName);
+            });
+        }
+
+        public Task SetConfig(IRepository repository, string key, string value)
+        {
+            Guard.ArgumentNotEmptyString(key, nameof(key));
+            Guard.ArgumentNotEmptyString(value, nameof(value));
+
+            return Task.Factory.StartNew(() =>
+            {
+                repository.Config.Set(key, value);
+            });
+        }
+
         public Task SetRemote(IRepository repository, string remoteName, Uri url)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Task.Factory.StartNew(() =>
             {
-
                 repository.Config.Set("remote." + remoteName + ".url", url.ToString());
                 repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
             });
@@ -92,11 +113,20 @@ namespace GitHub.Services
             });
         }
 
+        public Task UnsetConfig(IRepository repository, string key)
+        {
+            Guard.ArgumentNotEmptyString(key, nameof(key));
+
+            return Task.Factory.StartNew(() =>
+            {
+                repository.Config.Unset(key);
+            });
+        }
+
         public Task<Remote> GetHttpRemote(IRepository repo, string remote)
         {
             return Task.Factory.StartNew(() =>
             {
-
                 var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
                 var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
                 var ret = repo.Network.Remotes[remoteName];

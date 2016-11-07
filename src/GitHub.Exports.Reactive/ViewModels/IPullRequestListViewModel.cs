@@ -9,6 +9,16 @@ namespace GitHub.ViewModels
 {
     public class PullRequestState
     {
+        public PullRequestState()
+        {
+        }
+
+        public PullRequestState(bool isOpen, string name)
+        {
+            IsOpen = isOpen;
+            Name = name;
+        }
+
         public bool? IsOpen;
         public string Name;
         public override string ToString()

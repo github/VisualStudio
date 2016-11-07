@@ -41,4 +41,5 @@
   <SolidColorBrush x:Key="GitHubVsWindowText" Color="#FF000000" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBorder" Color="#FF8591A2" />
   <SolidColorBrush x:Key="GitHubVsBrandedUIBackground" Color="#FFFFFFFF" />
+  <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FFF5D367" />
 </ResourceDictionary>

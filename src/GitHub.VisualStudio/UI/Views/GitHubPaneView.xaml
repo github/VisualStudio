@@ -57,7 +57,7 @@
                  Text="{Binding ActiveRepo.Name}" />
     </StackPanel>
 
-    <Separator Margin="0,0,0,9"
+    <Separator Margin="0,0,0,2"
                DockPanel.Dock="Top"
                Style="{StaticResource PaneHorizontalSeparator}" />
 
