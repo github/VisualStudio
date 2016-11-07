@@ -446,12 +446,24 @@
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
                                                     Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
-                                            <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
+                                            <ui:OcticonImage Icon="file_code">
+                                                <ui:OcticonImage.Style>
+                                                    <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
+                                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:OcticonImage.Style>
+                                            </ui:OcticonImage>
                                             <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ChangeType}" Value="Removed">
+                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
                                                                 <Setter Property="TextDecorations" Value="Strikethrough"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
