@@ -279,12 +279,12 @@ namespace GitHub.ViewModels
             private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRepositoryModel>)value); }
         }
 
-        IRepositoryModel selectedRepository;
+        ISimpleRepositoryModel selectedRepository;
         /// <summary>
         /// Selected repository to clone
         /// </summary>
         [AllowNull]
-        public IRepositoryModel SelectedRepository
+        public ISimpleRepositoryModel SelectedRepository
         {
             [return: AllowNull]
             get { return selectedRepository; }

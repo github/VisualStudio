@@ -217,6 +217,7 @@
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
+    <Compile Include="ViewModels\StartPageCloneViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCloneViewModel.cs" />
     <Compile Include="ViewModels\LoginControlViewModel.cs" />
