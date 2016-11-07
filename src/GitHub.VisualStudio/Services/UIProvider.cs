@@ -114,7 +114,7 @@ namespace GitHub.VisualStudio
     /// This is a globally registered service (see `GitHubPackage`).
     /// If you need to access this service via MEF, use the `IUIProvider` type
     /// </summary>
-    internal class GitHubServiceProvider : IUIProvider, IDisposable
+    public class GitHubServiceProvider : IUIProvider, IDisposable
     {
         class OwnedComposablePart
         {
