@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.Services
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(ITeamExplorerServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServices : ITeamExplorerServices

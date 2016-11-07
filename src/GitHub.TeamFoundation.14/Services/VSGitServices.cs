@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Services
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(IVSGitServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServices : IVSGitServices
