@@ -184,7 +184,7 @@
     <value>File Name</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
+    <value>You are not signed in to {0}, so certain git operations may fail. [Sign in now]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
@@ -259,7 +259,7 @@
     <value>Private Repository</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>Login failed.</value>
+    <value>Sign in failed.</value>
   </data>
   <data name="localPathText" xml:space="preserve">
     <value>Local path</value>
@@ -298,7 +298,7 @@
     <value>Check your username and password, then try again</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>Login</value>
+    <value>Sign in</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
     <value>(forgot your password?)</value>
@@ -343,6 +343,6 @@
     <value>Get Started</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Sign in</value>
   </data>
 </root>

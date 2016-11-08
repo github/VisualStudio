@@ -412,7 +412,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Login failed..
+        ///   Looks up a localized string similar to Sign in failed..
         /// </summary>
         public static string LoginFailedText {
             get {
@@ -421,7 +421,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Login.
+        ///   Looks up a localized string similar to Sign in.
         /// </summary>
         public static string LoginLink {
             get {
@@ -502,7 +502,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are not logged in to {0}, so certain git operations may fail. [Login now]({1}).
+        ///   Looks up a localized string similar to You are not signed in to {0}, so certain git operations may fail. [Sign in now]({1}).
         /// </summary>
         public static string NotLoggedInMessage {
             get {
@@ -673,7 +673,7 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sign In.
+        ///   Looks up a localized string similar to Sign in.
         /// </summary>
         public static string SignInLink {
             get {
