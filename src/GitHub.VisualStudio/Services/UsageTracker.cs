@@ -14,20 +14,20 @@ using GitHub.Extensions;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IUsageTracker))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class UsageTracker : IUsageTracker
     {
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
-        IMetricsService client;
-        readonly IConnectionManager connectionManager;
-        IPackageSettings userSettings;
-        readonly IVSServices vsservices;
+        readonly IUIProvider uiProvider;
         readonly DispatcherTimer timer;
-        readonly string storePath;
-        readonly IServiceProvider serviceProvider;
+
+        IMetricsService client;
+        IConnectionManager connectionManager;
+        IPackageSettings userSettings;
+        IVSServices vsservices;
+        string storePath;
+        bool firstRun = true;
 
         Func<string, bool> fileExists;
         Func<string, Encoding, string> readAllText;
@@ -35,13 +35,9 @@ namespace GitHub.Services
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public UsageTracker(
-            IProgram program,
-            IConnectionManager connectionManager,
-            IVSServices vsservices,
-            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public UsageTracker(IUIProvider uiProvider)
         {
-            this.serviceProvider = serviceProvider;
+            this.uiProvider = uiProvider;
 
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) =>
@@ -65,17 +61,11 @@ namespace GitHub.Services
             };
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
-            this.connectionManager = connectionManager;
-            this.vsservices = vsservices;
             this.timer = new DispatcherTimer(
-                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(3),
                 DispatcherPriority.Background,
                 TimerTick,
                 Dispatcher.CurrentDispatcher);
-            this.storePath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationName,
-                StoreFileName);
 
             RunTimer();
         }
@@ -145,8 +135,29 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        void Initialize()
+        {
+            // The services needed by the usage tracker are loaded when they are first needed to
+            // improve the startup time of the extension.
+            if (userSettings == null)
+            {
+                client = uiProvider.GetService<IMetricsService>();
+                connectionManager = uiProvider.GetService<IConnectionManager>();
+                userSettings = uiProvider.GetService<IPackageSettings>();
+                vsservices = uiProvider.GetService<IVSServices>();
+
+                var program = uiProvider.GetService<IProgram>();
+                storePath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    program.ApplicationName,
+                    StoreFileName);
+            }
+        }
+
         UsageStore LoadUsage()
         {
+            Initialize();
+
             var json = fileExists(storePath) ? readAllText(storePath, Encoding.UTF8) : null;
             UsageStore result = null;
             try
@@ -178,7 +189,6 @@ namespace GitHub.Services
         {
             // The timer first ticks after 3 minutes to allow things to settle down after startup.
             // This will be changed to 8 hours after the first tick by the TimerTick method.
-            timer.Interval = TimeSpan.FromMinutes(3);
             timer.Start();
         }
 
@@ -194,21 +204,23 @@ namespace GitHub.Services
 
         async Task TimerTick()
         {
-            Debug.Assert(client != null, "TimerTick should not be triggered when there is no IMetricsService");
+            Initialize();
 
-            // Subsequent timer ticks should occur every 8 hours.
-            timer.Interval = TimeSpan.FromHours(8);
+            if (firstRun)
+            {
+                IncrementLaunchCount();
+                timer.Interval = TimeSpan.FromHours(8);
+                firstRun = false;
+            }
 
             if (userSettings == null)
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                client = serviceProvider.GetExportedValue<IMetricsService>();
                 if (client == null)
                 {
                     timer.Stop();
                     return;
                 }
-                userSettings = serviceProvider.GetExportedValue<IPackageSettings>();
             }
 
             if (!userSettings.CollectMetrics)
