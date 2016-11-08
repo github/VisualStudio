@@ -52,8 +52,9 @@ namespace GitHub.VisualStudio
             await base.InitializeAsync(cancellationToken, progress);
             await EnsurePackageLoaded(new Guid(ServiceProviderPackage.ServiceProviderPackageId));
 
-            //var usageTracker = await GetServiceAsync(typeof(IUsageTracker)) as IUsageTracker;
-            //usageTracker.IncrementLaunchCount();
+            // Activate the usage tracker by forcing an instance to be created.
+            GetServiceAsync(typeof(IUsageTracker)).Forget();
+
             InitializeMenus().Forget();
         }
 
@@ -177,6 +178,11 @@ namespace GitHub.VisualStudio
             {
                 var sp = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
                 return new MenuProvider(sp);
+            }
+            else if (serviceType == typeof(IUsageTracker))
+            {
+                var uiProvider = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
+                return new UsageTracker(uiProvider);
             }
             // go the mef route
             else

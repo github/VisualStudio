@@ -11,23 +11,24 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IUsageTracker))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class UsageTracker : IUsageTracker
     {
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
-        IMetricsService client;
-        readonly IConnectionManager connectionManager;
-        IPackageSettings userSettings;
-        readonly IVSServices vsservices;
+        readonly IUIProvider uiProvider;
         readonly DispatcherTimer timer;
-        readonly string storePath;
-        readonly IServiceProvider serviceProvider;
+
+        IMetricsService client;
+        IConnectionManager connectionManager;
+        IPackageSettings userSettings;
+        IVSServices vsservices;
+        string storePath;
+        bool firstRun = true;
 
         Func<string, bool> fileExists;
         Func<string, Encoding, string> readAllText;
@@ -35,13 +36,9 @@ namespace GitHub.Services
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public UsageTracker(
-            IProgram program,
-            IConnectionManager connectionManager,
-            IVSServices vsservices,
-            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public UsageTracker(IUIProvider uiProvider)
         {
-            this.serviceProvider = serviceProvider;
+            this.uiProvider = uiProvider;
 
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) =>
@@ -65,88 +62,105 @@ namespace GitHub.Services
             };
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
-            this.connectionManager = connectionManager;
-            this.vsservices = vsservices;
             this.timer = new DispatcherTimer(
-                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(3),
                 DispatcherPriority.Background,
                 TimerTick,
                 Dispatcher.CurrentDispatcher);
-            this.storePath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationName,
-                StoreFileName);
 
             RunTimer();
         }
 
-        public void IncrementLaunchCount()
+        public async Task IncrementLaunchCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfStartups;
             ++usage.Model.NumberOfStartupsWeek;
             ++usage.Model.NumberOfStartupsMonth;
             SaveUsage(usage);
         }
 
-        public void IncrementCloneCount()
+        public async Task IncrementCloneCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfClones;
             SaveUsage(usage);
         }
 
-        public void IncrementCreateCount()
+        public async Task IncrementCreateCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfReposCreated;
             SaveUsage(usage);
         }
 
-        public void IncrementPublishCount()
+        public async Task IncrementPublishCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfReposPublished;
             SaveUsage(usage);
         }
 
-        public void IncrementOpenInGitHubCount()
+        public async Task IncrementOpenInGitHubCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfOpenInGitHub;
             SaveUsage(usage);
         }
 
-        public void IncrementLinkToGitHubCount()
+        public async Task IncrementLinkToGitHubCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfLinkToGitHub;
             SaveUsage(usage);
         }
 
-        public void IncrementCreateGistCount()
+        public async Task IncrementCreateGistCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfGists;
             SaveUsage(usage);
         }
 
-        public void IncrementUpstreamPullRequestCount()
+        public async Task IncrementUpstreamPullRequestCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfUpstreamPullRequests;
             SaveUsage(usage);
         }
 
-        public void IncrementLoginCount()
+        public async Task IncrementLoginCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfLogins;
             SaveUsage(usage);
         }
 
-        UsageStore LoadUsage()
+        async Task Initialize()
         {
+            // The services needed by the usage tracker are loaded when they are first needed to
+            // improve the startup time of the extension.
+            if (userSettings == null)
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                client = uiProvider.GetService<IMetricsService>();
+                connectionManager = uiProvider.GetService<IConnectionManager>();
+                userSettings = uiProvider.GetService<IPackageSettings>();
+                vsservices = uiProvider.GetService<IVSServices>();
+
+                var program = uiProvider.GetService<IProgram>();
+                storePath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    program.ApplicationName,
+                    StoreFileName);
+            }
+        }
+
+        async Task<UsageStore> LoadUsage()
+        {
+            await Initialize();
+
             var json = fileExists(storePath) ? readAllText(storePath, Encoding.UTF8) : null;
             UsageStore result = null;
             try
@@ -178,7 +192,6 @@ namespace GitHub.Services
         {
             // The timer first ticks after 3 minutes to allow things to settle down after startup.
             // This will be changed to 8 hours after the first tick by the TimerTick method.
-            timer.Interval = TimeSpan.FromMinutes(3);
             timer.Start();
         }
 
@@ -194,31 +207,26 @@ namespace GitHub.Services
 
         async Task TimerTick()
         {
-            Debug.Assert(client != null, "TimerTick should not be triggered when there is no IMetricsService");
+            await Initialize();
 
-            // Subsequent timer ticks should occur every 8 hours.
-            timer.Interval = TimeSpan.FromHours(8);
-
-            if (userSettings == null)
+            if (firstRun)
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                client = serviceProvider.GetExportedValue<IMetricsService>();
-                if (client == null)
-                {
-                    timer.Stop();
-                    return;
-                }
-                userSettings = serviceProvider.GetExportedValue<IPackageSettings>();
+                await IncrementLaunchCount();
+                timer.Interval = TimeSpan.FromHours(8);
+                firstRun = false;
             }
 
-            if (!userSettings.CollectMetrics)
+            if (client == null || !userSettings.CollectMetrics)
+            {
+                timer.Stop();
                 return;
+            }
 
             // Every time we increment the launch count we increment both daily and weekly
             // launch count but we only submit (and clear) the weekly launch count when we've
             // transitioned into a new week. We've defined a week by the ISO8601 definition,
             // i.e. week starting on Monday and ending on Sunday.
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             var lastDate = usage.LastUpdated;
             var currentDate = DateTimeOffset.Now;
             var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);

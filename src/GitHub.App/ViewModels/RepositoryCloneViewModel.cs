@@ -161,7 +161,7 @@ namespace GitHub.ViewModels
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath)
                     .ContinueAfter(() =>
                     {
-                        usageTracker.IncrementCloneCount();
+                        usageTracker.IncrementCloneCount().Forget();
                         return Observable.Return(Unit.Default);
                     });
             })

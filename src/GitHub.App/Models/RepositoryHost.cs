@@ -17,6 +17,7 @@ using ReactiveUI;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
@@ -241,7 +242,7 @@ namespace GitHub.Models
                     if (result.IsSuccess())
                     {
                         var accountCacheItem = new AccountCacheItem(userAndScopes.User);
-                        usage.IncrementLoginCount();
+                        usage.IncrementLoginCount().Forget();
                         return ModelService.InsertUser(accountCacheItem).Select(_ => result);
                     }
 

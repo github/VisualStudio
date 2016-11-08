@@ -31,7 +31,7 @@ namespace GitHub.VisualStudio.Menus
                 Clipboard.SetText(link);
                 var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
-                UsageTracker.IncrementLinkToGitHubCount();
+                await UsageTracker.IncrementLinkToGitHubCount();
             }
             catch
             {
