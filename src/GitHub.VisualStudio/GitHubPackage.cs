@@ -53,7 +53,7 @@ namespace GitHub.VisualStudio
             await EnsurePackageLoaded(new Guid(ServiceProviderPackage.ServiceProviderPackageId));
 
             // Activate the usage tracker by forcing an instance to be created.
-            await GetServiceAsync(typeof(IUsageTracker));
+            GetServiceAsync(typeof(IUsageTracker)).Forget();
 
             InitializeMenus().Forget();
         }
