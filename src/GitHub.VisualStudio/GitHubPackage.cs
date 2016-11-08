@@ -137,7 +137,7 @@ namespace GitHub.VisualStudio
             AddService(typeof(IUIProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
-            return Task.FromResult<object>(null);
+            return Task.CompletedTask;
         }
 
         async Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
