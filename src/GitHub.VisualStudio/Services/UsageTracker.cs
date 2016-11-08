@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -70,77 +71,79 @@ namespace GitHub.Services
             RunTimer();
         }
 
-        public void IncrementLaunchCount()
+        public async Task IncrementLaunchCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfStartups;
             ++usage.Model.NumberOfStartupsWeek;
             ++usage.Model.NumberOfStartupsMonth;
             SaveUsage(usage);
         }
 
-        public void IncrementCloneCount()
+        public async Task IncrementCloneCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfClones;
             SaveUsage(usage);
         }
 
-        public void IncrementCreateCount()
+        public async Task IncrementCreateCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfReposCreated;
             SaveUsage(usage);
         }
 
-        public void IncrementPublishCount()
+        public async Task IncrementPublishCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfReposPublished;
             SaveUsage(usage);
         }
 
-        public void IncrementOpenInGitHubCount()
+        public async Task IncrementOpenInGitHubCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfOpenInGitHub;
             SaveUsage(usage);
         }
 
-        public void IncrementLinkToGitHubCount()
+        public async Task IncrementLinkToGitHubCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfLinkToGitHub;
             SaveUsage(usage);
         }
 
-        public void IncrementCreateGistCount()
+        public async Task IncrementCreateGistCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfGists;
             SaveUsage(usage);
         }
 
-        public void IncrementUpstreamPullRequestCount()
+        public async Task IncrementUpstreamPullRequestCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfUpstreamPullRequests;
             SaveUsage(usage);
         }
 
-        public void IncrementLoginCount()
+        public async Task IncrementLoginCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfLogins;
             SaveUsage(usage);
         }
 
-        void Initialize()
+        async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
             // improve the startup time of the extension.
             if (userSettings == null)
             {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
                 client = uiProvider.GetService<IMetricsService>();
                 connectionManager = uiProvider.GetService<IConnectionManager>();
                 userSettings = uiProvider.GetService<IPackageSettings>();
@@ -154,9 +157,9 @@ namespace GitHub.Services
             }
         }
 
-        UsageStore LoadUsage()
+        async Task<UsageStore> LoadUsage()
         {
-            Initialize();
+            await Initialize();
 
             var json = fileExists(storePath) ? readAllText(storePath, Encoding.UTF8) : null;
             UsageStore result = null;
@@ -204,33 +207,26 @@ namespace GitHub.Services
 
         async Task TimerTick()
         {
-            Initialize();
+            await Initialize();
 
             if (firstRun)
             {
-                IncrementLaunchCount();
+                await IncrementLaunchCount();
                 timer.Interval = TimeSpan.FromHours(8);
                 firstRun = false;
             }
 
-            if (userSettings == null)
+            if (client == null || !userSettings.CollectMetrics)
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                if (client == null)
-                {
-                    timer.Stop();
-                    return;
-                }
-            }
-
-            if (!userSettings.CollectMetrics)
+                timer.Stop();
                 return;
+            }
 
             // Every time we increment the launch count we increment both daily and weekly
             // launch count but we only submit (and clear) the weekly launch count when we've
             // transitioned into a new week. We've defined a week by the ISO8601 definition,
             // i.e. week starting on Monday and ending on Sunday.
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             var lastDate = usage.LastUpdated;
             var currentDate = DateTimeOffset.Now;
             var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);

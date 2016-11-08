@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Composition;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
@@ -16,14 +17,14 @@ namespace GitHub.Services
             inner = serviceProvider.GetService(typeof(IUsageTracker)) as IUsageTracker;
         }
 
-        public void IncrementCloneCount() => inner.IncrementCloneCount();
-        public void IncrementCreateCount() => inner.IncrementCreateCount();
-        public void IncrementCreateGistCount() => inner.IncrementCreateGistCount();
-        public void IncrementLaunchCount() => inner.IncrementLaunchCount();
-        public void IncrementLinkToGitHubCount() => inner.IncrementLinkToGitHubCount();
-        public void IncrementLoginCount() => inner.IncrementLoginCount();
-        public void IncrementOpenInGitHubCount() => inner.IncrementOpenInGitHubCount();
-        public void IncrementPublishCount() => inner.IncrementPublishCount();
-        public void IncrementUpstreamPullRequestCount() => inner.IncrementUpstreamPullRequestCount();
+        public Task IncrementCloneCount() => inner.IncrementCloneCount();
+        public Task IncrementCreateCount() => inner.IncrementCreateCount();
+        public Task IncrementCreateGistCount() => inner.IncrementCreateGistCount();
+        public Task IncrementLaunchCount() => inner.IncrementLaunchCount();
+        public Task IncrementLinkToGitHubCount() => inner.IncrementLinkToGitHubCount();
+        public Task IncrementLoginCount() => inner.IncrementLoginCount();
+        public Task IncrementOpenInGitHubCount() => inner.IncrementOpenInGitHubCount();
+        public Task IncrementPublishCount() => inner.IncrementPublishCount();
+        public Task IncrementUpstreamPullRequestCount() => inner.IncrementUpstreamPullRequestCount();
     }
 }

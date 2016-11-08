@@ -26,7 +26,7 @@ namespace GitHub.VisualStudio.Menus
             var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
 
-            UsageTracker.IncrementOpenInGitHubCount();
+            await UsageTracker.IncrementOpenInGitHubCount();
         }
 
         public bool CanShow()
