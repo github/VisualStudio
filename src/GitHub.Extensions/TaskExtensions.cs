@@ -20,6 +20,21 @@ namespace GitHub.Extensions
                 return default(T);
             }
         }
+
+        [return: AllowNull]
+        public static async Task Catch(this Task source, Action<Exception> handler = null)
+        {
+            try
+            {
+                await source;
+            }
+            catch (Exception ex)
+            {
+                if (handler != null)
+                    handler(ex);
+            }
+        }
+
         public static void Forget(this Task task)
         {
         }

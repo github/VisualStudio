@@ -1,21 +1,14 @@
-﻿using Microsoft.VisualStudio.Shell;
-using System;
-using System.ComponentModel.Composition;
-using GitHub.Services;
+﻿using GitHub.Services;
 using GitHub.UI;
-using GitHub.Extensions;
 using NullGuard;
-using GitHub.Api;
+using System;
 
 namespace GitHub.VisualStudio.Menus
 {
-    [Export(typeof(IMenuHandler))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class AddConnection: MenuBase, IMenuHandler
     {
-        [ImportingConstructor]
-        public AddConnection([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
-            : base(serviceProvider, apiFactory)
+        public AddConnection(IUIProvider serviceProvider)
+            : base(serviceProvider)
         {
         }
 

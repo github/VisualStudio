@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows.Controls;
 using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
@@ -18,12 +17,70 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using NLog;
 using NullGuard;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
 {
+    /// <summary>
+    /// This is a thin MEF wrapper around the GitHubServiceProvider
+    /// which is registered as a global VS service. This class just
+    /// redirects every request to the actual service, and can be
+    /// thrown away as soon as the caller is done (no state is kept)
+    /// </summary>
     [Export(typeof(IUIProvider))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    public class UIProvider : IUIProvider, IDisposable
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class GitHubProviderDispatcher : IUIProvider
+    {
+        readonly IUIProvider theRealProvider;
+
+        [ImportingConstructor]
+        public GitHubProviderDispatcher([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        {
+            theRealProvider = serviceProvider.GetService(typeof(IUIProvider)) as IUIProvider;
+        }
+
+        public ExportProvider ExportProvider => theRealProvider.ExportProvider;
+
+        public IServiceProvider GitServiceProvider
+        {
+            get
+            {
+                return theRealProvider.GitServiceProvider;
+            }
+
+            set
+            {
+                theRealProvider.GitServiceProvider = value;
+            }
+        }
+
+        public void AddService(Type t, object owner, object instance) => theRealProvider.AddService(t, owner, instance);
+
+        public void AddService<T>(object owner, T instance) => theRealProvider.AddService<T>(owner, instance);
+
+        public object GetService(Type serviceType) => theRealProvider.GetService(serviceType);
+
+        public IObservable<bool> ListenToCompletionState() => theRealProvider.ListenToCompletionState();
+
+        public void RemoveService(Type t, object owner) => theRealProvider.RemoveService(t, owner);
+
+        public void RunUI() => theRealProvider.RunUI();
+
+        public void RunUI(UIControllerFlow controllerFlow, IConnection connection) => theRealProvider.RunUI(controllerFlow, connection);
+
+        public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, IConnection connection) => theRealProvider.SetupUI(controllerFlow, connection);
+        public object TryGetService(string typename) => theRealProvider.TryGetService(typename);
+
+        public object TryGetService(Type t) => theRealProvider.TryGetService(t);
+
+        public T TryGetService<T>() where T : class => theRealProvider.TryGetService<T>();
+    }
+
+    /// <summary>
+    /// This is a globally registered service (see `GitHubPackage`).
+    /// If you need to access this service via MEF, use the `IUIProvider` type
+    /// </summary>
+    public class GitHubServiceProvider : IUIProvider, IDisposable
     {
         class OwnedComposablePart
         {
@@ -34,54 +91,71 @@ namespace GitHub.VisualStudio
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProvider serviceProvider;
-        CompositionContainer tempContainer;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         ExportLifetimeContext<IUIController> currentUIFlow;
         readonly Version currentVersion;
         bool initializingLogging = false;
 
-        [AllowNull]
-        public ExportProvider ExportProvider { get; }
+        public ExportProvider ExportProvider { get; private set; }
+
+        CompositionContainer tempContainer;
+        CompositionContainer TempContainer
+        {
+            get
+            {
+                if (tempContainer == null)
+                {
+                    tempContainer = AddToDisposables(new CompositionContainer(new ComposablePartExportProvider()
+                    {
+                        SourceProvider = ExportProvider
+                    }));
+                }
+                return tempContainer;
+            }
+        }
 
         [AllowNull]
         public IServiceProvider GitServiceProvider { get; set; }
 
-        bool Initialized { get { return ExportProvider != null; } }
-
-        [ImportingConstructor]
-        public UIProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public GitHubServiceProvider(IServiceProvider serviceProvider)
         {
-            this.currentVersion = typeof(UIProvider).Assembly.GetName().Version;
+            this.currentVersion = this.GetType().Assembly.GetName().Version;
             this.serviceProvider = serviceProvider;
 
-            var componentModel = serviceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+            tempParts = new Dictionary<string, OwnedComposablePart>();
+        }
+
+        public async Task Initialize()
+        {
+            var asyncProvider = serviceProvider as IAsyncServiceProvider;
+            IComponentModel componentModel = null;
+            if (asyncProvider != null)
+            {
+                componentModel = await asyncProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            }
+
+            else
+            {
+                componentModel = serviceProvider?.GetService(typeof(SComponentModel)) as IComponentModel;
+            }
+
             Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
             if (componentModel == null)
             {
                 log.Error("Service of type SComponentModel not found");
                 return;
             }
-            ExportProvider = componentModel.DefaultExportProvider;
 
+            ExportProvider = componentModel.DefaultExportProvider;
             if (ExportProvider == null)
             {
                 log.Error("DefaultExportProvider could not be obtained.");
-                return;
             }
-
-            tempContainer = AddToDisposables(new CompositionContainer(new ComposablePartExportProvider()
-            {
-                SourceProvider = ExportProvider
-            }));
-            tempParts = new Dictionary<string, OwnedComposablePart>();
         }
 
         [return: AllowNull]
         public object TryGetService(Type serviceType)
         {
-            if (!Initialized)
-                return null;
-
             if (!initializingLogging && log.Factory.Configuration == null)
             {
                 initializingLogging = true;
@@ -92,11 +166,14 @@ namespace GitHub.VisualStudio
                 }
                 catch
                 {
+#if DEBUG
+                    throw;
+#endif
                 }
             }
 
             string contract = AttributedModelServices.GetContractName(serviceType);
-            var instance = AddToDisposables(tempContainer.GetExportedValueOrDefault<object>(contract));
+            var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
                 return instance;
 
@@ -109,12 +186,9 @@ namespace GitHub.VisualStudio
             if (instance != null)
                 return instance;
 
-            if (GitServiceProvider != null)
-            {
-                instance = GitServiceProvider.GetService(serviceType);
-                if (instance != null)
-                    return instance;
-            }
+            instance = GitServiceProvider?.GetService(serviceType);
+            if (instance != null)
+                return instance;
 
             return null;
         }
@@ -161,12 +235,6 @@ namespace GitHub.VisualStudio
 
         public void AddService(Type t, object owner, object instance)
         {
-            if (!Initialized)
-            {
-                log.Error("ExportProvider is not initialized, cannot add service.");
-                return;
-            }
-
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
@@ -177,7 +245,7 @@ namespace GitHub.VisualStudio
             var part = batch.AddExportedValue(contract, instance);
             Debug.Assert(part != null, "Adding an exported value must return a non-null part");
             tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
-            tempContainer.Compose(batch);
+            TempContainer.Compose(batch);
         }
 
         /// <summary>
@@ -188,12 +256,6 @@ namespace GitHub.VisualStudio
         /// or if it's null, the service will be removed without checking for ownership</param>
         public void RemoveService(Type t, [AllowNull] object owner)
         {
-            if (!Initialized)
-            {
-                log.Error("ExportProvider is not initialized, cannot remove service.");
-                return;
-            }
-
             string contract = AttributedModelServices.GetContractName(t);
             Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
@@ -205,19 +267,13 @@ namespace GitHub.VisualStudio
                 tempParts.Remove(contract);
                 var batch = new CompositionBatch();
                 batch.RemovePart(part.Part);
-                tempContainer.Compose(batch);
+                TempContainer.Compose(batch);
             }
         }
 
         UI.WindowController windowController;
         public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
-            if (!Initialized)
-            {
-                log.Error("ExportProvider is not initialized, cannot setup UI.");
-                return Observable.Empty<LoadData>();
-            }
-
             StopUI();
 
             var factory = TryGetService(typeof(IExportFactoryProvider)) as IExportFactoryProvider;
@@ -256,12 +312,6 @@ namespace GitHub.VisualStudio
 
         public void RunUI()
         {
-            if (!Initialized)
-            {
-                log.Error("ExportProvider is not initialized, cannot run UI.");
-                return;
-            }
-
             Debug.Assert(windowController != null, "WindowController is null, did you forget to call SetupUI?");
             if (windowController == null)
             {
@@ -280,12 +330,6 @@ namespace GitHub.VisualStudio
 
         public void RunUI(UIControllerFlow controllerFlow, [AllowNull] IConnection connection)
         {
-            if (!Initialized)
-            {
-                log.Error("ExportProvider is not initialized, cannot run UI for {0}.", controllerFlow);
-                return;
-            }
-
             SetupUI(controllerFlow, connection);
             try
             {
@@ -299,12 +343,6 @@ namespace GitHub.VisualStudio
 
         public void StopUI()
         {
-            if (!Initialized)
-            {
-                log.Error("ExportProvider is not initialized, cannot stop UI.");
-                return;
-            }
-
             StopUI(currentUIFlow);
             currentUIFlow = null;
         }

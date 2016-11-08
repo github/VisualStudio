@@ -1,24 +1,22 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using GitHub.Extensions;
+﻿using GitHub.Api;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
-using System.Threading.Tasks;
-using GitHub.Api;
-using NullGuard;
 using GitHub.UI;
+using NullGuard;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
     public abstract class MenuBase
     {
-        readonly IServiceProvider serviceProvider;
-        readonly ISimpleApiClientFactory apiFactory;
+        readonly IUIProvider serviceProvider;
+        readonly Lazy<ISimpleApiClientFactory> apiFactory;
 
-        protected IServiceProvider ServiceProvider { get { return serviceProvider; } }
+        protected IUIProvider ServiceProvider { get { return serviceProvider; } }
 
         protected ISimpleRepositoryModel ActiveRepo { get; private set; }
 
@@ -32,35 +30,29 @@ namespace GitHub.VisualStudio
             set
             {
                 if (simpleApiClient != value && value == null)
-                    apiFactory.ClearFromCache(simpleApiClient);
+                    ApiFactory.ClearFromCache(simpleApiClient);
                 simpleApiClient = value;
             }
         }
 
-        protected ISimpleApiClientFactory ApiFactory => apiFactory;
+        protected ISimpleApiClientFactory ApiFactory => apiFactory.Value;
 
         protected MenuBase()
-        {
-        }
+        {}
 
-        protected MenuBase(IServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory)
+        protected MenuBase(IUIProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            this.apiFactory = apiFactory;
-        }
-
-        protected MenuBase(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
+            apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
         }
 
         protected ISimpleRepositoryModel GetActiveRepo()
         {
-            var activeRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>()?.ActiveRepo;
+            var activeRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
             // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
             if (activeRepo == null)
             {
-                var path = ServiceProvider.GetExportedValue<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
+                var path = ServiceProvider.TryGetService<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
                     activeRepo = !string.IsNullOrEmpty(path) ? new SimpleRepositoryModel(path) : null;
@@ -75,28 +67,23 @@ namespace GitHub.VisualStudio
 
         protected void StartFlow(UIControllerFlow controllerFlow)
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            Debug.Assert(uiProvider != null, "MenuBase:StartFlow:No UIProvider available.");
-            if (uiProvider == null)
-                return;
-
             IConnection connection = null;
             if (controllerFlow != UIControllerFlow.Authentication)
             {
                 var activeRepo = GetActiveRepo();
-                connection = ServiceProvider.GetExportedValue<IConnectionManager>()?.Connections
+                connection = ServiceProvider.TryGetService<IConnectionManager>()?.Connections
                     .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
             }
-            uiProvider.RunUI(controllerFlow, connection);
+            ServiceProvider.RunUI(controllerFlow, connection);
         }
 
         void RefreshRepo()
         {
-            ActiveRepo = ServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
+            ActiveRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>().ActiveRepo;
 
             if (ActiveRepo == null)
             {
-                var vsGitServices = ServiceProvider.GetExportedValue<IVSGitServices>();
+                var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
                 string path = vsGitServices?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
@@ -117,8 +104,7 @@ namespace GitHub.VisualStudio
             if (uri == null)
                 return false;
 
-            Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
-            SimpleApiClient = apiFactory.Create(uri);
+            SimpleApiClient = ApiFactory.Create(uri);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
             if (!isdotcom)

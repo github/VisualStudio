@@ -26,26 +26,22 @@ using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
-    [ExportViewModel(ViewType=UIViewType.Clone)]
+    [ExportViewModel(ViewType=UIViewType.StartPageClone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
+    public class StartPageCloneViewModel : BaseViewModel, IBaseCloneViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly IRepositoryHost repositoryHost;
         readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
         readonly INotificationService notificationService;
         readonly IUsageTracker usageTracker;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        bool isLoading;
-        bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
-        bool loadingFailed;
 
         [ImportingConstructor]
-        RepositoryCloneViewModel(
+        StartPageCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
             IOperatingSystem operatingSystem,
@@ -54,15 +50,13 @@ namespace GitHub.ViewModels
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService, usageTracker)
         { }
 
-
-        public RepositoryCloneViewModel(
+        public StartPageCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
             IOperatingSystem operatingSystem,
             INotificationService notificationService,
             IUsageTracker usageTracker)
         {
-            this.repositoryHost = repositoryHost;
             this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
             this.notificationService = notificationService;
@@ -70,29 +64,7 @@ namespace GitHub.ViewModels
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
 
-            Repositories = new TrackingCollection<IRepositoryModel>();
-            repositories.ProcessingDelay = TimeSpan.Zero;
-            repositories.Comparer = OrderedComparer<IRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
-            repositories.Filter = FilterRepository;
-            repositories.NewerComparer = OrderedComparer<IRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
-
-            filterTextIsEnabled = this.WhenAny(x => x.IsLoading, x => x.Value)
-                .Select(x => !x && repositories.UnfilteredCount > 0)
-                .ToProperty(this, x => x.FilterTextIsEnabled);
-
-            this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
-                , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
-                .Subscribe(x => NoRepositoriesFound = x);
-
-            this.WhenAny(x => x.FilterText, x => x.Value)
-                .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
-                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler)
-                .Subscribe(_ => repositories.Filter = FilterRepository);
-
-            var baseRepositoryPath = this.WhenAny(
-                x => x.BaseRepositoryPath,
-                x => x.SelectedRepository,
-                (x, y) => x.Value);
+            var baseRepositoryPath = this.WhenAnyValue(x => x.BaseRepositoryPath);
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(baseRepositoryPath)
                 .IfNullOrEmpty(Resources.RepositoryCreationClonePathEmpty)
@@ -112,36 +84,8 @@ namespace GitHub.ViewModels
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
                 .Subscribe();
             BaseRepositoryPath = cloneService.DefaultClonePath;
-            NoRepositoriesFound = true;
         }
 
-        public override void Initialize([AllowNull] ViewWithData data)
-        {
-            base.Initialize(data);
-
-            IsLoading = true;
-            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRepositoryModel>;
-            repositories.OriginalCompleted.Subscribe(
-                _ => { }
-                , ex =>
-                {
-                    LoadingFailed = true;
-                    IsLoading = false;
-                    log.Error("Error while loading repositories", ex);
-                },
-                () => IsLoading = false
-            );
-            repositories.Subscribe();
-        }
-
-        bool FilterRepository(IRepositoryModel repo, int position, IList<IRepositoryModel> list)
-        {
-            if (string.IsNullOrWhiteSpace(FilterText))
-                return true;
-
-            // Not matching on NameWithOwner here since that's already been filtered on by the selected account
-            return repo.Name.IndexOf(FilterText ?? "", StringComparison.OrdinalIgnoreCase) != -1;
-        }
 
         IObservable<Unit> OnCloneRepository(object state)
         {
@@ -233,14 +177,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        TrackingCollection<IRepositoryModel> repositories;
-        public ObservableCollection<IRepositoryModel> Repositories
-        {
-            [return: AllowNull]
-            get { return repositories; }
-            private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRepositoryModel>)value); }
-        }
-
         ISimpleRepositoryModel selectedRepository;
         /// <summary>
         /// Selected repository to clone
@@ -251,42 +187,6 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return selectedRepository; }
             set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }
-        }
-
-        readonly ObservableAsPropertyHelper<bool> filterTextIsEnabled;
-        /// <summary>
-        /// True if there are repositories (otherwise no point in filtering)
-        /// </summary>
-        public bool FilterTextIsEnabled { get { return filterTextIsEnabled.Value; } }
-
-        string filterText;
-        /// <summary>
-        /// User text to filter the repositories list
-        /// </summary>
-        [AllowNull]
-        public string FilterText
-        {
-            [return: AllowNull]
-            get { return filterText; }
-            set { this.RaiseAndSetIfChanged(ref filterText, value); }
-        }
-
-        public bool IsLoading
-        {
-            get { return isLoading; }
-            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
-        }
-
-        public bool LoadingFailed
-        {
-            get { return loadingFailed; }
-            private set { this.RaiseAndSetIfChanged(ref loadingFailed, value); }
-        }
-
-        public bool NoRepositoriesFound
-        {
-            get { return noRepositoriesFound; }
-            private set { this.RaiseAndSetIfChanged(ref noRepositoriesFound, value); }
         }
 
         public ICommand BrowseForDirectory
