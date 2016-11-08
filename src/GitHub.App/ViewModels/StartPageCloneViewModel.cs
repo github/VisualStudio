@@ -64,7 +64,10 @@ namespace GitHub.ViewModels
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
 
-            var baseRepositoryPath = this.WhenAnyValue(x => x.BaseRepositoryPath);
+            var baseRepositoryPath = this.WhenAny(
+                x => x.BaseRepositoryPath,
+                x => x.SelectedRepository,
+                (x, y) => x.Value);
 
             BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(baseRepositoryPath)
                 .IfNullOrEmpty(Resources.RepositoryCreationClonePathEmpty)
