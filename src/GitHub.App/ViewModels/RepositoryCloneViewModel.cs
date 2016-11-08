@@ -54,44 +54,6 @@ namespace GitHub.ViewModels
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService, usageTracker)
         { }
 
-        public RepositoryCloneViewModel(
-            IRepositoryHost repositoryHost,
-            IRepositoryModel repositoryToClone,
-            IRepositoryCloneService cloneService,
-            IOperatingSystem operatingSystem,
-            INotificationService notificationService,
-            IUsageTracker usageTracker)
-        {
-            this.repositoryHost = repositoryHost;
-            this.cloneService = cloneService;
-            this.operatingSystem = operatingSystem;
-            this.notificationService = notificationService;
-            this.usageTracker = usageTracker;
-            this.SelectedRepository = repositoryToClone;
-
-            Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
-
-            var baseRepositoryPath = this.WhenAnyValue(x => x.BaseRepositoryPath);
-
-            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(baseRepositoryPath)
-                .IfNullOrEmpty(Resources.RepositoryCreationClonePathEmpty)
-                .IfTrue(x => x.Length > 200, Resources.RepositoryCreationClonePathTooLong)
-                .IfContainsInvalidPathChars(Resources.RepositoryCreationClonePathInvalidCharacters)
-                .IfPathNotRooted(Resources.RepositoryCreationClonePathInvalid)
-                .IfTrue(IsAlreadyRepoAtPath, Resources.RepositoryNameValidatorAlreadyExists);
-
-            var canCloneObservable = this.WhenAny(
-                x => x.SelectedRepository,
-                x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
-                (x, y) => x.Value != null && y.Value);
-            canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
-
-            browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
-            this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
-                .Subscribe();
-            BaseRepositoryPath = cloneService.DefaultClonePath;
-        }
 
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
