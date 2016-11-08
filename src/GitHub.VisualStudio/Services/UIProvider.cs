@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
             theRealProvider = serviceProvider.GetService(typeof(IUIProvider)) as IUIProvider;
         }
 
-        public ExportProvider ExportProvider { get { return theRealProvider.ExportProvider; } }
+        public ExportProvider ExportProvider => theRealProvider.ExportProvider;
 
         public IServiceProvider GitServiceProvider
         {
@@ -54,60 +54,26 @@ namespace GitHub.VisualStudio
             }
         }
 
-        public void AddService(Type t, object owner, object instance)
-        {
-            theRealProvider.AddService(t, owner, instance);
-        }
+        public void AddService(Type t, object owner, object instance) => theRealProvider.AddService(t, owner, instance);
 
-        public void AddService<T>(object owner, T instance)
-        {
-            theRealProvider.AddService<T>(owner, instance);
-        }
+        public void AddService<T>(object owner, T instance) => theRealProvider.AddService<T>(owner, instance);
 
-        public object GetService(Type serviceType)
-        {
-            return theRealProvider.GetService(serviceType);
-        }
+        public object GetService(Type serviceType) => theRealProvider.GetService(serviceType);
 
-        public IObservable<bool> ListenToCompletionState()
-        {
-            return theRealProvider.ListenToCompletionState();
-        }
+        public IObservable<bool> ListenToCompletionState() => theRealProvider.ListenToCompletionState();
 
-        public void RemoveService(Type t, object owner)
-        {
-            theRealProvider.RemoveService(t, owner);
-        }
+        public void RemoveService(Type t, object owner) => theRealProvider.RemoveService(t, owner);
 
-        public void RunUI()
-        {
-            theRealProvider.RunUI();
-        }
+        public void RunUI() => theRealProvider.RunUI();
 
-        public void RunUI(UIControllerFlow controllerFlow, IConnection connection)
-        {
-            theRealProvider.RunUI(controllerFlow, connection);
-        }
+        public void RunUI(UIControllerFlow controllerFlow, IConnection connection) => theRealProvider.RunUI(controllerFlow, connection);
 
-        public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, IConnection connection)
-        {
-            return theRealProvider.SetupUI(controllerFlow, connection);
-        }
+        public IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, IConnection connection) => theRealProvider.SetupUI(controllerFlow, connection);
+        public object TryGetService(string typename) => theRealProvider.TryGetService(typename);
 
-        public object TryGetService(string typename)
-        {
-            return theRealProvider.TryGetService(typename);
-        }
+        public object TryGetService(Type t) => theRealProvider.TryGetService(t);
 
-        public object TryGetService(Type t)
-        {
-            return theRealProvider.TryGetService(t);
-        }
-
-        public T TryGetService<T>() where T : class
-        {
-            return theRealProvider.TryGetService<T>();
-        }
+        public T TryGetService<T>() where T : class => theRealProvider.TryGetService<T>();
     }
 
     /// <summary>
