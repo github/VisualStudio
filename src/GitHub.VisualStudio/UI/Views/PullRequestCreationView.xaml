@@ -115,6 +115,18 @@
                                 </TextBlock>
                             </DataTemplate>
                         </ui:LinkDropDown.ItemTemplate>
+                        <ui:LinkDropDown.LinkItemTemplate>
+                            <DataTemplate DataType="models:BranchModel">
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource BranchNameConverter}">
+                                            <Binding/>
+                                            <Binding Path="ViewModel.GitHubRepository" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestCreationView}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ui:LinkDropDown.LinkItemTemplate>
                     </ui:LinkDropDown>
                     <ui:OcticonImage Height="13"
                                      Margin="5,2,3,0"

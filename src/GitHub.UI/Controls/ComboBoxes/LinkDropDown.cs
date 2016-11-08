@@ -9,14 +9,23 @@ namespace GitHub.UI
     public class LinkDropDown : ComboBox
     {
         /// <summary>
-        /// Defines the <see cref="LinkText"/> property.
+        /// Defines the <see cref="LinkItem"/> property.
         /// </summary>
-        static readonly DependencyPropertyKey LinkTextPropertyKey =
+        static readonly DependencyPropertyKey LinkItemPropertyKey =
             DependencyProperty.RegisterReadOnly(
-                "LinkText",
-                typeof(string),
+                "LinkItem",
+                typeof(object),
                 typeof(LinkDropDown),
                 new FrameworkPropertyMetadata(string.Empty));
+
+        /// <summary>
+        /// Defines the <see cref="LinkItemTemplate"/> property.
+        /// </summary>
+        public static readonly DependencyProperty LinkItemTemplateProperty =
+            DependencyProperty.Register(
+                "LinkItemTemplate",
+                typeof(DataTemplate),
+                typeof(LinkDropDown));
 
         /// <summary>
         /// Defines the <see cref="Header"/> property.
@@ -27,10 +36,10 @@ namespace GitHub.UI
                 new FrameworkPropertyMetadata(typeof(LinkDropDown), HeaderChanged));
 
         /// <summary>
-        /// Defines the readonly <see cref="LinkText"/> property.
+        /// Defines the readonly <see cref="LinkItem"/> property.
         /// </summary>
-        public static readonly DependencyProperty LinkTextProperty =
-            LinkTextPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty LinkItemProperty =
+            LinkItemPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Initializes static members of the <see cref="LinkDropDown"/> class.
@@ -43,7 +52,7 @@ namespace GitHub.UI
         }
 
         /// <summary>
-        /// Gets or sets a header to use as the link text when no item is selected.
+        /// Gets or sets a header to use in the link when no item is selected.
         /// </summary>
         public object Header
         {
@@ -52,63 +61,37 @@ namespace GitHub.UI
         }
 
         /// <summary>
-        /// Gets the text to display in the link.
+        /// Gets the data to display in the link.
         /// </summary>
-        public string LinkText
+        public object LinkItem
         {
-            get { return (string)GetValue(LinkTextProperty); }
-            private set { SetValue(LinkTextPropertyKey, value); }
+            get { return (string)GetValue(LinkItemProperty); }
+            private set { SetValue(LinkItemPropertyKey, value); }
+        }
+
+        /// <summary>
+        /// Gets the template to use to display the link.
+        /// </summary>
+        public object LinkItemTemplate
+        {
+            get { return (string)GetValue(LinkItemTemplateProperty); }
+            set { SetValue(LinkItemTemplateProperty, value); }
         }
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-           UpdateLinkText();
+           UpdateLinkItem();
         }
 
         private static void HeaderChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var source = (LinkDropDown)d;
-            source.UpdateLinkText();
+            source.UpdateLinkItem();
         }
 
-        private void UpdateLinkText()
+        private void UpdateLinkItem()
         {
-            if (SelectedItem != null)
-            {
-                var item = SelectedItem;
-                
-                // HACK: The correct way to do this is to use a ContentPresenter in the control
-                // template to display the link text and do a:
-                //
-                //     ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                //
-                // to correctly display the DisplayMemberPath. However I couldn't work out how
-                // to do it like this and get the link text looking right. This is a hack that
-                // will work as long as DisplayMemberPath is just a property name, which is
-                // all we need right now.
-                if (string.IsNullOrWhiteSpace(DisplayMemberPath))
-                {                   
-                    if (ItemTemplate == null)
-                    {
-                        LinkText = item.ToString();
-                    }
-
-                    else
-                    {
-                        
-                    }
-                }
-
-                else
-                {
-                    var property = item.GetType().GetProperty(DisplayMemberPath);
-                    LinkText = property?.GetValue(item)?.ToString();
-                }
-            }
-            else
-            {
-                LinkText = Header.ToString();
-            }
+            LinkItem = SelectedItem ?? Header;
         }
     }
 }
