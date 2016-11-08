@@ -48,7 +48,7 @@ namespace GitHub.VisualStudio.Base
                 serviceProvider = value;
                 if (serviceProvider == null)
                     return;
-                GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid(Guids.GitSccProviderId));
                 UIContextChanged(GitUIContext?.IsActive ?? false, false);
             }
         }
@@ -118,7 +118,7 @@ namespace GitHub.VisualStudio.Base
 
         public void Refresh()
         {
-            GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+            GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid(Guids.GitSccProviderId));
             UIContextChanged(GitUIContext?.IsActive ?? false, true);
         }
 

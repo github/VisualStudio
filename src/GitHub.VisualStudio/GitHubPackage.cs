@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio
     [Guid(GuidList.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // this is the Git service GUID, so we load whenever it loads
-    [ProvideAutoLoad("11B8E6D7-C08B-4385-B321-321078CDD1F8")]
+    [ProvideAutoLoad(Guids.GitSccProviderId)]
     [ProvideToolWindow(typeof(GitHubPane), Orientation = ToolWindowOrientation.Right, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindSolutionExplorer)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
