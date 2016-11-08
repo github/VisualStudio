@@ -15,16 +15,24 @@ namespace GitHub.UI.Converters
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var branch = (IBranch)values[0];
-            var repo = (IRemoteRepositoryModel)branch.Repository;
-            var activeRepo = (IRepositoryModel)values[1];
-           
-            if (repo.Parent == null && activeRepo.Owner != repo.Owner)
-            {
-                return repo.Owner + ":" + branch.Name;
-            }
+            var branch = values[0] as IBranch;
+            var activeRepo = values[1] as IRepositoryModel;
 
-            return branch.DisplayName;
+            if (branch != null && activeRepo != null)
+            {
+                var repo = (IRemoteRepositoryModel)branch.Repository;
+
+                if (repo.Parent == null && activeRepo.Owner != repo.Owner)
+                {
+                    return repo.Owner + ":" + branch.Name;
+                }
+
+                return branch.DisplayName;
+            }
+            else
+            {
+                return values[0]?.ToString();
+            }
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
