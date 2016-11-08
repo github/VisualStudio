@@ -93,29 +93,6 @@ namespace GitHub.VisualStudio
         }
     }
 
-    //[NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
-    //[PackageRegistration(UseManagedResourcesOnly = true)]
-    //[ProvideAutoLoad(MenuLoadingContextId)]
-    //[ProvideUIContextRule(MenuLoadingContextId, 
-    //    name: "GitHub context menus",
-    //    expression: "FileOpen",
-    //    termNames: new[] { "FileOpen" },
-    //    termValues: new[] { "ActiveEditorContentType:CSharp" }
-    //)]
-    //[Guid(MenuRegistrationPackageId)]
-    //public sealed class MenuRegistrationPackage : Package
-    //{
-    //    const string MenuRegistrationPackageId = "E37D3B17-2255-4144-9802-349530796693";
-    //    const string MenuLoadingContextId = "F2CC8C27-AF24-4BA6-80BC-4819A0E8844F";
-
-    //    protected override void Initialize()
-    //    {
-    //        base.Initialize();
-
-
-    //    }
-    //}
-
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
