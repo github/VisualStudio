@@ -15,8 +15,8 @@ namespace GitHub.UI.Converters
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var branch = values[0] as IBranch;
-            var activeRepo = values[1] as IRepositoryModel;
+            var branch = values.OfType<IBranch>().FirstOrDefault();
+            var activeRepo = values.OfType<IRepositoryModel>().FirstOrDefault();
 
             if (branch != null && activeRepo != null)
             {
@@ -31,7 +31,7 @@ namespace GitHub.UI.Converters
             }
             else
             {
-                return values[0]?.ToString();
+                return values.FirstOrDefault()?.ToString();
             }
         }
 
