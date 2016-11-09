@@ -27,8 +27,9 @@ namespace GitHub.Services
         {
             get
             {
-                if (!string.IsNullOrEmpty(vsGitServices.GetActiveRepo()?.Info?.WorkingDirectory))
-                    return new DirectoryInfo(vsGitServices.GetActiveRepo().Info.WorkingDirectory).Name ?? "";
+                var activeRepo = vsGitServices.GetActiveRepo();
+                if (!string.IsNullOrEmpty(activeRepo?.Info?.WorkingDirectory))
+                    return new DirectoryInfo(activeRepo.Info.WorkingDirectory).Name ?? "";
                 return string.Empty;
             }
         }
