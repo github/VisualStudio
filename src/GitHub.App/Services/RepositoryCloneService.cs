@@ -3,9 +3,10 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using Rothko;
 using GitHub.Extensions;
+using Microsoft.VisualStudio.Shell;
 using NLog;
+using Rothko;
 
 namespace GitHub.Services
 {
@@ -39,11 +40,15 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(repositoryName, nameof(repositoryName));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
 
-            return Observable.Start(() =>
+            return Observable.StartAsync(async () =>
             {
                 string path = Path.Combine(repositoryPath, repositoryName);
 
                 operatingSystem.Directory.CreateDirectory(path);
+
+                // Once we've done IO switch to the main thread to call vsGitServices.Clone() as this must be
+                // called on the main thread.
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 try
                 {
