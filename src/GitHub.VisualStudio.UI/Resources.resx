@@ -333,6 +333,9 @@
   <data name="filterBranchesText" xml:space="preserve">
     <value>Filter branches</value>
   </data>
+  <data name="PublishToGitHubButton" xml:space="preserve">
+    <value>Publish to GitHub</value>
+  </data>
   <data name="GetStartedLink" xml:space="preserve">
     <value>Get Started</value>
   </data>

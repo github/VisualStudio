@@ -601,6 +601,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Publish to GitHub.
+        /// </summary>
+        public static string PublishToGitHubButton {
+            get {
+                return ResourceManager.GetString("PublishToGitHubButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pull Requests.
         /// </summary>
         public static string PullRequestsNavigationItemText {
@@ -698,7 +707,7 @@ namespace GitHub.VisualStudio.UI {
                 return ResourceManager.GetString("TitleRequired", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Two-factor authentication.
         /// </summary>
