@@ -219,6 +219,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
                     try
                     {
+                        // TODO: Cache the icon state.
                         var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
@@ -242,6 +243,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
                         try
                         {
+                            // TODO: Cache the icon state.
                             var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
                         }
