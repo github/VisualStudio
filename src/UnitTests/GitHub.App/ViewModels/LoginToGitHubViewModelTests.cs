@@ -37,7 +37,7 @@ public class LoginToGitHubViewModelTests
                 loginViewModel.Login.Execute(null);
             }
 
-            Assert.Equal("Make sure to use your password and not a Personal Access token to log in.",
+            Assert.Equal("Make sure to use your password and not a Personal Access token to sign in.",
                 message);
         }
     }
