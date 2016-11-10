@@ -216,8 +216,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         HandleClonedRepo(newrepo);
 
                     isCreating = isCloning = false;
-                    var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
-                    newrepo.SetIcon(repo.Private, repo.Fork);
+
+                    try
+                    {
+                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                        newrepo.SetIcon(repo.Private, repo.Fork);
+                    }
+                    catch { }
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
                 else
@@ -228,8 +233,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     {
                         if (Equals(Holder.ActiveRepo, r))
                             SelectedRepository = r;
-                        var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
-                        r.SetIcon(repo.Private, repo.Fork);
+
+                        try
+                        {
+                            var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
+                            r.SetIcon(repo.Private, repo.Fork);
+                        } catch { }
                     });
                 }
             }
