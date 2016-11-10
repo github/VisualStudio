@@ -216,8 +216,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         HandleClonedRepo(newrepo);
 
                     isCreating = isCloning = false;
-                    var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
-                    newrepo.SetIcon(repo.Private, repo.Fork);
+
+                    try
+                    {
+                        // TODO: Cache the icon state.
+                        var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
+                        newrepo.SetIcon(repo.Private, repo.Fork);
+                    }
+                    catch
+                    {
+                        // GetRepository() may throw if the user doesn't have permissions to access the repo
+                        // (because the repo no longer exists, or because the user has logged in on a different
+                        // profile, or their permissions have changed remotely)
+                        // TODO: Log
+                    }
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
                 else
@@ -228,8 +240,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     {
                         if (Equals(Holder.ActiveRepo, r))
                             SelectedRepository = r;
-                        var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
-                        r.SetIcon(repo.Private, repo.Fork);
+
+                        try
+                        {
+                            // TODO: Cache the icon state.
+                            var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
+                            r.SetIcon(repo.Private, repo.Fork);
+                        }
+                        catch
+                        {
+                            // GetRepository() may throw if the user doesn't have permissions to access the repo
+                            // (because the repo no longer exists, or because the user has logged in on a different
+                            // profile, or their permissions have changed remotely)
+                            // TODO: Log
+                        }
                     });
                 }
             }
