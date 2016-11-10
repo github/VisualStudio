@@ -222,7 +222,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         var repo = await ApiFactory.Create(newrepo.CloneUrl).GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
-                    catch { }
+                    catch
+                    {
+                        // GetRepository() may throw if the user doesn't have permissions to access the repo
+                        // (because the repo no longer exists, or because the user has logged in on a different
+                        // profile, or their permissions have changed remotely)
+                        // TODO: Log
+                    }
                 }
                 // looks like it's just a refresh with new stuff on the list, update the icons
                 else
@@ -238,7 +244,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         {
                             var repo = await ApiFactory.Create(r.CloneUrl).GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
-                        } catch { }
+                        }
+                        catch
+                        {
+                            // GetRepository() may throw if the user doesn't have permissions to access the repo
+                            // (because the repo no longer exists, or because the user has logged in on a different
+                            // profile, or their permissions have changed remotely)
+                            // TODO: Log
+                        }
                     });
                 }
             }
