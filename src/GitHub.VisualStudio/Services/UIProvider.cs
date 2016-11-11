@@ -29,6 +29,7 @@ namespace GitHub.VisualStudio
     /// </summary>
     [Export(typeof(IUIProvider))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
+    [NullGuard(ValidationFlags.None)]
     public class GitHubProviderDispatcher : IUIProvider
     {
         readonly IUIProvider theRealProvider;
