@@ -358,8 +358,7 @@ public class RepositoryCloneViewModelTests
             
             vm.SelectedRepository = Substitute.For<IRepositoryModel>();
             await vm.CloneCommand.ExecuteAsync();
-
-            usageTracker.Received().IncrementCloneCount().Forget();
+            Received.InOrder(async () => await usageTracker.IncrementCloneCount());
         }
     }
 }
