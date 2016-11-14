@@ -35,7 +35,8 @@ namespace GitHub.Extensions
             }
         }
 
-        public static void Forget(this Task task)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "task")]
+        public static void Forget([AllowNull] this Task task)
         {
         }
     }
