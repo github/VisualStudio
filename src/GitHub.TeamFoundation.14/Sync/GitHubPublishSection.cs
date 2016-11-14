@@ -48,15 +48,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             ShowGetStarted = false;
             IsVisible = false;
             IsExpanded = true;
-			InitializeSectionView();
-		}
+            InitializeSectionView();
+        }
 
-		void InitializeSectionView()
-		{
-			var view = new GitHubInvitationContent();
-			SectionContent = view;
-			view.DataContext = this;
-		}
+        void InitializeSectionView()
+        {
+            var view = new GitHubInvitationContent();
+            SectionContent = view;
+            view.DataContext = this;
+        }
 
         async void Setup()
         {
@@ -82,8 +82,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         {
             base.RepoChanged(changed);
             Setup();
-			InitializeSectionView();
-		}
+            InitializeSectionView();
+        }
 
         public async void Connect()
         {
