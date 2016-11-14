@@ -4,7 +4,7 @@ using GitHub.Extensions;
 using System.Runtime.CompilerServices;
 using System;
 using static Microsoft.VisualStudio.Threading.JoinableTaskFactory;
-using System.Threading;
+using static Microsoft.VisualStudio.Threading.AwaitExtensions;
 
 namespace GitHub.Helpers
 {
@@ -62,7 +62,7 @@ namespace GitHub.Helpers
 
             public AwaitableWrapper(TaskScheduler scheduler)
             {
-                getAwaiter = () => new AwaiterWrapper(new BackgroundThreadAwaiter(scheduler));
+                getAwaiter = () => new AwaiterWrapper(new TaskSchedulerAwaiter(scheduler));
             }
 
             public IAwaiter GetAwaiter() => getAwaiter();
@@ -88,7 +88,7 @@ namespace GitHub.Helpers
                 getResult = () => awaiter.GetResult();
             }
 
-            public AwaiterWrapper(BackgroundThreadAwaiter awaiter)
+            public AwaiterWrapper(TaskSchedulerAwaiter awaiter)
             {
                 isCompleted = () => awaiter.IsCompleted;
                 onCompleted = c => awaiter.OnCompleted(c);
@@ -100,35 +100,6 @@ namespace GitHub.Helpers
             public void OnCompleted(Action continuation) => onCompleted(continuation);
 
             public void GetResult() => getResult();
-        }
-
-        struct BackgroundThreadAwaiter : INotifyCompletion
-        {
-            readonly TaskScheduler scheduler;
-
-            public bool IsCompleted
-            {
-                get
-                {
-                    bool isThreadPoolThread = Thread.CurrentThread.IsThreadPoolThread;
-                    return (scheduler == TaskScheduler.Default & isThreadPoolThread) || (scheduler == TaskScheduler.Current && TaskScheduler.Current != TaskScheduler.Default);
-                }
-            }
-
-            public BackgroundThreadAwaiter(TaskScheduler scheduler)
-            {
-                Guard.ArgumentNotNull(scheduler, nameof(scheduler));
-                this.scheduler = scheduler;
-            }
-
-            public void OnCompleted(Action continuation)
-            {
-                Task.Factory.StartNew(continuation, CancellationToken.None, TaskCreationOptions.None, scheduler);
-            }
-
-            public void GetResult()
-            {
-            }
         }
     }
 }
