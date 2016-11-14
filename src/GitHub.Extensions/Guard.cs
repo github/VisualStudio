@@ -90,7 +90,7 @@ namespace GitHub.Extensions
         }
 
         // Borrowed from Splat.
-        static bool InUnitTestRunner()
+        public static bool InUnitTestRunner()
         {
             return Splat.ModeDetector.InUnitTestRunner();
         }

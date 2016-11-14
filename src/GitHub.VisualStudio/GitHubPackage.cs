@@ -62,7 +62,7 @@ namespace GitHub.VisualStudio
         {
             var menus = await GetServiceAsync(typeof(IMenuProvider)) as IMenuProvider;
 
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            await ThreadingHelper.SwitchToMainThreadAsync();
 
             foreach (var menu in menus.Menus)
                 serviceProvider.AddCommandHandler(menu.Guid, menu.CmdId, (s, e) => menu.Activate());
