@@ -676,21 +676,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup Condition="$(Buildtype) == 'Internal'">
-    <Content Include="..\..\submodules\externalpackages\StartPage\preview4\build\GitHub.StartPage.Preview4.pkgdef">
-      <Link>GitHub.StartPage.Preview4.pkgdef</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\..\submodules\externalpackages\StartPage\preview4\build\GitHub.StartPage.Preview4.dll">
-      <Link>GitHub.StartPage.Preview4.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\..\submodules\externalpackages\StartPage\preview4\build\GitHub.StartPage.Preview4.pdb">
-      <Link>GitHub.StartPage.Preview4.pdb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.pkgdef">
       <Link>GitHub.StartPage.Preview5.pkgdef</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
