@@ -109,9 +109,41 @@
         </Style>
       </Border.Resources>
       <StackPanel>
-        <ui:OcticonImage Icon="logo_github" Width="200" Height="200" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Center">Clone:</TextBlock>
-        <TextBlock HorizontalAlignment="Center" Text="{Binding SelectedRepository.CloneUrl}"/>
+        <ui:OcticonImage Icon="logo_github" Width="150" Height="150" VerticalAlignment="Top" Margin="0,0,0,-45"/>
+        <TextBlock HorizontalAlignment="Center">You're about to clone a GitHub repository to your computer</TextBlock>
+        <Grid HorizontalAlignment="Center" Margin="0,60,0,0" MaxWidth="400">
+          <Grid.Resources>
+            <Style x:Key="Light" TargetType="Label">
+                <Setter Property="Opacity" Value="0.6"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="5,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+          </Grid.Resources>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+            
+          <Label Style="{StaticResource Light}" Grid.Row="0" HorizontalAlignment="Left" Margin="6,0,0,0">Repo Name</Label>
+          <Label Style="{StaticResource Light}" Grid.Row="1" HorizontalAlignment="Right">Organization</Label>
+          <Label Style="{StaticResource Light}" Grid.Row="2" HorizontalAlignment="Right">Source</Label>
+            
+          <ui:OcticonImage Grid.Row="0" Grid.Column="1" Icon="repo"/>
+          <ui:OcticonImage Grid.Row="1" Grid.Column="1" Icon="organization"/>
+          <ui:OcticonImage Grid.Row="2" Grid.Column="1" Icon="link"/>
+            
+          <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.RepositoryName}"/>
+          <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.Owner}"/>
+          <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.Host}"/>
+        </Grid>
       </StackPanel>
     </Border>
   </DockPanel>
