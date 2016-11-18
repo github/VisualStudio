@@ -110,7 +110,7 @@ namespace GitHub.ViewModels
                     }))
             .OnExecuteCompleted(pr =>
             {
-                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name,
+                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, SourceBranch.DisplayName, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name + "#" + pr.Number,
                     TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
             });
 

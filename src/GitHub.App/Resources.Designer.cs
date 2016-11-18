@@ -223,7 +223,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Pull Request has been created at [{0}]({1})..
+        ///   Looks up a localized string similar to Pull Request for branch {0} created successfully created at [{1}]({2}).
         /// </summary>
         internal static string PRCreatedUpstream {
             get {
