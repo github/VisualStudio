@@ -1,4 +1,4 @@
-## Contributing to the GitHub Extension for Visual Studio
+## Contributing to the _GitHub Extension for Visual Studio_
 
 [fork]: https://github.com/github/VisualStudio/fork
 [pr]: https://github.com/github/VisualStudio/compare
