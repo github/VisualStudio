@@ -64,7 +64,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
             var ret = uiProvider.SetupUI(controllerFlow, null);
             ret.Subscribe(c => { }, () => CheckLogin().Forget());
             uiProvider.RunUI();
