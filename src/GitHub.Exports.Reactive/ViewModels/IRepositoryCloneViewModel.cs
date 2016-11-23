@@ -15,7 +15,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
-        ObservableCollection<IRepositoryModel> Repositories { get; }
+        ObservableCollection<IRemoteRepositoryModel> Repositories { get; }
 
         bool FilterTextIsEnabled { get; }
 

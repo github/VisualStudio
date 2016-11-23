@@ -18,6 +18,7 @@ using System.Reactive.Threading.Tasks;
 using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
+using GitHub.Extensions;
 
 namespace GitHub.Api
 {
@@ -235,6 +236,16 @@ namespace GitHub.Api
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
         }
 
+        public IObservable<PullRequest> GetPullRequest(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Get(owner, name, number);
+        }
+
+        public IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Files(owner, name, number);
+        }
+
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
         {
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
@@ -257,7 +268,11 @@ namespace GitHub.Api
 
         public IObservable<Branch> GetBranches(string owner, string repo)
         {
+#pragma warning disable CS0618
+            // GetAllBranches is obsolete, but don't want to introduce the change to fix the
+            // warning in the PR, so disabling for now.
             return gitHubClient.Repository.GetAllBranches(owner, repo);
+#pragma warning restore
         }
 
         public IObservable<Repository> GetRepository(string owner, string repo)

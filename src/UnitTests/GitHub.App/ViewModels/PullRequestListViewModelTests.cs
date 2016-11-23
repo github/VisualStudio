@@ -18,7 +18,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void SelectingAssigneeShouldTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
@@ -33,7 +33,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void ResettingAssigneeToNoneShouldNotTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
@@ -54,7 +54,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void SelectingAuthorShouldTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
@@ -69,7 +69,7 @@ namespace UnitTests.GitHub.App.ViewModels
         public void ResettingAuthorToNoneShouldNotTriggerFilter()
         {
             var repositoryHost = CreateRepositoryHost();
-            var repository = Substitute.For<ISimpleRepositoryModel>();
+            var repository = Substitute.For<ILocalRepositoryModel>();
             var settings = CreateSettings();
             var prViewModel = new PullRequestListViewModel(repositoryHost, repository, settings);
 
@@ -99,14 +99,14 @@ namespace UnitTests.GitHub.App.ViewModels
                 1,
                 "PR1",
                 new Account("foo", true, false, 1, 0, bitmapSource),
-                new Account("foo", true, false, 1, 0, bitmapSource),
                 DateTimeOffset.MinValue);
+            pullRequest.Assignee = new Account("foo", true, false, 1, 0, bitmapSource);
 
             var pullRequestCollection = Substitute.For<ITrackingCollection<IPullRequestModel>>();
             pullRequestCollection[0].Returns(pullRequest);
 
             modelService.GetPullRequests(
-                Arg.Any<ISimpleRepositoryModel>(),
+                Arg.Any<ILocalRepositoryModel>(),
                 Arg.Any<ITrackingCollection<IPullRequestModel>>())
                .Returns(pullRequestCollection);
             result.ModelService.Returns(modelService);

@@ -143,6 +143,7 @@
     <Compile Include="Factories\UIFactory.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Infrastructure\LoggingConfiguration.cs" />
+    <Compile Include="Models\PullRequestFileModel.cs" />
     <Compile Include="Models\PullRequestModel.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -150,6 +151,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SampleData\AccountDesigner.cs" />
+    <Compile Include="SampleData\LocalRepositoryModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestCreationViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
     <Compile Include="SampleData\LoggedOutViewModelDesigner.cs" />
@@ -189,7 +191,7 @@
     <Compile Include="Models\DisconnectedRepositoryHosts.cs" />
     <Compile Include="Models\RepositoryHost.cs" />
     <Compile Include="Models\RepositoryHosts.cs" />
-    <Compile Include="Models\RepositoryModel.cs" />
+    <Compile Include="Models\RemoteRepositoryModel.cs" />
     <Compile Include="SampleData\SampleViewModels.cs" />
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Factories\ApiClientFactory.cs" />
@@ -220,6 +222,8 @@
     <Compile Include="ViewModels\LogoutRequiredViewModel.cs" />
     <Compile Include="ViewModels\PullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\PullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\PullRequestDirectoryNode.cs" />
+    <Compile Include="ViewModels\PullRequestFileNode.cs" />
     <Compile Include="ViewModels\PullRequestListViewModel.cs" />
     <Compile Include="ViewModels\StartPageCloneViewModel.cs" />
     <Compile Include="ViewModels\RepositoryCreationViewModel.cs" />

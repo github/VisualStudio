@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
 using LibGit2Sharp;
@@ -27,7 +28,7 @@ namespace GitHub.Services
         UriString GetUri(string path, string remote = "origin");
         
         /// <summary>
-        /// Probes for a git repository and if one is found, returns a <see cref="IRepository"/> instance for the
+        /// Probes for a git repository and if one is found, returns a <see cref="IRepositoryModel"/> instance for the
         /// repository.
         /// </summary>
         /// <remarks>
@@ -35,7 +36,7 @@ namespace GitHub.Services
         /// walks up the parent directories until it either finds a repository, or reaches the root disk.
         /// </remarks>
         /// <param name="path">The path to start probing</param>
-        /// <returns>An instance of <see cref="IRepository"/> or null</returns>
+        /// <returns>An instance of <see cref="IRepositoryModel"/> or null</returns>
         IRepository GetRepository(string path);
 
         /// <summary>
@@ -44,5 +45,13 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <returns></returns>
         UriString GetRemoteUri(IRepository repo, string remote = "origin");
+
+        /// <summary>
+        /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 
+        /// been found in any remote branches or the current local branch. 
+        /// </summary>
+        /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
+        /// <returns></returns>
+        Task<string> GetLatestPushedSha(string path);
     }
 }

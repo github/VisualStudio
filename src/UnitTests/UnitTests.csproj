@@ -164,6 +164,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -215,6 +216,7 @@
     <Compile Include="GitHub.App\Caches\CredentialCacheTests.cs" />
     <Compile Include="GitHub.App\Caches\ImageCacheTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIProviderTests.cs" />
+    <Compile Include="GitHub.App\Models\AccountModelTests.cs" />
     <Compile Include="GitHub.App\Models\ModelServiceTests.cs" />
     <Compile Include="GitHub.App\Controllers\UIControllerTests.cs" />
     <Compile Include="GitHub.App\Models\PullRequestModelTests.cs" />
@@ -229,6 +231,7 @@
     <Compile Include="GitHub.App\ViewModels\LoginControlViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\PullRequestCreationViewModelTests.cs" />
+    <Compile Include="GitHub.App\ViewModels\PullRequestDetailViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\PullRequestListViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs" />
     <Compile Include="GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs" />
@@ -236,7 +239,9 @@
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
     <Compile Include="GitHub.Exports\GitServiceTests.cs" />
     <None Include="GitHub.Exports\VSServicesTests.cs" />
-    <Compile Include="GitHub.Exports\SimpleRepositoryModelTests.cs" />
+    <Compile Include="GitHub.Exports\HostAddressTests.cs" />
+    <Compile Include="GitHub.Exports\LocalRepositoryModelTests.cs" />
+    <Compile Include="GitHub.Extensions\GuardTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
@@ -244,7 +249,7 @@
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
     <Compile Include="GitHub.VisualStudio\TeamExplorer\Home\GraphsNavigationItemTests.cs" />
-    <Compile Include="GitHubPackageTests.cs" />
+    <Compile Include="GitHub.VisualStudio\UI\Views\GitHubPaneViewModelTests.cs" />
     <Compile Include="Helpers\CommandTestHelpers.cs" />
     <Compile Include="Helpers\LazySubstitute.cs" />
     <Compile Include="Helpers\ReactiveTestHelper.cs" />

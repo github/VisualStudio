@@ -67,7 +67,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             private set { SetValue(RepositoriesViewPropertyKey, value); }
         }
 
-        ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRepositoryModel> repositories)
+        ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRemoteRepositoryModel> repositories)
         {
             if (repositories == null)
                 return null;
@@ -89,7 +89,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             public override object GroupNameFromItem(object item, int level, System.Globalization.CultureInfo culture)
             {
-                var repo = item as IRepositoryModel;
+                var repo = item as IRemoteRepositoryModel;
                 var name = repo.Owner;
                 RepositoryGroup group;
 
