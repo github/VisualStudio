@@ -426,8 +426,7 @@ public class RepositoryCloneViewModelTests
             
             vm.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
             await vm.CloneCommand.ExecuteAsync();
-
-            usageTracker.Received().IncrementCloneCount().Forget();
+            Received.InOrder(async () => await usageTracker.IncrementCloneCount());
         }
     }
 }

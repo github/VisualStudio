@@ -12,7 +12,6 @@ install:
       Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
     } else {
       git submodule deinit script
-      git submodule deinit submodules/externalpackages/StartPage
     }
 
     git submodule update
