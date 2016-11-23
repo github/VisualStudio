@@ -7,11 +7,10 @@ using System.Text;
 using System.Windows.Threading;
 using GitHub.Models;
 using GitHub.Settings;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
 using System.Threading.Tasks;
+using GitHub.Helpers;
 
 namespace GitHub.Services
 {
@@ -142,7 +141,7 @@ namespace GitHub.Services
             // improve the startup time of the extension.
             if (userSettings == null)
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await ThreadingHelper.SwitchToMainThreadAsync();
 
                 client = uiProvider.GetService<IMetricsService>();
                 connectionManager = uiProvider.GetService<IConnectionManager>();
