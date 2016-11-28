@@ -550,6 +550,10 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\externalpackages\StartPage\preview5\GitHub.StartPage.Preview5.csproj">
+      <Project>{1bc94b6a-b021-4207-a70e-936ee272ad3e}</Project>
+      <Name>GitHub.StartPage.Preview5</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>
@@ -677,23 +681,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup Condition="$(Buildtype) == 'Internal'">
-    <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.pkgdef">
-      <Link>GitHub.StartPage.Preview5.pkgdef</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.dll">
-      <Link>GitHub.StartPage.Preview5.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\..\submodules\externalpackages\StartPage\preview5\build\GitHub.StartPage.Preview5.pdb">
-      <Link>GitHub.StartPage.Preview5.pdb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
