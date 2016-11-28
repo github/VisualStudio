@@ -57,7 +57,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
             uiProvider.RunUI(controllerFlow, null);
         }
 

@@ -100,7 +100,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
             var ret = uiProvider.SetupUI(controllerFlow, null);
             ret.Subscribe((c) => { }, async () =>
             {
@@ -114,7 +114,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         public void ShowPublish()
         {
             IsBusy = true;
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();
             disposable = uiflow;

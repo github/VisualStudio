@@ -13,6 +13,7 @@ using Xunit;
 using GitHub.Api;
 using Akavache;
 using GitHub.Collections;
+using GitHub.Extensions;
 
 public class RepositoryCloneViewModelTests
 {
@@ -425,8 +426,7 @@ public class RepositoryCloneViewModelTests
             
             vm.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
             await vm.CloneCommand.ExecuteAsync();
-
-            usageTracker.Received().IncrementCloneCount();
+            Received.InOrder(async () => await usageTracker.IncrementCloneCount());
         }
     }
 }

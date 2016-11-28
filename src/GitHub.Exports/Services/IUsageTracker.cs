@@ -1,15 +1,20 @@
-﻿namespace GitHub.Services
+﻿using GitHub.VisualStudio;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
+namespace GitHub.Services
 {
+    [Guid(Guids.UsageTrackerId)]
     public interface IUsageTracker
     {
-        void IncrementLaunchCount();
-        void IncrementCloneCount();
-        void IncrementCreateCount();
-        void IncrementPublishCount();
-        void IncrementOpenInGitHubCount();
-        void IncrementLinkToGitHubCount();
-        void IncrementCreateGistCount();
-        void IncrementUpstreamPullRequestCount();
-        void IncrementLoginCount();
+        Task IncrementLaunchCount();
+        Task IncrementCloneCount();
+        Task IncrementCreateCount();
+        Task IncrementPublishCount();
+        Task IncrementOpenInGitHubCount();
+        Task IncrementLinkToGitHubCount();
+        Task IncrementCreateGistCount();
+        Task IncrementUpstreamPullRequestCount();
+        Task IncrementLoginCount();
     }
 }
