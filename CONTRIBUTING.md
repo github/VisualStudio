@@ -1,11 +1,11 @@
-## Contributing
+## Contributing to the _GitHub Extension for Visual Studio_
 
 [fork]: https://github.com/github/VisualStudio/fork
 [pr]: https://github.com/github/VisualStudio/compare
 [code-of-conduct]: http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com
 [readme]: https://github.com/github/VisualStudio#build
 
-Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
+Hi there! We're thrilled that you'd like to contribute to the __GitHub Extension for Visual Studio__. Your help is essential for keeping it great.
 
 This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to uphold this code.
 
