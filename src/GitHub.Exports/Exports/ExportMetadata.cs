@@ -28,6 +28,8 @@ namespace GitHub.Exports
         LoggedOut,
         NotAGitRepository,
         NotAGitHubRepository,
+        StartPageClone,
+
     }
 
     public enum MenuType

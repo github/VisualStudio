@@ -366,6 +366,12 @@ namespace GitHub.Controllers
                 .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
                 .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
 
+            uiStateMachine.Configure(UIViewType.StartPageClone)
+                .OnEntry(tr => RunView(UIViewType.StartPageClone, CalculateDirection(tr)))
+                .PermitDynamic(Trigger.Next, () => Go(Trigger.Next))
+                .PermitDynamic(Trigger.Cancel, () => Go(Trigger.Cancel))
+                .PermitDynamic(Trigger.Finish, () => Go(Trigger.Finish));
+
             uiStateMachine.Configure(UIViewType.End)
                 .OnEntryFrom(Trigger.Cancel, () => End(false))
                 .OnEntryFrom(Trigger.Next, () => End(true))
@@ -558,6 +564,19 @@ namespace GitHub.Controllers
             logic.Configure(UIViewType.End)
                 .Permit(Trigger.Next, UIViewType.None);
             machines.Add(UIControllerFlow.LogoutRequired, logic);
+
+            // start page clone flow
+            logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.Configure(UIViewType.None)
+                .Permit(Trigger.Next, UIViewType.StartPageClone)
+                .Permit(Trigger.Finish, UIViewType.End);
+            logic.Configure(UIViewType.StartPageClone)
+                .Permit(Trigger.Next, UIViewType.End)
+                .Permit(Trigger.Cancel, UIViewType.End)
+                .Permit(Trigger.Finish, UIViewType.End);
+            logic.Configure(UIViewType.End)
+                .Permit(Trigger.Next, UIViewType.None);
+            machines.Add(UIControllerFlow.StartPageClone, logic);
         }
 
         UIControllerFlow SelectActiveFlow()
