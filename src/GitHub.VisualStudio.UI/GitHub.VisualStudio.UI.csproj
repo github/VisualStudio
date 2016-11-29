@@ -117,6 +117,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Styles\ItemsControls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Styles\ActionLinkButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

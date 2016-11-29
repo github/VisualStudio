@@ -48,7 +48,7 @@
                 <Style.Resources>
                     <Style TargetType="Image">
                         <Setter Property="Stretch" Value="UniformToFill" />
-                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="StretchDirection" Value="DownOnly" /> 
                         <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
                     </Style>
                 </Style.Resources>
@@ -494,6 +494,7 @@
                                       Margin="0 6 0 0"                                      
                                       ContextMenuOpening="ListView_ContextMenuOpening"
                                       ContextMenu="{StaticResource FileContextMenu}"
+                                      ItemContainerStyle="{StaticResource FlatListViewItemStyle}"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <ListView.Style>
                                     <Style TargetType="ListView">
@@ -504,13 +505,8 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ListView.Style>
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
                                 <ListView.View>
-                                    <GridView>
+                                    <GridView ColumnHeaderContainerStyle="{StaticResource FlatGridViewColumnHeader}">
                                         <GridViewColumn Header="Name" Width="Auto">
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
