@@ -439,14 +439,14 @@
                                     <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryNode}"
                                                               ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
+                                            <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" Margin="0,0,0,2"/>
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
                                                     Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
-                                            <ui:OcticonImage Icon="file_code">
+                                            <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
                                                         <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
