@@ -511,8 +511,8 @@
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <ui:OcticonImage Icon="file_code" Margin="0 0 4 0"/>
-                                                        <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
+                                                        <ui:OcticonImage Icon="file_code"/>
+                                                        <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
                                                                     <Style.Triggers>
