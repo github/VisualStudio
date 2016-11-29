@@ -24,115 +24,97 @@ namespace GitHub.Services
             fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
         }
 
-        public Task Push(IRepository repository, string branchName, string remoteName)
+        public async Task Push(IRepository repository, string branchName, string remoteName)
         {
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            var remote = await GetHttpRemote(repository, remoteName).ConfigureAwait(false);
+            if (repository.Head?.Commits != null && repository.Head.Commits.Any())
             {
-                if (repository.Head?.Commits != null && repository.Head.Commits.Any())
-                {
-                    var remote = repository.Network.Remotes[remoteName];
-                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
-                }
-            });
+                repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
+            }
         }
 
-        public Task Fetch(IRepository repository, string remoteName)
+        public async Task Fetch(IRepository repository, string remoteName)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
-            {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, fetchOptions);
-            });
+            var remote = await GetHttpRemote(repository, remoteName).ConfigureAwait(false);
+            repository.Network.Fetch(remote, fetchOptions);
         }
 
-        public Task Fetch(IRepository repository, string remoteName, params string[] refspecs)
+        public async Task Fetch(IRepository repository, string remoteName, params string[] refspecs)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
-            {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, refspecs, fetchOptions);
-            });
+            var remote = await GetHttpRemote(repository, remoteName).ConfigureAwait(false);
+            repository.Network.Fetch(remote, refspecs, fetchOptions);
         }
 
-        public Task Checkout(IRepository repository, string branchName)
+        public async Task Checkout(IRepository repository, string branchName)
         {
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
 
-            return Task.Factory.StartNew(() =>
-            {
-                repository.Checkout(branchName);
-            });
+            await TaskScheduler.Default;
+            repository.Checkout(branchName);
         }
 
-        public Task SetConfig(IRepository repository, string key, string value)
+        public async Task SetConfig(IRepository repository, string key, string value)
         {
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotEmptyString(value, nameof(value));
 
-            return Task.Factory.StartNew(() =>
-            {
-                repository.Config.Set(key, value);
-            });
+            await TaskScheduler.Default;
+            repository.Config.Set(key, value);
         }
 
-        public Task SetRemote(IRepository repository, string remoteName, Uri url)
+        public async Task SetRemote(IRepository repository, string remoteName, Uri url)
         {
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
-            {
-                repository.Config.Set("remote." + remoteName + ".url", url.ToString());
-                repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
-            });
+            await TaskScheduler.Default;
+
+            repository.Config.Set("remote." + remoteName + ".url", url.ToString());
+            repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
         }
 
-        public Task SetTrackingBranch(IRepository repository, string branchName, string remoteName)
+        public async Task SetTrackingBranch(IRepository repository, string branchName, string remoteName)
         {
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            await TaskScheduler.Default;
+
+            var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
+            var remoteBranch = repository.Branches[remoteBranchName];
+            // if it's null, it's because nothing was pushed
+            if (remoteBranch != null)
             {
-                var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
-                var remoteBranch = repository.Branches[remoteBranchName];
-                // if it's null, it's because nothing was pushed
-                if (remoteBranch != null)
-                {
-                    var localBranchName = IsCanonical(branchName) ? branchName : "refs/heads/" + branchName;
-                    var localBranch = repository.Branches[localBranchName];
-                    repository.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
-                }
-            });
+                var localBranchName = IsCanonical(branchName) ? branchName : "refs/heads/" + branchName;
+                var localBranch = repository.Branches[localBranchName];
+                repository.Branches.Update(localBranch, b => b.TrackedBranch = remoteBranch.CanonicalName);
+            }
         }
 
-        public Task UnsetConfig(IRepository repository, string key)
+        public async Task UnsetConfig(IRepository repository, string key)
         {
             Guard.ArgumentNotEmptyString(key, nameof(key));
 
-            return Task.Factory.StartNew(() =>
-            {
-                repository.Config.Unset(key);
-            });
+            await TaskScheduler.Default;
+            repository.Config.Unset(key);
         }
 
-        public Task<Remote> GetHttpRemote(IRepository repo, string remote)
+        public async Task<Remote> GetHttpRemote(IRepository repo, string remote)
         {
-            return Task.Factory.StartNew(() =>
-            {
-                var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
-                var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
-                var ret = repo.Network.Remotes[remoteName];
-                if (ret == null)
-                    ret = repo.Network.Remotes.Add(remoteName, UriString.ToUriString(uri.ToRepositoryUrl()));
-                return ret;
-            });
+            await TaskScheduler.Default;
+
+            var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
+            var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
+            var ret = repo.Network.Remotes[remoteName];
+            if (ret == null)
+                ret = repo.Network.Remotes.Add(remoteName, UriString.ToUriString(uri.ToRepositoryUrl()));
+            return ret;
         }
 
         public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)

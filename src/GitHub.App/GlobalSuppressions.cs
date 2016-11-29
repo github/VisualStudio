@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", MessageId = "Git", Scope = "resource", Target = "GitHub.Resources.resources")]
 [assembly: SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Scope = "member", Target = "GitHub.Caches.CredentialCache.#InsertObject`1(System.String,!!0,System.Nullable`1<System.DateTimeOffset>)")]
 [assembly: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", MessageId = "Git", Scope = "resource", Target = "GitHub.App.Resources.resources")]
+[assembly: SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Scope = "type", Target = "GitHub.Extensions.AwaitExtensions+TaskSchedulerAwaiter")]
 // This file is used by Code Analysis to maintain SuppressMessage 
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given 
