@@ -291,7 +291,6 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Base\MenuBase.cs" />
     <Compile Include="Helpers\VisualTreeExtensions.cs" />
     <Compile Include="Menus\MenuBase.cs" />
     <Compile Include="Menus\CreateGist.cs" />
