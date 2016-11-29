@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.ViewModels;
 using LibGit2Sharp;
 using NSubstitute;
@@ -359,7 +360,8 @@ namespace UnitTests.GitHub.App.ViewModels
             var vm = new PullRequestDetailViewModel(
                 repository,
                 Substitute.For<IModelService>(),
-                pullRequestService);
+                pullRequestService,
+                Substitute.For<IPackageSettings>());
 
             return Tuple.Create(vm, pullRequestService);
         }

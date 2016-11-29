@@ -12,6 +12,7 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using NullGuard;
 using ReactiveUI;
@@ -51,10 +52,12 @@ namespace GitHub.ViewModels
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPullRequestService pullRequestsService)
+            IPullRequestService pullRequestsService,
+            IPackageSettings settings)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
-                  pullRequestsService)
+                  pullRequestsService,
+                  settings)
         {
         }
 
@@ -68,7 +71,8 @@ namespace GitHub.ViewModels
         public PullRequestDetailViewModel(
             ILocalRepositoryModel repository,
             IModelService modelService,
-            IPullRequestService pullRequestsService)
+            IPullRequestService pullRequestsService,
+            IPackageSettings settings)
         {
             this.repository = repository;
             this.modelService = modelService;
@@ -82,18 +86,28 @@ namespace GitHub.ViewModels
 
             OpenOnGitHub = ReactiveCommand.Create();
 
+            ChangedFilesViewType = settings.UIState.PullRequestDetailState.ShowTree ?
+                ChangedFilesViewType.TreeView : ChangedFilesViewType.ListView;
+
             ToggleChangedFilesView = ReactiveCommand.Create();
             ToggleChangedFilesView.Subscribe(_ =>
             {
                 ChangedFilesViewType = ChangedFilesViewType == ChangedFilesViewType.TreeView ?
                     ChangedFilesViewType.ListView : ChangedFilesViewType.TreeView;
+                settings.UIState.PullRequestDetailState.ShowTree = ChangedFilesViewType == ChangedFilesViewType.TreeView;
+                settings.Save();
             });
+
+            OpenChangedFileAction = settings.UIState.PullRequestDetailState.DiffOnOpen ?
+                OpenChangedFileAction.Diff : OpenChangedFileAction.Open;
 
             ToggleOpenChangedFileAction = ReactiveCommand.Create();
             ToggleOpenChangedFileAction.Subscribe(_ =>
             {
                 OpenChangedFileAction = OpenChangedFileAction == OpenChangedFileAction.Diff ?
                     OpenChangedFileAction.Open : OpenChangedFileAction.Diff;
+                settings.UIState.PullRequestDetailState.DiffOnOpen = OpenChangedFileAction == OpenChangedFileAction.Diff;
+                settings.Save();
             });
 
             OpenFile = ReactiveCommand.Create();
