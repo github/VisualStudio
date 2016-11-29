@@ -33,25 +33,45 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     {
         readonly Dictionary<string, RepositoryGroup> groups = new Dictionary<string, RepositoryGroup>();
 
+        static readonly DependencyPropertyKey RepositoriesViewPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(RepositoriesView),
+                typeof(ICollectionView),
+                typeof(RepositoryCloneControl),
+                new PropertyMetadata(null));
+
+        public static readonly DependencyProperty RepositoriesViewProperty = RepositoriesViewPropertyKey.DependencyProperty;
+
         public RepositoryCloneControl()
         {
             InitializeComponent();
 
             this.WhenActivated(d =>
             {
-                d(this.OneWayBind(ViewModel, vm => vm.Repositories, v => v.repositoryList.ItemsSource, CreateRepositoryListCollectionView));
                 d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
                 d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
             });
+
             IsVisibleChanged += (s, e) =>
             {
                 if (IsVisible)
                     this.TryMoveFocus(FocusNavigationDirection.First).Subscribe();
             };
+
+            this.WhenAnyValue(x => x.ViewModel.Repositories, CreateRepositoryListCollectionView).Subscribe(x => RepositoriesView = x);
+        }
+
+        public ICollectionView RepositoriesView
+        {
+            get { return (ICollectionView)GetValue(RepositoriesViewProperty); }
+            private set { SetValue(RepositoriesViewPropertyKey, value); }
         }
 
         ListCollectionView CreateRepositoryListCollectionView(IEnumerable<IRemoteRepositoryModel> repositories)
         {
+            if (repositories == null)
+                return null;
+
             var view = new ListCollectionView((IList)repositories);
             Debug.Assert(view.GroupDescriptions != null, "view.GroupDescriptions is null");
             view.GroupDescriptions.Add(new RepositoryGroupDescription(this));

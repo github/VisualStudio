@@ -215,7 +215,7 @@
     </CommandPlacement>
 
   </CommandPlacements>
-    
+  
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidGitHubPkg" value="{c3d3dc68-c977-411f-b3e8-03b0dccf7dfc}" />

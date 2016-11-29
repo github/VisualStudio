@@ -151,7 +151,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to log in..
+        ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to sign in..
         /// </summary>
         internal static string LoginFailedForbiddenMessage {
             get {
@@ -169,7 +169,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Login failed..
+        ///   Looks up a localized string similar to Sign in failed..
         /// </summary>
         internal static string LoginFailedText {
             get {
@@ -412,7 +412,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter a login authentication code here.
+        ///   Looks up a localized string similar to Enter a sign in authentication code here.
         /// </summary>
         internal static string TwoFactorUnknown {
             get {

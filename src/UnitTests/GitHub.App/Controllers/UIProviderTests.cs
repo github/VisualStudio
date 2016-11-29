@@ -23,7 +23,7 @@ public class UIProviderTests : TestBaseClass
     {
         var provider = Substitutes.GetFullyMockedServiceProvider();
 
-        using (var p = new UIProvider(provider))
+        using (var p = new GitHubServiceProvider(provider))
         {
 #if DEBUG
             Assert.ThrowsAny<InvalidOperationException>(() =>

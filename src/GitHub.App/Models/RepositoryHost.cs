@@ -242,7 +242,7 @@ namespace GitHub.Models
                     if (result.IsSuccess())
                     {
                         var accountCacheItem = new AccountCacheItem(userAndScopes.User);
-                        usage.IncrementLoginCount();
+                        usage.IncrementLoginCount().Forget();
                         return ModelService.InsertUser(accountCacheItem).Select(_ => result);
                     }
 

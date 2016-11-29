@@ -421,7 +421,7 @@ namespace GitHub.ViewModels
                     break;
                 case CheckoutMode.Fetch:
                     operation = pullRequestsService
-                        .GetDefaultLocalBranchName(repository, Model.Number, Title)
+                        .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
                     break;
                 case CheckoutMode.Switch:
@@ -430,7 +430,7 @@ namespace GitHub.ViewModels
                 case CheckoutMode.InvalidState:
                     operation = pullRequestsService
                         .UnmarkLocalBranch(repository)
-                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Title))
+                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title))
                         .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
                     break;
                 default:

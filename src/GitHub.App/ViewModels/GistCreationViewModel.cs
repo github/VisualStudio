@@ -78,7 +78,7 @@ namespace GitHub.ViewModels
             newGist.Files.Add(FileName, SelectedText);
 
             return gistPublishService.PublishGist(apiClient, newGist)
-                .Do(_ => usageTracker.IncrementCreateGistCount())
+                .Do(_ => usageTracker.IncrementCreateGistCount().Forget())
                 .Catch<Gist, Exception>(ex =>
                 {
                     if (!ex.IsCriticalException())
