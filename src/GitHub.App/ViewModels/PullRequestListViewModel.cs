@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Models;
@@ -47,6 +48,8 @@ namespace GitHub.ViewModels
             this.repositoryHost = repositoryHost;
             this.repository = repository;
             this.settings = settings;
+
+            Title = Resources.PullRequestsNavigationItemText;
 
             this.listSettings = settings.UIState
                 .GetOrCreateRepositoryState(repository.CloneUrl)

@@ -259,6 +259,24 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pull Request.
+        /// </summary>
+        internal static string PullRequestNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Requests.
+        /// </summary>
+        internal static string PullRequestsNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestsNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source and target branch cannot be the same.
         /// </summary>
         internal static string PullRequestSourceAndTargetBranchTheSame {

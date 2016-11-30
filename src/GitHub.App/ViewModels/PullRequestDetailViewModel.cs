@@ -8,6 +8,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -268,6 +269,7 @@ namespace GitHub.ViewModels
         public async Task Load(IPullRequestModel pullRequest)
         {
             Model = pullRequest;
+            Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
