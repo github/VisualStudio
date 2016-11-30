@@ -14,7 +14,7 @@
                                     Foreground="{DynamicResource GitHubVsWindowText}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
-                                    d:DesignHeight="780"
+                                    d:DesignHeight="800"
                                     mc:Ignorable="d"
                                     Style="{DynamicResource BusyStateView}">
     <d:DesignProperties.DataContext>
@@ -62,13 +62,13 @@
                  It's a hack, it will break with localization -->
             <Style x:Key="StateIndicator" TargetType="TextBlock">
                 <Style.Triggers>
-                    <Trigger Property="Text" Value="Open">
+                    <Trigger Property="Text" Value="OPEN">
                         <Setter Property="Foreground" Value="#6CC644"/>
                     </Trigger>
-                    <Trigger Property="Text" Value="Closed">
+                    <Trigger Property="Text" Value="CLOSED">
                         <Setter Property="Foreground" Value="#BD2C00"/>
                     </Trigger>
-                    <Trigger Property="Text" Value="Merged">
+                    <Trigger Property="Text" Value="MERGED">
                         <Setter Property="Foreground" Value="#6E5494"/>
                     </Trigger>
                 </Style.Triggers>
@@ -92,57 +92,55 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+            <ui:AllCapsConverter x:Key="AllCaps"/>
         </ResourceDictionary>
     </Control.Resources>
 
-    <DockPanel Grid.IsSharedSizeScope="True">
+    <DockPanel Grid.IsSharedSizeScope="True" Margin="8">
         <!-- PR Title and number -->
-        <DockPanel DockPanel.Dock="Top"
-                   Margin="8 4 8 8">
-            <TextBlock DockPanel.Dock="Right"
-                       FontSize="9pt"
-                       Foreground="Gray"
-                       Margin="4 2 0 0"
-                       Text="{Binding Model.Number, StringFormat=#{0}}"
-                       VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Model.Title}"
-                       FontSize="10pt"
-                       VerticalAlignment="Top"
-                       TextWrapping="Wrap"/>
-        </DockPanel>
+        <TextBlock DockPanel.Dock="Top" FontSize="10pt" TextWrapping="Wrap">
+            <ui:OcticonImage Icon="git_pull_request" Margin="0,-4"/>
+            <Run Text="{Binding Model.Title}"/>
+            <Run Foreground="Gray" Text="{Binding Model.Number, Mode=OneWay, StringFormat={}#{0}}"/>
+        </TextBlock>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
+        <!-- Open/Merged/Closed state, author and time -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,4,0,0">
+            <TextBlock DockPanel.Dock="Left" FontWeight="Bold" Text="{Binding Model.State, Converter={StaticResource AllCaps}}" Style="{StaticResource StateIndicator}"/>
+            <Rectangle DockPanel.Dock="Left" Margin="4,2,4,1" Width="1" Fill="{DynamicResource GitHubVsWindowText}"/>
+            <TextBlock>
+                <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
+                <Run Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+            </TextBlock>
+        </DockPanel>
+        
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,12,-8,0"/>
 
         <!-- PR Overview -->
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
-                <ColumnDefinition Width="6" SharedSizeGroup="LeftMarginSpace"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/> <!-- Left margin w/icon -->
+                <ColumnDefinition Width="6"/>    <!-- Spacing -->
+                <ColumnDefinition Width="*"/>    <!-- Content -->
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Open/closed state and branches -->
+                <RowDefinition Height="Auto"/> <!-- Target/source branches -->
                 <RowDefinition Height="1"/>
                 <RowDefinition Height="Auto"/> <!-- Commit and files changed count -->
                 <RowDefinition Height="1"/>
-                <RowDefinition Height="Auto"/> <!-- Checkout button -->
+                <RowDefinition Height="Auto"/> <!-- Action area -->
             </Grid.RowDefinitions>
             
             <!-- PR Icon in left margin -->
             <ui:OcticonImage Grid.Column="0"
-                             Margin="8"
+                             Margin="0,8,8,8"
                              VerticalAlignment="Top"
-                             Icon="git_pull_request"/>
+                             Icon="git_branch"/>
 
             <!-- Open/closed state and branches -->
-            <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
-                <TextBlock Margin="0 0 12 0"
-                           FontWeight="Bold"
-                           Text="{Binding Model.State}"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource StateIndicator}"/>
-
+            <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal">
                 <TextBlock Text="{Binding TargetBranchDisplayName}" VerticalAlignment="Center"/>
                 <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 3 3 0"/>
                 <TextBlock Text="{Binding SourceBranchDisplayName}" VerticalAlignment="Center" 
@@ -295,13 +293,11 @@
             </StackPanel>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,0,-8,0"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
-                    <ColumnDefinition Width="6" SharedSizeGroup="LeftMarginSpace"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -312,29 +308,10 @@
                     <RowDefinition Height="Auto"/> <!-- Files changed -->
                 </Grid.RowDefinitions>
 
-                <!-- Author avatar -->
-                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0 6 0 3">
-                    <Grid.OpacityMask>
-                        <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
-                    </Grid.OpacityMask>
-                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
-                    <Image x:Name="avatar"
-                           Width="20"
-                           Height="20"
-                           RenderOptions.BitmapScalingMode="HighQuality"
-                           Source="{Binding Model.Author.Avatar}" />
-                </Grid>
-
-                <!-- Author and open time -->
-                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0 6">
-                    <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
-                    <Run Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
-                </TextBlock>
-
                 <!-- PR Body -->
                 <ui:MarkdownViewer Name="bodyMarkdown"
-                                   Grid.Column="2" Grid.Row="1"
-                                   Margin="2 6 10 6"
+                                   Grid.Row="1"
+                                   Margin="2 10 10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
@@ -344,15 +321,9 @@
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
-                <!-- Files changed Icon in left margin -->
-                <ui:OcticonImage Grid.Column="0" Grid.Row="3"
-                                 Margin="8"
-                                 VerticalAlignment="Top"
-                                 Icon="diff"/>
-
                 <!-- Files changed -->
                 <te:SectionControl Name="changesSection" 
-                                   Grid.Column="2" Grid.Row="3"
+                                   Grid.Row="3"
                                    IsExpanded="True"
                                    HeaderText="{Binding ChangedFilesList.Count, StringFormat=Changes ({0})}"
                                    Margin="0 5 10 0"
