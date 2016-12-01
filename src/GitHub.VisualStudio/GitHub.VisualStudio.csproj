@@ -10,10 +10,10 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.1.1.0</ApplicationVersion>
+    <ApplicationVersion>2.1.1.2</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <GenerateVsixV3>true</GenerateVsixV3>
-	<IsProductComponent>true</IsProductComponent>
+    <IsProductComponent>true</IsProductComponent>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
