@@ -13,6 +13,7 @@
     <ApplicationVersion>2.1.1.0</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <GenerateVsixV3>true</GenerateVsixV3>
+	<IsProductComponent>true</IsProductComponent>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
