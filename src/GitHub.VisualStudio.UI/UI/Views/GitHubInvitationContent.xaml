@@ -29,6 +29,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}"/>
         </ResourceDictionary>
     </UserControl.Resources>
 

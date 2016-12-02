@@ -7,26 +7,27 @@ using System.Text;
 using System.Windows.Threading;
 using GitHub.Models;
 using GitHub.Settings;
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
+using System.Threading.Tasks;
+using GitHub.Helpers;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IUsageTracker))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class UsageTracker : IUsageTracker
     {
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
-        readonly IMetricsService client;
-        readonly IConnectionManager connectionManager;
-        readonly IPackageSettings userSettings;
-        readonly IVSServices vsservices;
+        readonly IUIProvider uiProvider;
         readonly DispatcherTimer timer;
-        readonly string storePath;
+
+        IMetricsService client;
+        IConnectionManager connectionManager;
+        IPackageSettings userSettings;
+        IVSServices vsservices;
+        string storePath;
+        bool firstRun = true;
 
         Func<string, bool> fileExists;
         Func<string, Encoding, string> readAllText;
@@ -34,13 +35,10 @@ namespace GitHub.Services
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public UsageTracker(
-            IProgram program,
-            IConnectionManager connectionManager,
-            IPackageSettings userSettings,
-            IVSServices vsservices,
-            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public UsageTracker(IUIProvider uiProvider)
         {
+            this.uiProvider = uiProvider;
+
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) =>
             {
@@ -63,98 +61,105 @@ namespace GitHub.Services
             };
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
-            this.connectionManager = connectionManager;
-            this.userSettings = userSettings;
-            this.vsservices = vsservices;
-            this.client = serviceProvider.GetExportedValue<IMetricsService>();
             this.timer = new DispatcherTimer(
-                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(3),
                 DispatcherPriority.Background,
                 TimerTick,
                 Dispatcher.CurrentDispatcher);
-            this.storePath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                program.ApplicationName,
-                StoreFileName);
 
-            userSettings.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(userSettings.CollectMetrics))
-                {
-                    UpdateTimer(false);
-                }
-            };
-
-            UpdateTimer(true);
+            RunTimer();
         }
 
-        public void IncrementLaunchCount()
+        public async Task IncrementLaunchCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfStartups;
             ++usage.Model.NumberOfStartupsWeek;
             ++usage.Model.NumberOfStartupsMonth;
             SaveUsage(usage);
         }
 
-        public void IncrementCloneCount()
+        public async Task IncrementCloneCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfClones;
             SaveUsage(usage);
         }
 
-        public void IncrementCreateCount()
+        public async Task IncrementCreateCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfReposCreated;
             SaveUsage(usage);
         }
 
-        public void IncrementPublishCount()
+        public async Task IncrementPublishCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfReposPublished;
             SaveUsage(usage);
         }
 
-        public void IncrementOpenInGitHubCount()
+        public async Task IncrementOpenInGitHubCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfOpenInGitHub;
             SaveUsage(usage);
         }
 
-        public void IncrementLinkToGitHubCount()
+        public async Task IncrementLinkToGitHubCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfLinkToGitHub;
             SaveUsage(usage);
         }
 
-        public void IncrementCreateGistCount()
+        public async Task IncrementCreateGistCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfGists;
             SaveUsage(usage);
         }
 
-        public void IncrementUpstreamPullRequestCount()
+        public async Task IncrementUpstreamPullRequestCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfUpstreamPullRequests;
             SaveUsage(usage);
         }
 
-        public void IncrementLoginCount()
+        public async Task IncrementLoginCount()
         {
-            var usage = LoadUsage();
+            var usage = await LoadUsage();
             ++usage.Model.NumberOfLogins;
             SaveUsage(usage);
         }
 
-        UsageStore LoadUsage()
+        async Task Initialize()
         {
+            // The services needed by the usage tracker are loaded when they are first needed to
+            // improve the startup time of the extension.
+            if (userSettings == null)
+            {
+                await ThreadingHelper.SwitchToMainThreadAsync();
+
+                client = uiProvider.GetService<IMetricsService>();
+                connectionManager = uiProvider.GetService<IConnectionManager>();
+                userSettings = uiProvider.GetService<IPackageSettings>();
+                vsservices = uiProvider.GetService<IVSServices>();
+
+                var program = uiProvider.GetService<IProgram>();
+                storePath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    program.ApplicationName,
+                    StoreFileName);
+            }
+        }
+
+        async Task<UsageStore> LoadUsage()
+        {
+            await Initialize();
+
             var json = fileExists(storePath) ? readAllText(storePath, Encoding.UTF8) : null;
             UsageStore result = null;
             try
@@ -182,58 +187,57 @@ namespace GitHub.Services
             writeAllText(storePath, json, Encoding.UTF8);
         }
 
-        void UpdateTimer(bool initialCall)
+        void RunTimer()
         {
-            // If the method was called due to userSettings.CollectMetrics changing, then send an
-            // opt-in/out message.
-            if (!initialCall && client != null)
-            {
-                if (userSettings.CollectMetrics)
-                    client.SendOptIn();
-                else
-                    client.SendOptOut();
-            }
-
-            // The timer first ticks after 1 minute to allow things to settle down after startup.
+            // The timer first ticks after 3 minutes to allow things to settle down after startup.
             // This will be changed to 8 hours after the first tick by the TimerTick method.
-            timer.Stop();
-            timer.Interval = TimeSpan.FromMinutes(1);
-
-            if (userSettings.CollectMetrics && client != null)
-                timer.Start();
+            timer.Start();
         }
 
-        async void TimerTick(object sender, EventArgs e)
+        void TimerTick(object sender, EventArgs e)
         {
-            Debug.Assert(client != null, "TimerTick should not be triggered when there is no IMetricsService");
-
-            // Subsequent timer ticks should occur every 8 hours.
-            timer.Interval = TimeSpan.FromHours(8);
-
-            try
-            {
-                // Every time we increment the launch count we increment both daily and weekly 
-                // launch count but we only submit (and clear) the weekly launch count when we've
-                // transitioned into a new week. We've defined a week by the ISO8601 definition,
-                // i.e. week starting on Monday and ending on Sunday.
-                var usage = LoadUsage();
-                var lastDate = usage.LastUpdated;
-                var currentDate = DateTimeOffset.Now;
-                var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
-                var includeMonthly = lastDate.Month != currentDate.Month;
-
-                // Only send stats once a day.
-                if (lastDate.Date != currentDate.Date)
+            TimerTick()
+                .Catch(ex =>
                 {
-                    await SendUsage(usage.Model, includeWeekly, includeMonthly);
-                    ClearCounters(usage.Model, includeWeekly, includeMonthly);
-                    usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
-                    SaveUsage(usage);
-                }
-            }
-            catch //(Exception ex)
+                    //log.Warn("Failed submitting usage data", ex);
+                })
+                .Forget();
+        }
+
+        async Task TimerTick()
+        {
+            await Initialize();
+
+            if (firstRun)
             {
-                //log.Warn("Failed submitting usage data", ex);
+                await IncrementLaunchCount();
+                timer.Interval = TimeSpan.FromHours(8);
+                firstRun = false;
+            }
+
+            if (client == null || !userSettings.CollectMetrics)
+            {
+                timer.Stop();
+                return;
+            }
+
+            // Every time we increment the launch count we increment both daily and weekly
+            // launch count but we only submit (and clear) the weekly launch count when we've
+            // transitioned into a new week. We've defined a week by the ISO8601 definition,
+            // i.e. week starting on Monday and ending on Sunday.
+            var usage = await LoadUsage();
+            var lastDate = usage.LastUpdated;
+            var currentDate = DateTimeOffset.Now;
+            var includeWeekly = GetIso8601WeekOfYear(lastDate) != GetIso8601WeekOfYear(currentDate);
+            var includeMonthly = lastDate.Month != currentDate.Month;
+
+            // Only send stats once a day.
+            if (lastDate.Date != currentDate.Date)
+            {
+                await SendUsage(usage.Model, includeWeekly, includeMonthly);
+                ClearCounters(usage.Model, includeWeekly, includeMonthly);
+                usage.LastUpdated = DateTimeOffset.Now.UtcDateTime;
+                SaveUsage(usage);
             }
         }
 
@@ -258,7 +262,7 @@ namespace GitHub.Services
         // http://blogs.msdn.com/b/shawnste/archive/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net.aspx
         static int GetIso8601WeekOfYear(DateTimeOffset time)
         {
-            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll 
+            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
             // be the same week# as whatever Thursday, Friday or Saturday are,
             // and we always get those right
             DayOfWeek day = cal.GetDayOfWeek(time.UtcDateTime);
