@@ -223,17 +223,12 @@
                 </TextBlock>
 
                 <!-- Git operation error message -->
-                <TextBlock Foreground="Red" Margin="0 4" Text="{Binding OperationError}" TextWrapping="Wrap">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <Trigger Property="Text" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                <TextBox Foreground="Red" 
+                         Margin="0 4"
+                         Text="{Binding OperationError}"
+                         TextWrapping="Wrap"
+                         Style="{StaticResource FlatReadOnlyTextBox}"
+                         Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
             </StackPanel>
         </Grid>
 
