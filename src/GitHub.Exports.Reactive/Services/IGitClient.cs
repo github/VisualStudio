@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using GitHub.Models;
 using LibGit2Sharp;
 
 namespace GitHub.Services
@@ -9,11 +7,18 @@ namespace GitHub.Services
     public interface IGitClient
     {
         /// <summary>
-        /// Pushes the specified branch to the remote.
+        /// Pull changes from the configured upstream remote and branch into the branch pointed at by HEAD.
         /// </summary>
         /// <param name="repository">The repository to pull</param>
+        /// <returns></returns>
+        Task Pull(IRepository repository);
+
+        /// <summary>
+        /// Pushes the specified branch to the remote.
+        /// </summary>
+        /// <param name="repository">The repository to push</param>
         /// <param name="remoteName">The name of the remote</param>
-        /// <param name="branchName">the branch to pull</param>
+        /// <param name="branchName">the branch to push</param>
         /// <returns></returns>
         Task Push(IRepository repository, string branchName, string remoteName);
 

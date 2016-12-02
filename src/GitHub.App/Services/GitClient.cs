@@ -14,6 +14,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
+        readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
 
@@ -22,10 +23,27 @@ namespace GitHub.Services
         {
             pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
+            pullOptions = new PullOptions
+            {
+                FetchOptions = fetchOptions,
+                MergeOptions = new MergeOptions(),
+            };
+        }
+
+        public Task Pull(IRepository repository)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
+                repository.Network.Pull(signature, pullOptions);
+            });
         }
 
         public Task Push(IRepository repository, string branchName, string remoteName)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
@@ -41,6 +59,7 @@ namespace GitHub.Services
 
         public Task Fetch(IRepository repository, string remoteName)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Task.Factory.StartNew(() =>
@@ -52,6 +71,7 @@ namespace GitHub.Services
 
         public Task Fetch(IRepository repository, string remoteName, params string[] refspecs)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Task.Factory.StartNew(() =>
@@ -63,6 +83,7 @@ namespace GitHub.Services
 
         public Task Checkout(IRepository repository, string branchName)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
 
             return Task.Factory.StartNew(() =>
@@ -73,6 +94,7 @@ namespace GitHub.Services
 
         public Task SetConfig(IRepository repository, string key, string value)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotEmptyString(value, nameof(value));
 
@@ -84,6 +106,7 @@ namespace GitHub.Services
 
         public Task SetRemote(IRepository repository, string remoteName, Uri url)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
             return Task.Factory.StartNew(() =>
@@ -95,6 +118,7 @@ namespace GitHub.Services
 
         public Task SetTrackingBranch(IRepository repository, string branchName, string remoteName)
         {
+            Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 

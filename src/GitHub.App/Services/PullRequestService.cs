@@ -85,7 +85,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> IsCleanForCheckout(ILocalRepositoryModel repository)
+        public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
             return Observable.Return(!repo.RetrieveStatus().IsDirty);
@@ -93,11 +93,20 @@ namespace GitHub.Services
 
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)
         {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                await gitClient.Fetch(repo, repo.Head.Remote.Name);
+                return gitClient.Pull(repo).ToObservable();
+            });
+        }
+
+        public IObservable<Unit> Push(ILocalRepositoryModel repository)
+        {
             return Observable.Defer(() =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var refspec = string.Format(CultureInfo.InvariantCulture, "{0}:{0}", repo.Head.FriendlyName);
-                return gitClient.Fetch(repo, "origin", new[] { refspec }).ToObservable();
+                return gitClient.Push(repo, repo.Head.CanonicalName, repo.Head.Remote.Name).ToObservable();
             });
         }
 

@@ -20,9 +20,14 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" 
-                                                               CommitsBehind="2"
-                                                               CheckoutDisabledMessage="Cannot update branch as your working directory has uncommitted changes."/>
+                <sampleData:PullRequestDetailViewModelDesigner>
+                    <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
+                        <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling"/>
+                    </sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
+                    <sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                        <sampleData:PullRequestUpdateStateDesigner CommitsAhead="2" CommitsBehind="4"/>
+                    </sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                </sampleData:PullRequestDetailViewModelDesigner>
             </Binding.Source>
         </Binding>
     </d:DesignProperties.DataContext>
@@ -80,17 +85,6 @@
 
             <Style x:Key="CheckoutErrorMessage" TargetType="TextBlock">
                 <Setter Property="Foreground" Value="Red" />
-            </Style>
-
-            <!-- Hyperlink has no Visibility property, sigh. Hack around this by making the text 
-                 transparent and 1 px in size. -->
-            <Style x:Key="HyperlinkHiddenWhenDisabled" TargetType="Hyperlink">
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Foreground" Value="Transparent"/>
-                        <Setter Property="FontSize" Value="1"/>
-                    </Trigger>
-                </Style.Triggers>
             </Style>
 
             <ui:AllCapsConverter x:Key="AllCaps"/>
@@ -166,19 +160,30 @@
 
             <StackPanel Grid.Column="2" Grid.Row="4" Margin="0 6">
                 <!-- Checkout pull request button -->
-                <Button Command="{Binding Checkout}">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource GitHubVsButton}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Fetch">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    Checkout pull request
-                </Button>
+                <ui:GitHubActionLink Command="{Binding Checkout}"
+                                     Content="{Binding CheckoutState.Caption}"
+                                     TextWrapping="Wrap"
+                                     Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"/>
+
+                <!-- Pull/push buttons -->
+                <StackPanel Orientation="Horizontal" Visibility="{Binding UpdateState, Converter={ui:NullToVisibilityConverter}}">
+                    <ui:OcticonImage Icon="arrow_down"/>
+                    <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
+                    <ui:GitHubActionLink Content="Pull"
+                                         Command="{Binding Pull}"
+                                         Margin="4,0"
+                                         ToolTip="{Binding UpdateState.PullDisabledMessage}"
+                                         ToolTipService.ShowOnDisabled="True"
+                                         VerticalAlignment="Center"/>
+                    <ui:OcticonImage Icon="arrow_up"/>
+                    <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
+                    <ui:GitHubActionLink Content="Push"
+                                         Command="{Binding Push}"
+                                         Margin="4,0"
+                                         ToolTip="{Binding UpdateState.PushDisabledMessage}"
+                                         ToolTipService.ShowOnDisabled="True"
+                                         VerticalAlignment="Center"/>
+                </StackPanel>
 
                 <!-- Branch checked out and up-to-date -->
                 <TextBlock TextWrapping="Wrap">
@@ -188,77 +193,16 @@
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="UpToDate">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Branch checked out and needs pull -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run>Your local branch is behind by</Run>
-                    <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
-                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Update</Hyperlink>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="NeedsPull">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Local branch exists but is not checked out -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
-                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Switch">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Local branch is checked out but is in an invalid state -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run BaselineAlignment="Top">The pull request branch has local changes.</Run>
-                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Checkout to a new branch</Hyperlink>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="InvalidState">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Local branch is checked out but needs pushing-->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="info" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run BaselineAlignment="Top">Local changes can be pushed.</Run>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Push">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsCheckedOut}" Value="True"/>
+                                        <Condition Binding="{Binding CommitsAhead}" Value="0"/>
+                                        <Condition Binding="{Binding CommitsBehind}" Value="0"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
@@ -278,8 +222,8 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- Checkout error message -->
-                <TextBlock Foreground="Red" Margin="0 4" Text="{Binding CheckoutError}" TextWrapping="Wrap">
+                <!-- Git operation error message -->
+                <TextBlock Foreground="Red" Margin="0 4" Text="{Binding OperationError}" TextWrapping="Wrap">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Style.Triggers>

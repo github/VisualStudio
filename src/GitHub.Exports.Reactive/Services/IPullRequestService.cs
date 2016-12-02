@@ -14,11 +14,11 @@ namespace GitHub.Services
             string title, string body);
 
         /// <summary>
-        /// Checks whether the specified repository is in a clean state that will allow a checkout.
+        /// Checks whether the working directory for the specified repository is in a clean state.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
-        IObservable<bool> IsCleanForCheckout(ILocalRepositoryModel repository);
+        IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Fetches a pull request to a local branch and checks out the branch.
@@ -34,6 +34,12 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         IObservable<Unit> Pull(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Carries out a push of the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        IObservable<Unit> Push(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.
