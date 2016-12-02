@@ -71,6 +71,11 @@ namespace GitHub.ViewModels
         int CommitsBehind { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the current branch is up to date.
+        /// </summary>
+        bool UpToDate { get; }
+
+        /// <summary>
         /// Gets the message to display when a pull cannot be carried out.
         /// </summary>
         string PullDisabledMessage { get; }

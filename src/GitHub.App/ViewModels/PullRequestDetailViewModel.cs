@@ -462,6 +462,7 @@ namespace GitHub.ViewModels
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
             public string PullDisabledMessage { get; }
             public string PushDisabledMessage { get; }
         }

@@ -18,6 +18,7 @@ namespace GitHub.SampleData
     {
         public int CommitsAhead { get; set; }
         public int CommitsBehind { get; set; }
+        public bool UpToDate { get; set; }
         public string PullDisabledMessage { get; set; }
         public string PushDisabledMessage { get; set; }
     }

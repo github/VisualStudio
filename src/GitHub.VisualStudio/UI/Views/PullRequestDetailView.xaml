@@ -24,9 +24,9 @@
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling"/>
                     </sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
-                    <sampleData:PullRequestDetailViewModelDesigner.UpdateState>
-                        <sampleData:PullRequestUpdateStateDesigner CommitsAhead="2" CommitsBehind="4"/>
-                    </sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                    <!--<sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                        <sampleData:PullRequestUpdateStateDesigner CommitsAhead="2" CommitsBehind="4" UpToDate="False"/>
+                    </sampleData:PullRequestDetailViewModelDesigner.UpdateState>-->
                 </sampleData:PullRequestDetailViewModelDesigner>
             </Binding.Source>
         </Binding>
@@ -166,7 +166,8 @@
                                      Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"/>
 
                 <!-- Pull/push buttons -->
-                <StackPanel Orientation="Horizontal" Visibility="{Binding UpdateState, Converter={ui:NullToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal" 
+                            Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
                     <ui:OcticonImage Icon="arrow_down"/>
                     <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
                     <ui:GitHubActionLink Content="Pull"
@@ -186,7 +187,7 @@
                 </StackPanel>
 
                 <!-- Branch checked out and up-to-date -->
-                <TextBlock TextWrapping="Wrap">
+                <TextBlock TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
                     <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
                     <Run>Pull request checked out and up-to-date.</Run>
                     <TextBlock.Style>
@@ -195,9 +196,8 @@
                             <Style.Triggers>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding IsCheckedOut}" Value="True"/>
-                                        <Condition Binding="{Binding CommitsAhead}" Value="0"/>
-                                        <Condition Binding="{Binding CommitsBehind}" Value="0"/>
+                                        <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
+                                        <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
                                     </MultiDataTrigger.Conditions>
                                     <MultiDataTrigger.Setters>
                                         <Setter Property="Visibility" Value="Visible"/>
