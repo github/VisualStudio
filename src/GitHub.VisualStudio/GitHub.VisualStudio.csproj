@@ -10,7 +10,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.1.1.3</ApplicationVersion>
+    <ApplicationVersion>2.1.1.4</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <GenerateVsixV3>true</GenerateVsixV3>
     <IsProductComponent>true</IsProductComponent>
