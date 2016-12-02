@@ -18,5 +18,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         /// The icon to show next to a repository name. It indicates whether it's private, public, a fork, etc.
         /// </summary>
         Octicon Icon { get; }
+
+        /// <summary>
+        /// Indicate if the user is Logged in or not.
+        /// </summary>
+        bool IsLoggedIn { get; }
+        
+        /// <summary>
+        /// Start the login flow.
+        /// </summary>
+        void Login();
     }
 }

@@ -159,6 +159,82 @@ public class SimpleApiClientTests
         }
     }
 
+    public class TheIsIsAuthenticatedMethod
+    {
+        [Fact]
+        public void ReturnsFalseWhenCredentialsNotSet()
+        {
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Credentials.Returns((Credentials)null);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReturnsFalseWhenAuthenicationTypeIsAnonymous()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.Credentials=Credentials.Anonymous;
+
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Returns(connection);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenLoginIsSetToBasicAuth()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.Credentials.Returns(new Credentials("username", "password"));
+
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Returns(connection);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenLoginIsSetToOAuth()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.Credentials.Returns(new Credentials("token"));
+
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Returns(connection);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.True(result);
+        }
+    }
+
     private static Repository CreateRepository(int id, bool hasWiki)
     {
         return new Repository("", "", "", "", "", "", "",
