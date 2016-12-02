@@ -308,9 +308,9 @@ namespace GitHub.ViewModels
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
                 var pullDisabled = divergence.BehindBy == 0 ? "No commits to pull" : null;
-                var pushDisabled = divergence.BehindBy > 0 ?
-                    "You must pull before you can push" :
-                    divergence.AheadBy == 0 ? "No commits to push" : null;
+                var pushDisabled = divergence.AheadBy == 0 ? 
+                    "No commits to push" : 
+                    divergence.BehindBy > 0 ? "You must pull before you can push" : null;
 
                 UpdateState = new UpdateCommandState(divergence, pullDisabled, pushDisabled);
                 CheckoutState = null;

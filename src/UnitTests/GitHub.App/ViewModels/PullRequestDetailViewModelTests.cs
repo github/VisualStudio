@@ -284,6 +284,21 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             [Fact]
+            public async Task CheckedOutAndBehind()
+            {
+                var target = CreateTarget(
+                    currentBranch: "pr/123",
+                    existingPrBranch: "pr/123",
+                    behindBy: 2);
+                await target.Load(CreatePullRequest());
+
+                Assert.False(target.Push.CanExecute(null));
+                Assert.Equal(0, target.UpdateState.CommitsAhead);
+                Assert.Equal(2, target.UpdateState.CommitsBehind);
+                Assert.Equal("No commits to push", target.UpdateState.PushDisabledMessage);
+            }
+
+            [Fact]
             public async Task CheckedOutAndAheadAndBehind()
             {
                 var target = CreateTarget(
@@ -293,7 +308,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     behindBy: 2);
                 await target.Load(CreatePullRequest());
 
-                Assert.True(target.Pull.CanExecute(null));
+                Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(3, target.UpdateState.CommitsAhead);
                 Assert.Equal(2, target.UpdateState.CommitsBehind);
                 Assert.Equal("You must pull before you can push", target.UpdateState.PushDisabledMessage);
