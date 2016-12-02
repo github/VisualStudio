@@ -1,25 +1,14 @@
-﻿using GitHub.Extensions;
-using GitHub.Services;
-using Microsoft.VisualStudio.Shell;
-using System;
-using System.ComponentModel.Composition;
+﻿using GitHub.Services;
 using NullGuard;
-using GitHub.Api;
+using System;
 
 namespace GitHub.VisualStudio.Menus
 {
-    [Export(typeof(IDynamicMenuHandler))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class OpenLink: LinkMenuBase, IDynamicMenuHandler
     {
-        readonly IUsageTracker usageTracker;
-
-        [ImportingConstructor]
-        public OpenLink([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
-            IUsageTracker usageTracker, ISimpleApiClientFactory apiFactory)
-            : base(serviceProvider, apiFactory)
+        public OpenLink(IUIProvider serviceProvider)
+            : base(serviceProvider)
         {
-            this.usageTracker = usageTracker;
         }
 
         public Guid Guid => GuidList.guidContextMenuSet;
@@ -34,10 +23,10 @@ namespace GitHub.VisualStudio.Menus
             var link = await GenerateLink();
             if (link == null)
                 return;
-            var browser = ServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+            var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
 
-            usageTracker.IncrementOpenInGitHubCount();
+            await UsageTracker.IncrementOpenInGitHubCount();
         }
 
         public bool CanShow()

@@ -34,7 +34,7 @@ namespace GitHub.VisualStudio.UI.Controls
 
         public MessageType MessageType
         {
-            get { return (MessageType)GetValue(MessageProperty); }
+            get { return (MessageType)GetValue(MessageTypeProperty); }
             set { SetValue(MessageTypeProperty, value); }
         }
 
@@ -80,7 +80,9 @@ namespace GitHub.VisualStudio.UI.Controls
         {
             InitializeComponent();
 
-            this.DataContext = this;
+            DataContext = this;
+            Icon = Octicon.info;
+            IconColor = InfoColorBrush;
 
             LinkCommand = new RelayCommand(x =>
             {

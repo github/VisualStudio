@@ -257,7 +257,7 @@ namespace GitHub.Services
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
             var ret = await host.ModelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
-            usageTracker.IncrementUpstreamPullRequestCount();
+            await usageTracker.IncrementUpstreamPullRequestCount();
             return ret;
         }
 
