@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -15,6 +14,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
+using LibGit2Sharp;
 using NullGuard;
 using ReactiveUI;
 
@@ -37,10 +37,9 @@ namespace GitHub.ViewModels
         string body;
         ChangedFilesViewType changedFilesViewType;
         OpenChangedFileAction openChangedFileAction;
-        CheckoutMode checkoutMode;
-        string checkoutError;
-        int commitsBehind;
-        string checkoutDisabledMessage;
+        IPullRequestCheckoutState checkoutState;
+        IPullRequestUpdateState updateState;
+        string operationError;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -79,15 +78,30 @@ namespace GitHub.ViewModels
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
 
-            var canCheckout = this.WhenAnyValue(
-                x => x.CheckoutMode,
-                x => x.CheckoutDisabledMessage,
-                (mode, disabled) => mode != CheckoutMode.UpToDate && mode != CheckoutMode.Push && disabled == null);
-            Checkout = ReactiveCommand.CreateAsyncObservable(canCheckout, DoCheckout);
+            Checkout = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.CheckoutState)
+                    .Cast<CheckoutCommandState>()
+                    .Select(x => x != null && x.DisabledMessage == null), 
+                DoCheckout);
+            Checkout.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+
+            Pull = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.PullDisabledMessage == null),
+                DoPull);
+            Pull.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+
+            Push = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.PushDisabledMessage == null),
+                DoPush);
+            Push.ThrownExceptions.Subscribe(x => OperationError = x.Message);
 
             OpenOnGitHub = ReactiveCommand.Create();
 
-            ChangedFilesViewType = settings.UIState.PullRequestDetailState.ShowTree ?
+            ChangedFilesViewType = (settings.UIState?.PullRequestDetailState?.ShowTree ?? true) ?
                 ChangedFilesViewType.TreeView : ChangedFilesViewType.ListView;
 
             ToggleChangedFilesView = ReactiveCommand.Create();
@@ -99,7 +113,7 @@ namespace GitHub.ViewModels
                 settings.Save();
             });
 
-            OpenChangedFileAction = settings.UIState.PullRequestDetailState.DiffOnOpen ?
+            OpenChangedFileAction = (settings.UIState?.PullRequestDetailState?.DiffOnOpen ?? true) ?
                 OpenChangedFileAction.Diff : OpenChangedFileAction.Open;
 
             ToggleOpenChangedFileAction = ReactiveCommand.Create();
@@ -170,40 +184,31 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the checkout mode for the pull request.
+        /// Gets the state associated with the <see cref="Checkout"/> command.
         /// </summary>
-        public CheckoutMode CheckoutMode
+        public IPullRequestCheckoutState CheckoutState
         {
-            get { return checkoutMode; }
-            private set { this.RaiseAndSetIfChanged(ref checkoutMode, value); }
+            get { return checkoutState; }
+            private set { this.RaiseAndSetIfChanged(ref checkoutState, value); }
         }
 
         /// <summary>
-        /// Gets the error message to be displayed below the checkout button.
+        /// Gets the state associated with the <see cref="Pull"/> and <see cref="Push"/> commands.
         /// </summary>
-        public string CheckoutError
+        public IPullRequestUpdateState UpdateState
         {
-            get { return checkoutError; }
-            private set { this.RaiseAndSetIfChanged(ref checkoutError, value); }
+            get { return updateState; }
+            private set { this.RaiseAndSetIfChanged(ref updateState, value); }
         }
 
         /// <summary>
-        /// Gets the number of commits that the current branch is behind the PR when <see cref="CheckoutMode"/>
-        /// is <see cref="CheckoutMode.NeedsPull"/>.
+        /// Gets the error message to be displayed in the action area as a result of an error in a
+        /// git operation.
         /// </summary>
-        public int CommitsBehind
+        public string OperationError
         {
-            get { return commitsBehind; }
-            private set { this.RaiseAndSetIfChanged(ref commitsBehind, value); }
-        }
-
-        /// <summary>
-        /// Gets a message indicating the why the <see cref="Checkout"/> command is disabled.
-        /// </summary>
-        public string CheckoutDisabledMessage
-        {
-            get { return checkoutDisabledMessage; }
-            private set { this.RaiseAndSetIfChanged(ref checkoutDisabledMessage, value); }
+            get { return operationError; }
+            private set { this.RaiseAndSetIfChanged(ref operationError, value); }
         }
 
         /// <summary>
@@ -220,6 +225,16 @@ namespace GitHub.ViewModels
         /// Gets a command that checks out the pull request locally.
         /// </summary>
         public ReactiveCommand<Unit> Checkout { get; }
+
+        /// <summary>
+        /// Gets a command that pulls changes to the current branch.
+        /// </summary>
+        public ReactiveCommand<Unit> Pull { get; }
+
+        /// <summary>
+        /// Gets a command that pushes changes from the current branch.
+        /// </summary>
+        public ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
@@ -289,44 +304,31 @@ namespace GitHub.ViewModels
             }
 
             var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
-            
-            if (localBranches.Contains(repository.CurrentBranch))
+            var isCheckedOut = localBranches.Contains(repository.CurrentBranch);
+
+            if (isCheckedOut)
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
+                var pullDisabled = divergence.BehindBy == 0 ? "No commits to pull" : null;
+                var pushDisabled = divergence.AheadBy == 0 ? 
+                    "No commits to push" : 
+                    divergence.BehindBy > 0 ? "You must pull before you can push" : null;
 
-                if (divergence.BehindBy == null)
-                {
-                    CheckoutMode = CheckoutMode.InvalidState;
-                }
-                else if (divergence.AheadBy > 0)
-                {
-                    CheckoutMode = pullRequestsService.IsPullRequestFromFork(repository, pullRequest) ?
-                        CheckoutMode.InvalidState : CheckoutMode.Push;
-                }
-                else if (divergence.BehindBy == 0)
-                {
-                    CheckoutMode = CheckoutMode.UpToDate;
-                }
-                else
-                {
-                    CheckoutMode = CheckoutMode.NeedsPull;
-                    CommitsBehind = divergence.BehindBy.Value;
-                }
-            }
-            else if (localBranches.Count > 0)
-            {
-                CheckoutMode = CheckoutMode.Switch;
+                UpdateState = new UpdateCommandState(divergence, pullDisabled, pushDisabled);
+                CheckoutState = null;
             }
             else
             {
-                CheckoutMode = CheckoutMode.Fetch;
+                var caption = localBranches.Count > 0 ?
+                    "Checkout " + localBranches.First().DisplayName :
+                    "Checkout to " + (await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
+                var disabled = await pullRequestsService.IsWorkingDirectoryClean(repository) ?
+                    null :
+                    "Cannot checkout as your working directory has uncommitted changes.";
+
+                CheckoutState = new CheckoutCommandState(caption, disabled);
+                UpdateState = null;
             }
-
-            var clean = await pullRequestsService.IsCleanForCheckout(repository);
-
-            CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate && CheckoutMode != CheckoutMode.Push) ?
-                $"Cannot {GetCheckoutModeDescription(CheckoutMode)} as your working directory has uncommitted changes." :
-                null;
 
             IsBusy = false;
         }
@@ -374,23 +376,6 @@ namespace GitHub.ViewModels
             return dirs[string.Empty];
         }
 
-        static string GetCheckoutModeDescription(CheckoutMode checkoutMode)
-        {
-            switch (checkoutMode)
-            {
-                case CheckoutMode.NeedsPull:
-                    return "update branch";
-                case CheckoutMode.Switch:
-                    return "switch branches";
-                case CheckoutMode.Fetch:
-                case CheckoutMode.InvalidState:
-                    return "checkout pull request";
-                default:
-                    Debug.Fail("Invalid CheckoutMode in GetCheckoutModeDescription");
-                    return null;
-            }
-        }
-
         static PullRequestDirectoryNode GetDirectory(string path, Dictionary<string, PullRequestDirectoryNode> dirs)
         {
             PullRequestDirectoryNode dir;
@@ -428,38 +413,60 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoCheckout(object unused)
         {
-            IObservable<Unit> operation = null;
-
-            switch (CheckoutMode)
+            return Observable.Defer(async () =>
             {
-                case CheckoutMode.NeedsPull:
-                    operation = pullRequestsService.Pull(repository);
-                    break;
-                case CheckoutMode.Fetch:
-                    operation = pullRequestsService
+                var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
+
+                if (localBranches.Count > 0)
+                {
+                    return pullRequestsService.SwitchToBranch(repository, Model);
+                }
+                else
+                {
+                    return pullRequestsService
                         .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
-                    break;
-                case CheckoutMode.Switch:
-                    operation = pullRequestsService.SwitchToBranch(repository, Model);
-                    break;
-                case CheckoutMode.InvalidState:
-                    operation = pullRequestsService
-                        .UnmarkLocalBranch(repository)
-                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title))
-                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
-                    break;
-                default:
-                    Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");
-                    operation = Observable.Empty<Unit>();
-                    break;
+                }
+            });
+        }
+
+        IObservable<Unit> DoPull(object unused)
+        {
+            return pullRequestsService.Pull(repository);
+        }
+
+        IObservable<Unit> DoPush(object unused)
+        {
+            return pullRequestsService.Push(repository);
+        }
+
+        class CheckoutCommandState : IPullRequestCheckoutState
+        {
+            public CheckoutCommandState(string caption, string disabledMessage)
+            {
+                Caption = caption;
+                DisabledMessage = disabledMessage;
             }
 
-            return operation.Catch<Unit, Exception>(ex =>
+            public string Caption { get; }
+            public string DisabledMessage { get; }
+        }
+
+        class UpdateCommandState : IPullRequestUpdateState
+        {
+            public UpdateCommandState(HistoryDivergence divergence, string pullDisabledMessage, string pushDisabledMessage)
             {
-                CheckoutError = ex.Message;
-                return Observable.Empty<Unit>();
-            });
+                CommitsAhead = divergence.AheadBy ?? 0;
+                CommitsBehind = divergence.BehindBy ?? 0;
+                PullDisabledMessage = pullDisabledMessage;
+                PushDisabledMessage = pushDisabledMessage;
+            }
+
+            public int CommitsAhead { get; }
+            public int CommitsBehind { get; }
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
+            public string PullDisabledMessage { get; }
+            public string PushDisabledMessage { get; }
         }
     }
 }
