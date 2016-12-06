@@ -1,0 +1,19 @@
+﻿using System;
+using System.Reactive;
+using System.Windows.Input;
+using GitHub.Models;
+using GitHub.Validation;
+using GitHub.ViewModels;
+using ReactiveUI;
+
+namespace GitHub.SampleData
+{
+    public class StartPageCloneViewModelDesigner : BaseViewModel, IBaseCloneViewModel
+    {
+        public string BaseRepositoryPath { get; set; }
+        public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
+        public ICommand BrowseForDirectory { get; }
+        public IReactiveCommand<Unit> CloneCommand { get; }
+        public IRemoteRepositoryModel SelectedRepository { get; set; }
+    }
+}

@@ -17,7 +17,13 @@
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
-        <sampleData:RepositoryCloneViewModelDesigner />
+        <sampleData:StartPageCloneViewModelDesigner>
+            <sampleData:StartPageCloneViewModelDesigner.SelectedRepository>
+                <sampleData:RemoteRepositoryModelDesigner>
+                            <sampleData:RemoteRepositoryModelDesigner.CloneUrl>https://github.com/github/VisualStudio</sampleData:RemoteRepositoryModelDesigner.CloneUrl>
+                </sampleData:RemoteRepositoryModelDesigner>
+            </sampleData:StartPageCloneViewModelDesigner.SelectedRepository>
+        </sampleData:StartPageCloneViewModelDesigner>
       </Binding.Source>
     </Binding>
   </d:DesignProperties.DataContext>
@@ -109,8 +115,7 @@
         </Style>
       </Border.Resources>
       <StackPanel>
-        <ui:OcticonImage Icon="logo_github" Width="150" Height="150" VerticalAlignment="Top" Margin="0,0,0,-45"/>
-        <TextBlock HorizontalAlignment="Center">You're about to clone a GitHub repository to your computer</TextBlock>
+        <ui:OcticonImage Icon="logo_github" Width="100" Height="100" VerticalAlignment="Top" Margin="0,0,0,-10"/>
         <Grid HorizontalAlignment="Center" Margin="0,60,0,0" MaxWidth="400">
           <Grid.Resources>
             <Style x:Key="Light" TargetType="Label">
@@ -142,7 +147,12 @@
             
           <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.RepositoryName}"/>
           <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.Owner}"/>
-          <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.Host}"/>
+          <TextBox Grid.Row="2" Grid.Column="2"
+                   Margin="3 0"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   Text="{Binding SelectedRepository.CloneUrl, Mode=OneWay}"
+                   Style="{StaticResource FlatReadOnlyTextBox}"/>
         </Grid>
       </StackPanel>
     </Border>

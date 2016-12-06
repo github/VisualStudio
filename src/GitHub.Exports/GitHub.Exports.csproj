@@ -165,6 +165,7 @@
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Primitives\RelayCommand.cs" />
+    <Compile Include="Primitives\UriStringConverter.cs" />
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />

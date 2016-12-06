@@ -156,6 +156,8 @@
     <Compile Include="SampleData\PullRequestDetailViewModelDesigner.cs" />
     <Compile Include="SampleData\LoggedOutViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestListViewModelDesigner.cs" />
+    <Compile Include="SampleData\RemoteRepositoryModelDesigner.cs" />
+    <Compile Include="SampleData\StartPageCloneViewModelDesigner.cs" />
     <Compile Include="Services\AvatarProvider.cs" />
     <Compile Include="Services\GitHubCredentialProvider.cs" />
     <Compile Include="Services\IGitHubCredentialProvider.cs" />
