@@ -102,23 +102,40 @@
     <DockPanel Grid.IsSharedSizeScope="True">
         <!-- PR Title and number -->
         <DockPanel DockPanel.Dock="Top"
-                   Margin="8 4 8 8">
-            <TextBlock DockPanel.Dock="Right"
-                       FontSize="9pt"
-                       Foreground="Gray"
-                       Margin="4 2 0 0"
-                       Text="{Binding Model.Number, StringFormat=#{0}}"
-                       VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Model.Title}"
+                   Margin="8 4 8 0">
+            <TextBlock TextWrapping="Wrap"
                        FontSize="10pt"
-                       VerticalAlignment="Top"
-                       TextWrapping="Wrap"/>
+                       Text="{Binding Model.Title}" />
         </DockPanel>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
+        <DockPanel DockPanel.Dock="Top" Margin="8 0 8 8">
+            <!-- Branch state ( Open | Closed | Merged ) -->
+            <TextBlock FontWeight="Bold"
+                       Text="{Binding Model.State}"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource StateIndicator}"/>
 
+            <TextBlock Text="|" VerticalAlignment="Center" Margin="6 0" Opacity="0.5" Foreground="Gray"/>
+
+            <!-- Pull request number -->
+            <TextBlock Text="{Binding Model.Number, StringFormat=#{0}}" />
+
+            <TextBlock Text="|" VerticalAlignment="Center" Margin="6 0" Opacity="0.5" Foreground="Gray"/>
+
+            <!-- Author and open time -->
+            <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center">
+                <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
+                <Run Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+            </TextBlock>
+        </DockPanel>
+
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="1"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+            <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="1"/>
         <!-- PR Overview -->
-        <Grid DockPanel.Dock="Top">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
                 <ColumnDefinition Width="6" SharedSizeGroup="LeftMarginSpace"/>
@@ -137,16 +154,10 @@
             <ui:OcticonImage Grid.Column="0"
                              Margin="8"
                              VerticalAlignment="Top"
-                             Icon="git_pull_request"/>
+                             Icon="git_branch"/>
 
             <!-- Open/closed state and branches -->
             <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
-                <TextBlock Margin="0 0 12 0"
-                           FontWeight="Bold"
-                           Text="{Binding Model.State}"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource StateIndicator}"/>
-
                 <TextBlock Text="{Binding TargetBranchDisplayName}" VerticalAlignment="Center"/>
                 <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 3 3 0"/>
                 <TextBlock Text="{Binding SourceBranchDisplayName}" VerticalAlignment="Center" 
@@ -170,7 +181,7 @@
 
             <Rectangle Grid.Column="2" Grid.Row="3" Margin="-2 0 0 0" Style="{StaticResource Separator}"/>
 
-            <StackPanel Grid.Column="2" Grid.Row="4" Margin="0 6">
+            <StackPanel Grid.Column="2" Grid.Row="4" Margin="0 6 6 6">
                 <!-- Checkout pull request button -->
                 <Button Command="{Binding Checkout}">
                     <Button.Style>
@@ -204,7 +215,7 @@
 
                 <!-- Branch checked out and needs pull -->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="info" Margin="0 0 0 -4"/>
                     <Run>Your local branch is behind by</Run>
                     <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
                     <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Update</Hyperlink>
@@ -222,7 +233,7 @@
 
                 <!-- Local branch exists but is not checked out -->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="info" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
                     <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
                     <TextBlock.Style>
@@ -239,7 +250,7 @@
 
                 <!-- Local branch is checked out but is in an invalid state -->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="info" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">The pull request branch has local changes.</Run>
                     <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Checkout to a new branch</Hyperlink>
                     <TextBlock.Style>
@@ -256,7 +267,7 @@
 
                 <!-- Local branch is checked out but needs pushing-->
                 <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="info" Foreground="Orange" Margin="0 0 0 -4"/>
+                    <ui:OcticonImage Icon="info" Margin="0 0 0 -4"/>
                     <Run BaselineAlignment="Top">Local changes can be pushed.</Run>
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
@@ -299,9 +310,8 @@
             </StackPanel>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
-
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Rectangle Style="{StaticResource Separator}" Height="2"/>
+            
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
@@ -310,46 +320,27 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Author and open time -->
                     <RowDefinition Height="Auto"/> <!-- PR body -->
                     <RowDefinition Height="Auto"/> <!-- View on github link -->
                     <RowDefinition Height="Auto"/> <!-- Files changed -->
                 </Grid.RowDefinitions>
 
-                <!-- Author avatar -->
-                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0 6 0 3">
-                    <Grid.OpacityMask>
-                        <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
-                    </Grid.OpacityMask>
-                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
-                    <Image x:Name="avatar"
-                           Width="20"
-                           Height="20"
-                           RenderOptions.BitmapScalingMode="HighQuality"
-                           Source="{Binding Model.Author.Avatar}" />
-                </Grid>
-
-                <!-- Author and open time -->
-                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0 6">
-                    <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
-                    <Run Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
-                </TextBlock>
-
                 <!-- PR Body -->
                 <ui:MarkdownViewer Name="bodyMarkdown"
-                                   Grid.Column="2" Grid.Row="1"
-                                   Margin="2 6 10 6"
+                                   Grid.Column="0" Grid.Row="0"
+                                   Grid.ColumnSpan="3"
+                                   Margin="10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- View on github link -->
-                <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
+                <ui:GitHubActionLink Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Margin="10 6" Command="{Binding OpenOnGitHub}">
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
                 <!-- Files changed Icon in left margin -->
-                <ui:OcticonImage Grid.Column="0" Grid.Row="3"
+                <ui:OcticonImage Grid.Column="0" Grid.Row="2"
                                  Margin="8"
                                  VerticalAlignment="Top"
                                  Icon="diff"/>
@@ -478,6 +469,7 @@
                     </te:SectionControl.Content>
                 </te:SectionControl>
             </Grid>
+            </StackPanel>
         </ScrollViewer>
 
     </DockPanel>
