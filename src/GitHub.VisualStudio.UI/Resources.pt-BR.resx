@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authenticationSentLabelContent" xml:space="preserve">
+    <value>Código de autenticação enviado!</value>
+  </data>
+  <data name="authenticationFailedLabelContent" xml:space="preserve">
+    <value>Código de autenticação inválido</value>
+  </data>
+  <data name="loadingFailedMessageMessage" xml:space="preserve">
+    <value>Um erro ocorreu ao carregar os repositórios</value>
+  </data>
+  <data name="loadingFailedMessageContent" xml:space="preserve">
+    <value>Alguns ou todos os repositórios podem não terem sido carregados. Feche o diálogo e tente novamente.</value>
+  </data>
+  <data name="filterTextPromptText" xml:space="preserve">
+    <value>Pesquisar repositórios</value>
+  </data>
+  <data name="orText" xml:space="preserve">
+    <value>ou</value>
+  </data>
+  <data name="publishText" xml:space="preserve">
+    <value>Publicar</value>
+  </data>
+  <data name="PasswordPrompt" xml:space="preserve">
+    <value>Senha</value>
+  </data>
+  <data name="learnMoreLink" xml:space="preserve">
+    <value>Saiba mais</value>
+  </data>
+  <data name="licenseListText" xml:space="preserve">
+    <value>Licença</value>
+  </data>
+  <data name="dontHaveAnAccountText" xml:space="preserve">
+    <value>Não tem uma conta? </value>
+  </data>
+  <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
+    <value>Não tem GitHub Enterprise? </value>
+  </data>
+  <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
+    <value>Por gentileza verifique sua conexão de internet e tente novamente.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descrição</value>
+  </data>
+  <data name="NotAGitRepository" xml:space="preserve">
+    <value>Nenhum repositório</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>Crie uma conta</value>
+  </data>
+  <data name="GetStartedLink" xml:space="preserve">
+    <value>Começar</value>
+  </data>
+  <data name="RepoNameText" xml:space="preserve">
+    <value>Nome do Repositório</value>
+  </data>
+  <data name="NotAGitHubRepository" xml:space="preserve">
+    <value>Este repositório não está no GitHub</value>
+  </data>
+  <data name="localPathText" xml:space="preserve">
+    <value>Caminho local</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>Falha de login.</value>
+  </data>
+  <data name="makePrivateContent" xml:space="preserve">
+    <value>Repositório privado</value>
+  </data>
+  <data name="nameText" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="noRepositoriesMessageText" xml:space="preserve">
+    <value>Sem repositórios</value>
+  </data>
+  <data name="openTwoFactorAuthAppText" xml:space="preserve">
+    <value>Abra o aplicativo de autenticação de dois fatores no seu dispositivo para ver o seu código de autenticação.</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>Este repositório não tem um controle remoto. Preencha o formulário para publicá-lo no GitHub.</value>
+  </data>
+  <data name="enterpriseUrlPromptText" xml:space="preserve">
+    <value>Endereço do servidor GitHub Enterprise</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>O host não está disponível ou não é um servidor GitHub Enterprise. Verifique o endereço e tente novamente.</value>
+  </data>
+  <data name="filterBranchesText" xml:space="preserve">
+    <value>Filtrar branches</value>
+  </data>
+  <data name="browsePathButtonContent" xml:space="preserve">
+    <value>Procurar</value>
+  </data>
+  <data name="authenticationFailedLabelMessage" xml:space="preserve">
+    <value>Tente digitar o código novamente ou clique no botão reenviar para obter um novo código de autenticação.</value>
+  </data>
+  <data name="authenticationSentLabelMessage" xml:space="preserve">
+    <value>Se você não receber o código de autenticação, entre em contato com support@github.com.</value>
+  </data>
+  <data name="couldNotConnectToGitHubText" xml:space="preserve">
+    <value>Não foi possível se conectar com github.com</value>
+  </data>
+  <data name="couldNotConnectToTheServerText" xml:space="preserve">
+    <value>Não foi possível se conectar ao servidor.</value>
+  </data>
+  <data name="CreateLink" xml:space="preserve">
+    <value>Criar</value>
+  </data>
+  <data name="DescriptionOptional" xml:space="preserve">
+    <value>Descrição (opcional)</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>Abrir no Navegador</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>Falha ao criar o gist</value>
+  </data>
+  <data name="prOpenedByText" xml:space="preserve">
+    <value>por</value>
+  </data>
+  <data name="prOpenedText" xml:space="preserve">
+    <value>aberto</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>Privacidade</value>
+  </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>Ajude-nos enviando dados anônimos de utilização</value>
+  </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>Não foi possível copiar para área de transferência. Por favor tente novamente.</value>
+  </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>Link copiado para área de transferência</value>
+  </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Repositório criado com sucesso.</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>Gist Privado</value>
+  </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>Nome do Arquivo</value>
+  </data>
+  <data name="NotLoggedInMessage" xml:space="preserve">
+    <value>Você não está logado no {0}, portanto certas operações git podem falhar. [Fazer login agora]({1})</value>
+  </data>
+  <data name="WikiNavigationItemText" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="SignOutLink" xml:space="preserve">
+    <value>Sair</value>
+  </data>
+  <data name="PulseNavigationItemText" xml:space="preserve">
+    <value>Pulse</value>
+  </data>
+  <data name="pathText" xml:space="preserve">
+    <value>Caminho</value>
+  </data>
+  <data name="GraphsNavigationItemText" xml:space="preserve">
+    <value>Gráficos</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>Publicar no Github</value>
+  </data>
+  <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
+    <value>Conectar</value>
+  </data>
+  <data name="CloneLink" xml:space="preserve">
+    <value>Clonar</value>
+  </data>
+  <data name="verifyText" xml:space="preserve">
+    <value>Verificar</value>
+  </data>
+  <data name="twoFactorAuthText" xml:space="preserve">
+    <value>Autenticação de dois fatores</value>
+  </data>
+  <data name="SignUpLink" xml:space="preserve">
+    <value>Inscreva-se</value>
+  </data>
+  <data name="resendCodeButtonToolTip" xml:space="preserve">
+    <value>Enviar novamente o código para o dispositivo SMS registrado</value>
+  </data>
+  <data name="resendCodeButtonContent" xml:space="preserve">
+    <value>Reenviar</value>
+  </data>
+  <data name="UserNameOrEmailPromptText" xml:space="preserve">
+    <value>Nome de usuário ou email</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>Verifique seu nome de usuário e senha, então tente novamente</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(esqueceu sua senha?)</value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>Título (requerido)</value>
+  </data>
+  <data name="GetStartedText" xml:space="preserve">
+    <value>Começar</value>
+  </data>
+  <data name="SignInLink" xml:space="preserve">
+    <value>Entrar</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Requests</value>
+  </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>Issues</value>
+  </data>
+  <data name="BlurbText" xml:space="preserve">
+    <value>Colaboração eficiente, revisão e gerenciamento para código aberto e projetos privados.</value>
+  </data>
+  <data name="ignoreTemplateListText" xml:space="preserve">
+    <value>Ignorar git</value>
+  </data>
+  <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
+    <value>Publique este repositório no GitHub e tenha colaboração eficiente, revisão e gerenciamento para o código aberto e projetos privados.</value>
+  </data>
+  <data name="NotAGitRepositoryMessage" xml:space="preserve">
+    <value>Não encontramos um repositório git aqui. Abra um projeto git ou clique "Arquivo -&gt; Adicionar ao Controle do Código-Fonte"</value>
+  </data>
+</root>
