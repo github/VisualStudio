@@ -2,6 +2,7 @@
 using NullGuard;
 using System;
 using System.Globalization;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
