@@ -105,7 +105,7 @@
             
           <Label Style="{StaticResource Light}" Grid.Row="0" HorizontalAlignment="Left" Margin="6,0,0,0">Repo Name</Label>
           <Label Style="{StaticResource Light}" Grid.Row="1" HorizontalAlignment="Right">Organization</Label>
-          <Label Style="{StaticResource Light}" Grid.Row="2" HorizontalAlignment="Right">Source</Label>
+          <Label Style="{StaticResource Light}" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right">Source</Label>
           <Label Grid.Row="3"
                  Grid.Column="0"
                  Style="{StaticResource Light}" 
@@ -116,12 +116,12 @@
             
           <ui:OcticonImage Grid.Row="0" Grid.Column="1" Icon="repo"/>
           <ui:OcticonImage Grid.Row="1" Grid.Column="1" Icon="organization"/>
-          <ui:OcticonImage Grid.Row="2" Grid.Column="1" Icon="link"/>
+          <ui:OcticonImage Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Icon="link"/>
             
           <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.RepositoryName}"/>
           <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.Owner}"/>
           <TextBox Grid.Row="2" Grid.Column="2"
-                   Margin="3 0"
+                   Margin="3"
                    TextWrapping="Wrap"
                    VerticalAlignment="Center"
                    Text="{Binding SelectedRepository.CloneUrl, Mode=OneWay}"
