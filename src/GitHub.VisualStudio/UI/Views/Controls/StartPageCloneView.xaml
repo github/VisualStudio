@@ -115,7 +115,8 @@
         </Style>
       </Border.Resources>
       <StackPanel>
-        <ui:OcticonImage Icon="logo_github" Width="100" Height="100" VerticalAlignment="Top" Margin="0,0,0,-10"/>
+        <ui:OcticonImage Icon="logo_github" Width="100" Height="100" VerticalAlignment="Top" Margin="0,20,0,10"/>
+        <ui:HorizontalShadowDivider />
         <Grid HorizontalAlignment="Center" Margin="0,60,0,0" MaxWidth="400">
           <Grid.Resources>
             <Style x:Key="Light" TargetType="Label">
