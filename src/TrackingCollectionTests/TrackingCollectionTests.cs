@@ -333,7 +333,7 @@ public class TrackingTests : TestBase
         var total = 1000;
 
         var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 2")).ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -378,7 +378,7 @@ public class TrackingTests : TestBase
         var total = 1000;
 
         var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 2")).ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -429,8 +429,8 @@ public class TrackingTests : TestBase
         var count = 0;
         var total = 1000;
 
-        var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, total - i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, total - i, "Run 2")).ToList());
+        var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).Reverse().ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).Reverse().ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -2013,5 +2013,127 @@ public class TrackingTests : TestBase
 
         await Observable.Timeout(done, TimeSpan.FromMilliseconds(500));
         Assert.AreEqual(2, col.Count);
+    }
+
+    [Test]
+    public void DoesNotUpdateThingIfTimeIsOlder()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Never<Thing>(),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare);
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            evt.Set();
+        }, () => { });
+
+        var createdAndUpdatedTime = DateTimeOffset.Now;
+        var olderUpdateTime = createdAndUpdatedTime.Subtract(TimeSpan.FromMinutes(1));
+
+        const string originalTitle = "Original Thing";
+
+        var originalThing = new Thing(1, originalTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(originalThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        const string updatedTitle = "Updated Thing";
+
+        var updatedThing = new Thing(1, updatedTitle, createdAndUpdatedTime, olderUpdateTime);
+        col.AddItem(updatedThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        col.Dispose();
+    }
+
+    [Test]
+    public void DoesNotUpdateThingIfTimeIsEqual()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Never<Thing>(),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare);
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            evt.Set();
+        }, () => { });
+
+        var createdAndUpdatedTime = DateTimeOffset.Now;
+
+        const string originalTitle = "Original Thing";
+
+        var originalThing = new Thing(1, originalTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(originalThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        const string updatedTitle = "Updated Thing";
+
+        var updatedThing = new Thing(1, updatedTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(updatedThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        col.Dispose();
+    }
+
+    [Test]
+    public void DoesUpdateThingIfTimeIsNewer()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Never<Thing>(),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare);
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            evt.Set();
+        }, () => { });
+
+        var createdAndUpdatedTime = DateTimeOffset.Now;
+        var newerUpdateTime = createdAndUpdatedTime.Add(TimeSpan.FromMinutes(1));
+
+        const string originalTitle = "Original Thing";
+
+        var originalThing = new Thing(1, originalTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(originalThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        const string updatedTitle = "Updated Thing";
+
+        var updatedThing = new Thing(1, updatedTitle, createdAndUpdatedTime, newerUpdateTime);
+        col.AddItem(updatedThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(updatedTitle, col[0].Title);
+
+        col.Dispose();
     }
 }

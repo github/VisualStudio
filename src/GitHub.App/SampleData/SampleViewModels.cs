@@ -195,7 +195,7 @@ namespace GitHub.SampleData
             public HostAddress HostAddress { get; set; }
 
             public string Username { get; set; }
-            public ObservableCollection<ISimpleRepositoryModel> Repositories { get; set;  }
+            public ObservableCollection<ILocalRepositoryModel> Repositories { get; set;  }
 
             public IObservable<IConnection> Login()
             {
@@ -320,11 +320,11 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public static class RepositoryModelDesigner
     {
-        public static IRepositoryModel Create(string name = null, string owner = null)
+        public static IRemoteRepositoryModel Create(string name = null, string owner = null)
         {
             name = name ?? "octocat";
             owner = owner ?? "github";
-            return new RepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner });
+            return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner });
         }
     }
 
@@ -332,7 +332,7 @@ namespace GitHub.SampleData
     {
         public RepositoryCloneViewModelDesigner()
         {
-            Repositories = new ObservableCollection<IRepositoryModel>
+            Repositories = new ObservableCollection<IRemoteRepositoryModel>
             {
                 RepositoryModelDesigner.Create("encourage", "haacked"),
                 RepositoryModelDesigner.Create("haacked.com", "haacked"),
@@ -359,9 +359,9 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ISimpleRepositoryModel SelectedRepository { get; set; }
+        public IRemoteRepositoryModel SelectedRepository { get; set; }
 
-        public ObservableCollection<IRepositoryModel> Repositories
+        public ObservableCollection<IRemoteRepositoryModel> Repositories
         {
             get;
             private set;
@@ -382,7 +382,7 @@ namespace GitHub.SampleData
             get { return false; }
         }
 
-        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
+        public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
         {
             get;
             private set;
@@ -431,9 +431,16 @@ namespace GitHub.SampleData
             Icon = Octicon.repo;
             RepoName = "octokit";
             RepoUrl = "https://github.com/octokit/something-really-long-here-to-check-for-trimming";
+            IsLoggedIn = false;
         }
 
         public Octicon Icon
+        {
+            get;
+            private set;
+        }
+
+        public bool IsLoggedIn
         {
             get;
             private set;
@@ -450,22 +457,27 @@ namespace GitHub.SampleData
             get;
             set;
         }
+
+        public void Login()
+        {
+
+        }
     }
 
     public class GitHubConnectSectionDesigner : IGitHubConnectSection
     {
         public GitHubConnectSectionDesigner()
         {
-            Repositories = new ObservableCollection<ISimpleRepositoryModel>();
-            Repositories.Add(new SimpleRepositoryModel("octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\octokit.net"));
-            Repositories.Add(new SimpleRepositoryModel("cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\cefsharp"));
-            Repositories.Add(new SimpleRepositoryModel("git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\git-lfs"));
-            Repositories.Add(new SimpleRepositoryModel("another octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\another-octokit.net"));
-            Repositories.Add(new SimpleRepositoryModel("some cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\something-else"));
-            Repositories.Add(new SimpleRepositoryModel("even more git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\A different path"));
+            Repositories = new ObservableCollection<ILocalRepositoryModel>();
+            Repositories.Add(new LocalRepositoryModel("octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\octokit.net"));
+            Repositories.Add(new LocalRepositoryModel("cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\cefsharp"));
+            Repositories.Add(new LocalRepositoryModel("git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\git-lfs"));
+            Repositories.Add(new LocalRepositoryModel("another octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\another-octokit.net"));
+            Repositories.Add(new LocalRepositoryModel("some cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\something-else"));
+            Repositories.Add(new LocalRepositoryModel("even more git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\A different path"));
         }
 
-        public ObservableCollection<ISimpleRepositoryModel> Repositories
+        public ObservableCollection<ILocalRepositoryModel> Repositories
         {
             get; set;
         }

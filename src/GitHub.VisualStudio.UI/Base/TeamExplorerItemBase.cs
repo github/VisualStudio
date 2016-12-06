@@ -70,7 +70,7 @@ namespace GitHub.VisualStudio.Base
 
         void SubscribeToRepoChanges()
         {
-            holder.Subscribe(this, (ISimpleRepositoryModel repo) =>
+            holder.Subscribe(this, (ILocalRepositoryModel repo) =>
             {
                 var changed = ActiveRepo != repo;
                 ActiveRepo = repo;
@@ -134,6 +134,23 @@ namespace GitHub.VisualStudio.Base
         {
             var origin = await GetRepositoryOrigin();
             return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
+        }
+
+        protected bool IsUserAuthenticated()
+        {
+            if (SimpleApiClient == null)
+            {
+                if (ActiveRepo == null)
+                    return false;
+
+                var uri = ActiveRepoUri;
+                if (uri == null)
+                    return false;
+
+                SimpleApiClient = apiFactory.Create(uri);
+            }
+
+            return SimpleApiClient?.IsAuthenticated() ?? false;
         }
 
         bool disposed;

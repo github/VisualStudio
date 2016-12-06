@@ -86,7 +86,7 @@ namespace GitHub.Services
             return ret ?? String.Empty;
         }
 
-        public IEnumerable<ISimpleRepositoryModel> GetKnownRepositories()
+        public IEnumerable<ILocalRepositoryModel> GetKnownRepositories()
         {
             try
             {
@@ -95,7 +95,7 @@ namespace GitHub.Services
             catch (Exception ex)
             {
                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
-                return Enumerable.Empty<ISimpleRepositoryModel>();
+                return Enumerable.Empty<ILocalRepositoryModel>();
             }
         }
 

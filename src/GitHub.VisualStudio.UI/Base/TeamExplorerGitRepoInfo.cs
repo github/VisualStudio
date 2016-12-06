@@ -15,9 +15,9 @@ namespace GitHub.VisualStudio.Base
             activeRepoName = string.Empty;
         }
 
-        ISimpleRepositoryModel activeRepo;
+        ILocalRepositoryModel activeRepo;
         [AllowNull]
-        public ISimpleRepositoryModel ActiveRepo
+        public ILocalRepositoryModel ActiveRepo
         {
             [return: AllowNull]
             get { return activeRepo; }

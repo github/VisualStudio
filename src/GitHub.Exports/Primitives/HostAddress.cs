@@ -78,6 +78,16 @@ namespace GitHub.Primitives
                    || hostUri.IsSameHost(gistUri);
         }
 
+        public static bool operator ==(HostAddress a, HostAddress b)
+        {
+            return object.ReferenceEquals(a, null) ? object.ReferenceEquals(b, null) : a.Equals(b);
+        }
+
+        public static bool operator !=(HostAddress a, HostAddress b)
+        {
+            return !(a == b);
+        }
+
         public bool IsGitHubDotCom()
         {
             return IsGitHubDotComUri(ApiUri);

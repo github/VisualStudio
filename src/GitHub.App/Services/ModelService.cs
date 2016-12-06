@@ -23,6 +23,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class ModelService : IModelService
     {
+        public const string PRPrefix = "pr";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IApiClient apiClient;
@@ -125,7 +126,7 @@ namespace GitHub.Services
                  });
         }
 
-        public IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories()
+        public IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetRepositories()
         {
             return GetUserRepositories(RepositoryType.Owner)
                 .TakeLast(1)
@@ -144,7 +145,7 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo,
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(ILocalRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
@@ -177,7 +178,23 @@ namespace GitHub.Services
             return collection;
         }
 
-        public ITrackingCollection<IRepositoryModel> GetRepositories(ITrackingCollection<IRepositoryModel> collection)
+        public IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number)
+        {
+            return Observable.Defer(() =>
+            {
+                return hostCache.GetAndRefreshObject(PRPrefix + '|' + number, () =>
+                        Observable.CombineLatest(
+                            apiClient.GetPullRequest(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number),
+                            apiClient.GetPullRequestFiles(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName, number).ToList(),
+                            (pr, files) => new { PullRequest = pr, Files = files })
+                            .Select(x => PullRequestCacheItem.Create(x.PullRequest, (IReadOnlyList<PullRequestFile>)x.Files)),
+                        TimeSpan.Zero,
+                        TimeSpan.FromDays(7))
+                    .Select(Create);
+            });
+        }
+
+        public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
@@ -203,7 +220,7 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(ISimpleRepositoryModel sourceRepository, ISimpleRepositoryModel targetRepository,
+        public IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             IBranch sourceBranch, IBranch targetBranch,
             string title, string body)
         {
@@ -233,7 +250,7 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
+        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
@@ -241,7 +258,7 @@ namespace GitHub.Services
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
@@ -249,7 +266,7 @@ namespace GitHub.Services
                             "Retrieving '{0}' user repositories failed because user is not stored in the cache.",
                             repositoryType);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] {});
+                        return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
 
@@ -262,14 +279,14 @@ namespace GitHub.Services
                 .Catch<IEnumerable<RepositoryCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<RepositoryCacheItem>()));
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetAllRepositoriesForAllOrganizations()
+        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetAllRepositoriesForAllOrganizations()
         {
             return GetUserOrganizations()
                 .SelectMany(org => org.ToObservable())
                 .SelectMany(org => GetOrganizationRepositories(org.Login).TakeLast(1));
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> GetOrganizationRepositories(string organization)
+        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetOrganizationRepositories(string organization)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
@@ -278,7 +295,7 @@ namespace GitHub.Services
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRepositoryModel>, KeyNotFoundException>(
+                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
@@ -287,11 +304,11 @@ namespace GitHub.Services
                             "Retrieveing '{0}' org repositories failed because user is not stored in the cache.",
                             organization);
                         log.Error(message, e);
-                        return Observable.Return(new IRepositoryModel[] {});
+                        return Observable.Return(new IRemoteRepositoryModel[] {});
                     });
         }
 
-        public IObservable<IBranch> GetBranches(ISimpleRepositoryModel repo)
+        public IObservable<IBranch> GetBranches(IRepositoryModel repo)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));
@@ -322,9 +339,9 @@ namespace GitHub.Services
                 avatarProvider.GetAvatar(accountCacheItem));
         }
 
-        IRepositoryModel Create(RepositoryCacheItem item)
+        IRemoteRepositoryModel Create(RepositoryCacheItem item)
         {
-            return new RepositoryModel(
+            return new RemoteRepositoryModel(
                 item.Id,
                 item.Name,
                 new UriString(item.CloneUrl),
@@ -337,21 +354,33 @@ namespace GitHub.Services
             };
         }
 
+        private GitReferenceModel Create(GitReferenceCacheItem item)
+        {
+            return item != null ? new GitReferenceModel(item.Ref, item.Label, item.RepositoryCloneUrl) : null;
+        }
+
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
         {
             return new PullRequestModel(
                 prCacheItem.Number,
                 prCacheItem.Title,
                 Create(prCacheItem.Author),
-                prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
                 prCacheItem.CreatedAt,
                 prCacheItem.UpdatedAt)
             {
+                Assignee = prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
+                Base = Create(prCacheItem.Base),
+                Body = prCacheItem.Body ?? string.Empty,
+                ChangedFiles = prCacheItem.ChangedFiles.Select(x => (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Status)).ToList(),
                 CommentCount = prCacheItem.CommentCount,
-                IsOpen = prCacheItem.IsOpen
+                CommitCount = prCacheItem.CommitCount,
+                CreatedAt = prCacheItem.CreatedAt,
+                Head = Create(prCacheItem.Head),
+                State = prCacheItem.State.HasValue ? 
+                    prCacheItem.State.Value : 
+                    prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,                
             };
         }
-
 
         public IObservable<Unit> InsertUser(AccountCacheItem user)
         {
@@ -427,39 +456,107 @@ namespace GitHub.Services
             public DateTimeOffset UpdatedAt { get; set; }
         }
 
+        [NullGuard(ValidationFlags.None)]
         public class PullRequestCacheItem : CacheItem
         {
             public static PullRequestCacheItem Create(PullRequest pr)
             {
-                return new PullRequestCacheItem(pr);
+                return new PullRequestCacheItem(pr, new PullRequestFile[0]);
+            }
+
+            public static PullRequestCacheItem Create(PullRequest pr, IReadOnlyList<PullRequestFile> files)
+            {
+                return new PullRequestCacheItem(pr, files);
             }
 
             public PullRequestCacheItem() {}
+
             public PullRequestCacheItem(PullRequest pr)
+                : this(pr, new PullRequestFile[0])
+            {
+            }
+
+            public PullRequestCacheItem(PullRequest pr, IReadOnlyList<PullRequestFile> files)
             {
                 Title = pr.Title;
                 Number = pr.Number;
+                Base = new GitReferenceCacheItem { Label = pr.Base.Label, Ref = pr.Base.Ref, RepositoryCloneUrl = pr.Base.Repository.CloneUrl };
+                Head = pr.Head != null ? new GitReferenceCacheItem { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl } : null;
                 CommentCount = pr.Comments + pr.ReviewComments;
+                CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
                 Assignee = pr.Assignee != null ? new AccountCacheItem(pr.Assignee) : null;
                 CreatedAt = pr.CreatedAt;
                 UpdatedAt = pr.UpdatedAt;
+                Body = pr.Body;
+                ChangedFiles = files.Select(x => new PullRequestFileCacheItem(x)).ToList();
+                State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
+                Merged = pr.Merged;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
             }
 
-            [AllowNull]
-            public string Title {[return: AllowNull] get; set; }
+            public string Title {get; set; }
             public int Number { get; set; }
+            public GitReferenceCacheItem Base { get; set; }
+            public GitReferenceCacheItem Head { get; set; }
             public int CommentCount { get; set; }
-            [AllowNull]
-            public AccountCacheItem Author {[return: AllowNull] get; set; }
-            [AllowNull]
-            public AccountCacheItem Assignee { [return: AllowNull] get; set; }
+            public int CommitCount { get; set; }
+            public AccountCacheItem Author { get; set; }
+            public AccountCacheItem Assignee { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
-            public bool IsOpen { get; set; }
+            public string Body { get; set; }
+            public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
+
+            // Nullable for compatibility with old caches.
+            public PullRequestStateEnum? State { get; set; }
+
+            // This fields exists only for compatibility with old caches. The State property should be used.
+            public bool? IsOpen { get; set; }
+            public bool? Merged { get; set; }
+
+            static PullRequestStateEnum GetState(PullRequest pullRequest)
+            {
+                if (pullRequest.State == ItemState.Open)
+                {
+                    return PullRequestStateEnum.Open;
+                }
+                else if (pullRequest.Merged)
+                {
+                    return PullRequestStateEnum.Merged;
+                }
+                else
+                {
+                    return PullRequestStateEnum.Closed;
+                }
+            }
+        }
+
+        [NullGuard(ValidationFlags.None)]
+        public class PullRequestFileCacheItem
+        {
+            public PullRequestFileCacheItem()
+            {
+            }
+
+            public PullRequestFileCacheItem(PullRequestFile file)
+            {
+                FileName = file.FileName;
+                Status = (PullRequestFileStatus)Enum.Parse(typeof(PullRequestFileStatus), file.Status, true);
+            }
+
+            public string FileName { get; set; }
+            public PullRequestFileStatus Status { get; set; }
+        }
+
+        [NullGuard(ValidationFlags.None)]
+        public class GitReferenceCacheItem
+        {
+            public string Ref { get; set; }
+            public string Label { get; set; }
+            public string RepositoryCloneUrl { get; set; }
         }
     }
 }

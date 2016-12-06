@@ -150,6 +150,9 @@
   <data name="CancelLink" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="gistCreatedMessage" xml:space="preserve">
+    <value>Gist created</value>
+  </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
     <value>Failed to create gist</value>
   </data>
@@ -181,7 +184,7 @@
     <value>File Name</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>You are not logged in to {0}, so certain git operations may fail. [Login now]({1})</value>
+    <value>You are not signed in to {0}, so certain git operations may fail. [Sign in now]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
@@ -256,7 +259,7 @@
     <value>Private Repository</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>Login failed.</value>
+    <value>Sign in failed.</value>
   </data>
   <data name="localPathText" xml:space="preserve">
     <value>Local path</value>
@@ -295,7 +298,7 @@
     <value>Check your username and password, then try again</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>Login</value>
+    <value>Sign in</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
     <value>(forgot your password?)</value>
@@ -336,13 +339,13 @@
   <data name="PublishToGitHubButton" xml:space="preserve">
     <value>Publish to GitHub</value>
   </data>
-  <data name="GetStartedLink" xml:space="preserve">
-    <value>Get Started</value>
-  </data>
   <data name="GetStartedText" xml:space="preserve">
     <value>Get Started</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Sign in</value>
+  </data>
+  <data name="SignInCallToAction" xml:space="preserve">
+    <value>Sign in...</value>
   </data>
 </root>

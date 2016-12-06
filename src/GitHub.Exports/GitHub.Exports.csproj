@@ -77,6 +77,21 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.7.10.6071\lib\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.10.0.10.0.30319\lib\Microsoft.VisualStudio.Shell.Interop.10.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.11.0.11.0.61030\lib\Microsoft.VisualStudio.Shell.Interop.11.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.12.0.12.0.30110\lib\Microsoft.VisualStudio.Shell.Interop.12.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.Shell.Interop.8.0.dll</HintPath>
       <Private>True</Private>
@@ -85,15 +100,16 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Shell.Interop.9.0.9.0.30729\lib\Microsoft.VisualStudio.Shell.Interop.9.0.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.7.10.6070\lib\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\packages\Microsoft.VisualStudio.TextManager.Interop.8.0.8.0.50727\lib\Microsoft.VisualStudio.TextManager.Interop.8.0.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Threading, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Threading.14.1.131\lib\net45\Microsoft.VisualStudio.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -131,16 +147,21 @@
     <Compile Include="Helpers\AssemblyResolver.cs" />
     <Compile Include="Helpers\INotifyPropertySource.cs" />
     <Compile Include="Extensions\PropertyNotifierExtensions.cs" />
-    <Compile Include="Extensions\SimpleRepositoryModelExtensions.cs" />
+    <Compile Include="Extensions\LocalRepositoryModelExtensions.cs" />
     <Compile Include="Helpers\SettingsStore.cs" />
+    <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />
+    <Compile Include="Models\GitReferenceModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
     <Compile Include="Models\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
-    <Compile Include="Models\ISimpleRepositoryModel.cs" />
-    <Compile Include="Models\SimpleRepositoryModel.cs" />
+    <Compile Include="Models\IPullRequestFileModel.cs" />
+    <Compile Include="Models\IRepositoryModel.cs" />
+    <Compile Include="Models\ILocalRepositoryModel.cs" />
+    <Compile Include="Models\RepositoryModelBase.cs" />
+    <Compile Include="Models\LocalRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />
     <Compile Include="Primitives\RelayCommand.cs" />
@@ -185,6 +206,7 @@
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="ViewModels\IHasBusy.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
     <Compile Include="UI\IView.cs" />
@@ -196,7 +218,7 @@
     <Compile Include="Api\ISimpleApiClient.cs" />
     <Compile Include="Api\ISimpleApiClientFactory.cs" />
     <Compile Include="Authentication\AuthenticationResult.cs" />
-    <Compile Include="Models\IRepositoryModel.cs" />
+    <Compile Include="Models\IRemoteRepositoryModel.cs" />
     <Compile Include="Exports\ExportMetadata.cs" />
     <Compile Include="Primitives\StringEquivalent.cs" />
     <Compile Include="Primitives\UriString.cs" />

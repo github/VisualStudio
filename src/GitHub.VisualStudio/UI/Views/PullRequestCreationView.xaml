@@ -11,6 +11,8 @@
                                       xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                       xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                       xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+                                      xmlns:conv="clr-namespace:GitHub.UI.Converters;assembly=GitHub.UI"
+                                      xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -71,10 +73,14 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <conv:BranchNameConverter x:Key="BranchNameConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid VerticalAlignment="Top" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GenericPullRequestCreationView}}}">
+    <Grid VerticalAlignment="Top" 
+          MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GenericPullRequestCreationView}}}"
+          Margin="0 8 0 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -94,10 +100,34 @@
                     <ui:OcticonImage Foreground="{DynamicResource GitHubVsGrayText}" Icon="git_branch" />
                     <ui:LinkDropDown Header="Target Branch"
                                      ItemsSource="{Binding Branches}"
-                                     DisplayMemberPath="DisplayName"
                                      SelectedItem="{Binding TargetBranch}"
                                      ToolTip="Select a branch"
-                                     Margin="0,1,0,0"/>
+                                     Margin="0,1,0,0">
+                        <ui:LinkDropDown.ItemTemplate>
+                            <DataTemplate DataType="models:BranchModel">
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource BranchNameConverter}">
+                                            <Binding/>
+                                            <Binding Path="ViewModel.GitHubRepository" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestCreationView}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ui:LinkDropDown.ItemTemplate>
+                        <ui:LinkDropDown.LinkItemTemplate>
+                            <DataTemplate DataType="models:BranchModel">
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource BranchNameConverter}">
+                                            <Binding/>
+                                            <Binding Path="ViewModel.GitHubRepository" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestCreationView}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ui:LinkDropDown.LinkItemTemplate>
+                    </ui:LinkDropDown>
                     <ui:OcticonImage Height="13"
                                      Margin="5,2,3,0"
                                      VerticalAlignment="Center"

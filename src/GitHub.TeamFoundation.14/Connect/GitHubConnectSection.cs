@@ -67,18 +67,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             set { showLogout = value; this.RaisePropertyChange(); }
         }
 
-        IReactiveDerivedList<ISimpleRepositoryModel> repositories;
+        IReactiveDerivedList<ILocalRepositoryModel> repositories;
         [AllowNull]
-        public IReactiveDerivedList<ISimpleRepositoryModel> Repositories
+        public IReactiveDerivedList<ILocalRepositoryModel> Repositories
         {
             [return:AllowNull]
             get { return repositories; }
             set { repositories = value; this.RaisePropertyChange(); }
         }
 
-        ISimpleRepositoryModel selectedRepository;
+        ILocalRepositoryModel selectedRepository;
         [AllowNull]
-        public ISimpleRepositoryModel SelectedRepository
+        public ILocalRepositoryModel SelectedRepository
         {
             [return: AllowNull]
             get { return selectedRepository; }
@@ -153,7 +153,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     SectionConnection = connection;
                     Repositories = SectionConnection.Repositories.CreateDerivedCollection(x => x,
-                                        orderer: OrderedComparer<ISimpleRepositoryModel>.OrderBy(x => x.Name).Compare);
+                                        orderer: OrderedComparer<ILocalRepositoryModel>.OrderBy(x => x.Name).Compare);
                     Repositories.CollectionChanged += UpdateRepositoryList;
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
@@ -207,7 +207,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 // so we can handle just one new entry separately
                 if (isCloning || isCreating)
                 {
-                    var newrepo = e.NewItems.Cast<ISimpleRepositoryModel>().First();
+                    var newrepo = e.NewItems.Cast<ILocalRepositoryModel>().First();
 
                     SelectedRepository = newrepo;
                     if (isCreating)
@@ -235,7 +235,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 else
                 {
                     e.NewItems
-                        .Cast<ISimpleRepositoryModel>()
+                        .Cast<ILocalRepositoryModel>()
                         .ForEach(async r =>
                     {
                         if (Equals(Holder.ActiveRepo, r))
@@ -259,14 +259,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        void HandleCreatedRepo(ISimpleRepositoryModel newrepo)
+        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
         {
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
             msg += " " + string.Format(CultureInfo.CurrentUICulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
-        void HandleClonedRepo(ISimpleRepositoryModel newrepo)
+        void HandleClonedRepo(ILocalRepositoryModel newrepo)
         {
             var msg = string.Format(CultureInfo.CurrentUICulture, Constants.Notification_RepoCloned, newrepo.Name, newrepo.CloneUrl);
             if (newrepo.HasCommits() && newrepo.MightContainSolution())
@@ -276,7 +276,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void ShowNotification(ISimpleRepositoryModel newrepo, string msg)
+        void ShowNotification(ILocalRepositoryModel newrepo, string msg)
         {
             var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
             

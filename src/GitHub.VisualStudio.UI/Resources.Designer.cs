@@ -279,18 +279,18 @@ namespace GitHub.VisualStudio.UI {
         /// <summary>
         ///   Looks up a localized string similar to Get Started.
         /// </summary>
-        public static string GetStartedLink {
+        public static string GetStartedText {
             get {
-                return ResourceManager.GetString("GetStartedLink", resourceCulture);
+                return ResourceManager.GetString("GetStartedText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Get Started.
+        ///   Looks up a localized string similar to Gist created.
         /// </summary>
-        public static string GetStartedText {
+        public static string gistCreatedMessage {
             get {
-                return ResourceManager.GetString("GetStartedText", resourceCulture);
+                return ResourceManager.GetString("gistCreatedMessage", resourceCulture);
             }
         }
         
@@ -669,6 +669,15 @@ namespace GitHub.VisualStudio.UI {
         public static string resendCodeButtonToolTip {
             get {
                 return ResourceManager.GetString("resendCodeButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in....
+        /// </summary>
+        public static string SignInCallToAction {
+            get {
+                return ResourceManager.GetString("SignInCallToAction", resourceCulture);
             }
         }
         

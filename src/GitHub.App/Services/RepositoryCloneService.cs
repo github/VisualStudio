@@ -7,6 +7,7 @@ using GitHub.Extensions;
 using Microsoft.VisualStudio.Shell;
 using NLog;
 using Rothko;
+using GitHub.Helpers;
 
 namespace GitHub.Services
 {
@@ -48,7 +49,7 @@ namespace GitHub.Services
 
                 // Once we've done IO switch to the main thread to call vsGitServices.Clone() as this must be
                 // called on the main thread.
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await ThreadingHelper.SwitchToMainThreadAsync();
 
                 try
                 {

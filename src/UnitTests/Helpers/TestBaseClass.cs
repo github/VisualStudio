@@ -3,6 +3,8 @@ using GitHub.Models;
 using Octokit;
 using System;
 using System.IO;
+using System.IO.Compression;
+using Xunit.Abstractions;
 
 /// <summary>
 /// This base class will get its methods called by the most-derived
@@ -56,31 +58,58 @@ public class TestBaseClass : IEntryExitDecorator
         DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount = 0, int reviewCommentCount = 0)
     {
         var uri = new Uri("https://url");
+        var uris = uri.ToString();
+        var repo = new Repository(uris, uris, uris, uris, uris, uris, uris,
+            1, user, "Repo", "Repo", string.Empty, string.Empty, string.Empty,
+            false, false, 0, 0, "master",
+            0, null, createdAt, updatedAt,
+            null, null, null,
+            false, false, false);
         return new PullRequest(uri, uri, uri, uri, uri, uri,
             id, state, title, "", createdAt, updatedAt,
-            null, null, null, null, user, null, false, null,
+            null, null, 
+            new GitReference(uri.ToString(), "foo:bar", "bar", string.Empty, user, repo),
+            new GitReference(uri.ToString(), "foo:baz", "baz", string.Empty, user, repo),
+            user, null, false, null,
             commentCount, reviewCommentCount, 0, 0, 0, 0,
             null, false);
     }
-}
 
-public class TempFileBaseClass : TestBaseClass
-{
-    public DirectoryInfo Directory { get; set; }
-
-    public override void OnEntry()
+    protected class TempDirectory : IDisposable
     {
-        var f = Path.GetTempFileName();
-        var name = Path.GetFileNameWithoutExtension(f);
-        File.Delete(f);
-        Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
-        Directory.Create();
-        base.OnEntry();
+        public TempDirectory()
+        {
+            var f = Path.GetTempFileName();
+            var name = Path.GetFileNameWithoutExtension(f);
+            File.Delete(f);
+            Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
+            Directory.Create();
+        }
+
+        public DirectoryInfo Directory { get; }
+
+        public void Dispose()
+        {
+            Directory.Delete(true);
+        }
     }
 
-    public override void OnExit()
+    protected class TempRepository : TempDirectory
     {
-        Directory.Delete(true);
-        base.OnExit();
+        public TempRepository(string name, byte[] repositoryZip)
+            : base()
+        {
+            var outputZip = Path.Combine(Directory.FullName, name + ".zip");
+            var outputDir = Path.Combine(Directory.FullName, name);
+            var repositoryPath = Path.Combine(outputDir, name);
+            File.WriteAllBytes(outputZip, repositoryZip);
+            ZipFile.ExtractToDirectory(outputZip, outputDir);
+            Repository = new LibGit2Sharp.Repository(repositoryPath);
+        }
+
+        public LibGit2Sharp.Repository Repository
+        {
+            get;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using GitHub.Primitives;
 using GitHub.Services;
 using System;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.Menus
 {
@@ -16,7 +17,7 @@ namespace GitHub.VisualStudio.Menus
             usageTracker = new Lazy<IUsageTracker>(() => ServiceProvider.TryGetService<IUsageTracker>());
         }
 
-        protected UriString GenerateLink()
+        protected Task<UriString> GenerateLink()
         {
             var repo = ActiveRepo;
             var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();

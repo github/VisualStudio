@@ -148,13 +148,13 @@
     <value>(forgot your password?)</value>
   </data>
   <data name="LoginFailedForbiddenMessage" xml:space="preserve">
-    <value>Make sure to use your password and not a Personal Access token to log in.</value>
+    <value>Make sure to use your password and not a Personal Access token to sign in.</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
     <value>Check your username and password, then try again</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>Login failed.</value>
+    <value>Sign in failed.</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
     <value>Connect To GitHub</value>
@@ -172,7 +172,7 @@
     <value>Please enter your password</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>The Pull Request has been created at [{0}]({1}).</value>
+    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
     <value>Publish repository</value>
@@ -235,7 +235,7 @@
     <value>Two-Factor authentication required</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>Enter a login authentication code here</value>
+    <value>Enter a sign in authentication code here</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
     <value>Please enter your username or email address</value>

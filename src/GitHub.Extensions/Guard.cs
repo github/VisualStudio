@@ -37,13 +37,13 @@ namespace GitHub.Extensions
         }
 
         /// <summary>
-        ///   Checks a string argument to ensure it isn't null or empty.
+        /// Checks a string argument to ensure it isn't null or empty.
         /// </summary>
         /// <param name = "value">The argument value to check.</param>
         /// <param name = "name">The name of the argument.</param>
         public static void ArgumentNotEmptyString(string value, string name)
         {
-            if (value.Length > 0) return;
+            if (value?.Length > 0) return;
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
 #if DEBUG
             if (!InUnitTestRunner())
@@ -90,7 +90,7 @@ namespace GitHub.Extensions
         }
 
         // Borrowed from Splat.
-        static bool InUnitTestRunner()
+        public static bool InUnitTestRunner()
         {
             return Splat.ModeDetector.InUnitTestRunner();
         }

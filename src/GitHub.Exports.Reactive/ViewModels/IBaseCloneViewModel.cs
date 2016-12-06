@@ -16,6 +16,6 @@ namespace GitHub.ViewModels
         /// </summary>
         IReactiveCommand<Unit> CloneCommand { get; }
 
-        ISimpleRepositoryModel SelectedRepository { get; set; }
+        IRemoteRepositoryModel SelectedRepository { get; set; }
     }
 }

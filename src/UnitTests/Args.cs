@@ -25,8 +25,8 @@ internal static class Args
     public static LibGit2Sharp.IRepository LibGit2Repo { get { return Arg.Any<LibGit2Sharp.IRepository>(); } }
     public static LibGit2Sharp.Branch LibGit2Branch { get { return Arg.Any<LibGit2Sharp.Branch>(); } }
     public static Remote LibgGit2Remote { get { return Arg.Any<Remote>(); } }
-    public static ISimpleRepositoryModel SimpleRepositoryModel { get { return Arg.Any<ISimpleRepositoryModel>(); } }
-    public static IRepositoryModel RepositoryModel { get { return Arg.Any<IRepositoryModel>(); } }
+    public static ILocalRepositoryModel LocalRepositoryModel { get { return Arg.Any<ILocalRepositoryModel>(); } }
+    public static IRemoteRepositoryModel RemoteRepositoryModel { get { return Arg.Any<IRemoteRepositoryModel>(); } }
     public static IBranch Branch { get { return Arg.Any<IBranch>(); } }
     public static IGitService GitService { get { return Arg.Any<IGitService>(); } }
     public static Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>

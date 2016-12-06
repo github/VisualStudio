@@ -9,7 +9,7 @@ namespace GitHub.Services
         void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
         string GetActiveRepoPath();
         LibGit2Sharp.IRepository GetActiveRepo();
-        IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
+        IEnumerable<ILocalRepositoryModel> GetKnownRepositories();
         string SetDefaultProjectPath(string path);
     }
 }
