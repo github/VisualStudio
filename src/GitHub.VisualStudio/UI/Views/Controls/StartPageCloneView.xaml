@@ -59,17 +59,6 @@
       <TextBlock Text="{x:Static prop:Resources.CloneLink}" />
     </ui:OcticonCircleButton>
 
-    <Border DockPanel.Dock="Bottom" Style="{StaticResource repositoryBorderStyle}">
-      <Grid>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
-      </Grid>
-    </Border>
-
     <Border x:Name="repositoriesListPane"
             Margin="0"
             BorderBrush="#EAEAEA"
