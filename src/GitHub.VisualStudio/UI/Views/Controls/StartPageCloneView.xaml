@@ -67,31 +67,6 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <ui:PromptTextBox x:Name="clonePath"
-                          Grid.Column="1"
-                          Margin="0,2"
-                          Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}"
-                          />
-        <Button x:Name="browsePathButton"
-                Grid.Column="2"
-                Margin="4,0,4,0"
-                VerticalContentAlignment="Center"
-                Content="{x:Static prop:Resources.browsePathButtonContent}"
-                Padding="0"
-                Style="{StaticResource GitHubBlueLinkButton}"
-                Command="{Binding BrowseForDirectory}"
-                />
-        <Label Grid.Row="3"
-               Grid.Column="0"
-               Margin="4,0"
-               Content="{x:Static prop:Resources.pathText}"
-               Target="{Binding ElementName=clonePath}" />
-        <uirx:ValidationMessage x:Name="pathValidationMessage"
-                                Grid.Row="4"
-                                Grid.Column="1"
-                                ValidatesControl="{Binding ElementName=clonePath}"
-                                ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}"
-                                />
       </Grid>
     </Border>
 
@@ -136,11 +111,19 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
             
           <Label Style="{StaticResource Light}" Grid.Row="0" HorizontalAlignment="Left" Margin="6,0,0,0">Repo Name</Label>
           <Label Style="{StaticResource Light}" Grid.Row="1" HorizontalAlignment="Right">Organization</Label>
           <Label Style="{StaticResource Light}" Grid.Row="2" HorizontalAlignment="Right">Source</Label>
+          <Label Grid.Row="3"
+                 Grid.Column="0"
+                 Style="{StaticResource Light}" 
+                 HorizontalAlignment="Right"
+                 Margin="4,0"
+                 Content="{x:Static prop:Resources.pathText}"
+                 Target="{Binding ElementName=clonePath}" />
             
           <ui:OcticonImage Grid.Row="0" Grid.Column="1" Icon="repo"/>
           <ui:OcticonImage Grid.Row="1" Grid.Column="1" Icon="organization"/>
@@ -154,6 +137,39 @@
                    VerticalAlignment="Center"
                    Text="{Binding SelectedRepository.CloneUrl, Mode=OneWay}"
                    Style="{StaticResource FlatReadOnlyTextBox}"/>
+
+          <Grid Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ui:PromptTextBox x:Name="clonePath"
+                              Grid.Column="0"
+                              Margin="0,2"
+                              Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}" />
+
+            <Button x:Name="browsePathButton"
+                    Grid.Column="1"
+                    Margin="4,0,4,0"
+                    VerticalContentAlignment="Center"
+                    Content="{x:Static prop:Resources.browsePathButtonContent}"
+                    Padding="0"
+                    Style="{StaticResource GitHubBlueLinkButton}"
+                    Command="{Binding BrowseForDirectory}" />
+
+            <uirx:ValidationMessage x:Name="pathValidationMessage"
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2" 
+                                    Grid.Column="1"
+                                    ValidatesControl="{Binding ElementName=clonePath}"
+                                    ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}" />
+          </Grid>
         </Grid>
       </StackPanel>
     </Border>
