@@ -425,7 +425,7 @@ namespace GitHub.ViewModels
                 {
                     return pullRequestsService
                         .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
-                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
+                        .SelectMany(x => pullRequestsService.Checkout(repository, Model, x));
                 }
             });
         }
@@ -454,7 +454,7 @@ namespace GitHub.ViewModels
 
         class UpdateCommandState : IPullRequestUpdateState
         {
-            public UpdateCommandState(HistoryDivergence divergence, string pullDisabledMessage, string pushDisabledMessage)
+            public UpdateCommandState(BranchTrackingDetails divergence, string pullDisabledMessage, string pushDisabledMessage)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;

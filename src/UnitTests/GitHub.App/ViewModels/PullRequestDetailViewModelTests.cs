@@ -371,7 +371,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     .Returns(Observable.Empty<IBranch>());
             }
 
-            pullRequestService.FetchAndCheckout(repository, Arg.Any<int>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
+            pullRequestService.Checkout(repository, Arg.Any<IPullRequestModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
             pullRequestService.GetDefaultLocalBranchName(repository, Arg.Any<int>(), Arg.Any<string>()).Returns(x => Observable.Return($"pr/{x[1]}"));
             pullRequestService.IsPullRequestFromFork(repository, Arg.Any<IPullRequestModel>()).Returns(prFromFork);
             pullRequestService.IsWorkingDirectoryClean(repository).Returns(Observable.Return(!dirty));
@@ -379,7 +379,7 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.Push(repository).Returns(x => Throws("Push threw"));
             pullRequestService.SwitchToBranch(repository, Arg.Any<IPullRequestModel>()).Returns(x => Throws("Switch threw"));
 
-            var divergence = Substitute.For<HistoryDivergence>();
+            var divergence = Substitute.For<BranchTrackingDetails>();
             divergence.AheadBy.Returns(aheadBy);
             divergence.BehindBy.Returns(behindBy);
             pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())

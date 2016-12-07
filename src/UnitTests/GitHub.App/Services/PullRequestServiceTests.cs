@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -54,6 +56,80 @@ public class PullRequestServiceTests : TestBaseClass
         Assert.NotNull(pr);
     }
 
+    public class TheCheckoutMethod
+    {
+        [Fact]
+        public async void ShouldCheckoutExistingBranch()
+        {
+            var gitClient = Substitute.For<IGitClient>();
+            var service = new PullRequestService(
+                gitClient,
+                MockGitService(),
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IUsageTracker>());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var pr = Substitute.For<IPullRequestModel>();
+
+            await service.Checkout(localRepo, pr, "pr/123-foo1");
+
+            gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
+            Assert.Equal(1, gitClient.ReceivedCalls().Count());
+        }
+
+        [Fact]
+        public async void ShouldCheckoutLocalBranch()
+        {
+            var gitClient = Substitute.For<IGitClient>();
+            var service = new PullRequestService(
+                gitClient,
+                MockGitService(),
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IUsageTracker>());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
+
+            var pr = Substitute.For<IPullRequestModel>();
+            pr.Number.Returns(5);
+            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/owner/repo"));
+
+            await service.Checkout(localRepo, pr, "local");
+
+            gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
+            gitClient.Received().Checkout(Arg.Any<IRepository>(), "local").Forget();
+            Assert.Equal(2, gitClient.ReceivedCalls().Count());
+        }
+
+        [Fact]
+        public async void ShouldCheckoutBranchFromFork()
+        {
+            var gitClient = Substitute.For<IGitClient>();
+            var service = new PullRequestService(
+                gitClient,
+                MockGitService(),
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IUsageTracker>());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
+
+            var pr = Substitute.For<IPullRequestModel>();
+            pr.Number.Returns(5);
+            pr.Head.Returns(new GitReferenceModel("source", "owner:local", "123", "https://foo.bar/fork/repo.git"));
+
+            await service.Checkout(localRepo, pr, "pr/5-fork-branch");
+
+            gitClient.Received().SetRemote(Arg.Any<IRepository>(), "fork", new Uri("https://foo.bar/fork/repo.git")).Forget();
+            gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork").Forget();
+            gitClient.Received().Fetch(Arg.Any<IRepository>(), "fork", "source:pr/5-fork-branch").Forget();
+            gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/5-fork-branch").Forget();
+            gitClient.Received().SetTrackingBranch(Arg.Any<IRepository>(), "pr/5-fork-branch", "refs/remotes/fork/source").Forget();
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/5-fork-branch.ghfvs-pr", "5").Forget();
+            Assert.Equal(6, gitClient.ReceivedCalls().Count());
+        }
+    }
+
     public class TheGetDefaultLocalBranchNameMethod
     {
         [Fact]
@@ -82,17 +158,6 @@ public class PullRequestServiceTests : TestBaseClass
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "foo1");
             Assert.Equal("pr/123-foo1-3", result);
-        }
-
-        static IGitService MockGitService()
-        {
-            var repository = Substitute.For<IRepository>();
-            var branches = MockBranches("pr/123-foo1", "pr/123-foo1-2");
-            repository.Branches.Returns(branches);
-
-            var result = Substitute.For<IGitService>();
-            result.GetRepository(Arg.Any<string>()).Returns(repository);
-            return result;
         }
     }
 
@@ -182,6 +247,17 @@ public class PullRequestServiceTests : TestBaseClass
             result[name].Returns(branch);
         }
 
+        return result;
+    }
+
+    static IGitService MockGitService()
+    {
+        var repository = Substitute.For<IRepository>();
+        var branches = MockBranches("pr/123-foo1", "pr/123-foo1-2");
+        repository.Branches.Returns(branches);
+
+        var result = Substitute.For<IGitService>();        
+        result.GetRepository(Arg.Any<string>()).Returns(repository);
         return result;
     }
 }

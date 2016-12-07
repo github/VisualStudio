@@ -14,11 +14,11 @@ namespace GitHub.Services
         Task Pull(IRepository repository);
 
         /// <summary>
-        /// Pushes the specified branch to the remote.
+        /// Pushes HEAD to specified branch on the remote.
         /// </summary>
         /// <param name="repository">The repository to push</param>
+        /// <param name="branchName">the branch remote to push to</param>
         /// <param name="remoteName">The name of the remote</param>
-        /// <param name="branchName">the branch to push</param>
         /// <returns></returns>
         Task Push(IRepository repository, string branchName, string remoteName);
 
@@ -46,6 +46,14 @@ namespace GitHub.Services
         /// <param name="branchName">The name of the branch</param>
         /// <returns></returns>
         Task Checkout(IRepository repository, string branchName);
+
+        /// <summary>
+        /// Creates a new branch.
+        /// </summary>
+        /// <param name="repository">The repository to carry out the checkout on</param>
+        /// <param name="branchName">The name of the branch</param>
+        /// <returns></returns>
+        Task CreateBranch(IRepository repository, string branchName);
 
         /// <summary>
         /// Sets the configuration key to the specified value in the local config.

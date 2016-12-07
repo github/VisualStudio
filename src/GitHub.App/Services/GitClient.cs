@@ -52,7 +52,8 @@ namespace GitHub.Services
                 if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
                     var remote = repository.Network.Remotes[remoteName];
-                    repository.Network.Push(remote, "HEAD", @"refs/heads/" + branchName, pushOptions);
+                    var remoteRef = IsCanonical(branchName) ? branchName : @"refs/heads/" + branchName;
+                    repository.Network.Push(remote, "HEAD", remoteRef, pushOptions);
                 }
             });
         }
@@ -89,6 +90,17 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 repository.Checkout(branchName);
+            });
+        }
+
+        public Task CreateBranch(IRepository repository, string branchName)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
+
+            return Task.Factory.StartNew(() =>
+            {
+                repository.CreateBranch(branchName);
             });
         }
 
