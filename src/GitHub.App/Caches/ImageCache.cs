@@ -24,7 +24,7 @@ namespace GitHub.Caches
         static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
         public const string ImageCacheFileName = "images.cache.db";
-        readonly IObservable<IBlobCache> cacheFactory;
+        readonly IObservable<IBlobCache> blobCache;
         readonly Lazy<IImageDownloader> imageDownloader;
 
         readonly SerializedObservableProvider<Uri, BitmapSource> serializedGet;
@@ -49,9 +49,9 @@ namespace GitHub.Caches
         {
         }
 
-        ImageCache(IObservable<IBlobCache> cacheFactory, Lazy<IImageDownloader> imageDownloader)
+        ImageCache(IObservable<IBlobCache> blobCache, Lazy<IImageDownloader> imageDownloader)
         {
-            this.cacheFactory = cacheFactory;
+            this.blobCache = blobCache;
             this.imageDownloader = imageDownloader;
             serializedGet = new SerializedObservableProvider<Uri, BitmapSource>(GetImageImpl, UriComparer.Default);
         }
@@ -63,9 +63,9 @@ namespace GitHub.Caches
 
         IObservable<BitmapSource> GetImageImpl(Uri url)
         {
+            var maxCacheDuration = TimeSpan.FromDays(30);
             return Observable.Defer(() =>
             {
-                var maxCacheDuration = TimeSpan.FromDays(30);
                 TimeSpan refreshInterval;
 
                 // Random is not thread safe and multi-threaded access can lead to 
@@ -78,9 +78,8 @@ namespace GitHub.Caches
 
                 var ret = new ReplaySubject<BitmapSource>(1);
 
-                cacheFactory.SelectMany(c => c.GetAndRefresh(GetCacheKey(url),() => DownloadImage(url),
-                        refreshInterval,
-                        maxCacheDuration))
+                blobCache
+                    .SelectMany(c => c.GetAndRefresh(GetCacheKey(url),() => DownloadImage(url), refreshInterval, maxCacheDuration))
                     .SelectMany(x => LoadImage(x, url))
                     .Catch<BitmapSource, Exception>(ex =>
                         Observable.Throw<BitmapSource>(new KeyNotFoundException("Could not load image: " + url, ex)))
@@ -96,13 +95,14 @@ namespace GitHub.Caches
                 // one value so in an effort to reduce scope I'm keeping it that way. We
                 // unfortunately still need to maintain the subscription to GetAndRefresh though
                 // so that we don't cancel the refresh as soon as we get the stale object.
+
                 return ret.Take(1);
             });
         }
 
         public IObservable<Unit> SeedImage(Uri url, byte[] imageBytes, DateTimeOffset expiration)
         {
-            return cacheFactory.SelectMany(c => c.Insert(GetCacheKey(url), imageBytes, expiration));
+            return blobCache.SelectMany(c => c.Insert(GetCacheKey(url), imageBytes, expiration));
         }
 
         public IObservable<Unit> SeedImage(Uri url, BitmapSource image, DateTimeOffset expiration)
@@ -112,7 +112,7 @@ namespace GitHub.Caches
 
         public IObservable<Unit> Invalidate(Uri url)
         {
-            return cacheFactory.SelectMany(c => c.Invalidate(GetCacheKey(url)));
+            return blobCache.SelectMany(c => c.Invalidate(GetCacheKey(url)));
         }
 
         public static byte[] GetBytesFromBitmapImage(BitmapSource imageSource)
@@ -168,7 +168,7 @@ namespace GitHub.Caches
 
         IObservable<BitmapSource> LoadImage(byte[] x, Uri url)
         {
-            return cacheFactory.SelectMany(cache =>
+            return blobCache.SelectMany(cache =>
             {
                 return LoadImage(new MemoryStream(x), 32, 32)
                     .Catch<BitmapImage, Exception>(ex =>
