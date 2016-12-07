@@ -6,14 +6,15 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
 using NullGuard;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -51,10 +52,12 @@ namespace GitHub.ViewModels
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPullRequestService pullRequestsService)
+            IPullRequestService pullRequestsService,
+            IPackageSettings settings)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
-                  pullRequestsService)
+                  pullRequestsService,
+                  settings)
         {
         }
 
@@ -68,7 +71,8 @@ namespace GitHub.ViewModels
         public PullRequestDetailViewModel(
             ILocalRepositoryModel repository,
             IModelService modelService,
-            IPullRequestService pullRequestsService)
+            IPullRequestService pullRequestsService,
+            IPackageSettings settings)
         {
             this.repository = repository;
             this.modelService = modelService;
@@ -82,18 +86,28 @@ namespace GitHub.ViewModels
 
             OpenOnGitHub = ReactiveCommand.Create();
 
+            ChangedFilesViewType = settings.UIState.PullRequestDetailState.ShowTree ?
+                ChangedFilesViewType.TreeView : ChangedFilesViewType.ListView;
+
             ToggleChangedFilesView = ReactiveCommand.Create();
             ToggleChangedFilesView.Subscribe(_ =>
             {
                 ChangedFilesViewType = ChangedFilesViewType == ChangedFilesViewType.TreeView ?
                     ChangedFilesViewType.ListView : ChangedFilesViewType.TreeView;
+                settings.UIState.PullRequestDetailState.ShowTree = ChangedFilesViewType == ChangedFilesViewType.TreeView;
+                settings.Save();
             });
+
+            OpenChangedFileAction = settings.UIState.PullRequestDetailState.DiffOnOpen ?
+                OpenChangedFileAction.Diff : OpenChangedFileAction.Open;
 
             ToggleOpenChangedFileAction = ReactiveCommand.Create();
             ToggleOpenChangedFileAction.Subscribe(_ =>
             {
                 OpenChangedFileAction = OpenChangedFileAction == OpenChangedFileAction.Diff ?
                     OpenChangedFileAction.Open : OpenChangedFileAction.Diff;
+                settings.UIState.PullRequestDetailState.DiffOnOpen = OpenChangedFileAction == OpenChangedFileAction.Diff;
+                settings.Save();
             });
 
             OpenFile = ReactiveCommand.Create();
@@ -225,7 +239,7 @@ namespace GitHub.ViewModels
         /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         public ReactiveCommand<object> OpenFile { get; }
- 
+
         /// <summary>
         /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
@@ -315,9 +329,31 @@ namespace GitHub.ViewModels
             IsBusy = false;
         }
 
-        static IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
+        /// <summary>
+        /// Gets the specified file as it appears in the pull request.
+        /// </summary>
+        /// <param name="file">The file or directory node.</param>
+        /// <returns>The path to the extracted file.</returns>
+        public Task<string> ExtractFile(IPullRequestFileNode file)
         {
-            return files.Select(x => new PullRequestFileNode(x.FileName, x.Status));
+            var path = Path.Combine(file.DirectoryPath, file.FileName);
+            return pullRequestsService.ExtractFile(repository, model.Head.Sha, path).ToTask();
+        }
+
+        /// <summary>
+        /// Gets the before and after files needed for viewing a diff.
+        /// </summary>
+        /// <param name="file">The changed file.</param>
+        /// <returns>A tuple containing the full path to the before and after files.</returns>
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        {
+            var path = Path.Combine(file.DirectoryPath, file.FileName);
+            return pullRequestsService.ExtractDiffFiles(repository, model, path).ToTask();
+        }
+
+        IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
+        {
+            return files.Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status));
         }
 
         static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
@@ -329,7 +365,7 @@ namespace GitHub.ViewModels
 
             foreach (var file in files)
             {
-                var dir = GetDirectory(file.Path, dirs);
+                var dir = GetDirectory(file.DirectoryPath, dirs);
                 dir.Files.Add(file);
             }
 

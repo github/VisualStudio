@@ -82,6 +82,24 @@ namespace GitHub.Services
         /// <returns></returns>
         IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository);
 
+        /// <summary>
+        /// Extracts a file at a specified commit from the repository.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="fileName">The path to the file, relative to the repository.</param>
+        /// <returns>The filename of the extracted file.</returns>
+        IObservable<string> ExtractFile(ILocalRepositoryModel repository, string commitSha, string fileName);
+
+        /// <summary>
+        /// Gets the left and right files for a diff.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <param name="fileName">The filename relative to the repository root.</param>
+        /// <returns>The filenames of the left and right files for the diff.</returns>
+        IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName);
+
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }
 }

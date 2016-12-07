@@ -13,6 +13,7 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/TextBlocks.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/LinkDropDown.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubActionLink.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ItemsControls.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <DrawingBrush x:Key="ConnectArrowBrush">

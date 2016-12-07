@@ -160,7 +160,7 @@ namespace GitHub.Services
 
         public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            return pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+            return pullRequest.Head.RepositoryCloneUrl?.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
@@ -209,6 +209,29 @@ namespace GitHub.Services
                 var configKey = $"branch.{repo.Head.FriendlyName}.ghfvs-pr";
                 await gitClient.UnsetConfig(repo, configKey);
                 return Observable.Return(Unit.Default);
+            });
+        }
+
+        public IObservable<string> ExtractFile(ILocalRepositoryModel repository, string commitSha, string fileName)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                await gitClient.Fetch(repo, "origin");
+                var result = await gitClient.ExtractFile(repo, commitSha, fileName);
+                return Observable.Return(result);
+            });
+        }
+
+        public IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                await gitClient.Fetch(repo, "origin");
+                var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
+                var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName);
+                return Observable.Return(Tuple.Create(left, right));
             });
         }
 

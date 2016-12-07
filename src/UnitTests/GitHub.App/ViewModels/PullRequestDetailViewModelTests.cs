@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.ViewModels;
 using LibGit2Sharp;
 using NSubstitute;
@@ -49,6 +50,10 @@ namespace UnitTests.GitHub.App.ViewModels
             Assert.Equal("dir1", dir1.DirectoryName);
             Assert.Equal(2, dir1.Files.Count);
             Assert.Equal(1, dir1.Directories.Count);
+            Assert.Equal("f1.cs", dir1.Files[0].FileName);
+            Assert.Equal("f2.cs", dir1.Files[1].FileName);
+            Assert.Equal("dir1", dir1.Files[0].DirectoryPath);
+            Assert.Equal("dir1", dir1.Files[1].DirectoryPath);
 
             var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
             Assert.Equal("dir1a", dir1a.DirectoryName);
@@ -352,10 +357,14 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())
                 .Returns(Observable.Return(divergence));
 
+            var settings = Substitute.For<IPackageSettings>();
+            settings.UIState.Returns(new UIState { PullRequestDetailState = new PullRequestDetailUIState() });
+
             var vm = new PullRequestDetailViewModel(
                 repository,
                 Substitute.For<IModelService>(),
-                pullRequestService);
+                pullRequestService,
+                settings);
 
             return Tuple.Create(vm, pullRequestService);
         }
@@ -368,8 +377,8 @@ namespace UnitTests.GitHub.App.ViewModels
             {
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel("source", "foo:baz", "https://github.com/foo/bar.git"),
-                Base = new GitReferenceModel("dest", "foo:bar", "https://github.com/foo/bar.git"),
+                Head = new GitReferenceModel("source", "foo:baz", "sha", "https://github.com/foo/bar.git"),
+                Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
             };
         }
     }

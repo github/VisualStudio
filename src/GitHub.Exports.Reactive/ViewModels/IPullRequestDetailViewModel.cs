@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -170,5 +171,19 @@ namespace GitHub.ViewModels
         /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
+
+        /// <summary>
+        /// Gets the specified file as it appears in the pull request.
+        /// </summary>
+        /// <param name="file">The file or directory node.</param>
+        /// <returns>The path to the extracted file.</returns>
+        Task<string> ExtractFile(IPullRequestFileNode file);
+
+        /// <summary>
+        /// Gets the before and after files needed for viewing a diff.
+        /// </summary>
+        /// <param name="file">The changed file.</param>
+        /// <returns>A tuple containing the full path to the before and after files.</returns>
+        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
     }
 }
