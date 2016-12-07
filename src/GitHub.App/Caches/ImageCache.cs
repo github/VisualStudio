@@ -64,18 +64,12 @@ namespace GitHub.Caches
         IObservable<BitmapSource> GetImageImpl(Uri url)
         {
             var maxCacheDuration = TimeSpan.FromDays(30);
+
+            // Between 1 and 2 days.
+            var refreshInterval = TimeSpan.FromSeconds(random.Next(60 * 60 * 24, 60 * 60 * 24 * 2));
+
             return Observable.Defer(() =>
             {
-                TimeSpan refreshInterval;
-
-                // Random is not thread safe and multi-threaded access can lead to 
-                // a race with the outcome that it will only ever return 0.
-                lock (random)
-                {
-                    // Between 1 and 2 days.
-                    refreshInterval = TimeSpan.FromSeconds(random.Next(60*60*24, 60*60*24*2));
-                }
-
                 var ret = new ReplaySubject<BitmapSource>(1);
 
                 blobCache
