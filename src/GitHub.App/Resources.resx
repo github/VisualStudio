@@ -172,7 +172,7 @@
     <value>Please enter your password</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>The Pull Request has been created at [{0}]({1}).</value>
+    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
     <value>Publish repository</value>

@@ -136,6 +136,23 @@ namespace GitHub.VisualStudio.Base
             return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
         }
 
+        protected bool IsUserAuthenticated()
+        {
+            if (SimpleApiClient == null)
+            {
+                if (ActiveRepo == null)
+                    return false;
+
+                var uri = ActiveRepoUri;
+                if (uri == null)
+                    return false;
+
+                SimpleApiClient = apiFactory.Create(uri);
+            }
+
+            return SimpleApiClient?.IsAuthenticated() ?? false;
+        }
+
         bool disposed;
         protected override void Dispose(bool disposing)
         {

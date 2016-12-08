@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Converters\AllCapsConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Converters\BranchNameConverter.cs" />
     <Compile Include="Converters\CountToVisibilityConverter.cs" />
     <Compile Include="Converters\DefaultValueConverter.cs" />
     <Compile Include="Converters\StickieListItemConverter.cs" />

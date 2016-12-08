@@ -431,9 +431,16 @@ namespace GitHub.SampleData
             Icon = Octicon.repo;
             RepoName = "octokit";
             RepoUrl = "https://github.com/octokit/something-really-long-here-to-check-for-trimming";
+            IsLoggedIn = false;
         }
 
         public Octicon Icon
+        {
+            get;
+            private set;
+        }
+
+        public bool IsLoggedIn
         {
             get;
             private set;
@@ -449,6 +456,11 @@ namespace GitHub.SampleData
         {
             get;
             set;
+        }
+
+        public void Login()
+        {
+
         }
     }
 
