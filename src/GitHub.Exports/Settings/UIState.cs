@@ -27,6 +27,7 @@ namespace GitHub.Settings
         /// Gets or sets global settings for the Pull Request detail view.
         /// </summary>
         public PullRequestDetailUIState PullRequestDetailState { get; set; }
+            = new PullRequestDetailUIState();
 
         /// <summary>
         /// Gets or creates the UI state for a repository.

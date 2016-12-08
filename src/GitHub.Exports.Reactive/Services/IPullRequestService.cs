@@ -14,26 +14,32 @@ namespace GitHub.Services
             string title, string body);
 
         /// <summary>
-        /// Checks whether the specified repository is in a clean state that will allow a checkout.
+        /// Checks whether the working directory for the specified repository is in a clean state.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
-        IObservable<bool> IsCleanForCheckout(ILocalRepositoryModel repository);
+        IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository);
 
         /// <summary>
-        /// Fetches a pull request to a local branch and checks out the branch.
+        /// Checks out a pull request to a local branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="pullRequestNumber">The number of the pull request.</param>
+        /// <param name="pullRequest">The pull request details.</param>
         /// <param name="localBranchName">The name of the local branch.</param>
         /// <returns></returns>
-        IObservable<Unit> FetchAndCheckout(ILocalRepositoryModel repository, int pullRequestNumber, string localBranchName);
+        IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName);
 
         /// <summary>
         /// Carries out a pull on the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
         IObservable<Unit> Pull(ILocalRepositoryModel repository);
+
+        /// <summary>
+        /// Carries out a push of the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        IObservable<Unit> Push(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Calculates the name of a local branch for a pull request avoiding clashes with existing branches.
@@ -47,7 +53,7 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the local branches that exist for the specified pull request.
         /// </summary>
-        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
         IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
@@ -55,7 +61,7 @@ namespace GitHub.Services
         /// Determines whether the specified pull request is from a fork.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
         bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
@@ -63,7 +69,7 @@ namespace GitHub.Services
         /// Switches to an existing branch for the specified pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
         IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
@@ -73,7 +79,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequestNumber">The pull request number.</param>
         /// <returns></returns>
-        IObservable<HistoryDivergence> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
+        IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
 
         /// <summary>
         /// Removes any association between the current branch and a pull request.
@@ -95,7 +101,7 @@ namespace GitHub.Services
         /// Gets the left and right files for a diff.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="pullRequest">The octokit pull request details.</param>
+        /// <param name="pullRequest">The pull request details.</param>
         /// <param name="fileName">The filename relative to the repository root.</param>
         /// <returns>The filenames of the left and right files for the diff.</returns>
         IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName);
