@@ -128,7 +128,7 @@
                            TextWrapping="Wrap"
                            Text="{Binding Model.Title}"/>
                 <TextBlock Opacity="0.7"
-                           Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+                           Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
             </StackPanel>
             <TextBlock Grid.Column="2"
                        FontWeight="Bold"
