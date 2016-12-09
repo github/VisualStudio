@@ -129,20 +129,20 @@
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <!-- source and target branches -->
                 <StackPanel Orientation="Horizontal" Margin="0 -3">
-                    <ui:OcticonImage VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.6" Margin="0 0 5 0" />
-                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 2" Background="#e8f0f8">
+                    <ui:OcticonImage VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.6" Margin="0 0 3 0" />
+                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="#e8f0f8">
                         <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
                     </Border>
 
                     <TextBlock VerticalAlignment="Center" Margin="5" Text="to" />
 
-                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 2" Background="#e8f0f8">
+                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="#e8f0f8">
                         <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
                     </Border>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Opacity="0.7" VerticalAlignment="Center"
+                    <TextBlock Opacity="0.5" VerticalAlignment="Center"
                                Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
                     <Rectangle Margin="5" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
