@@ -328,7 +328,7 @@ namespace GitHub.ViewModels
                 var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
                 string disabled = null;
 
-                if (!pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
                 {
                     disabled = "The source repository is no longer available.";
                 }
