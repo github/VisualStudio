@@ -129,6 +129,7 @@
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <!-- source and target branches -->
                 <TextBlock TextWrapping="Wrap" Margin="0 0 0 3">
+                    <ui:OcticonImage Icon="git_branch" Height="15" Opacity="0.6" />
                     <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
                     <Run>to</Run>
                     <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}"/>
