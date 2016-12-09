@@ -119,8 +119,12 @@
                     <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}"/>
                 </TextBlock>
 
-                <TextBlock Opacity="0.7"
-                           Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Opacity="0.7"
+                               Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+
+                    <Rectangle Margin="5" Width="1" Style="{DynamicResource Separator}" />
+                </StackPanel>
             </StackPanel>
 
             <TextBlock Grid.Column="2"
