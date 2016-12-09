@@ -183,7 +183,7 @@
                     <!-- Branch checked out and up-to-date -->
                     <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
                         <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run>Pull request checked out and up-to-date.</Run>
+                        <Run>Local branch up to date</Run>
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
