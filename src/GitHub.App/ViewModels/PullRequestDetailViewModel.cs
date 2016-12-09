@@ -357,7 +357,7 @@ namespace GitHub.ViewModels
 
         IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
         {
-            return files.Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status));
+            return files.Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status, GetStatusDisplay(x)));
         }
 
         static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
@@ -408,6 +408,19 @@ namespace GitHub.ViewModels
             else
             {
                 return "[Invalid]";
+            }
+        }
+
+        string GetStatusDisplay(IPullRequestFileModel file)
+        {
+            switch (file.Status)
+            {
+                case PullRequestFileStatus.Added:
+                    return "add";
+                case PullRequestFileStatus.Renamed:
+                    return "rename";
+                default:
+                    return null;
             }
         }
 
