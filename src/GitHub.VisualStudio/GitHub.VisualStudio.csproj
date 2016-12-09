@@ -12,9 +12,8 @@
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
     <ApplicationVersion>2.2.0.0</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
-    <GenerateVsixV3>true</GenerateVsixV3>
 	<VsixType>v3</VsixType>
-	<IsComponentProduct>true</IsComponentProduct>
+	<IsProductComponent>true</IsProductComponent>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
