@@ -1120,7 +1120,6 @@ public class UIControllerTests
             }
         }
 
-
         [Fact]
         public void ShuttingDown()
         {

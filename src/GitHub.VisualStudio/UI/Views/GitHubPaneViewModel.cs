@@ -184,13 +184,14 @@ namespace GitHub.VisualStudio.UI.Views
         void LoadView(UIControllerFlow flow, IConnection connection = null, ViewWithData data = null, UIViewType type = UIViewType.None)
         {
             // if we're loading a single view or a different flow, we need to stop the current controller
-            var restart = flow == UIControllerFlow.None || uiController?.SelectedFlow != flow;
+            var isSingleView = flow == UIControllerFlow.None;
+            var isSingleViewOrFlowChanging = isSingleView || uiController?.SelectedFlow != flow;
 
-            if (restart)
+            if (isSingleViewOrFlowChanging)
                 Stop();
 
             // if there's no selected flow, then just load a view directly
-            if (flow == UIControllerFlow.None)
+            if (isSingleView)
             {
                 var factory = ServiceProvider.GetExportedValue<IUIFactory>();
                 var c = factory.CreateViewAndViewModel(type);
@@ -198,7 +199,7 @@ namespace GitHub.VisualStudio.UI.Views
                 Control = c.View;
             }
             // it's a new flow!
-            else if (restart)
+            else if (isSingleViewOrFlowChanging)
             {
                 StartFlow(flow, connection, data);
             }

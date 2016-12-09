@@ -28,7 +28,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             OpenPR = new RelayCommand(x =>
             {
-                NotifyOpen(new ViewWithData { Data = x });
+                NotifyOpen(new ViewWithData(UIControllerFlow.PullRequests) { ViewType = UIViewType.PRDetail, Data = x});
             });
 
             OpenPROnGitHub = new RelayCommand(x =>
