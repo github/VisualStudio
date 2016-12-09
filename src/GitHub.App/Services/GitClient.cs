@@ -123,8 +123,15 @@ namespace GitHub.Services
 
                 var commit1 = repository.Lookup<Commit>(sha1);
                 var commit2 = repository.Lookup<Commit>(sha2);
-                var changes = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, options);
-                return changes;
+
+                if (commit1 != null && commit2 != null)
+                {
+                    return repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, options);
+                }
+                else
+                {
+                    return null;
+                }
             });
         }
 

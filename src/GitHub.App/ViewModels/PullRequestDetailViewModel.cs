@@ -423,7 +423,7 @@ namespace GitHub.ViewModels
                     return "add";
                 case PullRequestFileStatus.Renamed:
                     var fileName = file.FileName.Replace("/", "\\");
-                    var change = changes.Renamed.FirstOrDefault(x => x.Path == fileName);
+                    var change = changes?.Renamed.FirstOrDefault(x => x.Path == fileName);
 
                     if (change != null)
                     {

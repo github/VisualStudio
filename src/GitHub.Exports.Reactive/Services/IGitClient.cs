@@ -62,7 +62,10 @@ namespace GitHub.Services
         /// <param name="sha1">The SHA of the first commit.</param>
         /// <param name="sha2">The SHA of the second commit.</param>
         /// <param name="detectRenames">Whether to detect renames</param>
-        /// <returns></returns>
+        /// <returns>
+        /// A <see cref="TreeChanges"/> object or null if one of the commits could not be found in the repository,
+        /// (e.g. it is from a fork).
+        /// </returns>
         Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false);
 
         /// <summary>
