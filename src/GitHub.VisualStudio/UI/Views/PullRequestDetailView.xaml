@@ -92,18 +92,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <DockPanel Grid.IsSharedSizeScope="True" Margin="8">
-        <!-- Commit count, source and target branches -->
-        <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap">
-            <Run Text="{Binding Model.CommitCount}"/>
-            <Run>commits from </Run>
-            <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
-            <Run>to</Run>
-            <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}"/>
-        </TextBlock>
-
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,10,-8,10"/>
-
+    <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
         <!-- Avatar, PR Title, Open/Merged/Closed state and actions area -->
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -115,14 +104,24 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Column="1" Margin="6,0" Orientation="Vertical">
+
+            <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <TextBlock Grid.Column="1"
                            FontSize="10pt"
                            TextWrapping="Wrap"
                            Text="{Binding Model.Title}"/>
+
+                <!-- source and target branches -->
+                <TextBlock TextWrapping="Wrap">
+                    <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
+                    <Run>to</Run>
+                    <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}"/>
+                </TextBlock>
+
                 <TextBlock Opacity="0.7"
                            Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
             </StackPanel>
+
             <TextBlock Grid.Column="2"
                        FontWeight="Bold"
                        FontSize="10pt"
@@ -130,7 +129,7 @@
                        Style="{StaticResource StateIndicator}"/>
 
             <!-- Actions area (checkout, pull, push) -->
-            <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Margin="6 10 0 0">
+            <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" Margin="6 10 0 0">
                 <!-- Checkout pull request button -->
                 <ui:GitHubActionLink Command="{Binding Checkout}"
                                      Content="{Binding CheckoutState.Caption}"
@@ -205,6 +204,8 @@
                          Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
             </StackPanel>
         </Grid>
+
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,10,-8,10"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid>
