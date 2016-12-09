@@ -134,7 +134,7 @@
                         <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
                     </Border>
 
-                    <TextBlock VerticalAlignment="Center" Margin="5" Text="to" />
+                    <TextBlock VerticalAlignment="Center" Margin="5" Text="into" />
 
                     <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="#e8f0f8">
                         <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
