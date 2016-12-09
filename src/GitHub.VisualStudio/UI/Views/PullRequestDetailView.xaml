@@ -123,7 +123,83 @@
                     <TextBlock Opacity="0.7"
                                Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
-                    <Rectangle Margin="5" Width="1" Style="{DynamicResource Separator}" />
+                    <Rectangle Margin="5" Width="1" Height="10" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
+
+
+                    <!-- Actions area (checkout, pull, push) -->
+
+                    <!-- Checkout pull request button -->
+                    <ui:GitHubActionLink Command="{Binding Checkout}"
+                                         Content="{Binding CheckoutState.Caption}"
+                                         TextWrapping="Wrap"
+                                         Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
+                                         ToolTip="{Binding CheckoutState.DisabledMessage}"
+                                         ToolTipService.ShowOnDisabled="True"/>
+
+                    <!-- Pull/push buttons -->
+                    <StackPanel Orientation="Horizontal" 
+                                Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
+                        <ui:OcticonImage Icon="arrow_down"/>
+                        <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
+                        <ui:GitHubActionLink Content="Pull"
+                                             Command="{Binding Pull}"
+                                             Margin="4,0"
+                                             ToolTip="{Binding UpdateState.PullDisabledMessage}"
+                                             ToolTipService.ShowOnDisabled="True"
+                                             VerticalAlignment="Center"/>
+                        <ui:OcticonImage Icon="arrow_up"/>
+                        <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
+                        <ui:GitHubActionLink Content="Push"
+                                             Command="{Binding Push}"
+                                             Margin="4,0"
+                                             ToolTip="{Binding UpdateState.PushDisabledMessage}"
+                                             ToolTipService.ShowOnDisabled="True"
+                                             VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Branch checked out and up-to-date -->
+                    <TextBlock TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
+                        <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
+                        <Run>Pull request checked out and up-to-date.</Run>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
+                                            <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Checkout disabled message -->
+                    <TextBlock Margin="0 0 0 4" TextWrapping="Wrap">
+                        <Run Text="{Binding CheckoutDisabledMessage}"/>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Git operation error message -->
+                    <TextBox Foreground="Red" 
+                             Margin="0 4"
+                             Text="{Binding OperationError}"
+                             TextWrapping="Wrap"
+                             Style="{StaticResource FlatReadOnlyTextBox}"
+                             Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
                 </StackPanel>
             </StackPanel>
 
@@ -133,82 +209,6 @@
                        Margin="0 4 0 0"
                        Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                        Style="{StaticResource StateIndicator}"/>
-
-            <!-- Actions area (checkout, pull, push) -->
-            <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" Margin="6 10 0 0">
-                <!-- Checkout pull request button -->
-                <ui:GitHubActionLink Command="{Binding Checkout}"
-                                     Content="{Binding CheckoutState.Caption}"
-                                     TextWrapping="Wrap"
-                                     Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
-                                     ToolTip="{Binding CheckoutState.DisabledMessage}"
-                                     ToolTipService.ShowOnDisabled="True"/>
-
-                <!-- Pull/push buttons -->
-                <StackPanel Orientation="Horizontal" 
-                            Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
-                    <ui:OcticonImage Icon="arrow_down"/>
-                    <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
-                    <ui:GitHubActionLink Content="Pull"
-                                         Command="{Binding Pull}"
-                                         Margin="4,0"
-                                         ToolTip="{Binding UpdateState.PullDisabledMessage}"
-                                         ToolTipService.ShowOnDisabled="True"
-                                         VerticalAlignment="Center"/>
-                    <ui:OcticonImage Icon="arrow_up"/>
-                    <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
-                    <ui:GitHubActionLink Content="Push"
-                                         Command="{Binding Push}"
-                                         Margin="4,0"
-                                         ToolTip="{Binding UpdateState.PushDisabledMessage}"
-                                         ToolTipService.ShowOnDisabled="True"
-                                         VerticalAlignment="Center"/>
-                </StackPanel>
-
-                <!-- Branch checked out and up-to-date -->
-                <TextBlock TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
-                    <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                    <Run>Pull request checked out and up-to-date.</Run>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
-                                        <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
-                                    </MultiDataTrigger.Conditions>
-                                    <MultiDataTrigger.Setters>
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </MultiDataTrigger.Setters>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Checkout disabled message -->
-                <TextBlock Margin="0 0 0 4" TextWrapping="Wrap">
-                    <Run Text="{Binding CheckoutDisabledMessage}"/>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Git operation error message -->
-                <TextBox Foreground="Red" 
-                         Margin="0 4"
-                         Text="{Binding OperationError}"
-                         TextWrapping="Wrap"
-                         Style="{StaticResource FlatReadOnlyTextBox}"
-                         Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
-            </StackPanel>
         </Grid>
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,10,-8,0"/>
