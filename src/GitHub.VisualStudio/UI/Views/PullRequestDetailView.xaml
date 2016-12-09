@@ -108,7 +108,7 @@
             <TextBlock Grid.Column="1"
                        FontWeight="Bold"
                        FontSize="11px"
-                       Margin="0 4 0 0"
+                       Margin="10 4 0 0"
                        Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                        Style="{StaticResource StateIndicator}"/>
         </Grid>
@@ -128,12 +128,18 @@
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <!-- source and target branches -->
-                <TextBlock TextWrapping="Wrap" Margin="0 0 0 3">
-                    <ui:OcticonImage Icon="git_branch" Height="15" Opacity="0.6" />
-                    <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
-                    <Run>to</Run>
-                    <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}"/>
-                </TextBlock>
+                <StackPanel Orientation="Horizontal" Margin="0 -3">
+                    <ui:OcticonImage VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.6" Margin="0 0 5 0" />
+                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 2" Background="#e8f0f8">
+                        <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
+                    </Border>
+
+                    <TextBlock VerticalAlignment="Center" Margin="5" Text="to" />
+
+                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 2" Background="#e8f0f8">
+                        <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
+                    </Border>
+                </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Opacity="0.7" VerticalAlignment="Center"
