@@ -82,6 +82,14 @@ namespace GitHub.Services
         IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
 
         /// <summary>
+        /// Gets the changes between the pull request base and head.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request details.</param>
+        /// <returns></returns>
+        IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
         /// Removes any association between the current branch and a pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>

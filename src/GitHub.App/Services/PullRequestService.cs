@@ -172,6 +172,17 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                await gitClient.Fetch(repo, "origin");
+                var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
+                return Observable.Return(changes);
+            });
+        }
+
         public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
             return Observable.Defer(() =>
