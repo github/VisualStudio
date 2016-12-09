@@ -243,4 +243,10 @@
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
     <value>Username or email address must not have spaces</value>
   </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Requests</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Pull Request</value>
+  </data>
 </root>
