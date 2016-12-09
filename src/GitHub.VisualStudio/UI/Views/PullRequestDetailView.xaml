@@ -228,7 +228,7 @@
             </StackPanel>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,10,-8,0"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,5,-8,0"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-8,0">
             <Grid Margin="0 5 0 0">
