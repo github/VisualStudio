@@ -126,6 +126,7 @@
             <TextBlock Grid.Column="2"
                        FontWeight="Bold"
                        FontSize="11px"
+                       Margin="0 4 0 0"
                        Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                        Style="{StaticResource StateIndicator}"/>
 
