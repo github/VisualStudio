@@ -93,6 +93,26 @@
     </Control.Resources>
 
     <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       FontSize="14px"
+                       TextWrapping="Wrap"
+                       Margin="0 0 5 3"
+                       Text="{Binding Model.Title}"/>
+
+            <TextBlock Grid.Column="1"
+                       FontWeight="Bold"
+                       FontSize="11px"
+                       Margin="0 4 0 0"
+                       Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
+                       Style="{StaticResource StateIndicator}"/>
+        </Grid>
+
         <!-- Avatar, PR Title, Open/Merged/Closed state and actions area -->
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
@@ -100,18 +120,13 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
-                <TextBlock Grid.Column="1"
-                           FontSize="14px"
-                           TextWrapping="Wrap"
-                           Margin="0 0 0 3"
-                           Text="{Binding Model.Title}"/>
-
                 <!-- source and target branches -->
                 <TextBlock TextWrapping="Wrap" Margin="0 0 0 3">
                     <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
@@ -202,13 +217,6 @@
                              Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
                 </StackPanel>
             </StackPanel>
-
-            <TextBlock Grid.Column="2"
-                       FontWeight="Bold"
-                       FontSize="11px"
-                       Margin="0 4 0 0"
-                       Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
-                       Style="{StaticResource StateIndicator}"/>
         </Grid>
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,10,-8,0"/>
