@@ -107,12 +107,13 @@
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <TextBlock Grid.Column="1"
-                           FontSize="10pt"
+                           FontSize="14px"
                            TextWrapping="Wrap"
+                           Margin="0 0 0 3"
                            Text="{Binding Model.Title}"/>
 
                 <!-- source and target branches -->
-                <TextBlock TextWrapping="Wrap">
+                <TextBlock TextWrapping="Wrap" Margin="0 0 0 3">
                     <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
                     <Run>to</Run>
                     <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}"/>
@@ -124,7 +125,7 @@
 
             <TextBlock Grid.Column="2"
                        FontWeight="Bold"
-                       FontSize="10pt"
+                       FontSize="11px"
                        Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                        Style="{StaticResource StateIndicator}"/>
 
