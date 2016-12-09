@@ -95,8 +95,6 @@
     <DockPanel Grid.IsSharedSizeScope="True" Margin="8">
         <!-- Commit count, source and target branches -->
         <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap">
-            <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
-            <Run>wants to merge</Run>
             <Run Text="{Binding Model.CommitCount}"/>
             <Run>commits from </Run>
             <Run Background="#e8f0f8" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}"/>
@@ -117,11 +115,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <controls:AccountAvatar Account="{Binding Model.Author}"
-                                    Margin="0,4,0,0"
-                                    VerticalAlignment="Top"
-                                    Width="32"
-                                    Height="32"/>
             <StackPanel Grid.Column="1" Margin="6,0" Orientation="Vertical">
                 <TextBlock Grid.Column="1"
                            FontSize="10pt"
@@ -225,6 +218,19 @@
                     <RowDefinition Height="Auto"/> <!-- View on github link -->
                     <RowDefinition Height="Auto"/> <!-- Files changed -->
                 </Grid.RowDefinitions>
+
+                <!-- Author and open time -->
+                <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
+                    <controls:AccountAvatar Account="{Binding Model.Author}"
+                                            VerticalAlignment="Top"
+                                            Width="16"
+                                            Height="16"/>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
+                        <Run FontWeight="Bold" Text="{Binding Model.Author.Login}" />
+                        <Run Text="wrote" />
+                    </TextBlock>
+                </StackPanel>
 
                 <!-- PR Body -->
                 <ui:MarkdownViewer Name="bodyMarkdown"
