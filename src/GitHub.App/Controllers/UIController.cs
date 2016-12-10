@@ -258,9 +258,15 @@ namespace GitHub.Controllers
 
         public void Jump(ViewWithData where)
         {
-            Debug.Assert(where.ActiveFlow == mainFlow, "Jump called for flow " + where.ActiveFlow + " but this is " + mainFlow);
             if (where.ActiveFlow != mainFlow)
-                return;
+            {
+                var message = string.Format(CultureInfo.CurrentCulture,
+                    "Jump called for flow {0} but this is {1}", 
+                    where.ActiveFlow, 
+                    mainFlow);
+
+                throw new ArgumentException(message);
+            }
 
             requestedTarget = where;
             if (activeFlow == where.ActiveFlow)

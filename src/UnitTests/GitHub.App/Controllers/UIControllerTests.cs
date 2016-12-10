@@ -1064,8 +1064,8 @@ public class UIControllerTests
                             //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
-                            //Jump to Publish View
-                            uiController.Jump(testPublishViewWithData);
+                            //Attempt Jump to Publish View
+                            Assert.Throws<ArgumentException>(()=> uiController.Jump(testPublishViewWithData));
 
                             //Demonstrate nothing happens when jump attempted to view outside of UIControllerFlow.PullRequests
                             //Demonstrate view is IPullRequestDetailViewModel
@@ -1078,16 +1078,17 @@ public class UIControllerTests
                             //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
-                            //Demonstrate cannot jump to same view
+                            //Demonstrate jump to current view
                             uiController.Jump(testPullRequestListViewWithData);
-
+                            break;
+                        case 4:
                             //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Jump back to pull request
                             uiController.Jump(testPullRequestViewWithData);
                             break;
-                        case 4:
+                        case 5:
                             //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
