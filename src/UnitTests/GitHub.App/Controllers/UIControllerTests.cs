@@ -110,6 +110,16 @@ public class UIControllerTests
             return connection;
         }
 
+        protected void TriggerDetailViewOpen(IView uc, ViewWithData viewWithData)
+        {
+            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(viewWithData);
+        }
+
+        protected void TriggerCreationViewCreate(IView uc, ViewWithData viewWithData)
+        {
+            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(viewWithData);
+        }
+
         protected void TriggerCancel(IView view)
         {
             ((ReplaySubject<ViewWithData>)view.Cancel).OnNext(null);
@@ -118,6 +128,14 @@ public class UIControllerTests
         protected void TriggerDone(IView view)
         {
             ((ReplaySubject<ViewWithData>)view.Done).OnNext(null);
+        }
+    }
+
+    public class TheJumpMethod : UIControllerTestBase
+    {
+        [Fact]
+        public void Jump()
+        {
         }
     }
 
@@ -591,41 +609,68 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+
+                            //Open a pull request
+                            TriggerDetailViewOpen(uc,
                                 new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
+                            //Demonstate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Completing a pull request
                             TriggerDone(uc);
                             break;
                         case 3:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+
+                            //Open a pull request
+                            TriggerDetailViewOpen(uc,
                                 new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
+                            //Demonstate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Cancelling on a pull request
                             TriggerCancel(uc);
                             break;
                         case 5:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
+
+                            //Creating a pull request
+                            TriggerCreationViewCreate(uc, null);
                             break;
                         case 6:
+                            //Demonstate view is IPullRequestCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
+
+                            //Cancelling on the creation of a pull request
                             TriggerCancel(uc);
                             break;
                         case 7:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
+
+                            //Creating a pull request
+                            TriggerCreationViewCreate(uc, null);
                             break;
                         case 8:
+                            //Demonstate view is IPullRequestCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
+
+                            //Completing a pull request
                             TriggerDone(uc);
                             break;
                         case 9:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+
+                            //Cancelling PullRequests flow
                             TriggerCancel(uc);
                             break;
                     }
@@ -671,7 +716,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+                            TriggerDetailViewOpen(uc,
                                 new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 2:
@@ -680,7 +725,7 @@ public class UIControllerTests
                             break;
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
+                            TriggerDetailViewOpen(uc,
                                 new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
                             break;
                         case 4:
