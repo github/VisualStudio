@@ -1018,7 +1018,7 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
-                const int testViewCount = 6;
+                const int testViewCount = 7;
 
                 var testPullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests)
                 {
@@ -1078,7 +1078,7 @@ public class UIControllerTests
                             //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
-                            //Demonstrate jump to current view
+                            //Demonstrate jump to current view, pull request list
                             uiController.Jump(testPullRequestListViewWithData);
                             break;
                         case 4:
@@ -1092,10 +1092,17 @@ public class UIControllerTests
                             //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
+                            //Demonstrate jump to current view, pull request
+                            uiController.Jump(testPullRequestListViewWithData);
+                            break;
+                        case 6:
+                            //Demonstrate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
                             //Cancelling the pull request
                             TriggerCancel(uc);
                             break;
-                        case 6:
+                        case 7:
                             //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
