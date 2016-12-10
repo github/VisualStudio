@@ -165,7 +165,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is ILoginControlViewModel
+                            //Demonstrate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
 
                             //Cancelling Clone flow
@@ -225,7 +225,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IRepositoryCloneViewModel
+                            //Demonstrate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
 
                             //Cancelling Clone flow
@@ -282,7 +282,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is ILoginControlViewModel
+                            //Demonstrate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
 
                             //Cancelling Authentication flow
@@ -343,7 +343,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is ILoginControlViewModel
+                            //Demonstrate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
 
                             //Cancelling Authentication flow
@@ -400,7 +400,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is ILoginControlViewModel
+                            //Demonstrate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
                           
                             //Login
@@ -409,7 +409,7 @@ public class UIControllerTests
                             TriggerDone(uc);
                             break;
                         case 2:
-                            //Demonstate view is IRepositoryCloneViewModel
+                            //Demonstrate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
 
                             //Cancelling Clone flow
@@ -466,7 +466,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is ILoginControlViewModel
+                            //Demonstrate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
 
                             //Displaying the TwoFactorView
@@ -476,7 +476,7 @@ public class UIControllerTests
 
                             break;
                         case 2:
-                            //Demonstate view is ITwoFactorDialogViewModel
+                            //Demonstrate view is ITwoFactorDialogViewModel
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
 
                             //Login
@@ -488,7 +488,7 @@ public class UIControllerTests
 
                             break;
                         case 3:
-                            //Demonstate view is IRepositoryCloneViewModel
+                            //Demonstrate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
 
                             //Cancelling Clone flow
@@ -547,7 +547,7 @@ public class UIControllerTests
                     {
                         case 1:
                             {
-                                //Demonstate view is ILoginControlViewModel
+                                //Demonstrate view is ILoginControlViewModel
                                 Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
 
                                 //Displaying the TwoFactorView
@@ -559,7 +559,7 @@ public class UIControllerTests
                             }
                         case 2:
                             {
-                                //Demonstate view is ITwoFactorDialogViewModel
+                                //Demonstrate view is ITwoFactorDialogViewModel
                                 Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
 
                                 //Hiding the TwoFactorView
@@ -574,7 +574,7 @@ public class UIControllerTests
                             }
                         case 3:
                             {
-                                //Demonstate view is ILoginControlViewModel
+                                //Demonstrate view is ILoginControlViewModel
                                 Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
 
                                 //Displaying the TwoFactorView
@@ -586,7 +586,7 @@ public class UIControllerTests
                             }
                         case 4:
                             {
-                                //Demonstate view is ITwoFactorDialogViewModel
+                                //Demonstrate view is ITwoFactorDialogViewModel
                                 Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
                              
                                 //Login
@@ -600,7 +600,7 @@ public class UIControllerTests
                             }
                         case 5:
                             {
-                                //Demonstate view is IRepositoryCloneViewModel
+                                //Demonstrate view is IRepositoryCloneViewModel
                                 Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
 
                                 //Stopping UIController
@@ -661,7 +661,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IRepositoryCloneViewModel
+                            //Demonstrate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
 
                             //Completing Create flow
@@ -724,7 +724,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IRepositoryCreationViewModel
+                            //Demonstrate view is IRepositoryCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCreationViewModel>>(uc);
 
                             //Completing Create flow
@@ -788,7 +788,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IRepositoryPublishViewModel
+                            //Demonstrate view is IRepositoryPublishViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
 
                             provider.Received().AddService(uiController, connection);
@@ -851,7 +851,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IRepositoryPublishViewModel
+                            //Demonstrate view is IRepositoryPublishViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
 
                             provider.Received().AddService(uiController, connection);
@@ -896,7 +896,8 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
-                const int testViewCount = 11;
+                const int testViewCount = 9;
+
                 var testPullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests)
                 {
                     ViewType = GitHub.Exports.UIViewType.PRDetail,
@@ -921,77 +922,63 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IPullRequestListViewModel
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
                             TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 2:
-                            //Demonstate view is IPullRequestDetailViewModel
+                            //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
                             //Completing a pull request
                             TriggerDone(uc);
                             break;
                         case 3:
-                            //Demonstate view is IPullRequestListViewModel
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
                             TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 4:
-                            //Demonstate view is IPullRequestDetailViewModel
+                            //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
                             //Cancelling on a pull request
                             TriggerCancel(uc);
                             break;
                         case 5:
-                            //Demonstate view is IPullRequestListViewModel
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
-                            //Jump to pull request
-                            uiController.Jump(testPullRequestViewWithData);
+                            //Creating a pull request
+                            TriggerCreationViewCreate(uc, null);
                             break;
                         case 6:
-                            //Demonstate view is IPullRequestDetailViewModel
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+                            //Demonstrate view is IPullRequestCreationViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
 
                             //Cancelling on the creation of a pull request
                             TriggerCancel(uc);
                             break;
                         case 7:
-                            //Demonstate view is IPullRequestListViewModel
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Creating a pull request
                             TriggerCreationViewCreate(uc, null);
                             break;
                         case 8:
-                            //Demonstate view is IPullRequestCreationViewModel
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
-
-                            //Cancelling on the creation of a pull request
-                            TriggerCancel(uc);
-                            break;
-                        case 9:
-                            //Demonstate view is IPullRequestListViewModel
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-
-                            //Creating a pull request
-                            TriggerCreationViewCreate(uc, null);
-                            break;
-                        case 10:
-                            //Demonstate view is IPullRequestCreationViewModel
+                            //Demonstrate view is IPullRequestCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
 
                             //Completing a pull request
                             TriggerDone(uc);
                             break;
-                        case 11:
-                            //Demonstate view is IPullRequestListViewModel
+                        case 9:
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Cancelling PullRequests flow
@@ -1015,6 +1002,123 @@ public class UIControllerTests
                 Assert.False(success);
             }
         }
+
+        [Fact]
+        public void Jump()
+        {
+            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var hosts = provider.GetRepositoryHosts();
+            var factory = SetupFactory(provider);
+            var cm = provider.GetConnectionManager();
+            var cons = new ObservableCollection<IConnection>();
+            cm.Connections.Returns(cons);
+
+            //Simulate being logged in
+            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+
+            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            {
+                const int testViewCount = 6;
+
+                var testPullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests)
+                {
+                    ViewType = GitHub.Exports.UIViewType.PRDetail,
+                    Data = 1
+                };
+
+                var testPullRequestListViewWithData = new ViewWithData(UIControllerFlow.PullRequests)
+                {
+                    ViewType = GitHub.Exports.UIViewType.PRList,
+                };
+
+                var testPublishViewWithData = new ViewWithData(UIControllerFlow.Publish)
+                {
+                    ViewType = GitHub.Exports.UIViewType.Publish,
+                };
+
+                var count = 0;
+                bool? success = null;
+
+                //Starting PullRequests flow
+                var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
+                flow.Subscribe(data =>
+                {
+                    var uc = data.View;
+                    switch (++count)
+                    {
+                        case 1:
+                            //Demonstrate view is IPullRequestListViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+                            
+                            //Open a pull request
+                            TriggerDetailViewOpen(uc, testPullRequestViewWithData);
+                            break;
+                        case 2:
+                            //Demonstrate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Jump to Publish View
+                            uiController.Jump(testPublishViewWithData);
+
+                            //Demonstrate nothing happens when jump attempted to view outside of UIControllerFlow.PullRequests
+                            //Demonstrate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Jump to pull request list
+                            uiController.Jump(testPullRequestListViewWithData);
+                            break;
+                        case 3:
+                            //Demonstrate view is IPullRequestListViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+
+                            //Demonstrate cannot jump to same view
+                            uiController.Jump(testPullRequestListViewWithData);
+
+                            //Demonstrate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+
+                            //Jump back to pull request
+                            uiController.Jump(testPullRequestViewWithData);
+                            break;
+                        case 4:
+                            //Demonstrate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Cancelling the pull request
+                            TriggerCancel(uc);
+                            break;
+                        case 6:
+                            //Demonstrate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+
+                            //Cancelling PullRequests flow
+                            TriggerCancel(uc);
+                            break;
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
+                    }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
+                });
+
+                uiController.Start(null);
+                Assert.Equal(testViewCount + 2, count);
+                Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.False(success);
+            }
+        }
+
 
         [Fact]
         public void ShuttingDown()
@@ -1056,28 +1160,28 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IPullRequestListViewModel
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
                             TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 2:
-                            //Demonstate view is IPullRequestDetailViewModel
+                            //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
                             //Completing a pull request
                             TriggerDone(uc);
                             break;
                         case 3:
-                            //Demonstate view is IPullRequestListViewModel
+                            //Demonstrate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
                             TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 4:
-                            //Demonstate view is IPullRequestDetailViewModel
+                            //Demonstrate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
                             //Stopping UIController
@@ -1143,7 +1247,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is ILogoutRequiredViewModel
+                            //Demonstrate view is ILogoutRequiredViewModel
                             Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(uc);
                             host.IsLoggedIn.Returns(false);
 
@@ -1151,7 +1255,7 @@ public class UIControllerTests
                             TriggerDone(uc);
                             break;
                         case 2:
-                            //Demonstate view is ILoginControlViewModel
+                            //Demonstrate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
                             
                             // login
@@ -1162,7 +1266,7 @@ public class UIControllerTests
                             TriggerDone(uc);
                             break;
                         case 3:
-                            //Demonstate view is IGistCreationViewModel
+                            //Demonstrate view is IGistCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
 
                             //Completing PullRequests flow
@@ -1223,7 +1327,7 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
-                            //Demonstate view is IGistCreationViewModel
+                            //Demonstrate view is IGistCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
                      
                             //Completing PullRequests flow
