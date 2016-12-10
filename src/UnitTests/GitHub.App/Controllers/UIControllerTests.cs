@@ -606,6 +606,7 @@ public class UIControllerTests
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
+                    var pullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 };
                     switch (++count)
                     {
                         case 1:
@@ -613,8 +614,7 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
-                            TriggerDetailViewOpen(uc,
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                            TriggerDetailViewOpen(uc, pullRequestViewWithData);
                             break;
                         case 2:
                             //Demonstate view is IPullRequestDetailViewModel
@@ -628,8 +628,7 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
-                            TriggerDetailViewOpen(uc,
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+                            TriggerDetailViewOpen(uc, pullRequestViewWithData);
                             break;
                         case 4:
                             //Demonstate view is IPullRequestDetailViewModel
@@ -642,12 +641,12 @@ public class UIControllerTests
                             //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
-                            //Creating a pull request
-                            TriggerCreationViewCreate(uc, null);
+                            //Jump to pull request
+                            uiController.Jump(pullRequestViewWithData);
                             break;
                         case 6:
-                            //Demonstate view is IPullRequestCreationViewModel
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
+                            //Demonstate view is IPullRequestDetailViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
 
                             //Cancelling on the creation of a pull request
                             TriggerCancel(uc);
@@ -663,10 +662,24 @@ public class UIControllerTests
                             //Demonstate view is IPullRequestCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
 
+                            //Cancelling on the creation of a pull request
+                            TriggerCancel(uc);
+                            break;
+                        case 9:
+                            //Demonstate view is IPullRequestListViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
+
+                            //Creating a pull request
+                            TriggerCreationViewCreate(uc, null);
+                            break;
+                        case 10:
+                            //Demonstate view is IPullRequestCreationViewModel
+                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
+
                             //Completing a pull request
                             TriggerDone(uc);
                             break;
-                        case 9:
+                        case 11:
                             //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
@@ -677,7 +690,7 @@ public class UIControllerTests
                 });
 
                 uiController.Start(null);
-                Assert.Equal(9, count);
+                Assert.Equal(11, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.False(success);
