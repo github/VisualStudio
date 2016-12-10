@@ -131,14 +131,6 @@ public class UIControllerTests
         }
     }
 
-    public class TheJumpMethod : UIControllerTestBase
-    {
-        [Fact]
-        public void Jump()
-        {
-        }
-    }
-
     public class AuthFlow : UIControllerTestBase
     {
         [Fact]
@@ -153,23 +145,48 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Clone flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+
+                            //Cancelling Clone flow
                             TriggerCancel(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.False(success);
             }
         }
 
@@ -188,23 +205,48 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Clone flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
+
+                            //Cancelling Clone flow
                             TriggerCancel(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.False(success);
             }
         }
 
@@ -220,23 +262,48 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Authentication flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+
+                            //Cancelling Authentication flow
                             TriggerCancel(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.False(success);
             }
         }
 
@@ -256,23 +323,48 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Authentication flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+
+                            //Cancelling Authentication flow
                             TriggerCancel(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.False(success);
             }
         }
 
@@ -288,29 +380,57 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 2;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Clone flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            // login
+                          
+                            //Login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+
                             TriggerDone(uc);
                             break;
                         case 2:
+                            //Demonstate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
+
+                            //Cancelling Clone flow
                             TriggerCancel(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(2, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
 
@@ -326,37 +446,71 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 3;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Clone flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+
+                            //Displaying the TwoFactorView
                             var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
                             vm.IsShowing.Returns(true);
                             RaisePropertyChange(vm, "IsShowing");
+
                             break;
                         case 2:
+                            //Demonstate view is ITwoFactorDialogViewModel
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-                            // login
+
+                            //Login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-                            // continue by triggering done on login view
+                            
+                            //Continue by triggering done on login view
                             var v = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
                             TriggerDone(v);
+
                             break;
                         case 3:
+                            //Demonstate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
+
+                            //Cancelling Clone flow
                             TriggerCancel(uc);
+
+                            break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
                             break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(3, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
 
@@ -372,54 +526,100 @@ public class UIControllerTests
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 5;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Clone flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
-                        case 1: {
-                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
-                            vm.IsShowing.Returns(true);
-                            RaisePropertyChange(vm, "IsShowing");
-                            break;
-                        }
-                        case 2: {
-                            Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
-                            vm.IsShowing.Returns(false);
-                            RaisePropertyChange(vm, "IsShowing");
-                            TriggerCancel(uc);
-                            break;
-                        }
-                        case 3: {
-                            Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
-                            vm.IsShowing.Returns(true);
-                            RaisePropertyChange(vm, "IsShowing");
-                            break;
-                        }
-                        case 4: {
-                            Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
-                            // login
-                            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-                            var v = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
-                            TriggerDone(v);
-                            break;
-                        }
-                        case 5: {
-                            Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
-                            uiController.Stop();
-                            break;
-                        }
+                        case 1:
+                            {
+                                //Demonstate view is ILoginControlViewModel
+                                Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+
+                                //Displaying the TwoFactorView
+                                var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                                vm.IsShowing.Returns(true);
+                                RaisePropertyChange(vm, "IsShowing");
+
+                                break;
+                            }
+                        case 2:
+                            {
+                                //Demonstate view is ITwoFactorDialogViewModel
+                                Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
+
+                                //Hiding the TwoFactorView
+                                var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                                vm.IsShowing.Returns(false);
+                                RaisePropertyChange(vm, "IsShowing");
+
+                                //Cancelling the TwoFactorDialog
+                                TriggerCancel(uc);
+
+                                break;
+                            }
+                        case 3:
+                            {
+                                //Demonstate view is ILoginControlViewModel
+                                Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+
+                                //Displaying the TwoFactorView
+                                var vm = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
+                                vm.IsShowing.Returns(true);
+                                RaisePropertyChange(vm, "IsShowing");
+
+                                break;
+                            }
+                        case 4:
+                            {
+                                //Demonstate view is ITwoFactorDialogViewModel
+                                Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
+                             
+                                //Login
+                                cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
+
+                                //Completing the TwoFactorDialog
+                                var v = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
+                                TriggerDone(v);
+
+                                break;
+                            }
+                        case 5:
+                            {
+                                //Demonstate view is IRepositoryCloneViewModel
+                                Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
+
+                                //Stopping UIController
+                                uiController.Stop();
+
+                                break;
+                            }
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(5, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
     }
@@ -436,28 +636,53 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            // simulate being logged in
+            //Simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Clone flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IRepositoryCloneViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
+
+                            //Completing Create flow
                             TriggerDone(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
     }
@@ -474,28 +699,53 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            // simulate being logged in
+            //Simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Create flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Create);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IRepositoryCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCreationViewModel>>(uc);
+
+                            //Completing Create flow
                             TriggerDone(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
     }
@@ -505,7 +755,7 @@ public class UIControllerTests
         [Fact]
         public void FlowWithConnection()
         {
-            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var provider = (IUIProvider)Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
@@ -513,36 +763,62 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
 
-            // simulate being logged in
+            //Simulate being logged in
             cons.Add(connection);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController(provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Publish flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Publish);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IRepositoryPublishViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
-                            ((IUIProvider)provider).Received().AddService(uiController, connection);
+
+                            provider.Received().AddService(uiController, connection);
+
+                            //Completing Publish flow
                             TriggerDone(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(connection);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
 
         [Fact]
         public void FlowWithoutConnection()
         {
-            var provider = Substitutes.GetFullyMockedServiceProvider();
+            var provider = (IUIProvider)Substitutes.GetFullyMockedServiceProvider();
             var hosts = provider.GetRepositoryHosts();
             var factory = SetupFactory(provider);
             var cm = provider.GetConnectionManager();
@@ -550,32 +826,57 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
             var connection = SetupConnection(provider, hosts, hosts.GitHubHost);
 
-            // simulate being logged in
+            //Simulate being logged in
             cons.Add(connection);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController(provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
+                bool? success = null;
+
+                //Starting Publish flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Publish);
+                uiController.ListenToCompletionState()
+                    .Subscribe(s =>
+                    {
+                        success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
+                    });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IRepositoryPublishViewModel
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
-                            ((IUIProvider)provider).Received().AddService(uiController, connection);
+
+                            provider.Received().AddService(uiController, connection);
+                         
+                            //Completing Publish flow
                             TriggerDone(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(1, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
+                Assert.True(success.HasValue);
+                Assert.True(success);
             }
         }
-
     }
 
     public class PullRequestsFlow : UIControllerTestBase
@@ -590,23 +891,33 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            // simulate being logged in
+            //Simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 11;
+                var testPullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests)
+                {
+                    ViewType = GitHub.Exports.UIViewType.PRDetail,
+                    Data = 1
+                };
+
                 var count = 0;
                 bool? success = null;
+
+                //Starting PullRequests flow
                 var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
                 uiController.ListenToCompletionState()
                     .Subscribe(s =>
                     {
                         success = s;
+                        Assert.Equal(testViewCount, count);
+                        count++;
                     });
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
-                    var pullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 };
                     switch (++count)
                     {
                         case 1:
@@ -614,7 +925,7 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
-                            TriggerDetailViewOpen(uc, pullRequestViewWithData);
+                            TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 2:
                             //Demonstate view is IPullRequestDetailViewModel
@@ -628,7 +939,7 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Open a pull request
-                            TriggerDetailViewOpen(uc, pullRequestViewWithData);
+                            TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 4:
                             //Demonstate view is IPullRequestDetailViewModel
@@ -642,7 +953,7 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
 
                             //Jump to pull request
-                            uiController.Jump(pullRequestViewWithData);
+                            uiController.Jump(testPullRequestViewWithData);
                             break;
                         case 6:
                             //Demonstate view is IPullRequestDetailViewModel
@@ -686,11 +997,19 @@ public class UIControllerTests
                             //Cancelling PullRequests flow
                             TriggerCancel(uc);
                             break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
+                            break;
                     }
+                }, () =>
+                {
+                    Assert.Equal(testViewCount + 1, count);
+                    count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(11, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.False(success);
@@ -707,19 +1026,28 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            // simulate being logged in
+            //Simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 4;
+                var testPullRequestViewWithData = new ViewWithData(UIControllerFlow.PullRequests)
+                {
+                    ViewType = GitHub.Exports.UIViewType.PRDetail,
+                    Data = 1
+                };
+
                 var count = 0;
                 bool? success = null;
+
+                //Starting PullRequests flow
                 var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
                 uiController.ListenToCompletionState()
                     .Subscribe(s =>
                     {
                         success = s;
-                        Assert.Equal(4, count);
+                        Assert.Equal(testViewCount, count);
                         count++;
                     });
                 flow.Subscribe(data =>
@@ -728,32 +1056,46 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            TriggerDetailViewOpen(uc,
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+
+                            //Open a pull request
+                            TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 2:
+                            //Demonstate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Completing a pull request
                             TriggerDone(uc);
                             break;
                         case 3:
+                            //Demonstate view is IPullRequestListViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            TriggerDetailViewOpen(uc,
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
+
+                            //Open a pull request
+                            TriggerDetailViewOpen(uc, testPullRequestViewWithData);
                             break;
                         case 4:
+                            //Demonstate view is IPullRequestDetailViewModel
                             Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
+
+                            //Stopping UIController
                             uiController.Stop();
+                            break;
+
+                        default:
+                            Assert.True(false, "Received more views than expected");
                             break;
                     }
                 }, () =>
                 {
-                    Assert.Equal(5, count);
+                    Assert.Equal(testViewCount + 1, count);
                     count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(6, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);
@@ -774,19 +1116,24 @@ public class UIControllerTests
             cm.Connections.Returns(cons);
 
             var host = hosts.GitHubHost;
-            // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, host, true, false));
+            //Simulate being logged in without gist support
+            const bool supportsGist = false;
+            cons.Add(SetupConnection(provider, hosts, host, true, supportsGist));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 3;
+
                 var count = 0;
                 bool? success = null;
+
+                //Starting Gist flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Gist);
                 uiController.ListenToCompletionState()
                     .Subscribe(s =>
                     {
                         success = s;
-                        Assert.Equal(3, count);
+                        Assert.Equal(testViewCount, count);
                         count++;
                     });
 
@@ -796,33 +1143,43 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is ILogoutRequiredViewModel
                             Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(uc);
                             host.IsLoggedIn.Returns(false);
+
+                            //Completing View
                             TriggerDone(uc);
                             break;
                         case 2:
+                            //Demonstate view is ILoginControlViewModel
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
+                            
                             // login
                             host.IsLoggedIn.Returns(true);
                             host.SupportsGist.Returns(true);
+
+                            //Completing View
                             TriggerDone(uc);
                             break;
                         case 3:
+                            //Demonstate view is IGistCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
+
+                            //Completing PullRequests flow
                             TriggerDone(uc);
                             break;
+
                         default:
-                            Assert.True(false, "Received more views than expected");
-                            break;
+                            throw new Exception("Received more views than expected");
                     }
                 }, () =>
                 {
-                    Assert.Equal(4, count);
+                    Assert.Equal(testViewCount + 1, count);
                     count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(5, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);
@@ -839,19 +1196,24 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true, true));
+            //Simulate being logged in with gist support
+            const bool supportsGist = true;
+            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true, supportsGist));
 
             using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
             {
+                const int testViewCount = 1;
+
                 var count = 0;
                 bool? success = null;
+
+                //Starting Gist flow
                 var flow = uiController.SelectFlow(UIControllerFlow.Gist);
                 uiController.ListenToCompletionState()
                     .Subscribe(s =>
                     {
                         success = s;
-                        Assert.Equal(1, count);
+                        Assert.Equal(testViewCount, count);
                         count++;
                     });
 
@@ -861,21 +1223,25 @@ public class UIControllerTests
                     switch (++count)
                     {
                         case 1:
+                            //Demonstate view is IGistCreationViewModel
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
+                     
+                            //Completing PullRequests flow
                             TriggerDone(uc);
                             break;
+
                         default:
                             Assert.True(false, "Received more views than expected");
                             break;
                     }
                 }, () =>
                 {
-                    Assert.Equal(2, count);
+                    Assert.Equal(testViewCount + 1, count);
                     count++;
                 });
 
                 uiController.Start(null);
-                Assert.Equal(3, count);
+                Assert.Equal(testViewCount + 2, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
                 Assert.True(success);
