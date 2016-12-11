@@ -129,15 +129,15 @@
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <!-- source and target branches -->
                 <StackPanel Orientation="Horizontal" Margin="0 -3">
-                    <ui:OcticonImage VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.6" Margin="0 0 3 0" />
-                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="#e8f0f8">
-                        <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
+                    <ui:OcticonImage VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.5" Margin="0 0 3 0" />
+                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                        <TextBlock FontFamily="Consolas" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
                     </Border>
 
                     <TextBlock VerticalAlignment="Center" Margin="5" Text="into" />
 
-                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="#e8f0f8">
-                        <TextBlock Foreground="#2e3031" FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
+                    <Border VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                        <TextBlock FontFamily="Consolas" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
                     </Border>
                 </StackPanel>
 
