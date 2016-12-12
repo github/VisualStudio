@@ -38,5 +38,7 @@ namespace GitHub.ViewModels
         IAccount SelectedAuthor { get; set; }
         ObservableCollection<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; set; }
+        string FilterText { get; set; }
+        bool IsLoaded { get; }
     }
 }

@@ -52,6 +52,8 @@ namespace GitHub.SampleData
             Authors = new ObservableCollection<IAccount>(prs.Select(x => x.Author));
             SelectedAssignee = Assignees.ElementAt(1);
             SelectedAuthor = Authors.ElementAt(1);
+
+            IsLoaded = true;
         }
 
         public ITrackingCollection<IPullRequestModel> PullRequests { get; set; }
@@ -66,5 +68,7 @@ namespace GitHub.SampleData
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
+        public string FilterText { get; set; }
+        public bool IsLoaded { get; }
     }
 }

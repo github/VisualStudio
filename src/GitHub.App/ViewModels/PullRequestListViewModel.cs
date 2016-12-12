@@ -83,15 +83,19 @@ namespace GitHub.ViewModels
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
-                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
+                .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor, FilterText));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
                 .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
-                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
+                .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor, FilterText));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
                 .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
-                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
+                .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a, FilterText));
+
+            this.WhenAny(x => x.FilterText, x => x.Value)
+                .Where(x => PullRequests != null && IsLoaded)
+                .Subscribe(f => UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, f));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
         }
@@ -134,18 +138,38 @@ namespace GitHub.ViewModels
                     }
  
                     IsLoaded = true;
-                    UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
+                    UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor, FilterText);
                 });
         }
 
-        void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass, [AllowNull]IAccount aut)
+        void UpdateFilter(PullRequestState state = null, [AllowNull]IAccount ass = null, [AllowNull]IAccount aut = null, [AllowNull]string filText = null)
         {
             if (PullRequests == null)
                 return;
-            pullRequests.Filter = (pr, i, l) =>
-                (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
-                     (ass == null || ass.Equals(pr.Assignee)) &&
-                     (aut == null || aut.Equals(pr.Author));
+
+            filText = filText?.Trim();
+
+            var hasFilterText = !string.IsNullOrWhiteSpace(filText);
+
+            var filterPullRequestNumber = 0;
+            var filterTextIsNumber = hasFilterText && int.TryParse(filText, out filterPullRequestNumber);
+
+            var filterTextIsString = hasFilterText && !filterTextIsNumber;
+
+            pullRequests.Filter = (pullRequest, index, list) =>
+                (!state.IsOpen.HasValue || state.IsOpen == pullRequest.IsOpen) &&
+                (ass == null || ass.Equals(pullRequest.Assignee)) &&
+                (aut == null || aut.Equals(pullRequest.Author)) &&
+                (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) && 
+                (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
+        }
+
+        string filterText;
+        [AllowNull]
+        public string FilterText
+        {
+            get { return filterText; }
+            set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
         bool isLoaded;

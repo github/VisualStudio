@@ -140,6 +140,11 @@
                            Content="Create New" />
     </Grid>
 
+    <TextBox x:Name="filterText"
+            Margin="5,0,5,5"
+            DockPanel.Dock="Top" 
+            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+
     <ListView x:Name="pullRequests"
               Margin="0,0,0,0"
               VerticalAlignment="Top"
