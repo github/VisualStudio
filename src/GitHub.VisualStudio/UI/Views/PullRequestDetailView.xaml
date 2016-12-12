@@ -17,6 +17,7 @@
                                     d:DesignWidth="356"
                                     d:DesignHeight="800"
                                     mc:Ignorable="d"
+                                    xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                     Style="{DynamicResource BusyStateView}">
     <d:DesignProperties.DataContext>
         <Binding>
@@ -100,14 +101,13 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0"
-                       FontSize="14px"
+                       Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                        TextWrapping="Wrap"
                        Margin="0 0 5 3"
                        Text="{Binding Model.Title}"/>
 
             <TextBlock Grid.Column="1"
                        FontWeight="Bold"
-                       FontSize="11px"
                        Margin="10 4 0 0"
                        Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
                        Style="{StaticResource StateIndicator}"/>
