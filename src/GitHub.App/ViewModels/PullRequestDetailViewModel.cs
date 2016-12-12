@@ -352,7 +352,7 @@ namespace GitHub.ViewModels
         public Task<string> ExtractFile(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractFile(repository, model.Head.Sha, path).ToTask();
+            return pullRequestsService.ExtractFile(repository, modelService, model.Head.Sha, path).ToTask();
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace GitHub.ViewModels
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(repository, model, path).ToTask();
+            return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path).ToTask();
         }
 
         IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IPullRequestModel pullRequest, TreeChanges changes)

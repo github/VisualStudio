@@ -4,6 +4,7 @@ using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -26,5 +27,6 @@ namespace GitHub.Services
             string title, string body);
         IObservable<IBranch> GetBranches(IRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
+        IObservable<byte[]> GetFileContents(IRepositoryModel repo, string commitSha, string fileName);
     }
 }

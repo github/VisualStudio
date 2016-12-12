@@ -247,27 +247,57 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> ExtractFile(ILocalRepositoryModel repository, string commitSha, string fileName)
+        public IObservable<string> ExtractFile(
+            ILocalRepositoryModel repository,
+            IModelService modelService,
+            string commitSha,
+            string fileName)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
-                var result = await gitClient.ExtractFile(repo, commitSha, fileName);
+                var result = await ExtractFile(repository, repo, modelService, commitSha, fileName);
                 return Observable.Return(result);
             });
         }
 
-        public IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName)
+        public IObservable<Tuple<string, string>> ExtractDiffFiles(
+            ILocalRepositoryModel repository,
+            IModelService modelService,
+            IPullRequestModel pullRequest,
+            string fileName)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
-                var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
-                var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName);
+                var left = await ExtractFile(repository, repo, modelService, pullRequest.Base.Sha, fileName);
+                var right = await ExtractFile(repository, repo, modelService, pullRequest.Head.Sha, fileName);
                 return Observable.Return(Tuple.Create(left, right));
             });
+        }
+
+        private async Task<string> ExtractFile(
+            ILocalRepositoryModel repository,
+            IRepository repo,
+            IModelService modelService,
+            string commitSha,
+            string fileName)
+        {
+            var result = await gitClient.ExtractFile(repo, commitSha, fileName);
+
+            if (result == null)
+            {
+                var contents = await modelService.GetFileContents(repository, commitSha, fileName);
+                var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
+                result = Path.Combine(tempDir, tempFileName);
+                Directory.CreateDirectory(tempDir);
+                File.WriteAllBytes(result, contents);
+            }
+
+            return result;
         }
 
         IEnumerable<string> GetLocalBranchesInternal(

@@ -250,6 +250,15 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
+        public IObservable<byte[]> GetFileContents(IRepositoryModel repo, string commitSha, string fileName)
+        {
+            return hostCache.GetAndRefresh($"{CacheIndex.PRPrefix}|{commitSha}",
+                () => apiClient.GetFileContents(repo.Owner, repo.Name, commitSha, fileName)
+                        .Select(x => Convert.FromBase64String(x.EncodedContent)),
+                TimeSpan.FromDays(14),
+                TimeSpan.FromDays(14));
+        }
+
         IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>

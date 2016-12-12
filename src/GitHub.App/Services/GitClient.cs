@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
+using NullGuard;
 
 namespace GitHub.Services
 {
@@ -202,11 +203,17 @@ namespace GitHub.Services
             });
         }
 
+        [return: AllowNull]
         public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
             var commit = repository.Lookup<Commit>(commitSha);
-            var blob = commit[fileName]?.Target as Blob;
 
+            if (commit == null)
+            {
+                return null;
+            }
+
+            var blob = commit[fileName]?.Target as Blob;
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
             var tempFile = Path.Combine(tempDir, tempFileName);
