@@ -24,6 +24,9 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestService : IPullRequestService
     {
+        const string SettingCreatedByGHfVS = "created-by-ghfvs";
+        const string SettingGHfVSPullRequest = "ghfvs-pr";
+
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
 
@@ -128,11 +131,9 @@ namespace GitHub.Services
                 else
                 {
                     var refSpec = $"{pullRequest.Head.Ref}:{localBranchName}";
-                    var prConfigKey = $"branch.{localBranchName}.ghfvs-pr";
-                    var remoteName = pullRequest.Head.RepositoryCloneUrl.Owner;
-                    var remoteUri = pullRequest.Head.RepositoryCloneUrl;
+                    var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
+                    var remoteName = await CreateRemote(repo, pullRequest.Head.RepositoryCloneUrl);
 
-                    await gitClient.SetRemote(repo, remoteName, new Uri(remoteUri));
                     await gitClient.Fetch(repo, remoteName);
                     await gitClient.Fetch(repo, remoteName, new[] { refSpec });
                     await gitClient.Checkout(repo, localBranchName);
@@ -257,6 +258,60 @@ namespace GitHub.Services
                 var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName);
                 return Observable.Return(Tuple.Create(left, right));
             });
+        }
+
+        public IObservable<Unit> RemoteUnusedRemotes(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var usedRemotes = new HashSet<string>(
+                    repo.Branches
+                        .Where(x => !x.IsRemote && x.Remote != null)
+                        .Select(x => x.Remote?.Name));
+
+                foreach (var remote in repo.Network.Remotes)
+                {
+                    var key = $"remote.{remote.Name}.{SettingCreatedByGHfVS}";
+                    var createdByUs = await gitClient.GetConfig<bool>(repo, key);
+
+                    if (createdByUs && !usedRemotes.Contains(remote.Name))
+                    {
+                        repo.Network.Remotes.Remove(remote.Name);
+                    }
+                }
+
+                return Observable.Return(Unit.Default);
+            });
+        }
+
+        async Task<string> CreateRemote(IRepository repo, UriString cloneUri)
+        {
+            foreach (var remote in repo.Network.Remotes)
+            {
+                if (remote.Url == cloneUri)
+                {
+                    return remote.Name;
+                }
+            }
+
+            var remoteName = CreateUniqueRemoteName(repo, cloneUri.Owner);
+            await gitClient.SetRemote(repo, remoteName, new Uri(cloneUri));
+            await gitClient.SetConfig(repo, $"remote.{remoteName}.{SettingCreatedByGHfVS}", "true");
+            return remoteName;
+        }
+
+        string CreateUniqueRemoteName(IRepository repo, string name)
+        {
+            var uniqueName = name;
+            var number = 1;
+
+            while (repo.Network.Remotes[uniqueName] != null)
+            {
+                uniqueName = name + number++;
+            }
+
+            return uniqueName;
         }
 
         IEnumerable<string> GetLocalBranchesInternal(
