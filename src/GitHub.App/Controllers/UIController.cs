@@ -877,33 +877,11 @@ namespace GitHub.Controllers
 
         void Fire(Trigger next, ViewWithData arg = null)
         {
-            log.Info(CultureInfo.InvariantCulture, "UIMachine Firing {0} from {1}", next, uiStateMachine.State);
-            StateMachineType.TriggerWithParameters<ViewWithData> viewWithDataTrigger = null;
-            if (arg != null)
-            {
-                if (next == Trigger.Next)
-                {
-                    switch (requestedTarget?.ViewType)
-                    {
-                        case UIViewType.PRDetail:
-                            viewWithDataTrigger = triggers[Trigger.PRDetail];
-                            break;
-                    }
-                }
-                else if (triggers.ContainsKey(next))
-                {
-                    viewWithDataTrigger = triggers[next];
-                }
-            }
-
-            if (viewWithDataTrigger != null)
-            {
-                uiStateMachine.Fire(viewWithDataTrigger, arg);
-            }
+            Debug.WriteLine("Firing {0} from {1} ({2})", next, uiStateMachine.State, GetHashCode());
+            if (arg != null && triggers.ContainsKey(next))
+                uiStateMachine.Fire(triggers[next], arg);
             else
-            {
                 uiStateMachine.Fire(next);
-            }
         }
 
         UIViewType Go(Trigger trigger)
