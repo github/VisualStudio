@@ -56,6 +56,14 @@ namespace GitHub.Services
         Task CreateBranch(IRepository repository, string branchName);
 
         /// <summary>
+        /// Gets the value of a configuration key.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="key">The configuration key. Keys are in the form 'section.name'.</param>
+        /// <returns></returns>
+        Task<T> GetConfig<T>(IRepository repository, string key);
+
+        /// <summary>
         /// Sets the configuration key to the specified value in the local config.
         /// </summary>
         /// <param name="repository">The repository</param>
