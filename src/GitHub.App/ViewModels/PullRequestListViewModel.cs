@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -149,10 +150,16 @@ namespace GitHub.ViewModels
 
             filText = filText?.Trim();
 
-            var hasFilterText = !string.IsNullOrWhiteSpace(filText);
+            var hasFilterText = !string.IsNullOrEmpty(filText);
 
             var filterPullRequestNumber = 0;
             var filterTextIsNumber = hasFilterText && int.TryParse(filText, out filterPullRequestNumber);
+
+            string filterPullRequestNumberAsString = null;
+            if (filterTextIsNumber)
+            {
+                filterPullRequestNumberAsString = filterPullRequestNumber.ToString(CultureInfo.InvariantCulture);
+            }
 
             var filterTextIsString = hasFilterText && !filterTextIsNumber;
 
@@ -160,7 +167,7 @@ namespace GitHub.ViewModels
                 (!state.IsOpen.HasValue || state.IsOpen == pullRequest.IsOpen) &&
                 (ass == null || ass.Equals(pullRequest.Assignee)) &&
                 (aut == null || aut.Equals(pullRequest.Author)) &&
-                (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) && 
+                (filterTextIsNumber == false || pullRequest.Number.ToString(CultureInfo.InvariantCulture).StartsWith(filterPullRequestNumberAsString, StringComparison.OrdinalIgnoreCase)) && 
                 (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
         }
 
