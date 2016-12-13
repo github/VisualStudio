@@ -11,6 +11,8 @@ namespace GitHub.Settings
     /// </summary>
     public class UIState
     {
+        PullRequestDetailUIState prState = new PullRequestDetailUIState();
+
         /// <summary>
         /// Gets or sets the UI state for the <see cref="IGitHubConnectSection"/>s in Team Explorer.
         /// </summary>
@@ -26,8 +28,17 @@ namespace GitHub.Settings
         /// <summary>
         /// Gets or sets global settings for the Pull Request detail view.
         /// </summary>
-        public PullRequestDetailUIState PullRequestDetailState { get; set; }
-            = new PullRequestDetailUIState();
+        public PullRequestDetailUIState PullRequestDetailState
+        {
+            get { return prState; }
+            set
+            {
+                if (value != null)
+                {
+                    prState = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or creates the UI state for a repository.

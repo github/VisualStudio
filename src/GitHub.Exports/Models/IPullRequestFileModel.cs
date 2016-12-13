@@ -5,6 +5,7 @@
         Modified,
         Added,
         Removed,
+        Renamed,
     }
 
     public interface IPullRequestFileModel
