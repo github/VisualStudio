@@ -121,7 +121,6 @@
 
         <ui:LinkDropDown Header="Assignee"
                          IsEnabled="{Binding IsLoaded}"
-                         ItemsSource="{Binding Assignees}"
                          ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAssignee}"/>
           
@@ -129,7 +128,6 @@
 
         <ui:LinkDropDown Header="Author"
                          IsEnabled="{Binding IsLoaded}"
-                         ItemsSource="{Binding Authors}"
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"/>          
       </WrapPanel>
