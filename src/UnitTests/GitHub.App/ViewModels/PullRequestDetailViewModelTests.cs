@@ -58,11 +58,11 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                    new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Added),
-                    new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Removed),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Added),
+                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Removed),
+                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
                 };
 
                 await target.Load(pr);
@@ -115,10 +115,10 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                    new PullRequestFileModel(@"readme.md", PullRequestFileStatus.Renamed),
-                    new PullRequestFileModel(@"dir1/f1.cs", PullRequestFileStatus.Renamed),
-                    new PullRequestFileModel(@"dir1/f2.cs", PullRequestFileStatus.Renamed),
-                    new PullRequestFileModel(@"f3.cs", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"readme.md", "abc", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"dir1/f1.cs", "abc", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"dir1/f2.cs", "abc", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"f3.cs", "abc", PullRequestFileStatus.Renamed),
                 };
 
                 var changes = Substitute.For<TreeChanges>();
@@ -158,11 +158,11 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                    new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
                 };
 
                 await target.Load(pr);

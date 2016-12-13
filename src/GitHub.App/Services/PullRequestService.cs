@@ -251,13 +251,15 @@ namespace GitHub.Services
             ILocalRepositoryModel repository,
             IModelService modelService,
             string commitSha,
-            string fileName)
+            string fileName,
+            string fileSha)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
-                var result = await ExtractFile(repository, repo, modelService, commitSha, fileName);
+                var result = await gitClient.ExtractFile(repo, commitSha, fileName) ??
+                             await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
                 return Observable.Return(result);
             });
         }
@@ -266,14 +268,21 @@ namespace GitHub.Services
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestModel pullRequest,
-            string fileName)
+            string fileName,
+            string fileSha)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
-                var left = await ExtractFile(repository, repo, modelService, pullRequest.Base.Sha, fileName);
-                var right = await ExtractFile(repository, repo, modelService, pullRequest.Head.Sha, fileName);
+
+                // The left file is the target of the PR so this should already be fetched.
+                var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
+
+                // The right file - if it comes from a fork - may not be fetched so fall back to
+                // getting the file contents from the model service.
+                var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName) ??
+                            await modelService.GetFileContents(repository, pullRequest.Head.Sha, fileName, fileSha);
                 return Observable.Return(Tuple.Create(left, right));
             });
         }
@@ -283,21 +292,11 @@ namespace GitHub.Services
             IRepository repo,
             IModelService modelService,
             string commitSha,
-            string fileName)
+            string fileName,
+            string fileSha)
         {
-            var result = await gitClient.ExtractFile(repo, commitSha, fileName);
-
-            if (result == null)
-            {
-                var contents = await modelService.GetFileContents(repository, commitSha, fileName);
-                var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-                var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
-                result = Path.Combine(tempDir, tempFileName);
-                Directory.CreateDirectory(tempDir);
-                File.WriteAllBytes(result, contents);
-            }
-
-            return result;
+            return await gitClient.ExtractFile(repo, commitSha, fileName) ??
+                   await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
         }
 
         IEnumerable<string> GetLocalBranchesInternal(

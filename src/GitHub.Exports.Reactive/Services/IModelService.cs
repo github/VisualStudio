@@ -27,6 +27,6 @@ namespace GitHub.Services
             string title, string body);
         IObservable<IBranch> GetBranches(IRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
-        IObservable<byte[]> GetFileContents(IRepositoryModel repo, string commitSha, string fileName);
+        IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
     }
 }
