@@ -74,10 +74,15 @@ namespace GitHub.ViewModels
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
 
             SortOrders = new[] {
-                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, true, "Updated At"),
-                new PullRequestSortOrder(PullRequestListSort.CreatedAt, true, "Created At"),
-                new PullRequestSortOrder(PullRequestListSort.Title, false, "Title"),
+                new PullRequestSortOrder(PullRequestListSort.CreatedAt, true, "Newest"),
+                new PullRequestSortOrder(PullRequestListSort.CreatedAt, false, "Oldest"),
+                new PullRequestSortOrder(PullRequestListSort.Commented, true, "Most commented"),
+                new PullRequestSortOrder(PullRequestListSort.Commented, false, "Least commented"),
+                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, true, "Recently updated"),
+                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, false, "Least recently updated")
             };
+
+            defaultSortOrder = SortOrders[0];
 
             trackingAuthors.Subscribe();
             trackingAssignees.Subscribe();
@@ -106,7 +111,7 @@ namespace GitHub.ViewModels
                 .Subscribe(s => UpdateSortOrder(s));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
-            SelectedSortOrder = SortOrders[0];
+            SelectedSortOrder = DefaultSortOrder;
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -167,35 +172,34 @@ namespace GitHub.ViewModels
             if (PullRequests == null)
                 return;
 
-            var selectedPullRequestSortOrder = pullRequestSortOrder ?? SortOrders[0];
-            var pullRequestListSort = selectedPullRequestSortOrder.PullRequestListSort;
+            var selectedPullRequestSortOrder = pullRequestSortOrder ?? DefaultSortOrder;
 
-            Func<IPullRequestModel, object> selector;
-            switch (pullRequestListSort)
+            IComparer<IPullRequestModel> orderBy;
+            switch (selectedPullRequestSortOrder.PullRequestListSort)
             {
                 case PullRequestListSort.UpdatedAt:
-                    selector = x => x.UpdatedAt;
+                    orderBy = selectedPullRequestSortOrder.IsDescending 
+                        ? OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt) 
+                        : OrderedComparer<IPullRequestModel>.OrderBy(x => x.UpdatedAt);
                     break;
+
                 case PullRequestListSort.CreatedAt:
-                    selector = x => x.CreatedAt;
+                    orderBy = selectedPullRequestSortOrder.IsDescending 
+                        ? OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt) 
+                        : OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt);
                     break;
-                case PullRequestListSort.Title:
-                    selector = x => x.Title;
+
+                case PullRequestListSort.Commented:
+                    orderBy = selectedPullRequestSortOrder.IsDescending 
+                        ? OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CommentCount).ThenBy(x => x.CreatedAt) 
+                        : OrderedComparer<IPullRequestModel>.OrderBy(x => x.CommentCount).ThenBy(x => x.CreatedAt);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(pullRequestSortOrder));
             }
 
-            if (selectedPullRequestSortOrder.IsDescending)
-            {
-                pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(selector).Compare;
-            }
-            else
-            {
-                pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderBy(selector).Compare;
-            }
-
-            SelectedSortOrderDescription = string.Format(CultureInfo.CurrentCulture, "Sort: {0}", selectedPullRequestSortOrder.Name);
+            pullRequests.Comparer = orderBy.Compare;
         }
 
         bool isLoaded;
@@ -289,13 +293,10 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedSortOrder, value); }
         }
 
-        string selectedSortOrderDescription;
-        [AllowNull]
-        public string SelectedSortOrderDescription
+        PullRequestSortOrder defaultSortOrder;
+        public PullRequestSortOrder DefaultSortOrder
         {
-            [return: AllowNull]
-            get { return selectedSortOrderDescription; }
-            set { this.RaiseAndSetIfChanged(ref selectedSortOrderDescription, value); }
+            get { return defaultSortOrder; }
         }
 
         IAccount emptyUser = new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>());

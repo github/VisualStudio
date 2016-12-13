@@ -134,20 +134,9 @@
           
         <Separator Style="{StaticResource VerticalSeparator}" />
 
-        <ui:LinkDropDown Header="Sort"
-                         IsEnabled="{Binding IsLoaded}"
+        <ui:LinkDropDown IsEnabled="{Binding IsLoaded}"
                          ItemsSource="{Binding SortOrders}"
-                         SelectedItem="{Binding SelectedSortOrder}">
-            <ui:LinkDropDown.LinkItemTemplate>
-                <DataTemplate DataType="viewModels:PullRequestSortOrder">
-                    <TextBlock
-                        Text="{Binding Path=ViewModel.SelectedSortOrderDescription, 
-                                       RelativeSource={RelativeSource FindAncestor,
-                                                                      AncestorType={x:Type local:PullRequestListView}}}">
-                    </TextBlock>
-                </DataTemplate>
-            </ui:LinkDropDown.LinkItemTemplate>
-        </ui:LinkDropDown>
+                         SelectedItem="{Binding SelectedSortOrder}" />
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"

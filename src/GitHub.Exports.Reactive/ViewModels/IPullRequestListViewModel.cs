@@ -31,7 +31,7 @@ namespace GitHub.ViewModels
     {
         UpdatedAt,
         CreatedAt,
-        Title
+        Commented
     }
 
     public class PullRequestSortOrder
@@ -66,6 +66,5 @@ namespace GitHub.ViewModels
         IAccount SelectedAssignee { get; set; }
         PullRequestSortOrder SelectedSortOrder { get; set; }
         IReadOnlyList<PullRequestSortOrder> SortOrders { get; set; }
-        string SelectedSortOrderDescription { get; set; }
     }
 }
