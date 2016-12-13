@@ -87,7 +87,6 @@
           </Setter.Value>
         </Setter>
       </Style>
-    </ResourceDictionary>
 
       <CollectionViewSource x:Key="AuthorCollectionViewSource" Source="{Binding Path=Authors}">
          <CollectionViewSource.SortDescriptions>
