@@ -135,6 +135,18 @@ namespace GitHub.Services
             });
         }
 
+        public Task<T> GetConfig<T>(IRepository repository, string key)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(key, nameof(key));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var result = repository.Config.Get<T>(key);
+                return result != null ? result.Value : default(T);
+            });
+        }
+
         public Task SetConfig(IRepository repository, string key, string value)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));

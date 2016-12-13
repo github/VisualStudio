@@ -114,6 +114,14 @@ namespace GitHub.Services
         /// <returns>The filenames of the left and right files for the diff.</returns>
         IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName);
 
+        /// <summary>
+        /// Remotes all unused remotes that were created by GitHub for Visual Studio to track PRs
+        /// from forks.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        IObservable<Unit> RemoteUnusedRemotes(ILocalRepositoryModel repository);
+
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }
 }
