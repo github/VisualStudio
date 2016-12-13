@@ -31,7 +31,6 @@ namespace GitHub.ViewModels
     {
         UpdatedAt,
         CreatedAt,
-        Commented
     }
 
     public class PullRequestSortOrder

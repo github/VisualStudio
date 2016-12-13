@@ -50,9 +50,10 @@ namespace GitHub.SampleData
             SelectedState = States[0];
 
             SortOrders = new List<PullRequestSortOrder> {
-                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, false, "Updated At"),
-                new PullRequestSortOrder(PullRequestListSort.CreatedAt, false, "Created At"),
-                new PullRequestSortOrder(PullRequestListSort.Commented, false, "Name"),
+                new PullRequestSortOrder(PullRequestListSort.CreatedAt, true, "Newest"),
+                new PullRequestSortOrder(PullRequestListSort.CreatedAt, false, "Oldest"),
+                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, true, "Recently updated"),
+                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, false, "Least recently updated")
             };
             SelectedSortOrder = SortOrders[0];
 

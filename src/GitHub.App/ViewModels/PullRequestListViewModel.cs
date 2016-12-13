@@ -76,8 +76,6 @@ namespace GitHub.ViewModels
             SortOrders = new[] {
                 new PullRequestSortOrder(PullRequestListSort.CreatedAt, true, "Newest"),
                 new PullRequestSortOrder(PullRequestListSort.CreatedAt, false, "Oldest"),
-                new PullRequestSortOrder(PullRequestListSort.Commented, true, "Most commented"),
-                new PullRequestSortOrder(PullRequestListSort.Commented, false, "Least commented"),
                 new PullRequestSortOrder(PullRequestListSort.UpdatedAt, true, "Recently updated"),
                 new PullRequestSortOrder(PullRequestListSort.UpdatedAt, false, "Least recently updated")
             };
@@ -187,12 +185,6 @@ namespace GitHub.ViewModels
                     orderBy = selectedPullRequestSortOrder.IsDescending 
                         ? OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt) 
                         : OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt);
-                    break;
-
-                case PullRequestListSort.Commented:
-                    orderBy = selectedPullRequestSortOrder.IsDescending 
-                        ? OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CommentCount).ThenBy(x => x.CreatedAt) 
-                        : OrderedComparer<IPullRequestModel>.OrderBy(x => x.CommentCount).ThenBy(x => x.CreatedAt);
                     break;
 
                 default:
