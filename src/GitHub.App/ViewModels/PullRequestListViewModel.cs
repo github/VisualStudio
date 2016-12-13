@@ -143,25 +143,38 @@ namespace GitHub.ViewModels
                 });
         }
 
-        void UpdateFilter(PullRequestState state = null, [AllowNull]IAccount ass = null, [AllowNull]IAccount aut = null, [AllowNull]string filText = null)
+        void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass = null, [AllowNull]IAccount aut = null, [AllowNull]string filText = null)
         {
             if (PullRequests == null)
                 return;
 
-            filText = filText?.Trim();
-
-            var hasFilterText = !string.IsNullOrEmpty(filText);
-
-            var filterPullRequestNumber = 0;
-            var filterTextIsNumber = hasFilterText && int.TryParse(filText, out filterPullRequestNumber);
-
+            var filterTextIsNumber = false;
+            var filterTextIsString = false;
             string filterPullRequestNumberAsString = null;
-            if (filterTextIsNumber)
-            {
-                filterPullRequestNumberAsString = filterPullRequestNumber.ToString(CultureInfo.InvariantCulture);
-            }
 
-            var filterTextIsString = hasFilterText && !filterTextIsNumber;
+            if (filText != null)
+            {
+                filText = filText.Trim();
+
+                var hasText = !string.IsNullOrEmpty(filText);
+
+                int filterPullRequestNumber;
+                if (hasText && filterText.StartsWith("#", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    filterTextIsNumber = int.TryParse(filText.Substring(1), out filterPullRequestNumber);
+                }
+                else
+                {
+                    filterTextIsNumber = int.TryParse(filText, out filterPullRequestNumber);
+                }
+
+                if (filterTextIsNumber)
+                {
+                    filterPullRequestNumberAsString = filterPullRequestNumber.ToString(CultureInfo.InvariantCulture);
+                }
+
+                filterTextIsString = hasText && !filterTextIsNumber;
+            }
 
             pullRequests.Filter = (pullRequest, index, list) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pullRequest.IsOpen) &&
