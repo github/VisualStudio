@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -71,6 +72,13 @@ namespace GitHub.ViewModels
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
             trackingAssignees = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
+
+            SortOrders = new[] {
+                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, true, "Updated At"),
+                new PullRequestSortOrder(PullRequestListSort.CreatedAt, true, "Created At"),
+                new PullRequestSortOrder(PullRequestListSort.Title, false, "Title"),
+            };
+
             trackingAuthors.Subscribe();
             trackingAssignees.Subscribe();
 
@@ -93,7 +101,12 @@ namespace GitHub.ViewModels
                 .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
+            this.WhenAny(x => x.SelectedSortOrder, x => x.Value)
+                .Where(x => PullRequests != null)
+                .Subscribe(s => UpdateSortOrder(s));
+
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
+            SelectedSortOrder = SortOrders[0];
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -142,10 +155,47 @@ namespace GitHub.ViewModels
         {
             if (PullRequests == null)
                 return;
+
             pullRequests.Filter = (pr, i, l) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
                      (ass == null || ass.Equals(pr.Assignee)) &&
                      (aut == null || aut.Equals(pr.Author));
+        }
+
+        void UpdateSortOrder([AllowNull]PullRequestSortOrder pullRequestSortOrder)
+        {
+            if (PullRequests == null)
+                return;
+
+            var selectedPullRequestSortOrder = pullRequestSortOrder ?? SortOrders[0];
+            var pullRequestListSort = selectedPullRequestSortOrder.PullRequestListSort;
+
+            Func<IPullRequestModel, object> selector;
+            switch (pullRequestListSort)
+            {
+                case PullRequestListSort.UpdatedAt:
+                    selector = x => x.UpdatedAt;
+                    break;
+                case PullRequestListSort.CreatedAt:
+                    selector = x => x.CreatedAt;
+                    break;
+                case PullRequestListSort.Title:
+                    selector = x => x.Title;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(pullRequestSortOrder));
+            }
+
+            if (selectedPullRequestSortOrder.IsDescending)
+            {
+                pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(selector).Compare;
+            }
+            else
+            {
+                pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderBy(selector).Compare;
+            }
+
+            SelectedSortOrderDescription = string.Format(CultureInfo.CurrentCulture, "Sort: {0}", selectedPullRequestSortOrder.Name);
         }
 
         bool isLoaded;
@@ -199,6 +249,13 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref assignees, value); }
         }
 
+        IReadOnlyList<PullRequestSortOrder> sortOrders;
+        public IReadOnlyList<PullRequestSortOrder> SortOrders
+        {
+            get { return sortOrders; }
+            set { this.RaiseAndSetIfChanged(ref sortOrders, value); }
+        }
+
         ObservableCollection<IAccount> authors;
         public ObservableCollection<IAccount> Authors
         {
@@ -222,6 +279,23 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return selectedAssignee; }
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
+        }
+
+        PullRequestSortOrder selectedSortOrder;
+        public PullRequestSortOrder SelectedSortOrder
+        {
+            [return: AllowNull]
+            get { return selectedSortOrder; }
+            set { this.RaiseAndSetIfChanged(ref selectedSortOrder, value); }
+        }
+
+        string selectedSortOrderDescription;
+        [AllowNull]
+        public string SelectedSortOrderDescription
+        {
+            [return: AllowNull]
+            get { return selectedSortOrderDescription; }
+            set { this.RaiseAndSetIfChanged(ref selectedSortOrderDescription, value); }
         }
 
         IAccount emptyUser = new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>());

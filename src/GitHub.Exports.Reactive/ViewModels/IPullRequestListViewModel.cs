@@ -27,6 +27,32 @@ namespace GitHub.ViewModels
         }
     }
 
+    public enum PullRequestListSort
+    {
+        UpdatedAt,
+        CreatedAt,
+        Title
+    }
+
+    public class PullRequestSortOrder
+    {
+        public PullRequestSortOrder(PullRequestListSort pullRequestListSort, bool isDescending, string name)
+        {
+            PullRequestListSort = pullRequestListSort;
+            IsDescending = isDescending;
+            Name = name;
+        }
+
+        public PullRequestListSort PullRequestListSort;
+        public bool IsDescending;
+        public string Name;
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+
     public interface IPullRequestListViewModel : IViewModel
     {
         ITrackingCollection<IPullRequestModel> PullRequests { get; }
@@ -38,5 +64,8 @@ namespace GitHub.ViewModels
         IAccount SelectedAuthor { get; set; }
         ObservableCollection<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; set; }
+        PullRequestSortOrder SelectedSortOrder { get; set; }
+        IReadOnlyList<PullRequestSortOrder> SortOrders { get; set; }
+        string SelectedSortOrderDescription { get; set; }
     }
 }

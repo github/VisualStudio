@@ -48,6 +48,15 @@ namespace GitHub.SampleData
                 new PullRequestState { Name = "All" }
             };
             SelectedState = States[0];
+
+            SortOrders = new List<PullRequestSortOrder> {
+                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, false, "Updated At"),
+                new PullRequestSortOrder(PullRequestListSort.CreatedAt, false, "Created At"),
+                new PullRequestSortOrder(PullRequestListSort.Title, false, "Name"),
+            };
+            SelectedSortOrder = SortOrders[0];
+            SelectedSortOrderDescription = "Sort By: Updated At";
+
             Assignees = new ObservableCollection<IAccount>(prs.Select(x => x.Assignee));
             Authors = new ObservableCollection<IAccount>(prs.Select(x => x.Author));
             SelectedAssignee = Assignees.ElementAt(1);
@@ -66,5 +75,9 @@ namespace GitHub.SampleData
 
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
+
+        public PullRequestSortOrder SelectedSortOrder { get; set; }
+        public IReadOnlyList<PullRequestSortOrder> SortOrders { get; set; }
+        public string SelectedSortOrderDescription { get; set; }
     }
 }

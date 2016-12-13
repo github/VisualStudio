@@ -9,6 +9,7 @@
                                   xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                                  xmlns:viewModels="clr-namespace:GitHub.ViewModels;assembly=GitHub.Exports.Reactive"
                                   xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
@@ -129,7 +130,24 @@
         <ui:LinkDropDown Header="Author"
                          IsEnabled="{Binding IsLoaded}"
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
-                         SelectedItem="{Binding SelectedAuthor}"/>          
+                         SelectedItem="{Binding SelectedAuthor}"/>
+          
+        <Separator Style="{StaticResource VerticalSeparator}" />
+
+        <ui:LinkDropDown Header="Sort"
+                         IsEnabled="{Binding IsLoaded}"
+                         ItemsSource="{Binding SortOrders}"
+                         SelectedItem="{Binding SelectedSortOrder}">
+            <ui:LinkDropDown.LinkItemTemplate>
+                <DataTemplate DataType="viewModels:PullRequestSortOrder">
+                    <TextBlock
+                        Text="{Binding Path=ViewModel.SelectedSortOrderDescription, 
+                                       RelativeSource={RelativeSource FindAncestor,
+                                                                      AncestorType={x:Type local:PullRequestListView}}}">
+                    </TextBlock>
+                </DataTemplate>
+            </ui:LinkDropDown.LinkItemTemplate>
+        </ui:LinkDropDown>
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"
