@@ -13,7 +13,6 @@ namespace GitHub.Models
         public GitReferenceModel(string @ref, string label, string sha, UriString repositoryCloneUri)
         {
             Guard.ArgumentNotEmptyString(@ref, nameof(@ref));
-            Guard.ArgumentNotEmptyString(label, nameof(label));
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
 
             Ref = @ref;

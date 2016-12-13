@@ -261,6 +261,22 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
+                var pr = CreatePullRequest();
+
+                pr.Head = new GitReferenceModel("source", null, "sha", (string)null);
+
+                await target.Load(pr);
+
+                Assert.False(target.Checkout.CanExecute(null));
+                Assert.Equal("The source repository is no longer available.", target.CheckoutState.DisabledMessage);
+            }
+
+            [Fact]
+            public async Task PullRequestFromGhostAccount()
+            {
+                var target = CreateTarget(
+                    currentBranch: "master",
+                    existingPrBranch: "pr/123");
                 await target.Load(CreatePullRequest());
 
                 await Assert.ThrowsAsync<Exception>(() => target.Checkout.ExecuteAsyncTask(null));

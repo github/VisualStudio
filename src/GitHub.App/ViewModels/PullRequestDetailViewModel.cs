@@ -325,9 +325,17 @@ namespace GitHub.ViewModels
                 var caption = localBranches.Count > 0 ?
                     "Checkout " + localBranches.First().DisplayName :
                     "Checkout to " + (await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
-                var disabled = await pullRequestsService.IsWorkingDirectoryClean(repository) ?
-                    null :
-                    "Cannot checkout as your working directory has uncommitted changes.";
+                var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
+                string disabled = null;
+
+                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                {
+                    disabled = "The source repository is no longer available.";
+                }
+                else if (!clean)
+                {
+                    disabled = "Cannot checkout as your working directory has uncommitted changes.";
+                }
 
                 CheckoutState = new CheckoutCommandState(caption, disabled);
                 UpdateState = null;
