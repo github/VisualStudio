@@ -141,6 +141,7 @@
     </Grid>
 
     <ui:FilterTextBox x:Name="filterText"
+            IsEnabled="{Binding IsLoaded}"
             Margin="5,0,5,5"
             DockPanel.Dock="Top" 
             Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
