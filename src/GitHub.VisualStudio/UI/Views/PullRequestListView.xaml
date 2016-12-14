@@ -141,10 +141,10 @@
     </Grid>
 
     <ui:FilterTextBox x:Name="filterText"
-            IsEnabled="{Binding IsLoaded, Delay=500}"
+            IsEnabled="{Binding IsLoaded}"
             Margin="5,0,5,5"
             DockPanel.Dock="Top" 
-            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 
     <ListView x:Name="pullRequests"
               Margin="0,0,0,0"
