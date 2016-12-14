@@ -223,7 +223,7 @@ namespace GitHub.App {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Pull Request has been created at [{0}]({1})..
+        ///   Looks up a localized string similar to Pull Request for branch **{0}** created successfully at [{1}]({2}).
         /// </summary>
         internal static string PRCreatedUpstream {
             get {
@@ -255,6 +255,24 @@ namespace GitHub.App {
         internal static string PullRequestCreationTitleValidatorEmpty {
             get {
                 return ResourceManager.GetString("PullRequestCreationTitleValidatorEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Request.
+        /// </summary>
+        internal static string PullRequestNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Requests.
+        /// </summary>
+        internal static string PullRequestsNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestsNavigationItemText", resourceCulture);
             }
         }
         

@@ -172,7 +172,7 @@
     <value>Please enter your password</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>The Pull Request has been created at [{0}]({1}).</value>
+    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
     <value>Publish repository</value>
@@ -242,5 +242,11 @@
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
     <value>Username or email address must not have spaces</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Requests</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Pull Request</value>
   </data>
 </root>

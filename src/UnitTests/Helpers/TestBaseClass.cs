@@ -68,8 +68,8 @@ public class TestBaseClass : IEntryExitDecorator
         return new PullRequest(uri, uri, uri, uri, uri, uri,
             id, state, title, "", createdAt, updatedAt,
             null, null, 
-            new GitReference(uri.ToString(), "foo:bar", "bar", string.Empty, user, repo),
-            new GitReference(uri.ToString(), "foo:baz", "baz", string.Empty, user, repo),
+            new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
+            new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
             user, null, false, null,
             commentCount, reviewCommentCount, 0, 0, 0, 0,
             null, false);

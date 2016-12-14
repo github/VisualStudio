@@ -356,7 +356,7 @@ namespace GitHub.Services
 
         private GitReferenceModel Create(GitReferenceCacheItem item)
         {
-            return item != null ? new GitReferenceModel(item.Ref, item.Label, item.RepositoryCloneUrl) : null;
+            return new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl);
         }
 
         IPullRequestModel Create(PullRequestCacheItem prCacheItem)
@@ -480,8 +480,20 @@ namespace GitHub.Services
             {
                 Title = pr.Title;
                 Number = pr.Number;
-                Base = new GitReferenceCacheItem { Label = pr.Base.Label, Ref = pr.Base.Ref, RepositoryCloneUrl = pr.Base.Repository.CloneUrl };
-                Head = pr.Head != null ? new GitReferenceCacheItem { Label = pr.Head.Label, Ref = pr.Head.Ref, RepositoryCloneUrl = pr.Head.Repository.CloneUrl } : null;
+                Base = new GitReferenceCacheItem
+                {
+                    Label = pr.Base.Label,
+                    Ref = pr.Base.Ref,
+                    Sha = pr.Base.Sha,
+                    RepositoryCloneUrl = pr.Base.Repository.CloneUrl,
+                };
+                Head = new GitReferenceCacheItem
+                {
+                    Label = pr.Head.Label,
+                    Ref = pr.Head.Ref,
+                    Sha = pr.Head.Sha,
+                    RepositoryCloneUrl = pr.Head.Repository?.CloneUrl
+                };
                 CommentCount = pr.Comments + pr.ReviewComments;
                 CommitCount = pr.Commits;
                 Author = new AccountCacheItem(pr.User);
@@ -556,6 +568,7 @@ namespace GitHub.Services
         {
             public string Ref { get; set; }
             public string Label { get; set; }
+            public string Sha { get; set; }
             public string RepositoryCloneUrl { get; set; }
         }
     }

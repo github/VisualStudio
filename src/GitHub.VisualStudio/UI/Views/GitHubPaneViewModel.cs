@@ -58,6 +58,12 @@ namespace GitHub.VisualStudio.UI.Views
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
             Message = String.Empty;
+
+            this.WhenAnyValue(x => x.Control.DataContext)
+                .OfType<BaseViewModel>()
+                .Select(x => x.WhenAnyValue(y => y.Title))
+                .Switch()
+                .Subscribe(x => Title = x ?? "GitHub");
         }
 
         public override void Initialize(IServiceProvider serviceProvider)
@@ -215,16 +221,6 @@ namespace GitHub.VisualStudio.UI.Views
             if (conn == null)
                 return;
 
-            switch (controllerFlow)
-            {
-                case UIControllerFlow.PullRequests:
-                    Title = Resources.PullRequestsNavigationItemText;
-                    break;
-                default:
-                    Title = "GitHub";
-                    break;
-            }
-            
             var uiProvider = ServiceProvider.GetService<IUIProvider>();
             var factory = uiProvider.GetService<IExportFactoryProvider>();
             var uiflow = factory.UIControllerFactory.CreateExport();

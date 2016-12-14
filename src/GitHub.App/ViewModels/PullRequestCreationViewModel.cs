@@ -108,10 +108,9 @@ namespace GitHub.ViewModels
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
                     }))
-
             .OnExecuteCompleted(pr =>
             {
-                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, TargetBranch.Id,
+                notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, SourceBranch.DisplayName, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name + "#" + pr.Number,
                     TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
             });
 
@@ -135,7 +134,6 @@ namespace GitHub.ViewModels
                 {
                     b = repositoryHost.ModelService.GetBranches(r.Parent).Select(x =>
                     {
-                        x.DisplayName = x.Id;
                         return x;
                     });
                 }
