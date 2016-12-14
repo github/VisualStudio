@@ -288,7 +288,7 @@ namespace GitHub.Services
             });
         }
 
-        private async Task<string> ExtractFile(
+        async Task<string> ExtractFile(
             ILocalRepositoryModel repository,
             IRepository repo,
             IModelService modelService,
