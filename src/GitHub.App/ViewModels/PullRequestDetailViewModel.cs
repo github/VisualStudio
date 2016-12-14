@@ -272,6 +272,7 @@ namespace GitHub.ViewModels
             IsBusy = true;
 
             modelService.GetPullRequest(repository, prNumber)
+                .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Load(x).Forget());
         }
@@ -292,8 +293,10 @@ namespace GitHub.ViewModels
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
 
+            var treeChanges = await pullRequestsService.GetTreeChanges(repository, pullRequest);
+
             // WPF doesn't support AddRange here so iterate through the changes.
-            foreach (var change in CreateChangedFilesList(pullRequest.ChangedFiles))
+            foreach (var change in CreateChangedFilesList(pullRequest, treeChanges))
             {
                 ChangedFilesList.Add(change);
             }
@@ -322,9 +325,17 @@ namespace GitHub.ViewModels
                 var caption = localBranches.Count > 0 ?
                     "Checkout " + localBranches.First().DisplayName :
                     "Checkout to " + (await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
-                var disabled = await pullRequestsService.IsWorkingDirectoryClean(repository) ?
-                    null :
-                    "Cannot checkout as your working directory has uncommitted changes.";
+                var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
+                string disabled = null;
+
+                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                {
+                    disabled = "The source repository is no longer available.";
+                }
+                else if (!clean)
+                {
+                    disabled = "Cannot checkout as your working directory has uncommitted changes.";
+                }
 
                 CheckoutState = new CheckoutCommandState(caption, disabled);
                 UpdateState = null;
@@ -357,9 +368,10 @@ namespace GitHub.ViewModels
             return pullRequestsService.ExtractDiffFiles(repository, model, path).ToTask();
         }
 
-        IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
+        IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IPullRequestModel pullRequest, TreeChanges changes)
         {
-            return files.Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status));
+            return pullRequest.ChangedFiles
+                .Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status, GetStatusDisplay(x, changes)));
         }
 
         static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
@@ -410,6 +422,30 @@ namespace GitHub.ViewModels
             else
             {
                 return "[Invalid]";
+            }
+        }
+
+        string GetStatusDisplay(IPullRequestFileModel file, TreeChanges changes)
+        {
+            switch (file.Status)
+            {
+                case PullRequestFileStatus.Added:
+                    return "add";
+                case PullRequestFileStatus.Renamed:
+                    var fileName = file.FileName.Replace("/", "\\");
+                    var change = changes?.Renamed.FirstOrDefault(x => x.Path == fileName);
+
+                    if (change != null)
+                    {
+                        return Path.GetDirectoryName(change.OldPath) == Path.GetDirectoryName(change.Path) ?
+                            Path.GetFileName(change.OldPath) : change.OldPath;
+                    }
+                    else
+                    {
+                        return "rename";
+                    }
+                default:
+                    return null;
             }
         }
 
