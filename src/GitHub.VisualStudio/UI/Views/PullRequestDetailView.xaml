@@ -23,12 +23,17 @@
         <Binding>
             <Binding.Source>
                 <sampleData:PullRequestDetailViewModelDesigner>
+                    <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
-                        <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling"/>
+                        <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
                     </sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
+                    -->
                     <!--<sampleData:PullRequestDetailViewModelDesigner.UpdateState>
                         <sampleData:PullRequestUpdateStateDesigner CommitsAhead="2" CommitsBehind="4" UpToDate="False"/>
                     </sampleData:PullRequestDetailViewModelDesigner.UpdateState>-->
+                    <sampleData:PullRequestDetailViewModelDesigner.OperationError>
+                        Unable to connect to the internets over here!
+                    </sampleData:PullRequestDetailViewModelDesigner.OperationError>
                 </sampleData:PullRequestDetailViewModelDesigner>
             </Binding.Source>
         </Binding>
