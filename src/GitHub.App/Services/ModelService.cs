@@ -26,7 +26,7 @@ namespace GitHub.Services
     public class ModelService : IModelService
     {
         public const string PRPrefix = "pr";
-        const string TempFilesDirectory = "GitHubVisualStudio";
+        const string TempFilesDirectory = Info.ApplicationInfo.ApplicationName;
         const string CachedFilesDirectory = "CachedFiles";
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
