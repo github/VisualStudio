@@ -150,7 +150,7 @@ namespace GitHub.ViewModels
 
             var filterTextIsNumber = false;
             var filterTextIsString = false;
-            string filterPullRequestNumberAsString = null;
+            var filterPullRequestNumber = 0;
 
             if (filText != null)
             {
@@ -158,7 +158,6 @@ namespace GitHub.ViewModels
 
                 var hasText = !string.IsNullOrEmpty(filText);
 
-                int filterPullRequestNumber;
                 if (hasText && filterText.StartsWith("#", StringComparison.CurrentCultureIgnoreCase))
                 {
                     filterTextIsNumber = int.TryParse(filText.Substring(1), out filterPullRequestNumber);
@@ -168,11 +167,6 @@ namespace GitHub.ViewModels
                     filterTextIsNumber = int.TryParse(filText, out filterPullRequestNumber);
                 }
 
-                if (filterTextIsNumber)
-                {
-                    filterPullRequestNumberAsString = filterPullRequestNumber.ToString(CultureInfo.InvariantCulture);
-                }
-
                 filterTextIsString = hasText && !filterTextIsNumber;
             }
 
@@ -180,7 +174,7 @@ namespace GitHub.ViewModels
                 (!state.IsOpen.HasValue || state.IsOpen == pullRequest.IsOpen) &&
                 (ass == null || ass.Equals(pullRequest.Assignee)) &&
                 (aut == null || aut.Equals(pullRequest.Author)) &&
-                (filterTextIsNumber == false || pullRequest.Number.ToString(CultureInfo.InvariantCulture).StartsWith(filterPullRequestNumberAsString, StringComparison.OrdinalIgnoreCase)) && 
+                (filterTextIsNumber == false || pullRequest.Number == filterPullRequestNumber) && 
                 (filterTextIsString == false || pullRequest.Title.ToUpperInvariant().Contains(filText.ToUpperInvariant()));
         }
 
