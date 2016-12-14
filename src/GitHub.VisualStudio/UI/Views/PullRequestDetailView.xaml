@@ -146,15 +146,22 @@
                     </Border>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Opacity="0.5" VerticalAlignment="Center"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Opacity="0.5" Margin="0 2 0 0" VerticalAlignment="Top"
                                Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
-                    <Rectangle Margin="5" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
+                    <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
 
                     <!-- Checkout pull request button -->
                     <ui:GitHubActionLink Command="{Binding Checkout}"
                                          Content="{Binding CheckoutState.Caption}"
+                                         Grid.Column="2"
                                          VerticalAlignment="Center"
                                          TextWrapping="Wrap"
                                          Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
@@ -162,7 +169,7 @@
                                          ToolTipService.ShowOnDisabled="True"/>
 
                     <!-- Pull/push buttons -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
                                 Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
                         <ui:OcticonImage Icon="arrow_down"/>
                         <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
@@ -183,7 +190,7 @@
                     </StackPanel>
 
                     <!-- Branch checked out and up-to-date -->
-                    <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
                         <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
                         <Run>Local branch up to date</Run>
                         <TextBlock.Style>
@@ -205,7 +212,7 @@
                     </TextBlock>
 
                     <!-- Checkout disabled message -->
-                    <TextBlock Margin="0 0 0 4" VerticalAlignment="Center" TextWrapping="Wrap">
+                    <TextBlock Grid.Column="2" Margin="0 0 0 4" VerticalAlignment="Center" TextWrapping="Wrap">
                         <Run Text="{Binding CheckoutDisabledMessage}"/>
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
@@ -219,14 +226,15 @@
                     </TextBlock>
 
                     <!-- Git operation error message -->
-                    <TextBox Foreground="Red" 
+                    <TextBox Grid.Column="2"
+                             Foreground="Red" 
                              Margin="0 4"
                              Text="{Binding OperationError}"
                              VerticalAlignment="Center"
                              TextWrapping="Wrap"
                              Style="{StaticResource FlatReadOnlyTextBox}"
                              Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
-                </StackPanel>
+                </Grid>
             </StackPanel>
         </Grid>
 
