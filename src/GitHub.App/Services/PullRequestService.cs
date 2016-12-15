@@ -159,7 +159,7 @@ namespace GitHub.Services
                     current = initial + '-' + index++;
                 }
 
-                return Observable.Return(current);
+                return Observable.Return(current.TrimEnd('-'));
             });
         }
 
