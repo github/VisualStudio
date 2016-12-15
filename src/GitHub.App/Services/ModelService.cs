@@ -157,33 +157,25 @@ namespace GitHub.Services
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name));
 
-            var source = Observable.Defer(() =>
-            {
-                var collectionIsDisposed = false;
-
-                return keyobs
-                    .SelectMany(key => hostCache.GetAndFetchLatestFromIndex(key, () =>
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
                         apiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-                            .Select(PullRequestCacheItem.Create), item =>
-                            {
-                                try
-                                {
-                                    if (!collectionIsDisposed)
-                                    {
-                                        // this could blow up due to the collection being disposed somewhere else
-                                        collection.RemoveItem(Create(item));
-                                    }
-                                }
-                                catch (ObjectDisposedException)
-                                {
-                                    // take the hint and stop trying
-                                    collectionIsDisposed = true;
-                                }
-                            }, 
-                            TimeSpan.Zero, 
-                            TimeSpan.FromDays(7)))
-                    .Select(Create);
-            });
+                                 .Select(PullRequestCacheItem.Create),
+                        item =>
+                        {
+                            if(collection.Disposed)
+                            { return; }
+
+                            // this could blow up due to the collection being disposed somewhere else
+                            try { collection.RemoveItem(Create(item)); }
+                            catch (ObjectDisposedException) { }
+                        },
+                        TimeSpan.Zero,
+                        TimeSpan.FromDays(7))
+                )
+                .Select(Create)
+            );
 
             collection.Listen(source);
             return collection;
@@ -210,33 +202,25 @@ namespace GitHub.Services
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
 
-            var source = Observable.Defer(() =>
-            {
-                var collectionIsDisposed = false;
-
-                return keyobs
-                    .SelectMany(key => hostCache.GetAndFetchLatestFromIndex(key, () =>
+            var source = Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatestFromIndex(key, () =>
                         apiClient.GetRepositories()
-                            .Select(RepositoryCacheItem.Create), item =>
-                            {
-                                try
-                                {
-                                    if (!collectionIsDisposed)
-                                    {
-                                        // this could blow up due to the collection being disposed somewhere else
-                                        collection.RemoveItem(Create(item));
-                                    }
-                                }
-                                catch (ObjectDisposedException)
-                                {
-                                    // take the hint and stop trying
-                                    collectionIsDisposed = true;
-                                }
-                            },
-                            TimeSpan.FromMinutes(5),
-                            TimeSpan.FromDays(1)))
-                    .Select(Create);
-            });
+                                 .Select(RepositoryCacheItem.Create),
+                        item =>
+                        {
+                            if (collection.Disposed)
+                            { return; }
+                            
+                            // this could blow up due to the collection being disposed somewhere else
+                            try { collection.RemoveItem(Create(item)); }
+                            catch (ObjectDisposedException) { }
+                        },
+                        TimeSpan.FromMinutes(5),
+                        TimeSpan.FromDays(1))
+                )
+                .Select(Create)
+            );
 
             collection.Listen(source);
             return collection;

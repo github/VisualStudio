@@ -67,5 +67,7 @@ namespace GitHub.Collections
         /// regardless of filtering
         /// </summary>
         int UnfilteredCount { get; }
+
+        bool Disposed { get; }
     }
 }
