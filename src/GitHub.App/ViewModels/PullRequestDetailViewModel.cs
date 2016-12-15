@@ -362,6 +362,8 @@ namespace GitHub.ViewModels
             }
 
             IsLoading = IsBusy = false;
+            IsBusy = false;
+            usageTracker.IncrementPullRequestOpened().Forget();
 
             if (!isInCheckout)
             {
@@ -480,6 +482,8 @@ namespace GitHub.ViewModels
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
+
+                usageTracker.IncrementPullRequestCheckedOut().Forget();
 
                 if (localBranches.Count > 0)
                 {
