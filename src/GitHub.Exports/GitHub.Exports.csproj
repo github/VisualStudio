@@ -205,6 +205,7 @@
     <Compile Include="Settings\PullRequestDetailUIState.cs" />
     <Compile Include="Settings\PullRequestListUIState.cs" />
     <Compile Include="Settings\RepositoryUIState.cs" />
+    <Compile Include="Settings\SortOrder.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
     <Compile Include="ViewModels\IHasBusy.cs" />

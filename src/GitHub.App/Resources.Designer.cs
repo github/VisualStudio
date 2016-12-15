@@ -403,6 +403,42 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Oldest.
+        /// </summary>
+        internal static string SortOrderCreatedAscending {
+            get {
+                return ResourceManager.GetString("SortOrderCreatedAscending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Newest.
+        /// </summary>
+        internal static string SortOrderCreatedDescending {
+            get {
+                return ResourceManager.GetString("SortOrderCreatedDescending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Least recently updated.
+        /// </summary>
+        internal static string SortOrderUpdatedAscending {
+            get {
+                return ResourceManager.GetString("SortOrderUpdatedAscending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recently updated.
+        /// </summary>
+        internal static string SortOrderUpdatedDescending {
+            get {
+                return ResourceManager.GetString("SortOrderUpdatedDescending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         internal static string TwoFactorApp {

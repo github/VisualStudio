@@ -4,52 +4,19 @@ using GitHub.Models;
 using System.Windows.Input;
 using ReactiveUI;
 using System.Collections.ObjectModel;
+using GitHub.Settings;
 
 namespace GitHub.ViewModels
 {
-    public class PullRequestState
+    public class PullRequestState : ViewModelItemContainer
     {
-        public PullRequestState()
-        {
-        }
-
-        public PullRequestState(bool isOpen, string name)
-        {
-            IsOpen = isOpen;
-            Name = name;
-        }
-
         public bool? IsOpen;
-        public string Name;
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 
-    public enum PullRequestListSort
+    public class PullRequestSortOrder : ViewModelItemContainer
     {
-        UpdatedAt,
-        CreatedAt,
-    }
-
-    public class PullRequestSortOrder
-    {
-        public PullRequestSortOrder(PullRequestListSort pullRequestListSort, bool isDescending, string name)
-        {
-            PullRequestListSort = pullRequestListSort;
-            IsDescending = isDescending;
-            Name = name;
-        }
-
-        public PullRequestListSort PullRequestListSort;
-        public bool IsDescending;
-        public string Name;
-
-        public override string ToString()
-        {
-            return Name;
-        }
+        public IComparer<IPullRequestModel> Comparer;
+        public SortOrder SortOrder;
     }
 
     public interface IPullRequestListViewModel : IViewModel
@@ -57,13 +24,13 @@ namespace GitHub.ViewModels
         ITrackingCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
         ICommand OpenPullRequest { get; }
-        IReadOnlyList<PullRequestState> States { get; set; }
+        IReadOnlyList<PullRequestState> States { get; }
         PullRequestState SelectedState { get; set; }
         ObservableCollection<IAccount> Authors { get; }
         IAccount SelectedAuthor { get; set; }
         ObservableCollection<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; set; }
+        IReadOnlyList<PullRequestSortOrder> SortOrders { get; }
         PullRequestSortOrder SelectedSortOrder { get; set; }
-        IReadOnlyList<PullRequestSortOrder> SortOrders { get; set; }
     }
 }

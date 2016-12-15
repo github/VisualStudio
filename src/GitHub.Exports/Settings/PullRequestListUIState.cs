@@ -1,11 +1,10 @@
-﻿using System;
-
-namespace GitHub.Settings
+﻿namespace GitHub.Settings
 {
     public class PullRequestListUIState
     {
         public string SelectedState { get; set; }
         public string SelectedAuthor { get; set; }
         public string SelectedAssignee { get; set; }
+        public SortOrder SelectedSort { get; set; }
     }
 }

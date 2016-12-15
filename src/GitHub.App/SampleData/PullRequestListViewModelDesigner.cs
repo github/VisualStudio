@@ -6,7 +6,6 @@ using GitHub.Collections;
 using GitHub.Models;
 using GitHub.ViewModels;
 using System.Collections.Generic;
-using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -50,10 +49,8 @@ namespace GitHub.SampleData
             SelectedState = States[0];
 
             SortOrders = new List<PullRequestSortOrder> {
-                new PullRequestSortOrder(PullRequestListSort.CreatedAt, true, "Newest"),
-                new PullRequestSortOrder(PullRequestListSort.CreatedAt, false, "Oldest"),
-                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, true, "Recently updated"),
-                new PullRequestSortOrder(PullRequestListSort.UpdatedAt, false, "Least recently updated")
+                new PullRequestSortOrder { Name = "Updated" },
+                new PullRequestSortOrder { Name = "Newest" },
             };
             SelectedSortOrder = SortOrders[0];
 

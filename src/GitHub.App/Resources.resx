@@ -249,4 +249,16 @@
   <data name="PullRequestNavigationItemText" xml:space="preserve">
     <value>Pull Request</value>
   </data>
+  <data name="SortOrderCreatedAscending" xml:space="preserve">
+    <value>Oldest</value>
+  </data>
+  <data name="SortOrderCreatedDescending" xml:space="preserve">
+    <value>Newest</value>
+  </data>
+  <data name="SortOrderUpdatedAscending" xml:space="preserve">
+    <value>Least recently updated</value>
+  </data>
+  <data name="SortOrderUpdatedDescending" xml:space="preserve">
+    <value>Recently updated</value>
+  </data>
 </root>
