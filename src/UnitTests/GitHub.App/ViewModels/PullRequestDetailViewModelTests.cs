@@ -509,7 +509,8 @@ namespace UnitTests.GitHub.App.ViewModels
                 repository,
                 Substitute.For<IModelService>(),
                 pullRequestService,
-                settings);
+                settings,
+                Substitute.For<IUsageTracker>());
 
             return Tuple.Create(vm, pullRequestService);
         }

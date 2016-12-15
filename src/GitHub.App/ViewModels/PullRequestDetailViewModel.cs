@@ -31,6 +31,7 @@ namespace GitHub.ViewModels
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
+        readonly IUsageTracker usageTracker;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -53,11 +54,13 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
                   pullRequestsService,
-                  settings)
+                  settings,
+                  usageTracker)
         {
         }
 
@@ -72,11 +75,13 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
         {
             this.repository = repository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
+            this.usageTracker = usageTracker;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -344,6 +349,7 @@ namespace GitHub.ViewModels
             IsBusy = false;
 
             pullRequestsService.RemoteUnusedRemotes(repository).Subscribe(_ => { });
+            usageTracker.IncrementPullRequestOpened().Forget();
         }
 
         /// <summary>
@@ -454,6 +460,8 @@ namespace GitHub.ViewModels
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
+
+                usageTracker.IncrementPullRequestCheckedOut().Forget();
 
                 if (localBranches.Count > 0)
                 {

@@ -20,6 +20,8 @@ namespace GitHub.Models
         public int NumberOfOpenInGitHub { get; set; }
         public int NumberOfLinkToGitHub { get; set; }
         public int NumberOfLogins { get; set; }
+        public int NumberOfPullRequestsOpened { get; set; }
+        public int NumberOfPullRequestsCheckedOut { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
@@ -41,6 +43,8 @@ namespace GitHub.Models
                 NumberOfOpenInGitHub = NumberOfOpenInGitHub,
                 NumberOfLinkToGitHub = NumberOfLinkToGitHub,
                 NumberOfLogins = NumberOfLogins,
+                NumberOfPullRequestsOpened = NumberOfPullRequestsOpened,
+                NumberOfPullRequestsCheckedOut = NumberOfPullRequestsCheckedOut,
             };
         }
     }
