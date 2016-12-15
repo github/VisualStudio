@@ -130,7 +130,7 @@ namespace GitHub.ViewModels
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             this.WhenAny(x => x.SelectedSortOrder, x => x.Value)
-                .Where(x => pullRequests != null)
+                .Where(x => x != null && pullRequests != null)
                 .Subscribe(s => pullRequests.Comparer = s.Comparer.Compare);
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
