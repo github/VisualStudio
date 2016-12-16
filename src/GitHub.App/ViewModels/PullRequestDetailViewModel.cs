@@ -88,14 +88,14 @@ namespace GitHub.ViewModels
             Pull = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PullDisabledMessage == null),
+                    .Select(x => x != null && x.PullEnabled),
                 DoPull);
             Pull.ThrownExceptions.Subscribe(x => OperationError = x.Message);
 
             Push = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PushDisabledMessage == null),
+                    .Select(x => x != null && x.PushEnabled),
                 DoPush);
             Push.ThrownExceptions.Subscribe(x => OperationError = x.Message);
 
@@ -286,8 +286,10 @@ namespace GitHub.ViewModels
         {
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
-            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
+
+            var prFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
+            SourceBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Head?.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Base.Label);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
 
             ChangedFilesTree.Clear();
@@ -312,12 +314,40 @@ namespace GitHub.ViewModels
             if (isCheckedOut)
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
-                var pullDisabled = divergence.BehindBy == 0 ? "No commits to pull" : null;
-                var pushDisabled = divergence.AheadBy == 0 ? 
-                    "No commits to push" : 
-                    divergence.BehindBy > 0 ? "You must pull before you can push" : null;
+                var pullEnabled = divergence.BehindBy > 0;
+                var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                string pullToolTip;
+                string pushToolTip;
 
-                UpdateState = new UpdateCommandState(divergence, pullDisabled, pushDisabled);
+                if (pullEnabled)
+                {
+                    pullToolTip = string.Format(
+                        "Pull from {0} branch {1}",
+                        prFromFork ? "fork" : "remote",
+                        SourceBranchDisplayName);
+                }
+                else
+                {
+                    pullToolTip = "No commits to pull";
+                }
+
+                if (pushEnabled)
+                {
+                    pushToolTip = string.Format(
+                        "Push to {0} branch {1}",
+                        prFromFork ? "fork" : "remote",
+                        SourceBranchDisplayName);
+                }
+                else if (divergence.AheadBy == 0)
+                {
+                    pushToolTip = "No commits to push";
+                }
+                else
+                {
+                    pushToolTip = "You must pull before you can push";
+                }
+
+                UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
                 CheckoutState = null;
             }
             else
@@ -411,17 +441,15 @@ namespace GitHub.ViewModels
             return dir;
         }
 
-        string GetBranchDisplayName(string targetBranchLabel)
+        string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
         {
             if (targetBranchLabel != null)
             {
-                var parts = targetBranchLabel.Split(':');
-                var owner = parts[0];
-                return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
+                return isFromFork ? targetBranchLabel : targetBranchLabel.Split(':')[1];
             }
             else
             {
-                return "[Invalid]";
+                return "[invalid]";
             }
         }
 
@@ -492,19 +520,28 @@ namespace GitHub.ViewModels
 
         class UpdateCommandState : IPullRequestUpdateState
         {
-            public UpdateCommandState(BranchTrackingDetails divergence, string pullDisabledMessage, string pushDisabledMessage)
+            public UpdateCommandState(
+                BranchTrackingDetails divergence,
+                bool pullEnabled,
+                bool pushEnabled,
+                string pullToolTip,
+                string pushToolTip)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
-                PullDisabledMessage = pullDisabledMessage;
-                PushDisabledMessage = pushDisabledMessage;
+                PushEnabled = pushEnabled;
+                PullEnabled = pullEnabled;
+                PullToolTip = pullToolTip;
+                PushToolTip = pushToolTip;
             }
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
             public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
-            public string PullDisabledMessage { get; }
-            public string PushDisabledMessage { get; }
+            public bool PullEnabled { get; }
+            public bool PushEnabled { get; }
+            public string PullToolTip { get; }
+            public string PushToolTip { get; }
         }
     }
 }

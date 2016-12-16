@@ -176,7 +176,7 @@
                         <ui:GitHubActionLink Content="Pull"
                                              Command="{Binding Pull}"
                                              Margin="4,0"
-                                             ToolTip="{Binding UpdateState.PullDisabledMessage}"
+                                             ToolTip="{Binding UpdateState.PullToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
                         <ui:OcticonImage Icon="arrow_up"/>
@@ -184,7 +184,7 @@
                         <ui:GitHubActionLink Content="Push"
                                              Command="{Binding Push}"
                                              Margin="4,0"
-                                             ToolTip="{Binding UpdateState.PushDisabledMessage}"
+                                             ToolTip="{Binding UpdateState.PushToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
                     </StackPanel>

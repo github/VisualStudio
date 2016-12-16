@@ -196,7 +196,14 @@ namespace GitHub.Services
 
         public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            return pullRequest.Head.RepositoryCloneUrl?.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+            if (pullRequest.Head?.Label != null && pullRequest.Base?.Label != null)
+            {
+                var headOwner = pullRequest.Head.Label.Split(':')[0];
+                var baseOwner = pullRequest.Base.Label.Split(':')[0];
+                return headOwner != baseOwner;
+            }
+
+            return false;
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
