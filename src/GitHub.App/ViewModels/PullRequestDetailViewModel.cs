@@ -343,7 +343,7 @@ namespace GitHub.ViewModels
 
             IsBusy = false;
 
-            pullRequestsService.RemoteUnusedRemotes(repository).Subscribe(_ => { });
+            pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
         }
 
         /// <summary>

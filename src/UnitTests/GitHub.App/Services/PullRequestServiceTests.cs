@@ -321,7 +321,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.GetConfig<bool>(Arg.Any<IRepository>(), "remote.remote1.created-by-ghfvs").Returns(Task.FromResult(true));
             gitClient.GetConfig<bool>(Arg.Any<IRepository>(), "remote.remote2.created-by-ghfvs").Returns(Task.FromResult(true));
 
-            await service.RemoteUnusedRemotes(localRepo);
+            await service.RemoveUnusedRemotes(localRepo);
 
             remoteCollection.DidNotReceive().Remove("remote1");
             remoteCollection.Received().Remove("remote2");
