@@ -134,7 +134,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
-        IObservable<Unit> RemoteUnusedRemotes(ILocalRepositoryModel repository);
+        IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }

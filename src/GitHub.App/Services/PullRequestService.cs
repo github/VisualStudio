@@ -315,7 +315,7 @@ namespace GitHub.Services
                    await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
         }
 
-        public IObservable<Unit> RemoteUnusedRemotes(ILocalRepositoryModel repository)
+        public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
