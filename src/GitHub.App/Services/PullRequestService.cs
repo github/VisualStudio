@@ -259,8 +259,7 @@ namespace GitHub.Services
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
-                var result = await gitClient.ExtractFile(repo, commitSha, fileName) ??
-                             await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+                var result = await GetFileFromRepositoryOrApi(repository, repo, modelService, commitSha, fileName, fileSha);
                 return Observable.Return(result);
             });
         }
@@ -282,13 +281,12 @@ namespace GitHub.Services
 
                 // The right file - if it comes from a fork - may not be fetched so fall back to
                 // getting the file contents from the model service.
-                var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName) ??
-                            await modelService.GetFileContents(repository, pullRequest.Head.Sha, fileName, fileSha);
+                var right = await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
                 return Observable.Return(Tuple.Create(left, right));
             });
         }
 
-        async Task<string> ExtractFile(
+        async Task<string> GetFileFromRepositoryOrApi(
             ILocalRepositoryModel repository,
             IRepository repo,
             IModelService modelService,
