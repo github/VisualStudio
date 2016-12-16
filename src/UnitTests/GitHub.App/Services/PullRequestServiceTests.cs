@@ -220,7 +220,7 @@ public class PullRequestServiceTests : TestBaseClass
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar"));
 
-            var result = await service.GetLocalBranches(localRepo, CreatePullRequest());
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
 
             Assert.Equal("source", result.Name);
         }
@@ -253,14 +253,13 @@ public class PullRequestServiceTests : TestBaseClass
                 Substitute.For<IUsageTracker>());
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
-            localRepo.CloneUrl.Returns(new UriString("https://github.com/baz/bar"));
 
-            var result = await service.GetLocalBranches(localRepo, CreatePullRequest());
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest(true));
 
             Assert.Equal("pr/1-foo", result.Name);
         }
 
-        static IPullRequestModel CreatePullRequest()
+        static IPullRequestModel CreatePullRequest(bool fromFork)
         {
             var author = Substitute.For<IAccount>();
 
@@ -268,7 +267,7 @@ public class PullRequestServiceTests : TestBaseClass
             {
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel("source", "foo:baz", "sha", "https://github.com/foo/bar.git"),
+                Head = new GitReferenceModel("source", fromFork ? "fork:baz" : "foo:baz", "sha", "https://github.com/foo/bar.git"),
                 Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
             };
         }

@@ -459,7 +459,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.True(target.Push.CanExecute(null));
                 Assert.Equal(2, target.UpdateState.CommitsAhead);
                 Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("Push to remote branch foo:baz", target.UpdateState.PushToolTip);
+                Assert.Equal("Push to fork branch foo:baz", target.UpdateState.PushToolTip);
             }
 
             [Fact]
