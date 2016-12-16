@@ -178,6 +178,20 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Fact]
+        public async Task ShouldReturnCorrectDefaultLocalBranchNameForPullRequestsWithNonLatinChars()
+        {
+            var service = new PullRequestService(
+                Substitute.For<IGitClient>(),
+                MockGitService(),
+                Substitute.For<IOperatingSystem>(),
+                Substitute.For<IUsageTracker>());
+
+            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var result = await service.GetDefaultLocalBranchName(localRepo, 123, "コードをレビューする準備ができたこと");
+            Assert.Equal("pr/123", result);
+        }
+
+        [Fact]
         public async Task DefaultLocalBranchNameShouldNotClashWithExistingBranchNames()
         {
             var service = new PullRequestService(
