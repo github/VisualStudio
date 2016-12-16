@@ -2,10 +2,9 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
-using LibGit2Sharp;
+using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -14,21 +13,22 @@ namespace GitHub.Services
     public class RepositoryPublishService : IRepositoryPublishService
     {
         readonly IGitClient gitClient;
-        readonly IRepository activeRepository;
+        readonly IVSGitServices vsGitServices;
 
         [ImportingConstructor]
         public RepositoryPublishService(IGitClient gitClient, IVSGitServices vsGitServices)
         {
             this.gitClient = gitClient;
-            this.activeRepository = vsGitServices.GetActiveRepo();
+            this.vsGitServices = vsGitServices;
         }
 
         public string LocalRepositoryName
         {
             get
             {
-                if (!string.IsNullOrEmpty(activeRepository?.Info?.WorkingDirectory))
-                    return new DirectoryInfo(activeRepository.Info.WorkingDirectory).Name ?? "";
+                var activeRepo = vsGitServices.GetActiveRepo();
+                if (!string.IsNullOrEmpty(activeRepo?.Info?.WorkingDirectory))
+                    return new DirectoryInfo(activeRepo.Info.WorkingDirectory).Name ?? "";
                 return string.Empty;
             }
         }
@@ -39,7 +39,8 @@ namespace GitHub.Services
             IApiClient apiClient)
         {
             return Observable.Defer(() => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                                     .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = activeRepository }))
+                                     .ObserveOn(RxApp.MainThreadScheduler)
+                                     .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = vsGitServices.GetActiveRepo() }))
                              .SelectMany(async repo =>
                              {
                                  await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl));

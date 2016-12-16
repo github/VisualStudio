@@ -14,6 +14,7 @@ namespace GitHub.Caches
         public const string RepoPrefix = "index:repos";
         public const string GitIgnoresPrefix = "index:ignores";
         public const string LicensesPrefix = "index:licenses";
+        public const string FileContentsPrefix = "index:filecontents";
 
         public static CacheIndex Create(string key)
         {
