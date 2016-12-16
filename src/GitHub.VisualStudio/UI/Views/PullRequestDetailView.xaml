@@ -129,6 +129,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
@@ -224,18 +225,21 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-
-                    <!-- Git operation error message -->
-                    <TextBox Grid.Column="2"
-                             Foreground="Red" 
-                             Margin="0 4"
-                             Text="{Binding OperationError}"
-                             VerticalAlignment="Center"
-                             TextWrapping="Wrap"
-                             Style="{StaticResource FlatReadOnlyTextBox}"
-                             Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
                 </Grid>
             </StackPanel>
+
+            <!-- Git operation error message -->
+
+            <TextBox Grid.Column="0"
+                     Grid.ColumnSpan="3"
+                     Grid.Row="2"
+                     Foreground="Red" 
+                     Margin="0 0 0 0"
+                     Text="{Binding OperationError}"
+                     VerticalAlignment="Center"
+                     TextWrapping="Wrap"
+                     Style="{StaticResource FlatReadOnlyTextBox}"
+                     Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
         </Grid>
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,5,-8,0"/>
