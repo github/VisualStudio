@@ -18,5 +18,10 @@ namespace GitHub.ViewModels
         /// Gets the type of change that was made to the file.
         /// </summary>
         PullRequestFileStatus Status { get; }
+
+        /// <summary>
+        /// Gets the string to display in the [message] box next to the filename.
+        /// </summary>
+        string StatusDisplay { get; }
     }
 }

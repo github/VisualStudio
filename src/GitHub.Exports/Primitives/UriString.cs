@@ -248,7 +248,7 @@ namespace GitHub.Primitives
 
         bool IEquatable<UriString>.Equals(UriString other)
         {
-            return other != null && ToString().Equals(other.ToString());
+            return other != null && Equals(ToString(), other.ToString());
         }
     }
 }

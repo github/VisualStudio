@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using GitHub.Models;
+using NullGuard;
 
 namespace GitHub.ViewModels
 {
@@ -14,13 +15,15 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="repositoryPath">The absolute path to the repository.</param>
         /// <param name="path">The path to the file, relative to the repository.</param>
-        /// <param name="changeType">The way the file was changed.</param>
-        public PullRequestFileNode(string repositoryPath, string path, PullRequestFileStatus status)
+        /// <param name="status">The way the file was changed.</param>
+        /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
+        public PullRequestFileNode(string repositoryPath, string path, PullRequestFileStatus status, [AllowNull] string statusDisplay)
         {
             FileName = Path.GetFileName(path);
             DirectoryPath = Path.GetDirectoryName(path);
             DisplayPath = Path.Combine(Path.GetFileName(repositoryPath), DirectoryPath);
             Status = status;
+            StatusDisplay = statusDisplay;
         }
 
         /// <summary>
@@ -42,5 +45,10 @@ namespace GitHub.ViewModels
         /// Gets the type of change that was made to the file.
         /// </summary>
         public PullRequestFileStatus Status { get; }
+
+        /// <summary>
+        /// Gets the string to display in the [message] box next to the filename.
+        /// </summary>
+        public string StatusDisplay { [return: AllowNull] get; }
     }
 }

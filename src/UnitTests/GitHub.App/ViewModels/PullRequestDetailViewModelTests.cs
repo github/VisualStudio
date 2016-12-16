@@ -48,6 +48,106 @@ namespace UnitTests.GitHub.App.ViewModels
             }
         }
 
+        public class TheChangedFilesListProperty
+        {
+            [Fact]
+            public async Task ShouldCreateChangesList()
+            {
+                var target = CreateTarget();
+                var pr = CreatePullRequest();
+
+                pr.ChangedFiles = new[]
+                {
+                    new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Added),
+                    new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Removed),
+                    new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
+                };
+
+                await target.Load(pr);
+
+                Assert.Equal(5, target.ChangedFilesList.Count);
+
+                var file = target.ChangedFilesList[0];
+                Assert.Equal("readme.md", file.FileName);
+                Assert.Equal(string.Empty, file.DirectoryPath);
+                Assert.Equal("ThisRepo", file.DisplayPath);
+                Assert.Equal(PullRequestFileStatus.Modified, file.Status);
+                Assert.Equal(null, file.StatusDisplay);
+
+                file = target.ChangedFilesList[1];
+                Assert.Equal("f1.cs", file.FileName);
+                Assert.Equal("dir1", file.DirectoryPath);
+                Assert.Equal(@"ThisRepo\dir1", file.DisplayPath);
+                Assert.Equal(PullRequestFileStatus.Added, file.Status);
+                Assert.Equal("add", file.StatusDisplay);
+
+                file = target.ChangedFilesList[2];
+                Assert.Equal("f2.cs", file.FileName);
+                Assert.Equal("dir1", file.DirectoryPath);
+                Assert.Equal(@"ThisRepo\dir1", file.DisplayPath);
+                Assert.Equal(PullRequestFileStatus.Removed, file.Status);
+                Assert.Equal(null, file.StatusDisplay);
+
+                file = target.ChangedFilesList[3];
+                Assert.Equal("f3.cs", file.FileName);
+                Assert.Equal(@"dir1\dir1a", file.DirectoryPath);
+                Assert.Equal(@"ThisRepo\dir1\dir1a", file.DisplayPath);
+                Assert.Equal(PullRequestFileStatus.Modified, file.Status);
+                Assert.Equal(null, file.StatusDisplay);
+
+                file = target.ChangedFilesList[4];
+                Assert.Equal("f4.cs", file.FileName);
+                Assert.Equal("dir2", file.DirectoryPath);
+                Assert.Equal(@"ThisRepo\dir2", file.DisplayPath);
+                Assert.Equal(PullRequestFileStatus.Modified, file.Status);
+                Assert.Equal(null, file.StatusDisplay);
+            }
+
+            [Fact]
+            public async Task ShouldDisplayRenamedFiles()
+            {
+                var targetAndSerivce = CreateTargetAndService();
+                var target = targetAndSerivce.Item1;
+                var service = targetAndSerivce.Item2;
+                var pr = CreatePullRequest();
+
+                pr.ChangedFiles = new[]
+                {
+                    new PullRequestFileModel(@"readme.md", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"dir1/f1.cs", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"dir1/f2.cs", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"f3.cs", PullRequestFileStatus.Renamed),
+                };
+
+                var changes = Substitute.For<TreeChanges>();
+                var readmeRename = Substitute.For<TreeEntryChanges>();
+                var f1Rename = Substitute.For<TreeEntryChanges>();
+                var f2Rename = Substitute.For<TreeEntryChanges>();
+                var f3Rename = Substitute.For<TreeEntryChanges>();
+
+                readmeRename.Path.Returns(@"readme.md");
+                readmeRename.OldPath.Returns(@"oldreadme.md");
+                f1Rename.Path.Returns(@"dir1\f1.cs");
+                f1Rename.OldPath.Returns(@"dir1\oldf1.cs");
+                f2Rename.Path.Returns(@"dir1\f2.cs");
+                f2Rename.OldPath.Returns(@"f2.cs");
+                f3Rename.Path.Returns(@"f3.cs");
+                f3Rename.OldPath.Returns(@"dir1\f3.cs");
+                changes.Renamed.Returns(new[] { readmeRename, f1Rename, f2Rename, f3Rename });
+
+                service.GetTreeChanges(Arg.Any<ILocalRepositoryModel>(), pr).Returns(Observable.Return(changes));
+
+                await target.Load(pr);
+
+                Assert.Equal(@"oldreadme.md", target.ChangedFilesList[0].StatusDisplay);
+                Assert.Equal(@"oldf1.cs", target.ChangedFilesList[1].StatusDisplay);
+                Assert.Equal(@"f2.cs", target.ChangedFilesList[2].StatusDisplay);
+                Assert.Equal(@"dir1\f3.cs", target.ChangedFilesList[3].StatusDisplay);
+            }
+        }
+
         public class TheChangedFilesTreeProperty
         {
             [Fact]
@@ -58,12 +158,12 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
-                new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Modified),
-                new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Modified),
-                new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
-                new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
-            };
+                    new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
+                };
 
                 await target.Load(pr);
 
@@ -157,6 +257,22 @@ namespace UnitTests.GitHub.App.ViewModels
 
             [Fact]
             public async Task UpdatesOperationErrorWithExceptionMessage()
+            {
+                var target = CreateTarget(
+                    currentBranch: "master",
+                    existingPrBranch: "pr/123");
+                var pr = CreatePullRequest();
+
+                pr.Head = new GitReferenceModel("source", null, "sha", (string)null);
+
+                await target.Load(pr);
+
+                Assert.False(target.Checkout.CanExecute(null));
+                Assert.Equal("The source repository is no longer available.", target.CheckoutState.DisabledMessage);
+            }
+
+            [Fact]
+            public async Task PullRequestFromGhostAccount()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
@@ -356,6 +472,7 @@ namespace UnitTests.GitHub.App.ViewModels
             var currentBranchModel = new BranchModel(currentBranch, repository);
             repository.CurrentBranch.Returns(currentBranchModel);
             repository.CloneUrl.Returns(new UriString(Uri.ToString()));
+            repository.LocalPath.Returns(@"C:\projects\ThisRepo");
 
             var pullRequestService = Substitute.For<IPullRequestService>();
 

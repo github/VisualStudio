@@ -353,13 +353,12 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
-                                            <TextBlock Text="[add]" VerticalAlignment="Center" Opacity="0.5">
+                                            <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Added">
-                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -408,13 +407,12 @@
                                                                 </Style>
                                                             </TextBlock.Style>
                                                         </TextBlock>
-                                                        <TextBlock Text="[add]" VerticalAlignment="Center" Opacity="0.5">
+                                                        <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
-                                                                    <Setter Property="Visibility" Value="Collapsed"/>
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Status}" Value="Added">
-                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                        <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>

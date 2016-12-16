@@ -159,7 +159,7 @@ namespace GitHub.Services
                     current = initial + '-' + index++;
                 }
 
-                return Observable.Return(current);
+                return Observable.Return(current.TrimEnd('-'));
             });
         }
 
@@ -170,6 +170,17 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, repo.Head.Remote.Name);
                 return Observable.Return(repo.Head.TrackingDetails);
+            });
+        }
+
+        public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        {
+            return Observable.Defer(async () =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                await gitClient.Fetch(repo, "origin");
+                var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
+                return Observable.Return(changes);
             });
         }
 
