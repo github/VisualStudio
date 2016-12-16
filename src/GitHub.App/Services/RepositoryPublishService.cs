@@ -3,9 +3,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Helpers;
 using GitHub.Models;
 using LibGit2Sharp;
 
@@ -42,7 +40,7 @@ namespace GitHub.Services
             IApiClient apiClient)
         {
             return Observable.Defer(() => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
-                             .SelectMany(async remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = await GetActiveRepo() }))
+                                     .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = vsGitServices.GetActiveRepo() }))
                              .SelectMany(async repo =>
                              {
                                  await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl));
@@ -51,12 +49,6 @@ namespace GitHub.Services
                                  await gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin");
                                  return repo.RemoteRepo;
                              });
-        }
-
-        async Task<IRepository> GetActiveRepo()
-        {
-            await ThreadingHelper.SwitchToMainThreadAsync();
-            return vsGitServices.GetActiveRepo();
         }
     }
 }
