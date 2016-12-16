@@ -129,16 +129,25 @@ namespace GitHub.VisualStudio.UI.Views
 
         async Task DoOpenFile(IPullRequestFileNode file)
         {
-            var fileName = await ViewModel.ExtractFile(file);
-            var window = Services.Dte.ItemOperations.OpenFile(fileName);
+            try
+            {
+                var fileName = await ViewModel.ExtractFile(file);
+                var window = Services.Dte.ItemOperations.OpenFile(fileName);
 
-            // If the file we extracted isn't the current file on disk, make the window read-only.
-            window.Document.ReadOnly = fileName != file.DirectoryPath;
+                // If the file we extracted isn't the current file on disk, make the window read-only.
+                window.Document.ReadOnly = fileName != file.DirectoryPath;
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error opening file", e);
+            }
         }
 
         async Task DoDiffFile(IPullRequestFileNode file)
         {
-            var fileNames = await ViewModel.ExtractDiffFiles(file);
+            try
+            {
+                var fileNames = await ViewModel.ExtractDiffFiles(file);
             var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
             var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
 
@@ -154,6 +163,17 @@ namespace GitHub.VisualStudio.UI.Views
                 (int)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
+            }
+            catch (Exception e)
+            {
+                ShowErrorInStatusBar("Error opening file", e);
+            }
+        }
+
+        void ShowErrorInStatusBar(string message, Exception e)
+        {
+            var ns = Services.DefaultExportProvider.GetExportedValue<IStatusBarNotificationService>();
+            ns?.ShowMessage(message + ": " + e.Message);
         }
 
         void FileListMouseDoubleClick(object sender, MouseButtonEventArgs e)

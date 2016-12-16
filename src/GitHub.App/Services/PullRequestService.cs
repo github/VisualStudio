@@ -260,6 +260,12 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 await gitClient.Fetch(repo, "origin");
                 var result = await GetFileFromRepositoryOrApi(repository, repo, modelService, commitSha, fileName, fileSha);
+
+                if (result == null)
+                {
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{commitSha}");
+                }
+
                 return Observable.Return(result);
             });
         }
@@ -282,6 +288,17 @@ namespace GitHub.Services
                 // The right file - if it comes from a fork - may not be fetched so fall back to
                 // getting the file contents from the model service.
                 var right = await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
+
+                if (left == null)
+                {
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Base.Sha}");
+                }
+
+                if (right == null)
+                {
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Head.Sha}");
+                }
+
                 return Observable.Return(Tuple.Create(left, right));
             });
         }
