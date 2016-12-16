@@ -107,7 +107,11 @@
   <DockPanel Margin="6,6,6,0">
 
     <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
-      <Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
@@ -131,12 +135,6 @@
                          IsEnabled="{Binding IsLoaded}"
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"/>
-          
-        <Separator Style="{StaticResource VerticalSeparator}" />
-
-        <ui:LinkDropDown IsEnabled="{Binding IsLoaded}"
-                         ItemsSource="{Binding SortOrders}"
-                         SelectedItem="{Binding SelectedSortOrder}" />
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"
@@ -145,6 +143,12 @@
                                              RelativeSource={RelativeSource FindAncestor,
                                                                             AncestorType={x:Type local:PullRequestListView}}}"
                            Content="Create New" />
+
+      <WrapPanel Grid.Column="0" Grid.Row="1" Margin="0,10,0,0"  HorizontalAlignment="Stretch">
+          <ui:LinkDropDown IsEnabled="{Binding IsLoaded}"
+                      ItemsSource="{Binding SortOrders}"
+                      SelectedItem="{Binding SelectedSortOrder}" />
+      </WrapPanel>
     </Grid>
 
     <ListView x:Name="pullRequests"
