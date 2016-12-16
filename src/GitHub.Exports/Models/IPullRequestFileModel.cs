@@ -11,6 +11,7 @@
     public interface IPullRequestFileModel
     {
         string FileName { get; }
+        string Sha { get; }
         PullRequestFileStatus Status { get; }
     }
 }
