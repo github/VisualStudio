@@ -271,7 +271,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Unit> RemoteUnusedRemotes(ILocalRepositoryModel repository)
+        public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
