@@ -2,10 +2,9 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
-using LibGit2Sharp;
+using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -40,6 +39,7 @@ namespace GitHub.Services
             IApiClient apiClient)
         {
             return Observable.Defer(() => apiClient.CreateRepository(newRepository, account.Login, account.IsUser)
+                                     .ObserveOn(RxApp.MainThreadScheduler)
                                      .Select(remoteRepo => new { RemoteRepo = remoteRepo, LocalRepo = vsGitServices.GetActiveRepo() }))
                              .SelectMany(async repo =>
                              {
