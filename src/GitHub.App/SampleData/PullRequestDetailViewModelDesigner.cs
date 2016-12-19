@@ -39,8 +39,8 @@ namespace GitHub.SampleData
                 CommitCount = 9,
             };
 
-            SourceBranchDisplayName = "shana/error-handling";
-            TargetBranchDisplayName = "master";
+            SourceBranchDisplayName = "shana/error-handling-a-ridiculously-long-branch-name-because-why-not";
+            TargetBranchDisplayName = "master-is-always-stable";
             Body = @"Adds a way to surface errors from the view model to the view so that view hosts can get to them.
 
 ViewModels are responsible for handling the UI on the view they control, but they shouldn't be handling UI for things outside of the view. In this case, we're showing errors in VS outside the view, and that should be handled by the section that is hosting the view.
