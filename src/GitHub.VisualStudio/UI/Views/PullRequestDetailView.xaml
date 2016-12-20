@@ -22,7 +22,8 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner>
+                <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
+                                                               TargetBranchDisplayName="master-is-always-stable">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
@@ -134,10 +135,10 @@
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <!-- source and target branches -->
-                <Grid Margin="0 -3">
+                <Grid Margin="0 -3" HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
@@ -171,7 +172,7 @@
                                          Content="{Binding CheckoutState.Caption}"
                                          Grid.Column="2"
                                          VerticalAlignment="Center"
-                                         TextWrapping="Wrap"
+                                         TextTrimming="CharacterEllipsis"
                                          Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
                                          ToolTip="{Binding CheckoutState.DisabledMessage}"
                                          ToolTipService.ShowOnDisabled="True"/>
