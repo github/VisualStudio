@@ -172,7 +172,7 @@
                                          Content="{Binding CheckoutState.Caption}"
                                          Grid.Column="2"
                                          VerticalAlignment="Center"
-                                         TextWrapping="Wrap"
+                                         TextTrimming="CharacterEllipsis"
                                          Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
                                          ToolTip="{Binding CheckoutState.DisabledMessage}"
                                          ToolTipService.ShowOnDisabled="True"/>
