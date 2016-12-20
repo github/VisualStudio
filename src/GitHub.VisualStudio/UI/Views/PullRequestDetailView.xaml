@@ -22,7 +22,8 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner>
+                <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
+                                                               TargetBranchDisplayName="master-is-always-stable">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
