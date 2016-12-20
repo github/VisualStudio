@@ -13,6 +13,7 @@
                                       xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                       xmlns:conv="clr-namespace:GitHub.UI.Converters;assembly=GitHub.UI"
                                       xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
+                                      xmlns:automation="clr-namespace:GithubVSAutomationIDs;assembly=GithubVSAutomationIDs"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -102,7 +103,8 @@
                                      ItemsSource="{Binding Branches}"
                                      SelectedItem="{Binding TargetBranch}"
                                      ToolTip="Select a branch"
-                                     Margin="0,1,0,0">
+                                     Margin="0,1,0,0"
+                                     AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestTargetBranchComboBox}" >
                         <ui:LinkDropDown.ItemTemplate>
                             <DataTemplate DataType="models:BranchModel">
                                 <TextBlock>
@@ -140,7 +142,8 @@
                                      HorizontalAlignment="Left"
                                      Content="{Binding SourceBranch.Name}"
                                      HasDropDown="False"
-                                     Grid.Column="1"/>
+                                     Grid.Column="1"
+                                     AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestSourceBranchHyperlink}"/>
             </Grid>
         </DockPanel>
 
