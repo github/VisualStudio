@@ -135,17 +135,39 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
-        public async Task IncrementPullRequestOpened()
+        public async Task IncrementPullRequestCheckOutCount(bool fork)
         {
             var usage = await LoadUsage();
-            ++usage.Model.NumberOfPullRequestsOpened;
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestsCheckedOut;
+            else
+                ++usage.Model.NumberOfLocalPullRequestsCheckedOut;
+
             SaveUsage(usage);
         }
 
-        public async Task IncrementPullRequestCheckedOut()
+        public async Task IncrementPullRequestPushCount(bool fork)
         {
             var usage = await LoadUsage();
-            ++usage.Model.NumberOfPullRequestsCheckedOut;
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestPushes;
+            else
+                ++usage.Model.NumberOfLocalPullRequestPushes;
+
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPullRequestPullCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestPulls;
+            else
+                ++usage.Model.NumberOfLocalPullRequestPulls;
+
             SaveUsage(usage);
         }
 
@@ -301,7 +323,12 @@ namespace GitHub.Services
             usage.NumberOfLogins = 0;
             usage.NumberOfUpstreamPullRequests = 0;
             usage.NumberOfPullRequestsOpened = 0;
-            usage.NumberOfPullRequestsCheckedOut = 0;
+            usage.NumberOfLocalPullRequestsCheckedOut = 0;
+            usage.NumberOfLocalPullRequestPulls = 0;
+            usage.NumberOfLocalPullRequestPushes = 0;
+            usage.NumberOfForkPullRequestsCheckedOut = 0;
+            usage.NumberOfForkPullRequestPulls = 0;
+            usage.NumberOfForkPullRequestPushes = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;

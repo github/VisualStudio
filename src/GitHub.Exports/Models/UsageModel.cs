@@ -21,7 +21,12 @@ namespace GitHub.Models
         public int NumberOfLinkToGitHub { get; set; }
         public int NumberOfLogins { get; set; }
         public int NumberOfPullRequestsOpened { get; set; }
-        public int NumberOfPullRequestsCheckedOut { get; set; }
+        public int NumberOfLocalPullRequestsCheckedOut { get; set; }
+        public int NumberOfLocalPullRequestPulls { get; set; }
+        public int NumberOfLocalPullRequestPushes { get; set; }
+        public int NumberOfForkPullRequestsCheckedOut { get; set; }
+        public int NumberOfForkPullRequestPulls { get; set; }
+        public int NumberOfForkPullRequestPushes { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
@@ -44,7 +49,12 @@ namespace GitHub.Models
                 NumberOfLinkToGitHub = NumberOfLinkToGitHub,
                 NumberOfLogins = NumberOfLogins,
                 NumberOfPullRequestsOpened = NumberOfPullRequestsOpened,
-                NumberOfPullRequestsCheckedOut = NumberOfPullRequestsCheckedOut,
+                NumberOfLocalPullRequestsCheckedOut = NumberOfLocalPullRequestsCheckedOut,
+                NumberOfLocalPullRequestPulls = NumberOfLocalPullRequestPulls,
+                NumberOfLocalPullRequestPushes = NumberOfLocalPullRequestPushes,
+                NumberOfForkPullRequestsCheckedOut = NumberOfForkPullRequestsCheckedOut,
+                NumberOfForkPullRequestPulls = NumberOfForkPullRequestPulls,
+                NumberOfForkPullRequestPushes = NumberOfForkPullRequestPushes,
             };
         }
     }

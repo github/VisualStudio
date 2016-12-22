@@ -41,6 +41,7 @@ namespace GitHub.ViewModels
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
+        bool isFromFork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -159,6 +160,15 @@ namespace GitHub.ViewModels
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request comes from a fork.
+        /// </summary>
+        public bool IsFromFork
+        {
+            get { return isFromFork; }
+            private set { this.RaiseAndSetIfChanged(ref isFromFork, value); }
         }
 
         /// <summary>
@@ -293,6 +303,7 @@ namespace GitHub.ViewModels
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
             SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
+            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, pullRequest);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
 
             ChangedFilesTree.Clear();
@@ -349,7 +360,6 @@ namespace GitHub.ViewModels
             IsBusy = false;
 
             pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
-            usageTracker.IncrementPullRequestOpened().Forget();
         }
 
         /// <summary>
@@ -461,7 +471,7 @@ namespace GitHub.ViewModels
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
 
-                usageTracker.IncrementPullRequestCheckedOut().Forget();
+                usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget();
 
                 if (localBranches.Count > 0)
                 {
@@ -478,11 +488,13 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoPull(object unused)
         {
+            usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget();
             return pullRequestsService.Pull(repository);
         }
 
         IObservable<Unit> DoPush(object unused)
         {
+            usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget();
             return pullRequestsService.Push(repository);
         }
 

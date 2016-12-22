@@ -74,6 +74,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public IPullRequestModel Model { get; }
         public string SourceBranchDisplayName { get; }
         public string TargetBranchDisplayName { get; }
+        public bool IsFromFork { get; }
         public string Body { get; }
         public ChangedFilesViewType ChangedFilesViewType { get; set; }
         public OpenChangedFileAction OpenChangedFileAction { get; set; }
