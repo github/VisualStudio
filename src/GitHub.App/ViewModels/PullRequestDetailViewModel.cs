@@ -348,7 +348,7 @@ namespace GitHub.ViewModels
 
             IsBusy = false;
 
-            pullRequestsService.RemoteUnusedRemotes(repository).Subscribe(_ => { });
+            pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
             usageTracker.IncrementPullRequestOpened().Forget();
         }
 
@@ -360,7 +360,7 @@ namespace GitHub.ViewModels
         public Task<string> ExtractFile(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractFile(repository, model.Head.Sha, path).ToTask();
+            return pullRequestsService.ExtractFile(repository, modelService, model.Head.Sha, path, file.Sha).ToTask();
         }
 
         /// <summary>
@@ -371,13 +371,13 @@ namespace GitHub.ViewModels
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(repository, model, path).ToTask();
+            return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path, file.Sha).ToTask();
         }
 
         IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IPullRequestModel pullRequest, TreeChanges changes)
         {
             return pullRequest.ChangedFiles
-                .Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Status, GetStatusDisplay(x, changes)));
+                .Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Sha, x.Status, GetStatusDisplay(x, changes)));
         }
 
         static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
