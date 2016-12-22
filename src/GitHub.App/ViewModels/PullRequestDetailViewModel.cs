@@ -288,6 +288,10 @@ namespace GitHub.ViewModels
         {
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
+            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
+            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, pullRequest);
+            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
 
             IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
@@ -483,7 +487,7 @@ namespace GitHub.ViewModels
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
 
-                usageTracker.IncrementPullRequestCheckedOut().Forget();
+                usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget();
 
                 if (localBranches.Count > 0)
                 {

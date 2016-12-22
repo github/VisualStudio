@@ -360,8 +360,6 @@ namespace GitHub.Services
             usage.NumberOfForkPullRequestsCheckedOut = 0;
             usage.NumberOfForkPullRequestPulls = 0;
             usage.NumberOfForkPullRequestPushes = 0;
-            usage.NumberOfPullRequestsOpened = 0;
-            usage.NumberOfPullRequestsCheckedOut = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;

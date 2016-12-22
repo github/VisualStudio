@@ -32,7 +32,5 @@ namespace GitHub.Services
         public Task IncrementWelcomeDocsClicks() => inner.IncrementWelcomeDocsClicks();
         public Task IncrementWelcomeTrainingClicks() => inner.IncrementWelcomeTrainingClicks();
         public Task IncrementGitHubPaneHelpClicks() => inner.IncrementGitHubPaneHelpClicks();
-        public Task IncrementPullRequestOpened() => inner.IncrementPullRequestOpened();
-        public Task IncrementPullRequestCheckedOut() => inner.IncrementPullRequestCheckedOut();
     }
 }
