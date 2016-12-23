@@ -290,7 +290,7 @@ namespace GitHub.ViewModels
             var prFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Base.Label);
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
+            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
@@ -322,29 +322,29 @@ namespace GitHub.ViewModels
                 if (pullEnabled)
                 {
                     pullToolTip = string.Format(
-                        "Pull from {0} branch {1}",
-                        prFromFork ? "fork" : "remote",
+                        Resources.PullRequestDetailsPullToolTip,
+                        prFromFork ? Resources.Fork : Resources.Remote,
                         SourceBranchDisplayName);
                 }
                 else
                 {
-                    pullToolTip = "No commits to pull";
+                    pullToolTip = Resources.NoCommitsToPull;
                 }
 
                 if (pushEnabled)
                 {
                     pushToolTip = string.Format(
-                        "Push to {0} branch {1}",
-                        prFromFork ? "fork" : "remote",
+                        Resources.PullRequestDetailsPushToolTip,
+                        prFromFork ? Resources.Fork : Resources.Remote,
                         SourceBranchDisplayName);
                 }
                 else if (divergence.AheadBy == 0)
                 {
-                    pushToolTip = "No commits to push";
+                    pushToolTip = Resources.NoCommitsToPush;
                 }
                 else
                 {
-                    pushToolTip = "You must pull before you can push";
+                    pushToolTip = Resources.MustPullBeforePush;
                 }
 
                 UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
@@ -353,18 +353,18 @@ namespace GitHub.ViewModels
             else
             {
                 var caption = localBranches.Count > 0 ?
-                    "Checkout " + localBranches.First().DisplayName :
-                    "Checkout to " + (await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
+                    string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
+                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
                 var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
                 string disabled = null;
 
                 if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
                 {
-                    disabled = "The source repository is no longer available.";
+                    disabled = Resources.SourceRepositoryNoLongerAvailable;
                 }
                 else if (!clean)
                 {
-                    disabled = "Cannot checkout as your working directory has uncommitted changes.";
+                    disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
                 }
 
                 CheckoutState = new CheckoutCommandState(caption, disabled);
@@ -449,7 +449,7 @@ namespace GitHub.ViewModels
             }
             else
             {
-                return "[invalid]";
+                return Resources.InvalidBranchName;
             }
         }
 
@@ -458,7 +458,7 @@ namespace GitHub.ViewModels
             switch (file.Status)
             {
                 case PullRequestFileStatus.Added:
-                    return "add";
+                    return Resources.AddedFileStatus;
                 case PullRequestFileStatus.Renamed:
                     var fileName = file.FileName.Replace("/", "\\");
                     var change = changes?.Renamed.FirstOrDefault(x => x.Path == fileName);
@@ -470,7 +470,7 @@ namespace GitHub.ViewModels
                     }
                     else
                     {
-                        return "rename";
+                        return Resources.RenamedFileStatus;
                     }
                 default:
                     return null;
