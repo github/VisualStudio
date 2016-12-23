@@ -348,4 +348,31 @@
   <data name="SignInCallToAction" xml:space="preserve">
     <value>Sign in...</value>
   </data>
+  <data name="LocalBranchUpToDate" xml:space="preserve">
+    <value>Local branch up to date</value>
+  </data>
+  <data name="ChangesCountFormat" xml:space="preserve">
+    <value>Changes ({0})</value>
+  </data>
+  <data name="CompareFile" xml:space="preserve">
+    <value>Compare File</value>
+  </data>
+  <data name="CompareFileAsDefaultAction" xml:space="preserve">
+    <value>Compare File as Default Action</value>
+  </data>
+  <data name="OpenFile" xml:space="preserve">
+    <value>Open File</value>
+  </data>
+  <data name="OpenFileAsDefaultAction" xml:space="preserve">
+    <value>Open File as Default Action</value>
+  </data>
+  <data name="SwitchToListView" xml:space="preserve">
+    <value>Switch to List View</value>
+  </data>
+  <data name="SwitchToTreeView" xml:space="preserve">
+    <value>Switch to Tree View</value>
+  </data>
+  <data name="UpdatedFormat" xml:space="preserve">
+    <value>updated {0}</value>
+  </data>
 </root>
