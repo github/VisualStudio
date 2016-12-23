@@ -9,10 +9,12 @@
              xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
+             xmlns:automation="clr-namespace:GithubVSAutomationIDs;assembly=GithubVSAutomationIDs"
              mc:Ignorable="d"
              d:DesignWidth="414"
              d:DesignHeight="440"
-             Style="{DynamicResource DialogUserControl}">
+             Style="{DynamicResource DialogUserControl}"
+             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SignInCustom}">
 
     <UserControl.Resources>
         <ResourceDictionary>

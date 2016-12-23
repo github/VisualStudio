@@ -15,7 +15,8 @@
                                   d:DesignWidth="300"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
                                   DataContext="{Binding ViewModel}"
-                                  mc:Ignorable="d">
+                                  mc:Ignorable="d"
+                                  AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListViewCustom}">
 
   <d:DesignProperties.DataContext>
     <Binding>
@@ -116,14 +117,16 @@
 
         <ui:LinkDropDown IsEnabled="{Binding IsLoaded}"
                          ItemsSource="{Binding States}"
-                         SelectedItem="{Binding SelectedState}"/>
+                         SelectedItem="{Binding SelectedState}"
+                         AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListStatusFilterComboBox}" />
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:LinkDropDown Header="Assignee"
                          IsEnabled="{Binding IsLoaded}"
                          ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
-                         SelectedItem="{Binding SelectedAssignee}"/>
+                         SelectedItem="{Binding SelectedAssignee}"
+                         AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
           
         <Separator Style="{StaticResource VerticalSeparator}" />
 
@@ -139,7 +142,8 @@
                            Command="{Binding CreatePR,
                                              RelativeSource={RelativeSource FindAncestor,
                                                                             AncestorType={x:Type local:PullRequestListView}}}"
-                           Content="Create New" />
+                           Content="Create New"
+                           AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateNewHyperlink}" />
     </Grid>
 
     <ListView x:Name="pullRequests"
