@@ -91,6 +91,8 @@ namespace GitHub.Controllers
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class UIController : IUIController, IDisposable
     {
+        static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+
         internal enum Trigger
         {
             None,
@@ -168,10 +170,21 @@ namespace GitHub.Controllers
             ConfigureLogicStates();
 
             uiStateMachine = new StateMachineType(UIViewType.None);
+            uiStateMachine.OnUnhandledTrigger((viewType, trigger) =>
+            {
+                log.Warn("UIMachine Unhandled {0} from {1}",  trigger,  viewType);
+            });
+            uiStateMachine.OnTransitioned(transition1 =>
+            {
+                var source = transition1.Source;
+                var destination = transition1.Destination;
+                var trigger = transition1.Trigger;
+
+                log.Info(CultureInfo.InvariantCulture, "UIMachine Transitioned from {0} by {1} to {2}", source, trigger, destination);
+            });
+
             triggers = new Dictionary<Trigger, StateMachineType.TriggerWithParameters<ViewWithData>>();
-
             ConfigureUIHandlingStates();
-
         }
 
         public IObservable<LoadData> SelectFlow(UIControllerFlow choice)
@@ -210,7 +223,7 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
                     {
-                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        log.Info("Start");
                         Fire(Trigger.Next);
                     });
             }
@@ -250,7 +263,7 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => { }, () =>
                     {
-                        Debug.WriteLine("Start ({0})", GetHashCode());
+                        log.Info("Start");
                         Fire(Trigger.Next);
                     });
             }
@@ -258,9 +271,15 @@ namespace GitHub.Controllers
 
         public void Jump(ViewWithData where)
         {
-            Debug.Assert(where.ActiveFlow == mainFlow, "Jump called for flow " + where.ActiveFlow + " but this is " + mainFlow);
             if (where.ActiveFlow != mainFlow)
-                return;
+            {
+                var message = string.Format(CultureInfo.InvariantCulture,
+                    "Jump called for flow {0} but this is {1}",
+                    where.ActiveFlow,
+                    mainFlow);
+
+                throw new ArgumentException(message);
+            }
 
             requestedTarget = where;
             if (activeFlow == where.ActiveFlow)
@@ -272,7 +291,7 @@ namespace GitHub.Controllers
             if (stopping || transition == null)
                 return;
 
-            Debug.WriteLine("Stopping {0} ({1})", activeFlow + (activeFlow != mainFlow ? " and " + mainFlow : ""), GetHashCode());
+            log.Info(CultureInfo.InvariantCulture, "Stopping {0}", activeFlow + (activeFlow != mainFlow ? " and " + mainFlow : ""));
             stopping = true;
             Fire(Trigger.Finish);
         }
@@ -428,8 +447,24 @@ namespace GitHub.Controllers
         {
             StateMachine<UIViewType, Trigger> logic;
 
+            Action<UIViewType, Trigger> onUnhandledTriggerAction = (viewType, trigger) => 
+            {
+                log.Warn("LogicMachine Unhandled {0} from {1}", trigger, viewType);
+            };
+            Action<StateMachineType.Transition> onTransitionAction = transition1 =>
+            {
+                var source = transition1.Source;
+                var destination = transition1.Destination;
+                var trigger = transition1.Trigger;
+
+                log.Info(CultureInfo.InvariantCulture, "LogicMachine Transitioned from {0} by {1} to {2}", source, trigger, destination);
+            };
+
             // no selected flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
+
             logic.Configure(UIViewType.None)
                 .Ignore(Trigger.Next)
                 .Ignore(Trigger.Finish);
@@ -437,6 +472,8 @@ namespace GitHub.Controllers
 
             // authentication flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Login)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -455,6 +492,8 @@ namespace GitHub.Controllers
 
             // clone flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Clone)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -468,6 +507,8 @@ namespace GitHub.Controllers
 
             // create flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Create)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -481,6 +522,8 @@ namespace GitHub.Controllers
 
             // publish flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Publish)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -494,20 +537,32 @@ namespace GitHub.Controllers
 
             // pr flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 // allows jumping to a specific view
-                .PermitDynamic(Trigger.Next, () => 
-                    requestedTarget == null || requestedTarget.ViewType == UIViewType.None
-                        ? UIViewType.PRList
-                        : requestedTarget.ViewType)
+                .PermitDynamic(Trigger.Next, () =>
+                {
+                    if (requestedTarget == null || requestedTarget.ViewType == UIViewType.None)
+                    {
+                        return UIViewType.PRList;
+                    }
+
+                    return requestedTarget.ViewType;
+                })
                 .Permit(Trigger.Finish, UIViewType.End);
 
             logic.Configure(UIViewType.PRList)
                 // allows jumping to a specific view or reload the current view
                 .PermitDynamic(Trigger.Next, () =>
-                    requestedTarget == null || requestedTarget.ViewType == UIViewType.None
-                        ? UIViewType.PRList
-                        : requestedTarget.ViewType)
+                {
+                    if (requestedTarget == null || requestedTarget.ViewType == UIViewType.None)
+                    {
+                        return UIViewType.PRList;
+                    }
+
+                    return requestedTarget.ViewType;
+                })
                 .Permit(Trigger.PRDetail, UIViewType.PRDetail)
                 .Permit(Trigger.PRCreation, UIViewType.PRCreation)
                 .Permit(Trigger.Cancel, UIViewType.End)
@@ -516,22 +571,38 @@ namespace GitHub.Controllers
             logic.Configure(UIViewType.PRDetail)
                 // allows jumping to a specific view or reload the current view
                 .PermitDynamic(Trigger.Next, () =>
-                    requestedTarget == null
-                        ? UIViewType.PRList
-                        : requestedTarget.ViewType == UIViewType.None
-                            ? UIViewType.PRDetail 
-                            : requestedTarget.ViewType)
+                {
+                    if (requestedTarget == null)
+                    {
+                        return UIViewType.PRList;
+                    }
+
+                    if (requestedTarget.ViewType == UIViewType.None)
+                    {
+                        return UIViewType.PRDetail;
+                    }
+
+                    return requestedTarget.ViewType;
+                })
                 .Permit(Trigger.Cancel, UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
 
             logic.Configure(UIViewType.PRCreation)
                 // allows jumping to a specific view or reload the current view
                 .PermitDynamic(Trigger.Next, () =>
-                    requestedTarget == null
-                        ? UIViewType.PRList
-                        : requestedTarget.ViewType == UIViewType.None
-                            ? UIViewType.PRDetail
-                            : requestedTarget.ViewType)
+                {
+                    if (requestedTarget == null)
+                    {
+                        return UIViewType.PRList;
+                    }
+
+                    if (requestedTarget.ViewType == UIViewType.None)
+                    {
+                        return UIViewType.PRDetail;
+                    }
+
+                    return requestedTarget.ViewType;
+                })
                 .Permit(Trigger.Cancel, UIViewType.PRList)
                 .Permit(Trigger.Finish, UIViewType.End);
 
@@ -541,6 +612,8 @@ namespace GitHub.Controllers
 
             // gist flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.Gist)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -554,6 +627,8 @@ namespace GitHub.Controllers
 
             // logout required flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.LogoutRequired)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -567,6 +642,8 @@ namespace GitHub.Controllers
 
             // start page clone flow
             logic = new StateMachine<UIViewType, Trigger>(UIViewType.None);
+            logic.OnUnhandledTrigger(onUnhandledTriggerAction);
+            logic.OnTransitioned(onTransitionAction);
             logic.Configure(UIViewType.None)
                 .Permit(Trigger.Next, UIViewType.StartPageClone)
                 .Permit(Trigger.Finish, UIViewType.End);
@@ -784,7 +861,6 @@ namespace GitHub.Controllers
             return firstTime;
         }
 
-
         /// <summary>
         /// Returns the view/viewmodel pair for a given flow
         /// </summary>
@@ -816,7 +892,7 @@ namespace GitHub.Controllers
         UIViewType Go(Trigger trigger, UIControllerFlow flow)
         {
             var m = machines[flow];
-            Debug.WriteLine("Firing {0} from {1} for flow {2} ({3})", trigger, m.State, flow, GetHashCode());
+            log.Info(CultureInfo.InvariantCulture, "LogicMachine Firing {0} from {1}", trigger, uiStateMachine.State);
             m.Fire(trigger);
             return m.State;
         }
@@ -846,7 +922,7 @@ namespace GitHub.Controllers
                 if (disposed) return;
                 disposed = true;
 
-                Debug.WriteLine("Disposing ({0})", GetHashCode());
+                log.Info("Disposing");
 
                 if (connectionAdded != null)
                     connectionManager.Connections.CollectionChanged -= connectionAdded;
