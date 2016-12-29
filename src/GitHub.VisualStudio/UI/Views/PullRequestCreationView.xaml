@@ -152,7 +152,8 @@
                             Margin="10,5"
                             Text="{Binding PRTitle, UpdateSourceTrigger=PropertyChanged}"
                             PromptText="{x:Static prop:Resources.TitleRequired}"
-                            Style="{DynamicResource GitHubVsPromptTextBox}" />
+                            Style="{DynamicResource GitHubVsPromptTextBox}" 
+                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestCreationTitleTextBox}"/>
 
         <ui:PromptTextBox Grid.Row="2"
                             MinHeight="100"
@@ -162,8 +163,9 @@
                             Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                             Style="{DynamicResource GitHubVsPromptTextBox}"
                             VerticalScrollBarVisibility="Auto"
-                            TextWrapping="Wrap" />
-
+                            TextWrapping="Wrap"
+                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestCreationDescriptionTextBox}"/>
+        
         <uirx:ValidationMessage x:Name="titleValidationMessage"
                                 Grid.Row="3"
                                 Fill="{StaticResource GitHubWarningBrush}"
@@ -177,12 +179,14 @@
                     HorizontalAlignment="Right"
                     Command="{Binding CreatePullRequest}"
                     Content="Create pull request"
-                    Style="{StaticResource GitHubVsPrimaryActionButton}" />
+                    Style="{StaticResource GitHubVsPrimaryActionButton}" 
+                    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestCreationCreateButton}"/>
             <Button DockPanel.Dock="Right"
                     HorizontalAlignment="Right"
                     Command="{Binding Cancel}"
                     Content="Cancel"
-                    Style="{StaticResource GitHubVsButton}" />
+                    Style="{StaticResource GitHubVsButton}" 
+                    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestCreationCancelButton}"/>
         </DockPanel>
     </Grid>
 </local:GenericPullRequestCreationView>

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:automation="clr-namespace:GithubVSAutomationIDs;assembly=GithubVSAutomationIDs"
     mc:Ignorable="d" 
     Width="256"
     d:DesignHeight="47"
@@ -19,11 +20,11 @@
         </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" UseLayoutRounding="True" SnapsToDevicePixels="True">
-        <TextBox x:Name="one" />
-        <TextBox x:Name="two" />
-        <TextBox x:Name="three" />
-        <TextBox x:Name="four" />
-        <TextBox x:Name="five" />
-        <TextBox x:Name="six" Margin="0" />
+        <TextBox x:Name="one" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonNumberOneTextBox}" />
+        <TextBox x:Name="two" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonNumberTwoTextBox}" />
+        <TextBox x:Name="three" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonNumberThreeTextBox}" />
+        <TextBox x:Name="four" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonNumberFourTextBox}" />
+        <TextBox x:Name="five" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonNumberFiveTextBox}" />
+        <TextBox x:Name="six" Margin="0"  AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonNumberSixTextBox}" />
     </StackPanel>
 </UserControl>
