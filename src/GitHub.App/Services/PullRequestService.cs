@@ -169,7 +169,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, repo.Head.Remote.Name);
+                if (repo.Head.Remote != null)
+                    await gitClient.Fetch(repo, repo.Head.Remote.Name);
                 return Observable.Return(repo.Head.TrackingDetails);
             });
         }
