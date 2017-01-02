@@ -19,9 +19,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public PulseNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
-                                    ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder, Octicon.pulse)
+        public PulseNavigationItem(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory,
+            Lazy<IVisualStudioBrowser> browser,
+            ITeamExplorerServiceHolder holder)
+            : base(serviceProvider, apiFactory, holder, Octicon.pulse)
         {
             this.browser = browser;
             Text = Resources.PulseNavigationItemText;

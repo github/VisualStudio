@@ -4,21 +4,23 @@ using System;
 
 namespace GitHub.UI
 {
-    public interface IUIController
+    public interface IUIController : IDisposable
     {
-        IObservable<LoadData> SelectFlow(UIControllerFlow choice);
         /// <summary>
         /// Allows listening to the completion state of the ui flow - whether
         /// it was completed because it was cancelled or whether it succeeded.
         /// </summary>
         /// <returns>true for success, false for cancel</returns>
         IObservable<bool> ListenToCompletionState();
-        void Start(IConnection connection);
+        void Start();
         void Stop();
         bool IsStopped { get; }
         UIControllerFlow CurrentFlow { get; }
         UIControllerFlow SelectedFlow { get; }
-        void Jump(ViewWithData where);
+        IObservable<LoadData> TransitionSignal { get; }
+
+        IObservable<LoadData> Configure(UIControllerFlow choice, IConnection connection = null, ViewWithData parameters = null);
+        void Reload();
     }
 
     public enum UIControllerFlow
@@ -28,11 +30,13 @@ namespace GitHub.UI
         Create,
         Clone,
         Publish,
-        PullRequests,
         Gist,
         LogoutRequired,
         Home,
-        StartPageClone
+        StartPageClone,
+        PullRequestList,
+        PullRequestDetail,
+        PullRequestCreation,
     }
 
     public class ViewWithData
@@ -50,22 +54,15 @@ namespace GitHub.UI
         }
     }
 
-    public enum LoadDirection
-    {
-        None,
-        Forward,
-        Back
-    }
-
     public struct LoadData
     {
+        public UIControllerFlow Flow;
         public IView View;
         public ViewWithData Data;
-        public LoadDirection Direction;
 
         public override int GetHashCode()
         {
-            return (View?.GetHashCode() ?? 0) ^ (Data?.GetHashCode() ?? 0) ^ Direction.GetHashCode();
+            return 17 * (23 + Flow.GetHashCode()) * (23 + (View?.GetHashCode() ?? 0)) * (23 + (Data?.GetHashCode() ?? 0));
         }
 
         public override bool Equals(object obj)

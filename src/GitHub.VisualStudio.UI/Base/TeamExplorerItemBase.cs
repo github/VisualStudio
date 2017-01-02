@@ -32,12 +32,15 @@ namespace GitHub.VisualStudio.Base
 
         protected ISimpleApiClientFactory ApiFactory => apiFactory;
 
-        public TeamExplorerItemBase(ITeamExplorerServiceHolder holder)
+        public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider, ITeamExplorerServiceHolder holder)
+            : base(serviceProvider)
         {
             this.holder = holder;
         }
 
-        public TeamExplorerItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+        public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            : base(serviceProvider)
         {
             this.apiFactory = apiFactory;
             this.holder = holder;
@@ -48,11 +51,11 @@ namespace GitHub.VisualStudio.Base
 #if DEBUG
             //VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize", DateTime.Now, GetType());
 #endif
-            ServiceProvider = serviceProvider;
+            TEServiceProvider = serviceProvider;
             Debug.Assert(holder != null, "Could not get an instance of TeamExplorerServiceHolder");
             if (holder == null)
                 return;
-            holder.ServiceProvider = ServiceProvider;
+            holder.ServiceProvider = TEServiceProvider;
             SubscribeToRepoChanges();
 #if DEBUG
             //VsOutputLogger.WriteLine("{0:HHmmssff}\t{1} Initialize DONE", DateTime.Now, GetType());
@@ -81,8 +84,8 @@ namespace GitHub.VisualStudio.Base
         void Unsubscribe()
         {
             holder.Unsubscribe(this);
-            if (ServiceProvider != null)
-                holder.ClearServiceProvider(ServiceProvider);
+            if (TEServiceProvider != null)
+                holder.ClearServiceProvider(TEServiceProvider);
         }
 
         protected virtual void RepoChanged(bool changed)

@@ -108,8 +108,8 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
-            var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+            var repo = Services.PackageServiceProvider.GetServiceSafe<ITeamExplorerServiceHolder>().ActiveRepo;
+            var browser = Services.PackageServiceProvider.GetServiceSafe<IVisualStudioBrowser>();
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);
         }

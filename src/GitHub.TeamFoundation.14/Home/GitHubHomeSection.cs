@@ -21,8 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 
         [ImportingConstructor]
-        public GitHubHomeSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder)
+        public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
             View = new GitHubHomeContent();
@@ -75,19 +76,19 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var notifications = ServiceProvider.GetExportedValue<INotificationDispatcher>();
-            var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
+            var notifications = ServiceProvider.TryGetService<INotificationDispatcher>();
+            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
             notifications.AddListener(teServices);
 
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            uiProvider.GitServiceProvider = ServiceProvider;
-            uiProvider.SetupUI(controllerFlow, null);
-            uiProvider.ListenToCompletionState()
+            ServiceProvider.GitServiceProvider = TEServiceProvider;
+            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
+            var controller = uiProvider.Configure(controllerFlow);
+            controller.ListenToCompletionState()
                 .Subscribe(success =>
                 {
                     Refresh();
                 });
-            uiProvider.RunUI();
+            uiProvider.RunInDialog(controller);
 
             notifications.RemoveListener();
         }

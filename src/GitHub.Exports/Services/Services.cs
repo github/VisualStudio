@@ -41,6 +41,8 @@ namespace GitHub.VisualStudio
             return Package.GetGlobalService(typeof(T)) as Ret;
         }
 
+        public static IGitHubServiceProvider GitHubServiceProvider => GetGlobalService<IGitHubServiceProvider, IGitHubServiceProvider>();
+
         public static IComponentModel ComponentModel => GetGlobalService<SComponentModel, IComponentModel>();
         public static ExportProvider DefaultExportProvider => ComponentModel.DefaultExportProvider;
 

@@ -9,6 +9,10 @@ using System.Reactive.Subjects;
 using System.Windows.Input;
 using GitHub.Services;
 using GitHub.Primitives;
+using System.Diagnostics;
+using System.Reactive.Linq;
+using System.Windows;
+using System.Reactive.Disposables;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -17,50 +21,56 @@ namespace GitHub.VisualStudio.UI.Views
 
     [ExportView(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class PullRequestListView : GenericPullRequestListView, IHasDetailView, IHasCreationView
+    public partial class PullRequestListView : GenericPullRequestListView, IHasDetail, IHasCreation
     {
-        readonly Subject<ViewWithData> open = new Subject<ViewWithData>();
-        readonly Subject<ViewWithData> create = new Subject<ViewWithData>();
+        readonly Subject<int> open = new Subject<int>();
+        readonly Subject<object> create = new Subject<object>();
 
         public PullRequestListView()
+        {
+            InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public PullRequestListView(IGitHubServiceProvider serviceProvider)
         {
             InitializeComponent();
 
             OpenPR = new RelayCommand(x =>
             {
-                NotifyOpen(new ViewWithData { Data = x });
+                open.OnNext((int)x);
+            });
+
+            CreatePR = new RelayCommand(x =>
+            {
+                create.OnNext(null);
             });
 
             OpenPROnGitHub = new RelayCommand(x =>
             {
-                var repo = Services.PackageServiceProvider.GetExportedValue<ITeamExplorerServiceHolder>().ActiveRepo;
-                var browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+                var repo = serviceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
+                var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
+                Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
+                Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
+                if (repo == null || browser == null)
+                {
+                    return;
+                }
                 var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + x);
                 browser.OpenUrl(url);
             });
-
-            CreatePR = new RelayCommand(x => NotifyCreate());
 
             this.WhenActivated(d =>
             {
             });
         }
 
-        public IObservable<ViewWithData> Open { get { return open; } }
-        public IObservable<ViewWithData> Create { get { return create; } }
-        public ICommand OpenPR { get; set; }
         public ICommand OpenPROnGitHub { get; set; }
+        public ICommand OpenPR { get; set; }
         public ICommand CreatePR { get; set; }
 
-        protected void NotifyOpen(ViewWithData id)
-        {
-            open.OnNext(id);
-        }
-
-        protected void NotifyCreate()
-        {
-            create.OnNext(null);
-        }
+        public IObservable<int> Open => open;
+        public IObservable<object> Create => create;
 
         bool disposed;
         protected override void Dispose(bool disposing)
