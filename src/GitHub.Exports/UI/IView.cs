@@ -15,13 +15,8 @@ namespace GitHub.UI
 
     }
 
-    public interface IHasDetail
+    public interface ICanLoad
     {
-        IObservable<int> Open { get; }
-    }
-
-    public interface IHasCreation
-    {
-        IObservable<object> Create { get; }
+        IObservable<ViewWithData> Load { get; }
     }
 }

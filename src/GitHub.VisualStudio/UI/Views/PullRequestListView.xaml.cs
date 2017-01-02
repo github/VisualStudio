@@ -21,10 +21,11 @@ namespace GitHub.VisualStudio.UI.Views
 
     [ExportView(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class PullRequestListView : GenericPullRequestListView, IHasDetail, IHasCreation
+    public partial class PullRequestListView : GenericPullRequestListView, ICanLoad
     {
         readonly Subject<int> open = new Subject<int>();
         readonly Subject<object> create = new Subject<object>();
+        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
 
         public PullRequestListView()
         {
@@ -38,12 +39,14 @@ namespace GitHub.VisualStudio.UI.Views
 
             OpenPR = new RelayCommand(x =>
             {
-                open.OnNext((int)x);
+                var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = x };
+                load.OnNext(d);
             });
 
             CreatePR = new RelayCommand(x =>
             {
-                create.OnNext(null);
+                var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
+                load.OnNext(d);
             });
 
             OpenPROnGitHub = new RelayCommand(x =>
@@ -69,8 +72,7 @@ namespace GitHub.VisualStudio.UI.Views
         public ICommand OpenPR { get; set; }
         public ICommand CreatePR { get; set; }
 
-        public IObservable<int> Open => open;
-        public IObservable<object> Create => create;
+        public IObservable<ViewWithData> Load => load;
 
         bool disposed;
         protected override void Dispose(bool disposing)

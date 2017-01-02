@@ -99,7 +99,6 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
-    //[ProvideAutoLoad(GitHubPane.GitHubPaneGuid)]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {

@@ -132,28 +132,13 @@ namespace GitHub.VisualStudio.UI.Views
                 {
                     disposablesForCurrentView?.Clear();
 
+                    var action = view as ICanLoad;
+                    if (action != null)
                     {
-                        var action = view as IHasDetail;
-                        if (action != null)
+                        disposablesForCurrentView.Add(action?.Load.Subscribe(d =>
                         {
-                            disposablesForCurrentView.Add(action?.Open.Subscribe(x =>
-                            {
-                                var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = x };
-                                LoadView(connection, d, onViewLoad);
-                            }));
-                        }
-                    }
-
-                    {
-                        var action = view as IHasCreation;
-                        if (action != null)
-                        {
-                            disposablesForCurrentView.Add(action.Create.Subscribe(_ =>
-                            {
-                                var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
-                                LoadView(connection, d, onViewLoad);
-                            }));
-                        }
+                            LoadView(connection, d, onViewLoad);
+                        }));
                     }
                     onViewLoad?.Invoke(view);
                 };
