@@ -125,7 +125,8 @@ namespace GitHub.Services
                 }
                 else if (repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl())
                 {
-                    await gitClient.Fetch(repo, "origin");
+                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    await gitClient.Fetch(repo, remote.Name);
                     await gitClient.Checkout(repo, localBranchName);
                 }
                 else
@@ -178,7 +179,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name);
                 var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
                 return Observable.Return(changes);
             });
@@ -217,13 +219,14 @@ namespace GitHub.Services
 
                 if (branchName != null)
                 {
-                    await gitClient.Fetch(repo, "origin");
+                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    await gitClient.Fetch(repo, remote.Name);
 
                     var branch = repo.Branches[branchName];
 
                     if (branch == null)
                     {
-                        var trackedBranchName = $"refs/remotes/origin/" + branchName;
+                        var trackedBranchName = $"refs/remotes/{remote.Name}/" + branchName;
                         var trackedBranch = repo.Branches[trackedBranchName];
 
                         if (trackedBranch != null)
@@ -265,7 +268,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name);
                 var result = await GetFileFromRepositoryOrApi(repository, repo, modelService, commitSha, fileName, fileSha);
 
                 if (result == null)
@@ -287,7 +291,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name);
 
                 // The left file is the target of the PR so this should already be fetched.
                 var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
