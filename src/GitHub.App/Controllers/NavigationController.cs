@@ -188,6 +188,11 @@ namespace GitHub.Controllers
 
         void Push(IUIController controller)
         {
+            while (history.Count > Pointer + 1)
+            {
+                history.RemoveAt(history.Count - 1);
+            }
+
             history.Add(controller);
             Pointer++;
         }
