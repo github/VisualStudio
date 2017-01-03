@@ -356,11 +356,12 @@ namespace GitHub.VisualStudio.UI.Views
             if (!initialized)
                 return;
 
-            if (!changed)
-                return;
+            if (changed)
+            {
+                Stop();
+                RepositoryOrigin = RepositoryOrigin.Unknown;
+            }
 
-            Stop();
-            RepositoryOrigin = RepositoryOrigin.Unknown;
             Refresh();
         }
 
