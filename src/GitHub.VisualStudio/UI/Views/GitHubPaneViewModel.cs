@@ -79,8 +79,15 @@ namespace GitHub.VisualStudio.UI.Views
                 break;
 
                 case UIControllerFlow.PullRequestDetail:
-                    CreateView(connection, data, onViewLoad);
-                break;
+                    if (data.Data == null && Current?.SelectedFlow == UIControllerFlow.PullRequestDetail)
+                    {
+                        Reload();
+                    }
+                    else
+                    {
+                        CreateView(connection, data, onViewLoad);
+                    }
+                    break;
 
                 case UIControllerFlow.PullRequestList:
                 case UIControllerFlow.Home:
