@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -14,7 +15,7 @@ namespace GitHub.Controllers
     public class NavigationController : NotificationAwareObject, IDisposable, IHasBusy
     {
         readonly List<IUIController> history = new List<IUIController>();
-        readonly Dictionary<UIControllerFlow, IUIController> controllers = new Dictionary<UIControllerFlow, IUIController>();
+        readonly Dictionary<UIControllerFlow, IUIController> reusableControllers = new Dictionary<UIControllerFlow, IUIController>();
         readonly IUIProvider uiProvider;
 
         int current = -1;
@@ -104,27 +105,19 @@ namespace GitHub.Controllers
         {
             IsBusy = true;
 
-            IUIController controller;
-            var exists = controllers.TryGetValue(data.MainFlow, out controller);
-
-            if (exists)
-            {
-                controller.Stop();
-            }
-
-            controller = CreateController(connection, data, onViewLoad);
+            var controller = CreateController(connection, data, onViewLoad);
             Push(controller);
         }
 
         void CreateOrReuseView(IConnection connection, ViewWithData data, Action<IView> onViewLoad)
         {
-            IsBusy = true;
-
             IUIController controller;
-            var exists = controllers.TryGetValue(data.MainFlow, out controller);
+            var exists = reusableControllers.TryGetValue(data.MainFlow, out controller);
 
             if (!exists)
             {
+                IsBusy = true;
+
                 Action<IView> handler = view =>
                 {
                     disposablesForCurrentView?.Clear();
@@ -141,6 +134,7 @@ namespace GitHub.Controllers
                 };
 
                 controller = CreateController(connection, data, handler);
+                reusableControllers.Add(data.MainFlow, controller);
             }
 
             Push(controller);
@@ -188,7 +182,6 @@ namespace GitHub.Controllers
                     Pop(controller);
                     Reload();
                 });
-            controllers.Add(data.MainFlow, controller);
             controller.Start();
             return controller;
         }
@@ -215,7 +208,7 @@ namespace GitHub.Controllers
                     count--;
                 }
             }
-            controllers.Remove(controller.SelectedFlow);
+            reusableControllers.Remove(controller.SelectedFlow);
             controller.Stop();
             Pointer = c;
         }
@@ -229,8 +222,8 @@ namespace GitHub.Controllers
                 {
                     disposed = true;
                     disposablesForCurrentView.Dispose();
-                    controllers.Values.ForEach(c => uiProvider.StopUI(c));
-                    controllers.Clear();
+                    reusableControllers.Values.ForEach(c => uiProvider.StopUI(c));
+                    reusableControllers.Clear();
                     history.Clear();
                 }
             }
