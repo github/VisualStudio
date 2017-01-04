@@ -4,6 +4,7 @@ using System.Diagnostics;
 using GitHub.Primitives;
 using NullGuard;
 using GitHub.Services;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -12,10 +13,21 @@ namespace GitHub.VisualStudio.Base
         public static readonly Guid TeamExplorerConnectionsSectionId = new Guid("ef6a7a99-f01f-4c91-ad31-183c1354dd97");
 
         [AllowNull]
-        protected IServiceProvider ServiceProvider
+        protected IServiceProvider TEServiceProvider
         {
             [return: AllowNull]
             get; set;
+        }
+
+        protected IGitHubServiceProvider ServiceProvider
+        {
+            [return: AllowNull]
+            get;
+        }
+
+        protected TeamExplorerBase(IGitHubServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
         }
 
         public void Dispose()
@@ -26,22 +38,6 @@ namespace GitHub.VisualStudio.Base
 
         protected virtual void Dispose(bool disposing)
         {
-        }
-
-        [return: AllowNull]
-        public T GetService<T>()
-        {
-            Debug.Assert(ServiceProvider != null, "GetService<T> called before service provider is set");
-            if (ServiceProvider == null)
-                return default(T);
-            return (T)ServiceProvider.GetService(typeof(T));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        [return: AllowNull]
-        public Ret GetService<T, Ret>() where Ret : class
-        {
-            return GetService<T>() as Ret;
         }
 
         protected static void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, Uri uri)

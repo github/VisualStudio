@@ -19,9 +19,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         readonly Lazy<IVisualStudioBrowser> browser;
 
         [ImportingConstructor]
-        public IssuesNavigationItem(ISimpleApiClientFactory apiFactory, Lazy<IVisualStudioBrowser> browser,
-                                    ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder, Octicon.issue_opened)
+        public IssuesNavigationItem(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory,
+            Lazy<IVisualStudioBrowser> browser,
+            ITeamExplorerServiceHolder holder)
+            : base(serviceProvider, apiFactory, holder, Octicon.issue_opened)
         {
             this.browser = browser;
             Text = Resources.IssuesNavigationItemText;

@@ -11,7 +11,7 @@ namespace GitHub.VisualStudio.Menus
 
         protected IUsageTracker UsageTracker => usageTracker.Value;
 
-        public LinkMenuBase(IUIProvider serviceProvider)
+        public LinkMenuBase(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
             usageTracker = new Lazy<IUsageTracker>(() => ServiceProvider.TryGetService<IUsageTracker>());

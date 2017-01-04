@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.UI;
+using LibGit2Sharp;
 using NullGuard;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -29,16 +31,17 @@ namespace GitHub.ViewModels
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
+        readonly IUsageTracker usageTracker;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
         string body;
         ChangedFilesViewType changedFilesViewType;
         OpenChangedFileAction openChangedFileAction;
-        CheckoutMode checkoutMode;
-        string checkoutError;
-        int commitsBehind;
-        string checkoutDisabledMessage;
+        IPullRequestCheckoutState checkoutState;
+        IPullRequestUpdateState updateState;
+        string operationError;
+        bool isFromFork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -51,10 +54,14 @@ namespace GitHub.ViewModels
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
-            IPullRequestService pullRequestsService)
+            IPullRequestService pullRequestsService,
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
-                  pullRequestsService)
+                  pullRequestsService,
+                  settings,
+                  usageTracker)
         {
         }
 
@@ -68,32 +75,60 @@ namespace GitHub.ViewModels
         public PullRequestDetailViewModel(
             ILocalRepositoryModel repository,
             IModelService modelService,
-            IPullRequestService pullRequestsService)
+            IPullRequestService pullRequestsService,
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
         {
             this.repository = repository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
+            this.usageTracker = usageTracker;
 
-            var canCheckout = this.WhenAnyValue(
-                x => x.CheckoutMode,
-                x => x.CheckoutDisabledMessage,
-                (mode, disabled) => mode != CheckoutMode.UpToDate && mode != CheckoutMode.Push && disabled == null);
-            Checkout = ReactiveCommand.CreateAsyncObservable(canCheckout, DoCheckout);
+            Checkout = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.CheckoutState)
+                    .Cast<CheckoutCommandState>()
+                    .Select(x => x != null && x.DisabledMessage == null), 
+                DoCheckout);
+            Checkout.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+
+            Pull = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.PullEnabled),
+                DoPull);
+            Pull.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+
+            Push = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.UpdateState)
+                    .Cast<UpdateCommandState>()
+                    .Select(x => x != null && x.PushEnabled),
+                DoPush);
+            Push.ThrownExceptions.Subscribe(x => OperationError = x.Message);
 
             OpenOnGitHub = ReactiveCommand.Create();
+
+            ChangedFilesViewType = (settings.UIState?.PullRequestDetailState?.ShowTree ?? true) ?
+                ChangedFilesViewType.TreeView : ChangedFilesViewType.ListView;
 
             ToggleChangedFilesView = ReactiveCommand.Create();
             ToggleChangedFilesView.Subscribe(_ =>
             {
                 ChangedFilesViewType = ChangedFilesViewType == ChangedFilesViewType.TreeView ?
                     ChangedFilesViewType.ListView : ChangedFilesViewType.TreeView;
+                settings.UIState.PullRequestDetailState.ShowTree = ChangedFilesViewType == ChangedFilesViewType.TreeView;
+                settings.Save();
             });
+
+            OpenChangedFileAction = (settings.UIState?.PullRequestDetailState?.DiffOnOpen ?? true) ?
+                OpenChangedFileAction.Diff : OpenChangedFileAction.Open;
 
             ToggleOpenChangedFileAction = ReactiveCommand.Create();
             ToggleOpenChangedFileAction.Subscribe(_ =>
             {
                 OpenChangedFileAction = OpenChangedFileAction == OpenChangedFileAction.Diff ?
                     OpenChangedFileAction.Open : OpenChangedFileAction.Diff;
+                settings.UIState.PullRequestDetailState.DiffOnOpen = OpenChangedFileAction == OpenChangedFileAction.Diff;
+                settings.Save();
             });
 
             OpenFile = ReactiveCommand.Create();
@@ -128,6 +163,15 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request comes from a fork.
+        /// </summary>
+        public bool IsFromFork
+        {
+            get { return isFromFork; }
+            private set { this.RaiseAndSetIfChanged(ref isFromFork, value); }
+        }
+
+        /// <summary>
         /// Gets the pull request body.
         /// </summary>
         public string Body
@@ -155,40 +199,31 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the checkout mode for the pull request.
+        /// Gets the state associated with the <see cref="Checkout"/> command.
         /// </summary>
-        public CheckoutMode CheckoutMode
+        public IPullRequestCheckoutState CheckoutState
         {
-            get { return checkoutMode; }
-            private set { this.RaiseAndSetIfChanged(ref checkoutMode, value); }
+            get { return checkoutState; }
+            private set { this.RaiseAndSetIfChanged(ref checkoutState, value); }
         }
 
         /// <summary>
-        /// Gets the error message to be displayed below the checkout button.
+        /// Gets the state associated with the <see cref="Pull"/> and <see cref="Push"/> commands.
         /// </summary>
-        public string CheckoutError
+        public IPullRequestUpdateState UpdateState
         {
-            get { return checkoutError; }
-            private set { this.RaiseAndSetIfChanged(ref checkoutError, value); }
+            get { return updateState; }
+            private set { this.RaiseAndSetIfChanged(ref updateState, value); }
         }
 
         /// <summary>
-        /// Gets the number of commits that the current branch is behind the PR when <see cref="CheckoutMode"/>
-        /// is <see cref="CheckoutMode.NeedsPull"/>.
+        /// Gets the error message to be displayed in the action area as a result of an error in a
+        /// git operation.
         /// </summary>
-        public int CommitsBehind
+        public string OperationError
         {
-            get { return commitsBehind; }
-            private set { this.RaiseAndSetIfChanged(ref commitsBehind, value); }
-        }
-
-        /// <summary>
-        /// Gets a message indicating the why the <see cref="Checkout"/> command is disabled.
-        /// </summary>
-        public string CheckoutDisabledMessage
-        {
-            get { return checkoutDisabledMessage; }
-            private set { this.RaiseAndSetIfChanged(ref checkoutDisabledMessage, value); }
+            get { return operationError; }
+            private set { this.RaiseAndSetIfChanged(ref operationError, value); }
         }
 
         /// <summary>
@@ -205,6 +240,16 @@ namespace GitHub.ViewModels
         /// Gets a command that checks out the pull request locally.
         /// </summary>
         public ReactiveCommand<Unit> Checkout { get; }
+
+        /// <summary>
+        /// Gets a command that pulls changes to the current branch.
+        /// </summary>
+        public ReactiveCommand<Unit> Pull { get; }
+
+        /// <summary>
+        /// Gets a command that pushes changes from the current branch.
+        /// </summary>
+        public ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
@@ -225,7 +270,7 @@ namespace GitHub.ViewModels
         /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         public ReactiveCommand<object> OpenFile { get; }
- 
+
         /// <summary>
         /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
@@ -237,11 +282,12 @@ namespace GitHub.ViewModels
         /// <param name="data"></param>
         public override void Initialize([AllowNull] ViewWithData data)
         {
-            var prNumber = (int)data.Data;
+            var prNumber = data?.Data != null ? (int)data.Data : Model.Number;
 
             IsBusy = true;
 
             modelService.GetPullRequest(repository, prNumber)
+                .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Load(x).Forget());
         }
@@ -254,15 +300,20 @@ namespace GitHub.ViewModels
         public async Task Load(IPullRequestModel pullRequest)
         {
             Model = pullRequest;
-            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
+            Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
+
+            var prFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
+            SourceBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Head?.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Base.Label);
+            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
 
+            var treeChanges = await pullRequestsService.GetTreeChanges(repository, pullRequest);
+
             // WPF doesn't support AddRange here so iterate through the changes.
-            foreach (var change in CreateChangedFilesList(pullRequest.ChangedFiles))
+            foreach (var change in CreateChangedFilesList(pullRequest, treeChanges))
             {
                 ChangedFilesList.Add(change);
             }
@@ -273,51 +324,99 @@ namespace GitHub.ViewModels
             }
 
             var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
-            
-            if (localBranches.Contains(repository.CurrentBranch))
+            var isCheckedOut = localBranches.Contains(repository.CurrentBranch);
+
+            if (isCheckedOut)
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
+                var pullEnabled = divergence.BehindBy > 0;
+                var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                string pullToolTip;
+                string pushToolTip;
 
-                if (divergence.BehindBy == null)
+                if (pullEnabled)
                 {
-                    CheckoutMode = CheckoutMode.InvalidState;
-                }
-                else if (divergence.AheadBy > 0)
-                {
-                    CheckoutMode = pullRequestsService.IsPullRequestFromFork(repository, pullRequest) ?
-                        CheckoutMode.InvalidState : CheckoutMode.Push;
-                }
-                else if (divergence.BehindBy == 0)
-                {
-                    CheckoutMode = CheckoutMode.UpToDate;
+                    pullToolTip = string.Format(
+                        Resources.PullRequestDetailsPullToolTip,
+                        prFromFork ? Resources.Fork : Resources.Remote,
+                        SourceBranchDisplayName);
                 }
                 else
                 {
-                    CheckoutMode = CheckoutMode.NeedsPull;
-                    CommitsBehind = divergence.BehindBy.Value;
+                    pullToolTip = Resources.NoCommitsToPull;
                 }
-            }
-            else if (localBranches.Count > 0)
-            {
-                CheckoutMode = CheckoutMode.Switch;
+
+                if (pushEnabled)
+                {
+                    pushToolTip = string.Format(
+                        Resources.PullRequestDetailsPushToolTip,
+                        prFromFork ? Resources.Fork : Resources.Remote,
+                        SourceBranchDisplayName);
+                }
+                else if (divergence.AheadBy == 0)
+                {
+                    pushToolTip = Resources.NoCommitsToPush;
+                }
+                else
+                {
+                    pushToolTip = Resources.MustPullBeforePush;
+                }
+
+                UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
+                CheckoutState = null;
             }
             else
             {
-                CheckoutMode = CheckoutMode.Fetch;
+                var caption = localBranches.Count > 0 ?
+                    string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
+                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
+                var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
+                string disabled = null;
+
+                if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                {
+                    disabled = Resources.SourceRepositoryNoLongerAvailable;
+                }
+                else if (!clean)
+                {
+                    disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
+                }
+
+                CheckoutState = new CheckoutCommandState(caption, disabled);
+                UpdateState = null;
             }
 
-            var clean = await pullRequestsService.IsCleanForCheckout(repository);
-
-            CheckoutDisabledMessage = (!clean && CheckoutMode != CheckoutMode.UpToDate && CheckoutMode != CheckoutMode.Push) ?
-                $"Cannot {GetCheckoutModeDescription(CheckoutMode)} as your working directory has uncommitted changes." :
-                null;
-
             IsBusy = false;
+
+            pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
         }
 
-        static IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IEnumerable<IPullRequestFileModel> files)
+        /// <summary>
+        /// Gets the specified file as it appears in the pull request.
+        /// </summary>
+        /// <param name="file">The file or directory node.</param>
+        /// <returns>The path to the extracted file.</returns>
+        public Task<string> ExtractFile(IPullRequestFileNode file)
         {
-            return files.Select(x => new PullRequestFileNode(x.FileName, x.Status));
+            var path = Path.Combine(file.DirectoryPath, file.FileName);
+            return pullRequestsService.ExtractFile(repository, modelService, model.Head.Sha, path, file.Sha).ToTask();
+        }
+
+        /// <summary>
+        /// Gets the before and after files needed for viewing a diff.
+        /// </summary>
+        /// <param name="file">The changed file.</param>
+        /// <returns>A tuple containing the full path to the before and after files.</returns>
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        {
+            var path = Path.Combine(file.DirectoryPath, file.FileName);
+            return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path, file.Sha).ToTask();
+        }
+
+        IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IPullRequestModel pullRequest, TreeChanges changes)
+        {
+            return pullRequest.ChangedFiles
+                .Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Sha, x.Status, GetStatusDisplay(x, changes)));
         }
 
         static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
@@ -329,28 +428,11 @@ namespace GitHub.ViewModels
 
             foreach (var file in files)
             {
-                var dir = GetDirectory(file.Path, dirs);
+                var dir = GetDirectory(file.DirectoryPath, dirs);
                 dir.Files.Add(file);
             }
 
             return dirs[string.Empty];
-        }
-
-        static string GetCheckoutModeDescription(CheckoutMode checkoutMode)
-        {
-            switch (checkoutMode)
-            {
-                case CheckoutMode.NeedsPull:
-                    return "update branch";
-                case CheckoutMode.Switch:
-                    return "switch branches";
-                case CheckoutMode.Fetch:
-                case CheckoutMode.InvalidState:
-                    return "checkout pull request";
-                default:
-                    Debug.Fail("Invalid CheckoutMode in GetCheckoutModeDescription");
-                    return null;
-            }
         }
 
         static PullRequestDirectoryNode GetDirectory(string path, Dictionary<string, PullRequestDirectoryNode> dirs)
@@ -374,54 +456,109 @@ namespace GitHub.ViewModels
             return dir;
         }
 
-        string GetBranchDisplayName(string targetBranchLabel)
+        static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
         {
             if (targetBranchLabel != null)
             {
-                var parts = targetBranchLabel.Split(':');
-                var owner = parts[0];
-                return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
+                return isFromFork ? targetBranchLabel : targetBranchLabel.Split(':')[1];
             }
             else
             {
-                return "[Invalid]";
+                return Resources.InvalidBranchName;
+            }
+        }
+
+        string GetStatusDisplay(IPullRequestFileModel file, TreeChanges changes)
+        {
+            switch (file.Status)
+            {
+                case PullRequestFileStatus.Added:
+                    return Resources.AddedFileStatus;
+                case PullRequestFileStatus.Renamed:
+                    var fileName = file.FileName.Replace("/", "\\");
+                    var change = changes?.Renamed.FirstOrDefault(x => x.Path == fileName);
+
+                    if (change != null)
+                    {
+                        return Path.GetDirectoryName(change.OldPath) == Path.GetDirectoryName(change.Path) ?
+                            Path.GetFileName(change.OldPath) : change.OldPath;
+                    }
+                    else
+                    {
+                        return Resources.RenamedFileStatus;
+                    }
+                default:
+                    return null;
             }
         }
 
         IObservable<Unit> DoCheckout(object unused)
         {
-            IObservable<Unit> operation = null;
-
-            switch (CheckoutMode)
+            return Observable.Defer(async () =>
             {
-                case CheckoutMode.NeedsPull:
-                    operation = pullRequestsService.Pull(repository);
-                    break;
-                case CheckoutMode.Fetch:
-                    operation = pullRequestsService
+                var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
+
+                if (localBranches.Count > 0)
+                {
+                    return pullRequestsService.SwitchToBranch(repository, Model);
+                }
+                else
+                {
+                    return pullRequestsService
                         .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
-                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
-                    break;
-                case CheckoutMode.Switch:
-                    operation = pullRequestsService.SwitchToBranch(repository, Model);
-                    break;
-                case CheckoutMode.InvalidState:
-                    operation = pullRequestsService
-                        .UnmarkLocalBranch(repository)
-                        .SelectMany(_ => pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title))
-                        .SelectMany(x => pullRequestsService.FetchAndCheckout(repository, Model.Number, x));
-                    break;
-                default:
-                    Debug.Fail("Invalid CheckoutMode in PullRequestDetailViewModel.DoCheckout.");
-                    operation = Observable.Empty<Unit>();
-                    break;
+                        .SelectMany(x => pullRequestsService.Checkout(repository, Model, x));
+                }
+            }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
+        }
+
+        IObservable<Unit> DoPull(object unused)
+        {
+            return pullRequestsService.Pull(repository)
+                .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
+        }
+
+        IObservable<Unit> DoPush(object unused)
+        {
+            return pullRequestsService.Push(repository)
+                .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+        }
+
+        class CheckoutCommandState : IPullRequestCheckoutState
+        {
+            public CheckoutCommandState(string caption, string disabledMessage)
+            {
+                Caption = caption;
+                DisabledMessage = disabledMessage;
             }
 
-            return operation.Catch<Unit, Exception>(ex =>
+            public string Caption { get; }
+            public string DisabledMessage { get; }
+        }
+
+        class UpdateCommandState : IPullRequestUpdateState
+        {
+            public UpdateCommandState(
+                BranchTrackingDetails divergence,
+                bool pullEnabled,
+                bool pushEnabled,
+                string pullToolTip,
+                string pushToolTip)
             {
-                CheckoutError = ex.Message;
-                return Observable.Empty<Unit>();
-            });
+                CommitsAhead = divergence.AheadBy ?? 0;
+                CommitsBehind = divergence.BehindBy ?? 0;
+                PushEnabled = pushEnabled;
+                PullEnabled = pullEnabled;
+                PullToolTip = pullToolTip;
+                PushToolTip = pushToolTip;
+            }
+
+            public int CommitsAhead { get; }
+            public int CommitsBehind { get; }
+            public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
+            public bool PullEnabled { get; }
+            public bool PushEnabled { get; }
+            public string PullToolTip { get; }
+            public string PushToolTip { get; }
         }
     }
 }

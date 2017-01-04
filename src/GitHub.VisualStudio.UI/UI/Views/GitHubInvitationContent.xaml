@@ -67,7 +67,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" KeyboardNavigation.TabIndex="0" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
+            <Button Grid.Column="0" KeyboardNavigation.TabIndex="0" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="login" Click="connect_Click" Content="{x:Static prop:Resources.LoginLink}"
                     Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <TextBlock Grid.Column="1" Margin="3,0,3,0"
                     Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static prop:Resources.orText}"

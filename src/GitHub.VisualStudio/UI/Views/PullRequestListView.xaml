@@ -9,6 +9,7 @@
                                   xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                                  xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
                                   d:DesignHeight="300"
                                   d:DesignWidth="300"
                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -43,8 +44,8 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
 
-        <Setter Property="Template">
-          <Setter.Value>
+                <Setter Property="Template">
+                    <Setter.Value>
             <ControlTemplate TargetType="{x:Type ListViewItem}">
               <Border x:Name="Bd"
                       Background="{TemplateBinding Background}"
@@ -86,8 +87,20 @@
           </Setter.Value>
         </Setter>
       </Style>
-    </ResourceDictionary>
 
+      <CollectionViewSource x:Key="AuthorCollectionViewSource" Source="{Binding Path=Authors}">
+         <CollectionViewSource.SortDescriptions>
+           <scm:SortDescription PropertyName="Login" Direction="Ascending" />
+         </CollectionViewSource.SortDescriptions>
+      </CollectionViewSource>
+        
+      <CollectionViewSource x:Key="AssigneeCollectionViewSource" Source="{Binding Path=Assignees}">
+         <CollectionViewSource.SortDescriptions>
+           <scm:SortDescription PropertyName="Login" Direction="Ascending" />
+         </CollectionViewSource.SortDescriptions>
+      </CollectionViewSource>
+        
+   </ResourceDictionary>
   </UserControl.Resources>
 
   <DockPanel Margin="6,6,6,0">
@@ -108,14 +121,14 @@
 
         <ui:LinkDropDown Header="Assignee"
                          IsEnabled="{Binding IsLoaded}"
-                         ItemsSource="{Binding Assignees}"
+                         ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAssignee}"/>
           
         <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:LinkDropDown Header="Author"
                          IsEnabled="{Binding IsLoaded}"
-                         ItemsSource="{Binding Authors}"
+                         ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"/>          
       </WrapPanel>
 

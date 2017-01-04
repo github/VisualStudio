@@ -41,6 +41,8 @@ namespace GitHub.VisualStudio
             return Package.GetGlobalService(typeof(T)) as Ret;
         }
 
+        public static IGitHubServiceProvider GitHubServiceProvider => GetGlobalService<IGitHubServiceProvider, IGitHubServiceProvider>();
+
         public static IComponentModel ComponentModel => GetGlobalService<SComponentModel, IComponentModel>();
         public static ExportProvider DefaultExportProvider => ComponentModel.DefaultExportProvider;
 
@@ -83,6 +85,8 @@ namespace GitHub.VisualStudio
         public static DTE2 Dte2 => Dte as DTE2;
 
         public static IVsUIShell UIShell => GetGlobalService<SVsUIShell, IVsUIShell>();
+
+        public static IVsDifferenceService DifferenceService => GetGlobalService<SVsDifferenceService, IVsDifferenceService>();
 
         public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
         {

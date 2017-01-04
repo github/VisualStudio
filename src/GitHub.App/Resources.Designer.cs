@@ -61,6 +61,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to add.
+        /// </summary>
+        internal static string AddedFileStatus {
+            get {
+                return ResourceManager.GetString("AddedFileStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select a containing folder for your new repository..
         /// </summary>
         internal static string BrowseForDirectory {
@@ -151,6 +160,24 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to fork.
+        /// </summary>
+        internal static string Fork {
+            get {
+                return ResourceManager.GetString("Fork", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [invalid].
+        /// </summary>
+        internal static string InvalidBranchName {
+            get {
+                return ResourceManager.GetString("InvalidBranchName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to sign in..
         /// </summary>
         internal static string LoginFailedForbiddenMessage {
@@ -214,6 +241,42 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must pull before you can push.
+        /// </summary>
+        internal static string MustPullBeforePush {
+            get {
+                return ResourceManager.GetString("MustPullBeforePush", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No commits to pull.
+        /// </summary>
+        internal static string NoCommitsToPull {
+            get {
+                return ResourceManager.GetString("NoCommitsToPull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No commits to push.
+        /// </summary>
+        internal static string NoCommitsToPush {
+            get {
+                return ResourceManager.GetString("NoCommitsToPush", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to *No description provided.*.
+        /// </summary>
+        internal static string NoDescriptionProvidedMarkdown {
+            get {
+                return ResourceManager.GetString("NoDescriptionProvidedMarkdown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter your password.
         /// </summary>
         internal static string PasswordValidatorEmpty {
@@ -259,6 +322,60 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checkout {0}.
+        /// </summary>
+        internal static string PullRequestDetailsCheckout {
+            get {
+                return ResourceManager.GetString("PullRequestDetailsCheckout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checkout to {0}.
+        /// </summary>
+        internal static string PullRequestDetailsCheckoutTo {
+            get {
+                return ResourceManager.GetString("PullRequestDetailsCheckoutTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull from {0} branch {1}.
+        /// </summary>
+        internal static string PullRequestDetailsPullToolTip {
+            get {
+                return ResourceManager.GetString("PullRequestDetailsPullToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Push to {0} branch {1}.
+        /// </summary>
+        internal static string PullRequestDetailsPushToolTip {
+            get {
+                return ResourceManager.GetString("PullRequestDetailsPushToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Request.
+        /// </summary>
+        internal static string PullRequestNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull Requests.
+        /// </summary>
+        internal static string PullRequestsNavigationItemText {
+            get {
+                return ResourceManager.GetString("PullRequestsNavigationItemText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source and target branch cannot be the same.
         /// </summary>
         internal static string PullRequestSourceAndTargetBranchTheSame {
@@ -273,6 +390,24 @@ namespace GitHub.App {
         internal static string PullRequestSourceBranchDoesNotExist {
             get {
                 return ResourceManager.GetString("PullRequestSourceBranchDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to remote.
+        /// </summary>
+        internal static string Remote {
+            get {
+                return ResourceManager.GetString("Remote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to rename.
+        /// </summary>
+        internal static string RenamedFileStatus {
+            get {
+                return ResourceManager.GetString("RenamedFileStatus", resourceCulture);
             }
         }
         
@@ -385,6 +520,15 @@ namespace GitHub.App {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The source repository is no longer available..
+        /// </summary>
+        internal static string SourceRepositoryNoLongerAvailable {
+            get {
+                return ResourceManager.GetString("SourceRepositoryNoLongerAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         internal static string TwoFactorApp {
@@ -435,6 +579,15 @@ namespace GitHub.App {
         internal static string UsernameOrEmailValidatorSpaces {
             get {
                 return ResourceManager.GetString("UsernameOrEmailValidatorSpaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot checkout as your working directory has uncommitted changes..
+        /// </summary>
+        internal static string WorkingDirectoryHasUncommittedCHanges {
+            get {
+                return ResourceManager.GetString("WorkingDirectoryHasUncommittedCHanges", resourceCulture);
             }
         }
     }

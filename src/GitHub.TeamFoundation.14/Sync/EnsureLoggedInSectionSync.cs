@@ -15,9 +15,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         public const string SyncLoginSectionId = "C5975729-3CF1-47B4-AE92-C2934906CDDA";
 
         [ImportingConstructor]
-        public EnsureLoggedInSectionSync(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+        public EnsureLoggedInSectionSync(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
             IConnectionManager cm, IRepositoryHosts hosts, ITeamExplorerServices teServices)
-            : base(apiFactory, holder, cm, hosts, teServices)
+            : base(serviceProvider, apiFactory, holder, cm, hosts, teServices)
         {}
     }
 }

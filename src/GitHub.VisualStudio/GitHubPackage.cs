@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 using GitHub.VisualStudio.Menus;
+using System.ComponentModel.Design;
+using GitHub.ViewModels;
 
 namespace GitHub.VisualStudio
 {
@@ -50,10 +52,8 @@ namespace GitHub.VisualStudio
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await base.InitializeAsync(cancellationToken, progress);
-            await EnsurePackageLoaded(new Guid(ServiceProviderPackage.ServiceProviderPackageId));
 
-            // Activate the usage tracker by forcing an instance to be created.
-            GetServiceAsync(typeof(IUsageTracker)).Forget();
+            await GetServiceAsync(typeof(IUsageTracker));
 
             InitializeMenus().Forget();
         }
@@ -74,13 +74,12 @@ namespace GitHub.VisualStudio
         async Task EnsurePackageLoaded(Guid packageGuid)
         {
             var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
-            if (shell  != null)
+            if (shell != null)
             {
                 IVsPackage vsPackage;
                 ErrorHandler.ThrowOnFailure(shell.LoadPackage(ref packageGuid, out vsPackage));
             }
         }
-
     }
 
     [Export(typeof(IGitHubClient))]
@@ -96,12 +95,12 @@ namespace GitHub.VisualStudio
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(IMenuProvider), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IGitHubServiceProvider), IsAsyncQueryable = true)]
     [ProvideService(typeof(IUsageTracker), IsAsyncQueryable = true)]
-    [ProvideAutoLoad(UIContextGuids.NoSolution)]
-    [ProvideAutoLoad(UIContextGuids.SolutionExists)]
+    [ProvideService(typeof(IUIProvider), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IGitHubToolWindowManager))]
     [Guid(ServiceProviderPackageId)]
-    public sealed class ServiceProviderPackage : AsyncPackage
+    public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
         public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         const string StartPagePreview4PackageId = "3b764d23-faf7-486f-94c7-b3accc44a70d";
@@ -134,10 +133,49 @@ namespace GitHub.VisualStudio
 
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            AddService(typeof(IUIProvider), CreateService, true);
+            AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
+            AddService(typeof(IUIProvider), CreateService, true);
+            AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             return Task.CompletedTask;
+        }
+
+        public IViewHost ShowHomePane()
+        {
+            var pane = ShowToolWindow(new Guid(GitHubPane.GitHubPaneGuid));
+            if (pane == null)
+                return null;
+            var frame = pane.Frame as IVsWindowFrame;
+            if (frame != null)
+            {
+                ErrorHandler.Failed(frame.Show());
+            }
+            return pane as IViewHost;
+        }
+
+        static ToolWindowPane ShowToolWindow(Guid windowGuid)
+        {
+            IVsWindowFrame frame;
+            if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint) __VSCREATETOOLWIN.CTW_fForceCreate,
+                ref windowGuid, out frame)))
+            {
+                VsOutputLogger.WriteLine("Unable to find or create GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                return null;
+            }
+            if (ErrorHandler.Failed(frame.Show()))
+            {
+                VsOutputLogger.WriteLine("Unable to show GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                return null;
+            }
+
+            object docView = null;
+            if (ErrorHandler.Failed(frame.GetProperty((int) __VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
+                VsOutputLogger.WriteLine("Unable to grab instance of GitHubPane '" + UI.GitHubPane.GitHubPaneGuid + "'");
+                return null;
+            }
+            return docView as GitHubPane;
         }
 
         async Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
@@ -145,26 +183,39 @@ namespace GitHub.VisualStudio
             if (serviceType == null)
                 return null;
 
-            if (serviceType == typeof(IUIProvider))
+            if (container != this)
+                return null;
+
+            if (serviceType == typeof(IGitHubServiceProvider))
             {
-                var result = new GitHubServiceProvider(this);
+                //var sp = await GetServiceAsync(typeof(SVsServiceProvider)) as IServiceProvider;
+                var result = new GitHubServiceProvider(this, this);
                 await result.Initialize();
                 return result;
             }
             else if (serviceType == typeof(IMenuProvider))
             {
-                var sp = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return new MenuProvider(sp);
             }
             else if (serviceType == typeof(IUsageTracker))
             {
-                var uiProvider = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
+                var uiProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return new UsageTracker(uiProvider);
+            }
+            else if (serviceType == typeof(IUIProvider))
+            {
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                return new UIProvider(sp);
+            }
+            else if (serviceType == typeof(IGitHubToolWindowManager))
+            {
+                return this;
             }
             // go the mef route
             else
             {
-                var sp = await GetServiceAsync(typeof(IUIProvider)) as IUIProvider;
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 return sp.TryGetService(serviceType);
             }
         }

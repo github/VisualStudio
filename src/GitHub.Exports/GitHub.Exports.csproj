@@ -179,6 +179,7 @@
     <Compile Include="Services\ITeamExplorerServices.cs" />
     <Compile Include="Services\ITeamExplorerServiceHolder.cs" />
     <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Services\IUIProvider.cs" />
     <Compile Include="Services\IUsageTracker.cs" />
     <Compile Include="Services\IVSGitServices.cs" />
     <Compile Include="Services\IVSServices.cs" />
@@ -203,6 +204,7 @@
     </Compile>
     <Compile Include="Settings\GitHubConnectSectionState.cs" />
     <Compile Include="Settings\Guids.cs" />
+    <Compile Include="Settings\PullRequestDetailUIState.cs" />
     <Compile Include="Settings\PullRequestListUIState.cs" />
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
@@ -227,7 +229,7 @@
     <Compile Include="Services\ExportFactoryProvider.cs" />
     <Compile Include="Services\IVisualStudioBrowser.cs" />
     <Compile Include="Services\IEnterpriseProbeTask.cs" />
-    <Compile Include="Services\IUIProvider.cs" />
+    <Compile Include="Services\IGitHubServiceProvider.cs" />
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />

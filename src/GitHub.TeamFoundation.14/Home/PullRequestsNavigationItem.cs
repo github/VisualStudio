@@ -22,9 +22,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         readonly IMenuProvider menuProvider;
 
         [ImportingConstructor]
-        public PullRequestsNavigationItem(ISimpleApiClientFactory apiFactory, 
-                ITeamExplorerServiceHolder holder, IMenuProvider menuProvider)
-            : base(apiFactory, holder, Octicon.git_pull_request)
+        public PullRequestsNavigationItem(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory,
+            ITeamExplorerServiceHolder holder,
+            IMenuProvider menuProvider)
+            : base(serviceProvider, apiFactory, holder, Octicon.git_pull_request)
         {
             this.menuProvider = menuProvider;
             Text = Resources.PullRequestsNavigationItemText;
@@ -34,7 +36,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public override void Execute()
         {
             var menu = menuProvider.Menus.FirstOrDefault(m => m.IsMenuType(MenuType.OpenPullRequests));
-            menu?.Activate(UIControllerFlow.PullRequests);
+            menu?.Activate(UIControllerFlow.PullRequestList);
             base.Execute();
         }
     }

@@ -1,4 +1,5 @@
-﻿using GitHub.VisualStudio.Helpers;
+﻿using GitHub.Services;
+using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using NullGuard;
 using System;
@@ -9,9 +10,12 @@ namespace GitHub.VisualStudio.Base
     {
         public static readonly Guid TeamExplorerInvitationSectionGuid = new Guid("8914ac06-d960-4537-8345-cb13c00378d8");
 
+        protected TeamExplorerInvitationBase(IGitHubServiceProvider serviceProvider) : base(serviceProvider)
+        {}
+
         public virtual void Initialize(IServiceProvider serviceProvider)
         {
-            ServiceProvider = serviceProvider;
+            TEServiceProvider = serviceProvider;
         }
 
         /// <summary>

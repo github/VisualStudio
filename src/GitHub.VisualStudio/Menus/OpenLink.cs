@@ -6,7 +6,7 @@ namespace GitHub.VisualStudio.Menus
 {
     public class OpenLink: LinkMenuBase, IDynamicMenuHandler
     {
-        public OpenLink(IUIProvider serviceProvider)
+        public OpenLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
         }

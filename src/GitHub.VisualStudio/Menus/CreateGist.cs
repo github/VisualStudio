@@ -11,7 +11,7 @@ namespace GitHub.VisualStudio.Menus
         readonly Lazy<ISelectedTextProvider> selectedTextProvider;
         ISelectedTextProvider SelectedTextProvider => selectedTextProvider.Value;
 
-        public CreateGist(IUIProvider serviceProvider)
+        public CreateGist(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
             selectedTextProvider = new Lazy<ISelectedTextProvider>(() => ServiceProvider.TryGetService<ISelectedTextProvider>());

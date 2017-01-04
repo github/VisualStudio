@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -38,41 +39,51 @@ namespace GitHub.ViewModels
     }
 
     /// <summary>
-    /// Describes how a pull request will be checked out.
+    /// Holds immutable state relating to the <see cref="IPullRequestDetailViewModel.Checkout"/> command.
     /// </summary>
-    public enum CheckoutMode
+    public interface IPullRequestCheckoutState
     {
         /// <summary>
-        /// The pull request branch is checked out and up-to-date.
+        /// Gets the message to display on the checkout button.
         /// </summary>
-        UpToDate,
+        string Caption { get; }
 
         /// <summary>
-        /// The pull request branch is checked out but needs updating.
+        /// Gets the message to display when a checkout cannot be carried out.
         /// </summary>
-        NeedsPull,
+        string DisabledMessage { get; }
+    }
+
+    /// <summary>
+    /// Holds immutable state relating to the <see cref="IPullRequestDetailViewModel.Pull"/> and
+    /// <see cref="IPullRequestDetailViewModel.Push"/> commands.
+    /// </summary>
+    public interface IPullRequestUpdateState
+    {
+        /// <summary>
+        /// Gets the number of commits that the current branch is ahead of the PR branch.
+        /// </summary>
+        int CommitsAhead { get; }
 
         /// <summary>
-        /// A local branch exists for the pull request but it is not the current branch.
+        /// Gets the number of commits that the current branch is behind the PR branch.
         /// </summary>
-        Switch,
+        int CommitsBehind { get; }
 
         /// <summary>
-        /// No local branch exists for the pull request.
+        /// Gets a value indicating whether the current branch is up to date.
         /// </summary>
-        Fetch,
+        bool UpToDate { get; }
 
         /// <summary>
-        /// The checked out branch is the branch from which the pull request comes, and the are
-        /// local changes, so invite the user to push.
+        /// Gets the message to display when a pull cannot be carried out.
         /// </summary>
-        Push,
+        string PullToolTip { get; }
 
         /// <summary>
-        /// The checked out branch is marked as the branch for a pull request from a fork, but
-        /// there are local commits or the branch shares no history.
+        /// Gets the message to display when a push cannot be carried out.
         /// </summary>
-        InvalidState,
+        string PushToolTip { get; }
     }
 
     /// <summary>
@@ -94,6 +105,11 @@ namespace GitHub.ViewModels
         /// Gets a string describing how to display the pull request's target branch.
         /// </summary>
         string TargetBranchDisplayName { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request comes from a fork.
+        /// </summary>
+        bool IsFromFork { get; }
 
         /// <summary>
         /// Gets the pull request body.
@@ -121,30 +137,34 @@ namespace GitHub.ViewModels
         IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
 
         /// <summary>
-        /// Gets the checkout mode for the pull request.
+        /// Gets the state associated with the <see cref="Checkout"/> command.
         /// </summary>
-        CheckoutMode CheckoutMode { get; }
+        IPullRequestCheckoutState CheckoutState { get; }
+
+        /// <summary>
+        /// Gets the state associated with the <see cref="Pull"/> and <see cref="Push"/> commands.
+        /// </summary>
+        IPullRequestUpdateState UpdateState { get; }
 
         /// <summary>
         /// Gets the error message to be displayed below the checkout button.
         /// </summary>
-        string CheckoutError { get; }
-
-        /// <summary>
-        /// Gets the number of commits that the current branch is behind the PR when <see cref="CheckoutMode"/>
-        /// is <see cref="CheckoutMode.NeedsPull"/>.
-        /// </summary>
-        int CommitsBehind { get; }
-
-        /// <summary>
-        /// Gets a message indicating the why the <see cref="Checkout"/> command is disabled.
-        /// </summary>
-        string CheckoutDisabledMessage { get; }
+        string OperationError { get; }
 
         /// <summary>
         /// Gets a command that checks out the pull request locally.
         /// </summary>
         ReactiveCommand<Unit> Checkout { get; }
+
+        /// <summary>
+        /// Gets a command that pulls changes to the current branch.
+        /// </summary>
+        ReactiveCommand<Unit> Pull { get; }
+
+        /// <summary>
+        /// Gets a command that pushes changes from the current branch.
+        /// </summary>
+        ReactiveCommand<Unit> Push { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
@@ -170,5 +190,19 @@ namespace GitHub.ViewModels
         /// Gets a command that diffs a <see cref="IPullRequestFileNode"/>.
         /// </summary>
         ReactiveCommand<object> DiffFile { get; }
+
+        /// <summary>
+        /// Gets the specified file as it appears in the pull request.
+        /// </summary>
+        /// <param name="file">The file or directory node.</param>
+        /// <returns>The path to the extracted file.</returns>
+        Task<string> ExtractFile(IPullRequestFileNode file);
+
+        /// <summary>
+        /// Gets the before and after files needed for viewing a diff.
+        /// </summary>
+        /// <param name="file">The changed file.</param>
+        /// <returns>A tuple containing the full path to the before and after files.</returns>
+        Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
     }
 }

@@ -1,17 +1,35 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
 
 namespace GitHub.SampleData
 {
+    public class PullRequestCheckoutStateDesigner : IPullRequestCheckoutState
+    {
+        public string Caption { get; set; }
+        public string DisabledMessage { get; set; }
+    }
+
+    public class PullRequestUpdateStateDesigner : IPullRequestUpdateState
+    {
+        public int CommitsAhead { get; set; }
+        public int CommitsBehind { get; set; }
+        public bool UpToDate { get; set; }
+        public string PullToolTip { get; set; }
+        public string PushToolTip { get; set; }
+    }
+
     [ExcludeFromCodeCoverage]
     public class PullRequestDetailViewModelDesigner : BaseViewModel, IPullRequestDetailViewModel
     {
         public PullRequestDetailViewModelDesigner()
         {
+            var repoPath = @"C:\Repo";
+
             Model = new PullRequestModel(419, 
                 "Error handling/bubbling from viewmodels to views to viewhosts",
                  new AccountDesigner { Login = "shana", IsUser = true },
@@ -34,9 +52,9 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var gitHubDir = new PullRequestDirectoryNode("GitHub");
             var modelsDir = new PullRequestDirectoryNode("Models");
             var repositoriesDir = new PullRequestDirectoryNode("Repositories");
-            var itrackingBranch = new PullRequestFileNode(@"GitHub\Models\ITrackingBranch.cs", PullRequestFileStatus.Modified);
-            var oldBranchModel = new PullRequestFileNode(@"GitHub\Models\OldBranchModel.cs", PullRequestFileStatus.Removed);
-            var concurrentRepositoryConnection = new PullRequestFileNode(@"GitHub\Repositories\ConcurrentRepositoryConnection.cs", PullRequestFileStatus.Added);
+            var itrackingBranch = new PullRequestFileNode(repoPath, @"GitHub\Models\ITrackingBranch.cs", "abc", PullRequestFileStatus.Modified, null);
+            var oldBranchModel = new PullRequestFileNode(repoPath, @"GitHub\Models\OldBranchModel.cs", "abc", PullRequestFileStatus.Removed, null);
+            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", "abc", PullRequestFileStatus.Added, "add");
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);
@@ -51,29 +69,38 @@ This requires that errors be propagated from the viewmodel to the view and from 
             ChangedFilesList.Add(concurrentRepositoryConnection);
             ChangedFilesList.Add(itrackingBranch);
             ChangedFilesList.Add(oldBranchModel);
-
-            CheckoutMode = CheckoutMode.Fetch;
         }
 
         public IPullRequestModel Model { get; }
-        public string SourceBranchDisplayName { get; }
-        public string TargetBranchDisplayName { get; }
+        public string SourceBranchDisplayName { get; set; }
+        public string TargetBranchDisplayName { get; set; }
+        public bool IsFromFork { get; }
         public string Body { get; }
         public ChangedFilesViewType ChangedFilesViewType { get; set; }
         public OpenChangedFileAction OpenChangedFileAction { get; set; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
         public IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
-        public CheckoutMode CheckoutMode { get; set; }
-        public string CheckoutError { get; set; }
-        public int CommitsBehind { get; set; }
-        public string CheckoutDisabledMessage { get; set; }
+        public IPullRequestCheckoutState CheckoutState { get; set; }
+        public IPullRequestUpdateState UpdateState { get; set; }
+        public string OperationError { get; set; }
 
         public ReactiveCommand<Unit> Checkout { get; }
+        public ReactiveCommand<Unit> Pull { get; }
+        public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> ActivateItem { get; }
         public ReactiveCommand<object> ToggleChangedFilesView { get; }
         public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
+
+        public Task<string> ExtractFile(IPullRequestFileNode file)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

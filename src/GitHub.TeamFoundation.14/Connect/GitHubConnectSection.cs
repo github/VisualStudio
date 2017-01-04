@@ -87,12 +87,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         internal ITeamExplorerServiceHolder Holder => holder;
 
-        public GitHubConnectSection(ISimpleApiClientFactory apiFactory,
+        public GitHubConnectSection(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings packageSettings,
             int index)
-            : base(apiFactory, holder, manager)
+            : base(serviceProvider, apiFactory, holder, manager)
         {
             Title = "GitHub";
             IsEnabled = true;
@@ -135,7 +136,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 Repositories = null;
                 settings = null;
 
-                if (sectionIndex == 0 && ServiceProvider != null)
+                if (sectionIndex == 0 && TEServiceProvider != null)
                 {
                     var section = GetSection(TeamExplorerInvitationBase.TeamExplorerInvitationSectionGuid);
                     IsVisible = !(section?.IsVisible ?? true); // only show this when the invitation section is hidden. When in doubt, don't show it.
@@ -158,7 +159,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
                     LoggedIn = true;
-                    if (ServiceProvider != null)
+                    if (TEServiceProvider != null)
                         RefreshRepositories().Forget();
 
                     settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
@@ -278,7 +279,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void ShowNotification(ILocalRepositoryModel newrepo, string msg)
         {
-            var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
+            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
             
             teServices.ClearNotifications();
             teServices.ShowMessage(
@@ -293,7 +294,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     */
                     var prefix = str.Substring(0, 2);
                     if (prefix == "u:")
-                        OpenInBrowser(ServiceProvider.GetExportedValue<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
+                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
                     else if (prefix == "o:")
                     {
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
@@ -301,7 +302,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     }
                     else if (prefix == "c:")
                     {
-                        var vsGitServices = ServiceProvider.GetExportedValue<IVSGitServices>();
+                        var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
                         vsGitServices.SetDefaultProjectPath(newrepo.LocalPath);
                         if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
                             ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
@@ -362,14 +363,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var notifications = ServiceProvider.GetExportedValue<INotificationDispatcher>();
-            var teServices = ServiceProvider.GetExportedValue<ITeamExplorerServices>();
+            var notifications = ServiceProvider.TryGetService<INotificationDispatcher>();
+            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
             notifications.AddListener(teServices);
 
-            var uiProvider = ServiceProvider.GetService<IUIProvider>();
-            uiProvider.GitServiceProvider = ServiceProvider;
-            uiProvider.SetupUI(controllerFlow, SectionConnection);
-            uiProvider.ListenToCompletionState()
+            ServiceProvider.GitServiceProvider = TEServiceProvider;
+            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
+            var controller = uiProvider.Configure(controllerFlow, SectionConnection);
+            controller.ListenToCompletionState()
                 .Subscribe(success =>
                 {
                     if (success)
@@ -380,7 +381,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                             isCreating = true;
                     }
                 });
-            uiProvider.RunUI();
+            uiProvider.RunInDialog(controller);
 
             notifications.RemoveListener();
         }

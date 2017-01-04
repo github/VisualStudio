@@ -3,6 +3,7 @@
                                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                     xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                    xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
                                     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
@@ -10,18 +11,32 @@
                                     xmlns:uir="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                                     xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
+                                    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                    Foreground="{DynamicResource GitHubVsWindowText}"
                                     DataContext="{Binding ViewModel}"
                                     d:DesignWidth="356"
-                                    d:DesignHeight="780"
+                                    d:DesignHeight="800"
                                     mc:Ignorable="d"
+                                    xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                     Style="{DynamicResource BusyStateView}">
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner CheckoutMode="NeedsPull" 
-                                                               CommitsBehind="2"
-                                                               CheckoutDisabledMessage="Cannot update branch as your working directory has uncommitted changes."/>
+                <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
+                                                               TargetBranchDisplayName="master-is-always-stable">
+                    <!--
+                    <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
+                        <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
+                    </sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
+                    -->
+                    <sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                        <sampleData:PullRequestUpdateStateDesigner CommitsAhead="0" CommitsBehind="0" UpToDate="True"/>
+                    </sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                    <sampleData:PullRequestDetailViewModelDesigner.OperationError>
+                        Unable to connect to the internets over here!
+                    </sampleData:PullRequestDetailViewModelDesigner.OperationError>
+                </sampleData:PullRequestDetailViewModelDesigner>
             </Binding.Source>
         </Binding>
     </d:DesignProperties.DataContext>
@@ -47,15 +62,10 @@
                 <Style.Resources>
                     <Style TargetType="Image">
                         <Setter Property="Stretch" Value="UniformToFill" />
-                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="StretchDirection" Value="DownOnly" /> 
                         <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
                     </Style>
                 </Style.Resources>
-            </Style>
-
-            <Style TargetType="GridViewColumnHeader">
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
             </Style>
 
             <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
@@ -66,13 +76,13 @@
                  It's a hack, it will break with localization -->
             <Style x:Key="StateIndicator" TargetType="TextBlock">
                 <Style.Triggers>
-                    <Trigger Property="Text" Value="Open">
+                    <Trigger Property="Text" Value="OPEN">
                         <Setter Property="Foreground" Value="#6CC644"/>
                     </Trigger>
-                    <Trigger Property="Text" Value="Closed">
+                    <Trigger Property="Text" Value="CLOSED">
                         <Setter Property="Foreground" Value="#BD2C00"/>
                     </Trigger>
-                    <Trigger Property="Text" Value="Merged">
+                    <Trigger Property="Text" Value="MERGED">
                         <Setter Property="Foreground" Value="#6E5494"/>
                     </Trigger>
                 </Style.Triggers>
@@ -86,226 +96,166 @@
                 <Setter Property="Foreground" Value="Red" />
             </Style>
 
-            <!-- Hyperlink has no Visibility property, sigh. Hack around this by making the text 
-                 transparent and 1 px in size. -->
-            <Style x:Key="HyperlinkHiddenWhenDisabled" TargetType="Hyperlink">
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Foreground" Value="Transparent"/>
-                        <Setter Property="FontSize" Value="1"/>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
+            <ui:AllCapsConverter x:Key="AllCaps"/>
         </ResourceDictionary>
     </Control.Resources>
 
-    <DockPanel Grid.IsSharedSizeScope="True">
-        <!-- PR Title and number -->
-        <DockPanel DockPanel.Dock="Top"
-                   Margin="8 4 8 8">
-            <TextBlock DockPanel.Dock="Right"
-                       FontSize="9pt"
-                       Foreground="Gray"
-                       Margin="4 2 0 0"
-                       Text="{Binding Model.Number, StringFormat=#{0}}"
-                       VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Model.Title}"
-                       FontSize="10pt"
-                       VerticalAlignment="Top"
-                       TextWrapping="Wrap"/>
-        </DockPanel>
-
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
-
-        <!-- PR Overview -->
+    <DockPanel Grid.IsSharedSizeScope="True" Margin="8 0">
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
-                <ColumnDefinition Width="6" SharedSizeGroup="LeftMarginSpace"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
+                       TextWrapping="Wrap"
+                       Margin="0 0 5 3"
+                       Text="{Binding Model.Title}"/>
+
+            <TextBlock Grid.Column="1"
+                       FontWeight="Bold"
+                       Margin="10 4 0 0"
+                       Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
+                       Style="{StaticResource StateIndicator}"/>
+        </Grid>
+
+        <!-- Avatar, PR Title, Open/Merged/Closed state and actions area -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Open/closed state and branches -->
-                <RowDefinition Height="1"/>
-                <RowDefinition Height="Auto"/> <!-- Commit and files changed count -->
-                <RowDefinition Height="1"/>
-                <RowDefinition Height="Auto"/> <!-- Checkout button -->
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
-            <!-- PR Icon in left margin -->
-            <ui:OcticonImage Grid.Column="0"
-                             Margin="8"
-                             VerticalAlignment="Top"
-                             Icon="git_pull_request"/>
 
-            <!-- Open/closed state and branches -->
-            <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" Margin="0 6">
-                <TextBlock Margin="0 0 12 0"
-                           FontWeight="Bold"
-                           Text="{Binding Model.State}"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource StateIndicator}"/>
+            <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
+                <!-- source and target branches -->
+                <Grid Margin="0 -3" HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{Binding TargetBranchDisplayName}" VerticalAlignment="Center"/>
-                <ui:OcticonImage Icon="chevron_left" Height="13" Margin="1 3 3 0"/>
-                <TextBlock Text="{Binding SourceBranchDisplayName}" VerticalAlignment="Center" 
-                           ToolTip="{Binding SourceBranchDisplayName}"/>
+                    <ui:OcticonImage Grid.Column="0" VerticalAlignment="Center" Icon="git_branch" Height="15" Opacity="0.5" Margin="0 0 3 0" />
+                    <Border Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceBranchDisplayName, Mode=OneWay}" Text="{Binding SourceBranchDisplayName, Mode=OneWay}" /> 
+                    </Border>
+
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="into" />
+
+                    <Border Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Padding="5 1" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
+                        <TextBlock FontFamily="Consolas" TextTrimming="CharacterEllipsis" ToolTip="{Binding TargetBranchDisplayName, Mode=OneWay}" Text="{Binding TargetBranchDisplayName, Mode=OneWay}" /> 
+                    </Border>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Opacity="0.5" Margin="0 2 0 0" VerticalAlignment="Top"
+                               Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+
+                    <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
+
+                    <!-- Checkout pull request button -->
+                    <ui:GitHubActionLink Command="{Binding Checkout}"
+                                         Content="{Binding CheckoutState.Caption}"
+                                         Grid.Column="2"
+                                         VerticalAlignment="Center"
+                                         TextTrimming="CharacterEllipsis"
+                                         Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
+                                         ToolTip="{Binding CheckoutState.DisabledMessage}"
+                                         ToolTipService.ShowOnDisabled="True"/>
+
+                    <!-- Pull/push buttons -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                                Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
+                        <ui:OcticonImage Icon="arrow_down"/>
+                        <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
+                        <ui:GitHubActionLink Content="Pull"
+                                             Command="{Binding Pull}"
+                                             Margin="4,0"
+                                             ToolTip="{Binding UpdateState.PullToolTip}"
+                                             ToolTipService.ShowOnDisabled="True"
+                                             VerticalAlignment="Center"/>
+                        <ui:OcticonImage Icon="arrow_up"/>
+                        <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
+                        <ui:GitHubActionLink Content="Push"
+                                             Command="{Binding Push}"
+                                             Margin="4,0"
+                                             ToolTip="{Binding UpdateState.PushToolTip}"
+                                             ToolTipService.ShowOnDisabled="True"
+                                             VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Branch checked out and up-to-date -->
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
+                        <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
+                        <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
+                                            <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Checkout disabled message -->
+                    <TextBlock Grid.Column="2" Margin="0 0 0 4" VerticalAlignment="Center" TextWrapping="Wrap">
+                        <Run Text="{Binding CheckoutDisabledMessage}"/>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
             </StackPanel>
 
-            <Rectangle Grid.Column="2" Grid.Row="1" Margin="-2 0 0 0" Style="{StaticResource Separator}"/>
+            <!-- Git operation error message -->
 
-            <!-- Commit and files changed count -->
-            <StackPanel Grid.Column="2" Grid.Row="2" Orientation="Horizontal" Margin="0 6">
-                <ui:OcticonImage Icon="git_commit" Margin="0 1 2 0"/>
-                <TextBlock Margin="2 0"
-                           VerticalAlignment="Center"
-                           Text="{Binding Model.CommitCount, StringFormat={}{0} commits}"/>
-
-                <ui:OcticonImage Icon="diff" Margin="28 0 2 0"/>
-                <TextBlock Margin="2 0"
-                           VerticalAlignment="Center"
-                           Text="{Binding Model.ChangedFiles.Count, StringFormat={}{0} files changed}"/>
-            </StackPanel>
-
-            <Rectangle Grid.Column="2" Grid.Row="3" Margin="-2 0 0 0" Style="{StaticResource Separator}"/>
-
-            <StackPanel Grid.Column="2" Grid.Row="4" Margin="0 6">
-                <!-- Checkout pull request button -->
-                <Button Command="{Binding Checkout}">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource GitHubVsButton}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Fetch">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    Checkout pull request
-                </Button>
-
-                <!-- Branch checked out and up-to-date -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                    <Run>Pull request checked out and up-to-date.</Run>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="UpToDate">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Branch checked out and needs pull -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run>Your local branch is behind by</Run>
-                    <Run FontWeight="Bold" Text="{Binding CommitsBehind, StringFormat={}{0} commits.}"/>
-                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Update</Hyperlink>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="NeedsPull">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Local branch exists but is not checked out -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run BaselineAlignment="Top">This branch is not currently checked out.</Run>
-                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Switch branch</Hyperlink>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Switch">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Local branch is checked out but is in an invalid state -->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="alert" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run BaselineAlignment="Top">The pull request branch has local changes.</Run>
-                    <Hyperlink Command="{Binding Checkout}" Style="{StaticResource HyperlinkHiddenWhenDisabled}">Checkout to a new branch</Hyperlink>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="InvalidState">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Local branch is checked out but needs pushing-->
-                <TextBlock TextWrapping="Wrap">
-                    <ui:OcticonImage Icon="info" Foreground="Orange" Margin="0 0 0 -4"/>
-                    <Run BaselineAlignment="Top">Local changes can be pushed.</Run>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutMode}" Value="Push">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Checkout disabled message -->
-                <TextBlock Margin="0 0 0 4" TextWrapping="Wrap">
-                    <Run Text="{Binding CheckoutDisabledMessage}"/>
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Checkout error message -->
-                <TextBlock Foreground="Red" Margin="0 4" Text="{Binding CheckoutError}" TextWrapping="Wrap">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <Trigger Property="Text" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </StackPanel>
+            <TextBox Grid.Column="0"
+                     Grid.ColumnSpan="3"
+                     Grid.Row="2"
+                     Foreground="Red" 
+                     Margin="0 0 0 0"
+                     Text="{Binding OperationError}"
+                     VerticalAlignment="Center"
+                     TextWrapping="Wrap"
+                     Style="{StaticResource FlatReadOnlyTextBox}"
+                     Visibility="{Binding OperationError, Converter={ui:NullToVisibilityConverter}}"/>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="-8,5,-8,0"/>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-8,0">
+            <Grid Margin="0 5 0 0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="LeftMargin"/>
-                    <ColumnDefinition Width="6" SharedSizeGroup="LeftMarginSpace"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -316,29 +266,23 @@
                     <RowDefinition Height="Auto"/> <!-- Files changed -->
                 </Grid.RowDefinitions>
 
-                <!-- Author avatar -->
-                <Grid Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0 6 0 3">
-                    <Grid.OpacityMask>
-                        <VisualBrush Visual="{Binding ElementName=avatarMask}"/>
-                    </Grid.OpacityMask>
-                    <Border Name="avatarMask" Background="White" CornerRadius="3" Width="20" />
-                    <Image x:Name="avatar"
-                           Width="20"
-                           Height="20"
-                           RenderOptions.BitmapScalingMode="HighQuality"
-                           Source="{Binding Model.Author.Avatar}" />
-                </Grid>
-
                 <!-- Author and open time -->
-                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0 6">
-                    <Run FontWeight="Bold" Text="{Binding Model.Author.Login}"/>
-                    <Run Text="{Binding Model.CreatedAt, StringFormat={}opened {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
-                </TextBlock>
+                <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
+                    <controls:AccountAvatar Account="{Binding Model.Author}"
+                                            VerticalAlignment="Top"
+                                            Width="16"
+                                            Height="16"/>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
+                        <Run FontWeight="Bold" Text="{Binding Model.Author.Login}" />
+                        <Run Text="wrote" />
+                    </TextBlock>
+                </StackPanel>
 
                 <!-- PR Body -->
                 <ui:MarkdownViewer Name="bodyMarkdown"
-                                   Grid.Column="2" Grid.Row="1"
-                                   Margin="2 6 10 6"
+                                   Grid.Row="1"
+                                   Margin="2 10 10 6"
                                    DocumentStyle="{StaticResource DocumentStyle}"
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
@@ -348,45 +292,39 @@
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
-                <!-- Files changed Icon in left margin -->
-                <ui:OcticonImage Grid.Column="0" Grid.Row="3"
-                                 Margin="8"
-                                 VerticalAlignment="Top"
-                                 Icon="diff"/>
-
                 <!-- Files changed -->
                 <te:SectionControl Name="changesSection" 
-                                   Grid.Column="2" Grid.Row="3"
+                                   Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat=Changes ({0})}"
+                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0"
                                    ContextMenuService.IsEnabled="False">
                     <te:SectionControl.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Command="{Binding ToggleOpenChangedFileAction}" Visibility="Collapsed">
+                            <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
-                                                <Setter Property="Header" Value="Compare File as Default Action"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.OpenFileAsDefaultAction}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
-                                                <Setter Property="Header" Value="Open File as Default Action"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.CompareFileAsDefaultAction}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
-                            <Separator Visibility="Collapsed"/>
+                            <Separator/>
                             <MenuItem Command="{Binding ToggleChangedFilesView}">
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                <Setter Property="Header" Value="Switch to List View"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToListView}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                <Setter Property="Header" Value="Switch to Tree View"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToTreeView}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -400,11 +338,23 @@
                     
                     <te:SectionControl.Content>
                         <Grid>
+                            <Grid.Resources>
+                                <!-- When invoked from the TreeView and the ListView we programmatically bind the 
+                                     DataContext and update the CommandParameter to the changed file -->
+                                <ContextMenu x:Key="FileContextMenu">
+                                    <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding CompareFile}"/>
+                                </ContextMenu>
+                            </Grid.Resources>
+                            
                             <!-- Tree View -->
-                            <TreeView ItemsSource="{Binding ChangedFilesTree}" 
+                            <TreeView ItemsSource="{Binding ChangedFilesTree}"
+                                      ContextMenuOpening="TreeView_ContextMenuOpening"
+                                      ContextMenu="{StaticResource FileContextMenu}"
                                       Background="Transparent"
                                       BorderThickness="0"
                                       Margin="0 6 0 0"
+                                      MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <TreeView.Style>
                                     <Style TargetType="TreeView">
@@ -425,14 +375,48 @@
                                     <HierarchicalDataTemplate DataType="{x:Type vm:PullRequestDirectoryNode}"
                                                               ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" />
+                                            <ui:OcticonImage Icon="file_directory" Foreground="{DynamicResource GitHubDirectoryIconForeground}" Margin="0,0,0,2"/>
                                             <TextBlock Text="{Binding DirectoryName}" Margin="4 2" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:OcticonImage Icon="file_code" Foreground="{DynamicResource GitHubVsWindowText}"/>
-                                            <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center"/>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
+                                            <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
+                                                <ui:OcticonImage.Style>
+                                                    <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
+                                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:OcticonImage.Style>
+                                            </ui:OcticonImage>
+                                            <TextBlock Text="{Binding FileName}" Margin="4 2" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
+                                                                <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </TreeView.Resources>
@@ -442,7 +426,11 @@
                             <ListView ItemsSource="{Binding ChangedFilesList}"
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      Margin="0 6 0 0"
+                                      Foreground="{DynamicResource GitHubVsWindowText}"
+                                      Margin="0 6 0 0"                                      
+                                      ContextMenuOpening="ListView_ContextMenuOpening"
+                                      ContextMenu="{StaticResource FileContextMenu}"
+                                      ItemContainerStyle="{StaticResource FlatListViewItemStyle}"
                                       MouseDoubleClick="FileListMouseDoubleClick">
                                 <ListView.Style>
                                     <Style TargetType="ListView">
@@ -453,24 +441,41 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ListView.Style>
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
                                 <ListView.View>
-                                    <GridView>
+                                    <GridView ColumnHeaderContainerStyle="{StaticResource FlatGridViewColumnHeader}">
                                         <GridViewColumn Header="Name" Width="Auto">
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <ui:OcticonImage Icon="file_code" Margin="0 0 4 0"/>
-                                                        <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                                        <ui:OcticonImage Icon="file_code"/>
+                                                        <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Removed">
+                                                                            <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
+                                                                            <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </GridViewColumn.CellTemplate>
                                         </GridViewColumn>
-                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding Path}"/>
+                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding DisplayPath}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
