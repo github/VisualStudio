@@ -27,14 +27,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
         readonly IRepositoryHosts hosts;
-        IDisposable disposable;
         bool loggedIn;
 
         [ImportingConstructor]
-        public GitHubPublishSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+        public GitHubPublishSection(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
             IConnectionManager cm, Lazy<IVisualStudioBrowser> browser,
             IRepositoryHosts hosts)
-            : base(apiFactory, holder, cm)
+            : base(serviceProvider, apiFactory, holder, cm)
         {
 
             lazyBrowser = browser;
@@ -85,13 +85,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             InitializeSectionView();
         }
 
-        public async void Connect()
+        public void Connect()
         {
-            loggedIn = await connectionManager.IsLoggedIn(hosts);
-            if (loggedIn)
-                ShowPublish();
-            else
-                Login();
+            ShowPublish();
         }
 
         public void SignUp()
@@ -99,37 +95,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             OpenInBrowser(lazyBrowser, GitHubUrls.Plans);
         }
 
-        public void Login()
-        {
-            StartFlow(UIControllerFlow.Authentication);
-        }
-
-        void StartFlow(UIControllerFlow controllerFlow)
-        {
-            var uiProvider = ServiceProvider.GetService<IUIProvider>();
-            var ret = uiProvider.SetupUI(controllerFlow, null);
-            ret.Subscribe((c) => { }, async () =>
-            {
-                loggedIn = await connectionManager.IsLoggedIn(hosts);
-                if (loggedIn)
-                    ShowPublish();
-            });
-            uiProvider.RunUI();
-        }
-
         public void ShowPublish()
         {
             IsBusy = true;
             var uiProvider = ServiceProvider.GetService<IUIProvider>();
-            var factory = uiProvider.GetService<IExportFactoryProvider>();
-            var uiflow = factory.UIControllerFactory.CreateExport();
-            disposable = uiflow;
-            var ui = uiflow.Value;
-            var creation = ui.SelectFlow(UIControllerFlow.Publish);
+            var controller = uiProvider.Configure(UIControllerFlow.Publish);
             bool success = false;
-            ui.ListenToCompletionState().Subscribe(s => success = s);
+            controller.ListenToCompletionState().Subscribe(s => success = s);
 
-            creation.Subscribe(data =>
+            controller.TransitionSignal.Subscribe(data =>
             {
                 var c = data.View;
                 SectionContent = c;
@@ -142,7 +116,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 if (success)
                     ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             });
-            ui.Start(null);
+            uiProvider.Run(controller);
         }
 
         bool disposed;
@@ -153,7 +127,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 if (!disposed)
                 {
                     disposed = true;
-                    disposable?.Dispose();
                 }
             }
             base.Dispose(disposing);

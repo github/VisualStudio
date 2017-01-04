@@ -11,8 +11,8 @@ namespace GitHub.VisualStudio.UI
     {
         IDisposable subscription;
         readonly IObservable<LoadData> controls;
-        readonly Func<IView, bool> shouldLoad;
-        readonly Func<IView, bool> shouldStop;
+        readonly Func<IView, UIControllerFlow, bool> shouldLoad;
+        readonly Func<IView, UIControllerFlow, bool> shouldStop;
 
         /// <summary>
         /// 
@@ -21,8 +21,8 @@ namespace GitHub.VisualStudio.UI
         /// <param name="shouldLoad">If set, this condition will be checked before loading each control</param>
         /// <param name="shouldStop">If set, this condition will be checked to determine when to close this window</param>
         public WindowController(IObservable<LoadData> controls,
-            Func<IView, bool> shouldLoad = null,
-            Func<IView, bool> shouldStop = null)
+            Func<IView, UIControllerFlow, bool> shouldLoad = null,
+            Func<IView, UIControllerFlow, bool> shouldStop = null)
         {
             this.controls = controls;
             this.shouldLoad = shouldLoad;
@@ -36,9 +36,9 @@ namespace GitHub.VisualStudio.UI
         {
             subscription = controls.Subscribe(c =>
             {
-                if (shouldLoad == null || shouldLoad(c.View))
+                if (shouldLoad == null || shouldLoad(c.View, c.Flow))
                     Load(c.View);
-                if (shouldStop != null && shouldStop(c.View))
+                if (shouldStop != null && shouldStop(c.View, c.Flow))
                 {
                     Stop();
                     Close();

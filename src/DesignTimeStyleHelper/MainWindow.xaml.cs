@@ -48,14 +48,12 @@ namespace DesignTimeStyleHelper
         void ShowDialog(UIControllerFlow flow)
         {
             var ui = App.ServiceProvider.GetService<IUIProvider>();
-
-            var factory = ui.GetService<IExportFactoryProvider>();
-            var d = factory.UIControllerFactory.CreateExport();
-            var userControlObservable = d.Value.SelectFlow(flow);
+            var controller = ui.Configure(flow);
+            var userControlObservable = controller.TransitionSignal;
             var x = new WindowController(userControlObservable);
             userControlObservable.Subscribe(_ => { }, _ => x.Close());
             x.Show();
-            d.Value.Start(null);
+            ui.RunInDialog(controller);
         }
     }
 }

@@ -11,6 +11,5 @@ namespace GitHub.VisualStudio.TeamExplorer
         bool ShowGetStarted { get; }
         void Connect();
         void SignUp();
-        void Login();
     }
 }

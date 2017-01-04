@@ -19,7 +19,7 @@ namespace GitHub.Services
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
-        readonly IUIProvider uiProvider;
+        readonly IGitHubServiceProvider gitHubServiceProvider;
         readonly DispatcherTimer timer;
 
         IMetricsService client;
@@ -35,9 +35,9 @@ namespace GitHub.Services
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public UsageTracker(IUIProvider uiProvider)
+        public UsageTracker(IGitHubServiceProvider gitHubServiceProvider)
         {
-            this.uiProvider = uiProvider;
+            this.gitHubServiceProvider = gitHubServiceProvider;
 
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) =>
@@ -143,12 +143,12 @@ namespace GitHub.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = uiProvider.GetService<IMetricsService>();
-                connectionManager = uiProvider.GetService<IConnectionManager>();
-                userSettings = uiProvider.GetService<IPackageSettings>();
-                vsservices = uiProvider.GetService<IVSServices>();
+                client = gitHubServiceProvider.GetService<IMetricsService>();
+                connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
+                userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
+                vsservices = gitHubServiceProvider.GetService<IVSServices>();
 
-                var program = uiProvider.GetService<IProgram>();
+                var program = gitHubServiceProvider.GetService<IProgram>();
                 storePath = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     program.ApplicationName,

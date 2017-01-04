@@ -8,7 +8,6 @@ namespace GitHub.Models
 {
     public interface IExportFactoryProvider
     {
-        ExportFactory<IUIController> UIControllerFactory { get; set; }
         IEnumerable<ExportFactory<IViewModel, IViewModelMetadata>> ViewModelFactory { get; set; }
         IEnumerable<ExportFactory<IView, IViewModelMetadata>> ViewFactory { get; set; }
         ExportLifetimeContext<IViewModel> GetViewModel(UIViewType viewType);

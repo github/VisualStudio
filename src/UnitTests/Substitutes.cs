@@ -67,13 +67,14 @@ namespace UnitTests
         public static ITwoFactorChallengeHandler TwoFactorChallengeHandler { get { return Substitute.For<ITwoFactorChallengeHandler>(); } }
         public static IGistPublishService GistPublishService { get { return Substitute.For<IGistPublishService>(); } }
         public static IPullRequestService PullRequestService { get { return Substitute.For<IPullRequestService>(); } }
+        public static IUIProvider UIProvider { get { return Substitute.For<IUIProvider>(); } }
 
         /// <summary>
         /// This returns a service provider with everything mocked except for 
         /// RepositoryCloneService and RepositoryCreationService, which are real
         /// instances.
         /// </summary>
-        public static IServiceProvider ServiceProvider { get { return GetServiceProvider();  } }
+        public static IGitHubServiceProvider ServiceProvider { get { return GetServiceProvider();  } }
 
         /// <summary>
         /// This returns a service provider with mocked IRepositoryCreationService and
@@ -95,12 +96,12 @@ namespace UnitTests
         /// <param name="cloneService"></param>
         /// <param name="creationService"></param>
         /// <returns></returns>
-        public static IServiceProvider GetServiceProvider(
+        public static IGitHubServiceProvider GetServiceProvider(
             IRepositoryCloneService cloneService = null,
             IRepositoryCreationService creationService = null,
             IAvatarProvider avatarProvider = null)
         {
-            var ret = Substitute.For<IServiceProvider, IUIProvider>();
+            var ret = Substitute.For<IGitHubServiceProvider, IServiceProvider>();
 
             var gitservice = IGitService;
             var cm = Substitute.For<SComponentModel, IComponentModel>();
@@ -131,6 +132,7 @@ namespace UnitTests
             ret.GetService(typeof(ITwoFactorChallengeHandler)).Returns(TwoFactorChallengeHandler);
             ret.GetService(typeof(IGistPublishService)).Returns(GistPublishService);
             ret.GetService(typeof(IPullRequestService)).Returns(PullRequestService);
+            ret.GetService(typeof(IUIProvider)).Returns(UIProvider);
             return ret;
         }
 
@@ -211,6 +213,11 @@ namespace UnitTests
         public static IPullRequestService GetPullRequestsService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IPullRequestService)) as IPullRequestService;
+        }
+
+        public static IUIProvider GetUIProvider(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IUIProvider)) as IUIProvider;
         }
     }
 }

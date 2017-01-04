@@ -14,11 +14,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public const string GitHubConnectSection1Id = "519B47D3-F2A9-4E19-8491-8C9FA25ABE91";
 
         [ImportingConstructor]
-        public GitHubConnectSection1(ISimpleApiClientFactory apiFactory,
+        public GitHubConnectSection1(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings settings)
-            : base(apiFactory, holder, manager, settings, 1)
+            : base(serviceProvider, apiFactory, holder, manager, settings, 1)
         {
         }
     }

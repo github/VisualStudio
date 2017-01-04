@@ -267,7 +267,7 @@ namespace GitHub.ViewModels
         /// <param name="data"></param>
         public override void Initialize([AllowNull] ViewWithData data)
         {
-            var prNumber = (int)data.Data;
+            var prNumber = data?.Data != null ? (int)data.Data : Model.Number;
 
             IsBusy = true;
 

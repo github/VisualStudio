@@ -20,9 +20,6 @@ namespace GitHub.Services
             cc.SatisfyImportsOnce(this);
         }
 
-        [Import(AllowRecomposition = true)]
-        public ExportFactory<IUIController> UIControllerFactory { get; set; }
-
         [ImportMany(AllowRecomposition = true)]
         public IEnumerable<ExportFactory<IViewModel, IViewModelMetadata>> ViewModelFactory { get; set; }
 

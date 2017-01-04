@@ -23,7 +23,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         readonly Lazy<IVisualStudioBrowser> lazyBrowser;
 
         [ImportingConstructor]
-        public GitHubInvitationSection(IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
+        public GitHubInvitationSection(IGitHubServiceProvider serviceProvider, IConnectionManager cm, Lazy<IVisualStudioBrowser> browser)
+            : base(serviceProvider)
         {
             lazyBrowser = browser;
             CanConnect = true;
@@ -57,8 +58,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var uiProvider = ServiceProvider.GetService<IUIProvider>();
-            uiProvider.RunUI(controllerFlow, null);
+            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
+            uiProvider.RunInDialog(controllerFlow);
         }
 
         void OnThemeChanged()

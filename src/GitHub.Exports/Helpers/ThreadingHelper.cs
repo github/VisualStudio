@@ -3,6 +3,8 @@ using ThreadHelper = Microsoft.VisualStudio.Shell.ThreadHelper;
 using GitHub.Extensions;
 using System.Runtime.CompilerServices;
 using System;
+using System.Threading;
+using System.Windows;
 using static Microsoft.VisualStudio.Threading.JoinableTaskFactory;
 using static Microsoft.VisualStudio.Threading.AwaitExtensions;
 
@@ -21,6 +23,8 @@ namespace GitHub.Helpers
 
     public static class ThreadingHelper
     {
+        public static bool InUIThread => (!Guard.InUnitTestRunner && Application.Current.Dispatcher.CheckAccess()) || !(Guard.InUnitTestRunner);
+
         /// <summary>
         /// Switch to the UI thread using ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync
         /// Auto-disables switching when running in unit test mode
@@ -28,7 +32,7 @@ namespace GitHub.Helpers
         /// <returns></returns>
         public static IAwaitable SwitchToMainThreadAsync()
         {
-            return Guard.InUnitTestRunner() ?
+            return Guard.InUnitTestRunner ?
                 new AwaitableWrapper() :
                 new AwaitableWrapper(ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync());
         }
@@ -39,11 +43,11 @@ namespace GitHub.Helpers
         /// </summary>
         /// <param name="scheduler"></param>
         /// <returns></returns>
-        public static IAwaitable SwitchToPoolThreadAsync(TaskScheduler scheduler)
+        public static IAwaitable SwitchToPoolThreadAsync(TaskScheduler scheduler = null)
         {
-            return Guard.InUnitTestRunner() ?
+            return Guard.InUnitTestRunner ?
                 new AwaitableWrapper() :
-                new AwaitableWrapper(scheduler);
+                new AwaitableWrapper(scheduler ?? TaskScheduler.Default);
         }
 
         class AwaitableWrapper : IAwaitable
