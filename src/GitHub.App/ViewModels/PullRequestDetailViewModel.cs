@@ -498,8 +498,6 @@ namespace GitHub.ViewModels
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
 
-                usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget();
-
                 if (localBranches.Count > 0)
                 {
                     return pullRequestsService.SwitchToBranch(repository, Model);
@@ -510,19 +508,19 @@ namespace GitHub.ViewModels
                         .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.Checkout(repository, Model, x));
                 }
-            });
+            }).Do(_ => { }, () => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPull(object unused)
         {
-            usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget();
-            return pullRequestsService.Pull(repository);
+            return pullRequestsService.Pull(repository)
+                .Do(_ => { }, () => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPush(object unused)
         {
-            usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget();
-            return pullRequestsService.Push(repository);
+            return pullRequestsService.Push(repository)
+                .Do(_ => { }, () => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
