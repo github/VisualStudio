@@ -8,6 +8,8 @@ using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using NullGuard;
+using System.Diagnostics;
+using NLog;
 
 namespace GitHub.Services
 {
@@ -15,6 +17,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
@@ -66,8 +69,18 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, fetchOptions);
+                try
+                {
+                    var remote = repository.Network.Remotes[remoteName];
+                    repository.Network.Fetch(remote, fetchOptions);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Failed to fetch", ex);
+#if DEBUG
+                    throw;
+#endif
+                }
             });
         }
 
@@ -78,8 +91,18 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, refspecs, fetchOptions);
+                try
+                {
+                    var remote = repository.Network.Remotes[remoteName];
+                    repository.Network.Fetch(remote, refspecs, fetchOptions);
+                }
+                catch(Exception ex)
+                {
+                    log.Error("Failed to fetch", ex);
+#if DEBUG
+                    throw;
+#endif
+                }
             });
         }
 

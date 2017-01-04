@@ -56,10 +56,6 @@ namespace GitHub.ViewModels
                 .PullRequests;
 
             openPullRequestCommand = ReactiveCommand.Create();
-            openPullRequestCommand.Subscribe(_ =>
-            {
-                VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>().OpenUrl(repositoryHost.Address.WebUri);
-            });
 
             States = new List<PullRequestState> {
                 new PullRequestState { IsOpen = true, Name = "Open" },

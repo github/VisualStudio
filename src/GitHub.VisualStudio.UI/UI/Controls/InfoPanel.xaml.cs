@@ -71,7 +71,7 @@ namespace GitHub.VisualStudio.UI.Controls
             get
             {
                 if (browser == null)
-                    browser = Services.PackageServiceProvider.GetExportedValue<IVisualStudioBrowser>();
+                    browser = Services.PackageServiceProvider.GetServiceSafe<IVisualStudioBrowser>();
                 return browser;
             }
         }

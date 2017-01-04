@@ -16,8 +16,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class LoggedOutViewModel : BaseViewModel, ILoggedOutViewModel
     {
-        IUIProvider uiProvider;
-        IVisualStudioBrowser browser;
+        readonly IUIProvider uiProvider;
+        readonly IVisualStudioBrowser browser;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggedOutViewModel"/> class.
@@ -47,8 +47,7 @@ namespace GitHub.ViewModels
             // Show the Sign In dialog. We don't need to listen to the outcome of this: the parent
             // GitHubPaneViewModel will listen to RepositoryHosts.IsLoggedInToAnyHost and close
             // this view when the user logs in.
-            uiProvider.SetupUI(UIControllerFlow.Authentication, null);
-            uiProvider.RunUI();
+            uiProvider.RunInDialog(UIControllerFlow.Authentication);
         }
 
         /// <summary>

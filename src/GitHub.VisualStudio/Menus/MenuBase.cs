@@ -13,10 +13,10 @@ namespace GitHub.VisualStudio
 {
     public abstract class MenuBase
     {
-        readonly IUIProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
         readonly Lazy<ISimpleApiClientFactory> apiFactory;
 
-        protected IUIProvider ServiceProvider { get { return serviceProvider; } }
+        protected IGitHubServiceProvider ServiceProvider { get { return serviceProvider; } }
 
         protected ILocalRepositoryModel ActiveRepo { get; private set; }
 
@@ -40,7 +40,7 @@ namespace GitHub.VisualStudio
         protected MenuBase()
         {}
 
-        protected MenuBase(IUIProvider serviceProvider)
+        protected MenuBase(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
             apiFactory = new Lazy<ISimpleApiClientFactory>(() => ServiceProvider.TryGetService<ISimpleApiClientFactory>());
@@ -74,7 +74,7 @@ namespace GitHub.VisualStudio
                 connection = ServiceProvider.TryGetService<IConnectionManager>()?.Connections
                     .FirstOrDefault(c => activeRepo?.CloneUrl?.RepositoryName != null && c.HostAddress.Equals(HostAddress.Create(activeRepo.CloneUrl)));
             }
-            ServiceProvider.RunUI(controllerFlow, connection);
+            ServiceProvider.TryGetService<IUIProvider>().RunInDialog(controllerFlow, connection);
         }
 
         void RefreshRepo()
