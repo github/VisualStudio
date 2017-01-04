@@ -508,19 +508,19 @@ namespace GitHub.ViewModels
                         .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.Checkout(repository, Model, x));
                 }
-            }).Do(_ => { }, () => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
+            }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPull(object unused)
         {
             return pullRequestsService.Pull(repository)
-                .Do(_ => { }, () => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
+                .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPush(object unused)
         {
             return pullRequestsService.Push(repository)
-                .Do(_ => { }, () => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+                .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
