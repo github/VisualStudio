@@ -94,14 +94,14 @@ namespace GitHub.ViewModels
             Pull = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PullDisabledMessage == null),
+                    .Select(x => x != null && x.PullEnabled),
                 DoPull);
             Pull.ThrownExceptions.Subscribe(x => OperationError = x.Message);
 
             Push = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PushDisabledMessage == null),
+                    .Select(x => x != null && x.PushEnabled),
                 DoPush);
             Push.ThrownExceptions.Subscribe(x => OperationError = x.Message);
 
@@ -301,10 +301,11 @@ namespace GitHub.ViewModels
         {
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
-            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
-            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, pullRequest);
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
+
+            var prFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
+            SourceBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Head?.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Base.Label);
+            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             ChangedFilesTree.Clear();
             ChangedFilesList.Clear();
@@ -328,29 +329,57 @@ namespace GitHub.ViewModels
             if (isCheckedOut)
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
-                var pullDisabled = divergence.BehindBy == 0 ? "No commits to pull" : null;
-                var pushDisabled = divergence.AheadBy == 0 ? 
-                    "No commits to push" : 
-                    divergence.BehindBy > 0 ? "You must pull before you can push" : null;
+                var pullEnabled = divergence.BehindBy > 0;
+                var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
+                string pullToolTip;
+                string pushToolTip;
 
-                UpdateState = new UpdateCommandState(divergence, pullDisabled, pushDisabled);
+                if (pullEnabled)
+                {
+                    pullToolTip = string.Format(
+                        Resources.PullRequestDetailsPullToolTip,
+                        prFromFork ? Resources.Fork : Resources.Remote,
+                        SourceBranchDisplayName);
+                }
+                else
+                {
+                    pullToolTip = Resources.NoCommitsToPull;
+                }
+
+                if (pushEnabled)
+                {
+                    pushToolTip = string.Format(
+                        Resources.PullRequestDetailsPushToolTip,
+                        prFromFork ? Resources.Fork : Resources.Remote,
+                        SourceBranchDisplayName);
+                }
+                else if (divergence.AheadBy == 0)
+                {
+                    pushToolTip = Resources.NoCommitsToPush;
+                }
+                else
+                {
+                    pushToolTip = Resources.MustPullBeforePush;
+                }
+
+                UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip);
                 CheckoutState = null;
             }
             else
             {
                 var caption = localBranches.Count > 0 ?
-                    "Checkout " + localBranches.First().DisplayName :
-                    "Checkout to " + (await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
+                    string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
+                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(repository, Model.Number, Model.Title));
                 var clean = await pullRequestsService.IsWorkingDirectoryClean(repository);
                 string disabled = null;
 
                 if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
                 {
-                    disabled = "The source repository is no longer available.";
+                    disabled = Resources.SourceRepositoryNoLongerAvailable;
                 }
                 else if (!clean)
                 {
-                    disabled = "Cannot checkout as your working directory has uncommitted changes.";
+                    disabled = Resources.WorkingDirectoryHasUncommittedCHanges;
                 }
 
                 CheckoutState = new CheckoutCommandState(caption, disabled);
@@ -427,17 +456,15 @@ namespace GitHub.ViewModels
             return dir;
         }
 
-        string GetBranchDisplayName(string targetBranchLabel)
+        static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
         {
             if (targetBranchLabel != null)
             {
-                var parts = targetBranchLabel.Split(':');
-                var owner = parts[0];
-                return owner == repository.CloneUrl.Owner ? parts[1] : targetBranchLabel;
+                return isFromFork ? targetBranchLabel : targetBranchLabel.Split(':')[1];
             }
             else
             {
-                return "[Invalid]";
+                return Resources.InvalidBranchName;
             }
         }
 
@@ -446,7 +473,7 @@ namespace GitHub.ViewModels
             switch (file.Status)
             {
                 case PullRequestFileStatus.Added:
-                    return "add";
+                    return Resources.AddedFileStatus;
                 case PullRequestFileStatus.Renamed:
                     var fileName = file.FileName.Replace("/", "\\");
                     var change = changes?.Renamed.FirstOrDefault(x => x.Path == fileName);
@@ -458,7 +485,7 @@ namespace GitHub.ViewModels
                     }
                     else
                     {
-                        return "rename";
+                        return Resources.RenamedFileStatus;
                     }
                 default:
                     return null;
@@ -512,19 +539,28 @@ namespace GitHub.ViewModels
 
         class UpdateCommandState : IPullRequestUpdateState
         {
-            public UpdateCommandState(BranchTrackingDetails divergence, string pullDisabledMessage, string pushDisabledMessage)
+            public UpdateCommandState(
+                BranchTrackingDetails divergence,
+                bool pullEnabled,
+                bool pushEnabled,
+                string pullToolTip,
+                string pushToolTip)
             {
                 CommitsAhead = divergence.AheadBy ?? 0;
                 CommitsBehind = divergence.BehindBy ?? 0;
-                PullDisabledMessage = pullDisabledMessage;
-                PushDisabledMessage = pushDisabledMessage;
+                PushEnabled = pushEnabled;
+                PullEnabled = pullEnabled;
+                PullToolTip = pullToolTip;
+                PushToolTip = pushToolTip;
             }
 
             public int CommitsAhead { get; }
             public int CommitsBehind { get; }
             public bool UpToDate => CommitsAhead == 0 && CommitsBehind == 0;
-            public string PullDisabledMessage { get; }
-            public string PushDisabledMessage { get; }
+            public bool PullEnabled { get; }
+            public bool PushEnabled { get; }
+            public string PullToolTip { get; }
+            public string PushToolTip { get; }
         }
     }
 }

@@ -78,12 +78,12 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the message to display when a pull cannot be carried out.
         /// </summary>
-        string PullDisabledMessage { get; }
+        string PullToolTip { get; }
 
         /// <summary>
         /// Gets the message to display when a push cannot be carried out.
         /// </summary>
-        string PushDisabledMessage { get; }
+        string PushToolTip { get; }
     }
 
     /// <summary>

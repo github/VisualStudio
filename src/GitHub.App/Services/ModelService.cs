@@ -168,6 +168,8 @@ namespace GitHub.Services
                                  .Select(PullRequestCacheItem.Create),
                         item =>
                         {
+                            if (collection.Disposed) return;
+
                             // this could blow up due to the collection being disposed somewhere else
                             try { collection.RemoveItem(Create(item)); }
                             catch (ObjectDisposedException) { }
@@ -210,6 +212,8 @@ namespace GitHub.Services
                                  .Select(RepositoryCacheItem.Create),
                         item =>
                         {
+                            if (collection.Disposed) return;
+
                             // this could blow up due to the collection being disposed somewhere else
                             try { collection.RemoveItem(Create(item)); }
                             catch (ObjectDisposedException) { }

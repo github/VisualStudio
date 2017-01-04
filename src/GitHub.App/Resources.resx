@@ -249,4 +249,49 @@
   <data name="PullRequestNavigationItemText" xml:space="preserve">
     <value>Pull Request</value>
   </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>add</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>fork</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>[invalid]</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>You must pull before you can push</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>No commits to pull</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>No commits to push</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>*No description provided.*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>Checkout {0}</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>Checkout to {0}</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>Pull from {0} branch {1}</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>Push to {0} branch {1}</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>remote</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>rename</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>The source repository is no longer available.</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>Cannot checkout as your working directory has uncommitted changes.</value>
+  </data>
 </root>

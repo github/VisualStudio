@@ -11,6 +11,7 @@
                                     xmlns:uir="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
                                     xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
+                                    xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
                                     DataContext="{Binding ViewModel}"
@@ -22,15 +23,16 @@
     <d:DesignProperties.DataContext>
         <Binding>
             <Binding.Source>
-                <sampleData:PullRequestDetailViewModelDesigner>
+                <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
+                                                               TargetBranchDisplayName="master-is-always-stable">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
                     </sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                     -->
-                    <!--<sampleData:PullRequestDetailViewModelDesigner.UpdateState>
-                        <sampleData:PullRequestUpdateStateDesigner CommitsAhead="2" CommitsBehind="4" UpToDate="False"/>
-                    </sampleData:PullRequestDetailViewModelDesigner.UpdateState>-->
+                    <sampleData:PullRequestDetailViewModelDesigner.UpdateState>
+                        <sampleData:PullRequestUpdateStateDesigner CommitsAhead="0" CommitsBehind="0" UpToDate="True"/>
+                    </sampleData:PullRequestDetailViewModelDesigner.UpdateState>
                     <sampleData:PullRequestDetailViewModelDesigner.OperationError>
                         Unable to connect to the internets over here!
                     </sampleData:PullRequestDetailViewModelDesigner.OperationError>
@@ -134,10 +136,10 @@
 
             <StackPanel Grid.Column="1" Margin="0 0 6 0" Orientation="Vertical">
                 <!-- source and target branches -->
-                <Grid Margin="0 -3">
+                <Grid Margin="0 -3" HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
@@ -162,7 +164,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0" Opacity="0.5" Margin="0 2 0 0" VerticalAlignment="Top"
-                               Text="{Binding Model.UpdatedAt, StringFormat={}updated {0}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
+                               Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
                     <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
 
@@ -171,7 +173,7 @@
                                          Content="{Binding CheckoutState.Caption}"
                                          Grid.Column="2"
                                          VerticalAlignment="Center"
-                                         TextWrapping="Wrap"
+                                         TextTrimming="CharacterEllipsis"
                                          Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
                                          ToolTip="{Binding CheckoutState.DisabledMessage}"
                                          ToolTipService.ShowOnDisabled="True"/>
@@ -184,7 +186,7 @@
                         <ui:GitHubActionLink Content="Pull"
                                              Command="{Binding Pull}"
                                              Margin="4,0"
-                                             ToolTip="{Binding UpdateState.PullDisabledMessage}"
+                                             ToolTip="{Binding UpdateState.PullToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
                         <ui:OcticonImage Icon="arrow_up"/>
@@ -192,7 +194,7 @@
                         <ui:GitHubActionLink Content="Push"
                                              Command="{Binding Push}"
                                              Margin="4,0"
-                                             ToolTip="{Binding UpdateState.PushDisabledMessage}"
+                                             ToolTip="{Binding UpdateState.PushToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
                     </StackPanel>
@@ -200,7 +202,7 @@
                     <!-- Branch checked out and up-to-date -->
                     <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
                         <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run>Local branch up to date</Run>
+                        <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -294,7 +296,7 @@
                 <te:SectionControl Name="changesSection" 
                                    Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat=Changes ({0})}"
+                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0"
                                    ContextMenuService.IsEnabled="False">
                     <te:SectionControl.ContextMenu>
@@ -304,10 +306,10 @@
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
-                                                <Setter Property="Header" Value="Open File as Default Action"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.OpenFileAsDefaultAction}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
-                                                <Setter Property="Header" Value="Compare File as Default Action"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.CompareFileAsDefaultAction}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -319,10 +321,10 @@
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                <Setter Property="Header" Value="Switch to List View"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToListView}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                <Setter Property="Header" Value="Switch to Tree View"/>
+                                                <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToTreeView}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -340,8 +342,8 @@
                                 <!-- When invoked from the TreeView and the ListView we programmatically bind the 
                                      DataContext and update the CommandParameter to the changed file -->
                                 <ContextMenu x:Key="FileContextMenu">
-                                    <MenuItem Header="Open File" Command="{Binding OpenFile }"/>
-                                    <MenuItem Header="Compare File" Command="{Binding DiffFile }"/>
+                                    <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding CompareFile}"/>
                                 </ContextMenu>
                             </Grid.Resources>
                             
