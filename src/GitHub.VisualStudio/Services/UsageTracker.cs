@@ -135,6 +135,42 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementPullRequestCheckOutCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestsCheckedOut;
+            else
+                ++usage.Model.NumberOfLocalPullRequestsCheckedOut;
+
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPullRequestPushCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestPushes;
+            else
+                ++usage.Model.NumberOfLocalPullRequestPushes;
+
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPullRequestPullCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestPulls;
+            else
+                ++usage.Model.NumberOfLocalPullRequestPulls;
+
+            SaveUsage(usage);
+        }
+
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
@@ -286,6 +322,13 @@ namespace GitHub.Services
             usage.NumberOfLinkToGitHub = 0;
             usage.NumberOfLogins = 0;
             usage.NumberOfUpstreamPullRequests = 0;
+            usage.NumberOfPullRequestsOpened = 0;
+            usage.NumberOfLocalPullRequestsCheckedOut = 0;
+            usage.NumberOfLocalPullRequestPulls = 0;
+            usage.NumberOfLocalPullRequestPushes = 0;
+            usage.NumberOfForkPullRequestsCheckedOut = 0;
+            usage.NumberOfForkPullRequestPulls = 0;
+            usage.NumberOfForkPullRequestPushes = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;

@@ -244,7 +244,7 @@ namespace GitHub.Services
                     await gitClient.Checkout(repo, branchName);
                 }
 
-                return Observable.Empty<Unit>();
+                return Observable.Return(Unit.Default);
             });
         }
 

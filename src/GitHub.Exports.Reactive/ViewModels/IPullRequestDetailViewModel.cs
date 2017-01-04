@@ -107,6 +107,11 @@ namespace GitHub.ViewModels
         string TargetBranchDisplayName { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request comes from a fork.
+        /// </summary>
+        bool IsFromFork { get; }
+
+        /// <summary>
         /// Gets the pull request body.
         /// </summary>
         string Body { get; }

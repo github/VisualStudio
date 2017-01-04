@@ -31,6 +31,7 @@ namespace GitHub.ViewModels
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
+        readonly IUsageTracker usageTracker;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -40,6 +41,7 @@ namespace GitHub.ViewModels
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
+        bool isFromFork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -53,11 +55,13 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
                   pullRequestsService,
-                  settings)
+                  settings,
+                  usageTracker)
         {
         }
 
@@ -72,11 +76,13 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
         {
             this.repository = repository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
+            this.usageTracker = usageTracker;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
@@ -154,6 +160,15 @@ namespace GitHub.ViewModels
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request comes from a fork.
+        /// </summary>
+        public bool IsFromFork
+        {
+            get { return isFromFork; }
+            private set { this.RaiseAndSetIfChanged(ref isFromFork, value); }
         }
 
         /// <summary>
@@ -441,7 +456,7 @@ namespace GitHub.ViewModels
             return dir;
         }
 
-        string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
+        static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
         {
             if (targetBranchLabel != null)
             {
@@ -493,17 +508,19 @@ namespace GitHub.ViewModels
                         .GetDefaultLocalBranchName(repository, Model.Number, Model.Title)
                         .SelectMany(x => pullRequestsService.Checkout(repository, Model, x));
                 }
-            });
+            }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPull(object unused)
         {
-            return pullRequestsService.Pull(repository);
+            return pullRequestsService.Pull(repository)
+                .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPush(object unused)
         {
-            return pullRequestsService.Push(repository);
+            return pullRequestsService.Push(repository)
+                .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState
