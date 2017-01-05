@@ -10,7 +10,6 @@
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     xmlns:uir="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
-                                    xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
                                     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
@@ -392,7 +391,7 @@
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
-                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
+                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ui:SectionControl}}}">
                                             <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
