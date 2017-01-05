@@ -155,7 +155,7 @@ namespace GitHub.StartPage
                 }
             });
 
-            controller.Start();
+            uiProvider.RunInDialog(controller);
             gitHubServiceProvider.RemoveService(typeof(IGitRepositoriesExt), this);
 
             return new CloneRequest(basePath, repository);
