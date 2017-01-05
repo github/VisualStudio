@@ -390,7 +390,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\GitHub.StartPage\bin\Debug\GitHub.StartPage.pkgdef">
+    <Content Include="..\GitHub.StartPage\build\GitHub.StartPage.pkgdef">
       <Link>GitHub.StartPage.pkgdef</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
