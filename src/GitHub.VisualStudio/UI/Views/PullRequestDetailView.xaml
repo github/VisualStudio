@@ -243,7 +243,7 @@
                      Grid.Row="2"
                      Foreground="Red" 
                      Margin="0 0 0 0"
-                     Text="{Binding OperationError}"
+                     Text="{Binding OperationError, Mode=OneWay}"
                      VerticalAlignment="Center"
                      TextWrapping="Wrap"
                      Style="{StaticResource FlatReadOnlyTextBox}"
@@ -273,7 +273,7 @@
                                             Height="16"/>
 
                     <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
-                        <Run FontWeight="Bold" Text="{Binding Model.Author.Login}" />
+                        <Run FontWeight="Bold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
                         <Run Text="wrote" />
                     </TextBlock>
                 </StackPanel>
