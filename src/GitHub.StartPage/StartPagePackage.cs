@@ -158,7 +158,7 @@ namespace GitHub.StartPage
             uiProvider.RunInDialog(controller);
             gitHubServiceProvider.RemoveService(typeof(IGitRepositoriesExt), this);
 
-            return new CloneRequest(basePath, repository);
+            return repository != null && basePath != null ? new CloneRequest(basePath, repository) : null;
         }
 
         class CloneRequest
