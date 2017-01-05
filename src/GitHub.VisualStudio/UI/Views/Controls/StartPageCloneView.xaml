@@ -120,12 +120,11 @@
             
           <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.RepositoryName}"/>
           <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedRepository.CloneUrl.Owner}"/>
-          <TextBox Grid.Row="2" Grid.Column="2"
-                   Margin="3"
-                   TextWrapping="Wrap"
-                   VerticalAlignment="Center"
-                   Text="{Binding SelectedRepository.CloneUrl, Mode=OneWay}"
-                   Style="{StaticResource FlatReadOnlyTextBox}"/>
+          <TextBlock Grid.Row="2" Grid.Column="2"
+                     Margin="3"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     Text="{Binding SelectedRepository.CloneUrl, Mode=OneWay}"/>
 
           <Grid Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
