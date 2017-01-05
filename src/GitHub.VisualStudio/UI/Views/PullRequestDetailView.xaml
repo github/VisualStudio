@@ -10,7 +10,6 @@
                                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                     xmlns:uir="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                     xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App"
-                                    xmlns:te="clr-namespace:Microsoft.TeamFoundation.Controls.WPF.TeamExplorer.Framework;assembly=Microsoft.TeamFoundation.Controls"
                                     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                     Background="{DynamicResource GitHubVsToolWindowBackground}"
                                     Foreground="{DynamicResource GitHubVsWindowText}"
@@ -293,50 +292,61 @@
                 </ui:GitHubActionLink>
 
                 <!-- Files changed -->
-                <te:SectionControl Name="changesSection" 
+                <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
                                    IsExpanded="True"
                                    HeaderText="{Binding ChangedFilesList.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
-                                   Margin="0 5 10 0"
-                                   ContextMenuService.IsEnabled="False">
-                    <te:SectionControl.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
-                                                <Setter Property="Header" Value="{x:Static prop:Resources.OpenFileAsDefaultAction}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
-                                                <Setter Property="Header" Value="{x:Static prop:Resources.CompareFileAsDefaultAction}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
-                            <Separator/>
-                            <MenuItem Command="{Binding ToggleChangedFilesView}">
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToListView}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToTreeView}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                                <MenuItem.Icon>
-                                    <ui:OcticonPath Icon="list_unordered" Fill="Black" Height="16"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                        </ContextMenu>
-                    </te:SectionControl.ContextMenu>
+                                   Margin="0 5 10 0">
+
+                    <ui:SectionControl.Buttons>
+                        <ui:OcticonButton Name="changesOptionsMenuButton"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Icon="three_bars"
+                                          Padding="4"
+                                          ContextMenuService.IsEnabled="False"
+                                          ContextMenuService.Placement="Bottom"
+                                          Click="changesOptionsMenuButton_Click">
+                            <ui:OcticonButton.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
+                                        <MenuItem.Style>
+                                            <Style TargetType="MenuItem">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
+                                                        <Setter Property="Header" Value="{x:Static prop:Resources.OpenFileAsDefaultAction}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
+                                                        <Setter Property="Header" Value="{x:Static prop:Resources.CompareFileAsDefaultAction}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </MenuItem.Style>
+                                    </MenuItem>
+                                    <Separator/>
+                                    <MenuItem Command="{Binding ToggleChangedFilesView}">
+                                        <MenuItem.Style>
+                                            <Style TargetType="MenuItem">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
+                                                        <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToListView}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
+                                                        <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToTreeView}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </MenuItem.Style>
+                                        <MenuItem.Icon>
+                                            <ui:OcticonPath Icon="list_unordered" Fill="Black" Height="16"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </ui:OcticonButton.ContextMenu>
+                        </ui:OcticonButton>
+                    </ui:SectionControl.Buttons>
                     
-                    <te:SectionControl.Content>
+                    <ui:SectionControl.Content>
                         <Grid>
                             <Grid.Resources>
                                 <!-- When invoked from the TreeView and the ListView we programmatically bind the 
@@ -381,7 +391,7 @@
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type vm:PullRequestFileNode}">
                                         <StackPanel Orientation="Horizontal"
-                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type te:SectionControl}}}">
+                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ui:SectionControl}}}">
                                             <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
@@ -480,8 +490,8 @@
                                 </ListView.View>
                             </ListView>
                         </Grid>
-                    </te:SectionControl.Content>
-                </te:SectionControl>
+                    </ui:SectionControl.Content>
+                </ui:SectionControl>
             </Grid>
         </ScrollViewer>
 
