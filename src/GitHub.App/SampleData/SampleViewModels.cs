@@ -359,7 +359,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IRemoteRepositoryModel SelectedRepository { get; set; }
+        public IRepositoryModel SelectedRepository { get; set; }
 
         public ObservableCollection<IRemoteRepositoryModel> Repositories
         {

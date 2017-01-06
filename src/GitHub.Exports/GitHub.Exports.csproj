@@ -160,7 +160,7 @@
     <Compile Include="Models\IPullRequestFileModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />
     <Compile Include="Models\ILocalRepositoryModel.cs" />
-    <Compile Include="Models\RepositoryModelBase.cs" />
+    <Compile Include="Models\RepositoryModel.cs" />
     <Compile Include="Models\LocalRepositoryModel.cs" />
     <Compile Include="Helpers\NotificationAwareObject.cs" />
     <Compile Include="Models\UsageModel.cs" />
