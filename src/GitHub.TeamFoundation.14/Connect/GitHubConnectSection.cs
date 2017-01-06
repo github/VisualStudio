@@ -159,12 +159,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
                     LoggedIn = true;
-                    if (TEServiceProvider != null)
-                        RefreshRepositories().Forget();
-
                     settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
                     IsExpanded = settings.IsExpanded;
                 }
+                if (sectionIndex == 0 && TEServiceProvider != null)
+                    RefreshRepositories().Forget();
             }
         }
 
