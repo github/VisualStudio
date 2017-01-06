@@ -22,14 +22,12 @@ using GitHub.VisualStudio;
 namespace GitHub.StartPage
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [Guid(guidPackage)]
-    [ProvideCodeContainerProvider("GitHub Container", guidPackage, Guids.ImagesId, 1, "#110", "#111", typeof(GitHubContainerProvider))]
+    [Guid(Guids.StartPagePackageId)]
+    [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Guids.ImagesId, 1, "#110", "#111", typeof(GitHubContainerProvider))]
     public sealed class StartPagePackage : ExtensionPointPackage
     {
         static IServiceProvider serviceProvider;
         internal static IServiceProvider ServiceProvider { get { return serviceProvider; } }
-
-        public const string guidPackage = "3b764d23-faf7-486f-94c7-b3accc44a70e";
 
         public StartPagePackage()
         {
@@ -37,10 +35,9 @@ namespace GitHub.StartPage
         }
     }
 
-    [Guid(CodeContainerProviderId)]
+    [Guid(Guids.CodeContainerProviderId)]
     public class GitHubContainerProvider : ICodeContainerProvider
     {
-        public const string CodeContainerProviderId = "6CE146CB-EF57-4F2C-A93F-5BA685317660";
         public async Task<CodeContainer> AcquireCodeContainerAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
 
@@ -78,7 +75,7 @@ namespace GitHub.StartPage
                 localProperties: new CodeContainerLocalProperties(path, CodeContainerType.Folder,
                                 new CodeContainerSourceControlProperties(request.Repository.Name, path, new Guid(Guids.GitSccProviderId))),
                 remote: new RemoteCodeContainer(request.Repository.Name,
-                                                new Guid(CodeContainerProviderId),
+                                                new Guid(Guids.CodeContainerProviderId),
                                                 uri,
                                                 new Uri(uri.ToString().TrimSuffix(".git")),
                                                 DateTimeOffset.UtcNow),
