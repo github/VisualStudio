@@ -12,17 +12,17 @@ namespace GitHub.Models
     /// The base class for local and remote repository models.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class RepositoryModelBase : NotificationAwareObject, IRepositoryModel
+    public class RepositoryModel : NotificationAwareObject, IRepositoryModel
     {
         UriString cloneUrl;
         Octicon icon;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RepositoryModelBase"/> class.
+        /// Initializes a new instance of the <see cref="RepositoryModel"/> class.
         /// </summary>
         /// <param name="name">The repository name.</param>
         /// <param name="cloneUrl">The repository's clone URL.</param>
-        public RepositoryModelBase(
+        public RepositoryModel(
             string name,
             UriString cloneUrl)
         {
@@ -34,13 +34,13 @@ namespace GitHub.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RepositoryModelBase"/> class.
+        /// Initializes a new instance of the <see cref="RepositoryModel"/> class.
         /// </summary>
         /// <param name="path">
         /// The path to the local repository from which repository name and clone URL will be
         /// extracted.
         /// </param>
-        protected RepositoryModelBase(string path)
+        protected RepositoryModel(string path)
         {
             Guard.ArgumentNotNull(path, nameof(path));
 

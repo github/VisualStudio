@@ -49,7 +49,7 @@ namespace GitHub.StartPage
 
         public async Task<CodeContainer> AcquireCodeContainerAsync(RemoteCodeContainer onlineCodeContainer, IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
-            var repository = new RepositoryModelBase(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
+            var repository = new RepositoryModel(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
             return await RunAcquisition(downloadProgress, cancellationToken, repository);
         }
 
