@@ -14,6 +14,6 @@ namespace GitHub.SampleData
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
         public ICommand BrowseForDirectory { get; }
         public IReactiveCommand<Unit> CloneCommand { get; }
-        public IRemoteRepositoryModel SelectedRepository { get; set; }
+        public IRepositoryModel SelectedRepository { get; set; }
     }
 }

@@ -49,11 +49,11 @@ namespace GitHub.StartPage
 
         public async Task<CodeContainer> AcquireCodeContainerAsync(RemoteCodeContainer onlineCodeContainer, IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
-            var repository = new StartPageRepositoryModel(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
+            var repository = new RepositoryModelBase(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
             return await RunAcquisition(downloadProgress, cancellationToken, repository);
         }
 
-        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRemoteRepositoryModel repository)
+        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRepositoryModel repository)
         {
             CloneRequest request = null;
 
@@ -128,7 +128,7 @@ namespace GitHub.StartPage
             }
         }
 
-        CloneRequest ShowCloneDialog(IGitHubServiceProvider gitHubServiceProvider, IGitRepositoriesExt gitRepositories, IRemoteRepositoryModel repository = null)
+        CloneRequest ShowCloneDialog(IGitHubServiceProvider gitHubServiceProvider, IGitRepositoriesExt gitRepositories, IRepositoryModel repository = null)
         {
             string basePath = null;
 
@@ -163,14 +163,14 @@ namespace GitHub.StartPage
 
         class CloneRequest
         {
-            public CloneRequest(string basePath, IRemoteRepositoryModel repository)
+            public CloneRequest(string basePath, IRepositoryModel repository)
             {
                 BasePath = basePath;
                 Repository = repository;
             }
 
             public string BasePath { get; }
-            public IRemoteRepositoryModel Repository { get; }
+            public IRepositoryModel Repository { get; }
         }
     }
 }

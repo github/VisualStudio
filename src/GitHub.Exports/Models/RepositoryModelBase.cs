@@ -22,7 +22,7 @@ namespace GitHub.Models
         /// </summary>
         /// <param name="name">The repository name.</param>
         /// <param name="cloneUrl">The repository's clone URL.</param>
-        protected RepositoryModelBase(
+        public RepositoryModelBase(
             string name,
             UriString cloneUrl)
         {
