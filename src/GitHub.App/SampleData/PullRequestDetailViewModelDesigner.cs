@@ -95,12 +95,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public Task<string> ExtractFile(IPullRequestFileNode file)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

@@ -22,23 +22,21 @@ namespace GitHub.SampleData
 
         public int CompareTo(IRemoteRepositoryModel other)
         {
-            throw new NotImplementedException();
+            return 0;
         }
 
         public void CopyFrom(IRemoteRepositoryModel other)
         {
-            throw new NotImplementedException();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         public bool Equals(IRemoteRepositoryModel other)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public void SetIcon(bool isPrivate, bool isFork)
         {
-            throw new NotImplementedException();
         }
     }
 }
