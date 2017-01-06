@@ -45,7 +45,7 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// An MEF export attribute that defines an export of type <see cref="IViewModel"/> with
+    /// A MEF export attribute that defines an export of type <see cref="IViewModel"/> with
     /// <see cref="UIViewType"/> metadata.
     /// </summary>
     [MetadataAttribute]
@@ -59,7 +59,7 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// An MEF export attribute that defines an export of type <see cref="IView"/> with
+    /// A MEF export attribute that defines an export of type <see cref="IView"/> with
     /// <see cref="UIViewType"/> metadata.
     /// </summary>
     [MetadataAttribute]
@@ -74,7 +74,7 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// An MEF export attribute that defines an export of type <see cref="IMenuHandler"/> with
+    /// A MEF export attribute that defines an export of type <see cref="IMenuHandler"/> with
     /// <see cref="MenuType"/> metadata.
     /// </summary>
     [MetadataAttribute]
@@ -89,7 +89,7 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// Defines an MEF metadata view that matches <see cref="ExportViewModelAttribute"/> and
+    /// Defines a MEF metadata view that matches <see cref="ExportViewModelAttribute"/> and
     /// <see cref="ExportViewAttribute"/>.
     /// </summary>
     /// <remarks>
@@ -102,7 +102,7 @@ namespace GitHub.Exports
     }
 
     /// <summary>
-    /// Defines an MEF metadata view that matches <see cref="ExportMenuAttribute"/>.
+    /// Defines a MEF metadata view that matches <see cref="ExportMenuAttribute"/>.
     /// </summary>
     /// <remarks>
     /// For more information see the Metadata and Metadata views section at
