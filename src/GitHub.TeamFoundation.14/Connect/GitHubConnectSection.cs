@@ -162,8 +162,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
                     IsExpanded = settings.IsExpanded;
                 }
-                if (sectionIndex == 0 && TEServiceProvider != null)
-                    RefreshRepositories().Forget();
+                if (TEServiceProvider != null)
+                    RefreshRepositories(sectionIndex == 0).Forget();
             }
         }
 
@@ -181,7 +181,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // watch for new repos added to the local repo list
             var section = GetSection(TeamExplorerConnectionsSectionId);
             if (section != null)
-                sectionTracker = new SectionStateTracker(section, RefreshRepositories);
+                sectionTracker = new SectionStateTracker(section, () => RefreshRepositories(true));
         }
 
         void UpdateConnection()
@@ -313,9 +313,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 #endif
         }
 
-        async Task RefreshRepositories()
+        async Task RefreshRepositories(bool refreshConnectionManager)
         {
-            await connectionManager.RefreshRepositories();
+            if (refreshConnectionManager)
+                await connectionManager.RefreshRepositories();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
