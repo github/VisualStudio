@@ -104,7 +104,8 @@ namespace GitHub.VisualStudio.Base
 
         protected ITeamExplorerSection GetSection(Guid section)
         {
-            return ServiceProvider.TryGetService<ITeamExplorerPage>()?.GetSection(section);
+            var tep = (ITeamExplorerPage)TEServiceProvider.GetServiceSafe(typeof(ITeamExplorerPage));
+            return tep?.GetSection(section);
         }
     }
 }

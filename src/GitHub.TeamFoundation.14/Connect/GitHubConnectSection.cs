@@ -159,12 +159,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     Title = connection.HostAddress.Title;
                     IsVisible = true;
                     LoggedIn = true;
-                    if (TEServiceProvider != null)
-                        RefreshRepositories().Forget();
-
                     settings = packageSettings.UIState.GetOrCreateConnectSection(Title);
                     IsExpanded = settings.IsExpanded;
                 }
+                if (TEServiceProvider != null)
+                    RefreshRepositories().Forget();
             }
         }
 
@@ -316,6 +315,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         async Task RefreshRepositories()
         {
+            // TODO: This is wasteful as we can be calling it multiple times for a single changed
+            // signal, once from each section. Needs refactoring.
             await connectionManager.RefreshRepositories();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
