@@ -163,7 +163,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     IsExpanded = settings.IsExpanded;
                 }
                 if (TEServiceProvider != null)
-                    RefreshRepositories(sectionIndex == 0).Forget();
+                    RefreshRepositories().Forget();
             }
         }
 
@@ -181,7 +181,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // watch for new repos added to the local repo list
             var section = GetSection(TeamExplorerConnectionsSectionId);
             if (section != null)
-                sectionTracker = new SectionStateTracker(section, () => RefreshRepositories(sectionIndex == 0));
+                sectionTracker = new SectionStateTracker(section, RefreshRepositories);
         }
 
         void UpdateConnection()
@@ -313,10 +313,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 #endif
         }
 
-        async Task RefreshRepositories(bool refreshConnectionManager)
+        async Task RefreshRepositories()
         {
-            if (refreshConnectionManager)
-                await connectionManager.RefreshRepositories();
+            // TODO: This is wasteful as we can be calling it multiple times for a single changed
+            // signal, once from each section. Needs refactoring.
+            await connectionManager.RefreshRepositories();
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 
