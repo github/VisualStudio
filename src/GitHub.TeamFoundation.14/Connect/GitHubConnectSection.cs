@@ -181,7 +181,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // watch for new repos added to the local repo list
             var section = GetSection(TeamExplorerConnectionsSectionId);
             if (section != null)
-                sectionTracker = new SectionStateTracker(section, () => RefreshRepositories(true));
+                sectionTracker = new SectionStateTracker(section, () => RefreshRepositories(sectionIndex == 0));
         }
 
         void UpdateConnection()
