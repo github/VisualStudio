@@ -42,6 +42,7 @@ namespace GitHub.ViewModels
         IPullRequestUpdateState updateState;
         string operationError;
         bool isFromFork;
+        bool isInCheckout;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -90,6 +91,7 @@ namespace GitHub.ViewModels
                     .Select(x => x != null && x.DisabledMessage == null), 
                 DoCheckout);
             Checkout.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+            Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
 
             Pull = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
@@ -388,7 +390,10 @@ namespace GitHub.ViewModels
 
             IsBusy = false;
 
-            pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
+            if (!isInCheckout)
+            {
+                pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
+            }
         }
 
         /// <summary>
