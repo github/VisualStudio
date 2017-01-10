@@ -158,7 +158,7 @@
       - [ ] "Checkout to [branch name]" text has changed to "Local branch up to date"
 - [ ] **Create a new branch (can alternatively make commits on an existing branch)**
 - [ ] **Switch Git context to new branch**
-- [ ] **Click on Create New button**
+- [ ] **Navigate to the Pull Request List (Pull request icon in navigation toolbar) and click on Create New button**
       - [ ] Pane title displays "GitHub | (current repository)"
       - [ ] Selected pane tab title (on the bottom) displays "GitHub"
       - [ ] Create Pull Request button is disabled.
@@ -173,7 +173,8 @@
       - [ ] Pull request list is displayed with new pull request (that was just created) at the top of the list
       - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
       - [ ] Verify all non pushed commits prior to pull request creation have been pushed and exist on .com
-
+- [ ] **Click on back/right/pull request/refresh navigation items (any order)**
+      - [ ] Verify that navigation buttons show views are consistent with clicked navigation buttons
 
 # In VS text/code Editor (logged in to GitHub, open a file that is hosted on Github)
 - [ ] **Highlight code or text within solution, then right click.**
