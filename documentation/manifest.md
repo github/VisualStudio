@@ -126,6 +126,36 @@
       - [ ] "Create New" Link button is displayed
       - [ ] Clicking on a pull request title opens browser window to pull request on .com
       - [ ] Clicking on a pull request number opens browser window to pull request on .com
+- [ ] **Click on a pull request title**
+      - [ ] A detailed description of the pull request is displayed.
+      - [ ] Pull request number matches the number in the list.
+      - [ ] Pull request title matches the title in the list.
+      - [ ] Source branch is displayed on the left
+      - [ ] Mousing over the source branch shows the entire branch name in a tool tip
+      - [ ] Target branch is displayed on the right
+      - [ ] Mousing over the target branch shows the entire branch name in a tool tip
+      - [ ] "View conversation on GitHub" link navigates to pull request on .com
+      - [ ] List of changed files displayed under pull request description
+      - [ ] Right clicking on a specific file displays options to open or compare file
+      - [ ] Double clicking on a file opens a diff view of the file or a single file (depends on current file option)
+      - [ ] Files in file diff view match diff on .com (pick any file)
+- [ ] **Change the changed files current view**
+      - [ ] The view has been changed to the view selected
+- [ ] **Close & reopen Visual Studio**
+- [ ] **Go to any pull request details**
+      - [ ] View of changed files was the selected view before closing Visual Studio
+- [ ] **Change the default file action**
+      - [ ] Double clicking on a file in the changed file list opens a diff view if previous action setting opened the file, or a single file if the previous action setting opened the diff view (depends on current file option)
+- [ ] **Close & reopen Visual Studio**
+- [ ] **Go to any pull request details**
+      - [ ] Double clicking on a file in the changed file list uses last default action setting open file/file diff
+- [ ] **Make a change any file and save it**
+- [ ] **Go to any pull request details and mouseover**
+      - [ ] "Checkout to [branch name]" is plain text (not hyperlink) and mouseover displays tool tip
+- [ ] **Undo pending changes (Many option to do this. One way: Go to Team Explorer > Home > Changes > Right click on files > Undo Changes)**
+- [ ] **Click on "checkout to [branch name]"**
+      - [ ] Git context (lower right) displays source branch name of pull request
+      - [ ] "Checkout to [branch name]" text has changed to "Local branch up to date"
 - [ ] **Create a new branch (can alternatively make commits on an existing branch)**
 - [ ] **Switch Git context to new branch**
 - [ ] **Click on Create New button**
