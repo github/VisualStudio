@@ -224,7 +224,7 @@ namespace GitHub.VisualStudio
         public Ret GetService<T, Ret>() where T : class
                                         where Ret : class
         {
-            return TryGetService<T>() as Ret;
+            return TryGetService(typeof(T)) as Ret;
         }
 
         public void AddService<T>(object owner, T instance) where T : class
