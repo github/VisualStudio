@@ -49,9 +49,14 @@ namespace GitHub.ViewModels
         string Caption { get; }
 
         /// <summary>
-        /// Gets the message to display when a checkout cannot be carried out.
+        /// Gets a value indicating whether checkout is available.
         /// </summary>
-        string DisabledMessage { get; }
+        bool IsEnabled { get; }
+
+        /// <summary>
+        /// Gets the message to display as the checkout button's tooltip.
+        /// </summary>
+        string ToolTip { get; }
     }
 
     /// <summary>

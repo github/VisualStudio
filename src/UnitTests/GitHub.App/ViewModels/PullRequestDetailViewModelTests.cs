@@ -216,7 +216,8 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
-                Assert.Null(target.CheckoutState.DisabledMessage);
+                Assert.True(target.CheckoutState.IsEnabled);
+                Assert.Equal("Checkout pr/123", target.CheckoutState.ToolTip);
             }
 
             [Fact]
@@ -229,7 +230,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.DisabledMessage);
+                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.ToolTip);
             }
 
             [Fact]
@@ -268,7 +269,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Load(pr);
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("The source repository is no longer available.", target.CheckoutState.DisabledMessage);
+                Assert.Equal("The source repository is no longer available.", target.CheckoutState.ToolTip);
             }
 
             [Fact]

@@ -88,7 +88,7 @@ namespace GitHub.ViewModels
             Checkout = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.CheckoutState)
                     .Cast<CheckoutCommandState>()
-                    .Select(x => x != null && x.DisabledMessage == null), 
+                    .Select(x => x != null && x.IsEnabled), 
                 DoCheckout);
             Checkout.ThrownExceptions.Subscribe(x => OperationError = x.Message);
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
@@ -533,11 +533,13 @@ namespace GitHub.ViewModels
             public CheckoutCommandState(string caption, string disabledMessage)
             {
                 Caption = caption;
-                DisabledMessage = disabledMessage;
+                IsEnabled = disabledMessage == null;
+                ToolTip = disabledMessage ?? caption;
             }
 
             public string Caption { get; }
-            public string DisabledMessage { get; }
+            public bool IsEnabled { get; }
+            public string ToolTip { get; }
         }
 
         class UpdateCommandState : IPullRequestUpdateState

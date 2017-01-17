@@ -11,7 +11,8 @@ namespace GitHub.SampleData
     public class PullRequestCheckoutStateDesigner : IPullRequestCheckoutState
     {
         public string Caption { get; set; }
-        public string DisabledMessage { get; set; }
+        public bool IsEnabled { get; set; }
+        public string ToolTip { get; set; }
     }
 
     public class PullRequestUpdateStateDesigner : IPullRequestUpdateState
