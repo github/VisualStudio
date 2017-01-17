@@ -353,7 +353,7 @@
                                      DataContext and update the CommandParameter to the changed file -->
                                 <ContextMenu x:Key="FileContextMenu">
                                     <MenuItem Header="{x:Static prop:Resources.OpenFile}" Command="{Binding OpenFile}"/>
-                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding CompareFile}"/>
+                                    <MenuItem Header="{x:Static prop:Resources.CompareFile}" Command="{Binding DiffFile}"/>
                                 </ContextMenu>
                             </Grid.Resources>
                             
