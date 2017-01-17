@@ -174,7 +174,7 @@
                                          VerticalAlignment="Center"
                                          TextTrimming="CharacterEllipsis"
                                          Visibility="{Binding CheckoutState, Converter={ui:NullToVisibilityConverter}}"
-                                         ToolTip="{Binding CheckoutState.DisabledMessage}"
+                                         ToolTip="{Binding CheckoutState.ToolTip}"
                                          ToolTipService.ShowOnDisabled="True"/>
 
                     <!-- Pull/push buttons -->
