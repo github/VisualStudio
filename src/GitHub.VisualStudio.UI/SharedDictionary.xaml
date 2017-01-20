@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:cache="clr-namespace:GitHub.VisualStudio.UI.Helpers"
-                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
+                    xmlns:conv="clr-namespace:GitHub.VisualStudio.UI.Converters"
+                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                    xmlns:vm="clr-namespace:GitHub.ViewModels;assembly=GitHub.App">
 
     <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml"/>
@@ -17,6 +19,11 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/SectionControl.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
+    <conv:ViewLocatorConverter x:Key="ViewLocator"/>
+    <DataTemplate DataType="{x:Type vm:BaseViewModel}">
+        <ContentControl Content="{Binding Converter={StaticResource ViewLocator}}"/>
+    </DataTemplate>
+    
     <DrawingBrush x:Key="ConnectArrowBrush">
         <DrawingBrush.Drawing>
             <DrawingGroup>
