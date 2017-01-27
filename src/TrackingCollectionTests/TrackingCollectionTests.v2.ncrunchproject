@@ -23,4 +23,9 @@
   <UseCPUArchitecture>AutoDetect</UseCPUArchitecture>
   <MSTestThreadApartmentState>STA</MSTestThreadApartmentState>
   <BuildProcessArchitecture>x86</BuildProcessArchitecture>
+  <IgnoredTests>
+    <NamedTestSelector>
+      <TestName>TrackingTests.OrderByDoesntMatchOriginalOrderTimings</TestName>
+    </NamedTestSelector>
+  </IgnoredTests>
 </ProjectConfiguration>

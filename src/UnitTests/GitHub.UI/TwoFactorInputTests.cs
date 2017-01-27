@@ -67,7 +67,7 @@ public class TwoFactorInputTests
         }
 
 #if !NCRUNCH
-        [STAFact]
+        [STATheory]
 #endif
         [InlineData(null, null)]
         [InlineData("", "")]
