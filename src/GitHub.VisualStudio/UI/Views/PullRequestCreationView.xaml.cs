@@ -4,6 +4,7 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using System.ComponentModel.Composition;
 using ReactiveUI;
+using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -14,6 +15,8 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class PullRequestCreationView : GenericPullRequestCreationView
     {
+        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
+
         public PullRequestCreationView()
         {
             InitializeComponent();
@@ -21,7 +24,12 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
-                d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
+                d(ViewModel.CreatePullRequest.Subscribe(_ =>
+                {
+                    NotifyDone();
+                    var v = new ViewWithData(UIControllerFlow.PullRequestList);
+                    load.OnNext(v);
+                }));
             });
         }
     }
