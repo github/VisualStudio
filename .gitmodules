@@ -1,6 +1,6 @@
 [submodule "submodules/rothko"]
 	path = submodules/rothko
-	url = https://github.com/Haacked/Rothko.git
+	url = https://github.com/editor-tools/Rothko.git
 [submodule "submodules/reactiveui"]
 	path = submodules/reactiveui
 	url = https://github.com/shana/ReactiveUI
@@ -16,6 +16,3 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
-[submodule "submodules/externalpackages/StartPage"]
-	path = submodules/externalpackages/StartPage
-	url = https://github.com/editor-tools/StartPage.git

@@ -53,7 +53,8 @@ namespace GitHub.ViewModels
             IUsageTracker usageTracker)
             : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService, usageTracker)
         { }
-        
+
+
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
@@ -160,7 +161,7 @@ namespace GitHub.ViewModels
                 return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath)
                     .ContinueAfter(() =>
                     {
-                        usageTracker.IncrementCloneCount();
+                        usageTracker.IncrementCloneCount().Forget();
                         return Observable.Return(Unit.Default);
                     });
             })
@@ -240,12 +241,12 @@ namespace GitHub.ViewModels
             private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRemoteRepositoryModel>)value); }
         }
 
-        IRemoteRepositoryModel selectedRepository;
+        IRepositoryModel selectedRepository;
         /// <summary>
         /// Selected repository to clone
         /// </summary>
         [AllowNull]
-        public IRemoteRepositoryModel SelectedRepository
+        public IRepositoryModel SelectedRepository
         {
             [return: AllowNull]
             get { return selectedRepository; }

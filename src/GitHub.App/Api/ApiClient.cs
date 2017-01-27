@@ -236,6 +236,16 @@ namespace GitHub.Api
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
         }
 
+        public IObservable<PullRequest> GetPullRequest(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Get(owner, name, number);
+        }
+
+        public IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Files(owner, name, number);
+        }
+
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
         {
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
@@ -268,6 +278,11 @@ namespace GitHub.Api
         public IObservable<Repository> GetRepository(string owner, string repo)
         {
             return gitHubClient.Repository.Get(owner, repo);
+        }
+
+        public IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path)
+        {
+            return gitHubClient.Repository.Content.GetAllContentsByRef(owner, name, reference, path);
         }
     }
 }

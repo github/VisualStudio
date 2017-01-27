@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         public GistCreationControl(
             ITeamExplorerServices teServices,
             INotificationDispatcher notifications,
-            [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+            IGitHubServiceProvider serviceProvider)
         {
             InitializeComponent();
 
@@ -43,8 +43,12 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     .Where(x => x != null)
                     .Subscribe(gist =>
                     {
-                        var browser = serviceProvider.GetExportedValue<IVisualStudioBrowser>();
+                        var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
                         browser?.OpenUrl(new Uri(gist.HtmlUrl));
+
+                        var ns = serviceProvider.TryGetService<IStatusBarNotificationService>();
+                        ns?.ShowMessage(UI.Resources.gistCreatedMessage);
+
                         NotifyDone();
                     });
 

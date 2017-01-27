@@ -58,9 +58,19 @@ public class TestBaseClass : IEntryExitDecorator
         DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount = 0, int reviewCommentCount = 0)
     {
         var uri = new Uri("https://url");
+        var uris = uri.ToString();
+        var repo = new Repository(uris, uris, uris, uris, uris, uris, uris,
+            1, user, "Repo", "Repo", string.Empty, string.Empty, string.Empty,
+            false, false, 0, 0, "master",
+            0, null, createdAt, updatedAt,
+            null, null, null,
+            false, false, false);
         return new PullRequest(uri, uri, uri, uri, uri, uri,
             id, state, title, "", createdAt, updatedAt,
-            null, null, null, null, user, null, false, null,
+            null, null, 
+            new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
+            new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
+            user, null, false, null,
             commentCount, reviewCommentCount, 0, 0, 0, 0,
             null, false);
     }

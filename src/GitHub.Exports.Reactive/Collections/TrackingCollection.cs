@@ -492,6 +492,7 @@ namespace GitHub.Collections
 
         void RecalculateSort(List<T> list, int start, int end)
         {
+            sortedIndexCache.Clear();
             list.Sort(start, end, new LambdaComparer<T>(comparer));
         }
 
@@ -539,8 +540,8 @@ namespace GitHub.Collections
                 var old = list[idx];
                 if (newer != null)
                 {
-                    // the object is "older" than the one we have, ignore it
-                    if (newer(item, old) > 0)
+                    // the object is not "newer" than the one we have, ignore it
+                    if (newer(item, old) >= 0)
                         return new ActionData(TheAction.Ignore, list, item, null, idx, idx);
                 }
 
@@ -872,10 +873,8 @@ namespace GitHub.Collections
                 throw new ArgumentOutOfRangeException(nameof(start), "Start cannot be bigger than end, evaluation of the filter goes forward.");
 
             InternalMoveItem(from, to);
-            start++;
-            RecalculateFilter(list, (from < to ? from : to) + 1, start, end);
+            RecalculateFilter(list, (from < to ? from : to), start, end);
         }
-
 
         /// <summary>
         /// Go through the list of objects and adjust their "visibility" in the live list
@@ -1180,6 +1179,8 @@ namespace GitHub.Collections
         }
 
         bool disposed = false;
+        public bool Disposed => disposed;
+
         void Dispose(bool disposing)
         {
             if (disposing)

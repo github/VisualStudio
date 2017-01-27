@@ -8,11 +8,12 @@ using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.Services
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(ITeamExplorerServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServices : ITeamExplorerServices
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. ITeamExplorerNotificationManager is declared here so
@@ -23,7 +24,7 @@ namespace GitHub.Services
         ITeamExplorerNotificationManager manager;
 
         [ImportingConstructor]
-        public TeamExplorerServices([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public TeamExplorerServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -38,31 +39,31 @@ namespace GitHub.Services
 
         public void ShowMessage(string message)
         {
-            manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
         }
 
         public void ShowMessage(string message, ICommand command)
         {
-            manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
         }
 
         public void ShowWarning(string message)
         {
-            manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
         }
 
         public void ShowError(string message)
         {
-            manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
         }
 
         public void ClearNotifications()
         {
-            manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ClearNotifications();
         }
     }

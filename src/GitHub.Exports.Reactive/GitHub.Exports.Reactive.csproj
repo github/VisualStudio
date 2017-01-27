@@ -115,8 +115,12 @@
     <Compile Include="ViewModels\ILoginToHostViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestCreationViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestDetailViewModel.cs" />
+    <Compile Include="ViewModels\IPullRequestChangeNode.cs" />
+    <Compile Include="ViewModels\IPullRequestDirectoryNode.cs" />
+    <Compile Include="ViewModels\IPullRequestFileNode.cs" />
     <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
     <Compile Include="ViewModels\IReactiveViewModel.cs" />
+    <Compile Include="ViewModels\IBaseCloneViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />

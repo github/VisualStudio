@@ -15,11 +15,12 @@ using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 
 namespace GitHub.Services
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(IVSGitServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServices : IVSGitServices
     {
-        readonly IUIProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -30,7 +31,7 @@ namespace GitHub.Services
         IGitExt gitExtService;
 
         [ImportingConstructor]
-        public VSGitServices(IUIProvider serviceProvider)
+        public VSGitServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }

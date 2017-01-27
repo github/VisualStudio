@@ -13,6 +13,7 @@ using NUnit.Framework;
 using System.Reactive;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
+using GitHub;
 
 [TestFixture]
 public class TrackingTests : TestBase
@@ -333,7 +334,7 @@ public class TrackingTests : TestBase
         var total = 1000;
 
         var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 2")).ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -378,7 +379,7 @@ public class TrackingTests : TestBase
         var total = 1000;
 
         var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 2")).ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -429,8 +430,8 @@ public class TrackingTests : TestBase
         var count = 0;
         var total = 1000;
 
-        var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, total - i, "Run 1")).ToList());
-        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, total - i, "Run 2")).ToList());
+        var list1 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i, "Run 1")).Reverse().ToList());
+        var list2 = new List<Thing>(Enumerable.Range(1, total).Select(i => GetThing(i, i, i + 1, "Run 2")).Reverse().ToList());
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.ToObservable(),
@@ -1323,7 +1324,7 @@ public class TrackingTests : TestBase
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             source,
             OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare,
-            (item, position, list) => (position >= 1 && position <= 2) || (position >= 5 && position <= 7));
+            (item, position, list) => position == 1 || position == 2 || position == 5 || position == 6 || position == 7);
         col.ProcessingDelay = TimeSpan.Zero;
 
         var count = 0;
@@ -1882,46 +1883,25 @@ public class TrackingTests : TestBase
         var expectedTotal = 20;
         var rnd = new Random(214748364);
 
-        var titles1 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('a' + x)).ToString()).ToList();
-        var dates1 = Enumerable.Range(1, expectedTotal).Select(x => Now + TimeSpan.FromMinutes(x)).ToList();
-
-        var idstack1 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
-        var datestack1 = new Stack<DateTimeOffset>(dates1);
-        var titlestack1 = new Stack<string>(titles1.OrderBy(_ => rnd.Next()));
-
-        var titles2 = Enumerable.Range(1, expectedTotal).Select(x => ((char)('c' + x)).ToString()).ToList();
-        var dates2 = Enumerable.Range(1, expectedTotal).Select(x => Now + TimeSpan.FromMinutes(x)).ToList();
-        var dates2mixed = new List<DateTimeOffset>() {
-                dates2[2],  dates2[0],  dates2[1],  dates2[3],  dates2[5],
-                dates2[9],  dates2[15], dates2[6],  dates2[7],  dates2[8],
-                dates2[13], dates2[10], dates2[16], dates2[11], dates2[12],
-                dates2[14], dates2[17], dates2[18], dates2[19], dates2[4],
-        };
-        var idstack2 = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
-        var datestack2 = new Stack<DateTimeOffset>(dates2mixed);
-        var titlestack2 = new Stack<string>(titles2.OrderBy(_ => rnd.Next()));
-
-        var datestack3 = new Stack<DateTimeOffset>();
-        for (int i = 0; i < datestack1.Count; i++)
-            datestack3.Push(new DateTimeOffset(Math.Max(dates1[i].Ticks, dates2mixed[i].Ticks), TimeSpan.Zero));
+        var updatedAtMinutesStack = new Stack<int>(Enumerable.Range(1, expectedTotal).OrderBy(rnd.Next));
 
         var list1 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
             .OrderBy(rnd.Next)
-            .Select(x => new Thing(idstack1.Pop(), titlestack1.Pop(), datestack1.Pop()))
+            .Select(x => GetThing(x, x, x, ((char)('a' + x)).ToString()))
             .ToObservable())
             .Replay()
             .RefCount();
 
         var list2 = Observable.Defer(() => Enumerable.Range(1, expectedTotal)
             .OrderBy(rnd.Next)
-            .Select(x => new Thing(idstack2.Pop(), titlestack2.Pop(), datestack2.Pop()))
+            .Select(x => GetThing(x, x, updatedAtMinutesStack.Pop(), ((char)('c' + x)).ToString()))
             .ToObservable())
             .Replay()
             .RefCount();
 
         ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
             list1.Concat(list2),
-            OrderedComparer<Thing>.OrderByDescending(x => x.CreatedAt).Compare,
+            OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare,
             (item, idx, list) => idx < 5
         );
         col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
@@ -1933,7 +1913,9 @@ public class TrackingTests : TestBase
         CollectionAssert.AreNotEqual(list1.Select(x => x.Number).ToEnumerable(), list2.Select(x => x.Number).ToEnumerable());
 
         var sortlist = col.ToArray();
-        Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderByDescending(x => x.CreatedAt).Compare));
+        Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>
+            .OrderByDescending(x => x.UpdatedAt)
+            .ThenByDescending(x => x.CreatedAt).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
         col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.Number).Compare;
@@ -1941,9 +1923,11 @@ public class TrackingTests : TestBase
         Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderBy(x => x.Number).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
-        col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare;
+        col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare;
         sortlist = col.ToArray();
-        Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>.OrderBy(x => x.CreatedAt).Compare));
+        Array.Sort(sortlist, new LambdaComparer<Thing>(OrderedComparer<Thing>
+            .OrderBy(x => x.UpdatedAt)
+            .ThenBy(x => x.CreatedAt).Compare));
         CollectionAssert.AreEqual(sortlist.Take(5), col);
 
         col.Comparer = OrderedComparer<Thing>.OrderByDescending(x => x.Title).Compare;
@@ -2013,5 +1997,245 @@ public class TrackingTests : TestBase
 
         await Observable.Timeout(done, TimeSpan.FromMilliseconds(500));
         Assert.AreEqual(2, col.Count);
+    }
+
+    [Test]
+    public void DoesNotUpdateThingIfTimeIsOlder()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Never<Thing>(),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare);
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            evt.Set();
+        }, () => { });
+
+        var createdAndUpdatedTime = DateTimeOffset.Now;
+        var olderUpdateTime = createdAndUpdatedTime.Subtract(TimeSpan.FromMinutes(1));
+
+        const string originalTitle = "Original Thing";
+
+        var originalThing = new Thing(1, originalTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(originalThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        const string updatedTitle = "Updated Thing";
+
+        var updatedThing = new Thing(1, updatedTitle, createdAndUpdatedTime, olderUpdateTime);
+        col.AddItem(updatedThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        col.Dispose();
+    }
+
+    [Test]
+    public void DoesNotUpdateThingIfTimeIsEqual()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Never<Thing>(),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare);
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            evt.Set();
+        }, () => { });
+
+        var createdAndUpdatedTime = DateTimeOffset.Now;
+
+        const string originalTitle = "Original Thing";
+
+        var originalThing = new Thing(1, originalTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(originalThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        const string updatedTitle = "Updated Thing";
+
+        var updatedThing = new Thing(1, updatedTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(updatedThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        col.Dispose();
+    }
+
+    [Test]
+    public void DoesUpdateThingIfTimeIsNewer()
+    {
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            Observable.Never<Thing>(),
+            OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare);
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var evt = new ManualResetEvent(false);
+        col.Subscribe(t =>
+        {
+            evt.Set();
+        }, () => { });
+
+        var createdAndUpdatedTime = DateTimeOffset.Now;
+        var newerUpdateTime = createdAndUpdatedTime.Add(TimeSpan.FromMinutes(1));
+
+        const string originalTitle = "Original Thing";
+
+        var originalThing = new Thing(1, originalTitle, createdAndUpdatedTime, createdAndUpdatedTime);
+        col.AddItem(originalThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(originalTitle, col[0].Title);
+
+        const string updatedTitle = "Updated Thing";
+
+        var updatedThing = new Thing(1, updatedTitle, createdAndUpdatedTime, newerUpdateTime);
+        col.AddItem(updatedThing);
+
+        evt.WaitOne();
+        evt.Reset();
+
+        Assert.AreEqual(updatedTitle, col[0].Title);
+
+        col.Dispose();
+    }
+
+
+    [Test]
+    public void ChangingSortingAndUpdatingItemsUpdatesSortCorrectly()
+    {
+        var source = new Subject<Thing>();
+
+        ITrackingCollection<Thing> col = new TrackingCollection<Thing>(
+            source);
+        col.Comparer = OrderedComparer<Thing>.OrderBy(x => x.UpdatedAt).Compare;
+        col.NewerComparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        col.Filter = (item, position, list) =>
+            position == 2 || position == 3 || position == 5 || position == 7;
+        col.ProcessingDelay = TimeSpan.Zero;
+
+        var count = 0;
+        var expectedCount = 0;
+        var evt = new ManualResetEvent(false);
+
+        col.Subscribe(t =>
+        {
+            if (++count == expectedCount)
+                evt.Set();
+        }, () => { });
+
+        expectedCount = 9;
+        Enumerable.Range(0, expectedCount)
+            .Select(x => GetThing(x, x))
+            .ForEach(x => Add(source, x));
+
+        evt.WaitOne();
+        evt.Reset();
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(2, 2),
+            GetThing(3, 3),
+            GetThing(5, 5),
+            GetThing(7, 7),
+        }, col);
+
+        expectedCount = 10;
+        Add(source, GetThing(3, 3, 2));
+        evt.WaitOne();
+        evt.Reset();
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(2, 2),
+            GetThing(3, 3),
+            GetThing(5, 5),
+            GetThing(7, 7),
+        }, col);
+
+        expectedCount = 11;
+        Add(source, GetThing(3, 3, 4));
+        evt.WaitOne();
+        evt.Reset();
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(2, 2),
+            GetThing(3, 3, 4),
+            GetThing(5, 5),
+            GetThing(7, 7),
+        }, col);
+
+        expectedCount = 12;
+        Add(source, GetThing(3, 3, 6));
+        evt.WaitOne();
+        evt.Reset();
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(2, 2),
+            GetThing(4, 4),
+            GetThing(3, 3, 6),
+            GetThing(7, 7),
+        }, col);
+
+        col.Comparer = OrderedComparer<Thing>.OrderByDescending(x => x.UpdatedAt).Compare;
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(3, 3, 6),
+            GetThing(6, 6),
+            GetThing(4, 4),
+            GetThing(1, 1),
+        }, col);
+
+        expectedCount = 13;
+        Add(source, GetThing(4, 4));
+        evt.WaitOne();
+        evt.Reset();
+
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(3, 3, 6),
+            GetThing(6, 6),
+            GetThing(4, 4),
+            GetThing(1, 1),
+        }, col);
+
+        expectedCount = 14;
+        Add(source, GetThing(4, 4, 6));
+        evt.WaitOne();
+        evt.Reset();
+
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(3, 3, 6),
+            GetThing(6, 6),
+            GetThing(5, 5),
+            GetThing(1, 1),
+        }, col);
+
+        expectedCount = 15;
+        Add(source, GetThing(5, 5, 6));
+        evt.WaitOne();
+        evt.Reset();
+
+        CollectionAssert.AreEqual(new List<Thing> {
+            GetThing(3, 3, 6),
+            GetThing(6, 6),
+            GetThing(5, 5, 6),
+            GetThing(1, 1),
+        }, col);
+
+        col.Dispose();
     }
 }

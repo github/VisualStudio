@@ -32,10 +32,13 @@ namespace GitHub.Api
         IObservable<string> GetGitIgnoreTemplates();
         IObservable<LicenseMetadata> GetLicenses();
         IObservable<Unit> DeleteApplicationAuthorization(int id, string twoFactorAuthorizationCode);
+        IObservable<PullRequest> GetPullRequest(string owner, string name, int number);
+        IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number);
         IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name);
         IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo);
         IObservable<Branch> GetBranches(string owner, string repo);
         IObservable<Repository> GetRepositories();
         IObservable<Repository> GetRepository(string owner, string repo);
+        IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path);
     }
 }

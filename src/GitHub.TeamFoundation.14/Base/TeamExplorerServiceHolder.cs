@@ -48,7 +48,7 @@ namespace GitHub.VisualStudio.Base
                 serviceProvider = value;
                 if (serviceProvider == null)
                     return;
-                GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+                GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid(Guids.GitSccProviderId));
                 UIContextChanged(GitUIContext?.IsActive ?? false, false);
             }
         }
@@ -118,7 +118,7 @@ namespace GitHub.VisualStudio.Base
 
         public void Refresh()
         {
-            GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid("11B8E6D7-C08B-4385-B321-321078CDD1F8"));
+            GitUIContext = GitUIContext ?? UIContext.FromUIContextGuid(new Guid(Guids.GitSccProviderId));
             UIContextChanged(GitUIContext?.IsActive ?? false, true);
         }
 
@@ -146,7 +146,7 @@ namespace GitHub.VisualStudio.Base
 
             if (active)
             {
-                GitService = GitService ?? ServiceProvider.GetService<IGitExt>();
+                GitService = GitService ?? ServiceProvider.GetServiceSafe<IGitExt>();
                 if (ActiveRepo == null || refresh)
                     ActiveRepo = await System.Threading.Tasks.Task.Run(() =>
                     {
@@ -157,7 +157,7 @@ namespace GitHub.VisualStudio.Base
                         if (repos == null)
                         {
                             VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2001: ActiveRepositories is null. GitService: '{0}'", GitService));
-                            GitService = ServiceProvider?.GetService<IGitExt>();
+                            GitService = ServiceProvider?.GetServiceSafe<IGitExt>();
                             repos = GitService?.ActiveRepositories;
                             if (repos == null)
                                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error 2002: ActiveRepositories is null. GitService: '{0}'", GitService));
@@ -207,7 +207,7 @@ namespace GitHub.VisualStudio.Base
         ITeamExplorerPage PageService
         {
             [return:AllowNull]
-            get { return ServiceProvider.GetService<ITeamExplorerPage>(); }
+            get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
         }
 
         [AllowNull]

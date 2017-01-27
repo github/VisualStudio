@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace GitHub.VisualStudio
 {
@@ -7,6 +8,7 @@ namespace GitHub.VisualStudio
     /// Container for static and dynamic visibility menus (context, toolbar, top, etc)
     /// Get a reference to this via MEF and register the menus
     /// </summary>
+    [Guid(Guids.MenuProviderId)]
     public interface IMenuProvider
     {
         /// <summary>

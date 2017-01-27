@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
 using GitHub.Models;
@@ -48,15 +49,13 @@ namespace GitHub.ViewModels
             this.repository = repository;
             this.settings = settings;
 
+            Title = Resources.PullRequestsNavigationItemText;
+
             this.listSettings = settings.UIState
                 .GetOrCreateRepositoryState(repository.CloneUrl)
                 .PullRequests;
 
             openPullRequestCommand = ReactiveCommand.Create();
-            openPullRequestCommand.Subscribe(_ =>
-            {
-                VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>().OpenUrl(repositoryHost.Address.WebUri);
-            });
 
             States = new List<PullRequestState> {
                 new PullRequestState { IsOpen = true, Name = "Open" },
@@ -108,6 +107,16 @@ namespace GitHub.ViewModels
 
             pullRequests.OriginalCompleted
                 .ObserveOn(RxApp.MainThreadScheduler)
+                .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
+                {
+                    // TODO: Do some decent logging here
+                    return repositoryHost.LogOut();
+                })
+                .Catch<System.Reactive.Unit, Octokit.NotFoundException>(ex =>
+                {
+                    //this is caused when repository was deleted on github
+                    return Observable.Empty<System.Reactive.Unit>();
+                })
                 .Subscribe(_ =>
                 {
                     if (listSettings.SelectedAuthor != null)

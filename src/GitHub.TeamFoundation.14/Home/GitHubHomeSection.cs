@@ -10,6 +10,7 @@ using GitHub.Api;
 using GitHub.Primitives;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using GitHub.Extensions;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -20,8 +21,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
 
         [ImportingConstructor]
-        public GitHubHomeSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder)
+        public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
             View = new GitHubHomeContent();
@@ -30,6 +32,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         protected async override void RepoChanged(bool changed)
         {
+            IsLoggedIn = true;
             IsVisible = false;
 
             base.RepoChanged(changed);
@@ -45,12 +48,17 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await SimpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
+                IsLoggedIn = IsUserAuthenticated();
             }
         }
 
         public override async void Refresh()
         {
             IsVisible = await IsAGitHubRepo();
+            if (IsVisible)
+            {
+                IsLoggedIn = IsUserAuthenticated();
+            }
             base.Refresh();
         }
 
@@ -59,6 +67,30 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             return !isHosted ? Octicon.device_desktop
                 : isPrivate ? Octicon.@lock
                 : isFork ? Octicon.repo_forked : Octicon.repo;
+        }
+
+        public void Login()
+        {
+            StartFlow(UIControllerFlow.Authentication);
+        }
+
+        void StartFlow(UIControllerFlow controllerFlow)
+        {
+            var notifications = ServiceProvider.TryGetService<INotificationDispatcher>();
+            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
+            notifications.AddListener(teServices);
+
+            ServiceProvider.GitServiceProvider = TEServiceProvider;
+            var uiProvider = ServiceProvider.TryGetService<IUIProvider>();
+            var controller = uiProvider.Configure(controllerFlow);
+            controller.ListenToCompletionState()
+                .Subscribe(success =>
+                {
+                    Refresh();
+                });
+            uiProvider.RunInDialog(controller);
+
+            notifications.RemoveListener();
         }
 
         protected GitHubHomeContent View
@@ -86,6 +118,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         {
             get { return icon; }
             set { icon = value; this.RaisePropertyChange(); }
+        }
+
+        bool isLoggedIn;
+        public bool IsLoggedIn
+        {
+            get { return isLoggedIn; }
+            set { isLoggedIn = value; this.RaisePropertyChange(); }
         }
     }
 }

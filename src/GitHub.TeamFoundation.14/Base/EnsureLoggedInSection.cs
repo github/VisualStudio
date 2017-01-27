@@ -18,9 +18,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServices teServices;
 
-        public EnsureLoggedInSection(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+        public EnsureLoggedInSection(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
             IConnectionManager cm, IRepositoryHosts hosts, ITeamExplorerServices teServices)
-            : base(apiFactory, holder, cm)
+            : base(serviceProvider, apiFactory, holder, cm)
         {
             IsVisible = false;
             this.hosts = hosts;
@@ -64,10 +65,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         void StartFlow(UIControllerFlow controllerFlow)
         {
-            var uiProvider = ServiceProvider.GetExportedValue<IUIProvider>();
-            var ret = uiProvider.SetupUI(controllerFlow, null);
-            ret.Subscribe(c => { }, () => CheckLogin().Forget());
-            uiProvider.RunUI();
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
+            var controller = uiProvider.Configure(controllerFlow);
+            controller.TransitionSignal.Subscribe(c => { }, () => CheckLogin().Forget());
+            uiProvider.RunInDialog(controller);
         }
     }
 }

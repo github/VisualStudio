@@ -18,21 +18,4 @@ using GitHub.VisualStudio;
 
 public class UIProviderTests : TestBaseClass
 {
-    [Fact]
-    public void ListenToCompletionDoesNotThrowInRelease()
-    {
-        var provider = Substitutes.GetFullyMockedServiceProvider();
-
-        using (var p = new UIProvider(provider))
-        {
-#if DEBUG
-            Assert.ThrowsAny<InvalidOperationException>(() =>
-            {
-#endif
-                p.ListenToCompletionState();
-#if DEBUG
-            });
-#endif
-        }
-    }
 }

@@ -2,13 +2,14 @@
 using NullGuard;
 using System;
 using System.Globalization;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
     /// <summary>
     /// A repository read from the GitHub API.
     /// </summary>
-    public class RemoteRepositoryModel : RepositoryModelBase, IRemoteRepositoryModel,
+    public class RemoteRepositoryModel : RepositoryModel, IRemoteRepositoryModel,
         IEquatable<RemoteRepositoryModel>, IComparable<RemoteRepositoryModel>
     {
         /// <summary>

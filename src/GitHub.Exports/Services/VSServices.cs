@@ -14,10 +14,10 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
-        readonly IUIProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         [ImportingConstructor]
-        public VSServices(IUIProvider serviceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -72,8 +72,8 @@ namespace GitHub.Services
         const string EnvVersionKey = "EnvVersion";
         string GetVSVersion()
         {
-            var version = VisualStudio.Services.Dte.Version;
-            var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}_Config\\SplashInfo", RegistryRootKey, version);
+            var version = typeof(Microsoft.VisualStudio.Shell.ActivityLog).Assembly.GetName().Version;
+            var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}.{2}_Config\\SplashInfo", RegistryRootKey, version.Major, version.Minor);
             try
             {
                 using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
@@ -82,6 +82,7 @@ namespace GitHub.Services
                     if (!String.IsNullOrEmpty(value))
                         return value;
                 }
+                // fallback to poking the CommonIDE assembly, which most closely follows the advertised version.
                 var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.StartsWith("Microsoft.VisualStudio.CommonIDE", StringComparison.OrdinalIgnoreCase));
                 if (asm != null)
                     return asm.GetName().Version.ToString();
@@ -90,7 +91,7 @@ namespace GitHub.Services
             {
                 VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error getting the Visual Studio version '{0}'", ex));
             }
-            return version;
+            return version.ToString();
         }
     }
 }

@@ -19,14 +19,17 @@
   <Color x:Key="GitHubPaneTitleColor">#FF1B293E</Color>
   <SolidColorBrush x:Key="GitHubPaneTitleBrush" Color="{StaticResource GitHubPaneTitleColor}" />
 
+  <SolidColorBrush x:Key="GitHubDeletedFileIconBrush" Color="{DynamicResource VsColor.GrayText}"></SolidColorBrush>
+  <SolidColorBrush x:Key="GitHubDeletedFileBrush" Color="{DynamicResource VsColor.GrayText}"></SolidColorBrush>
+
   <SolidColorBrush x:Key="GitHubPrimaryGreenBrush" Color="#FF6CC644" />
   <SolidColorBrush x:Key="GitHubPrimaryOrangeBrush" Color="#FFC9510C" />
 
   <SolidColorBrush x:Key="GitHubButtonBackgroundBrush" Color="#FFECECF1" />
-  <SolidColorBrush x:Key="GitHubButtonBackgroundMouseOverBrush" Color="#FFDDDDE6" />
+  <SolidColorBrush x:Key="GitHubButtonBackgroundMouseOverBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="GitHubButtonBackgroundPressedBrush" Color="#FFCFCFDB" />
   <SolidColorBrush x:Key="GitHubButtonBackgroundDisabledBrush" Color="#FFFCFCFC" />
-  <SolidColorBrush x:Key="GitHubButtonForegroundBrush" Color="#FF666666" />
+  <SolidColorBrush x:Key="GitHubButtonForegroundBrush" Color="#1E1E1E" />
   <SolidColorBrush x:Key="GitHubButtonBorderBrush" Color="#FFCACACA" />
   <SolidColorBrush x:Key="GitHubButtonBorderMouseOverBrush" Color="#FFCACACA" />
   <SolidColorBrush x:Key="GitHubButtonBorderPressedBrush" Color="#FFBFBFBF" />
@@ -48,4 +51,8 @@
   <SolidColorBrush x:Key="GitHubComboBoxBorderBrush" Color="#FFCCCEDC" />
 
   <SolidColorBrush x:Key="GitHubTabItemSelectedBorder" Color="#FFD0D7E4" />
+
+  <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FFF5D367" />
+
+  <SolidColorBrush x:Key="GitHubBranchNameBackgroundBrush" Color="#FFE8F0F8" />
 </ResourceDictionary>

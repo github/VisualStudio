@@ -9,46 +9,40 @@ namespace GitHub.Extensions
 {
     public static class IServiceProviderExtensions
     {
-        static IUIProvider cachedUIProvider = null;
-
         /// <summary>
         /// Safe variant of GetService that doesn't throw exceptions if the service is
         /// not found.
         /// </summary>
         /// <returns>The service, or null if not found</returns>
-        public static object TryGetService(this IServiceProvider serviceProvider, Type type)
+        public static object GetServiceSafe(this IServiceProvider serviceProvider, Type type)
         {
-            if (cachedUIProvider != null && type == typeof(IUIProvider))
-                return cachedUIProvider;
+            var ui = serviceProvider as IGitHubServiceProvider;
+            if (ui == null)
+            {
+                try
+                {
+                    var ret = serviceProvider.GetService(type);
+                    if (ret != null)
+                        return ret;
+                }
+                catch { }
+            }
 
-            var ui = serviceProvider as IUIProvider;
-            return ui != null
-                ? ui.TryGetService(type)
-                : GetServiceAndCache(serviceProvider, type, ref cachedUIProvider);
-        }
-
-        /// <summary>
-        /// Calls <see cref="TryGetService(IServiceProvider, Type)" with type <typeparamref name="Ret"/>
-        /// and returns the service obtained cast to type <typeparamref name="T"/>. Use this for services
-        /// like <code>GetService(typeof(SVsTextManager) as IVsTextManager</code>
-        /// Does not throw exceptions
-        /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        public static Ret GetService<T, Ret>(this IServiceProvider provider)
-            where Ret : class
-            where T : class
-        {
-            return provider.TryGetService(typeof(T)) as Ret;
-        }
-        public static T GetExportedValue<T>(this IServiceProvider serviceProvider) where T : class
-        {
-            if (cachedUIProvider != null && typeof(T) == typeof(IUIProvider))
-                return (T)cachedUIProvider;
-
-            var ui = serviceProvider as IUIProvider;
-            return ui != null
-                ? ui.TryGetService(typeof(T)) as T
-                : GetExportedValueAndCache<T, IUIProvider>(ref cachedUIProvider);
+            try
+            {
+                if (ui == null)
+                {
+                    ui = serviceProvider.GetService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                }
+                if (type.IsEquivalentTo(typeof(IGitHubServiceProvider)))
+                    return ui;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                VisualStudio.VsOutputLogger.WriteLine("GetServiceSafe: Could not obtain instance of '{0}'", type);
+            }
+            return ui?.TryGetService(type);
         }
 
         /// <summary>
@@ -56,44 +50,9 @@ namespace GitHub.Extensions
         /// so it doesn't throw exceptions if the service is not found
         /// </summary>
         /// <returns>The service, or null if not found</returns>
-        public static T TryGetService<T>(this IServiceProvider serviceProvider) where T : class
+        public static T GetServiceSafe<T>(this IServiceProvider serviceProvider) where T : class
         {
-            return serviceProvider.TryGetService(typeof(T)) as T;
-        }
-
-        /// <summary>
-        /// Safe generic variant of GetService that doesn't throw exceptions if the service
-        /// is not found (calls <see cref="TryGetService(IServiceProvider, Type)"/>)
-        /// </summary>
-        /// <returns>The service, or null if not found</returns>
-        public static T GetService<T>(this IServiceProvider serviceProvider) where T : class
-        {
-            return serviceProvider.TryGetService(typeof(T)) as T;
-        }
-
-        static object GetServiceAndCache<CacheType>(IServiceProvider provider, Type type, ref CacheType cache)
-        {
-            object ret = null;
-            try
-            {
-                ret = provider.GetService(type);
-            }
-            catch (Exception ex)
-            {
-                Debug.Print(ex.ToString());
-                VisualStudio.VsOutputLogger.WriteLine("GetServiceAndCache: Could not obtain instance of '{0}'", type);
-            }
-            if (ret != null && type == typeof(CacheType))
-                cache = (CacheType)ret;
-            return ret;
-        }
-
-        static T GetExportedValueAndCache<T, CacheType>(ref CacheType cache) where T : class
-        {
-            object ret = VisualStudio.Services.ComponentModel.DefaultExportProvider.GetExportedValueOrDefault<T>();
-            if (ret != null && typeof(T) == typeof(CacheType))
-                cache = (CacheType)ret;
-            return ret as T;
+            return serviceProvider.GetServiceSafe(typeof(T)) as T;
         }
 
         public static void AddCommandHandler(this IServiceProvider provider,

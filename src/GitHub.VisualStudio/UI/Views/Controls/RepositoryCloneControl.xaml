@@ -243,7 +243,7 @@
       <Grid Margin="0">
         <ListBox x:Name="repositoryList"
                  HorizontalContentAlignment="Stretch"
-                 ItemsSource="{Binding Repositories}"
+                 ItemsSource="{Binding Path=RepositoriesView, RelativeSource={RelativeSource AncestorType={x:Type local:GenericRepositoryCloneControl}}}"
                  SelectedItem="{Binding SelectedRepository}"
                  Style="{DynamicResource LightListBox}">
           <ListBox.GroupStyle>

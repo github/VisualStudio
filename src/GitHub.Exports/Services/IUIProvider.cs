@@ -1,35 +1,21 @@
-﻿using System;
-using System.ComponentModel.Composition.Hosting;
+﻿using GitHub.Exports;
 using GitHub.Models;
 using GitHub.UI;
-using System.Windows.Controls;
+using GitHub.VisualStudio;
+using System;
 using System.Runtime.InteropServices;
 
 namespace GitHub.Services
 {
-    [Guid("76909E1A-9D58-41AB-8957-C26B9550787B")]
-    public interface IUIProvider : IServiceProvider
+    [Guid(Guids.UIProviderId)]
+    public interface IUIProvider
     {
-        ExportProvider ExportProvider { get; }
-        IServiceProvider GitServiceProvider { get; set; }
-
-        object TryGetService(Type t);
-        object TryGetService(string typename);
-        T TryGetService<T>() where T : class;
-
-        void AddService(Type t, object owner, object instance);
-        void AddService<T>(object owner, T instance);
-        /// <summary>
-        /// Removes a service from the catalog
-        /// </summary>
-        /// <param name="t">The type we want to remove</param>
-        /// <param name="owner">The owner, which either has to match what was passed to AddService,
-        /// or if it's null, the service will be removed without checking for ownership</param>
-        void RemoveService(Type t, object owner);
-
-        IObservable<LoadData> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
-        void RunUI();
-        void RunUI(UIControllerFlow controllerFlow, IConnection connection);
-        IObservable<bool> ListenToCompletionState();
+        IUIController Configure(UIControllerFlow flow, IConnection connection = null, ViewWithData data = null);
+        IUIController Run(UIControllerFlow flow);
+        void RunInDialog(UIControllerFlow flow, IConnection connection = null);
+        void RunInDialog(IUIController controller);
+        IView GetView(UIViewType which, ViewWithData data = null);
+        void StopUI(IUIController controller);
+        void Run(IUIController controller);
     }
 }
