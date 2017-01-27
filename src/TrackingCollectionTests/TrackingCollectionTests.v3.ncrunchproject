@@ -1,0 +1,15 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <DefaultTestTimeout>5000</DefaultTestTimeout>
+    <HiddenComponentWarnings>
+      <Value>AbnormalReferenceResolution</Value>
+    </HiddenComponentWarnings>
+    <IgnoredTests>
+      <NamedTestSelector>
+        <TestName>TrackingTests.OrderByDoesntMatchOriginalOrderTimings</TestName>
+      </NamedTestSelector>
+    </IgnoredTests>
+    <PreloadReferencedAssemblies>True</PreloadReferencedAssemblies>
+    <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
+  </Settings>
+</ProjectConfiguration>
