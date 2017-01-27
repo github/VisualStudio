@@ -6,6 +6,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using Octokit;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace GitHub.Api
 {
@@ -27,12 +28,13 @@ namespace GitHub.Api
             lazyWikiProbe = wikiProbe;
         }
 
-        public ISimpleApiClient Create(UriString repositoryUrl)
+        public Task<ISimpleApiClient> Create(UriString repositoryUrl)
         {
             var hostAddress = HostAddress.Create(repositoryUrl);
-            return cache.GetOrAdd(repositoryUrl, new SimpleApiClient(repositoryUrl,
+            var result = cache.GetOrAdd(repositoryUrl, new SimpleApiClient(repositoryUrl,
                 new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), hostAddress.ApiUri),
                 lazyEnterpriseProbe, lazyWikiProbe));
+            return Task.FromResult(result);
         }
 
         public void ClearFromCache(ISimpleApiClient client)
