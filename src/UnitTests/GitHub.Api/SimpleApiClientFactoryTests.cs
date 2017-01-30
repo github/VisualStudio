@@ -27,7 +27,7 @@ public class SimpleApiClientFactoryTests
 
             Assert.Equal(url, client.OriginalUrl);
             Assert.Equal(HostAddress.GitHubDotComHostAddress, client.HostAddress);
-            Assert.Same(client, factory.Create(url)); // Tests caching.
+            Assert.Same(client, await factory.Create(url)); // Tests caching.
         }
     }
 
