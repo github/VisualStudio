@@ -8,6 +8,7 @@ using Octokit;
 using Octokit.Reactive;
 using ApiClient = GitHub.Api.ApiClient;
 using GitHub.Infrastructure;
+using System.Threading.Tasks;
 
 namespace GitHub.Factories
 {
@@ -25,13 +26,13 @@ namespace GitHub.Factories
             config.Configure();
         }
 
-        public IApiClient Create(HostAddress hostAddress)
+        public Task<IApiClient> Create(HostAddress hostAddress)
         {
             var apiBaseUri = hostAddress.ApiUri;
 
-            return new ApiClient(
+            return Task.FromResult<IApiClient>(new ApiClient(
                 hostAddress,
-                new ObservableGitHubClient(new GitHubClient(productHeader, new GitHubCredentialStore(hostAddress, LoginCache), apiBaseUri)));
+                new ObservableGitHubClient(new GitHubClient(productHeader, new GitHubCredentialStore(hostAddress, LoginCache), apiBaseUri))));
         }
 
         protected ILoginCache LoginCache { get; private set; }

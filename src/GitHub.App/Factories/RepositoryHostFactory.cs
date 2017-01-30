@@ -6,6 +6,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 
 namespace GitHub.Factories
 {
@@ -38,9 +39,9 @@ namespace GitHub.Factories
             this.usage = usage;
         }
 
-        public IRepositoryHost Create(HostAddress hostAddress)
+        public async Task<IRepositoryHost> Create(HostAddress hostAddress)
         {
-            var apiClient = apiClientFactory.Create(hostAddress);
+            var apiClient = await apiClientFactory.Create(hostAddress);
             var hostCache = hostCacheFactory.Create(hostAddress);
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
             var host = new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler, usage);

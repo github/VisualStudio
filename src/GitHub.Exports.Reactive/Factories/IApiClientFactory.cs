@@ -1,11 +1,12 @@
 ﻿using GitHub.Api;
 using GitHub.Primitives;
 using System;
+using System.Threading.Tasks;
 
 namespace GitHub.Factories
 {
     public interface IApiClientFactory
     {
-        IApiClient Create(HostAddress hostAddress);
+        Task<IApiClient> Create(HostAddress hostAddress);
     }
 }
