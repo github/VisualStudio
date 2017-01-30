@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using static Microsoft.VisualStudio.Threading.JoinableTaskFactory;
 using static Microsoft.VisualStudio.Threading.AwaitExtensions;
+using System.Windows.Threading;
 
 namespace GitHub.Helpers
 {
@@ -24,6 +25,11 @@ namespace GitHub.Helpers
     public static class ThreadingHelper
     {
         public static bool InUIThread => (!Guard.InUnitTestRunner && Application.Current.Dispatcher.CheckAccess()) || !(Guard.InUnitTestRunner);
+
+        /// <summary>
+        /// Gets the Dispatcher for the main thread.
+        /// </summary>
+        public static Dispatcher MainThreadDispatcher => Application.Current.Dispatcher;
 
         /// <summary>
         /// Switch to the UI thread using ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync

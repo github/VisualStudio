@@ -65,7 +65,7 @@ namespace GitHub.Services
                 TimeSpan.FromMinutes(3),
                 DispatcherPriority.Background,
                 TimerTick,
-                Dispatcher.CurrentDispatcher);
+                ThreadingHelper.MainThreadDispatcher);
 
             RunTimer();
         }
