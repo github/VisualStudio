@@ -30,7 +30,7 @@ namespace GitHub.ViewModels
         [ImportingConstructor]
         public TwoFactorDialogViewModel(
             IVisualStudioBrowser browser,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler)
+            IDelegatingTwoFactorChallengeHandler twoFactorChallengeHandler)
         {
             Title = Resources.TwoFactorTitle;
             twoFactorChallengeHandler.SetViewModel(this);

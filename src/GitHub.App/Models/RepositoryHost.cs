@@ -18,6 +18,7 @@ using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
 using GitHub.Extensions;
+using ILoginCache = GitHub.Caches.ILoginCache;
 
 namespace GitHub.Models
 {
@@ -27,6 +28,7 @@ namespace GitHub.Models
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
+        readonly ILoginManager loginManager;
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
@@ -38,12 +40,14 @@ namespace GitHub.Models
         public RepositoryHost(
             IApiClient apiClient,
             IModelService modelService,
+            ILoginManager loginManager,
             ILoginCache loginCache,
             ITwoFactorChallengeHandler twoFactorChallengeHandler,
             IUsageTracker usage)
         {
             ApiClient = apiClient;
             ModelService = modelService;
+            this.loginManager = loginManager;
             this.loginCache = loginCache;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.usage = usage;
@@ -99,6 +103,7 @@ namespace GitHub.Models
             var interceptingTwoFactorChallengeHandler =
                 new Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>(ex =>
                     twoFactorChallengeHandler.HandleTwoFactorException(ex)
+                    .ToObservable()
                     .Do(twoFactorChallengeResult =>
                         authenticationCode = twoFactorChallengeResult.AuthenticationCode));
 

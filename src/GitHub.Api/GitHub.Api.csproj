@@ -55,7 +55,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiClientConfiguration.cs" />
+    <Compile Include="ILoginCache.cs" />
+    <Compile Include="ILoginManager.cs" />
+    <Compile Include="ITwoFactorChallengeHandler.cs" />
+    <Compile Include="LoginManager.cs" />
     <Compile Include="SimpleCredentialStore.cs" />
+    <Compile Include="WindowsLoginCache.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>

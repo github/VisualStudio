@@ -30,9 +30,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -57,9 +58,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await host.LogIn("jiminy", "cricket"));
 
@@ -86,9 +88,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("Cthulu")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("Cthulu", "aPassword");
 
@@ -128,9 +131,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await host.LogIn("aUsername", "aPassowrd");
 
@@ -155,9 +159,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await host.LogIn("jiminy", "aPassowrd");
 
@@ -175,9 +180,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax", new[] { "gist" })));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -193,9 +199,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax", new[] { "foo" })));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -215,9 +222,10 @@ public class RepositoryHostTests
             apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 

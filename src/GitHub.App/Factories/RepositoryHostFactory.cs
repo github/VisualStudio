@@ -7,6 +7,8 @@ using GitHub.Primitives;
 using GitHub.Services;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using GitHub.Api;
+using ILoginCache = GitHub.Caches.ILoginCache;
 
 namespace GitHub.Factories
 {
@@ -16,9 +18,10 @@ namespace GitHub.Factories
     {
         readonly IApiClientFactory apiClientFactory;
         readonly IHostCacheFactory hostCacheFactory;
+        readonly ILoginManager loginManager;
         readonly ILoginCache loginCache;
         readonly IAvatarProvider avatarProvider;
-        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
+        readonly IDelegatingTwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly CompositeDisposable hosts = new CompositeDisposable();
         readonly IUsageTracker usage;
 
@@ -26,13 +29,15 @@ namespace GitHub.Factories
         public RepositoryHostFactory(
             IApiClientFactory apiClientFactory,
             IHostCacheFactory hostCacheFactory,
+            ILoginManager loginManager,
             ILoginCache loginCache,
             IAvatarProvider avatarProvider,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            IDelegatingTwoFactorChallengeHandler twoFactorChallengeHandler,
             IUsageTracker usage)
         {
             this.apiClientFactory = apiClientFactory;
             this.hostCacheFactory = hostCacheFactory;
+            this.loginManager = loginManager;
             this.loginCache = loginCache;
             this.avatarProvider = avatarProvider;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
@@ -44,7 +49,7 @@ namespace GitHub.Factories
             var apiClient = await apiClientFactory.Create(hostAddress);
             var hostCache = hostCacheFactory.Create(hostAddress);
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
-            var host = new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, twoFactorChallengeHandler, usage);
             hosts.Add(host);
             return host;
         }

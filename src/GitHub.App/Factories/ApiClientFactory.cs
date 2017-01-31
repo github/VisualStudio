@@ -9,6 +9,7 @@ using Octokit.Reactive;
 using ApiClient = GitHub.Api.ApiClient;
 using GitHub.Infrastructure;
 using System.Threading.Tasks;
+using ILoginCache = GitHub.Caches.ILoginCache;
 
 namespace GitHub.Factories
 {
