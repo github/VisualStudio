@@ -69,9 +69,9 @@
     - [ ] Team Explorer view changes to Home page
     - [ ] GitHub header and repo information is shown
 - [ ] **Publishing a local repo**
-- [ ] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
-- [ ] **Set "Create new Git Repository" checkbox to checked**
-- [ ] **Click OK button**
+  - [ ] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
+  - [ ] **Set "Create new Git Repository" checkbox to checked**
+  - [ ] **Click OK button**
   - [ ] Verify that Team Explorer home page does *not* have a GitHub section
 - [ ] **Click "Sync"**
        - [ ] Synchronization page opens with "Publish to GitHub" section
