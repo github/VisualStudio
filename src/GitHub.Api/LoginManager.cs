@@ -98,15 +98,14 @@ namespace GitHub.Api
 
                     if (!challengeResult.ResendCodeRequested)
                     {
-                        auth = await client.Authorization.Create(
-                            clientId,
-                            clientSecret,
+                        auth = await SendTwoFactorAuorizationCode(
+                            hostAddress,
+                            client, 
                             newAuth,
                             challengeResult.AuthenticationCode).ConfigureAwait(false);
-                        EnsureNonNullAuthorization(auth);
                     }
                 }
-                catch (ApiException e)
+                catch (Exception e)
                 {
                     // Some enterpise instances don't support OAUTH, so fall back to using the
                     // supplied password - on intances that don't support OAUTH the user should
@@ -117,6 +116,7 @@ namespace GitHub.Api
                     }
                     else
                     {
+                        await loginCache.EraseLogin(hostAddress);
                         throw;
                     }
                 }
@@ -144,7 +144,29 @@ namespace GitHub.Api
             await loginCache.EraseLogin(hostAddress);
         }
 
-        void EnsureNonNullAuthorization(ApplicationAuthorization auth)
+        async Task<ApplicationAuthorization> SendTwoFactorAuorizationCode(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            NewAuthorization newAuth,
+            string authenticationCode)
+        {
+            try
+            {
+                var auth = await client.Authorization.Create(
+                    clientId,
+                    clientSecret,
+                    newAuth,
+                    authenticationCode).ConfigureAwait(false);
+                return EnsureNonNullAuthorization(auth);
+            }
+            catch
+            {
+                await loginCache.EraseLogin(hostAddress);
+                throw;
+            }
+        }
+
+        ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
         {
             // If a mock IGitHubClient is not set up correctly, it can return null from
             // IGutHubClient.Authorization.Create - this will cause an infinite loop in Login()
@@ -153,9 +175,11 @@ namespace GitHub.Api
             {
                 throw new InvalidOperationException("IGutHubClient.Authorization.Create returned null.");
             }
+
+            return auth;
         }
 
-        bool EnterpriseWorkaround(HostAddress hostAddress, ApiException e)
+        bool EnterpriseWorkaround(HostAddress hostAddress, Exception e)
         {
             // Older Enterprise hosts either don't have the API end-point to PUT an authorization, or they
             // return 422 because they haven't white-listed our client ID. In that case, we just ignore
@@ -164,10 +188,11 @@ namespace GitHub.Api
             // Since enterprise 2.1 and https://github.com/github/github/pull/36669 the API returns 403
             // instead of 404 to signal that it's not allowed. In the name of backwards compatibility we 
             // test for both 404 (NotFoundException) and 403 (ForbiddenException) here.
+            var apiException = e as ApiException;
             return !hostAddress.IsGitHubDotCom() &&
                 (e is NotFoundException ||
                  e is ForbiddenException ||
-                 e.StatusCode == (HttpStatusCode)422);
+                 apiException?.StatusCode == (HttpStatusCode)422);
         }
     }
 }
