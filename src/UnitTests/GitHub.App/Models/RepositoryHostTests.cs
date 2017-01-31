@@ -7,6 +7,7 @@ using Akavache;
 using GitHub.Api;
 using GitHub.Authentication;
 using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -45,6 +46,27 @@ public class RepositoryHostTests
             Assert.Equal("baymax", loginInfo.UserName);
             Assert.Equal("S3CR3TS", loginInfo.Password);
             Assert.True(host.IsLoggedIn);
+        }
+
+        [Fact]
+        public async Task IncrementsLoginCount()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetOrCreateApplicationAuthenticationCode(
+                Args.TwoFactorChallengCallback, Args.String, Args.Boolean)
+                .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = Substitute.For<IModelService>();
+            var loginManager = Substitute.For<ILoginManager>();
+            var loginCache = new TestLoginCache();
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+
+            var result = await host.LogIn("baymax", "aPassword");
+
+            await usage.Received().IncrementLoginCount();
         }
 
         [Fact]
@@ -231,6 +253,48 @@ public class RepositoryHostTests
 
             Assert.Equal(AuthenticationResult.Success, result);
             Assert.True(host.SupportsGist);
+        }
+    }
+
+    public class TheLoginFromCacheMethod : TestBaseClass
+    {
+        [Fact]
+        public async Task LogsTheUserInSuccessfullyAndCachesRelevantInfo()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginManager = Substitute.For<ILoginManager>();
+            var loginCache = new TestLoginCache();
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+
+            var result = await host.LogInFromCache();
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            var user = await hostCache.GetObject<AccountCacheItem>("user");
+            Assert.NotNull(user);
+            Assert.Equal("baymax", user.Login);
+        }
+
+        [Fact]
+        public async Task IncrementsLoginCount()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = Substitute.For<IModelService>();
+            var loginManager = Substitute.For<ILoginManager>();
+            var loginCache = new TestLoginCache();
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+
+            var result = await host.LogInFromCache();
+
+            await usage.Received().IncrementLoginCount();
         }
     }
 }
