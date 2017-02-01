@@ -1,5 +1,7 @@
 # GitHub Extension for Visual Studio
 
+[![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015.
 Most of the extension UI lives in the Team Explorer pane, which is available from the View menu.
 
