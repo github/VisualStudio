@@ -8,7 +8,7 @@ using GitHub.Settings;
 
 namespace GitHub.ViewModels
 {
-    public class PullRequestState : ViewModelItemContainer
+    public class PullRequestState : NamedItemContainer
     {
         public PullRequestState(string name, bool? isOpen = null) : base(name)
         {
@@ -18,7 +18,7 @@ namespace GitHub.ViewModels
         public bool? IsOpen { get; }
     }
 
-    public class PullRequestSortOrder : ViewModelItemContainer
+    public class PullRequestSortOrder : NamedItemContainer
     {
         public PullRequestSortOrder(string name, IComparer<IPullRequestModel> comparer, SortOrder sortOrder) : base(name)
         {

@@ -125,7 +125,7 @@
     <Compile Include="ViewModels\IRepositoryForm.cs" />
     <Compile Include="ViewModels\IRepositoryPublishViewModel.cs" />
     <Compile Include="ViewModels\ITwoFactorDialogViewModel.cs" />
-    <Compile Include="ViewModels\ViewModelItemContainer.cs" />
+    <Compile Include="ViewModels\NamedItemContainer.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>

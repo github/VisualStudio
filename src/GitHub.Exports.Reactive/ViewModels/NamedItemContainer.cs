@@ -4,9 +4,9 @@
     /// Simple container for complex objects that we stuff
     /// into dropdowns and the likes
     /// </summary>
-    public abstract class ViewModelItemContainer
+    public abstract class NamedItemContainer
     {
-        protected ViewModelItemContainer(string name)
+        protected NamedItemContainer(string name)
         {
             Name = name;
         }
