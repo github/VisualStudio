@@ -53,4 +53,6 @@
   <SolidColorBrush x:Key="GitHubTabItemSelectedBorder" Color="#FF3F3F46" />
 
   <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FF87C3FC" />
+
+  <SolidColorBrush x:Key="GitHubBranchNameBackgroundBrush" Color="#FF4B4D50" />
 </ResourceDictionary>

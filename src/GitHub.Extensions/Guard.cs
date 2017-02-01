@@ -14,7 +14,7 @@ namespace GitHub.Extensions
             if (value != null) return;
             string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -28,7 +28,7 @@ namespace GitHub.Extensions
 
             var message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must be non-negative", name);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -46,7 +46,7 @@ namespace GitHub.Extensions
             if (value?.Length > 0) return;
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -63,7 +63,7 @@ namespace GitHub.Extensions
                 name,
                 minValue);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -81,7 +81,7 @@ namespace GitHub.Extensions
                 minValue,
                 maxValue);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -90,9 +90,7 @@ namespace GitHub.Extensions
         }
 
         // Borrowed from Splat.
-        public static bool InUnitTestRunner()
-        {
-            return Splat.ModeDetector.InUnitTestRunner();
-        }
+
+        public static bool InUnitTestRunner { get; } = Splat.ModeDetector.InUnitTestRunner();
     }
 }

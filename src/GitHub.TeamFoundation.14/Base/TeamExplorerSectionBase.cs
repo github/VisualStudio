@@ -51,29 +51,32 @@ namespace GitHub.VisualStudio.Base
             return null;
         }
 
-        public TeamExplorerSectionBase(ITeamExplorerServiceHolder holder)
-            : base(holder)
+        public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider, ITeamExplorerServiceHolder holder)
+            : base(serviceProvider, holder)
         {
             IsVisible = false;
             IsEnabled = true;
             IsExpanded = true;
         }
 
-        public TeamExplorerSectionBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
-            : base(apiFactory, holder)
+        public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            : base(serviceProvider, apiFactory, holder)
         {
             IsVisible = false;
             IsEnabled = true;
             IsExpanded = true;
         }
 
-        public TeamExplorerSectionBase(ITeamExplorerServiceHolder holder, IConnectionManager cm) : this(holder)
+        public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider,
+            ITeamExplorerServiceHolder holder, IConnectionManager cm) : this(serviceProvider, holder)
         {
             connectionManager = cm;
         }
 
-        public TeamExplorerSectionBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm) : this(apiFactory, holder)
+        public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+            IConnectionManager cm) : this(serviceProvider, apiFactory, holder)
         {
             connectionManager = cm;
         }
@@ -101,7 +104,8 @@ namespace GitHub.VisualStudio.Base
 
         protected ITeamExplorerSection GetSection(Guid section)
         {
-            return ServiceProvider.GetService<ITeamExplorerPage>()?.GetSection(section);
+            var tep = (ITeamExplorerPage)TEServiceProvider.GetServiceSafe(typeof(ITeamExplorerPage));
+            return tep?.GetSection(section);
         }
     }
 }

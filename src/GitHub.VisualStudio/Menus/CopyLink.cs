@@ -9,7 +9,7 @@ namespace GitHub.VisualStudio.Menus
     public class CopyLink : LinkMenuBase, IDynamicMenuHandler
     {
 
-        public CopyLink(IUIProvider serviceProvider)
+        public CopyLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
         }

@@ -17,8 +17,9 @@ namespace GitHub.VisualStudio.Base
     {
         readonly Octicon octicon;
 
-        public TeamExplorerNavigationItemBase(ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
-            : base(apiFactory, holder)
+        public TeamExplorerNavigationItemBase(IGitHubServiceProvider serviceProvider,
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
+            : base(serviceProvider, apiFactory, holder)
         {
             this.octicon = octicon;
 

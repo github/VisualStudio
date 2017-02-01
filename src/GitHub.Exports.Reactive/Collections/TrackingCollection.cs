@@ -1179,6 +1179,8 @@ namespace GitHub.Collections
         }
 
         bool disposed = false;
+        public bool Disposed => disposed;
+
         void Dispose(bool disposing)
         {
             if (disposing)

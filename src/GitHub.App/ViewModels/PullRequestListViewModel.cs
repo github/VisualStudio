@@ -98,10 +98,6 @@ namespace GitHub.ViewModels
                 .PullRequests;
 
             openPullRequestCommand = ReactiveCommand.Create();
-            openPullRequestCommand.Subscribe(_ =>
-            {
-                VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>().OpenUrl(repositoryHost.Address.WebUri);
-            });
 
             trackingAuthors = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);

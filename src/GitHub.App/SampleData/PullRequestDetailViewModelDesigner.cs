@@ -11,7 +11,8 @@ namespace GitHub.SampleData
     public class PullRequestCheckoutStateDesigner : IPullRequestCheckoutState
     {
         public string Caption { get; set; }
-        public string DisabledMessage { get; set; }
+        public bool IsEnabled { get; set; }
+        public string ToolTip { get; set; }
     }
 
     public class PullRequestUpdateStateDesigner : IPullRequestUpdateState
@@ -19,8 +20,8 @@ namespace GitHub.SampleData
         public int CommitsAhead { get; set; }
         public int CommitsBehind { get; set; }
         public bool UpToDate { get; set; }
-        public string PullDisabledMessage { get; set; }
-        public string PushDisabledMessage { get; set; }
+        public string PullToolTip { get; set; }
+        public string PushToolTip { get; set; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -52,9 +53,9 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var gitHubDir = new PullRequestDirectoryNode("GitHub");
             var modelsDir = new PullRequestDirectoryNode("Models");
             var repositoriesDir = new PullRequestDirectoryNode("Repositories");
-            var itrackingBranch = new PullRequestFileNode(repoPath, @"GitHub\Models\ITrackingBranch.cs", PullRequestFileStatus.Modified, null);
-            var oldBranchModel = new PullRequestFileNode(repoPath, @"GitHub\Models\OldBranchModel.cs", PullRequestFileStatus.Removed, null);
-            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", PullRequestFileStatus.Added, "add");
+            var itrackingBranch = new PullRequestFileNode(repoPath, @"GitHub\Models\ITrackingBranch.cs", "abc", PullRequestFileStatus.Modified, null);
+            var oldBranchModel = new PullRequestFileNode(repoPath, @"GitHub\Models\OldBranchModel.cs", "abc", PullRequestFileStatus.Removed, null);
+            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", "abc", PullRequestFileStatus.Added, "add");
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);
@@ -72,8 +73,9 @@ This requires that errors be propagated from the viewmodel to the view and from 
         }
 
         public IPullRequestModel Model { get; }
-        public string SourceBranchDisplayName { get; }
-        public string TargetBranchDisplayName { get; }
+        public string SourceBranchDisplayName { get; set; }
+        public string TargetBranchDisplayName { get; set; }
+        public bool IsFromFork { get; }
         public string Body { get; }
         public ChangedFilesViewType ChangedFilesViewType { get; set; }
         public OpenChangedFileAction OpenChangedFileAction { get; set; }
@@ -94,12 +96,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public Task<string> ExtractFile(IPullRequestFileNode file)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace GitHub.Validation
         readonly Dictionary<string, bool> enabledProperties = new Dictionary<string, bool>();
         bool validationEnabled = true;
 
-        public ReactiveValidatableObject([AllowNull]IUIProvider serviceProvider)
+        public ReactiveValidatableObject([AllowNull]IGitHubServiceProvider serviceProvider)
         {
             validatedProperties = typeValidatorsMap.GetOrAdd(GetType(), GetValidatedProperties);
             this.serviceProvider = serviceProvider; // This is allowed to be null.

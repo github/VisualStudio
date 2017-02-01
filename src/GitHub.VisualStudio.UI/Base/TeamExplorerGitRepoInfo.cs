@@ -8,7 +8,7 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerGitRepoInfo : TeamExplorerBase, IGitAwareItem
     {
-        public TeamExplorerGitRepoInfo()
+        public TeamExplorerGitRepoInfo(IGitHubServiceProvider serviceProvider) : base(serviceProvider)
         {
             activeRepo = null;
             activeRepoUri = null;

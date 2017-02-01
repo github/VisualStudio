@@ -7,7 +7,7 @@ namespace GitHub.VisualStudio.Menus
 {
     public class AddConnection: MenuBase, IMenuHandler
     {
-        public AddConnection(IUIProvider serviceProvider)
+        public AddConnection(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
         }

@@ -24,7 +24,7 @@ public class UIControllerTests
         [Fact]
         public void WithMultipleCallsDoesNotThrowException()
         {
-            var uiProvider = Substitute.For<IUIProvider>();
+            var uiProvider = Substitute.For<IGitHubServiceProvider>();
             var hosts = Substitute.For<IRepositoryHosts>();
             var factory = Substitute.For<IUIFactory>();
             var cm = Substitutes.ConnectionManager;
@@ -41,16 +41,16 @@ public class UIControllerTests
             where VM : class, IViewModel
         {
             IView view;
-            if (type == GitHub.Exports.UIViewType.PRList)
-                view = Substitutes.For<IView, IViewFor<VM>, IHasCreationView, IHasDetailView>();
-            else
+            //if (type == GitHub.Exports.UIViewType.PRList)
+            //    view = Substitutes.For<IView, IViewFor<VM>, IHasCreationView, IHasDetailView>();
+            //else
                 view = Substitute.For<IView, IViewFor<VM>>();
 
             view.Done.Returns(new ReplaySubject<ViewWithData>());
             view.Cancel.Returns(new ReplaySubject<ViewWithData>());
 
-            (view as IHasDetailView)?.Open.Returns(new ReplaySubject<ViewWithData>());
-            (view as IHasCreationView)?.Create.Returns(new ReplaySubject<ViewWithData>());
+            //(view as IHasDetailView)?.Open.Returns(new ReplaySubject<ViewWithData>());
+            //(view as IHasCreationView)?.Create.Returns(new ReplaySubject<ViewWithData>());
 
             var e = new ExportLifetimeContext<IView>(view, () => { });
             factory.GetView(type).Returns(e);
@@ -133,10 +133,10 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                var flow = uiController.Configure(UIControllerFlow.Clone);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -149,7 +149,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -168,10 +168,10 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                var flow = uiController.Configure(UIControllerFlow.Clone);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -184,7 +184,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -200,10 +200,10 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
+                var flow = uiController.Configure(UIControllerFlow.Authentication);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -216,7 +216,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -236,10 +236,10 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection> { connection };
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Authentication);
+                var flow = uiController.Configure(UIControllerFlow.Authentication);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -252,7 +252,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -268,10 +268,10 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                var flow = uiController.Configure(UIControllerFlow.Clone);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -290,7 +290,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(2, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -306,10 +306,10 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                var flow = uiController.Configure(UIControllerFlow.Clone);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -336,7 +336,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(3, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -352,10 +352,10 @@ public class UIControllerTests
             var cons = new ObservableCollection<IConnection>();
             cm.Connections.Returns(cons);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                var flow = uiController.Configure(UIControllerFlow.Clone);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -399,7 +399,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(5, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -421,10 +421,10 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Clone);
+                var flow = uiController.Configure(UIControllerFlow.Clone);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -437,7 +437,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -459,10 +459,10 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Create);
+                var flow = uiController.Configure(UIControllerFlow.Create);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -475,7 +475,7 @@ public class UIControllerTests
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -498,10 +498,10 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(connection);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Publish);
+                var flow = uiController.Configure(UIControllerFlow.Publish, connection);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -509,13 +509,13 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
-                            ((IUIProvider)provider).Received().AddService(uiController, connection);
+                            ((IGitHubServiceProvider)provider).Received().AddService(uiController, connection);
                             TriggerDone(uc);
                             break;
                     }
                 });
 
-                uiController.Start(connection);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
             }
@@ -535,10 +535,10 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(connection);
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
-                var flow = uiController.SelectFlow(UIControllerFlow.Publish);
+                var flow = uiController.Configure(UIControllerFlow.Publish);
                 flow.Subscribe(data =>
                 {
                     var uc = data.View;
@@ -546,159 +546,15 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
-                            ((IUIProvider)provider).Received().AddService(uiController, connection);
+                            ((IGitHubServiceProvider)provider).Received().AddService(uiController, connection);
                             TriggerDone(uc);
                             break;
                     }
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(1, count);
                 Assert.True(uiController.IsStopped);
-            }
-        }
-
-    }
-
-    public class PullRequestsFlow : UIControllerTestBase
-    {
-        [Fact]
-        public void Flow()
-        {
-            var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
-            var factory = SetupFactory(provider);
-            var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
-            cm.Connections.Returns(cons);
-
-            // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-            {
-                var count = 0;
-                bool? success = null;
-                var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
-                uiController.ListenToCompletionState()
-                    .Subscribe(s =>
-                    {
-                        success = s;
-                    });
-                flow.Subscribe(data =>
-                {
-                    var uc = data.View;
-                    switch (++count)
-                    {
-                        case 1:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
-                            break;
-                        case 2:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-                            TriggerDone(uc);
-                            break;
-                        case 3:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
-                            break;
-                        case 4:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-                            TriggerCancel(uc);
-                            break;
-                        case 5:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
-                            break;
-                        case 6:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
-                            TriggerCancel(uc);
-                            break;
-                        case 7:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasCreationView)uc).Create).OnNext(null);
-                            break;
-                        case 8:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestCreationViewModel>>(uc);
-                            TriggerDone(uc);
-                            break;
-                        case 9:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            TriggerCancel(uc);
-                            break;
-                    }
-                });
-
-                uiController.Start(null);
-                Assert.Equal(9, count);
-                Assert.True(uiController.IsStopped);
-                Assert.True(success.HasValue);
-                Assert.False(success);
-            }
-        }
-
-        [Fact]
-        public void ShuttingDown()
-        {
-            var provider = Substitutes.GetFullyMockedServiceProvider();
-            var hosts = provider.GetRepositoryHosts();
-            var factory = SetupFactory(provider);
-            var cm = provider.GetConnectionManager();
-            var cons = new ObservableCollection<IConnection>();
-            cm.Connections.Returns(cons);
-
-            // simulate being logged in
-            cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
-            {
-                var count = 0;
-                bool? success = null;
-                var flow = uiController.SelectFlow(UIControllerFlow.PullRequests);
-                uiController.ListenToCompletionState()
-                    .Subscribe(s =>
-                    {
-                        success = s;
-                        Assert.Equal(4, count);
-                        count++;
-                    });
-                flow.Subscribe(data =>
-                {
-                    var uc = data.View;
-                    switch (++count)
-                    {
-                        case 1:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
-                            break;
-                        case 2:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-                            TriggerDone(uc);
-                            break;
-                        case 3:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestListViewModel>>(uc);
-                            ((ReplaySubject<ViewWithData>)((IHasDetailView)uc).Open).OnNext(
-                                new ViewWithData(UIControllerFlow.PullRequests) { ViewType = GitHub.Exports.UIViewType.PRDetail, Data = 1 });
-                            break;
-                        case 4:
-                            Assert.IsAssignableFrom<IViewFor<IPullRequestDetailViewModel>>(uc);
-                            uiController.Stop();
-                            break;
-                    }
-                }, () =>
-                {
-                    Assert.Equal(5, count);
-                    count++;
-                });
-
-                uiController.Start(null);
-                Assert.Equal(6, count);
-                Assert.True(uiController.IsStopped);
-                Assert.True(success.HasValue);
-                Assert.True(success);
             }
         }
     }
@@ -719,11 +575,11 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, host, true, false));
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
                 bool? success = null;
-                var flow = uiController.SelectFlow(UIControllerFlow.Gist);
+                var flow = uiController.Configure(UIControllerFlow.Gist);
                 uiController.ListenToCompletionState()
                     .Subscribe(s =>
                     {
@@ -763,7 +619,7 @@ public class UIControllerTests
                     count++;
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(5, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);
@@ -784,11 +640,11 @@ public class UIControllerTests
             // simulate being logged in
             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost, true, true));
 
-            using (var uiController = new UIController((IUIProvider)provider, hosts, factory, cm))
+            using (var uiController = new UIController((IGitHubServiceProvider)provider, hosts, factory, cm))
             {
                 var count = 0;
                 bool? success = null;
-                var flow = uiController.SelectFlow(UIControllerFlow.Gist);
+                var flow = uiController.Configure(UIControllerFlow.Gist);
                 uiController.ListenToCompletionState()
                     .Subscribe(s =>
                     {
@@ -816,7 +672,7 @@ public class UIControllerTests
                     count++;
                 });
 
-                uiController.Start(null);
+                uiController.Start();
                 Assert.Equal(3, count);
                 Assert.True(uiController.IsStopped);
                 Assert.True(success.HasValue);

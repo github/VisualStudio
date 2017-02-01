@@ -61,7 +61,7 @@ public class PullRequestServiceTests : TestBaseClass
         [Fact]
         public async void ShouldCheckoutExistingBranch()
         {
-            var gitClient = Substitute.For<IGitClient>();
+            var gitClient = MockGitClient();
             var service = new PullRequestService(
                 gitClient,
                 MockGitService(),
@@ -80,7 +80,7 @@ public class PullRequestServiceTests : TestBaseClass
         [Fact]
         public async void ShouldCheckoutLocalBranch()
         {
-            var gitClient = Substitute.For<IGitClient>();
+            var gitClient = MockGitClient();
             var service = new PullRequestService(
                 gitClient,
                 MockGitService(),
@@ -98,13 +98,13 @@ public class PullRequestServiceTests : TestBaseClass
 
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "local").Forget();
-            Assert.Equal(2, gitClient.ReceivedCalls().Count());
+            Assert.Equal(3, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
         public async void ShouldCheckoutBranchFromFork()
         {
-            var gitClient = Substitute.For<IGitClient>();
+            var gitClient = MockGitClient();
             var service = new PullRequestService(
                 gitClient,
                 MockGitService(),
@@ -133,7 +133,7 @@ public class PullRequestServiceTests : TestBaseClass
         [Fact]
         public async void ShouldUseUniquelyNamedRemoteForFork()
         {
-            var gitClient = Substitute.For<IGitClient>();
+            var gitClient = MockGitClient();
             var gitService = MockGitService();
             var service = new PullRequestService(
                 gitClient,
@@ -167,7 +167,7 @@ public class PullRequestServiceTests : TestBaseClass
         public async Task ShouldReturnCorrectDefaultLocalBranchName()
         {
             var service = new PullRequestService(
-                Substitute.For<IGitClient>(),
+                MockGitClient(),
                 MockGitService(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
@@ -181,7 +181,7 @@ public class PullRequestServiceTests : TestBaseClass
         public async Task ShouldReturnCorrectDefaultLocalBranchNameForPullRequestsWithNonLatinChars()
         {
             var service = new PullRequestService(
-                Substitute.For<IGitClient>(),
+                MockGitClient(),
                 MockGitService(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
@@ -195,7 +195,7 @@ public class PullRequestServiceTests : TestBaseClass
         public async Task DefaultLocalBranchNameShouldNotClashWithExistingBranchNames()
         {
             var service = new PullRequestService(
-                Substitute.For<IGitClient>(),
+                MockGitClient(),
                 MockGitService(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
@@ -212,7 +212,7 @@ public class PullRequestServiceTests : TestBaseClass
         public async Task ShouldReturnPullRequestBranchForPullRequestFromSameRepository()
         {
             var service = new PullRequestService(
-                Substitute.For<IGitClient>(),
+                MockGitClient(),
                 MockGitService(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
@@ -220,7 +220,7 @@ public class PullRequestServiceTests : TestBaseClass
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar"));
 
-            var result = await service.GetLocalBranches(localRepo, CreatePullRequest());
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
 
             Assert.Equal("source", result.Name);
         }
@@ -247,20 +247,19 @@ public class PullRequestServiceTests : TestBaseClass
             repo.Config.Returns(config);
 
             var service = new PullRequestService(
-                Substitute.For<IGitClient>(),
+                MockGitClient(),
                 MockGitService(repo),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
-            localRepo.CloneUrl.Returns(new UriString("https://github.com/baz/bar"));
 
-            var result = await service.GetLocalBranches(localRepo, CreatePullRequest());
+            var result = await service.GetLocalBranches(localRepo, CreatePullRequest(true));
 
             Assert.Equal("pr/1-foo", result.Name);
         }
 
-        static IPullRequestModel CreatePullRequest()
+        static IPullRequestModel CreatePullRequest(bool fromFork)
         {
             var author = Substitute.For<IAccount>();
 
@@ -268,7 +267,7 @@ public class PullRequestServiceTests : TestBaseClass
             {
                 State = PullRequestStateEnum.Open,
                 Body = string.Empty,
-                Head = new GitReferenceModel("source", "foo:baz", "sha", "https://github.com/foo/bar.git"),
+                Head = new GitReferenceModel("source", fromFork ? "fork:baz" : "foo:baz", "sha", "https://github.com/foo/bar.git"),
                 Base = new GitReferenceModel("dest", "foo:bar", "sha", "https://github.com/foo/bar.git"),
             };
         }
@@ -286,7 +285,7 @@ public class PullRequestServiceTests : TestBaseClass
         [Fact]
         public async Task ShouldRemoveUnusedRemote()
         {
-            var gitClient = Substitute.For<IGitClient>();
+            var gitClient = MockGitClient();
             var gitService = MockGitService();
             var service = new PullRequestService(
                 gitClient,
@@ -321,7 +320,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient.GetConfig<bool>(Arg.Any<IRepository>(), "remote.remote1.created-by-ghfvs").Returns(Task.FromResult(true));
             gitClient.GetConfig<bool>(Arg.Any<IRepository>(), "remote.remote2.created-by-ghfvs").Returns(Task.FromResult(true));
 
-            await service.RemoteUnusedRemotes(localRepo);
+            await service.RemoveUnusedRemotes(localRepo);
 
             remoteCollection.DidNotReceive().Remove("remote1");
             remoteCollection.Received().Remove("remote2");
@@ -340,6 +339,15 @@ public class PullRequestServiceTests : TestBaseClass
             result[name].Returns(branch);
         }
 
+        return result;
+    }
+
+    static IGitClient MockGitClient()
+    {
+        var result = Substitute.For<IGitClient>();
+        var remote = Substitute.For<Remote>();
+        remote.Name.Returns("origin");
+        result.GetHttpRemote(Arg.Any<IRepository>(), Arg.Any<string>()).Returns(Task.FromResult(remote));
         return result;
     }
 

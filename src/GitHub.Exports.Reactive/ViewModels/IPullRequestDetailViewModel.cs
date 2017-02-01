@@ -49,9 +49,14 @@ namespace GitHub.ViewModels
         string Caption { get; }
 
         /// <summary>
-        /// Gets the message to display when a checkout cannot be carried out.
+        /// Gets a value indicating whether checkout is available.
         /// </summary>
-        string DisabledMessage { get; }
+        bool IsEnabled { get; }
+
+        /// <summary>
+        /// Gets the message to display as the checkout button's tooltip.
+        /// </summary>
+        string ToolTip { get; }
     }
 
     /// <summary>
@@ -78,12 +83,12 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the message to display when a pull cannot be carried out.
         /// </summary>
-        string PullDisabledMessage { get; }
+        string PullToolTip { get; }
 
         /// <summary>
         /// Gets the message to display when a push cannot be carried out.
         /// </summary>
-        string PushDisabledMessage { get; }
+        string PushToolTip { get; }
     }
 
     /// <summary>
@@ -105,6 +110,11 @@ namespace GitHub.ViewModels
         /// Gets a string describing how to display the pull request's target branch.
         /// </summary>
         string TargetBranchDisplayName { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request comes from a fork.
+        /// </summary>
+        bool IsFromFork { get; }
 
         /// <summary>
         /// Gets the pull request body.

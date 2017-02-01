@@ -125,7 +125,8 @@ namespace GitHub.Services
                 }
                 else if (repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl())
                 {
-                    await gitClient.Fetch(repo, "origin");
+                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    await gitClient.Fetch(repo, remote.Name);
                     await gitClient.Checkout(repo, localBranchName);
                 }
                 else
@@ -168,7 +169,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, repo.Head.Remote.Name);
+                if (repo.Head.Remote != null)
+                    await gitClient.Fetch(repo, repo.Head.Remote.Name);
                 return Observable.Return(repo.Head.TrackingDetails);
             });
         }
@@ -178,7 +180,8 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name);
                 var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
                 return Observable.Return(changes);
             });
@@ -196,7 +199,14 @@ namespace GitHub.Services
 
         public bool IsPullRequestFromFork(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
-            return pullRequest.Head.RepositoryCloneUrl?.ToRepositoryUrl() != repository.CloneUrl.ToRepositoryUrl();
+            if (pullRequest.Head?.Label != null && pullRequest.Base?.Label != null)
+            {
+                var headOwner = pullRequest.Head.Label.Split(':')[0];
+                var baseOwner = pullRequest.Base.Label.Split(':')[0];
+                return headOwner != baseOwner;
+            }
+
+            return false;
         }
 
         public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
@@ -210,13 +220,14 @@ namespace GitHub.Services
 
                 if (branchName != null)
                 {
-                    await gitClient.Fetch(repo, "origin");
+                    var remote = await gitClient.GetHttpRemote(repo, "origin");
+                    await gitClient.Fetch(repo, remote.Name);
 
                     var branch = repo.Branches[branchName];
 
                     if (branch == null)
                     {
-                        var trackedBranchName = $"refs/remotes/origin/" + branchName;
+                        var trackedBranchName = $"refs/remotes/{remote.Name}/" + branchName;
                         var trackedBranch = repo.Branches[trackedBranchName];
 
                         if (trackedBranch != null)
@@ -233,7 +244,7 @@ namespace GitHub.Services
                     await gitClient.Checkout(repo, branchName);
                 }
 
-                return Observable.Empty<Unit>();
+                return Observable.Return(Unit.Default);
             });
         }
 
@@ -248,30 +259,76 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> ExtractFile(ILocalRepositoryModel repository, string commitSha, string fileName)
+        public IObservable<string> ExtractFile(
+            ILocalRepositoryModel repository,
+            IModelService modelService,
+            string commitSha,
+            string fileName,
+            string fileSha)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, "origin");
-                var result = await gitClient.ExtractFile(repo, commitSha, fileName);
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name);
+                var result = await GetFileFromRepositoryOrApi(repository, repo, modelService, commitSha, fileName, fileSha);
+
+                if (result == null)
+                {
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{commitSha}");
+                }
+
                 return Observable.Return(result);
             });
         }
 
-        public IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName)
+        public IObservable<Tuple<string, string>> ExtractDiffFiles(
+            ILocalRepositoryModel repository,
+            IModelService modelService,
+            IPullRequestModel pullRequest,
+            string fileName,
+            string fileSha)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                await gitClient.Fetch(repo, "origin");
+                var remote = await gitClient.GetHttpRemote(repo, "origin");
+                await gitClient.Fetch(repo, remote.Name);
+
+                // The left file is the target of the PR so this should already be fetched.
                 var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
-                var right = await gitClient.ExtractFile(repo, pullRequest.Head.Sha, fileName);
+
+                // The right file - if it comes from a fork - may not be fetched so fall back to
+                // getting the file contents from the model service.
+                var right = await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
+
+                if (left == null)
+                {
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Base.Sha}");
+                }
+
+                if (right == null)
+                {
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Head.Sha}");
+                }
+
                 return Observable.Return(Tuple.Create(left, right));
             });
         }
 
-        public IObservable<Unit> RemoteUnusedRemotes(ILocalRepositoryModel repository)
+        async Task<string> GetFileFromRepositoryOrApi(
+            ILocalRepositoryModel repository,
+            IRepository repo,
+            IModelService modelService,
+            string commitSha,
+            string fileName,
+            string fileSha)
+        {
+            return await gitClient.ExtractFile(repo, commitSha, fileName) ??
+                   await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+        }
+
+        public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
