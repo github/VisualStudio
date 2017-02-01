@@ -56,6 +56,26 @@ namespace GitHub.Services
         Task CreateBranch(IRepository repository, string branchName);
 
         /// <summary>
+        /// Compares two commits.
+        /// </summary>
+        /// <param name="repository">The repository</param>
+        /// <param name="sha1">The SHA of the first commit.</param>
+        /// <param name="sha2">The SHA of the second commit.</param>
+        /// <param name="detectRenames">Whether to detect renames</param>
+        /// <returns>
+        /// A <see cref="TreeChanges"/> object or null if one of the commits could not be found in the repository,
+        /// (e.g. it is from a fork).
+        /// </returns>
+        Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false);
+
+        /// Gets the value of a configuration key.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="key">The configuration key. Keys are in the form 'section.name'.</param>
+        /// <returns></returns>
+        Task<T> GetConfig<T>(IRepository repository, string key);
+
+        /// <summary>
         /// Sets the configuration key to the specified value in the local config.
         /// </summary>
         /// <param name="repository">The repository</param>
@@ -98,7 +118,9 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="commitSha">The SHA of the commit.</param>
         /// <param name="fileName">The path to the file, relative to the repository.</param>
-        /// <returns>The filename of the extracted file.</returns>
+        /// <returns>
+        /// The filename of a temporary file containing the file contents.
+        /// </returns>
         Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
     }
 }

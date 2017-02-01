@@ -180,12 +180,12 @@ namespace GitHub.ViewModels
         /// </summary>
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
-        IRemoteRepositoryModel selectedRepository;
+        IRepositoryModel selectedRepository;
         /// <summary>
         /// Selected repository to clone
         /// </summary>
         [AllowNull]
-        public IRemoteRepositoryModel SelectedRepository
+        public IRepositoryModel SelectedRepository
         {
             [return: AllowNull]
             get { return selectedRepository; }

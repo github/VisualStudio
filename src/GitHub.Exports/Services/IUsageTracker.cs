@@ -16,5 +16,8 @@ namespace GitHub.Services
         Task IncrementCreateGistCount();
         Task IncrementUpstreamPullRequestCount();
         Task IncrementLoginCount();
+        Task IncrementPullRequestCheckOutCount(bool fork);
+        Task IncrementPullRequestPullCount(bool fork);
+        Task IncrementPullRequestPushCount(bool fork);
     }
 }

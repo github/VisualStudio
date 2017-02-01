@@ -39,5 +39,6 @@ namespace GitHub.Api
         IObservable<Branch> GetBranches(string owner, string repo);
         IObservable<Repository> GetRepositories();
         IObservable<Repository> GetRepository(string owner, string repo);
+        IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path);
     }
 }

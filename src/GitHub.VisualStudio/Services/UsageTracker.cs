@@ -19,7 +19,7 @@ namespace GitHub.Services
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
-        readonly IUIProvider uiProvider;
+        readonly IGitHubServiceProvider gitHubServiceProvider;
         readonly DispatcherTimer timer;
 
         IMetricsService client;
@@ -35,9 +35,9 @@ namespace GitHub.Services
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public UsageTracker(IUIProvider uiProvider)
+        public UsageTracker(IGitHubServiceProvider gitHubServiceProvider)
         {
-            this.uiProvider = uiProvider;
+            this.gitHubServiceProvider = gitHubServiceProvider;
 
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) =>
@@ -65,7 +65,7 @@ namespace GitHub.Services
                 TimeSpan.FromMinutes(3),
                 DispatcherPriority.Background,
                 TimerTick,
-                Dispatcher.CurrentDispatcher);
+                ThreadingHelper.MainThreadDispatcher);
 
             RunTimer();
         }
@@ -135,6 +135,42 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementPullRequestCheckOutCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestsCheckedOut;
+            else
+                ++usage.Model.NumberOfLocalPullRequestsCheckedOut;
+
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPullRequestPushCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestPushes;
+            else
+                ++usage.Model.NumberOfLocalPullRequestPushes;
+
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementPullRequestPullCount(bool fork)
+        {
+            var usage = await LoadUsage();
+
+            if (fork)
+                ++usage.Model.NumberOfForkPullRequestPulls;
+            else
+                ++usage.Model.NumberOfLocalPullRequestPulls;
+
+            SaveUsage(usage);
+        }
+
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
@@ -143,12 +179,12 @@ namespace GitHub.Services
             {
                 await ThreadingHelper.SwitchToMainThreadAsync();
 
-                client = uiProvider.GetService<IMetricsService>();
-                connectionManager = uiProvider.GetService<IConnectionManager>();
-                userSettings = uiProvider.GetService<IPackageSettings>();
-                vsservices = uiProvider.GetService<IVSServices>();
+                client = gitHubServiceProvider.GetService<IMetricsService>();
+                connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
+                userSettings = gitHubServiceProvider.GetService<IPackageSettings>();
+                vsservices = gitHubServiceProvider.GetService<IVSServices>();
 
-                var program = uiProvider.GetService<IProgram>();
+                var program = gitHubServiceProvider.GetService<IProgram>();
                 storePath = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     program.ApplicationName,
@@ -286,6 +322,13 @@ namespace GitHub.Services
             usage.NumberOfLinkToGitHub = 0;
             usage.NumberOfLogins = 0;
             usage.NumberOfUpstreamPullRequests = 0;
+            usage.NumberOfPullRequestsOpened = 0;
+            usage.NumberOfLocalPullRequestsCheckedOut = 0;
+            usage.NumberOfLocalPullRequestPulls = 0;
+            usage.NumberOfLocalPullRequestPushes = 0;
+            usage.NumberOfForkPullRequestsCheckedOut = 0;
+            usage.NumberOfForkPullRequestPulls = 0;
+            usage.NumberOfForkPullRequestPushes = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;

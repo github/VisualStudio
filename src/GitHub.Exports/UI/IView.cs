@@ -1,5 +1,6 @@
 ﻿using GitHub.ViewModels;
 using System;
+using System.Windows.Input;
 
 namespace GitHub.UI
 {
@@ -14,13 +15,8 @@ namespace GitHub.UI
 
     }
 
-    public interface IHasDetailView
+    public interface ICanLoad
     {
-        IObservable<ViewWithData> Open { get; }
-    }
-
-    public interface IHasCreationView
-    {
-        IObservable<ViewWithData> Create { get; }
+        IObservable<ViewWithData> Load { get; }
     }
 }

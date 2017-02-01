@@ -82,6 +82,14 @@ namespace GitHub.Services
         IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber);
 
         /// <summary>
+        /// Gets the changes between the pull request base and head.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request details.</param>
+        /// <returns></returns>
+        IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+
+        /// <summary>
         /// Removes any association between the current branch and a pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -92,19 +100,41 @@ namespace GitHub.Services
         /// Extracts a file at a specified commit from the repository.
         /// </summary>
         /// <param name="repository">The repository.</param>
+        /// <param name="modelService">A model service to use as a cache if the file is not fetched.</param>
         /// <param name="commitSha">The SHA of the commit.</param>
         /// <param name="fileName">The path to the file, relative to the repository.</param>
+        /// <param name="fileSha">The SHA of the file in the pull request.</param>
         /// <returns>The filename of the extracted file.</returns>
-        IObservable<string> ExtractFile(ILocalRepositoryModel repository, string commitSha, string fileName);
+        IObservable<string> ExtractFile(
+            ILocalRepositoryModel repository,
+            IModelService modelService,
+            string commitSha,
+            string fileName,
+            string fileSha);
 
         /// <summary>
         /// Gets the left and right files for a diff.
         /// </summary>
         /// <param name="repository">The repository.</param>
+        /// <param name="modelService">A model service to use as a cache if the file is not fetched.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <param name="fileName">The filename relative to the repository root.</param>
+        /// <param name="fileSha">The SHA of the file in the pull request.</param>
         /// <returns>The filenames of the left and right files for the diff.</returns>
-        IObservable<Tuple<string, string>> ExtractDiffFiles(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string fileName);
+        IObservable<Tuple<string, string>> ExtractDiffFiles(
+            ILocalRepositoryModel repository,
+            IModelService modelService,
+            IPullRequestModel pullRequest,
+            string fileName,
+            string fileSha);
+
+        /// <summary>
+        /// Remotes all unused remotes that were created by GitHub for Visual Studio to track PRs
+        /// from forks.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository);
 
         IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository);
     }

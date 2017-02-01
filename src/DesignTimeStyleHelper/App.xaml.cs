@@ -46,7 +46,7 @@ namespace DesignTimeStyleHelper
         public IExportFactoryProvider ExportFactoryProvider;
 
         [Import]
-        public IUIProvider UIProvider;
+        public IGitHubServiceProvider GitHubServiceProvider;
         
         public Holder(ICompositionService cc)
         {

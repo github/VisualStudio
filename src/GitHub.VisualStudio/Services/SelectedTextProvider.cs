@@ -12,10 +12,10 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class SelectedTextProvider : ISelectedTextProvider
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         [ImportingConstructor]
-        public SelectedTextProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public SelectedTextProvider(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }

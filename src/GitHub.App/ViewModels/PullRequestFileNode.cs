@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using GitHub.Models;
+using NullGuard;
 
 namespace GitHub.ViewModels
 {
@@ -14,13 +15,17 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="repositoryPath">The absolute path to the repository.</param>
         /// <param name="path">The path to the file, relative to the repository.</param>
-        /// <param name="changeType">The way the file was changed.</param>
-        public PullRequestFileNode(string repositoryPath, string path, PullRequestFileStatus status)
+        /// <param name="sha">The SHA of the file.</param>
+        /// <param name="status">The way the file was changed.</param>
+        /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
+        public PullRequestFileNode(string repositoryPath, string path, string sha, PullRequestFileStatus status, [AllowNull] string statusDisplay)
         {
             FileName = Path.GetFileName(path);
             DirectoryPath = Path.GetDirectoryName(path);
             DisplayPath = Path.Combine(Path.GetFileName(repositoryPath), DirectoryPath);
+            Sha = sha;
             Status = status;
+            StatusDisplay = statusDisplay;
         }
 
         /// <summary>
@@ -39,8 +44,18 @@ namespace GitHub.ViewModels
         public string DisplayPath { get; }
 
         /// <summary>
+        /// Gets the SHA of the file.
+        /// </summary>
+        public string Sha { get; }
+
+        /// <summary>
         /// Gets the type of change that was made to the file.
         /// </summary>
         public PullRequestFileStatus Status { get; }
+
+        /// <summary>
+        /// Gets the string to display in the [message] box next to the filename.
+        /// </summary>
+        public string StatusDisplay { [return: AllowNull] get; }
     }
 }

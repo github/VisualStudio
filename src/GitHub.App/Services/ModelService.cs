@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Akavache;
 using GitHub.Api;
 using GitHub.Caches;
@@ -27,6 +29,8 @@ namespace GitHub.Services
         static readonly ILogger log = LogManager.ForContext<ModelService>();
 
         public const string PRPrefix = "pr";
+        const string TempFilesDirectory = Info.ApplicationInfo.ApplicationName;
+        const string CachedFilesDirectory = "CachedFiles";
         readonly IApiClient apiClient;
         readonly IBlobCache hostCache;
         readonly IAvatarProvider avatarProvider;
@@ -165,6 +169,8 @@ namespace GitHub.Services
                                  .Select(PullRequestCacheItem.Create),
                         item =>
                         {
+                            if (collection.Disposed) return;
+
                             // this could blow up due to the collection being disposed somewhere else
                             try { collection.RemoveItem(Create(item)); }
                             catch (ObjectDisposedException) { }
@@ -207,6 +213,8 @@ namespace GitHub.Services
                                  .Select(RepositoryCacheItem.Create),
                         item =>
                         {
+                            if (collection.Disposed) return;
+
                             // this could blow up due to the collection being disposed somewhere else
                             try { collection.RemoveItem(Create(item)); }
                             catch (ObjectDisposedException) { }
@@ -249,6 +257,25 @@ namespace GitHub.Services
         public IObservable<Unit> InvalidateAll()
         {
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
+        }
+
+        public IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha)
+        {
+            return Observable.Defer(() => Task.Run(async () =>
+            {
+                // Store cached file contents a the temp directory so they can be deleted by disk cleanup etc.
+                var tempDir = Path.Combine(Path.GetTempPath(), TempFilesDirectory, CachedFilesDirectory, fileSha.Substring(0, 2));
+                var tempFile = Path.Combine(tempDir, Path.GetFileNameWithoutExtension(path) + '@' + fileSha + Path.GetExtension(path));
+
+                if (!File.Exists(tempFile))
+                {
+                    var contents = await apiClient.GetFileContents(repo.Owner, repo.Name, commitSha, path);
+                    Directory.CreateDirectory(tempDir);
+                    File.WriteAllBytes(tempFile, Convert.FromBase64String(contents.EncodedContent));
+                }
+
+                return Observable.Return(tempFile);
+            }));
         }
 
         IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
@@ -351,7 +378,7 @@ namespace GitHub.Services
             };
         }
 
-        private GitReferenceModel Create(GitReferenceCacheItem item)
+        GitReferenceModel Create(GitReferenceCacheItem item)
         {
             return new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl);
         }
@@ -368,7 +395,8 @@ namespace GitHub.Services
                 Assignee = prCacheItem.Assignee != null ? Create(prCacheItem.Assignee) : null,
                 Base = Create(prCacheItem.Base),
                 Body = prCacheItem.Body ?? string.Empty,
-                ChangedFiles = prCacheItem.ChangedFiles.Select(x => (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Status)).ToList(),
+                ChangedFiles = prCacheItem.ChangedFiles.Select(x => 
+                    (IPullRequestFileModel)new PullRequestFileModel(x.FileName, x.Sha, x.Status)).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
                 CreatedAt = prCacheItem.CreatedAt,
@@ -553,10 +581,12 @@ namespace GitHub.Services
             public PullRequestFileCacheItem(PullRequestFile file)
             {
                 FileName = file.FileName;
+                Sha = file.Sha;
                 Status = (PullRequestFileStatus)Enum.Parse(typeof(PullRequestFileStatus), file.Status, true);
             }
 
             public string FileName { get; set; }
+            public string Sha { get; set; }
             public PullRequestFileStatus Status { get; set; }
         }
 

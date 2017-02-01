@@ -43,21 +43,6 @@ namespace GitHub.Models
             GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
 
-            var initialCacheLoadObs = sharedCache.UserAccount.GetObject<Uri>(EnterpriseHostApiBaseUriCacheKey)
-                .Catch<Uri, KeyNotFoundException>(_ => Observable.Return<Uri>(null))
-                .Catch<Uri, Exception>(ex =>
-                {
-                    log.Warning(ex, "Failed to get Enterprise host URI from cache.");
-                    return Observable.Return<Uri>(null);
-                })
-                .WhereNotNull()
-                .Select(HostAddress.Create)
-                .Where(x => connectionManager.Connections.Any(c => c.HostAddress.Equals(x)))
-                .Select(repositoryHostFactory.Create)
-                .Do(x => EnterpriseHost = x)
-                .Do(disposables.Add)
-                .SelectUnit();
-
             var persistEntepriseHostObs = this.WhenAny(x => x.EnterpriseHost, x => x.Value)
                 .Skip(1)  // The first value will be null or something already in the db
                 .SelectMany(enterpriseHost =>
@@ -110,7 +95,7 @@ namespace GitHub.Models
 
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
             // start tracking changes to the EnterpriseHost property and persist every change to the db
-            disposables.Add(Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe());
+            disposables.Add(persistEntepriseHostObs.Subscribe());
         }
 
         IObservable<IConnection> RunLoginHandler(IConnection connection)

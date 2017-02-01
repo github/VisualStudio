@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
+using NullGuard;
+using System.Diagnostics;
+using NLog;
 
 namespace GitHub.Services
 {
@@ -14,6 +17,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
@@ -65,8 +69,18 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, fetchOptions);
+                try
+                {
+                    var remote = repository.Network.Remotes[remoteName];
+                    repository.Network.Fetch(remote, fetchOptions);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Failed to fetch", ex);
+#if DEBUG
+                    throw;
+#endif
+                }
             });
         }
 
@@ -77,8 +91,18 @@ namespace GitHub.Services
 
             return Task.Factory.StartNew(() =>
             {
-                var remote = repository.Network.Remotes[remoteName];
-                repository.Network.Fetch(remote, refspecs, fetchOptions);
+                try
+                {
+                    var remote = repository.Network.Remotes[remoteName];
+                    repository.Network.Fetch(remote, refspecs, fetchOptions);
+                }
+                catch(Exception ex)
+                {
+                    log.Error("Failed to fetch", ex);
+#if DEBUG
+                    throw;
+#endif
+                }
             });
         }
 
@@ -101,6 +125,49 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 repository.CreateBranch(branchName);
+            });
+        }
+
+        public Task<TreeChanges> Compare(
+            IRepository repository,
+            string sha1,
+            string sha2,
+            bool detectRenames)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
+            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var options = new CompareOptions
+                {
+                    Similarity = detectRenames ? SimilarityOptions.Renames : SimilarityOptions.None
+                };
+
+                var commit1 = repository.Lookup<Commit>(sha1);
+                var commit2 = repository.Lookup<Commit>(sha2);
+
+                if (commit1 != null && commit2 != null)
+                {
+                    return repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, options);
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+
+        public Task<T> GetConfig<T>(IRepository repository, string key)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(key, nameof(key));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var result = repository.Config.Get<T>(key);
+                return result != null ? result.Value : default(T);
             });
         }
 
@@ -171,11 +238,17 @@ namespace GitHub.Services
             });
         }
 
+        [return: AllowNull]
         public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
             var commit = repository.Lookup<Commit>(commitSha);
-            var blob = commit[fileName]?.Target as Blob;
 
+            if (commit == null)
+            {
+                return null;
+            }
+
+            var blob = commit[fileName]?.Target as Blob;
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
             var tempFile = Path.Combine(tempDir, tempFileName);

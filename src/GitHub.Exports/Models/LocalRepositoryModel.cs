@@ -15,7 +15,7 @@ namespace GitHub.Models
     /// A locally cloned repository.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class LocalRepositoryModel : RepositoryModelBase, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
+    public class LocalRepositoryModel : RepositoryModel, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.

@@ -280,5 +280,10 @@ namespace GitHub.Api
         {
             return gitHubClient.Repository.Get(owner, repo);
         }
+
+        public IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path)
+        {
+            return gitHubClient.Repository.Content.GetAllContentsByRef(owner, name, reference, path);
+        }
     }
 }
