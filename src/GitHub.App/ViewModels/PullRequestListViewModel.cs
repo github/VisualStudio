@@ -176,12 +176,12 @@ namespace GitHub.ViewModels
                 });
         }
 
-        void UpdateFilter(PullRequestState state, IAccount ass, IAccount aut)
+        void UpdateFilter(PullRequestState state, IAccount assignee, IAccount author)
         {
             pullRequests.Filter = (pr, i, l) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
-                     (ass == null || ass.Equals(pr.Assignee)) &&
-                     (aut == null || aut.Equals(pr.Author));
+                     (assignee == null || assignee.Equals(pr.Assignee)) &&
+                     (author == null || author.Equals(pr.Author));
         }
 
         bool isLoaded;
