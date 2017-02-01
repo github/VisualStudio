@@ -52,11 +52,12 @@ namespace GitHub.ViewModels
         static Dictionary<SortOrder, PullRequestSortOrder> sortOrderIndex;
 
         // TODO: Move strings to resources
-        IReadOnlyList<PullRequestState> states = new List<PullRequestState> {
-            new PullRequestState { IsOpen = true, Name = "Open" },
-            new PullRequestState { IsOpen = false, Name = "Closed" },
-            new PullRequestState { Name = "All" }
-        };
+        private IReadOnlyList<PullRequestState> states = Array.AsReadOnly(new []
+        {
+            new PullRequestState {IsOpen = true, Name = "Open"},
+            new PullRequestState {IsOpen = false, Name = "Closed"},
+            new PullRequestState {Name = "All"}
+        });
 
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
