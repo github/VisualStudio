@@ -6,7 +6,12 @@
     /// </summary>
     public abstract class ViewModelItemContainer
     {
-        public string Name;
+        protected ViewModelItemContainer(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
         public override string ToString()
         {
             return Name;

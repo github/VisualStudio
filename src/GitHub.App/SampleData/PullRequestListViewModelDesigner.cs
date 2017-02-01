@@ -8,6 +8,7 @@ using GitHub.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GitHub.Settings;
 
 namespace GitHub.SampleData
 {
@@ -42,15 +43,15 @@ namespace GitHub.SampleData
             PullRequests = prs;
 
             States = new List<PullRequestState> {
-                new PullRequestState { IsOpen = true, Name = "Open" },
-                new PullRequestState { IsOpen = false, Name = "Closed" },
-                new PullRequestState { Name = "All" }
+                new PullRequestState("Open", true),
+                new PullRequestState("Closed", false),
+                new PullRequestState("All")
             };
             SelectedState = States[0];
 
             SortOrders = new List<PullRequestSortOrder> {
-                new PullRequestSortOrder { Name = "Updated" },
-                new PullRequestSortOrder { Name = "Newest" },
+                new PullRequestSortOrder("Name", null, SortOrder.UpdatedAscending),
+                new PullRequestSortOrder("Newest", null, SortOrder.CreatedAscending)
             };
             SelectedSortOrder = SortOrders[0];
 

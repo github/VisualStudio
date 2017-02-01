@@ -26,26 +26,18 @@ namespace GitHub.ViewModels
     {
         // this is the order that will show up in the dropdown
         static IReadOnlyList<PullRequestSortOrder> sortOrders = new List<PullRequestSortOrder> {
-            new PullRequestSortOrder {
-                SortOrder = SortOrder.UpdatedDescending,
-                Name = Resources.SortOrderUpdatedDescending,
-                Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt)
-            },
-            new PullRequestSortOrder {
-                SortOrder = SortOrder.CreatedDescending,
-                Name = Resources.SortOrderCreatedDescending,
-                Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt)
-            },
-            new PullRequestSortOrder {
-                SortOrder = SortOrder.UpdatedAscending,
-                Name = Resources.SortOrderUpdatedAscending,
-                Comparer = OrderedComparer<IPullRequestModel>.OrderBy(x => x.UpdatedAt)
-            },
-            new PullRequestSortOrder {
-                SortOrder = SortOrder.CreatedAscending,
-                Name = Resources.SortOrderCreatedAscending,
-                Comparer = OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt)
-            }
+            new PullRequestSortOrder(Resources.SortOrderUpdatedDescending,
+                OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt), 
+                SortOrder.UpdatedDescending),
+            new PullRequestSortOrder(Resources.SortOrderCreatedDescending,
+                OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt), 
+                SortOrder.CreatedDescending),
+            new PullRequestSortOrder(Resources.SortOrderUpdatedAscending,
+                OrderedComparer<IPullRequestModel>.OrderBy(x => x.UpdatedAt), 
+                SortOrder.UpdatedAscending),
+            new PullRequestSortOrder(Resources.SortOrderCreatedAscending,
+                OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt), 
+                SortOrder.CreatedAscending)
         };
 
         // a helper lookup table for easy access to the sorting comparers
@@ -54,9 +46,9 @@ namespace GitHub.ViewModels
         // TODO: Move strings to resources
         private IReadOnlyList<PullRequestState> states = Array.AsReadOnly(new []
         {
-            new PullRequestState {IsOpen = true, Name = "Open"},
-            new PullRequestState {IsOpen = false, Name = "Closed"},
-            new PullRequestState {Name = "All"}
+            new PullRequestState("Open", true),
+            new PullRequestState("Closed", false),
+            new PullRequestState("All")
         });
 
         readonly ReactiveCommand<object> openPullRequestCommand;
