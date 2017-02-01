@@ -2,14 +2,13 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using NullGuard;
-using System.Diagnostics;
-using NLog;
+using GitHub.Infrastructure;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -17,7 +16,7 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
@@ -76,7 +75,7 @@ namespace GitHub.Services
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif
@@ -98,7 +97,7 @@ namespace GitHub.Services
                 }
                 catch(Exception ex)
                 {
-                    log.Error("Failed to fetch", ex);
+                    log.Error(ex, "Failed to fetch");
 #if DEBUG
                     throw;
 #endif

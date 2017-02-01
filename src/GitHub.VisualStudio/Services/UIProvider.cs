@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Models;
@@ -16,6 +17,7 @@ using ReactiveUI;
 using GitHub.App.Factories;
 using GitHub.Exports;
 using GitHub.Controllers;
+using GitHub.Infrastructure;
 
 namespace GitHub.VisualStudio.UI
 {

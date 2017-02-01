@@ -8,17 +8,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using GitHub.Infrastructure;
-using GitHub.Models;
 using GitHub.Services;
-using GitHub.UI;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using NLog;
 using NullGuard;
+using Serilog;
+using Serilog.Core;
 using Task = System.Threading.Tasks.Task;
-using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
@@ -89,13 +86,12 @@ namespace GitHub.VisualStudio
             public ComposablePart Part { get; set; }
         }
 
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<GitHubServiceProvider>();
         CompositeDisposable disposables = new CompositeDisposable();
         readonly IServiceProviderPackage asyncServiceProvider;
         readonly IServiceProvider syncServiceProvider;
         readonly Dictionary<string, OwnedComposablePart> tempParts;
         readonly Version currentVersion;
-        bool initializingLogging = false;
         bool initialized = false;
 
         public ExportProvider ExportProvider { get; private set; }
@@ -151,22 +147,6 @@ namespace GitHub.VisualStudio
         [return: AllowNull]
         public object TryGetService(Type serviceType)
         {
-            if (!initializingLogging && log.Factory.Configuration == null)
-            {
-                initializingLogging = true;
-                try
-                {
-                    var logging = TryGetService(typeof(ILoggingConfiguration)) as ILoggingConfiguration;
-                    logging.Configure();
-                }
-                catch
-                {
-#if DEBUG
-                    throw;
-#endif
-                }
-            }
-
             string contract = AttributedModelServices.GetContractName(serviceType);
             var instance = AddToDisposables(TempContainer.GetExportedValueOrDefault<object>(contract));
             if (instance != null)
