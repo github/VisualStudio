@@ -9,6 +9,10 @@ namespace GitHub.Api
     public interface IApiClient
     {
         HostAddress HostAddress { get; }
+
+        // HACK: This is temporary. Should be removed in login refactor timeframe.
+        IGitHubClient GitHubClient { get; }
+
         IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser);
         IObservable<Gist> CreateGist(NewGist newGist);
         IObservable<UserAndScopes> GetUser();

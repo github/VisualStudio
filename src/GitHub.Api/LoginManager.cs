@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Net;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -80,30 +79,14 @@ namespace GitHub.Api
             {
                 try
                 {
-                    auth = await client.Authorization.Create(
-                        clientId,
-                        clientSecret,
-                        newAuth).ConfigureAwait(false);
+                    auth = await CreateAndDeleteExistingApplicationAuthorization(client, newAuth, null)
+                        .ConfigureAwait(false);
                     EnsureNonNullAuthorization(auth);
                 }
                 catch (TwoFactorAuthorizationException e)
                 {
-                    var challengeResult = await twoFactorChallengeHandler.HandleTwoFactorException(e);
-
-                    if (challengeResult == null)
-                    {
-                        throw new InvalidOperationException(
-                            "ITwoFactorChallengeHandler.HandleTwoFactorException returned null.");
-                    }
-
-                    if (!challengeResult.ResendCodeRequested)
-                    {
-                        auth = await SendTwoFactorAuorizationCode(
-                            hostAddress,
-                            client, 
-                            newAuth,
-                            challengeResult.AuthenticationCode).ConfigureAwait(false);
-                    }
+                    auth = await HandleTwoFactorAuthorization(hostAddress, client, newAuth, e)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -116,7 +99,7 @@ namespace GitHub.Api
                     }
                     else
                     {
-                        await loginCache.EraseLogin(hostAddress);
+                        await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }
@@ -144,25 +127,88 @@ namespace GitHub.Api
             await loginCache.EraseLogin(hostAddress);
         }
 
-        async Task<ApplicationAuthorization> SendTwoFactorAuorizationCode(
+        async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
+            IGitHubClient client,
+            NewAuthorization newAuth,
+            string twoFactorAuthenticationCode)
+        {
+            ApplicationAuthorization result;
+            var retry = 0;
+
+            do
+            {
+                if (twoFactorAuthenticationCode == null)
+                {
+                    result = await client.Authorization.GetOrCreateApplicationAuthentication(
+                        clientId,
+                        clientSecret,
+                        newAuth).ConfigureAwait(false);
+                }
+                else
+                {
+                    result = await client.Authorization.GetOrCreateApplicationAuthentication(
+                        clientId,
+                        clientSecret,
+                        newAuth,
+                        twoFactorAuthenticationCode).ConfigureAwait(false);
+                }
+
+                if (result.Token == string.Empty)
+                {
+                    if (twoFactorAuthenticationCode == null)
+                    {
+                        await client.Authorization.Delete(result.Id);
+                    }
+                    else
+                    {
+                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode);
+                    }
+                }
+            } while (result.Token == string.Empty && retry++ == 0);
+
+            return result;
+        }
+
+        async Task<ApplicationAuthorization> HandleTwoFactorAuthorization(
             HostAddress hostAddress,
             IGitHubClient client,
             NewAuthorization newAuth,
-            string authenticationCode)
+            TwoFactorAuthorizationException exception)
         {
-            try
+            for (;;)
             {
-                var auth = await client.Authorization.Create(
-                    clientId,
-                    clientSecret,
-                    newAuth,
-                    authenticationCode).ConfigureAwait(false);
-                return EnsureNonNullAuthorization(auth);
-            }
-            catch
-            {
-                await loginCache.EraseLogin(hostAddress);
-                throw;
+                var challengeResult = await twoFactorChallengeHandler.HandleTwoFactorException(exception);
+
+                if (challengeResult == null)
+                {
+                    throw new InvalidOperationException(
+                        "ITwoFactorChallengeHandler.HandleTwoFactorException returned null.");
+                }
+
+                if (!challengeResult.ResendCodeRequested)
+                {
+                    try
+                    {
+                        var auth = await CreateAndDeleteExistingApplicationAuthorization(
+                            client,
+                            newAuth,
+                            challengeResult.AuthenticationCode).ConfigureAwait(false);
+                        return EnsureNonNullAuthorization(auth);
+                    }
+                    catch (TwoFactorAuthorizationException e)
+                    {
+                        exception = e;
+                    }
+                    catch (Exception)
+                    {
+                        await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
+                        throw;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 

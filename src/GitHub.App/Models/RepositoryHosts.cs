@@ -135,6 +135,7 @@ namespace GitHub.Models
 
                 return host.LogIn(usernameOrEmail, password)
                     .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Do(result =>
                     {
                         bool successful = result.IsSuccess();

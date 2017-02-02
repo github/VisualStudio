@@ -50,6 +50,8 @@ namespace GitHub.Api
 
         partial void Configure();
 
+        public IGitHubClient GitHubClient => new GitHubClient(gitHubClient.Connection);
+
         public IObservable<Repository> CreateRepository(NewRepository repository, string login, bool isUser)
         {
             Guard.ArgumentNotEmptyString(login, nameof(login));

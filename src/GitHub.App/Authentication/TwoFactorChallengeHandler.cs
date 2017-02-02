@@ -7,6 +7,7 @@ using ReactiveUI;
 using NullGuard;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Helpers;
 
 namespace GitHub.Authentication
 {
@@ -31,6 +32,8 @@ namespace GitHub.Authentication
 
         public async Task<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
         {
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
             var userError = new TwoFactorRequiredUserError(exception);
             var result = await twoFactorDialog.Show(userError);
 
