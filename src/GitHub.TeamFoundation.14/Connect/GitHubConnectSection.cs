@@ -20,8 +20,6 @@ using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
 using GitHub.Primitives;
 using GitHub.Settings;
-using System.IO;
-
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -346,22 +344,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public bool OpenRepository()
         {
             var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
-            // open the solution selection dialog when the user wants to switch to a different repo
-            // since there's no other way of changing the source control context in VS
             if (!Equals(SelectedRepository, old))
             {
                 Services.OpenRepository(SelectedRepository.LocalPath);
                 ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
                 return true;
-                //if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
-                //{
-                //    return true;
-                //}
-                //else
-                //{
-                //    SelectedRepository = old;
-                //    return false;
-                //}
             }
             return false;
         }
