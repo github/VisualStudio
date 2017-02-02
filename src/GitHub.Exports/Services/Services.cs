@@ -120,5 +120,14 @@ namespace GitHub.VisualStudio
             var fullName = Dte2?.ActiveDocument?.FullName;
             return Path.GetFileName(fullName);
         }
+
+        public static void OpenRepository(string directory)
+        {
+            var name = "FakeSolution";
+            var file = Path.Combine(directory, name + ".sln");
+            Dte2.Solution.Create(directory, name);
+            Dte2.Solution.Close(false);
+            File.Delete(file);
+        }
     }
 }

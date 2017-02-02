@@ -20,6 +20,8 @@ using System.Threading.Tasks;
 using GitHub.VisualStudio.UI;
 using GitHub.Primitives;
 using GitHub.Settings;
+using System.IO;
+
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
@@ -348,16 +350,18 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // since there's no other way of changing the source control context in VS
             if (!Equals(SelectedRepository, old))
             {
-                if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
-                {
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-                    return true;
-                }
-                else
-                {
-                    SelectedRepository = old;
-                    return false;
-                }
+                Services.OpenRepository(SelectedRepository.LocalPath);
+                ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                return true;
+                //if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                //{
+                //    return true;
+                //}
+                //else
+                //{
+                //    SelectedRepository = old;
+                //    return false;
+                //}
             }
             return false;
         }
