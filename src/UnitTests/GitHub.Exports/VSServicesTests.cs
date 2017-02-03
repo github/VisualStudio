@@ -35,6 +35,24 @@ public class VSServicesTests
         }
 
         [Fact]
+        public void DeleteThrowsIOException_ReturnTrue()
+        {
+            var repoDir = @"x:\repo";
+            var tempDir = Path.Combine(repoDir, ".vs", VSServices.TempSolutionName);
+            var os = Substitute.For<IOperatingSystem>();
+            var directoryInfo = Substitute.For<IDirectoryInfo>();
+            directoryInfo.Exists.Returns(true);
+            os.Directory.GetDirectory(tempDir).Returns(directoryInfo);
+            directoryInfo.When(di =>  di.Delete(true)).Do(
+                ci => { throw new IOException(); });
+            var target = CreateVSServices(os: os);
+
+            var success = target.TryOpenRepository(repoDir);
+
+            Assert.True(success);
+        }
+
+        [Fact]
         public void SolutionCreate_DeleteVsSolutionSubdir()
         {
             var repoDir = @"x:\repo";

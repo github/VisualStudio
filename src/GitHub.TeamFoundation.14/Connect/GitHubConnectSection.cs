@@ -350,10 +350,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
             if (!Equals(SelectedRepository, old))
             {
-                vsServices.TryOpenRepository(SelectedRepository.LocalPath);
-                ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-                return true;
+                if (vsServices.TryOpenRepository(SelectedRepository.LocalPath))
+                {
+                    // Only navigate away when we think the repository was opened successfully.
+                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+                    return true;
+                }
             }
+
             return false;
         }
 

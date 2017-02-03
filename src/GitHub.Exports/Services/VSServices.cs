@@ -78,18 +78,22 @@ namespace GitHub.Services
         /// Our workaround is to create, open and delete a solution in the repo directory.
         /// This triggers an event that causes the target repo to open. ;)
         /// </summary>
-        /// <param name="repoPath">The target repo directory. </param>
+        /// <param name="repoPath">The target repo directory.</param>
+        /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
         public bool TryOpenRepository(string repoPath)
         {
+            bool solutionCreated = false;
+
             try
             {
                 var dte = (DTE)serviceProvider.GetService(typeof(DTE));
                 var os = (IOperatingSystem)serviceProvider.GetService(typeof(IOperatingSystem));
 
-                dte.Solution.Create(repoPath, TempSolutionName);
-
                 try
                 {
+                    dte.Solution.Create(repoPath, TempSolutionName);
+                    solutionCreated = true;
+
                     // Don't create a .sln file when we close.
                     dte.Solution.Close(false);
                 }
@@ -103,14 +107,13 @@ namespace GitHub.Services
                         vsDir.Delete(true);
                     }
                 }
-
-                return true;
             }
             catch (Exception e)
             {
                 VsOutputLogger.WriteLine("Error opening repository. {0}", e);
-                return false;
             }
+
+            return solutionCreated;
         }
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
