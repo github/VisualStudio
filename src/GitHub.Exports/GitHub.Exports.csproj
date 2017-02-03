@@ -152,9 +152,11 @@
     <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />
+    <Compile Include="Models\ConnectionDetails.cs" />
     <Compile Include="Models\GitReferenceModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
+    <Compile Include="Services\IConnectionCache.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\IPullRequestFileModel.cs" />
