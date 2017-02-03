@@ -121,28 +121,5 @@ namespace GitHub.VisualStudio
             var fullName = Dte2?.ActiveDocument?.FullName;
             return Path.GetFileName(fullName);
         }
-
-        /// <summary>
-        /// There doesn't appear to be a command that directly opens a target repo.
-        /// Our workaround is to create, open and delete a solution in the repo directory.
-        /// This triggers an event that causes the target repo to open. ;)
-        /// </summary>
-        /// <param name="directory">The target repo directory. </param>
-        public static void OpenRepository(string directory)
-        {
-            // Use a distinctive solution name that is unlikely to have been created by the user.
-            var name = "__GitHubVSTemp___";
-            var file = Path.Combine(directory, name + ".sln");
-
-            // If something went wrong last time, the solution file might already exist.
-            // Delete the solution file if it exists.
-            File.Delete(file);
-
-            Dte.Solution.Create(directory, name);
-            Dte.Solution.Close(false);
-
-            // Clean up the dummy solution file.
-            File.Delete(file);
-        }
     }
 }
