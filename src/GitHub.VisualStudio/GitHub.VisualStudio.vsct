@@ -121,6 +121,15 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>GitHub</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x0100" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -204,6 +213,10 @@
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
     </CommandPlacement>
 
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="githubCommand" priority="0x103">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
     <!-- Show GitHub pane command -->
     <CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
@@ -251,6 +264,7 @@
       <IDSymbol name="forwardCommand" value="0x301" />
       <IDSymbol name="refreshCommand" value="0x302" />
       <IDSymbol name="pullRequestCommand" value="0x310" />
+      <IDSymbol name="githubCommand" value="0x320" />
     </GuidSymbol>
 
     <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">

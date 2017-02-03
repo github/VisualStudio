@@ -17,6 +17,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+
 namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
@@ -37,6 +38,9 @@ namespace GitHub.VisualStudio.UI.Views
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
         int latestReloadCallId;
+
+        [Import]
+        IVisualStudioBrowser VisualStudioBrowser { get; set; }
 
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
@@ -87,6 +91,27 @@ namespace GitHub.VisualStudio.UI.Views
                     Refresh();
                 },
                 true);
+
+            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
+                (s, e) =>
+                {
+                    switch (navController?.Current.CurrentFlow)
+                    {
+                        case UIControllerFlow.PullRequestCreation:
+                            break;
+
+                        case UIControllerFlow.PullRequestDetail:
+                            break;
+
+                        case UIControllerFlow.PullRequestList:
+                            var browser = VisualStudioBrowser;
+                            browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pulls/"));
+                            break;
+                        case UIControllerFlow.Home:
+                        default:
+                            break;
+                    }
+                });
 
             initialized = true;
 
