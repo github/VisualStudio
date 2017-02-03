@@ -70,7 +70,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && (navController?.HasBack ?? false),
-                () => {
+                () =>
+                {
                     DisableButtons();
                     navController.Back();
                 },
@@ -78,7 +79,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && (navController?.HasForward ?? false),
-                () => {
+                () =>
+                {
                     DisableButtons();
                     navController.Forward();
                 },
@@ -86,32 +88,44 @@ namespace GitHub.VisualStudio.UI.Views
 
             refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled,
-                () => {
+                () =>
+                {
                     DisableButtons();
                     Refresh();
                 },
                 true);
 
             serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
-                (s, e) =>
+                () => !disabled && (RepositoryOrigin == RepositoryOrigin.DotCom || RepositoryOrigin == RepositoryOrigin.Enterprise),
+                () =>
                 {
+                    var browser = VisualStudioBrowser;
                     switch (navController?.Current.CurrentFlow)
                     {
-                        case UIControllerFlow.PullRequestCreation:
-                            break;
-
                         case UIControllerFlow.PullRequestDetail:
+                            var prDetailViewModel = control.DataContext as IPullRequestDetailViewModel;
+                            if (prDetailViewModel != null)
+                            {
+                                browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pull/" + prDetailViewModel.Model.Number));
+                            }
+                            else
+                            {
+                                goto default;
+                            }
                             break;
 
                         case UIControllerFlow.PullRequestList:
-                            var browser = VisualStudioBrowser;
+                        case UIControllerFlow.PullRequestCreation:
                             browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pulls/"));
                             break;
+
                         case UIControllerFlow.Home:
                         default:
+                            browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl());
                             break;
                     }
-                });
+                },
+                true);
 
             initialized = true;
 
@@ -139,7 +153,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             navController
                 .WhenAnyValue(x => x.IsBusy)
-                .Subscribe(v => {
+                .Subscribe(v =>
+                {
                     if (v)
                         DisableButtons();
                     else
@@ -300,7 +315,7 @@ namespace GitHub.VisualStudio.UI.Views
         public bool IsLoggedIn
         {
             get { return isLoggedIn; }
-            set { isLoggedIn = value;  this.RaisePropertyChange(); }
+            set { isLoggedIn = value; this.RaisePropertyChange(); }
         }
 
         public RepositoryOrigin RepositoryOrigin { get; private set; }
