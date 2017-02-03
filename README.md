@@ -40,12 +40,16 @@ To be able to use the GitHub API, you'll need to:
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
 - Open [src/GitHub.App/Api/ApiClientConfiguration.cs](src/GitHub.App/Api/ApiClientConfiguration.cs) and fill out the clientId/clientSecret fields for your application.
 
+## More information
+
+- Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
+
 ## Contributing
 
 Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
 
 ## Copyright
 
-Copyright 2015 - 2016 GitHub, Inc.
+Copyright 2015 - 2017 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)
