@@ -32,6 +32,6 @@ namespace GitHub.Models
         /// <param name="startLine">A specific line, or (if specifying the <paramref name="endLine"/> as well) the start of a range</param>
         /// <param name="endLine">The end of a line range on the specified file.</param>
         /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
-        Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1);
+        Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1, bool blame = false);
     }
 }

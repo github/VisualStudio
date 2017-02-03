@@ -22,7 +22,7 @@ namespace GitHub.App.SampleData
         public event PropertyChangedEventHandler PropertyChanged;
 #pragma warning restore CS0067
 
-        public Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1)
+        public Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1, bool blame = false)
         {
             throw new NotImplementedException();
         }

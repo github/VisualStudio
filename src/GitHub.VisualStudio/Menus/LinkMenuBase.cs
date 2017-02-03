@@ -31,12 +31,13 @@ namespace GitHub.VisualStudio.Menus
         }
 
         protected Task<UriString> GenerateLink()
+        protected Task<UriString> GenerateLink(bool blame = false)
         {
             var repo = ActiveRepo;
             var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();
             if (activeDocument == null)
                 return null;
-            return repo.GenerateUrl(activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine);
+            return repo.GenerateUrl(activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine, blame);
         }
 
         // Taken from http://stackoverflow.com/a/26012991/6448
