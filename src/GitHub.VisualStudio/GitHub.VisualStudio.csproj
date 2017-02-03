@@ -303,7 +303,7 @@
     <Compile Include="AssemblyResolverPackage.cs" />
     <Compile Include="Helpers\VisualTreeExtensions.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
-    <Compile Include="Menus\Blame.cs" />
+    <Compile Include="Menus\BlameLink.cs" />
     <Compile Include="Menus\MenuBase.cs" />
     <Compile Include="Menus\CreateGist.cs" />
     <Compile Include="Helpers\SharedDictionaryManager.cs" />
