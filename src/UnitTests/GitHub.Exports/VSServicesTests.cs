@@ -9,7 +9,7 @@ using Rothko;
 
 public class VSServicesTests
 {
-    public class TryOpenRepository : TestBaseClass
+    public class TheTryOpenRepositoryMethod : TestBaseClass
     {
         [Fact]
         public void NoExceptions_ReturnsTrue()
