@@ -24,12 +24,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
-                d(ViewModel.CreatePullRequest.Subscribe(_ =>
-                {
-                    NotifyDone();
-                    var v = new ViewWithData(UIControllerFlow.PullRequestList);
-                    load.OnNext(v);
-                }));
+                d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
             });
         }
     }
