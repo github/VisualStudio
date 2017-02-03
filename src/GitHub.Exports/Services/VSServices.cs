@@ -7,6 +7,7 @@ using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using DTE = EnvDTE.DTE;
+using Rothko;
 
 namespace GitHub.Services
 {
@@ -15,6 +16,10 @@ namespace GitHub.Services
     public class VSServices : IVSServices
     {
         readonly IGitHubServiceProvider serviceProvider;
+
+        // Use a prefix (~$) that is defined in the default VS gitignore.
+        public const string TempSolutionName = "~$GitHubVSTemp$~";
+
 
         [ImportingConstructor]
         public VSServices(IGitHubServiceProvider serviceProvider)
@@ -73,16 +78,15 @@ namespace GitHub.Services
         /// Our workaround is to create, open and delete a solution in the repo directory.
         /// This triggers an event that causes the target repo to open. ;)
         /// </summary>
-        /// <param name="directory">The target repo directory. </param>
-        public bool TryOpenRepository(string directory)
+        /// <param name="repoPath">The target repo directory. </param>
+        public bool TryOpenRepository(string repoPath)
         {
             try
             {
                 var dte = (DTE)serviceProvider.GetService(typeof(DTE));
+                var os = (IOperatingSystem)serviceProvider.GetService(typeof(IOperatingSystem));
 
-                // Use a prefix (~$) that is defined in the default VS gitignore.
-                const string name = "~$GitHubVSTemp$~";
-                dte.Solution.Create(directory, name);
+                dte.Solution.Create(repoPath, TempSolutionName);
 
                 try
                 {
@@ -92,10 +96,11 @@ namespace GitHub.Services
                 finally
                 {
                     // Clean up the dummy solution's subdirectory inside `.vs`.
-                    var dir = Path.Combine(directory, ".vs", name);
-                    if (Directory.Exists(dir))
+                    var vsDirPath = Path.Combine(repoPath, ".vs", TempSolutionName);
+                    var vsDir = os.Directory.GetDirectory(vsDirPath);
+                    if (vsDir.Exists)
                     {
-                        Directory.Delete(dir, true);
+                        vsDir.Delete(true);
                     }
                 }
 
