@@ -1,23 +1,44 @@
 ﻿using System;
 using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.Models
 {
-    public class ConnectionDetails : IEquatable<ConnectionDetails>
+    /// <summary>
+    /// Represents details about a connection stored in an <see cref="IConnectionCache"/>.
+    /// </summary>
+    public struct ConnectionDetails : IEquatable<ConnectionDetails>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionDetails"/> struct.
+        /// </summary>
+        /// <param name="hostAddress">The address of the host.</param>
+        /// <param name="userName">The username for the host.</param>
         public ConnectionDetails(string hostAddress, string userName)
         {
             HostAddress = HostAddress.Create(hostAddress);
             UserName = userName;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionDetails"/> struct.
+        /// </summary>
+        /// <param name="hostAddress">The address of the host.</param>
+        /// <param name="userName">The username for the host.</param>
         public ConnectionDetails(HostAddress hostAddress, string userName)
         {
             HostAddress = hostAddress;
             UserName = userName;
         }
 
+        /// <summary>
+        /// Gets the address of the host.
+        /// </summary>
         public HostAddress HostAddress { get; }
+
+        /// <summary>
+        /// Gets the username for the host.
+        /// </summary>
         public string UserName { get; }
 
         public bool Equals(ConnectionDetails other)
