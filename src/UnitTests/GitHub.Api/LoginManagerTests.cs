@@ -10,7 +10,7 @@ using Xunit;
 public class LoginManagerTests
 {
     static readonly HostAddress host = HostAddress.GitHubDotComHostAddress;
-    static readonly HostAddress enterprise = HostAddress.Create("https://ghe.io");
+    static readonly HostAddress enterprise = HostAddress.Create("https://enterprise.hub");
 
     public class TheLoginMethod
     {

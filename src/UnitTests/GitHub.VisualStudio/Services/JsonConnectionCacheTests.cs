@@ -16,7 +16,7 @@ public class JsonConnectionCacheTests
         [Fact]
         public async Task IsLoadedFromCache()
         {
-            const string cacheData = @"{""connections"":[{""HostUrl"":""https://github.com"", ""UserName"":""shana""},{""HostUrl"":""https://ghe.io"", ""UserName"":""haacked""}]}";
+            const string cacheData = @"{""connections"":[{""HostUrl"":""https://github.com"", ""UserName"":""shana""},{""HostUrl"":""https://github.enterprise"", ""UserName"":""haacked""}]}";
             var program = Substitute.For<IProgram>();
             program.ApplicationName.Returns("GHfVS");
             var operatingSystem = Substitute.For<IOperatingSystem>();
@@ -29,7 +29,7 @@ public class JsonConnectionCacheTests
             var connections = (await cache.Load()).ToList();
             Assert.Equal(2, connections.Count);
             Assert.Equal(new Uri("https://api.github.com"), connections[0].HostAddress.ApiUri);
-            Assert.Equal(new Uri("https://ghe.io/api/v3/"), connections[1].HostAddress.ApiUri);
+            Assert.Equal(new Uri("https://github.enterprise/api/v3/"), connections[1].HostAddress.ApiUri);
         }
 
         [Theory]
