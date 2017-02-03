@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -10,9 +9,9 @@ using System.Reactive.Subjects;
 using Akavache;
 using GitHub.Authentication;
 using GitHub.Caches;
-using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
+using GitHub.Services;
 using NullGuard;
 using ReactiveUI;
 

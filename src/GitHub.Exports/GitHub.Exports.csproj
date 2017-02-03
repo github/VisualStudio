@@ -155,7 +155,7 @@
     <Compile Include="Models\GitReferenceModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
-    <Compile Include="Models\IConnectionManager.cs" />
+    <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Models\IExportFactoryProvider.cs" />
     <Compile Include="Models\IPullRequestFileModel.cs" />
     <Compile Include="Models\IRepositoryModel.cs" />

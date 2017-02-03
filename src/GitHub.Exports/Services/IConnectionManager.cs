@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using GitHub.Primitives;
 using System.Threading.Tasks;
+using GitHub.Models;
+using GitHub.Primitives;
 
-namespace GitHub.Models
+namespace GitHub.Services
 {
     public interface IConnectionManager
     {
