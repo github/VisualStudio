@@ -2,8 +2,11 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -16,6 +19,8 @@ namespace GitHub.VisualStudio
     {
         readonly IVSGitServices vsGitServices;
         readonly IConnectionCache cache;
+        readonly ILoginManager loginManager;
+        readonly IApiClientFactory apiClientFactory;
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
 
@@ -23,10 +28,14 @@ namespace GitHub.VisualStudio
         public ConnectionManager(
             IProgram program,
             IVSGitServices vsGitServices,
-            IConnectionCache cache)
+            IConnectionCache cache,
+            ILoginManager loginManager,
+            IApiClientFactory apiClientFactory)
         {
             this.vsGitServices = vsGitServices;
             this.cache = cache;
+            this.loginManager = loginManager;
+            this.apiClientFactory = apiClientFactory;
 
             Connections = new ObservableCollection<IConnection>();
             LoadConnectionsFromCache().Forget();
@@ -115,7 +124,27 @@ namespace GitHub.VisualStudio
         {
             foreach (var c in await cache.Load())
             {
-                AddConnection(c.HostAddress, c.UserName);
+                var client = await apiClientFactory.CreateGitHubClient(c.HostAddress);
+                var addConnection = true;
+
+                try
+                {
+                    await loginManager.LoginFromCache(c.HostAddress, client);
+                }
+                catch (Octokit.ApiException e)
+                {
+                    addConnection = false;
+                    VsOutputLogger.WriteLine("Cached credentials for connection {0} were invalid: {1}", c.HostAddress, e);
+                }
+                catch (Exception)
+                {
+                    // Add the connection in this case - could be that there's no internet connection.
+                }
+
+                if (addConnection)
+                {
+                    AddConnection(c.HostAddress, c.UserName);
+                }
             }
 
             Connections.CollectionChanged += RefreshConnections;

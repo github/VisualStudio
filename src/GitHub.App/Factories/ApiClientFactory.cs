@@ -27,13 +27,19 @@ namespace GitHub.Factories
             config.Configure();
         }
 
-        public Task<IApiClient> Create(HostAddress hostAddress)
+        public Task<IGitHubClient> CreateGitHubClient(HostAddress hostAddress)
         {
-            var apiBaseUri = hostAddress.ApiUri;
+            return Task.FromResult<IGitHubClient>(new GitHubClient(
+                productHeader,
+                new GitHubCredentialStore(hostAddress, LoginCache),
+                hostAddress.ApiUri));
+        }
 
-            return Task.FromResult<IApiClient>(new ApiClient(
+        public async Task<IApiClient> Create(HostAddress hostAddress)
+        {
+            return new ApiClient(
                 hostAddress,
-                new ObservableGitHubClient(new GitHubClient(productHeader, new GitHubCredentialStore(hostAddress, LoginCache), apiBaseUri))));
+                new ObservableGitHubClient(await CreateGitHubClient(hostAddress)));
         }
 
         protected ILoginCache LoginCache { get; private set; }
