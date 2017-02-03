@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using DTE = EnvDTE.DTE;
 
@@ -17,13 +15,11 @@ namespace GitHub.Services
     public class VSServices : IVSServices
     {
         readonly IGitHubServiceProvider serviceProvider;
-        readonly DTE dte = null;
 
         [ImportingConstructor]
-        public VSServices(IGitHubServiceProvider serviceProvider, SVsServiceProvider vsServiceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            dte = (DTE)vsServiceProvider.GetService(typeof(DTE));
         }
 
         string vsVersion;
@@ -82,30 +78,26 @@ namespace GitHub.Services
         {
             try
             {
+                var dte = (DTE)serviceProvider.GetService(typeof(DTE));
+
                 // Use a prefix (~$) that is defined in the default VS gitignore.
-                var name = "~$GitHubVSTemp$~";
-
-                // If .vs\ exists, create the dummy sln there.
-                var vsDir = Path.Combine(directory, ".vs");
-                if(Directory.Exists(vsDir))
-                {
-                    directory = vsDir;
-                }
-
-                var file = Path.Combine(directory, name + ".sln");
-
-                // If something went wrong last time, the solution file might already exist.
-                if(File.Exists(file))
-                {
-                    File.Delete(file);
-                }
-
+                const string name = "~$GitHubVSTemp$~";
                 dte.Solution.Create(directory, name);
-                dte.Solution.Close(false);
 
-                // Clean up the dummy solution file.
-                // Try a couple of times incase antivirus app has take a lock.
-                TryFileDelete(file, 2, 500);
+                try
+                {
+                    // Don't create a .sln file when we close.
+                    dte.Solution.Close(false);
+                }
+                finally
+                {
+                    // Clean up the dummy solution's subdirectory inside `.vs`.
+                    var dir = Path.Combine(directory, ".vs", name);
+                    if (Directory.Exists(dir))
+                    {
+                        Directory.Delete(dir, true);
+                    }
+                }
 
                 return true;
             }
@@ -113,22 +105,6 @@ namespace GitHub.Services
             {
                 VsOutputLogger.WriteLine("Error opening repository. {0}", e);
                 return false;
-            }
-        }
-
-        void TryFileDelete(string file, int retries, int msTimeout)
-        {
-            for(int count = 0; count < retries; count++)
-            {
-                try
-                {
-                    File.Delete(file);
-                }
-                catch (Exception e)
-                {
-                    VsOutputLogger.WriteLine("Error deleting file. {0}", e);
-                    Thread.Sleep(msTimeout);
-                }
             }
         }
 
