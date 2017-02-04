@@ -15,8 +15,6 @@ namespace GitHub.VisualStudio.UI.Views
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class PullRequestCreationView : GenericPullRequestCreationView
     {
-        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
-
         public PullRequestCreationView()
         {
             InitializeComponent();

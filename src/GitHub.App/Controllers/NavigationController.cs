@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 using NullGuard;
+using System.Diagnostics;
 
 namespace GitHub.Controllers
 {
@@ -72,6 +73,7 @@ namespace GitHub.Controllers
                     CreateView(connection, data, onViewLoad);
                     if (data.Data == null && previousFlow == UIControllerFlow.PullRequestCreation)
                     {
+                        Debug.Assert(history.Count >= 2, "History shouldn't have less than 2 items in it when visiting the creation view.");
                         Pop(history[history.Count-2]);
                     }
 
