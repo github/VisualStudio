@@ -1,4 +1,5 @@
-﻿using GitHub.Services;
+﻿using GitHub.Exports;
+using GitHub.Services;
 using GitHub.VisualStudio.UI;
 using NullGuard;
 using System;
@@ -23,7 +24,7 @@ namespace GitHub.VisualStudio.Menus
             if (!isgithub)
                 return;
 
-            var link = await GenerateLink();
+            var link = await GenerateLink(LinkType.Blob);
             if (link == null)
                 return;
             try
