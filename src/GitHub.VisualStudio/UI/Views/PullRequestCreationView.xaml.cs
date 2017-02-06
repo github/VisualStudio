@@ -4,7 +4,6 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using System.ComponentModel.Composition;
 using ReactiveUI;
-using System.Reactive.Subjects;
 
 namespace GitHub.VisualStudio.UI.Views
 {
