@@ -47,8 +47,9 @@
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
       - [ ] Team Explorer view changes to Home page
       - [ ] GitHub header and repo information is shown
-      - [ ] Click Clone in "Local Git Repositories" List and copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
-  - [ ] **Click on Create action link**
+  - [ ] **Navigate back to Connect view, then click clone in "Local Git Repositories" list**
+      - [ ] Copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
+  - [ ] **Click on Create action link in GitHub section**
     - [ ] Create dialog appears
     - [ ] Cursor is on the Name field
     - [ ] Create button is disabled
@@ -68,14 +69,15 @@
     - [ ] Team Explorer view changes to Home page
     - [ ] GitHub header and repo information is shown
 - [ ] **Publishing a local repo**
-  - [ ] File - New - Project - Console Application (or any type of project, doesn't matter much)
-  - [ ] Select "Add to source control" from the dialog and click Ok
-  - [ ] Select "Git" from the Choose Source Control dialog
+  - [ ] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
+  - [ ] **Set "Create new Git Repository" checkbox to checked**
+  - [ ] **Click OK button**
   - [ ] Verify that Team Explorer home page does *not* have a GitHub section
 - [ ] **Click "Sync"**
        - [ ] Synchronization page opens with "Publish to GitHub" section
-- [ ] **Click "Get Started" in the "Publish to GitHub" section**
+- [ ] **Click "Publish to GitHub" in the "Publish to GitHub" section**
       - [ ] Contents of section change to a publish form with:
+        - [ ] Account type dropdown
         - [ ] User dropdown
         - [ ] Pre-filled name field with project name
         - [ ] Description field
@@ -105,6 +107,7 @@
     - [ ] Go to Sync page and publish repository
     - [ ] Go to Team Explorer Connect page (logged in)
     - [ ] Click GitHub > Create
+    - [ ] Received error: "There is already a repository named [repo name] for the current account"
 # Connect page when logged in to TFS
    - [ ] **Connect to a TFS project**
     - [ ] Login to GitHub
@@ -124,7 +127,6 @@
       - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
       - [ ] Filter author selection displays recent pull request authors
       - [ ] "Create New" Link button is displayed
-      - [ ] Clicking on a pull request title opens browser window to pull request on .com
       - [ ] Clicking on a pull request number opens browser window to pull request on .com
 - [ ] **Click on a pull request title**
       - [ ] A detailed description of the pull request is displayed.

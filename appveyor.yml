@@ -4,6 +4,8 @@ install:
     $full_build = Test-Path env:GHFVS_KEY
 
     git submodule init
+    
+    git submodule sync
 
     if ($full_build) {
       $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
@@ -14,7 +16,7 @@ install:
       git submodule deinit script
     }
 
-    git submodule update
+    git submodule update --recursive --force
 
     nuget restore GitHubVS.sln
 build_script:
