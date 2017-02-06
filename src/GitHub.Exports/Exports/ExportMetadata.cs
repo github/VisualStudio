@@ -45,6 +45,15 @@ namespace GitHub.Exports
     }
 
     /// <summary>
+    /// Defines the type of repository link to navigate to
+    /// </summary>
+    public enum LinkType
+    {
+        Blob,
+        Blame
+    }
+
+    /// <summary>
     /// A MEF export attribute that defines an export of type <see cref="IViewModel"/> with
     /// <see cref="UIViewType"/> metadata.
     /// </summary>

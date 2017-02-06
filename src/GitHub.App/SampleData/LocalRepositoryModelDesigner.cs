@@ -5,6 +5,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.UI;
 using NullGuard;
+using GitHub.Exports;
 
 namespace GitHub.App.SampleData
 {
@@ -22,7 +23,7 @@ namespace GitHub.App.SampleData
         public event PropertyChangedEventHandler PropertyChanged;
 #pragma warning restore CS0067
 
-        public Task<UriString> GenerateUrl(string path = null, int startLine = -1, int endLine = -1, bool blame = false)
+        public Task<UriString> GenerateUrl(LinkType linkType, string path = null, int startLine = -1, int endLine = -1)
         {
             throw new NotImplementedException();
         }
