@@ -9,7 +9,6 @@ namespace GitHub.VisualStudio.Menus
 {
     public class BlameLink : LinkMenuBase, IDynamicMenuHandler
     {
-
         public BlameLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
@@ -38,6 +37,5 @@ namespace GitHub.VisualStudio.Menus
             var githubRepoCheckTask = IsGitHubRepo();
             return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
         }
-
     }
 }
