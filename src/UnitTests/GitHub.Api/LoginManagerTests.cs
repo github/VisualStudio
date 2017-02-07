@@ -133,6 +133,37 @@ public class LoginManagerTests
         }
 
         [Fact]
+        public async Task HandlerNotifiedOfExceptionIn2FAChallengeResponse()
+        {
+            var client = Substitute.For<IGitHubClient>();
+            var twoFaException = new TwoFactorChallengeFailedException();
+            var forbiddenResponse = Substitute.For<IResponse>();
+            forbiddenResponse.StatusCode.Returns(HttpStatusCode.Forbidden);
+            var loginAttemptsException = new LoginAttemptsExceededException(forbiddenResponse);
+
+            client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
+                .Returns<ApplicationAuthorization>(_ => { throw twoFaException; });
+            client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "111111")
+                .Returns<ApplicationAuthorization>(_ => { throw loginAttemptsException; });
+
+            var loginCache = Substitute.For<ILoginCache>();
+            var tfa = Substitute.For<ITwoFactorChallengeHandler>();
+            tfa.HandleTwoFactorException(twoFaException).Returns(
+                new TwoFactorChallengeResult("111111"),
+                new TwoFactorChallengeResult("123456"));
+
+            var target = new LoginManager(loginCache, tfa, "id", "secret");
+            Assert.ThrowsAsync<LoginAttemptsExceededException>(async () => await target.Login(host, client, "foo", "bar"));
+
+            await client.Authorization.Received(1).GetOrCreateApplicationAuthentication(
+                "id",
+                "secret",
+                Arg.Any<NewAuthorization>(),
+                "111111");
+            tfa.Received(1).ChallengeFailed(loginAttemptsException);
+        }
+
+        [Fact]
         public async Task RequestResendCodeResultsInRetryingLogin()
         {
             var client = Substitute.For<IGitHubClient>();

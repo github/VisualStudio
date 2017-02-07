@@ -46,5 +46,9 @@ namespace GitHub.Authentication
                 throw exception;
             }
         }
+
+        public void ChallengeFailed(Exception exception)
+        {
+        }
     }
 }
