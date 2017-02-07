@@ -37,9 +37,9 @@ namespace GitHub.Authentication
             var userError = new TwoFactorRequiredUserError(exception);
             var result = await twoFactorDialog.Show(userError);
 
-            if (result == RecoveryOptionResult.RetryOperation)
+            if (result != null)
             {
-                return userError.ChallengeResult;
+                return result;
             }
             else
             {

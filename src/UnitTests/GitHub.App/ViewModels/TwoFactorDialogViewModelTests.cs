@@ -40,7 +40,7 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             [Fact]
-            public async Task OkCommandCompletesAndReturnsCancel()
+            public async Task OkCommandCompletesAndReturnsNullWithNoAuthorizationCode()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -53,12 +53,11 @@ namespace UnitTests.GitHub.App.ViewModels
                 // This isn't correct but it doesn't matter as the dialog will be closed.
                 Assert.True(target.IsBusy); 
 
-                Assert.Equal(RecoveryOptionResult.CancelOperation, result);
-                Assert.Null(userError.ChallengeResult);
+                Assert.Null(result);
             }
 
             [Fact]
-            public async Task OkCommandCompletesAndReturnsRetry()
+            public async Task OkCommandCompletesAndReturnsAuthorizationCode()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -70,12 +69,11 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 var result = await task;
                 Assert.True(target.IsBusy);
-                Assert.Equal(RecoveryOptionResult.RetryOperation, result);
-                Assert.Equal("123456", userError.ChallengeResult.AuthenticationCode);
+                Assert.Equal("123456", result.AuthenticationCode);
             }
 
             [Fact]
-            public async Task CancelCommandCompletesAndReturnsCancel()
+            public async Task CancelCommandCompletesAndReturnsNull()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -87,12 +85,11 @@ namespace UnitTests.GitHub.App.ViewModels
                 var result = await task;
 
                 Assert.False(target.IsBusy);
-                Assert.Equal(RecoveryOptionResult.CancelOperation, result);
-                Assert.Null(userError.ChallengeResult);
+                Assert.Null(result);
             }
 
             [Fact]
-            public async Task ResendCodeCommandCompletesAndReturnsRetry()
+            public async Task ResendCodeCommandCompletesAndReturnsRequestResendCode()
             {
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
@@ -104,8 +101,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 var result = await task;
 
                 Assert.False(target.IsBusy);
-                Assert.Equal(RecoveryOptionResult.RetryOperation, result);
-                Assert.Equal(TwoFactorChallengeResult.RequestResendCode, userError.ChallengeResult);
+                Assert.Equal(TwoFactorChallengeResult.RequestResendCode, result);
             }
            
             [Fact]
