@@ -31,11 +31,5 @@ namespace GitHub.VisualStudio.Menus
 
             await UsageTracker.IncrementOpenInGitHubCount();
         }
-
-        public bool CanShow()
-        {
-            var githubRepoCheckTask = IsGitHubRepo();
-            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
-        }
     }
 }

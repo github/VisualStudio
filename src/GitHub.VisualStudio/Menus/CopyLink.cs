@@ -40,11 +40,5 @@ namespace GitHub.VisualStudio.Menus
                 ns?.ShowMessage(Resources.Error_FailedToCopyToClipboard);
             }
         }
-
-        public bool CanShow()
-        {
-            var githubRepoCheckTask = IsCurrentFileInGitHubRepository();
-            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
-        }
     }
 }

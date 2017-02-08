@@ -31,8 +31,6 @@ namespace GitHub.VisualStudio.Menus
                 IsFileDescendantOfDirectory(activeDocument.Name, ActiveRepo.LocalPath);
         }
 
-        protected Task<UriString> GenerateLink()
-        protected Task<UriString> GenerateLink(bool blame = false)
         protected Task<UriString> GenerateLink(LinkType linkType)
         {
             var repo = ActiveRepo;
@@ -58,6 +56,13 @@ namespace GitHub.VisualStudio.Menus
                 dir = dir.Parent;
             }
             return false;
+        }
+
+        public bool CanShow()
+        {
+            var githubRepoCheckTask = IsGitHubRepo();
+            //Set max of 250ms wait time to prevent UI blocking
+            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
         }
     }
 }
