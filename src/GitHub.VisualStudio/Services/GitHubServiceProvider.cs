@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Shell;
 using NullGuard;
 using Serilog;
 using Serilog.Core;
+using Log = GitHub.Infrastructure.Log;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
@@ -128,7 +129,7 @@ namespace GitHub.VisualStudio
         {
             IComponentModel componentModel = await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
 
-            Debug.Assert(componentModel != null, "Service of type SComponentModel not found");
+            Log.Assert(componentModel != null, "Service of type SComponentModel not found");
             if (componentModel == null)
             {
                 log.Error("Service of type SComponentModel not found");
@@ -215,14 +216,14 @@ namespace GitHub.VisualStudio
         public void AddService(Type t, object owner, object instance)
         {
             string contract = AttributedModelServices.GetContractName(t);
-            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+            Log.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
             // we want to remove stale instances of a service, if they exist, regardless of who put them there
             RemoveService(t, null);
 
             var batch = new CompositionBatch();
             var part = batch.AddExportedValue(contract, instance);
-            Debug.Assert(part != null, "Adding an exported value must return a non-null part");
+            Log.Assert(part != null, "Adding an exported value must return a non-null part");
             tempParts.Add(contract, new OwnedComposablePart { Owner = owner, Part = part });
             TempContainer.Compose(batch);
         }
@@ -236,7 +237,7 @@ namespace GitHub.VisualStudio
         public void RemoveService(Type t, [AllowNull] object owner)
         {
             string contract = AttributedModelServices.GetContractName(t);
-            Debug.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
+            Log.Assert(!string.IsNullOrEmpty(contract), "Every type must have a contract name");
 
             OwnedComposablePart part;
             if (tempParts.TryGetValue(contract, out part))

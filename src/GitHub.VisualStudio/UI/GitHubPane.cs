@@ -10,6 +10,7 @@ using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
 using System.Diagnostics;
+using GitHub.Infrastructure;
 using GitHub.VisualStudio.UI.Views;
 
 namespace GitHub.VisualStudio.UI
@@ -69,7 +70,7 @@ namespace GitHub.VisualStudio.UI
                 initialized = true;
 
                 var vm = View.ViewModel as IServiceProviderAware;
-                Debug.Assert(vm != null);
+                Log.Assert(vm != null, "vm != null");
                 vm?.Initialize(serviceProvider);
             }
         }

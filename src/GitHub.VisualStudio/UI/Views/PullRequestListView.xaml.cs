@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Reactive.Disposables;
+using GitHub.Infrastructure;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -53,8 +54,8 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var repo = serviceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
                 var browser = serviceProvider.TryGetService<IVisualStudioBrowser>();
-                Debug.Assert(repo != null, "No active repo, cannot open PR on GitHub");
-                Debug.Assert(browser != null, "No browser service, cannot open PR on GitHub");
+                Log.Assert(repo != null, "No active repo, cannot open PR on GitHub");
+                Log.Assert(browser != null, "No browser service, cannot open PR on GitHub");
                 if (repo == null || browser == null)
                 {
                     return;

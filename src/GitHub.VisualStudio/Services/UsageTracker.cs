@@ -11,6 +11,7 @@ using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
 using System.Threading.Tasks;
 using GitHub.Helpers;
+using GitHub.Infrastructure;
 
 namespace GitHub.Services
 {
@@ -279,7 +280,7 @@ namespace GitHub.Services
 
         async Task SendUsage(UsageModel usage, bool weekly, bool monthly)
         {
-            Debug.Assert(client != null, "SendUsage should not be called when there is no IMetricsService");
+            Log.Assert(client != null, "SendUsage should not be called when there is no IMetricsService");
 
             if (connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom()))
             {

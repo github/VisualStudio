@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using GitHub.Extensions;
 using Serilog;
@@ -127,7 +128,8 @@ namespace GitHub.Infrastructure
         {
             if (!condition)
             {
-                logger.Warning($"Assertion Failed: {messageTemplate}");
+                messageTemplate = "Assertion Failed: " + messageTemplate;
+                logger.Warning(messageTemplate);
             }
         }
 
@@ -135,7 +137,8 @@ namespace GitHub.Infrastructure
         {
             if (!condition)
             {
-                logger.Warning($"Assertion Failed: {messageTemplate}", propertyValues);
+                messageTemplate = "Assertion Failed: " + messageTemplate;
+                logger.Warning(messageTemplate, propertyValues);
             }
         }
     }

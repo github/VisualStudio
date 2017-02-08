@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Akavache;
 using GitHub.Caches;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using NullGuard;
 
@@ -59,7 +60,7 @@ namespace GitHub.Services
 
             Uri avatarUrl;
             Uri.TryCreate(apiAccount.AvatarUrl, UriKind.Absolute, out avatarUrl);
-            Debug.Assert(avatarUrl != null, "Cannot have a null avatar url");
+            Log.Assert(avatarUrl != null, "Cannot have a null avatar url");
 
             return imageCache.GetImage(avatarUrl)
                 .Catch<BitmapSource, Exception>(_ => Observable.Return(DefaultAvatar(apiAccount)));

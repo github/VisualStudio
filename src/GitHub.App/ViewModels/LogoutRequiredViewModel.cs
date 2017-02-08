@@ -49,7 +49,7 @@ namespace GitHub.ViewModels
                     Resources.LogoutRequiredFeatureGist);
             }
             else
-                Debug.Assert(false, "Add a resource string for feature " + data.MainFlow + "!");
+                log.Assert(false, "Add a resource string for feature " + data.MainFlow + "!");
             base.Initialize(data);
         }
 

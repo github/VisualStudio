@@ -149,7 +149,7 @@ namespace GitHub.ViewModels
             return Observable.Start(() =>
             {
                 var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
+                log.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
                 if (repository == null)
                 {
                     notificationService.ShowError(Resources.RepositoryCloneFailedNoSelectedRepo);
@@ -170,7 +170,7 @@ namespace GitHub.ViewModels
             .Catch<Unit, Exception>(e =>
             {
                 var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
+                log.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
                 notificationService.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
                 return Observable.Return(Unit.Default);
             });
@@ -178,7 +178,7 @@ namespace GitHub.ViewModels
 
         bool IsAlreadyRepoAtPath(string path)
         {
-            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
+            log.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
 
             bool isAlreadyRepoAtPath = false;
 

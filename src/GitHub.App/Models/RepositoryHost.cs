@@ -49,7 +49,7 @@ namespace GitHub.Models
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.usage = usage;
 
-            Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
+            log.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
             hostAddress = apiClient.HostAddress;
             isEnterprise = !hostAddress.IsGitHubDotCom();

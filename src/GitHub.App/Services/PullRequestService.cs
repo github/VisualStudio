@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using LibGit2Sharp;
 using PullRequest = Octokit.PullRequest;
 using System.Diagnostics;
+using GitHub.Infrastructure;
 
 namespace GitHub.Services
 {
@@ -216,7 +217,7 @@ namespace GitHub.Services
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var branchName = GetLocalBranchesInternal(repository, repo, pullRequest).FirstOrDefault();
 
-                Debug.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
+                Log.Assert(branchName != null, "PullRequestService.SwitchToBranch called but no local branch found.");
 
                 if (branchName != null)
                 {
