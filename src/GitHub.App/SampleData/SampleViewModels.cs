@@ -18,6 +18,7 @@ using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using GitHub.Collections;
 
 namespace GitHub.SampleData
 {
@@ -332,7 +333,7 @@ namespace GitHub.SampleData
     {
         public RepositoryCloneViewModelDesigner()
         {
-            Repositories = new ObservableCollection<IRemoteRepositoryModel>
+            Repositories = new TrackingCollection<IRemoteRepositoryModel>
             {
                 RepositoryModelDesigner.Create("encourage", "haacked"),
                 RepositoryModelDesigner.Create("haacked.com", "haacked"),
@@ -361,7 +362,7 @@ namespace GitHub.SampleData
 
         public IRepositoryModel SelectedRepository { get; set; }
 
-        public ObservableCollection<IRemoteRepositoryModel> Repositories
+        public TrackingCollection<IRemoteRepositoryModel> Repositories
         {
             get;
             private set;

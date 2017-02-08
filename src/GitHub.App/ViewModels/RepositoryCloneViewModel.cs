@@ -80,9 +80,24 @@ namespace GitHub.ViewModels
                 loading => loading.Value || repositories.UnfilteredCount > 0 && !LoadingFailed)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
-            this.WhenAny(x => x.IsLoading, x => x.LoadingFailed,
-                (loading, failed) => !loading.Value && !failed.Value && repositories.UnfilteredCount == 0)
-                .Subscribe(x => NoRepositoriesFound = x);
+            this.WhenAny(
+                x => x.Repositories.UnfilteredCount,
+                x => x.IsLoading,
+                x => x.LoadingFailed,
+                (unfilteredCount, loading, failed) =>
+                {
+                    if (loading.Value)
+                        return false;
+
+                    if (failed.Value)
+                        return false;
+
+                    return unfilteredCount.Value == 0;
+                })
+                .Subscribe(x =>
+                {
+                    NoRepositoriesFound = x;
+                });
 
             this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
@@ -234,7 +249,7 @@ namespace GitHub.ViewModels
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
         TrackingCollection<IRemoteRepositoryModel> repositories;
-        public ObservableCollection<IRemoteRepositoryModel> Repositories
+        public TrackingCollection<IRemoteRepositoryModel> Repositories
         {
             [return: AllowNull]
             get { return repositories; }
