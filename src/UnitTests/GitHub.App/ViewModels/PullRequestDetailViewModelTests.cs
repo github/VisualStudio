@@ -388,7 +388,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     existingPrBranch: "pr/123");
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<Exception>(() => target.Pull.ExecuteAsyncTask(null));
+                await Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
                 Assert.Equal("Pull threw", target.OperationError);
             }
         }
@@ -491,7 +491,7 @@ namespace UnitTests.GitHub.App.ViewModels
                     existingPrBranch: "pr/123");
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<Exception>(() => target.Push.ExecuteAsyncTask(null));
+                await Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
                 Assert.Equal("Push threw", target.OperationError);
             }
         }
