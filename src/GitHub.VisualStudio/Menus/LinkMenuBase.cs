@@ -26,5 +26,12 @@ namespace GitHub.VisualStudio.Menus
                 return null;
             return repo.GenerateUrl(linkType, activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine);
         }
+
+        public bool CanShow()
+        {
+            var githubRepoCheckTask = IsGitHubRepo();
+            //Set max of 250ms wait time to prevent UI blocking
+            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
+        }
     }
 }
