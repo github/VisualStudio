@@ -3,7 +3,6 @@ using System.Reactive;
 using GitHub.Models;
 using ReactiveUI;
 using System.Collections.ObjectModel;
-using GitHub.Collections;
 
 namespace GitHub.ViewModels
 {
@@ -16,7 +15,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// The list of repositories the current user may clone from the specified host.
         /// </summary>
-        TrackingCollection<IRemoteRepositoryModel> Repositories { get; }
+        ObservableCollection<IRemoteRepositoryModel> Repositories { get; }
 
         bool FilterTextIsEnabled { get; }
 

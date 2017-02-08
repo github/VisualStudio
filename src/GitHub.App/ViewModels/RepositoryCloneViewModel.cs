@@ -81,7 +81,7 @@ namespace GitHub.ViewModels
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
             this.WhenAny(
-                x => x.Repositories.UnfilteredCount,
+                x => x.repositories.UnfilteredCount,
                 x => x.IsLoading,
                 x => x.LoadingFailed,
                 (unfilteredCount, loading, failed) =>
@@ -135,7 +135,7 @@ namespace GitHub.ViewModels
             base.Initialize(data);
 
             IsLoading = true;
-            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRemoteRepositoryModel>;
+            repositoryHost.ModelService.GetRepositories(repositories);
             repositories.OriginalCompleted.Subscribe(
                 _ => { }
                 , ex =>
@@ -249,7 +249,7 @@ namespace GitHub.ViewModels
         public IReactiveCommand<Unit> CloneCommand { get; private set; }
 
         TrackingCollection<IRemoteRepositoryModel> repositories;
-        public TrackingCollection<IRemoteRepositoryModel> Repositories
+        public ObservableCollection<IRemoteRepositoryModel> Repositories
         {
             [return: AllowNull]
             get { return repositories; }
