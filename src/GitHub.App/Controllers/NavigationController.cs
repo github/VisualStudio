@@ -73,7 +73,6 @@ namespace GitHub.Controllers
                     CreateView(connection, data, onViewLoad);
                     if (data.Data == null && previousFlow == UIControllerFlow.PullRequestCreation && history.Count >= 2)
                     {
-                        Debug.Assert(history.Count >= 2, "History shouldn't have less than 2 items in it when visiting the creation view.");
                         Pop(history[history.Count-2]);
                     }
 
