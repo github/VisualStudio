@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -273,15 +274,34 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             [Fact]
-            public async Task PullRequestFromGhostAccount()
+            public async Task SetsOperationErrorOnCheckoutFailure()
             {
                 var target = CreateTarget(
                     currentBranch: "master",
                     existingPrBranch: "pr/123");
                 await target.Load(CreatePullRequest());
 
-                await Assert.ThrowsAsync<Exception>(() => target.Checkout.ExecuteAsyncTask(null));
+                Assert.True(target.Checkout.CanExecute(null));
+
+                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+
                 Assert.Equal("Switch threw", target.OperationError);
+            }
+
+            [Fact]
+            public async Task ClearsOperationErrorOnCheckoutSuccess()
+            {
+                var target = CreateTarget(
+                    currentBranch: "master",
+                    existingPrBranch: "pr/123");
+                await target.Load(CreatePullRequest());
+
+                Assert.True(target.Checkout.CanExecute(null));
+                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.Equal("Switch threw", target.OperationError);
+
+                await target.Checkout.ExecuteAsync();
+                Assert.Null(target.OperationError);
             }
         }
 
@@ -527,7 +547,10 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.IsWorkingDirectoryClean(repository).Returns(Observable.Return(!dirty));
             pullRequestService.Pull(repository).Returns(x => Throws("Pull threw"));
             pullRequestService.Push(repository).Returns(x => Throws("Push threw"));
-            pullRequestService.SwitchToBranch(repository, Arg.Any<IPullRequestModel>()).Returns(x => Throws("Switch threw"));
+            pullRequestService.SwitchToBranch(repository, Arg.Any<IPullRequestModel>())
+                .Returns(
+                    x => Throws("Switch threw"),
+                    _ => Observable.Return(Unit.Default));
 
             var divergence = Substitute.For<BranchTrackingDetails>();
             divergence.AheadBy.Returns(aheadBy);
@@ -563,7 +586,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
         static IObservable<Unit> Throws(string message)
         {
-            Func<IObserver<Unit>, Action> f = _ => { throw new Exception(message); };
+            Func<IObserver<Unit>, Action> f = _ => { throw new FileNotFoundException(message); };
             return Observable.Create(f);
         }
     }

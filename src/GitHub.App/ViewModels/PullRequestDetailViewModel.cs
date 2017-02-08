@@ -499,6 +499,7 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoCheckout(object unused)
         {
+            OperationError = null;
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
