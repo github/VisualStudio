@@ -32,18 +32,6 @@ namespace GitHub.UI
                 {
                     DataContext = result;
                 });
-
-            Unloaded += (o, e) =>
-            {
-                if (whenAnyShowingMessage != null)
-                {
-                    whenAnyShowingMessage.Dispose();
-                }
-                if (whenAnyDataContext != null)
-                {
-                    whenAnyDataContext.Dispose();
-                }
-            };
         }
 
         public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0,0,8,0)));
