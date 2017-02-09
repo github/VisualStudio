@@ -83,35 +83,43 @@ namespace GitHub.Services
         /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
         public bool TryOpenRepository(string repoPath)
         {
+            var dte = serviceProvider.TryGetService<DTE>();
+            if (dte == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find DTE service.");
+                return false;
+            }
+
+            var os = serviceProvider.TryGetService<IOperatingSystem>();
+            if (os == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                return false;
+            }
+
             bool solutionCreated = false;
 
             try
             {
-                var dte = (DTE)serviceProvider.GetService(typeof(DTE));
-                var os = (IOperatingSystem)serviceProvider.GetService(typeof(IOperatingSystem));
+                dte.Solution.Create(repoPath, TempSolutionName);
+                solutionCreated = true;
 
-                try
-                {
-                    dte.Solution.Create(repoPath, TempSolutionName);
-                    solutionCreated = true;
-
-                    // Don't create a .sln file when we close.
-                    dte.Solution.Close(false);
-                }
-                finally
-                {
-                    // Clean up the dummy solution's subdirectory inside `.vs`.
-                    var vsDirPath = Path.Combine(repoPath, ".vs", TempSolutionName);
-                    var vsDir = os.Directory.GetDirectory(vsDirPath);
-                    if (vsDir.Exists)
-                    {
-                        vsDir.Delete(true);
-                    }
-                }
+                // Don't create a .sln file when we close.
+                dte.Solution.Close(false);
             }
             catch (Exception e)
             {
                 VsOutputLogger.WriteLine("Error opening repository. {0}", e);
+            }
+            finally
+            {
+                // Clean up the dummy solution's subdirectory inside `.vs`.
+                var vsTempPath = Path.Combine(repoPath, ".vs", TempSolutionName);
+                var vsTempDir = os.Directory.GetDirectory(vsTempPath);
+                if (vsTempDir.Exists)
+                {
+                    vsTempDir.Delete(true);
+                }
             }
 
             return solutionCreated;
