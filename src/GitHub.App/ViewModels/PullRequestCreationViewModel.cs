@@ -35,6 +35,7 @@ namespace GitHub.ViewModels
         readonly IRepositoryHost repositoryHost;
         readonly IObservable<IRemoteRepositoryModel> githubObs;
         readonly CompositeDisposable disposables = new CompositeDisposable();
+        readonly ILocalRepositoryModel activeLocalRepo;
 
         [ImportingConstructor]
         PullRequestCreationViewModel(
@@ -42,7 +43,7 @@ namespace GitHub.ViewModels
              IPullRequestService service, INotificationService notifications)
              : this(connectionRepositoryHostMap?.CurrentRepositoryHost, teservice?.ActiveRepo, service,
                    notifications)
-         {}
+        {}
 
         public PullRequestCreationViewModel(IRepositoryHost repositoryHost, ILocalRepositoryModel activeRepo,
             IPullRequestService service, INotificationService notifications)
@@ -53,6 +54,7 @@ namespace GitHub.ViewModels
             Extensions.Guard.ArgumentNotNull(notifications, nameof(notifications));
 
             this.repositoryHost = repositoryHost;
+            activeLocalRepo = activeRepo;
 
             var obs = repositoryHost.ApiClient.GetRepository(activeRepo.Owner, activeRepo.Name)
                 .Select(r => new RemoteRepositoryModel(r))
@@ -146,6 +148,8 @@ namespace GitHub.ViewModels
                 Branches = x.ToList();
                 Initialized = true;
             });
+
+            SourceBranch = activeLocalRepo.CurrentBranch;
         }
 
         void SetupValidators()

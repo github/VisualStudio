@@ -67,15 +67,14 @@ namespace GitHub.Controllers
             switch (data.MainFlow)
             {
                 case UIControllerFlow.PullRequestCreation:
-                    //The selected flow will change after the view is created, so save it.
-                    var previousFlow = Current?.SelectedFlow;
-
-                    CreateView(connection, data, onViewLoad);
-                    if (data.Data == null && previousFlow == UIControllerFlow.PullRequestCreation && history.Count >= 2)
+                    if (data.Data == null && Current?.SelectedFlow == UIControllerFlow.PullRequestCreation)
                     {
-                        Pop(history[history.Count-2]);
+                        Reload();
                     }
-
+                    else
+                    {
+                        CreateView(connection, data, onViewLoad);
+                    }
                     break;
 
                 case UIControllerFlow.PullRequestDetail:
