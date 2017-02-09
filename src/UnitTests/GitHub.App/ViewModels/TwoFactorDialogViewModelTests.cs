@@ -73,22 +73,6 @@ namespace UnitTests.GitHub.App.ViewModels
             }
 
             [Fact]
-            public async Task CancelCommandCompletesAndReturnsNull()
-            {
-                var target = CreateTarget();
-                var exception = new TwoFactorChallengeFailedException();
-                var userError = new TwoFactorRequiredUserError(exception);
-                var task = target.Show(userError).ToTask();
-
-                target.AuthenticationCode = "123456";
-                target.CancelCommand.Execute(null);
-                var result = await task;
-
-                Assert.False(target.IsBusy);
-                Assert.Null(result);
-            }
-
-            [Fact]
             public async Task ResendCodeCommandCompletesAndReturnsRequestResendCode()
             {
                 var target = CreateTarget();
@@ -118,13 +102,50 @@ namespace UnitTests.GitHub.App.ViewModels
                 var result = await task;
                 Assert.False(target.ShowErrorMessage);
             }
+        }
 
-            TwoFactorDialogViewModel CreateTarget()
+        public class TheCancelCommand
+        {
+            [Fact]
+            public async Task CancelCommandCompletesAndReturnsNull()
             {
-                var browser = Substitute.For<IVisualStudioBrowser>();
-                var twoFactorChallengeHandler = Substitute.For<IDelegatingTwoFactorChallengeHandler>();
-                return new TwoFactorDialogViewModel(browser, twoFactorChallengeHandler);
+                var target = CreateTarget();
+                var exception = new TwoFactorChallengeFailedException();
+                var userError = new TwoFactorRequiredUserError(exception);
+                var task = target.Show(userError).ToTask();
+
+                target.AuthenticationCode = "123456";
+                target.CancelCommand.Execute(null);
+                var result = await task;
+
+                Assert.False(target.IsBusy);
+                Assert.Null(result);
             }
+
+            [Fact]
+            public async Task Cancel_Resets_TwoFactorType()
+            {
+                var target = CreateTarget();
+                var exception = new TwoFactorRequiredException(TwoFactorType.Sms);
+                var userError = new TwoFactorRequiredUserError(exception);
+                var task = target.Show(userError).ToTask();
+
+                Assert.Equal(TwoFactorType.Sms, target.TwoFactorType);
+
+                target.CancelCommand.Execute(null);
+                await task;
+
+                // TwoFactorType must be cleared here as the UIController uses it as a trigger
+                // to show the 2FA dialog view.
+                Assert.Equal(TwoFactorType.None, target.TwoFactorType);
+            }
+        }
+
+        static TwoFactorDialogViewModel CreateTarget()
+        {
+            var browser = Substitute.For<IVisualStudioBrowser>();
+            var twoFactorChallengeHandler = Substitute.For<IDelegatingTwoFactorChallengeHandler>();
+            return new TwoFactorDialogViewModel(browser, twoFactorChallengeHandler);
         }
     }
 }

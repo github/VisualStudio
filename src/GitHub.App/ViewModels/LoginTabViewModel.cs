@@ -47,13 +47,14 @@ namespace GitHub.ViewModels
                 if (ex.IsCriticalException()) return;
 
                 log.Info(string.Format(CultureInfo.InvariantCulture, "Error logging into '{0}' as '{1}'", BaseUri, UsernameOrEmail), ex);
+
                 if (ex is Octokit.ForbiddenException)
                 {
-                    UserError.Throw(new UserError(Resources.LoginFailedForbiddenMessage));
+                    Error = new UserError(Resources.LoginFailedForbiddenMessage, ex.Message);
                 }
                 else
                 {
-                    UserError.Throw(new UserError(ex.Message));
+                    Error = new UserError(ex.Message);
                 }
             });
 
@@ -127,6 +128,15 @@ namespace GitHub.ViewModels
             get { return canLogin.Value; }
         }
 
+        UserError error;
+        [AllowNull]
+        public UserError Error
+        {
+            [return: AllowNull]
+            get { return error; }
+            set { this.RaiseAndSetIfChanged(ref error, value); }
+        }
+
         protected abstract IObservable<AuthenticationResult> LogIn(object args);
 
         protected IObservable<AuthenticationResult> LogInToHost(HostAddress hostAddress)
@@ -142,15 +152,15 @@ namespace GitHub.ViewModels
                 switch (authResult)
                 {
                     case AuthenticationResult.CredentialFailure:
-                        UserError.Throw(new UserError(
+                        Error = new UserError(
                             Resources.LoginFailedText,
                             Resources.LoginFailedMessage,
-                            new[] { NavigateForgotPassword }));
+                            new[] { NavigateForgotPassword });
                         break;
                     case AuthenticationResult.VerificationFailure:
                         break;
                     case AuthenticationResult.EnterpriseServerNotFound:
-                        UserError.Throw(new UserError(Resources.CouldNotConnectToGitHub));
+                        Error = new UserError(Resources.CouldNotConnectToGitHub);
                         break;
                 }
             })

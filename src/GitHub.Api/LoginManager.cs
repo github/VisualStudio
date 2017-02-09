@@ -201,7 +201,7 @@ namespace GitHub.Api
                     }
                     catch (Exception e)
                     {
-                        twoFactorChallengeHandler.ChallengeFailed(e);
+                        await twoFactorChallengeHandler.ChallengeFailed(e);
                         await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
                         throw;
                     }

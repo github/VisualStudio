@@ -47,8 +47,10 @@ namespace GitHub.Authentication
             }
         }
 
-        public void ChallengeFailed(Exception exception)
+        public async Task ChallengeFailed(Exception exception)
         {
+            await ThreadingHelper.SwitchToMainThreadAsync();
+            await twoFactorDialog.CancelCommand.ExecuteAsync(null);
         }
     }
 }

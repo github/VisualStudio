@@ -24,9 +24,9 @@ namespace GitHub.Api
         /// <remarks>
         /// This method is called when, on sending the challenge response returned by 
         /// <see cref="HandleTwoFactorException(TwoFactorAuthorizationException)"/>, an exception of
-        /// a type other than <see cref="TwoFactorAuthorizationException"/>. This indicates that the
-        /// login attempt is over and any 2FA dialog being shown should close.
+        /// a type other than <see cref="TwoFactorAuthorizationException"/> is thrown. This
+        /// indicates that the login attempt is over and any 2FA dialog being shown should close.
         /// </remarks>
-        void ChallengeFailed(Exception e);
+        Task ChallengeFailed(Exception e);
     }
 }
