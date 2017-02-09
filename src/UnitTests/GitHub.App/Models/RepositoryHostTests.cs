@@ -34,7 +34,7 @@ public class RepositoryHostTests
             loginManager.Login(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>(), "baymax", "aPassword").Returns(CreateUserAndScopes("baymax").User);
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -59,7 +59,7 @@ public class RepositoryHostTests
             loginManager.Login(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>(), "baymax", "aPassword").Returns(CreateUserAndScopes("baymax").User);
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -78,7 +78,7 @@ public class RepositoryHostTests
                 .Returns<User>(_ => { throw new NotFoundException("", HttpStatusCode.BadGateway); });
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await host.LogIn("jiminy", "cricket"));
 
@@ -100,7 +100,7 @@ public class RepositoryHostTests
             loginManager.LoginFromCache(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>()).Returns(CreateUserAndScopes("baymax").User);
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             var result = await host.LogInFromCache();
 
@@ -121,7 +121,7 @@ public class RepositoryHostTests
             loginManager.LoginFromCache(HostAddress.GitHubDotComHostAddress, Arg.Any<IGitHubClient>()).Returns(CreateUserAndScopes("baymax").User);
             var loginCache = new TestLoginCache();
             var usage = Substitute.For<IUsageTracker>();
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, Substitute.For<IDelegatingTwoFactorChallengeHandler>(), usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
 
             var result = await host.LogInFromCache();
 

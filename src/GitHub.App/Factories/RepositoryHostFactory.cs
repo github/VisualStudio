@@ -21,7 +21,6 @@ namespace GitHub.Factories
         readonly ILoginManager loginManager;
         readonly ILoginCache loginCache;
         readonly IAvatarProvider avatarProvider;
-        readonly IDelegatingTwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly CompositeDisposable hosts = new CompositeDisposable();
         readonly IUsageTracker usage;
 
@@ -32,7 +31,6 @@ namespace GitHub.Factories
             ILoginManager loginManager,
             ILoginCache loginCache,
             IAvatarProvider avatarProvider,
-            IDelegatingTwoFactorChallengeHandler twoFactorChallengeHandler,
             IUsageTracker usage)
         {
             this.apiClientFactory = apiClientFactory;
@@ -40,7 +38,6 @@ namespace GitHub.Factories
             this.loginManager = loginManager;
             this.loginCache = loginCache;
             this.avatarProvider = avatarProvider;
-            this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.usage = usage;
         }
 
@@ -49,7 +46,7 @@ namespace GitHub.Factories
             var apiClient = await apiClientFactory.Create(hostAddress);
             var hostCache = hostCacheFactory.Create(hostAddress);
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
-            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, twoFactorChallengeHandler, usage);
+            var host = new RepositoryHost(apiClient, modelService, loginManager, loginCache, usage);
             hosts.Add(host);
             return host;
         }

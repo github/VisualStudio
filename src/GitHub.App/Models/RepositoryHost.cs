@@ -30,33 +30,28 @@ namespace GitHub.Models
         static readonly UserAndScopes unverifiedUser = new UserAndScopes(null, null);
 
         readonly ILoginManager loginManager;
-        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
         readonly HostAddress hostAddress;
         readonly ILoginCache loginCache;
         readonly IUsageTracker usage;
 
         bool isLoggedIn;
-        readonly bool isEnterprise;
 
         public RepositoryHost(
             IApiClient apiClient,
             IModelService modelService,
             ILoginManager loginManager,
             ILoginCache loginCache,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler,
             IUsageTracker usage)
         {
             ApiClient = apiClient;
             ModelService = modelService;
             this.loginManager = loginManager;
             this.loginCache = loginCache;
-            this.twoFactorChallengeHandler = twoFactorChallengeHandler;
             this.usage = usage;
 
             Debug.Assert(apiClient.HostAddress != null, "HostAddress of an api client shouldn't be null");
             Address = apiClient.HostAddress;
             hostAddress = apiClient.HostAddress;
-            isEnterprise = !hostAddress.IsGitHubDotCom();
             Title = apiClient.HostAddress.Title;
         }
 
