@@ -146,10 +146,10 @@ namespace GitHub.Models
                         );
                         if (successful)
                         {
-                        // Make sure that GitHubHost/EnterpriseHost are set when the connections
-                        // changed event is raised and likewise that the connection is added when
-                        // the property changed notification is sent.
-                        if (isDotCom)
+                            // Make sure that GitHubHost/EnterpriseHost are set when the connections
+                            // changed event is raised and likewise that the connection is added when
+                            // the property changed notification is sent.
+                            if (isDotCom)
                                 githubHost = host;
                             else
                                 enterpriseHost = host;
