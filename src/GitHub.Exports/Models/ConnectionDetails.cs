@@ -1,6 +1,5 @@
 ﻿using System;
 using GitHub.Primitives;
-using GitHub.Services;
 
 namespace GitHub.Models
 {
@@ -43,16 +42,16 @@ namespace GitHub.Models
 
         public bool Equals(ConnectionDetails other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return HostAddress.Equals(other.HostAddress) && string.Equals(UserName, other.UserName, StringComparison.OrdinalIgnoreCase);
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return HostAddress.Equals(other.HostAddress) &&
+                string.Equals(UserName, other.UserName, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == this.GetType() && Equals((ConnectionDetails)obj);
+            return obj is ConnectionDetails && Equals((ConnectionDetails)obj);
         }
 
         public override int GetHashCode()
