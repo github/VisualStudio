@@ -30,10 +30,9 @@ public class RepositoryCloneViewModelTests
 
     static ITrackingCollection<IRemoteRepositoryModel> SetupRepositories(
         CallInfo callInfo,
-        IObservable<IRemoteRepositoryModel> repositories,
-        out ITrackingCollection<IRemoteRepositoryModel> collection)
+        IObservable<IRemoteRepositoryModel> repositories)
     {
-        collection = callInfo.Arg<ITrackingCollection<IRemoteRepositoryModel>>();
+        var collection = callInfo.Arg<ITrackingCollection<IRemoteRepositoryModel>>();
         collection.Listen(repositories);
         return collection;
     }
@@ -56,10 +55,9 @@ public class RepositoryCloneViewModelTests
                 CreateMockRepositoryModel(),
                 CreateMockRepositoryModel(),
             };
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repos.ToObservable(), out col));
+                .Returns(x => SetupRepositories(x, repos.ToObservable()));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -69,6 +67,7 @@ public class RepositoryCloneViewModelTests
                 Substitute.For<INotificationService>(),
                 Substitute.For<IUsageTracker>());
 
+            var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
             await col.OriginalCompleted;
             Assert.Equal(3, vm.Repositories.Count);
         }
@@ -80,10 +79,9 @@ public class RepositoryCloneViewModelTests
         public async Task StartsTrueBecomesFalseWhenCompleted()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -92,6 +90,7 @@ public class RepositoryCloneViewModelTests
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<INotificationService>(),
                 Substitute.For<IUsageTracker>());
+            var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
 
             Assert.True(vm.IsLoading);
 
@@ -119,10 +118,9 @@ public class RepositoryCloneViewModelTests
         public void IsFalseWhenLoadingReposFailsImmediately()
         {
             var repoSubject = Observable.Throw<IRemoteRepositoryModel>(new InvalidOperationException("Doh!"));
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -143,10 +141,9 @@ public class RepositoryCloneViewModelTests
         public void IsTrueInitially()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
             var cloneService = Substitute.For<IRepositoryCloneService>();
 
             var vm = new RepositoryCloneViewModel(
@@ -164,10 +161,9 @@ public class RepositoryCloneViewModelTests
         public async Task IsFalseWhenLoadingAndCompletedWithRepository()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
                 repositoryHost,
@@ -182,6 +178,7 @@ public class RepositoryCloneViewModelTests
 
             repoSubject.OnCompleted();
 
+            var col = (ITrackingCollection<IRemoteRepositoryModel>)vm.Repositories;
             await col.OriginalCompleted;
             await Task.Delay(100);
             Assert.Equal(1, vm.Repositories.Count);
@@ -192,10 +189,9 @@ public class RepositoryCloneViewModelTests
         public void IsFalseWhenFailed()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
                 repositoryHost,
@@ -213,10 +209,9 @@ public class RepositoryCloneViewModelTests
         public void IsTrueWhenLoadingCompleteNotFailedAndNoRepositories()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -238,10 +233,9 @@ public class RepositoryCloneViewModelTests
         public void IsTrueInitially()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
             var cloneService = Substitute.For<IRepositoryCloneService>();
 
             var vm = GetVM(
@@ -259,10 +253,9 @@ public class RepositoryCloneViewModelTests
         public void IsFalseIfLoadingReposFails()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
                 repositoryHost,
@@ -284,10 +277,9 @@ public class RepositoryCloneViewModelTests
         public void IsFalseWhenLoadingCompleteNotFailedAndNoRepositories()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -309,10 +301,9 @@ public class RepositoryCloneViewModelTests
         public void IsTrueIfLoadingReposFails()
         {
             var repoSubject = new Subject<IRemoteRepositoryModel>();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, repoSubject, out col));
+                .Returns(x => SetupRepositories(x, repoSubject));
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
                 repositoryHost,
@@ -340,11 +331,10 @@ public class RepositoryCloneViewModelTests
             repo.Id.Returns(1);
             repo.Name.Returns("bar");
             var data = new[] { repo }.ToObservable();
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
 
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, data, out col));
+                .Returns(x => SetupRepositories(x, data));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var os = Substitute.For<IOperatingSystem>();
@@ -370,10 +360,9 @@ public class RepositoryCloneViewModelTests
         [Fact]
         public void IsEnabledWhenRepositorySelectedAndPathValid()
         {
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, Observable.Empty<IRemoteRepositoryModel>(), out col));
+                .Returns(x => SetupRepositories(x, Observable.Empty<IRemoteRepositoryModel>()));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -393,10 +382,9 @@ public class RepositoryCloneViewModelTests
         [Fact]
         public void IsNotEnabledWhenPathIsNotValid()
         {
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, Observable.Empty<IRemoteRepositoryModel>(), out col));
+                .Returns(x => SetupRepositories(x, Observable.Empty<IRemoteRepositoryModel>()));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             var vm = GetVM(
@@ -416,10 +404,9 @@ public class RepositoryCloneViewModelTests
         [Fact]
         public async Task DisplaysErrorMessageWhenExceptionOccurs()
         {
-            var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>())
-                .Returns(x => SetupRepositories(x, Observable.Empty<IRemoteRepositoryModel>(), out col));
+                .Returns(x => SetupRepositories(x, Observable.Empty<IRemoteRepositoryModel>()));
 
             var cloneService = Substitute.For<IRepositoryCloneService>();
             cloneService.CloneRepository(Args.String, Args.String, Args.String)
