@@ -38,6 +38,13 @@ public class RepositoryCloneViewModelTests
         return collection;
     }
 
+    static IRemoteRepositoryModel CreateMockRepositoryModel()
+    {
+        var result = Substitute.For<IRemoteRepositoryModel>();
+        result.Equals(result).Returns(true);
+        return result;
+    }
+
     public class TheLoadRepositoriesCommand : TestBaseClass
     {
         [Fact]
@@ -45,9 +52,9 @@ public class RepositoryCloneViewModelTests
         {
             var repos = new IRemoteRepositoryModel[]
             {
-                Substitute.For<IRemoteRepositoryModel>(),
-                Substitute.For<IRemoteRepositoryModel>(),
-                Substitute.For<IRemoteRepositoryModel>()
+                CreateMockRepositoryModel(),
+                CreateMockRepositoryModel(),
+                CreateMockRepositoryModel(),
             };
             var col = default(ITrackingCollection<IRemoteRepositoryModel>);
             var repositoryHost = Substitute.For<IRepositoryHost>();
