@@ -38,12 +38,13 @@ namespace GitHub.Api
         readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
         readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
+        string ClientId { get; set; }
+        string ClientSecret { get; set; }
 
         public ApiClient([AllowNull] HostAddress hostAddress, [AllowNull] IObservableGitHubClient gitHubClient)
         {
-            Configure();
+            ClientId = ApiClientConfiguration.ClientId;
+            ClientSecret = ApiClientConfiguration.ClientSecret;
             HostAddress = hostAddress;
             this.gitHubClient = gitHubClient;
         }

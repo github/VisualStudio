@@ -13,36 +13,25 @@ namespace GitHub.Api
     /// <summary>
     /// Holds the configuration for API clients.
     /// </summary>
-    public static class ApiClientConfiguration
+    public static partial class ApiClientConfiguration
     {
         /// <summary>
         /// Initializes static members of the <see cref="ApiClientConfiguration"/> class.
         /// </summary>
         static ApiClientConfiguration()
         {
-            // HACK: The client ID and secret are set up as properties on ApiClient
-            // for the moment, so we have to create an instance of that class to get
-            // hold of them. TODO: Move them here.
-            var gitHubApp = Assembly.Load("GitHub.App");
-            var apiClientType = gitHubApp.GetType("GitHub.Api.ApiClient");
-            var octokitReactive = Assembly.Load("Octokit.Reactive");
-            var observableGitHubClientType = octokitReactive.GetType("Octokit.Reactive.IObservableGitHubClient");
-            var ctor = apiClientType.GetConstructor(new[] { typeof(HostAddress), observableGitHubClientType });
-            dynamic apiClient = ctor.Invoke(new object[] { null, null });
-
-            ClientId = apiClient.ClientId;
-            ClientSecret = apiClient.ClientSecret;
+            Configure();
         }
 
         /// <summary>
         /// Gets the application's OAUTH client ID.
         /// </summary>
-        public static string ClientId { get; }
+        public static string ClientId { get; private set; }
 
         /// <summary>
         /// Gets the application's OAUTH client secret.
         /// </summary>
-        public static string ClientSecret { get; }
+        public static string ClientSecret { get; private set; }
 
         /// <summary>
         /// Gets a note that will be stored with the OAUTH token.
@@ -63,6 +52,8 @@ namespace GitHub.Api
                 return GetSha256Hash(Info.ApplicationInfo.ApplicationDescription + ":" + GetMachineIdentifier());
             }
         }
+
+        static partial void Configure();
 
         static string GetMachineIdentifier()
         {
