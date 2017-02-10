@@ -90,22 +90,15 @@ namespace GitHub.Services
                 return false;
             }
 
-            var os = serviceProvider.TryGetService<IOperatingSystem>();
-            if (os == null)
-            {
-                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
-                return false;
-            }
-
             bool solutionCreated = false;
+            const string slnName = TempSolutionName;
 
             try
             {
-                dte.Solution.Create(repoPath, TempSolutionName);
+                dte.Solution.Create(repoPath, slnName);
                 solutionCreated = true;
 
-                // Don't create a .sln file when we close.
-                dte.Solution.Close(false);
+                dte.Solution.Close(false); // Don't create a .sln file when we close.
             }
             catch (Exception e)
             {
@@ -113,16 +106,35 @@ namespace GitHub.Services
             }
             finally
             {
+                TryCleanupSolutionUserFiles(repoPath, slnName);
+            }
+
+            return solutionCreated;
+        }
+
+        void TryCleanupSolutionUserFiles(string repoPath, string slnName)
+        {
+            var os = serviceProvider.TryGetService<IOperatingSystem>();
+            if (os == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                return;
+            }
+
+            var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
+            try
+            {
                 // Clean up the dummy solution's subdirectory inside `.vs`.
-                var vsTempPath = Path.Combine(repoPath, ".vs", TempSolutionName);
                 var vsTempDir = os.Directory.GetDirectory(vsTempPath);
                 if (vsTempDir.Exists)
                 {
                     vsTempDir.Delete(true);
                 }
             }
-
-            return solutionCreated;
+            catch (Exception e)
+            {
+                VsOutputLogger.WriteLine("Couldn't clean up {0}. {1}", vsTempPath, e);
+            }
         }
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";

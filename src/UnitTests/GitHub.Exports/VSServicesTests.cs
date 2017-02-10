@@ -73,8 +73,8 @@ public class VSServicesTests
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
             var provider = Substitute.For<IGitHubServiceProvider>();
-            provider.GetService(typeof(DTE)).Returns(dte);
-            provider.GetService(typeof(IOperatingSystem)).Returns(os);
+            provider.TryGetService<DTE>().Returns(dte);
+            provider.TryGetService<IOperatingSystem>().Returns(os);
             return new VSServices(provider);
         }
     }
