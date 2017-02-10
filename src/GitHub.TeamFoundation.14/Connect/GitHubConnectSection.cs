@@ -355,11 +355,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     // Fall back to making the user select a solution to open.
                     opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
-                }
-
-                if (!opened)
-                {
-                    return false;
+                    if (!opened)
+                    {
+                        SelectedRepository = old;
+                        return false;
+                    }
                 }
             }
 
