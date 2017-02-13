@@ -112,9 +112,9 @@ namespace GitHub.ViewModels
                     // TODO: Do some decent logging here
                     return repositoryHost.LogOut();
                 })
-                .Catch<System.Reactive.Unit, Octokit.NotFoundException>(ex =>
+                .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
-                    //this is caused when repository was deleted on github
+                    // Occurs on network error, when the repository was deleted on GitHub etc.
                     return Observable.Empty<System.Reactive.Unit>();
                 })
                 .Subscribe(_ =>
