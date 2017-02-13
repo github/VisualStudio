@@ -137,12 +137,6 @@ namespace GitHub.ViewModels
             DiffFile = ReactiveCommand.Create();
         }
 
-        void SubscribeOperationError(ReactiveCommand<Unit> command)
-        {
-            command.ThrownExceptions.Subscribe(x => OperationError = x.Message);
-            command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
-        }
-
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
@@ -423,6 +417,12 @@ namespace GitHub.ViewModels
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
             return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path, file.Sha).ToTask();
+        }
+
+        void SubscribeOperationError(ReactiveCommand<Unit> command)
+        {
+            command.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+            command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
         IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IPullRequestModel pullRequest, TreeChanges changes)
