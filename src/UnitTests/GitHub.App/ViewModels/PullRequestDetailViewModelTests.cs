@@ -303,6 +303,22 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Checkout.ExecuteAsync();
                 Assert.Null(target.OperationError);
             }
+
+            [Fact]
+            public async Task ClearsOperationErrorOnCheckoutRefresh()
+            {
+                var target = CreateTarget(
+                    currentBranch: "master",
+                    existingPrBranch: "pr/123");
+                await target.Load(CreatePullRequest());
+
+                Assert.True(target.Checkout.CanExecute(null));
+                await Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.Equal("Switch threw", target.OperationError);
+
+                target.Initialize(null);
+                Assert.Null(target.OperationError);
+            }
         }
 
         public class ThePullCommand

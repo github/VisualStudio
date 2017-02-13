@@ -90,22 +90,22 @@ namespace GitHub.ViewModels
                     .Cast<CheckoutCommandState>()
                     .Select(x => x != null && x.IsEnabled), 
                 DoCheckout);
-            Checkout.ThrownExceptions.Subscribe(x => OperationError = x.Message);
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
+            SubscribeOperationError(Checkout);
 
             Pull = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
                     .Select(x => x != null && x.PullEnabled),
                 DoPull);
-            Pull.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+            SubscribeOperationError(Pull);
 
             Push = ReactiveCommand.CreateAsyncObservable(
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
                     .Select(x => x != null && x.PushEnabled),
                 DoPush);
-            Push.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+            SubscribeOperationError(Push);
 
             OpenOnGitHub = ReactiveCommand.Create();
 
@@ -135,6 +135,12 @@ namespace GitHub.ViewModels
 
             OpenFile = ReactiveCommand.Create();
             DiffFile = ReactiveCommand.Create();
+        }
+
+        void SubscribeOperationError(ReactiveCommand<Unit> command)
+        {
+            command.ThrownExceptions.Subscribe(x => OperationError = x.Message);
+            command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
         /// <summary>
@@ -288,6 +294,7 @@ namespace GitHub.ViewModels
 
             IsBusy = true;
 
+            OperationError = null;
             modelService.GetPullRequest(repository, prNumber)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -499,7 +506,6 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoCheckout(object unused)
         {
-            OperationError = null;
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
