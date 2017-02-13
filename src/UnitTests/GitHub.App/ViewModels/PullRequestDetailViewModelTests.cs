@@ -44,7 +44,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 await target.Load(model);
 
-                Assert.Equal("[Invalid]", target.SourceBranchDisplayName);
+                Assert.Equal("[invalid]", target.SourceBranchDisplayName);
             }
         }
 
@@ -58,11 +58,11 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                    new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Added),
-                    new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Removed),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Added),
+                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Removed),
+                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
                 };
 
                 await target.Load(pr);
@@ -115,10 +115,10 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                    new PullRequestFileModel(@"readme.md", PullRequestFileStatus.Renamed),
-                    new PullRequestFileModel(@"dir1/f1.cs", PullRequestFileStatus.Renamed),
-                    new PullRequestFileModel(@"dir1/f2.cs", PullRequestFileStatus.Renamed),
-                    new PullRequestFileModel(@"f3.cs", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"readme.md", "abc", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"dir1/f1.cs", "abc", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"dir1/f2.cs", "abc", PullRequestFileStatus.Renamed),
+                    new PullRequestFileModel(@"f3.cs", "abc", PullRequestFileStatus.Renamed),
                 };
 
                 var changes = Substitute.For<TreeChanges>();
@@ -158,11 +158,11 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 pr.ChangedFiles = new[]
                 {
-                    new PullRequestFileModel("readme.md", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f1.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/f2.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir1/dir1a/f3.cs", PullRequestFileStatus.Modified),
-                    new PullRequestFileModel("dir2/f4.cs", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("readme.md", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f1.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/f2.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir1/dir1a/f3.cs", "abc", PullRequestFileStatus.Modified),
+                    new PullRequestFileModel("dir2/f4.cs", "abc", PullRequestFileStatus.Modified),
                 };
 
                 await target.Load(pr);
@@ -216,7 +216,8 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Load(CreatePullRequest());
 
                 Assert.True(target.Checkout.CanExecute(null));
-                Assert.Null(target.CheckoutState.DisabledMessage);
+                Assert.True(target.CheckoutState.IsEnabled);
+                Assert.Equal("Checkout pr/123", target.CheckoutState.ToolTip);
             }
 
             [Fact]
@@ -229,7 +230,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Load(CreatePullRequest());
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.DisabledMessage);
+                Assert.Equal("Cannot checkout as your working directory has uncommitted changes.", target.CheckoutState.ToolTip);
             }
 
             [Fact]
@@ -268,7 +269,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 await target.Load(pr);
 
                 Assert.False(target.Checkout.CanExecute(null));
-                Assert.Equal("The source repository is no longer available.", target.CheckoutState.DisabledMessage);
+                Assert.Equal("The source repository is no longer available.", target.CheckoutState.ToolTip);
             }
 
             [Fact]
@@ -309,7 +310,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.False(target.Pull.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
                 Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("No commits to pull", target.UpdateState.PullDisabledMessage);
+                Assert.Equal("No commits to pull", target.UpdateState.PullToolTip);
             }
 
             [Fact]
@@ -324,7 +325,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
                 Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Null(target.UpdateState.PullDisabledMessage);
+                Assert.Equal("Pull from remote branch baz", target.UpdateState.PullToolTip);
             }
 
             [Fact]
@@ -340,7 +341,23 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.True(target.Pull.CanExecute(null));
                 Assert.Equal(3, target.UpdateState.CommitsAhead);
                 Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Null(target.UpdateState.PullDisabledMessage);
+                Assert.Equal("Pull from remote branch baz", target.UpdateState.PullToolTip);
+            }
+
+            [Fact]
+            public async Task CheckedOutAndBehindFork()
+            {
+                var target = CreateTarget(
+                    currentBranch: "pr/123",
+                    existingPrBranch: "pr/123",
+                    prFromFork: true,
+                    behindBy: 2);
+                await target.Load(CreatePullRequest());
+
+                Assert.True(target.Pull.CanExecute(null));
+                Assert.Equal(0, target.UpdateState.CommitsAhead);
+                Assert.Equal(2, target.UpdateState.CommitsBehind);
+                Assert.Equal("Pull from fork branch foo:baz", target.UpdateState.PullToolTip);
             }
 
             [Fact]
@@ -381,7 +398,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
                 Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Equal("No commits to push", target.UpdateState.PushDisabledMessage);
+                Assert.Equal("No commits to push", target.UpdateState.PushToolTip);
             }
 
             [Fact]
@@ -396,7 +413,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.True(target.Push.CanExecute(null));
                 Assert.Equal(2, target.UpdateState.CommitsAhead);
                 Assert.Equal(0, target.UpdateState.CommitsBehind);
-                Assert.Null(target.UpdateState.PushDisabledMessage);
+                Assert.Equal("Push to remote branch baz", target.UpdateState.PushToolTip);
             }
 
             [Fact]
@@ -411,7 +428,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(0, target.UpdateState.CommitsAhead);
                 Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("No commits to push", target.UpdateState.PushDisabledMessage);
+                Assert.Equal("No commits to push", target.UpdateState.PushToolTip);
             }
 
             [Fact]
@@ -427,7 +444,23 @@ namespace UnitTests.GitHub.App.ViewModels
                 Assert.False(target.Push.CanExecute(null));
                 Assert.Equal(3, target.UpdateState.CommitsAhead);
                 Assert.Equal(2, target.UpdateState.CommitsBehind);
-                Assert.Equal("You must pull before you can push", target.UpdateState.PushDisabledMessage);
+                Assert.Equal("You must pull before you can push", target.UpdateState.PushToolTip);
+            }
+
+            [Fact]
+            public async Task CheckedOutAndAheadOfFork()
+            {
+                var target = CreateTarget(
+                    currentBranch: "pr/123",
+                    existingPrBranch: "pr/123",
+                    prFromFork: true,
+                    aheadBy: 2);
+                await target.Load(CreatePullRequest());
+
+                Assert.True(target.Push.CanExecute(null));
+                Assert.Equal(2, target.UpdateState.CommitsAhead);
+                Assert.Equal(0, target.UpdateState.CommitsBehind);
+                Assert.Equal("Push to fork branch foo:baz", target.UpdateState.PushToolTip);
             }
 
             [Fact]
@@ -509,7 +542,8 @@ namespace UnitTests.GitHub.App.ViewModels
                 repository,
                 Substitute.For<IModelService>(),
                 pullRequestService,
-                settings);
+                settings,
+                Substitute.For<IUsageTracker>());
 
             return Tuple.Create(vm, pullRequestService);
         }

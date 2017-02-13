@@ -47,8 +47,9 @@
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
       - [ ] Team Explorer view changes to Home page
       - [ ] GitHub header and repo information is shown
-      - [ ] Click Clone in "Local Git Repositories" List and copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
-  - [ ] **Click on Create action link**
+  - [ ] **Navigate back to Connect view, then click clone in "Local Git Repositories" list**
+      - [ ] Copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
+  - [ ] **Click on Create action link in GitHub section**
     - [ ] Create dialog appears
     - [ ] Cursor is on the Name field
     - [ ] Create button is disabled
@@ -68,14 +69,15 @@
     - [ ] Team Explorer view changes to Home page
     - [ ] GitHub header and repo information is shown
 - [ ] **Publishing a local repo**
-  - [ ] File - New - Project - Console Application (or any type of project, doesn't matter much)
-  - [ ] Select "Add to source control" from the dialog and click Ok
-  - [ ] Select "Git" from the Choose Source Control dialog
+  - [ ] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
+  - [ ] **Set "Create new Git Repository" checkbox to checked**
+  - [ ] **Click OK button**
   - [ ] Verify that Team Explorer home page does *not* have a GitHub section
 - [ ] **Click "Sync"**
        - [ ] Synchronization page opens with "Publish to GitHub" section
-- [ ] **Click "Get Started" in the "Publish to GitHub" section**
+- [ ] **Click "Publish to GitHub" in the "Publish to GitHub" section**
       - [ ] Contents of section change to a publish form with:
+        - [ ] Account type dropdown
         - [ ] User dropdown
         - [ ] Pre-filled name field with project name
         - [ ] Description field
@@ -105,6 +107,7 @@
     - [ ] Go to Sync page and publish repository
     - [ ] Go to Team Explorer Connect page (logged in)
     - [ ] Click GitHub > Create
+    - [ ] Received error: "There is already a repository named [repo name] for the current account"
 # Connect page when logged in to TFS
    - [ ] **Connect to a TFS project**
     - [ ] Login to GitHub
@@ -124,11 +127,40 @@
       - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
       - [ ] Filter author selection displays recent pull request authors
       - [ ] "Create New" Link button is displayed
-      - [ ] Clicking on a pull request title opens browser window to pull request on .com
       - [ ] Clicking on a pull request number opens browser window to pull request on .com
+- [ ] **Click on a pull request title**
+      - [ ] A detailed description of the pull request is displayed.
+      - [ ] Pull request number matches the number in the list.
+      - [ ] Pull request title matches the title in the list.
+      - [ ] Source branch is displayed on the left
+      - [ ] Mousing over the source branch shows the entire branch name in a tool tip
+      - [ ] Target branch is displayed on the right
+      - [ ] Mousing over the target branch shows the entire branch name in a tool tip
+      - [ ] "View conversation on GitHub" link navigates to pull request on .com
+      - [ ] List of changed files displayed under pull request description
+      - [ ] Right clicking on a specific file displays options to open or compare file
+      - [ ] Double clicking on a file opens a diff view of the file or a single file (depends on current file option)
+      - [ ] Files in file diff view match diff on .com (pick any file)
+- [ ] **Change the changed files current view**
+      - [ ] The view has been changed to the view selected
+- [ ] **Close & reopen Visual Studio**
+- [ ] **Go to any pull request details**
+      - [ ] View of changed files was the selected view before closing Visual Studio
+- [ ] **Change the default file action**
+      - [ ] Double clicking on a file in the changed file list opens a diff view if previous action setting opened the file, or a single file if the previous action setting opened the diff view (depends on current file option)
+- [ ] **Close & reopen Visual Studio**
+- [ ] **Go to any pull request details**
+      - [ ] Double clicking on a file in the changed file list uses last default action setting open file/file diff
+- [ ] **Make a change any file and save it**
+- [ ] **Go to any pull request details and mouseover**
+      - [ ] "Checkout to [branch name]" is plain text (not hyperlink) and mouseover displays tool tip
+- [ ] **Undo pending changes (Many option to do this. One way: Go to Team Explorer > Home > Changes > Right click on files > Undo Changes)**
+- [ ] **Click on "checkout to [branch name]"**
+      - [ ] Git context (lower right) displays source branch name of pull request
+      - [ ] "Checkout to [branch name]" text has changed to "Local branch up to date"
 - [ ] **Create a new branch (can alternatively make commits on an existing branch)**
 - [ ] **Switch Git context to new branch**
-- [ ] **Click on Create New button**
+- [ ] **Navigate to the Pull Request List (Pull request icon in navigation toolbar) and click on Create New button**
       - [ ] Pane title displays "GitHub | (current repository)"
       - [ ] Selected pane tab title (on the bottom) displays "GitHub"
       - [ ] Create Pull Request button is disabled.
@@ -143,7 +175,8 @@
       - [ ] Pull request list is displayed with new pull request (that was just created) at the top of the list
       - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
       - [ ] Verify all non pushed commits prior to pull request creation have been pushed and exist on .com
-
+- [ ] **Click on back/right/pull request/refresh navigation items (any order)**
+      - [ ] Verify that navigation buttons show views are consistent with clicked navigation buttons
 
 # In VS text/code Editor (logged in to GitHub, open a file that is hosted on Github)
 - [ ] **Highlight code or text within solution, then right click.**

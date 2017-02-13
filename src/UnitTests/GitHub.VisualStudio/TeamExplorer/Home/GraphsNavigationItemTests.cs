@@ -4,6 +4,7 @@ using GitHub.Services;
 using GitHub.VisualStudio.TeamExplorer.Home;
 using NSubstitute;
 using Xunit;
+using UnitTests;
 
 public class GraphsNavigationItemTests
 {
@@ -20,7 +21,7 @@ public class GraphsNavigationItemTests
             var browser = Substitute.For<IVisualStudioBrowser>();
             var lazyBrowser = new Lazy<IVisualStudioBrowser>(() => browser);
             var holder = Substitute.For<ITeamExplorerServiceHolder>();
-            var graphsNavigationItem = new GraphsNavigationItem(apiFactory, lazyBrowser, holder)
+            var graphsNavigationItem = new GraphsNavigationItem(Substitutes.ServiceProvider, apiFactory, lazyBrowser, holder)
             {
                 ActiveRepoUri = origin
             };

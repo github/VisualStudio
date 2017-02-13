@@ -1,5 +1,7 @@
 # GitHub Extension for Visual Studio
 
+**The location of the submodules has changed as of 31-01-2017.** If you have an existing clone, make sure to run `git submodule sync` to update your local clone with the new locations for the submodules.
+
 The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015.
 Most of the extension UI lives in the Team Explorer pane, which is available from the View menu.
 
@@ -38,12 +40,16 @@ To be able to use the GitHub API, you'll need to:
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
 - Open [src/GitHub.App/Api/ApiClientConfiguration.cs](src/GitHub.App/Api/ApiClientConfiguration.cs) and fill out the clientId/clientSecret fields for your application.
 
+## More information
+
+- Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
+
 ## Contributing
 
 Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
 
 ## Copyright
 
-Copyright 2015 - 2016 GitHub, Inc.
+Copyright 2015 - 2017 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)

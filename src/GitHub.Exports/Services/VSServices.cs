@@ -14,10 +14,10 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
-        readonly IUIProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
 
         [ImportingConstructor]
-        public VSServices(IUIProvider serviceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }

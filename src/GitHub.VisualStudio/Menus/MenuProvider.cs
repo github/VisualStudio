@@ -37,20 +37,21 @@ namespace GitHub.VisualStudio.Menus
 
         public IReadOnlyCollection<IDynamicMenuHandler> DynamicMenus { get; }
 
-        public MenuProvider(IUIProvider serviceProvider)
+        public MenuProvider(IGitHubServiceProvider serviceProvider)
         {
             Menus = new List<IMenuHandler>
             {
                 new AddConnection(serviceProvider),
-                new OpenPullRequests(),
-                new ShowGitHubPane()
+                new OpenPullRequests(serviceProvider),
+                new ShowGitHubPane(serviceProvider)
             };
 
             DynamicMenus = new List<IDynamicMenuHandler>
             {
                 new CopyLink(serviceProvider),
                 new CreateGist(serviceProvider),
-                new OpenLink(serviceProvider)
+                new OpenLink(serviceProvider),
+                new BlameLink(serviceProvider)
             };
         }
     }

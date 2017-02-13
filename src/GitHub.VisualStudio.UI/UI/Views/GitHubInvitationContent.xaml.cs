@@ -40,10 +40,5 @@ namespace GitHub.VisualStudio.UI.Views
         {
             ViewModel.SignUp();
         }
-
-        void login_Click(object sender, RoutedEventArgs e)
-        {
-            ViewModel.Login();
-        }
     }
 }

@@ -42,7 +42,7 @@ namespace GitHub.Services
 
         void ShowText(string text)
         {
-            var statusBar = serviceProvider.TryGetService<IVsStatusbar>();
+            var statusBar = serviceProvider.GetServiceSafe<IVsStatusbar>();
             int frozen;
             if (!ErrorHandler.Succeeded(statusBar.IsFrozen(out frozen)))
                 return;
