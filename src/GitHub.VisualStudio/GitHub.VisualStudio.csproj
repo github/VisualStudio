@@ -567,10 +567,6 @@
       <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
       <Name>GithubVSAutomationIDs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\externalpackages\StartPage\preview5\GitHub.StartPage.Preview5.csproj">
-      <Project>{1bc94b6a-b021-4207-a70e-936ee272ad3e}</Project>
-      <Name>GitHub.StartPage.Preview5</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>
@@ -652,10 +648,6 @@
       <Private>False</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
-      <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
-      <Name>GitHub.StartPage</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
