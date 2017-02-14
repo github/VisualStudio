@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
+  <Import Project="..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CA1989F9-6545-4A47-BFB9-1082605CE447}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GitHub.App.UnitTests</RootNamespace>
+    <AssemblyName>GitHub.App.UnitTests</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntryExitDecoratorInterfaces, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EntryExitDecorator.Fody.0.3.0\lib\net45\EntryExitDecoratorInterfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LibGit2Sharp, Version=0.22.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LibGit2Sharp.0.22.0\lib\net40\LibGit2Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Reactive.Testing, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Testing.2.2.5-custom\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\VSSDK.ComponentModelHost.12.0.4\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NSubstitute, Version=1.8.1.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NSubstitute.1.8.1.0\lib\net45\NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.assert, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.assert.2.1.0\lib\dotnet\xunit.assert.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.core, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Caches\CredentialCacheTests.cs">
+      <Link>Caches\CredentialCacheTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Caches\ImageCacheTests.cs">
+      <Link>Caches\ImageCacheTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Controllers\UIProviderTests.cs">
+      <Link>Controllers\UIProviderTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Models\AccountModelTests.cs">
+      <Link>Models\AccountModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Models\ModelServiceTests.cs">
+      <Link>Models\ModelServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Controllers\UIControllerTests.cs">
+      <Link>Controllers\UIControllerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Models\PullRequestModelTests.cs">
+      <Link>Models\PullRequestModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Models\RepositoryHostTests.cs">
+      <Link>Models\RepositoryHostTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Models\RepositoryModelTests.cs">
+      <Link>Models\RepositoryModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Services\AvatarProviderTests.cs">
+      <Link>Services\AvatarProviderTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Services\GitClientTests.cs">
+      <Link>Services\GitClientTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Services\PullRequestServiceTests.cs">
+      <Link>Services\PullRequestServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Services\RepositoryCloneServiceTests.cs">
+      <Link>Services\RepositoryCloneServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\Services\RepositoryCreationServiceTests.cs">
+      <Link>Services\RepositoryCreationServiceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\GistCreationViewModelTests.cs">
+      <Link>ViewModels\GistCreationViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\LoginControlViewModelTests.cs">
+      <Link>ViewModels\LoginControlViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\LoginToGitHubViewModelTests.cs">
+      <Link>ViewModels\LoginToGitHubViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\PullRequestCreationViewModelTests.cs">
+      <Link>ViewModels\PullRequestCreationViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\PullRequestDetailViewModelTests.cs">
+      <Link>ViewModels\PullRequestDetailViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\PullRequestListViewModelTests.cs">
+      <Link>ViewModels\PullRequestListViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\RepositoryCloneViewModelTests.cs">
+      <Link>ViewModels\RepositoryCloneViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\RepositoryCreationViewModelTests.cs">
+      <Link>ViewModels\RepositoryCreationViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs">
+      <Link>ViewModels\RepositoryPublishViewModelTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Helpers\CommandTestHelpers.cs">
+      <Link>Helpers\CommandTestHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Helpers\ReactiveTestHelper.cs">
+      <Link>Helpers\ReactiveTestHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Helpers\TestBaseClass.cs">
+      <Link>TestBaseClass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Helpers\TestImageCache.cs">
+      <Link>Helpers\TestImageCache.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Helpers\TestLoginCache.cs">
+      <Link>Helpers\TestLoginCache.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Helpers\TestSharedCache.cs">
+      <Link>Helpers\TestSharedCache.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\Substitutes.cs">
+      <Link>Substitutes.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\UnitTests\TestDoubles\FakeCommitLog.cs">
+      <Link>TestDoubles\FakeCommitLog.cs</Link>
+    </Compile>
+    <Compile Include="Args.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
+      <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
+      <Name>Akavache_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
+      <Project>{674B69B8-0780-4D54-AE2B-C15821FA51CB}</Project>
+      <Name>Octokit.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Testing\ReactiveUI.Testing_Net45.csproj">
+      <Project>{dd99fd0f-82f6-4c30-930e-4a1d0df01d65}</Project>
+      <Name>ReactiveUI.Testing_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
+      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
+      <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\Rothko\src\Rothko.csproj">
+      <Project>{4a84e568-ca86-4510-8cd0-90d3ef9b65f9}</Project>
+      <Name>Rothko</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Api\GitHub.Api.csproj">
+      <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
+      <Name>GitHub.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj">
+      <Project>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</Project>
+      <Name>GitHub.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
+      <Name>GitHub.Exports.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
+      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
+      <Name>GitHub.Extensions.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Extensions\GitHub.Extensions.csproj">
+      <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
+      <Name>GitHub.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
+    <Error Condition="!Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props'))" />
+    <Error Condition="!Exists('..\..\packages\Fody.1.28.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.1.28.3\build\Fody.targets'))" />
+  </Target>
+  <Import Project="..\..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\..\packages\Fody.1.28.3\build\Fody.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
