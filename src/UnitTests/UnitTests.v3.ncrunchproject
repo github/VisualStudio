@@ -1,0 +1,21 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <DefaultTestTimeout>2000</DefaultTestTimeout>
+    <HiddenComponentWarnings>
+      <Value>AbnormalReferenceResolution</Value>
+    </HiddenComponentWarnings>
+    <IgnoredTests>
+      <FixtureTestSelector>
+        <FixtureName>SimpleRepositoryModelTests</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>UIControllerTests+PullRequestsFlow</FixtureName>
+      </FixtureTestSelector>
+      <FixtureTestSelector>
+        <FixtureName>UIProviderTests</FixtureName>
+      </FixtureTestSelector>
+    </IgnoredTests>
+    <PreloadReferencedAssemblies>True</PreloadReferencedAssemblies>
+    <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
+  </Settings>
+</ProjectConfiguration>
