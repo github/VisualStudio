@@ -16,6 +16,7 @@ using GitHub.VisualStudio.TeamExplorer;
 using System.Windows.Controls;
 using GitHub.VisualStudio.UI;
 using GitHub.ViewModels;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
@@ -85,9 +86,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             InitializeSectionView();
         }
 
-        public void Connect()
+        public async Task Connect()
         {
-            ShowPublish();
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
+            else
+                await Login();
         }
 
         public void SignUp()
@@ -117,6 +122,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                     ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
             });
             uiProvider.Run(controller);
+        }
+
+        async Task Login()
+        {
+            var uiProvider = ServiceProvider.GetService<IUIProvider>();
+            uiProvider.RunInDialog(UIControllerFlow.Authentication);
+
+            loggedIn = await connectionManager.IsLoggedIn(hosts);
+            if (loggedIn)
+                ShowPublish();
         }
 
         bool disposed;
