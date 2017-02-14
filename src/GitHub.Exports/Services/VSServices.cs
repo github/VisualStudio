@@ -83,6 +83,13 @@ namespace GitHub.Services
         /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
         public bool TryOpenRepository(string repoPath)
         {
+            var os = serviceProvider.TryGetService<IOperatingSystem>();
+            if (os == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                return false;
+            }
+
             var dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
@@ -90,12 +97,16 @@ namespace GitHub.Services
                 return false;
             }
 
-            bool solutionCreated = false;
-            const string slnName = TempSolutionName;
+            var repoDir = os.Directory.GetDirectory(repoPath);
+            if(!repoDir.Exists)
+            {
+                return false;
+            }
 
+            bool solutionCreated = false;
             try
             {
-                dte.Solution.Create(repoPath, slnName);
+                dte.Solution.Create(repoPath, TempSolutionName);
                 solutionCreated = true;
 
                 dte.Solution.Close(false); // Don't create a .sln file when we close.
@@ -106,21 +117,13 @@ namespace GitHub.Services
             }
             finally
             {
-                TryCleanupSolutionUserFiles(repoPath, slnName);
+                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName);
             }
-
             return solutionCreated;
         }
 
-        void TryCleanupSolutionUserFiles(string repoPath, string slnName)
+        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName)
         {
-            var os = serviceProvider.TryGetService<IOperatingSystem>();
-            if (os == null)
-            {
-                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
-                return;
-            }
-
             var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
             try
             {

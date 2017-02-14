@@ -353,11 +353,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 var opened = vsServices.TryOpenRepository(SelectedRepository.LocalPath);
                 if (!opened)
                 {
-                    // Fall back to making the user select a solution to open.
+                    // TryOpenRepository might fail because dir no longer exists. Let user find solution themselves.
                     opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
                     if (!opened)
                     {
-                        SelectedRepository = old;
                         return false;
                     }
                 }

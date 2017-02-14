@@ -14,9 +14,10 @@ public class VSServicesTests
         [Fact]
         public void NoExceptions_ReturnsTrue()
         {
-            var target = CreateVSServices();
+            var repoDir = @"x:\repo";
+            var target = CreateVSServices(repoDir);
 
-            var success = target.TryOpenRepository("");
+            var success = target.TryOpenRepository(repoDir);
 
             Assert.True(success);
         }
@@ -24,12 +25,28 @@ public class VSServicesTests
         [Fact]
         public void SolutionCreateThrows_ReturnsFalse()
         {
+            var repoDir = @"x:\repo";
             var dte = Substitute.For<DTE>();
             dte.Solution.When(s => s.Create(Arg.Any<string>(), Arg.Any<string>())).Do(
                 ci => { throw new COMException(); });
-            var target = CreateVSServices(dte: dte);
+            var target = CreateVSServices(repoDir, dte: dte);
 
             var success = target.TryOpenRepository("");
+
+            Assert.False(success);
+        }
+
+        [Fact]
+        public void RepoDirExistsFalse_ReturnFalse()
+        {
+            var repoDir = @"x:\repo";
+            var os = Substitute.For<IOperatingSystem>();
+            //var directoryInfo = Substitute.For<IDirectoryInfo>();
+            //directoryInfo.Exists.Returns(false);
+            //os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
+            var target = CreateVSServices(null, os: os);
+
+            var success = target.TryOpenRepository(repoDir);
 
             Assert.False(success);
         }
@@ -43,9 +60,9 @@ public class VSServicesTests
             var directoryInfo = Substitute.For<IDirectoryInfo>();
             directoryInfo.Exists.Returns(true);
             os.Directory.GetDirectory(tempDir).Returns(directoryInfo);
-            directoryInfo.When(di =>  di.Delete(true)).Do(
+            directoryInfo.When(di => di.Delete(true)).Do(
                 ci => { throw new IOException(); });
-            var target = CreateVSServices(os: os);
+            var target = CreateVSServices(repoDir, os: os);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -61,17 +78,25 @@ public class VSServicesTests
             var directoryInfo = Substitute.For<IDirectoryInfo>();
             directoryInfo.Exists.Returns(true);
             os.Directory.GetDirectory(tempDir).Returns(directoryInfo);
-            var target = CreateVSServices(os: os);
+            var target = CreateVSServices(repoDir, os: os);
 
             var success = target.TryOpenRepository(repoDir);
 
             directoryInfo.Received().Delete(true);
         }
 
-        VSServices CreateVSServices(IOperatingSystem os = null, DTE dte = null)
+        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
+
+            if (repoDir != null)
+            {
+                var directoryInfo = Substitute.For<IDirectoryInfo>();
+                directoryInfo.Exists.Returns(true);
+                os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
+            }
+
             var provider = Substitute.For<IGitHubServiceProvider>();
             provider.TryGetService<DTE>().Returns(dte);
             provider.TryGetService<IOperatingSystem>().Returns(os);
