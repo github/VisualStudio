@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -23,6 +24,33 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
     {
+        // this is the order that will show up in the dropdown
+        static IReadOnlyList<PullRequestSortOrder> sortOrders = new List<PullRequestSortOrder> {
+            new PullRequestSortOrder(Resources.SortOrderUpdatedDescending,
+                OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt), 
+                SortOrder.UpdatedDescending),
+            new PullRequestSortOrder(Resources.SortOrderCreatedDescending,
+                OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.CreatedAt), 
+                SortOrder.CreatedDescending),
+            new PullRequestSortOrder(Resources.SortOrderUpdatedAscending,
+                OrderedComparer<IPullRequestModel>.OrderBy(x => x.UpdatedAt), 
+                SortOrder.UpdatedAscending),
+            new PullRequestSortOrder(Resources.SortOrderCreatedAscending,
+                OrderedComparer<IPullRequestModel>.OrderBy(x => x.CreatedAt), 
+                SortOrder.CreatedAscending)
+        };
+
+        // a helper lookup table for easy access to the sorting comparers
+        static Dictionary<SortOrder, PullRequestSortOrder> sortOrderIndex;
+
+        // TODO: Move strings to resources
+        private IReadOnlyList<PullRequestState> states = Array.AsReadOnly(new []
+        {
+            new PullRequestState("Open", true),
+            new PullRequestState("Closed", false),
+            new PullRequestState("All")
+        });
+
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
@@ -30,6 +58,13 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
+
+        static PullRequestListViewModel()
+        {
+            sortOrderIndex = sortOrders.ToDictionary(x => x.SortOrder, x => x);
+            // the default is no specific ordering if saved in the settings
+            sortOrderIndex.Add(SortOrder.Unspecified, sortOrderIndex[SortOrder.UpdatedDescending]);
+        }
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -57,16 +92,11 @@ namespace GitHub.ViewModels
 
             openPullRequestCommand = ReactiveCommand.Create();
 
-            States = new List<PullRequestState> {
-                new PullRequestState { IsOpen = true, Name = "Open" },
-                new PullRequestState { IsOpen = false, Name = "Closed" },
-                new PullRequestState { Name = "All" }
-            };
-
             trackingAuthors = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
             trackingAssignees = new TrackingCollection<IAccount>(Observable.Empty<IAccount>(),
                 OrderedComparer<IAccount>.OrderByDescending(x => x.Login).Compare);
+
             trackingAuthors.Subscribe();
             trackingAssignees.Subscribe();
 
@@ -74,22 +104,26 @@ namespace GitHub.ViewModels
             Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
 
             PullRequests = new TrackingCollection<IPullRequestModel>();
-            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
             pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
-                .Where(x => PullRequests != null)
+                .Where(x => pullRequests != null)
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
+                .Where(x => pullRequests != null && x != EmptyUser && IsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
+                .Where(x => pullRequests != null && x != EmptyUser && IsLoaded)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
+            this.WhenAny(x => x.SelectedSortOrder, x => x.Value)
+                .Where(x => x != null && pullRequests != null)
+                .Subscribe(s => pullRequests.Comparer = s.Comparer.Compare);
+
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
+            SelectedSortOrder = sortOrderIndex[listSettings.SelectedSort];
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -134,14 +168,12 @@ namespace GitHub.ViewModels
                 });
         }
 
-        void UpdateFilter(PullRequestState state, [AllowNull]IAccount ass, [AllowNull]IAccount aut)
+        void UpdateFilter(PullRequestState state, IAccount assignee, IAccount author)
         {
-            if (PullRequests == null)
-                return;
             pullRequests.Filter = (pr, i, l) =>
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
-                     (ass == null || ass.Equals(pr.Assignee)) &&
-                     (aut == null || aut.Equals(pr.Author));
+                     (assignee == null || assignee.Equals(pr.Assignee)) &&
+                     (author == null || author.Equals(pr.Author));
         }
 
         bool isLoaded;
@@ -173,12 +205,7 @@ namespace GitHub.ViewModels
             get { return openPullRequestCommand; }
         }
 
-        IReadOnlyList<PullRequestState> states;
-        public IReadOnlyList<PullRequestState> States
-        {
-            get { return states; }
-            set { this.RaiseAndSetIfChanged(ref states, value); }
-        }
+        public IReadOnlyList<PullRequestState> States => states;
 
         PullRequestState selectedState;
         public PullRequestState SelectedState
@@ -186,6 +213,16 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return selectedState; }
             set { this.RaiseAndSetIfChanged(ref selectedState, value); }
+        }
+
+        public IReadOnlyList<PullRequestSortOrder> SortOrders => sortOrders;
+
+        PullRequestSortOrder selectedSortOrder;
+        public PullRequestSortOrder SelectedSortOrder
+        {
+            [return: AllowNull]
+            get { return selectedSortOrder; }
+            set { this.RaiseAndSetIfChanged(ref selectedSortOrder, value); }
         }
 
         ObservableCollection<IAccount> assignees;
@@ -251,6 +288,7 @@ namespace GitHub.ViewModels
             listSettings.SelectedState = SelectedState.Name;
             listSettings.SelectedAssignee = SelectedAssignee?.Login;
             listSettings.SelectedAuthor = SelectedAuthor?.Login;
+            listSettings.SelectedSort = SelectedSortOrder.SortOrder;
             settings.Save();
         }
     }
