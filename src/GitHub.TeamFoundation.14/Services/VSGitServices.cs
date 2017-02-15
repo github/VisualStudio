@@ -12,6 +12,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 using GitHub.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using Microsoft.VisualStudio.Shell;
+using System.Threading;
 
 namespace GitHub.Services
 {
@@ -21,6 +23,7 @@ namespace GitHub.Services
     public class VSGitServices : IVSGitServices
     {
         readonly IGitHubServiceProvider serviceProvider;
+        readonly IVsStatusbar statusBar;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -34,6 +37,7 @@ namespace GitHub.Services
         public VSGitServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+            this.statusBar = serviceProvider.GetService<IVsStatusbar>();
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -57,8 +61,19 @@ namespace GitHub.Services
 
         public void Clone(string cloneUrl, string clonePath, bool recurseSubmodules)
         {
+#if TEAMEXPLORER14
             var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+#else
+            var gitExt = serviceProvider.GetService<IGitActionsExt>();
+            var progress = new Progress<ServiceProgressData>();
+
+            ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+            {
+                progress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
+                await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), progress);
+            });
+#endif
         }
 
         IGitRepositoryInfo GetRepoFromVS()
