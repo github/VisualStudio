@@ -70,10 +70,20 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fileName = await ViewModel.ExtractFile(file);
+
+                var readOnly = true;
+
+                var workingFile = FindWorkingDirectoryFile(file);
+                if (workingFile != null)
+                {
+                    fileName = workingFile;
+                    readOnly = false;
+                }
+
                 var window = Services.Dte.ItemOperations.OpenFile(fileName);
 
                 // If the file we extracted isn't the current file on disk, make the window read-only.
-                window.Document.ReadOnly = fileName != file.DirectoryPath;
+                window.Document.ReadOnly = readOnly;
             }
             catch (Exception e)
             {
@@ -86,26 +96,54 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
-            var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-            var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
+                var leftFile = fileNames.Item1;
+                var rightFile = fileNames.Item2;
+                var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
 
-            Services.DifferenceService.OpenComparisonWindow2(
-                fileNames.Item1,
-                fileNames.Item2,
-                $"{leftLabel} vs {rightLabel}",
-                file.DirectoryPath,
-                leftLabel,
-                rightLabel,
-                string.Empty,
-                string.Empty,
-                (int)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
+                var readOnly = true;
+
+                var workingFile = FindWorkingDirectoryFile(file);
+                if (workingFile != null)
+                {
+                    rightFile = workingFile;
+                    readOnly = false;
+                }
+
+                var diffOptions =
+                    (uint)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles | __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary);
+                if (readOnly)
+                {
+                    diffOptions |= (uint)__VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
+
+                Services.DifferenceService.OpenComparisonWindow2(
+                    leftFile,
+                    rightFile,
+                    $"{leftLabel} vs {rightLabel}",
+                    file.DirectoryPath,
+                    leftLabel,
+                    rightLabel,
+                    string.Empty,
+                    string.Empty,
+                    diffOptions);
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
             }
+        }
+
+        string FindWorkingDirectoryFile(IPullRequestFileNode file)
+        {
+            var state = ViewModel.UpdateState;
+            if(state == null || !state.UpToDate)
+            {
+                return null;
+            }
+
+            var repo = TeamExplorerServiceHolder.ActiveRepo;
+            return System.IO.Path.Combine(repo.LocalPath, file.DirectoryPath, file.FileName);
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
