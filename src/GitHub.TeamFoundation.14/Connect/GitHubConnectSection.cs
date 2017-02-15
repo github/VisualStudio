@@ -25,10 +25,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 {
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
+        readonly IPackageSettings packageSettings;
+        readonly IVSServices vsServices;
         readonly int sectionIndex;
+
         bool isCloning;
         bool isCreating;
-        IPackageSettings packageSettings;
         GitHubConnectSectionState settings;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
@@ -92,6 +94,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings packageSettings,
+            IVSServices vsServices,
             int index)
             : base(serviceProvider, apiFactory, holder, manager)
         {
@@ -102,6 +105,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             sectionIndex = index;
 
             this.packageSettings = packageSettings;
+            this.vsServices = vsServices;
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
@@ -344,22 +348,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         public bool OpenRepository()
         {
             var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
-            // open the solution selection dialog when the user wants to switch to a different repo
-            // since there's no other way of changing the source control context in VS
             if (!Equals(SelectedRepository, old))
             {
-                if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1)))
+                var opened = vsServices.TryOpenRepository(SelectedRepository.LocalPath);
+                if (!opened)
                 {
-                    ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-                    return true;
-                }
-                else
-                {
-                    SelectedRepository = old;
-                    return false;
+                    // TryOpenRepository might fail because dir no longer exists. Let user find solution themselves.
+                    opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
+                    if (!opened)
+                    {
+                        return false;
+                    }
                 }
             }
-            return false;
+
+            // Navigate away when we're on the correct source control contexts.
+            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+            return true;
         }
 
         void StartFlow(UIControllerFlow controllerFlow)
