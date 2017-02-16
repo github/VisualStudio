@@ -474,14 +474,10 @@ namespace UnitTests.GitHub.App.ViewModels
             pullRequestService.CalculateHistoryDivergence(repository, Arg.Any<int>())
                 .Returns(Observable.Return(divergence));
 
-            var settings = Substitute.For<IPackageSettings>();
-            settings.UIState.Returns(new UIState { PullRequestDetailState = new PullRequestDetailUIState() });
-
             var vm = new PullRequestDetailViewModel(
                 repository,
                 Substitute.For<IModelService>(),
                 pullRequestService,
-                settings,
                 Substitute.For<IUsageTracker>());
 
             return Tuple.Create(vm, pullRequestService);
