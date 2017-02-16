@@ -67,10 +67,6 @@
                 </Style.Resources>
             </Style>
 
-            <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
-                <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
-            </Style>
-            
             <!-- TODO Fix this: here we change the color of TextBlock depending on the label.
                  It's a hack, it will break with localization -->
             <Style x:Key="StateIndicator" TargetType="TextBlock">
@@ -347,7 +343,6 @@
                                             <ui:OcticonImage Icon="file_code" Margin="0,0,0,2">
                                                 <ui:OcticonImage.Style>
                                                     <Style TargetType="ui:OcticonImage" BasedOn="{StaticResource OcticonImage}">
-                                                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsWindowText}"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}" Value="Removed">
                                                                 <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileIconBrush}"/>
