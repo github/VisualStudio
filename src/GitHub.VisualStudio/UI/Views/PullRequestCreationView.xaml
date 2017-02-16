@@ -178,8 +178,7 @@
             <Button DockPanel.Dock="Right"
                     HorizontalAlignment="Right"
                     Command="{Binding Cancel}"
-                    Content="Cancel"
-                    Style="{StaticResource GitHubVsButton}" />
+                    Content="Cancel"/>
         </DockPanel>
     </Grid>
 </local:GenericPullRequestCreationView>
