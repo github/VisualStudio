@@ -16,12 +16,6 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
-[submodule "submodules/AutomationIDResource"]
-	path = submodules/AutomationIDResource
-	url = git@github.com:github.com/editor-tools/AutomationIDResource.git
-[submodule "submodules/--force"]
-	path = submodules/--force
-	url = https://github.com/editor-tools/GitHubVSAutomationIDs.git
 [submodule "submodules/GitHubVSAutomationIDs"]
 	path = submodules/GitHubVSAutomationIDs
 	url = https://github.com/editor-tools/GitHubVSAutomationIDs.git
