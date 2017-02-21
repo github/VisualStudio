@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
@@ -14,6 +13,7 @@ using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.UI;
+using NLog;
 using NullGuard;
 using ReactiveUI;
 
@@ -23,6 +23,8 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
     {
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+
         readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
@@ -109,12 +111,13 @@ namespace GitHub.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Catch<System.Reactive.Unit, Octokit.AuthorizationException>(ex =>
                 {
-                    // TODO: Do some decent logging here
+                    log.Info("Received AuthorizationException reading pull requests", ex);
                     return repositoryHost.LogOut();
                 })
-                .Catch<System.Reactive.Unit, Octokit.NotFoundException>(ex =>
+                .Catch<System.Reactive.Unit, Exception>(ex =>
                 {
-                    //this is caused when repository was deleted on github
+                    // Occurs on network error, when the repository was deleted on GitHub etc.
+                    log.Info("Received Exception reading pull requests", ex);
                     return Observable.Empty<System.Reactive.Unit>();
                 })
                 .Subscribe(_ =>
