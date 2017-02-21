@@ -305,9 +305,9 @@ namespace GitHub.ViewModels
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-            var prFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
-            SourceBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Base.Label);
+            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
+            SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             ChangedFilesTree.Clear();
@@ -341,7 +341,7 @@ namespace GitHub.ViewModels
                 {
                     pullToolTip = string.Format(
                         Resources.PullRequestDetailsPullToolTip,
-                        prFromFork ? Resources.Fork : Resources.Remote,
+                        IsFromFork ? Resources.Fork : Resources.Remote,
                         SourceBranchDisplayName);
                 }
                 else
@@ -353,7 +353,7 @@ namespace GitHub.ViewModels
                 {
                     pushToolTip = string.Format(
                         Resources.PullRequestDetailsPushToolTip,
-                        prFromFork ? Resources.Fork : Resources.Remote,
+                        IsFromFork ? Resources.Fork : Resources.Remote,
                         SourceBranchDisplayName);
                 }
                 else if (divergence.AheadBy == 0)
