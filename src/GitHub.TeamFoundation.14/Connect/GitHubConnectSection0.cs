@@ -18,8 +18,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
-            IPackageSettings settings)
-            : base(serviceProvider, apiFactory, holder, manager, settings, 0)
+            IPackageSettings settings,
+            IVSServices vsServices)
+            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, 0)
         {
         }
     }
