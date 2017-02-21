@@ -139,7 +139,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             teServices.ClearNotifications();
             teServices.ShowMessage(
                 msg,
-                    new RelayCommand(o =>
+                new RelayCommand(o =>
                 {
                     var str = o.ToString();
                     /* the prefix is the action to perform:
