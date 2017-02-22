@@ -49,10 +49,11 @@
                   Text="{Binding Path=RepoName}"
                   TextTrimming="CharacterEllipsis"
                   Margin="0,-2,0,0" />
-      <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
-                  Padding="0"
-                  Text="{Binding Path=RepoUrl}"
-                  TextTrimming="CharacterEllipsis" />
+      <TextBlock Foreground="{DynamicResource GitHubVsGrayText}">
+        <Hyperlink Command="{Binding OpenOnGitHub}">
+            <TextBlock Text="{Binding RepoUrl}" TextTrimming="CharacterEllipsis"/>
+        </Hyperlink>
+      </TextBlock>
     </DockPanel>
   
     <Button Margin="0,6,0,0"
