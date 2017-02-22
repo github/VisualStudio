@@ -462,6 +462,8 @@ namespace GitHub.SampleData
         {
 
         }
+
+        public ICommand OpenOnGitHub { get; }
     }
 
     public class GitHubConnectSectionDesigner : IGitHubConnectSection
