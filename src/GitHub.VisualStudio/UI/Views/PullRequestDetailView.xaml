@@ -219,20 +219,6 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-
-                    <!-- Checkout disabled message -->
-                    <TextBlock Grid.Column="2" Margin="0 0 0 4" VerticalAlignment="Center" TextWrapping="Wrap">
-                        <Run Text="{Binding CheckoutDisabledMessage}"/>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                 </Grid>
             </StackPanel>
 
@@ -295,57 +281,9 @@
                 <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
+                                   HeaderText="{Binding Model.ChangedFiles.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0">
 
-                    <ui:SectionControl.Buttons>
-                        <ui:OcticonButton Name="changesOptionsMenuButton"
-                                          Background="Transparent"
-                                          BorderThickness="0"
-                                          Icon="three_bars"
-                                          Padding="4"
-                                          ContextMenuService.IsEnabled="False"
-                                          ContextMenuService.Placement="Bottom"
-                                          Click="changesOptionsMenuButton_Click">
-                            <ui:OcticonButton.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Command="{Binding ToggleOpenChangedFileAction}">
-                                        <MenuItem.Style>
-                                            <Style TargetType="MenuItem">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Diff">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.OpenFileAsDefaultAction}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding OpenChangedFileAction}" Value="Open">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.CompareFileAsDefaultAction}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </MenuItem.Style>
-                                    </MenuItem>
-                                    <Separator/>
-                                    <MenuItem Command="{Binding ToggleChangedFilesView}">
-                                        <MenuItem.Style>
-                                            <Style TargetType="MenuItem">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToListView}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                        <Setter Property="Header" Value="{x:Static prop:Resources.SwitchToTreeView}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </MenuItem.Style>
-                                        <MenuItem.Icon>
-                                            <ui:OcticonPath Icon="list_unordered" Fill="Black" Height="16"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                </ContextMenu>
-                            </ui:OcticonButton.ContextMenu>
-                        </ui:OcticonButton>
-                    </ui:SectionControl.Buttons>
-                    
                     <ui:SectionControl.Content>
                         <Grid>
                             <Grid.Resources>
@@ -366,15 +304,6 @@
                                       Margin="0 6 0 0"
                                       MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
-                                <TreeView.Style>
-                                    <Style TargetType="TreeView">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TreeView.Style>
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="IsExpanded" Value="True"/>
@@ -431,64 +360,6 @@
                                     </DataTemplate>
                                 </TreeView.Resources>
                             </TreeView>
-
-                            <!-- List View -->
-                            <ListView ItemsSource="{Binding ChangedFilesList}"
-                                      Background="Transparent"
-                                      BorderThickness="0"
-                                      Foreground="{DynamicResource GitHubVsWindowText}"
-                                      Margin="0 6 0 0"                                      
-                                      ContextMenuOpening="ListView_ContextMenuOpening"
-                                      ContextMenu="{StaticResource FileContextMenu}"
-                                      ItemContainerStyle="{StaticResource FlatListViewItemStyle}"
-                                      MouseDoubleClick="FileListMouseDoubleClick">
-                                <ListView.Style>
-                                    <Style TargetType="ListView">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="TreeView">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListView.Style>
-                                <ListView.View>
-                                    <GridView ColumnHeaderContainerStyle="{StaticResource FlatGridViewColumnHeader}">
-                                        <GridViewColumn Header="Name" Width="Auto">
-                                            <GridViewColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <ui:OcticonImage Icon="file_code"/>
-                                                        <TextBlock Text="{Binding FileName}" Margin="4 0" VerticalAlignment="Center">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Status}" Value="Removed">
-                                                                            <Setter Property="Foreground" Value="{DynamicResource GitHubDeletedFileBrush}"/>
-                                                                            <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                        <TextBlock Text="{Binding StatusDisplay, StringFormat=[{0}]}" VerticalAlignment="Center" Opacity="0.5">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Null}">
-                                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </GridViewColumn.CellTemplate>
-                                        </GridViewColumn>
-                                        <GridViewColumn Header="Path" Width="Auto" DisplayMemberBinding="{Binding DisplayPath}"/>
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>
                         </Grid>
                     </ui:SectionControl.Content>
                 </ui:SectionControl>
