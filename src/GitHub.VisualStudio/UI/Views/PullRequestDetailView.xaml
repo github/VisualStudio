@@ -215,20 +215,6 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-
-                    <!-- Checkout disabled message -->
-                    <TextBlock Grid.Column="2" Margin="0 0 0 4" VerticalAlignment="Center" TextWrapping="Wrap">
-                        <Run Text="{Binding CheckoutDisabledMessage}"/>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutErrorMessage}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CheckoutDisabledMessage}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                 </Grid>
             </StackPanel>
 
@@ -291,7 +277,7 @@
                 <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
                                    IsExpanded="True"
-                                   HeaderText="{Binding ChangedFilesList.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
+                                   HeaderText="{Binding Model.ChangedFiles.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0">
 
                     <ui:SectionControl.Content>
@@ -314,15 +300,6 @@
                                       Margin="0 6 0 0"
                                       MouseRightButtonDown="FileListMouseRightButtonDown"
                                       MouseDoubleClick="FileListMouseDoubleClick">
-                                <TreeView.Style>
-                                    <Style TargetType="TreeView">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ChangedFilesViewType}" Value="ListView">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TreeView.Style>
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="IsExpanded" Value="True"/>
