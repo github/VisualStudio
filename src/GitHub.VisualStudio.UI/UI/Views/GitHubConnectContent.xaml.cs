@@ -21,13 +21,6 @@ namespace GitHub.VisualStudio.UI.Views
             repositories.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
 
-        void cloneLink_Click(object sender, RoutedEventArgs e)
-        {
-            cloneLink.IsEnabled = false;
-            ViewModel.DoClone();
-            cloneLink.IsEnabled = true;
-        }
-
         void createLink_Click(object sender, RoutedEventArgs e)
         {
             createLink.IsEnabled = false;

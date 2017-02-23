@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -20,7 +21,16 @@ namespace GitHub.Services
         /// <param name="cloneUrl">The url of the repository to clone.</param>
         /// <param name="repositoryName">The name of the repository to clone.</param>
         /// <param name="repositoryPath">The directory that will contain the repository directory.</param>
+        /// <param name="progress">
+        /// An object through which to report progress. This must be of type
+        /// <see cref="System.IProgress{Microsoft.VisualStudio.Shell.ServiceProgressData}"/>, but
+        /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
+        /// </param>
         /// <returns></returns>
-        IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath);
+        Task CloneRepository(
+            string cloneUrl,
+            string repositoryName,
+            string repositoryPath,
+            object progress = null);
     }
 }

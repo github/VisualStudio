@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.VisualStudio;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using GitHub.TeamFoundation;
+using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using Microsoft.VisualStudio.Shell;
-using System.Threading;
+using ReactiveUI;
 
 namespace GitHub.Services
 {
@@ -59,19 +59,29 @@ namespace GitHub.Services
             return ret;
         }
 
-        public void Clone(string cloneUrl, string clonePath, bool recurseSubmodules)
+        /// <inheritdoc/>
+        public async Task Clone(
+            string cloneUrl,
+            string clonePath,
+            bool recurseSubmodules,
+            object progress = null)
         {
 #if TEAMEXPLORER14
             var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+
+            // The operation will have completed when CanClone goes false and then true again.
+            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1);
+            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
-            var progress = new Progress<ServiceProgressData>();
+            var typedProgress = ((Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>)progress) ??
+                new Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>();
 
-            ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+            await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
-                progress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
-                await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), progress);
+                typedProgress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
+                await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
 #endif
         }

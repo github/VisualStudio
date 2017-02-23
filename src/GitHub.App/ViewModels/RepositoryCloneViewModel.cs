@@ -33,10 +33,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IRepositoryHost repositoryHost;
-        readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
-        readonly INotificationService notificationService;
-        readonly IUsageTracker usageTracker;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
         bool isLoading;
         bool noRepositoriesFound;
@@ -48,25 +45,18 @@ namespace GitHub.ViewModels
         RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
-            IOperatingSystem operatingSystem,
-            INotificationService notificationService,
-            IUsageTracker usageTracker)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, notificationService, usageTracker)
+            IOperatingSystem operatingSystem)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem)
         { }
 
 
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
-            IOperatingSystem operatingSystem,
-            INotificationService notificationService,
-            IUsageTracker usageTracker)
+            IOperatingSystem operatingSystem)
         {
             this.repositoryHost = repositoryHost;
-            this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
-            this.notificationService = notificationService;
-            this.usageTracker = usageTracker;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
 
@@ -106,7 +96,7 @@ namespace GitHub.ViewModels
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value != null && y.Value);
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
+            CloneCommand = ReactiveCommand.Create(canCloneObservable);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
@@ -141,38 +131,6 @@ namespace GitHub.ViewModels
 
             // Not matching on NameWithOwner here since that's already been filtered on by the selected account
             return repo.Name.IndexOf(FilterText ?? "", StringComparison.OrdinalIgnoreCase) != -1;
-        }
-
-        IObservable<Unit> OnCloneRepository(object state)
-        {
-            return Observable.Start(() =>
-            {
-                var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                if (repository == null)
-                {
-                    notificationService.ShowError(Resources.RepositoryCloneFailedNoSelectedRepo);
-                    return Observable.Return(Unit.Default);
-                }
-
-                // The following is a noop if the directory already exists.
-                operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
-
-                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath)
-                    .ContinueAfter(() =>
-                    {
-                        usageTracker.IncrementCloneCount().Forget();
-                        return Observable.Return(Unit.Default);
-                    });
-            })
-            .SelectMany(_ => _)
-            .Catch<Unit, Exception>(e =>
-            {
-                var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                notificationService.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
-                return Observable.Return(Unit.Default);
-            });
         }
 
         bool IsAlreadyRepoAtPath(string path)
@@ -229,9 +187,9 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Fires off the cloning process
+        /// Signals that the user clicked the clone button.
         /// </summary>
-        public IReactiveCommand<Unit> CloneCommand { get; private set; }
+        public IReactiveCommand<object> CloneCommand { get; private set; }
 
         TrackingCollection<IRemoteRepositoryModel> repositories;
         public ObservableCollection<IRemoteRepositoryModel> Repositories

@@ -18,6 +18,7 @@ using GitHub.VisualStudio.TeamExplorer.Connect;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace GitHub.SampleData
 {
@@ -353,7 +354,7 @@ namespace GitHub.SampleData
                 .IfPathNotRooted("Please enter a valid path");
         }
 
-        public IReactiveCommand<Unit> CloneCommand
+        public IReactiveCommand<object> CloneCommand
         {
             get;
             private set;
@@ -484,10 +485,6 @@ namespace GitHub.SampleData
             get; set;
         }
 
-        public void DoClone()
-        {
-        }
-
         public void DoCreate()
         {
         }
@@ -506,6 +503,7 @@ namespace GitHub.SampleData
         }
 
         public IConnection SectionConnection { get; }
+        public ICommand Clone { get; }
     }
 
     public class InfoPanelDesigner

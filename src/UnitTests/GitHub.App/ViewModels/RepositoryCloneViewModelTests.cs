@@ -23,9 +23,7 @@ public class RepositoryCloneViewModelTests
         var vm = new RepositoryCloneViewModel(
             repositoryHost,
             cloneService,
-            os,
-            notificationService,
-            usageTracker);
+            os);
         vm.Initialize(null);
         return vm;
     }
@@ -133,9 +131,7 @@ public class RepositoryCloneViewModelTests
             var vm = new RepositoryCloneViewModel(
                 repositoryHost,
                 cloneService,
-                Substitute.For<IOperatingSystem>(),
-                Substitute.For<INotificationService>(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IOperatingSystem>());
 
             Assert.False(vm.LoadingFailed);
             Assert.True(vm.NoRepositoriesFound);
@@ -382,51 +378,6 @@ public class RepositoryCloneViewModelTests
             vm.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
 
             Assert.False(vm.CloneCommand.CanExecute(null));
-        }
-
-        [Fact]
-        public async Task DisplaysErrorMessageWhenExceptionOccurs()
-        {
-            var col = TrackingCollection.Create(Observable.Empty<IRemoteRepositoryModel>());
-            var repositoryHost = Substitute.For<IRepositoryHost>();
-            repositoryHost.ModelService.GetRepositories(Arg.Any<ITrackingCollection<IRemoteRepositoryModel>>()).Returns(_ => col);
-
-            var cloneService = Substitute.For<IRepositoryCloneService>();
-            cloneService.CloneRepository(Args.String, Args.String, Args.String)
-                .Returns(Observable.Throw<Unit>(new InvalidOperationException("Oh my! That was bad.")));
-            var notificationService = Substitute.For<INotificationService>();
-            var vm = GetVM(
-                repositoryHost,
-                cloneService,
-                Substitute.For<IOperatingSystem>(),
-                notificationService,
-                Substitute.For<IUsageTracker>());
-            vm.BaseRepositoryPath = @"c:\fake";
-            var repository = Substitute.For<IRemoteRepositoryModel>();
-            repository.Name.Returns("octokit");
-            vm.SelectedRepository = repository;
-
-            await vm.CloneCommand.ExecuteAsync(null);
-
-            notificationService.Received().ShowError("Failed to clone the repository 'octokit'\r\nEmail support@github.com if you continue to have problems.");
-        }
-
-        [Fact]
-        public async Task UpdatesMetricsWhenRepositoryCloned()
-        {
-            var repositoryHost = Substitute.For<IRepositoryHost>();
-            var cloneService = Substitute.For<IRepositoryCloneService>();
-            var usageTracker = Substitute.For<IUsageTracker>();
-            var vm = new RepositoryCloneViewModel(
-                repositoryHost,
-                cloneService,
-                Substitute.For<IOperatingSystem>(),
-                Substitute.For<INotificationService>(),
-                usageTracker);
-            
-            vm.SelectedRepository = Substitute.For<IRemoteRepositoryModel>();
-            await vm.CloneCommand.ExecuteAsync();
-            Received.InOrder(async () => await usageTracker.IncrementCloneCount());
         }
     }
 }
