@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 using NullGuard;
+using System.Diagnostics;
 
 namespace GitHub.Controllers
 {
@@ -66,7 +67,14 @@ namespace GitHub.Controllers
             switch (data.MainFlow)
             {
                 case UIControllerFlow.PullRequestCreation:
-                    CreateView(connection, data, onViewLoad);
+                    if (data.Data == null && Current?.SelectedFlow == UIControllerFlow.PullRequestCreation)
+                    {
+                        Reload();
+                    }
+                    else
+                    {
+                        CreateView(connection, data, onViewLoad);
+                    }
                     break;
 
                 case UIControllerFlow.PullRequestDetail:
