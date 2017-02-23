@@ -126,7 +126,7 @@
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText>GitHub</ButtonText>
+          <ButtonText>View on GitHub</ButtonText>
         </Strings>
       </Button>
 

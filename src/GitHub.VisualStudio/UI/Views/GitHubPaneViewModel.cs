@@ -33,19 +33,17 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
         readonly IUIProvider uiProvider;
+        readonly IVisualStudioBrowser browser;
         NavigationController navController;
 
         bool disabled;
         Microsoft.VisualStudio.Shell.OleMenuCommand back, forward, refresh;
         int latestReloadCallId;
 
-        [Import]
-        IVisualStudioBrowser VisualStudioBrowser { get; set; }
-
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider)
+            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser)
             : base(serviceProvider, apiFactory, holder)
         {
             this.connectionManager = cm;
@@ -55,6 +53,7 @@ namespace GitHub.VisualStudio.UI.Views
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
             Message = String.Empty;
+            browser = vsBrowser;
 
             this.WhenAnyValue(x => x.Control.DataContext)
                 .OfType<BaseViewModel>()
@@ -99,7 +98,6 @@ namespace GitHub.VisualStudio.UI.Views
                 () => !disabled && (RepositoryOrigin == RepositoryOrigin.DotCom || RepositoryOrigin == RepositoryOrigin.Enterprise),
                 () =>
                 {
-                    var browser = VisualStudioBrowser;
                     switch (navController?.Current.CurrentFlow)
                     {
                         case UIControllerFlow.PullRequestDetail:
