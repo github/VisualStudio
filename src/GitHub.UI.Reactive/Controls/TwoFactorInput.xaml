@@ -20,7 +20,7 @@
             <Setter Property="FontSize" Value="20px" />
         </Style>
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" UseLayoutRounding="True" SnapsToDevicePixels="True"  AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationInputStackPanel}">
+    <StackPanel Orientation="Horizontal" UseLayoutRounding="True" SnapsToDevicePixels="True" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationInputStackPanel}">
         <TextBox x:Name="one" />        
         <TextBox x:Name="two" />        
         <TextBox x:Name="three" />        
