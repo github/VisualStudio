@@ -420,7 +420,7 @@ namespace GitHub.Controllers
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestList, UIViewType.PRList);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestDetail, UIViewType.PRDetail);
             ConfigureSingleViewLogic(UIControllerFlow.PullRequestCreation, UIViewType.PRCreation);
-            ConfigureSingleViewLogic(UIControllerFlow.StartPageClone, UIViewType.StartPageClone);
+            ConfigureSingleViewLogic(UIControllerFlow.ReClone, UIViewType.StartPageClone);
         }
 
         void ConfigureSingleViewLogic(UIControllerFlow flow, UIViewType type)

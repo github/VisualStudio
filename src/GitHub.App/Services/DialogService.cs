@@ -46,7 +46,7 @@ namespace GitHub.Services
 
         public Task<string> ShowReCloneDialog(IRepositoryModel repository)
         {
-            var controller = uiProvider.Configure(UIControllerFlow.StartPageClone);
+            var controller = uiProvider.Configure(UIControllerFlow.ReClone);
             var basePath = default(string);
 
             controller.TransitionSignal.Subscribe(x =>

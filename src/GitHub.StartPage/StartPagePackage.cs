@@ -131,7 +131,7 @@ namespace GitHub.StartPage
 
             gitHubServiceProvider.AddService(this, gitRepositories);
             var uiProvider = gitHubServiceProvider.GetService<IUIProvider>();
-            var controller = uiProvider.Configure(repository == null ? UIControllerFlow.Clone : UIControllerFlow.StartPageClone,
+            var controller = uiProvider.Configure(repository == null ? UIControllerFlow.Clone : UIControllerFlow.ReClone,
                 null //TODO: set the connection corresponding to the repository if the repository is not null
                 );
             controller.TransitionSignal.Subscribe(x =>
