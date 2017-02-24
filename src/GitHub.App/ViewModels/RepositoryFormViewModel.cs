@@ -97,6 +97,7 @@ namespace GitHub.ViewModels
 
         public bool ShowUpgradeToMicroPlanWarning { get; private set; }
 
+        [AllowNull]
         public ICommand UpgradeAccountPlan { get; private set; }
 
         protected IObservable<bool> CanKeepPrivateObservable { get; private set; }

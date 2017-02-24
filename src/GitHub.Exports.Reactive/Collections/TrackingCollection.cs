@@ -17,6 +17,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Linq;
 using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace GitHub.Collections
 {
@@ -594,6 +595,7 @@ namespace GitHub.Collections
             if (data.TheAction != TheAction.Add)
                 return data;
             data.List.Add(data.Item);
+            RaiseUnfilteredCountPropertyChange();
             return data;
         }
 
@@ -603,6 +605,7 @@ namespace GitHub.Collections
                 return data;
             data.List.Insert(data.Position, data.Item);
             UpdateIndexCache(data.Position, data.List.Count, data.List, sortedIndexCache);
+            RaiseUnfilteredCountPropertyChange();
             return data;
         }
         ActionData SortedMove(ActionData data)
@@ -624,6 +627,7 @@ namespace GitHub.Collections
             sortedIndexCache.Remove(data.Item);
             UpdateIndexCache(data.List.Count - 1, data.OldPosition, data.List, sortedIndexCache);
             data.List.Remove(data.Item);
+            RaiseUnfilteredCountPropertyChange();
             return data;
         }
 
@@ -1154,6 +1158,10 @@ namespace GitHub.Collections
             return scheduler ?? (d != null ? new DispatcherScheduler(d) : null as IScheduler) ?? CurrentThreadScheduler.Instance;
         }
 #endif
+        void RaiseUnfilteredCountPropertyChange()
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(UnfilteredCount)));
+        }
 
         void Reset()
         {
