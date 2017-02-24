@@ -37,12 +37,13 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="VSStyledComboBox" BasedOn="{StaticResource VsComboBoxStyleKey}" TargetType="{x:Type ComboBox}"/>
+        <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource TeamExplorerPromptTextBox}" />
 
         <Style BasedOn="{StaticResource VSStyledComboBox}" TargetType="{x:Type ComboBox}">
-        <Setter Property="Margin" Value="0,0,0,8" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="Height" Value="23" />
-      </Style>
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="23" />
+        </Style>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -112,9 +113,10 @@
                MaxLength="{x:Static cache:Constants.MaxRepositoryNameLength}"
                Text="{Binding RepositoryName}"
                PromptText="{x:Static prop:Resources.RepoNameText}" 
-               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishRepositoryNameTextBox}" />
-        </Grid>
-
+               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishRepositoryNameTextBox}"
+               VerticalContentAlignment="Center"/>
+    </Grid>
+    
     <Grid>
       <ui:PromptTextBox x:Name="description"
                Height="52"
@@ -158,8 +160,8 @@
             IsDefault="True"
             Style="{StaticResource GitHubVsButton}"
             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerPublishRepositoryButton}" >
-        <TextBlock Text="{x:Static prop:Resources.publishText}" />
-    </Button>
+            <TextBlock Text="{x:Static prop:Resources.publishText}" />
+        </Button>
 
   </StackPanel>
 </local:GenericRepositoryPublishControl>

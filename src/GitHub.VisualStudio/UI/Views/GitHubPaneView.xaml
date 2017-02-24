@@ -24,6 +24,7 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
+      <Style TargetType="{x:Type Button}" BasedOn="{StaticResource GitHubVsButton}"/>
       <Style x:Key="PaneHorizontalSeparator" TargetType="{x:Type Separator}">
         <Setter Property="Background" Value="{DynamicResource GitHubHeaderSeparatorBrush}" />
         <Setter Property="Height" Value="2" />

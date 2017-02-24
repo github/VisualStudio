@@ -34,7 +34,7 @@ namespace GitHub.Services
             var te = serviceProvider.TryGetService<ITeamExplorer>();
             var foo = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
             var publish = foo?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
-            publish?.ShowPublish();
+            publish?.Connect();
         }
 
         public void ShowMessage(string message)

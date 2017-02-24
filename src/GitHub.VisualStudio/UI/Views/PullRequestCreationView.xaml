@@ -187,6 +187,7 @@
                     Content="Cancel"
                     Style="{StaticResource GitHubVsButton}" 
                     AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestCreationCancelButton}"/>
+
         </DockPanel>
     </Grid>
 </local:GenericPullRequestCreationView>

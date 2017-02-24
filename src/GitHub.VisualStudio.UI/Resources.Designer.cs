@@ -574,6 +574,15 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View Pull Request on GitHub.
+        /// </summary>
+        public static string OpenPROnGitHubToolTip {
+            get {
+                return ResourceManager.GetString("OpenPROnGitHubToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the two-factor authentication app on your device to view your authentication code..
         /// </summary>
         public static string openTwoFactorAuthAppText {
