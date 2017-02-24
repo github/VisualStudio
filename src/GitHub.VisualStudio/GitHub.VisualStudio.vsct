@@ -122,7 +122,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
-        <Icon guid="guidImages" id="logo" />
+        <Icon guid="guidImages" id="logo_toolbar" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -254,6 +254,7 @@
       <IDSymbol name="pullrequest" value="5" />
       <IDSymbol name="link_external" value="6"/>
       <IDSymbol name="clippy" value="7"/>
+      <IDSymbol name="logo_toolbar" value="8"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
