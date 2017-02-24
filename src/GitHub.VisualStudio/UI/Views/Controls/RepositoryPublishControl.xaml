@@ -150,8 +150,7 @@
     <Button x:Name="publishRepositoryButton"
             Margin="0,8,0,0"
             HorizontalAlignment="Left"
-            IsDefault="True"
-            Style="{StaticResource GitHubVsButton}">
+            IsDefault="True">
       <TextBlock Text="{x:Static prop:Resources.publishText}" />
     </Button>
 
