@@ -34,7 +34,7 @@ namespace GitHub.Helpers
             "GitHub.TeamFoundation.14",
             "GitHub.TeamFoundation.15",
             "GitHub.VisualStudio.UI",
-            "GitHub.VisualStudio.TestAutomation",
+            "GitHub.VisualStudio.TestAutomation.AutomationIDs",
             "System.Windows.Interactivity"
         };
 
