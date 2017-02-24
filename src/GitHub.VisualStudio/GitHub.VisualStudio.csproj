@@ -2,6 +2,20 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
   <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.12-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.12-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
+
+  <!--
+  Update 'Debug' and 'Release' configurations to have AllUsers="false" and Experimental="true"
+  The Publish configuration will keep AllUsers="true" and Experimental="false".
+  -->
+  <Target Name="MakeVsixManifestExperimental" AfterTargets="DetokenizeVsixManifestFile"
+          Condition=" '$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Release' ">
+    <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to be 'Experimental'" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="false"
+             Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+    <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="true"
+             Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
+  </Target>
+
   <PropertyGroup>
     <MinimumVisualStudioVersion>$(MSBuildToolsVersion)</MinimumVisualStudioVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">$(MSBuildToolsVersion)</VisualStudioVersion>
