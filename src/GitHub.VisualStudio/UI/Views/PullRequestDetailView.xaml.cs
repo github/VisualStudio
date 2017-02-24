@@ -120,15 +120,7 @@ namespace GitHub.VisualStudio.UI.Views
 
             if (file != null)
             {
-                switch (ViewModel.OpenChangedFileAction)
-                {
-                    case OpenChangedFileAction.Open:
-                        DoOpenFile(file).Forget();
-                        break;
-                    case OpenChangedFileAction.Diff:
-                        DoDiffFile(file).Forget();
-                        break;
-                }
+                DoDiffFile(file).Forget();
             }
         }
 
@@ -143,22 +135,9 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        void ListView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            ApplyContextMenuBinding<ListViewItem>(sender, e);
-        }
-
         void TreeView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             ApplyContextMenuBinding<TreeViewItem>(sender, e);
-        }
-
-
-        void changesOptionsMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            var menu = ((Button)sender).ContextMenu;
-            menu.DataContext = DataContext;
-            menu.IsOpen = true;
         }
 
         void ApplyContextMenuBinding<TItem>(object sender, ContextMenuEventArgs e) where TItem : Control

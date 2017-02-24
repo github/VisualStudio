@@ -36,8 +36,6 @@ namespace GitHub.ViewModels
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
         string body;
-        ChangedFilesViewType changedFilesViewType;
-        OpenChangedFileAction openChangedFileAction;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
@@ -56,12 +54,10 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
-            IPackageSettings settings,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
                   pullRequestsService,
-                  settings,
                   usageTracker)
         {
         }
@@ -77,7 +73,6 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
-            IPackageSettings settings,
             IUsageTracker usageTracker)
         {
             this.repository = repository;
@@ -108,31 +103,6 @@ namespace GitHub.ViewModels
             SubscribeOperationError(Push);
 
             OpenOnGitHub = ReactiveCommand.Create();
-
-            ChangedFilesViewType = (settings.UIState?.PullRequestDetailState?.ShowTree ?? true) ?
-                ChangedFilesViewType.TreeView : ChangedFilesViewType.ListView;
-
-            ToggleChangedFilesView = ReactiveCommand.Create();
-            ToggleChangedFilesView.Subscribe(_ =>
-            {
-                ChangedFilesViewType = ChangedFilesViewType == ChangedFilesViewType.TreeView ?
-                    ChangedFilesViewType.ListView : ChangedFilesViewType.TreeView;
-                settings.UIState.PullRequestDetailState.ShowTree = ChangedFilesViewType == ChangedFilesViewType.TreeView;
-                settings.Save();
-            });
-
-            OpenChangedFileAction = (settings.UIState?.PullRequestDetailState?.DiffOnOpen ?? true) ?
-                OpenChangedFileAction.Diff : OpenChangedFileAction.Open;
-
-            ToggleOpenChangedFileAction = ReactiveCommand.Create();
-            ToggleOpenChangedFileAction.Subscribe(_ =>
-            {
-                OpenChangedFileAction = OpenChangedFileAction == OpenChangedFileAction.Diff ?
-                    OpenChangedFileAction.Open : OpenChangedFileAction.Diff;
-                settings.UIState.PullRequestDetailState.DiffOnOpen = OpenChangedFileAction == OpenChangedFileAction.Diff;
-                settings.Save();
-            });
-
             OpenFile = ReactiveCommand.Create();
             DiffFile = ReactiveCommand.Create();
         }
@@ -183,24 +153,6 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a value describing how changed files are displayed in a view.
-        /// </summary>
-        public ChangedFilesViewType ChangedFilesViewType
-        {
-            get { return changedFilesViewType; }
-            set { this.RaiseAndSetIfChanged(ref changedFilesViewType, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets a value describing how files are opened when double clicked.
-        /// </summary>
-        public OpenChangedFileAction OpenChangedFileAction
-        {
-            get { return openChangedFileAction; }
-            set { this.RaiseAndSetIfChanged(ref openChangedFileAction, value); }
-        }
-
-        /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
         /// </summary>
         public IPullRequestCheckoutState CheckoutState
@@ -234,11 +186,6 @@ namespace GitHub.ViewModels
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
 
         /// <summary>
-        /// Gets the changed files as a flat list.
-        /// </summary>
-        public IReactiveList<IPullRequestFileNode> ChangedFilesList { get; } = new ReactiveList<IPullRequestFileNode>();
-
-        /// <summary>
         /// Gets a command that checks out the pull request locally.
         /// </summary>
         public ReactiveCommand<Unit> Checkout { get; }
@@ -257,16 +204,6 @@ namespace GitHub.ViewModels
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         public ReactiveCommand<object> OpenOnGitHub { get; }
-
-        /// <summary>
-        /// Gets a command that toggles the <see cref="ChangedFilesViewType"/> property.
-        /// </summary>
-        public ReactiveCommand<object> ToggleChangedFilesView { get; }
-
-        /// <summary>
-        /// Gets a command that toggles the <see cref="OpenChangedFileAction"/> property.
-        /// </summary>
-        public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         /// <summary>
         /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.
@@ -305,23 +242,17 @@ namespace GitHub.ViewModels
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-            var prFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
-            SourceBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(prFromFork, pullRequest.Base.Label);
+            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
+            SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
+            TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             ChangedFilesTree.Clear();
-            ChangedFilesList.Clear();
 
             var treeChanges = await pullRequestsService.GetTreeChanges(repository, pullRequest);
 
             // WPF doesn't support AddRange here so iterate through the changes.
-            foreach (var change in CreateChangedFilesList(pullRequest, treeChanges))
-            {
-                ChangedFilesList.Add(change);
-            }
-
-            foreach (var change in CreateChangedFilesTree(ChangedFilesList).Children)
+            foreach (var change in CreateChangedFilesTree(pullRequest, treeChanges).Children)
             {
                 ChangedFilesTree.Add(change);
             }
@@ -341,7 +272,7 @@ namespace GitHub.ViewModels
                 {
                     pullToolTip = string.Format(
                         Resources.PullRequestDetailsPullToolTip,
-                        prFromFork ? Resources.Fork : Resources.Remote,
+                        IsFromFork ? Resources.Fork : Resources.Remote,
                         SourceBranchDisplayName);
                 }
                 else
@@ -353,7 +284,7 @@ namespace GitHub.ViewModels
                 {
                     pushToolTip = string.Format(
                         Resources.PullRequestDetailsPushToolTip,
-                        prFromFork ? Resources.Fork : Resources.Remote,
+                        IsFromFork ? Resources.Fork : Resources.Remote,
                         SourceBranchDisplayName);
                 }
                 else if (divergence.AheadBy == 0)
@@ -425,23 +356,23 @@ namespace GitHub.ViewModels
             command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        IEnumerable<IPullRequestFileNode> CreateChangedFilesList(IPullRequestModel pullRequest, TreeChanges changes)
-        {
-            return pullRequest.ChangedFiles
-                .Select(x => new PullRequestFileNode(repository.LocalPath, x.FileName, x.Sha, x.Status, GetStatusDisplay(x, changes)));
-        }
-
-        static IPullRequestDirectoryNode CreateChangedFilesTree(IEnumerable<IPullRequestFileNode> files)
+        IPullRequestDirectoryNode CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
         {
             var dirs = new Dictionary<string, PullRequestDirectoryNode>
             {
                 { string.Empty, new PullRequestDirectoryNode(string.Empty) }
             };
 
-            foreach (var file in files)
+            foreach (var changedFile in pullRequest.ChangedFiles)
             {
-                var dir = GetDirectory(file.DirectoryPath, dirs);
-                dir.Files.Add(file);
+                var node = new PullRequestFileNode(
+                    repository.LocalPath,
+                    changedFile.FileName,
+                    changedFile.Sha,
+                    changedFile.Status,
+                    GetStatusDisplay(changedFile, changes));
+                var dir = GetDirectory(node.DirectoryPath, dirs);
+                dir.Files.Add(node);
             }
 
             return dirs[string.Empty];
