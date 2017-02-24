@@ -17,6 +17,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+
 namespace GitHub.VisualStudio.UI.Views
 {
     [ExportViewModel(ViewType = UIViewType.GitHubPane)]
@@ -32,6 +33,7 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IRepositoryHosts hosts;
         readonly IConnectionManager connectionManager;
         readonly IUIProvider uiProvider;
+        readonly IVisualStudioBrowser browser;
         NavigationController navController;
 
         bool disabled;
@@ -41,7 +43,7 @@ namespace GitHub.VisualStudio.UI.Views
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider)
+            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser)
             : base(serviceProvider, apiFactory, holder)
         {
             this.connectionManager = cm;
@@ -51,6 +53,7 @@ namespace GitHub.VisualStudio.UI.Views
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
             Message = String.Empty;
+            browser = vsBrowser;
 
             this.WhenAnyValue(x => x.Control.DataContext)
                 .OfType<BaseViewModel>()
@@ -66,7 +69,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             back = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.backCommand,
                 () => !disabled && (navController?.HasBack ?? false),
-                () => {
+                () =>
+                {
                     DisableButtons();
                     navController.Back();
                 },
@@ -74,7 +78,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             forward = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.forwardCommand,
                 () => !disabled && (navController?.HasForward ?? false),
-                () => {
+                () =>
+                {
                     DisableButtons();
                     navController.Forward();
                 },
@@ -82,9 +87,41 @@ namespace GitHub.VisualStudio.UI.Views
 
             refresh = serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.refreshCommand,
                 () => !disabled,
-                () => {
+                () =>
+                {
                     DisableButtons();
                     Refresh();
+                },
+                true);
+
+            serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.githubCommand,
+                () => !disabled && (RepositoryOrigin == RepositoryOrigin.DotCom || RepositoryOrigin == RepositoryOrigin.Enterprise),
+                () =>
+                {
+                    switch (navController?.Current.CurrentFlow)
+                    {
+                        case UIControllerFlow.PullRequestDetail:
+                            var prDetailViewModel = control.DataContext as IPullRequestDetailViewModel;
+                            if (prDetailViewModel != null)
+                            {
+                                browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pull/" + prDetailViewModel.Model.Number));
+                            }
+                            else
+                            {
+                                goto default;
+                            }
+                            break;
+
+                        case UIControllerFlow.PullRequestList:
+                        case UIControllerFlow.PullRequestCreation:
+                            browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl().Append("pulls/"));
+                            break;
+
+                        case UIControllerFlow.Home:
+                        default:
+                            browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl());
+                            break;
+                    }
                 },
                 true);
 
@@ -114,7 +151,8 @@ namespace GitHub.VisualStudio.UI.Views
 
             navController
                 .WhenAnyValue(x => x.IsBusy)
-                .Subscribe(v => {
+                .Subscribe(v =>
+                {
                     if (v)
                         DisableButtons();
                     else
@@ -275,7 +313,7 @@ namespace GitHub.VisualStudio.UI.Views
         public bool IsLoggedIn
         {
             get { return isLoggedIn; }
-            set { isLoggedIn = value;  this.RaisePropertyChange(); }
+            set { isLoggedIn = value; this.RaisePropertyChange(); }
         }
 
         public RepositoryOrigin RepositoryOrigin { get; private set; }

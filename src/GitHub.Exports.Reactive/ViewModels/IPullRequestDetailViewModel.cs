@@ -7,38 +7,6 @@ using ReactiveUI;
 namespace GitHub.ViewModels
 {
     /// <summary>
-    /// Describes how changed files are displayed in a the pull request details view.
-    /// </summary>
-    public enum ChangedFilesViewType
-    {
-        /// <summary>
-        /// The files are displayed as a tree.
-        /// </summary>
-        TreeView,
-
-        /// <summary>
-        /// The files are displayed as a flat list.
-        /// </summary>
-        ListView,
-    }
-
-    /// <summary>
-    /// Describes how files are opened in a the pull request details view.
-    /// </summary>
-    public enum OpenChangedFileAction
-    {
-        /// <summary>
-        /// Opening the file opens a diff.
-        /// </summary>
-        Diff,
-
-        /// <summary>
-        /// Opening the file opens the file in a text editor.
-        /// </summary>
-        Open
-    }
-
-    /// <summary>
     /// Holds immutable state relating to the <see cref="IPullRequestDetailViewModel.Checkout"/> command.
     /// </summary>
     public interface IPullRequestCheckoutState
@@ -122,24 +90,9 @@ namespace GitHub.ViewModels
         string Body { get; }
 
         /// <summary>
-        /// Gets or sets a value describing how changed files are displayed in a view.
-        /// </summary>
-        ChangedFilesViewType ChangedFilesViewType { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value describing how files are opened when double clicked.
-        /// </summary>
-        OpenChangedFileAction OpenChangedFileAction { get; set; }
-
-        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
         IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
-
-        /// <summary>
-        /// Gets the changed files as a flat list.
-        /// </summary>
-        IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
 
         /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
@@ -175,16 +128,6 @@ namespace GitHub.ViewModels
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         ReactiveCommand<object> OpenOnGitHub { get; }
-
-        /// <summary>
-        /// Gets a command that toggles the <see cref="ChangedFilesViewType"/> property.
-        /// </summary>
-        ReactiveCommand<object> ToggleChangedFilesView { get; }
-
-        /// <summary>
-        /// Gets a command that toggles the <see cref="OpenChangedFileAction"/> property.
-        /// </summary>
-        ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
 
         /// <summary>
         /// Gets a command that opens a <see cref="IPullRequestFileNode"/>.

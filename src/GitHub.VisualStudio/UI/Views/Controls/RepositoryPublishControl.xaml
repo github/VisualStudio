@@ -15,7 +15,8 @@
                                        d:DesignWidth="414"
                                        Background="{DynamicResource GitHubVsToolWindowBackground}"
                                        d:DataContext="{d:DesignInstance Type=sampleData:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
-                                       mc:Ignorable="d">
+                                       mc:Ignorable="d"
+                                       IsEnabled="{Binding IsPublishing, Converter={ui:InverseBooleanConverter}}">
 
   <UserControl.Resources>
     <ResourceDictionary>
@@ -34,12 +35,13 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="VSStyledComboBox" BasedOn="{StaticResource VsComboBoxStyleKey}" TargetType="{x:Type ComboBox}"/>
+        <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource TeamExplorerPromptTextBox}" />
 
         <Style BasedOn="{StaticResource VSStyledComboBox}" TargetType="{x:Type ComboBox}">
-        <Setter Property="Margin" Value="0,0,0,8" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="Height" Value="23" />
-      </Style>
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="23" />
+        </Style>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -106,7 +108,8 @@
                Foreground="{DynamicResource GitHubVsWindowText}"
                MaxLength="{x:Static cache:Constants.MaxRepositoryNameLength}"
                Text="{Binding RepositoryName}"
-               PromptText="{x:Static prop:Resources.RepoNameText}" />
+               PromptText="{x:Static prop:Resources.RepoNameText}"
+               VerticalContentAlignment="Center"/>
     </Grid>
 
     <Grid>
