@@ -70,9 +70,24 @@ namespace GitHub.ViewModels
                 loading => loading.Value || repositories.UnfilteredCount > 0 && !LoadingFailed)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
-            this.WhenAny(x => x.IsLoading, x => x.LoadingFailed,
-                (loading, failed) => !loading.Value && !failed.Value && repositories.UnfilteredCount == 0)
-                .Subscribe(x => NoRepositoriesFound = x);
+            this.WhenAny(
+                x => x.repositories.UnfilteredCount,
+                x => x.IsLoading,
+                x => x.LoadingFailed,
+                (unfilteredCount, loading, failed) =>
+                {
+                    if (loading.Value)
+                        return false;
+
+                    if (failed.Value)
+                        return false;
+
+                    return unfilteredCount.Value == 0;
+                })
+                .Subscribe(x =>
+                {
+                    NoRepositoriesFound = x;
+                });
 
             this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
@@ -110,7 +125,7 @@ namespace GitHub.ViewModels
             base.Initialize(data);
 
             IsLoading = true;
-            Repositories = repositoryHost.ModelService.GetRepositories(repositories) as TrackingCollection<IRemoteRepositoryModel>;
+            repositoryHost.ModelService.GetRepositories(repositories);
             repositories.OriginalCompleted.Subscribe(
                 _ => { }
                 , ex =>

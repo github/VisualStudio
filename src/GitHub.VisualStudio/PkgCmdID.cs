@@ -15,5 +15,6 @@ namespace GitHub.VisualStudio
         public const int createGistCommand = 0x400;
         public const int openLinkCommand = 0x100;
         public const int copyLinkCommand = 0x101;
+        public const int githubCommand = 0x320;
     };
 }

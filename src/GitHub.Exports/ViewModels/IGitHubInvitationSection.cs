@@ -1,4 +1,5 @@
-﻿using GitHub.UI;
+﻿using System.Threading.Tasks;
+using GitHub.UI;
 
 namespace GitHub.VisualStudio.TeamExplorer
 {
@@ -9,7 +10,7 @@ namespace GitHub.VisualStudio.TeamExplorer
         bool ShowLogin { get; }
         bool ShowSignup { get;  }
         bool ShowGetStarted { get; }
-        void Connect();
+        Task Connect();
         void SignUp();
     }
 }

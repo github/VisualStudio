@@ -91,6 +91,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="SharedResources.cs" />
+    <Compile Include="TeamFoundationColors.cs" />
     <Compile Include="UI\Controls\AccountAvatar.xaml.cs">
       <DependentUpon>AccountAvatar.xaml</DependentUpon>
     </Compile>
