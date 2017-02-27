@@ -19,6 +19,7 @@
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
                                       DataContext="{Binding ViewModel}"
                                       IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}"
+                                      AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestCreationViewCustom}"
                                       mc:Ignorable="d">
 
     <d:DesignProperties.DataContext>
