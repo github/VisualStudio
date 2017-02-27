@@ -151,6 +151,7 @@
     <Compile Include="Helpers\ThreadingHelper.cs" />
     <Compile Include="Info\ApplicationInfo.cs" />
     <Compile Include="Models\BranchModel.cs" />
+    <Compile Include="Models\CloneDialogResult.cs" />
     <Compile Include="Models\GitReferenceModel.cs" />
     <Compile Include="Models\IAccount.cs" />
     <Compile Include="Models\IBranch.cs" />
@@ -168,6 +169,7 @@
     <Compile Include="Services\Connection.cs" />
     <Compile Include="Services\GitService.cs" />
     <Compile Include="Services\IActiveDocumentSnapshot.cs" />
+    <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Services\IGitService.cs" />
     <Compile Include="Services\IMetricsService.cs" />
     <Compile Include="Services\ISelectedTextProvider.cs" />
