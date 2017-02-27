@@ -9,11 +9,6 @@ namespace GitHub.VisualStudio.UI.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary
     {
-        static SharedDictionaryManager()
-        {
-            AssemblyResolver.InitializeAssemblyResolver();
-        }
-
         public SharedDictionaryManager()
         {
             currentTheme = Colors.DetectTheme();
