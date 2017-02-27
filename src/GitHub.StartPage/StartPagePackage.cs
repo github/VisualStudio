@@ -52,14 +52,13 @@ namespace GitHub.StartPage
 
         async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRepositoryModel repository)
         {
-            CloneRequest request = null;
+            CloneDialogResult request = null;
 
             try
             {
                 var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
-                var cm = uiProvider.TryGetService<IConnectionManager>();
-                var gitRepositories = await GetGitRepositoriesExt(uiProvider);
-                request = ShowCloneDialog(uiProvider, gitRepositories, repository);
+                await ShowTeamExplorerPage(uiProvider);
+                request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
             }
             catch
             {
@@ -83,13 +82,7 @@ namespace GitHub.StartPage
                 lastAccessed: DateTimeOffset.UtcNow);
         }
 
-        async Task<IGitRepositoriesExt> GetGitRepositoriesExt(IGitHubServiceProvider gitHubServiceProvider)
-        {
-            var page = await GetTeamExplorerPage(gitHubServiceProvider);
-            return page?.GetService<IGitRepositoriesExt>();
-        }
-
-        async Task<ITeamExplorerPage> GetTeamExplorerPage(IGitHubServiceProvider gitHubServiceProvider)
+        async Task ShowTeamExplorerPage(IGitHubServiceProvider gitHubServiceProvider)
         {
             var te = gitHubServiceProvider?.GetService(typeof(ITeamExplorer)) as ITeamExplorer;
 
@@ -115,59 +108,51 @@ namespace GitHub.StartPage
 
                     page = await tcs.Task;
                 }
+            }
+        }
 
-                return page;
+        async Task<CloneDialogResult> ShowCloneDialog(
+            IGitHubServiceProvider gitHubServiceProvider,
+            IProgress<ServiceProgressData> progress,
+            IRepositoryModel repository = null)
+        {
+            var dialogService = gitHubServiceProvider.GetService<IDialogService>();
+            var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();
+            CloneDialogResult result = null;
+            
+            if (repository == null)
+            {
+                result = await dialogService.ShowCloneDialog(null);
             }
             else
             {
-                // TODO: Log
-                return null;
-            }
-        }
+                var basePath = await dialogService.ShowReCloneDialog(repository);
 
-        CloneRequest ShowCloneDialog(IGitHubServiceProvider gitHubServiceProvider, IGitRepositoriesExt gitRepositories, IRepositoryModel repository = null)
-        {
-            string basePath = null;
-
-            gitHubServiceProvider.AddService(this, gitRepositories);
-            var uiProvider = gitHubServiceProvider.GetService<IUIProvider>();
-            var controller = uiProvider.Configure(repository == null ? UIControllerFlow.Clone : UIControllerFlow.StartPageClone,
-                null //TODO: set the connection corresponding to the repository if the repository is not null
-                );
-            controller.TransitionSignal.Subscribe(x =>
-            {
-                if ((repository == null && x.Data.ViewType == Exports.UIViewType.Clone) || // fire the normal clone dialog
-                    (repository != null && x.Data.ViewType == Exports.UIViewType.StartPageClone) // fire the clone dialog for re-acquiring a repo
-                   )
+                if (basePath != null)
                 {
-                    var vm = x.View.ViewModel as IBaseCloneViewModel;
-                    if (repository != null)
-                        vm.SelectedRepository = repository;
-                    x.View.Done.Subscribe(_ =>
-                    {
-                        basePath = vm.BaseRepositoryPath;
-                        if (repository == null)
-                            repository = vm.SelectedRepository;
-                    });
+                    result = new CloneDialogResult(basePath, repository);
                 }
-            });
-
-            uiProvider.RunInDialog(controller);
-            gitHubServiceProvider.RemoveService(typeof(IGitRepositoriesExt), this);
-
-            return repository != null && basePath != null ? new CloneRequest(basePath, repository) : null;
-        }
-
-        class CloneRequest
-        {
-            public CloneRequest(string basePath, IRepositoryModel repository)
+            }
+            
+            if (result != null)
             {
-                BasePath = basePath;
-                Repository = repository;
+                try
+                {
+                    await cloneService.CloneRepository(
+                        result.Repository.CloneUrl,
+                        result.Repository.Name,
+                        result.BasePath,
+                        progress);
+                }
+                catch
+                {
+                    var teServices = gitHubServiceProvider.TryGetService<ITeamExplorerServices>();
+                    teServices.ShowError($"Failed to clone the repository '{result.Repository.Name}'");
+                    result = null;
+                }
             }
 
-            public string BasePath { get; }
-            public IRepositoryModel Repository { get; }
+            return result;
         }
     }
 }
