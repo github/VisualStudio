@@ -10,11 +10,13 @@
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
                             xmlns:control="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+                            xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
                             Background="{DynamicResource GitHubVsToolWindowBackground}"
                             Foreground="{DynamicResource GitHubVsToolWindowText}"
                             d:DesignHeight="300"
                             d:DesignWidth="300"
-                            mc:Ignorable="d">
+                            mc:Ignorable="d"
+                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GitHubPaneView}">
 
   <UserControl.Resources>
     <ResourceDictionary>

@@ -10,10 +10,12 @@
     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
     xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+    xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
     mc:Ignorable="d"
     d:DesignWidth="414"
     d:DesignHeight="440"
-    Style="{DynamicResource DialogUserControl}">
+    Style="{DynamicResource DialogUserControl}"
+    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -43,13 +45,17 @@
             Margin="30,0,30,16"
             HorizontalAlignment="Center"
             TextWrapping="Wrap"
-            Style="{DynamicResource GitHubDescriptionTextBlock}">
+            Style="{DynamicResource GitHubDescriptionTextBlock}"
+            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationInformationTextBlock}" >
             <Run x:Name="description" Text="{x:Static prop:Resources.openTwoFactorAuthAppText}"/>
-            <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication"><TextBlock Text="{x:Static prop:Resources.learnMoreLink}"/></Hyperlink>
+            <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication" 
+                       AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationLearnMoreHyperlink}">
+                <TextBlock Text="{x:Static prop:Resources.learnMoreLink}"/></Hyperlink>
         </TextBlock>
         <uirx:TwoFactorInput
             x:Name="authenticationCode"
-            TabIndex="1" />
+            TabIndex="1" 
+            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonInputCustom}" />
         <Grid Margin="0,12,0,0" Height="18">
             <uirx:ErrorMessageDisplay
                 x:Name="authenticationFailedLabel"
@@ -71,7 +77,8 @@
                 TabIndex="2" 
                 Icon="check"
                 IsDefault="True"
-                Content="{x:Static prop:Resources.verifyText}" />
+                Content="{x:Static prop:Resources.verifyText}"
+                AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonVerifyButton}" />
             <ui:OcticonLinkButton 
                 x:Name="resendCodeButton"
                 TabIndex="3"
