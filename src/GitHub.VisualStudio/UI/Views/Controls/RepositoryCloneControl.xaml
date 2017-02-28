@@ -10,10 +10,12 @@
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                            xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
                             d:DesignHeight="440"
                             d:DesignWidth="414"
                             Background="Transparent"
-                            mc:Ignorable="d">
+                            mc:Ignorable="d"
+                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.RepositoryCloneControlCustom}" >
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
@@ -150,7 +152,8 @@
                       DockPanel.Dock="Top"
                       PromptText="{x:Static prop:Resources.filterTextPromptText}"
                       Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-                      IsEnabled="{Binding FilterTextIsEnabled, Mode=OneWay}"/>
+                      IsEnabled="{Binding FilterTextIsEnabled, Mode=OneWay}"
+                      AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.SearchRepositoryTextBox}" />
 
     <ui:GitHubProgressBar x:Name="loadingProgressBar"
                           Margin="0"
@@ -181,7 +184,7 @@
                             Icon="check"
                             IsDefault="True"
                             Command="{Binding CloneCommand}"
-                            >
+                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CloneRepositoryButton}" >
       <TextBlock Text="{x:Static prop:Resources.CloneLink}" />
     </ui:OcticonCircleButton>
 
@@ -197,6 +200,7 @@
                           Grid.Column="1"
                           Margin="0,2"
                           Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}"
+                          AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateRepositoryLocalPathTextBox}"
                           />
         <Button x:Name="browsePathButton"
                 Grid.Column="2"
@@ -206,6 +210,7 @@
                 Padding="0"
                 Style="{StaticResource GitHubBlueLinkButton}"
                 Command="{Binding BrowseForDirectory}"
+                AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CloneRepositoryLocalPathBrowsePathButton}"
                 />
         <Label Grid.Row="3"
                Grid.Column="0"

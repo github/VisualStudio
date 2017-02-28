@@ -8,9 +8,11 @@
                                   xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
                                   xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
+                                  xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
                                   mc:Ignorable="d"
                                   d:DesignWidth="414"
-                                  d:DesignHeight="440">
+                                  d:DesignHeight="440"
+                                  AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistCreationControlCustom}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -72,10 +74,10 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Label Grid.Column="0" Grid.Row="0" Target="{Binding ElementName=nameTextBox}" Content="{x:Static prop:Resources.fileNameText}"/>
-                <ui:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" />
+                <ui:PromptTextBox x:Name="fileNameTextBox" Grid.Column="1" Grid.Row="0" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistFileNameTextBox}" />
 
                 <Label Grid.Column="0" Grid.Row="1" Target="{Binding ElementName=descriptionTextBox}" Content="{x:Static prop:Resources.Description}"/>
-                <ui:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1"/>
+                <ui:PromptTextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.Row="1" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistDescriptionTextBlock}"/>
 
                 <StackPanel x:Name="accountStackPanel" Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
                     <Image
@@ -93,7 +95,8 @@
                     Grid.Row="3"
                     Content="{x:Static prop:Resources.makePrivateGist}"
                     Style="{DynamicResource BlueRoundedCheckBox}"
-                    Padding="8,4,0,4" />
+                    Padding="8,4,0,4" 
+                    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PrivateGistCheckBox}" />
 
                 <uirx:ErrorMessageDisplay
                     x:Name="errorMessage"
