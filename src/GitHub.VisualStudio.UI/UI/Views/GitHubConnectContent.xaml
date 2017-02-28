@@ -147,7 +147,7 @@
   
   <DockPanel>
     <WrapPanel Orientation="Horizontal" Margin="6,0,0,6" DockPanel.Dock="Top">
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Content="{x:Static prop:Resources.CloneLink}"              
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static prop:Resources.CloneLink}"              
               AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CloneHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
       <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"
