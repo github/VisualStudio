@@ -46,7 +46,7 @@ Build using Visual Studio 2015 or:
 build.cmd
 ```
 
-Install in live (non-Exp) instances of Visual Studio 2015 and 2017:
+Install in live (non-Experimental) instances of Visual Studio 2015 and 2017:
 
 ```txt
 install.cmd
