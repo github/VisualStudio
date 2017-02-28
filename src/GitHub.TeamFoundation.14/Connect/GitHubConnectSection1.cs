@@ -22,7 +22,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IVSServices vsServices,
             IRepositoryCloneService cloneService,
             IDialogService dialogService)
-            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, cloneService, dialogService, 0)
+            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, cloneService, dialogService, 1)
         {
         }
     }
