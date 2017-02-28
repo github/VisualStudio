@@ -52,7 +52,7 @@ Install in live (non-Exp) instances of Visual Studio 2015 and 2017:
 install.cmd
 ```
 
-Note, the script will only install in one instance of Visual Studio 2017 (Enterprise, Professional of Community).
+Note, the script will only install in one instance of Visual Studio 2017 (Enterprise, Professional or Community).
 
 ## More information
 
