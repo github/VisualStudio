@@ -1,10 +1,10 @@
 # First Launch
 - **Start page is displayed by default on first launch**
   - **Click on GitHub link on start page under Open > Checkout from**
-    - [ ] Team Explorer Window exposed
-    - [ ] Clone a GitHub Repository dialog visible
+    - [ ] Team Explorer Window exposed (only appears when clone dialog is closed)
+    - [x] Clone a GitHub Repository dialog visible
   - **If last solution was in a git repo hosted on GitHub**
-    - **Team Explorer Home page shows:**
+    - **Team Explorer Home page shows:** (VS 2017 doesn't seem to remember. Shows Connect page)
       - [ ] GitHub header, repo information
       - [ ] Pull Requests button
       - [ ] Pulse button
@@ -13,64 +13,65 @@
     - **If last solution was in a git repo not hosted on GitHub**
         - [ ] Team Explorer Home page does not show any github information
   - **Go to Team Explorer Connect page**
-    - [ ] GitHub invitation section in Hosted Service Providers area is visible with Connect... and Sign up links
-    - [ ] **Click on Connect**
-        - [ ] Connect to GitHub dialog appears
-        - [ ] GitHub option underlined
-        - [ ] Cursor on username field
-        - [ ] Login button disabled
-        - [ ] Link to sign up at the bottom
-    - [ ] **Fill out login information**
-        - [ ] **On successful login**
-              - [ ] Connect dialog disappears
-              - [ ] GitHub invitation section in Connect page disappears
-              - [ ] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
+    - [x] GitHub invitation section in Hosted Service Providers area is visible with Connect... and Sign up links
+    - [x] **Click on Connect**
+        - [x] Connect to GitHub dialog appears
+        - [x] GitHub option underlined
+        - [x] Cursor on username field
+        - [x] Login button disabled
+        - [x] Link to sign up at the bottom
+    - [x] **Fill out login information**
+        - [x] **On successful login**
+              - [x] Connect dialog disappears
+              - [x] GitHub invitation section in Connect page disappears
+              - [x] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
 
 # In Team Explorer Connect page (logged in)
-  - [ ] **Click on Clone action link**
-      - [ ] Clone dialog appears
-      - [ ] List of user repositories is populated
-      - [ ] Path field contains default cloning path C:\Users\[user]\Source\Repos
-      - [ ] Cursor is in Search Repositories field
-      - [ ] Clone button is disabled
-      - [ ] Typing in the Search Repositories field filters the list
-      - [ ] Clicking on the browse action link opens a file explorer
-      - [ ] Selecting a directory in the file explorer changes the contents of the Path field to the new path
-      - [ ] Selecting a repository from the list enables the clone button
-      - [ ] ctrl-clicking a selection in the list removes the selection and disables the clone button
-      - [ ] Hovering over the clone button (when enabled) animates the button (reversing colors)
-  - [ ] **Select a repository and click Clone**
-      - [ ] Clone dialog disappears
-      - [ ] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
-      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed.
-      - [ ] Repository shows up in the "Local Git Repositories" list
+  - [x] **Click on Clone action link**
+      - [x] Clone dialog appears
+      - [x] List of user repositories is populated
+      - [x] Path field contains default cloning path C:\Users\[user]\Source\Repos
+      - [x] Cursor is in Search Repositories field
+      - [x] Clone button is disabled
+      - [x] Typing in the Search Repositories field filters the list
+      - [x] Clicking on the browse action link opens a file explorer
+      - [x] Selecting a directory in the file explorer changes the contents of the Path field to the new path
+      - [x] Selecting a repository from the list enables the clone button
+      - [x] ctrl-clicking a selection in the list removes the selection and disables the clone button
+      - [x] Hovering over the clone button (when enabled) animates the button (reversing colors)
+  - [x] **Select a repository and click Clone**
+      - [x] Clone dialog disappears
+      - [x] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
+      - [x] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed.
+      - [ ] ~~Repository shows up in the "Local Git Repositories" list~~
+      - [x] Repository opens in Solution Explorer - Folder View
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
-      - [ ] Team Explorer view changes to Home page
-      - [ ] GitHub header and repo information is shown
+      - [x] Team Explorer view changes to Home page
+      - [x] GitHub header and repo information is shown
   - [ ] **Navigate back to Connect view, then click clone in "Local Git Repositories" list**
-      - [ ] Copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
-  - [ ] **Click on Create action link in GitHub section**
-    - [ ] Create dialog appears
-    - [ ] Cursor is on the Name field
-    - [ ] Create button is disabled
-    - [ ] Local path is set to default cloning path C:\Users\[user]\Source\Repos
-    - [ ] Git ignore is set to VisualStudio
-    - [ ] User is set to current logged user
-    - [ ] Tabbing through the fields follows visual placement of fields
-    - [ ] Filling the name field enables the Create button
-    - [ ] Hovering over the Create button animates it (reversing colors)
-    - [ ] Clicking on the browse action link opens a file explorer
-    - [ ] Selecting a directory in the file explorer changes the contents of the Path field to the new path
-  - [ ] **Fill out the name field and click Create**
-    - [ ] Dialog disappears
-    - [ ] Notification appears in Team Explorer Connect page: "The repository was created successfully"
-    - [ ] Repository shows up in the "Local Git Repositories" list
-  - [ ] **Double-click the created repository in the "Local Git Repositories" list**
-    - [ ] Team Explorer view changes to Home page
-    - [ ] GitHub header and repo information is shown
-- [ ] **Publishing a local repo**
-  - [ ] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
-  - [ ] **Set "Create new Git Repository" checkbox to checked**
+      - [x] Copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
+  - [x] **Click on Create action link in GitHub section**
+    - [x] Create dialog appears
+    - [x] Cursor is on the Name field
+    - [x] Create button is disabled
+    - [x] Local path is set to default cloning path C:\Users\[user]\Source\Repos
+    - [x] Git ignore is set to VisualStudio
+    - [x] User is set to current logged user
+    - [x] Tabbing through the fields follows visual placement of fields
+    - [x] Filling the name field enables the Create button
+    - [x] Hovering over the Create button animates it (reversing colors)
+    - [x] Clicking on the browse action link opens a file explorer
+    - [x] Selecting a directory in the file explorer changes the contents of the Path field to the new path
+  - [x] **Fill out the name field and click Create**
+    - [x] Dialog disappears
+    - [x] Notification appears in Team Explorer Connect page: "The repository was created successfully"
+    - [x] Repository shows up in the "Local Git Repositories" list
+  - [x] **Double-click the created repository in the "Local Git Repositories" list**
+    - [x] Team Explorer view changes to Home page
+    - [x] GitHub header and repo information is shown
+- [x] **Publishing a local repo**
+  - [x] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
+  - [x] **Set "Create new Git Repository" checkbox to checked**
   - [ ] **Click OK button**
   - [ ] Verify that Team Explorer home page does *not* have a GitHub section
 - [ ] **Click "Sync"**
