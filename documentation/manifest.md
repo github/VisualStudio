@@ -72,62 +72,63 @@
 - [x] **Publishing a local repo**
   - [x] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
   - [x] **Set "Create new Git Repository" checkbox to checked**
-  - [ ] **Click OK button**
-  - [ ] Verify that Team Explorer home page does *not* have a GitHub section
-- [ ] **Click "Sync"**
-       - [ ] Synchronization page opens with "Publish to GitHub" section
-- [ ] **Click "Publish to GitHub" in the "Publish to GitHub" section**
-      - [ ] Contents of section change to a publish form with:
-        - [ ] Account type dropdown
-        - [ ] User dropdown
-        - [ ] Pre-filled name field with project name
-        - [ ] Description field
-        - [ ] Private checkbox
-        - [ ] Publish button
-- [ ] **Publish button is enabled and private checkbox is unchecked (and disabled if user cannot create private repos)**
-    - [ ] Click on "Publish"
-        - [ ] Form becomes disabled
-        - [ ] Progress bar appears above Synchronization title
-        - [ ] Team Explorer view changes to Home page
-        - [ ] Notification appears: "Repository published successfully"
-        - [ ] Publish a private repo and verify on .com that it's private
-- [ ] **Project section (Home button)***
-    - [ ] Click on "Home" icon
-        - [ ] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
-        - [ ] Verify Pulse button navigates to Pulse page on Github.com
-        - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
-        - [ ] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
-        - [ ] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
-- [ ] **Creating Multiple Repositories**
-    - [ ] Go to Team Explorer Connect page (logged in)
-      - [ ] Create additional repository
-        - [ ] Publish new repository
-          - [ ] Verify remote information present in repository settings
-- [ ] **Validate Publish Repository Error**
-    - [ ] Remove remote settings from repository
-    - [ ] Go to Sync page and publish repository
-    - [ ] Go to Team Explorer Connect page (logged in)
-    - [ ] Click GitHub > Create
-    - [ ] Received error: "There is already a repository named [repo name] for the current account"
+  - [x] **Click OK button**
+  - [x] Verify that Team Explorer home page does *not* have a GitHub section
+- [x] **Click "Sync"**
+       - [x] Synchronization page opens with "Publish to GitHub" section
+- [x] **Click "Publish to GitHub" in the "Publish to GitHub" section**
+      - [x] Contents of section change to a publish form with:
+        - [x] Account type dropdown
+        - [x] User dropdown
+        - [x] Pre-filled name field with project name
+        - [x] Description field
+        - [x] Private checkbox (might we want note about why this is disabled for non-paying users?)
+        - [x] Publish button
+- [x] **Publish button is enabled and private checkbox is unchecked (and disabled if user cannot create private repos)**
+    - [x] Click on "Publish"
+        - [x] Form becomes disabled
+        - [x] Progress bar appears above Synchronization title
+        - [x] Team Explorer view changes to Home page
+        - [ ] Notification appears: "Repository published successfully" (... has been successfully *created*)
+        - [ ] Publish a private repo and verify on .com that it's private (N/A I'm using a regular account)
+- [x] **Project section (Home button)***
+    - [x] Click on "Home" icon
+        - [x] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
+        - [x] Verify Pulse button navigates to Pulse page on Github.com
+        - [x] Verify Graphs button navigates to Graphs page on GitHub.com
+        - [x] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
+        - [x] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
+- [x] **Creating Multiple Repositories**
+    - [x] Go to Team Explorer Connect page (logged in)
+    - [x] Create additional repository
+    - [x] Publish new repository (note, it doesn't change to new repository which seems surprising) 
+    - [x] Verify remote information present in repository settings
+- [x] **Validate Publish Repository Error**
+    - [x] Remove remote settings from repository
+    - [x] Go to Sync page and publish repository
+    - [x] Go to Team Explorer Connect page (logged in)
+    - [x] Click GitHub > Create
+    - [x] Enter name of original repository
+    - [x] Received error: "There is already a repository named [repo name] for the current account"
 # Connect page when logged in to TFS
-   - [ ] **Connect to a TFS project**
-    - [ ] Login to GitHub
-      - [ ] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Sign out links
-    - [ ] Log out of GitHub
-      - [ ] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Login links
-    - [ ]  Disconnect from TFS (right click on project and "Remove"
+   - [x] **Connect to a TFS project**
+    - [x] Login to GitHub
+      - [x] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Sign out links
+    - [x] Log out of GitHub
+      - [x] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Login links
+    - [ ]  Disconnect from TFS (right click on project and "Remove" (no more option to remove?)
       - [ ] Team Explorer Connect page: GitHub invitation section appears in Hosted Service Providers with Connect.. and Sign up links
 
 # In GitHub pane (logged into GitHub)
-- [ ] **Go to Team Explorer > Home > Pull Requests**
-      - [ ] List of pull requests is displayed.
-      - [ ] Pane title displays "GitHub | (current repository)"
-      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
-      - [ ] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
-      - [ ] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
-      - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
-      - [ ] Filter author selection displays recent pull request authors
-      - [ ] "Create New" Link button is displayed
+- [x] **Go to Team Explorer > Home > Pull Requests**
+      - [x] List of pull requests is displayed.
+      - [ ] Pane title displays "GitHub | (current repository)" (title  just says `GitHub`)
+      - [x] Selected pane tab title (on the bottom) displays "GitHub"
+      - [x] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
+      - [x] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
+      - [x] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
+      - [ ] Filter author selection displays recent pull request authors (recent?  there's a lot on the VisualStudio repo, plenty where list comes up empty)
+      - [x] "Create New" Link button is displayed
       - [ ] Clicking on a pull request number opens browser window to pull request on .com
 - [ ] **Click on a pull request title**
       - [ ] A detailed description of the pull request is displayed.
