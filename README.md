@@ -54,6 +54,42 @@ install.cmd
 
 Note, the script will only install in one instance of Visual Studio 2017 (Enterprise, Professional or Community).
 
+## Build Flavors
+
+By default, building will create a VSIX with `Experimental="true"` and `AllUsers="false"` in its `extension.vsixmanifest`. These settings are necessary in order to easily install a standalone VSIX file. There is no need to uninstall the version previously installed via Visual Studio setup / Extensions and Updates.
+
+To build and install a `Debug` configuration VSIX:
+```txt
+build.cmd
+install.cmd
+```
+
+To build and install a `Release` configuration VSIX:
+```txt
+set Configuration=Release
+build.cmd
+install.cmd
+```
+
+To build a VSIX that could be deployed via the gallery / Extensions and Updates:
+```txt
+set Configuration=Release
+set IsExperimental=false
+build.cmd
+install.cmd
+```
+
+To build a VSIX that could be deployed via Visual Studio setup:
+```txt
+set Configuration=Release
+set IsExperimental=false
+set IsProductComponent=false
+build.cmd
+install.cmd
+```
+
+Note, attempting to install `IsExperimental=false` builds of the VSIX is not recommended.
+
 ## More information
 
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.

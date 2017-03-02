@@ -3,10 +3,9 @@
   <Import Project="..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="Exists('..\..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props" Condition="Exists('..\..\packages\LibGit2Sharp.NativeBinaries.1.0.129\build\LibGit2Sharp.NativeBinaries.props')" />
   <!--
-  Update 'Release' configurations to have AllUsers="true" and Experimental="false"
-  The 'Debug' configuration will keep AllUsers="false" and Experimental="true".
+  Update to have AllUsers="true" and Experimental="false" when $(IsExperimental)' == 'false'
   -->
-  <Target Name="MakeVsixManifestAllUsers" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(Configuration)' == 'Release' ">
+  <Target Name="MakeVsixManifestAllUsers" AfterTargets="DetokenizeVsixManifestFile" Condition=" '$(IsExperimental)' == 'false' ">
     <Warning Text="NOTE: Tweaking '$(IntermediateVsixManifest)' to have AllUsers='true' and Experimental='false'" />
     <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@AllUsers" Value="true" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
     <XmlPoke XmlInputPath="$(IntermediateVsixManifest)" Query="/x:PackageManifest/x:Installation/@Experimental" Value="false" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/vsx-schema/2011' /&gt;" />
@@ -444,7 +443,9 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FodyWeavers.xml" />
+    <Resource Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Resource>
     <CodeAnalysisDictionary Include="..\common\CodeAnalysisDictionary.xml">
       <Link>Properties\CodeAnalysisDictionary.xml</Link>
     </CodeAnalysisDictionary>

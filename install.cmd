@@ -1,6 +1,6 @@
-@if "%config%" == "" set config=Debug
+@if "%Configuration%" == "" set Configuration=Debug
 
 @set path=%cd%\tools\VsixUtil;%path%
 
-@echo Installing `%config%` build of GitHub for Visual Studio
-vsixutil /install "%cd%\build\%config%\GitHub.VisualStudio.vsix" /s Enterprise;Professional;Community
+vsixutil /install "%cd%\build\%Configuration%\GitHub.VisualStudio.vsix" /s Enterprise;Professional;Community
+@echo Installed %Configuration% build of GitHub for Visual Studio

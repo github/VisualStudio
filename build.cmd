@@ -1,6 +1,8 @@
-@if "%config%" == "" set config=Debug
+@if "%Configuration%" == "" set Configuration=Debug
+@if "%IsExperimental%" == "" set IsExperimental=true
+@if "%IsProductComponent%" == "" set IsProductComponent=false
 
 call "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"
 
-@rem Build the GitHub.VisualStudio project / VSIX file
-msbuild GitHubVS.sln /p:Configuration=%Config% /t:GitHub_VisualStudio /p:IsProductComponent=false
+msbuild GitHubVS.sln /t:GitHub_VisualStudio /p:Configuration=%Configuration% /p:IsExperimental=%IsExperimental% /p:IsProductComponent=%IsProductComponent%
+@echo Built GitHub.VisualStudio with Configuration=%Configuration% IsExperimental=%IsExperimental% IsProductComponent=%IsProductComponent%
