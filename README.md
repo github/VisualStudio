@@ -58,6 +58,8 @@ Note, the script will only install in one instance of Visual Studio 2017 (Enterp
 
 By default, building will create a VSIX with `Experimental="true"` and `AllUsers="false"` in its `extension.vsixmanifest`. These settings are necessary in order to easily install a standalone VSIX file. There is no need to uninstall the version previously installed via Visual Studio setup / Extensions and Updates.
 
+The following can be executed via `cmd.exe`.
+
 To build and install a `Debug` configuration VSIX:
 ```txt
 build.cmd
@@ -83,7 +85,7 @@ To build a VSIX that could be deployed via Visual Studio setup:
 ```txt
 set Configuration=Release
 set IsExperimental=false
-set IsProductComponent=false
+set IsProductComponent=true
 build.cmd
 install.cmd
 ```
