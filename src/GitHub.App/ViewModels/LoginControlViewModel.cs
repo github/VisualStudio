@@ -11,7 +11,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LoginControlViewModel : BaseViewModel, ILoginControlViewModel
+    public class LoginControlViewModel : DialogViewModelBase, ILoginControlViewModel
     {
         [ImportingConstructor]
         public LoginControlViewModel(

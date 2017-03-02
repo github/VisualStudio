@@ -113,7 +113,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
             controller.TransitionSignal.Subscribe(data =>
             {
-                var c = data.View;
+                var c = (IDialogView)data.View;
                 SectionContent = c;
                 c.IsBusy.Subscribe(x => IsBusy = x);
             },

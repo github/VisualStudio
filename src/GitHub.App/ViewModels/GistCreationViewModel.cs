@@ -17,7 +17,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Gist)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class GistCreationViewModel : BaseViewModel, IGistCreationViewModel
+    public class GistCreationViewModel : DialogViewModelBase, IGistCreationViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 

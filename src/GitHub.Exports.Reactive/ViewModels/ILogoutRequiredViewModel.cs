@@ -7,7 +7,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Represents a view model for the "Log out Required" dialog..
     /// </summary>
-    public interface ILogoutRequiredViewModel : IReactiveViewModel
+    public interface ILogoutRequiredViewModel : IReactiveDialogViewModel
     {
         IReactiveCommand<ProgressState> Logout { get; }
         string LogoutRequiredMessage { get; set; }

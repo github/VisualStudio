@@ -5,13 +5,16 @@ using GitHub.UI;
 
 namespace GitHub.ViewModels
 {
-    public class BaseViewModel : ReactiveObject, IReactiveViewModel, IHasBusy
+    /// <summary>
+    /// Base class for view models that can be dismissed, such as dialogs.
+    /// </summary>
+    public class DialogViewModelBase : ReactiveObject, IReactiveDialogViewModel, IHasBusy
     {
         protected ObservableAsPropertyHelper<bool> isShowing;
         string title;
         bool isBusy;
 
-        public BaseViewModel()
+        public DialogViewModelBase()
         {
             CancelCommand = ReactiveCommand.Create();
         }

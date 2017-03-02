@@ -14,7 +14,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.LoggedOut)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LoggedOutViewModel : BaseViewModel, ILoggedOutViewModel
+    public class LoggedOutViewModel : DialogViewModelBase, ILoggedOutViewModel
     {
         readonly IUIProvider uiProvider;
         readonly IVisualStudioBrowser browser;

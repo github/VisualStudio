@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : BaseViewModel, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : DialogViewModelBase, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -329,7 +329,7 @@ namespace GitHub.SampleData
         }
     }
 
-    public class RepositoryCloneViewModelDesigner : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : DialogViewModelBase, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {

@@ -19,7 +19,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.LogoutRequired)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LogoutRequiredViewModel : BaseViewModel, ILogoutRequiredViewModel
+    public class LogoutRequiredViewModel : DialogViewModelBase, ILogoutRequiredViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IRepositoryHosts repositoryHosts;

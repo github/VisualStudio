@@ -18,7 +18,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
     [ExportView(ViewType=UIViewType.Gist)]
     [PartCreationPolicy(CreationPolicy.NonShared)] 
-    public partial class GistCreationControl
+    public partial class GistCreationControl : GenericGistCreationControl, IDialogView
     {
         [ImportingConstructor]
         public GistCreationControl(
