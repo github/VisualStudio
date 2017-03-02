@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.StartPageClone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class StartPageCloneView : GenericStartPageCloneView
+    public partial class StartPageCloneView : GenericStartPageCloneView, IDialogView
     {
         public StartPageCloneView()
         {

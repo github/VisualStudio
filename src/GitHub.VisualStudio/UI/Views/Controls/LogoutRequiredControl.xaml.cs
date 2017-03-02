@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType = UIViewType.LogoutRequired)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class LogoutRequiredControl : GenericLogoutRequiredControl
+    public partial class LogoutRequiredControl : GenericLogoutRequiredControl, IDialogView
     {
         public LogoutRequiredControl()
         {

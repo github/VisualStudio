@@ -13,7 +13,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.NotAGitRepository)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class NotAGitRepositoryViewModel : BaseViewModel, INotAGitRepositoryViewModel
+    public class NotAGitRepositoryViewModel : DialogViewModelBase, INotAGitRepositoryViewModel
     {
     }
 }

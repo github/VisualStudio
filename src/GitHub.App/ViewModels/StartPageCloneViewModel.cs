@@ -20,7 +20,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.StartPageClone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class StartPageCloneViewModel : BaseViewModel, IBaseCloneViewModel
+    public class StartPageCloneViewModel : DialogViewModelBase, IBaseCloneViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 

@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.Clone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class RepositoryCloneControl : GenericRepositoryCloneControl
+    public partial class RepositoryCloneControl : GenericRepositoryCloneControl, IDialogView
     {
         readonly Dictionary<string, RepositoryGroup> groups = new Dictionary<string, RepositoryGroup>();
 

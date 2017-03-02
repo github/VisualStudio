@@ -8,7 +8,7 @@ using ReactiveUI;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestCreationViewModelDesigner : BaseViewModel, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModelDesigner : DialogViewModelBase, IPullRequestCreationViewModel
     {
         public PullRequestCreationViewModelDesigner()
         {

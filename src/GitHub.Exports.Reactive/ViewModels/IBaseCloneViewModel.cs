@@ -9,7 +9,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// ViewModel for the the Clone Repository dialog
     /// </summary>
-    public interface IBaseCloneViewModel : IViewModel, IRepositoryCreationTarget
+    public interface IBaseCloneViewModel : IDialogViewModel, IRepositoryCreationTarget
     {
         /// <summary>
         /// Signals that the user clicked the clone button.

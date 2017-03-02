@@ -25,7 +25,7 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class PullRequestDetailViewModelDesigner : BaseViewModel, IPullRequestDetailViewModel
+    public class PullRequestDetailViewModelDesigner : DialogViewModelBase, IPullRequestDetailViewModel
     {
         public PullRequestDetailViewModelDesigner()
         {

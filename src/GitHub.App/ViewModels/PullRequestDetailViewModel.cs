@@ -12,7 +12,6 @@ using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.Settings;
 using GitHub.UI;
 using LibGit2Sharp;
 using NullGuard;
@@ -26,7 +25,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
-    public class PullRequestDetailViewModel : BaseViewModel, IPullRequestDetailViewModel
+    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IHasBusy
     {
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
@@ -39,6 +38,7 @@ namespace GitHub.ViewModels
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
+        bool isBusy;
         bool isCheckedOut;
         bool isFromFork;
         bool isInCheckout;
@@ -144,6 +144,15 @@ namespace GitHub.ViewModels
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the view model is loading.
+        /// </summary>
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
         /// <summary>

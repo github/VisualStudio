@@ -119,7 +119,7 @@
     <Compile Include="ViewModels\IPullRequestDirectoryNode.cs" />
     <Compile Include="ViewModels\IPullRequestFileNode.cs" />
     <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
-    <Compile Include="ViewModels\IReactiveViewModel.cs" />
+    <Compile Include="ViewModels\IReactiveDialogViewModel.cs" />
     <Compile Include="ViewModels\IBaseCloneViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />

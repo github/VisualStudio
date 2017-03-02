@@ -8,7 +8,7 @@ using ReactiveUI;
 
 namespace GitHub.SampleData
 {
-    public class StartPageCloneViewModelDesigner : BaseViewModel, IBaseCloneViewModel
+    public class StartPageCloneViewModelDesigner : DialogViewModelBase, IBaseCloneViewModel
     {
         public string BaseRepositoryPath { get; set; }
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }

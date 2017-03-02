@@ -14,9 +14,7 @@ using GitHub.App;
 using System.Diagnostics.CodeAnalysis;
 using Octokit;
 using NLog;
-using LibGit2Sharp;
 using System.Globalization;
-using GitHub.Primitives;
 using GitHub.Extensions;
 using System.Reactive.Disposables;
 
@@ -26,7 +24,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRCreation)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class PullRequestCreationViewModel : BaseViewModel, IPullRequestCreationViewModel, IDisposable
+    public class PullRequestCreationViewModel : DialogViewModelBase, IPullRequestCreationViewModel, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 

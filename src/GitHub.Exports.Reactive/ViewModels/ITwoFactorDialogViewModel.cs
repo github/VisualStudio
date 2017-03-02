@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface ITwoFactorDialogViewModel : IReactiveViewModel
+    public interface ITwoFactorDialogViewModel : IReactiveDialogViewModel
     {
         ReactiveCommand<object> OkCommand { get; }
         ReactiveCommand<object> NavigateLearnMore { get; }
