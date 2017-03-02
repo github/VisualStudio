@@ -73,19 +73,10 @@ build.cmd
 install.cmd
 ```
 
-To build a VSIX that could be deployed via the gallery / Extensions and Updates:
+To build a VSIX that can be installed via a gallery feed on Extensions and Updates:
 ```txt
 set Configuration=Release
 set IsExperimental=false
-build.cmd
-install.cmd
-```
-
-To build a VSIX that could be deployed via Visual Studio setup:
-```txt
-set Configuration=Release
-set IsExperimental=false
-set IsProductComponent=true
 build.cmd
 install.cmd
 ```
