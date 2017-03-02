@@ -113,7 +113,18 @@ namespace GitHub.ViewModels
         public IPullRequestModel Model
         {
             get { return model; }
-            private set { this.RaiseAndSetIfChanged(ref model, value); }
+            private set
+            {
+                // PullRequestModel overrides Equals such that two PRs with the same number are
+                // considered equal. This was causing the Model not to be updated on refresh:
+                // we need to use ReferenceEquals.
+                if (!ReferenceEquals(model, value))
+                {
+                    this.RaisePropertyChanging(nameof(Model));
+                    model = value;
+                    this.RaisePropertyChanged(nameof(Model));
+                }
+            }
         }
 
         /// <summary>
