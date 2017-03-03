@@ -13,7 +13,7 @@ namespace GitHub.SampleData
         public string BaseRepositoryPath { get; set; }
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
         public ICommand BrowseForDirectory { get; }
-        public IReactiveCommand<Unit> CloneCommand { get; }
+        public IReactiveCommand<object> CloneCommand { get; }
         public IRepositoryModel SelectedRepository { get; set; }
     }
 }

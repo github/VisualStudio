@@ -65,11 +65,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             ChangedFilesTree = new ReactiveList<IPullRequestChangeNode>();
             ChangedFilesTree.Add(gitHubDir);
-
-            ChangedFilesList = new ReactiveList<IPullRequestFileNode>();
-            ChangedFilesList.Add(concurrentRepositoryConnection);
-            ChangedFilesList.Add(itrackingBranch);
-            ChangedFilesList.Add(oldBranchModel);
         }
 
         public IPullRequestModel Model { get; }
@@ -77,10 +72,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string TargetBranchDisplayName { get; set; }
         public bool IsFromFork { get; }
         public string Body { get; }
-        public ChangedFilesViewType ChangedFilesViewType { get; set; }
-        public OpenChangedFileAction OpenChangedFileAction { get; set; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
-        public IReactiveList<IPullRequestFileNode> ChangedFilesList { get; }
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
         public string OperationError { get; set; }
@@ -89,8 +81,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> ToggleChangedFilesView { get; }
-        public ReactiveCommand<object> ToggleOpenChangedFileAction { get; }
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
 

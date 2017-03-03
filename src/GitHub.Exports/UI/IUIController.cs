@@ -33,7 +33,7 @@ namespace GitHub.UI
         Gist,
         LogoutRequired,
         Home,
-        StartPageClone,
+        ReClone,
         PullRequestList,
         PullRequestDetail,
         PullRequestCreation,

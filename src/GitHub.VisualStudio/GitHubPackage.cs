@@ -34,11 +34,6 @@ namespace GitHub.VisualStudio
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IServiceProvider serviceProvider;
 
-        static GitHubPackage()
-        {
-            AssemblyResolver.InitializeAssemblyResolver();
-        }
-
         public GitHubPackage()
         {
             serviceProvider = this;
