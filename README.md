@@ -17,6 +17,16 @@ You can configure the gallery by going to `Tools / Options / Extensions and Upda
 
 Beta releases will have `(beta)` in their title in the gallery, following the version number. You can view the release notes in the gallery by hovering over the description, or by clicking the `Release Notes` link on the right side.
 
+## Dogfooding master
+
+For those who like living on the bleeding edge, an 'Experimental' build of the `master` branch is always available here: [GitHub.VisualStudio.vsix](https://ci.appveyor.com/api/projects/github-windows/visualstudio/artifacts/build/Release/GitHub.VisualStudio.vsix?branch=master)
+
+There is no need to uninstall the released version when installing an 'Experimental' build. To revert to the previous version, simply uninstall the 'Experimental' build via 'Extensions and Updates'. The 'Experimental' build won't automatically update, so be sure to keep up or uninstall to get back on the default releases!
+
+![Experimental](documentation\images\experimental.png)
+
+
+
 ## Build requirements
 
 * Visual Studio 2015
