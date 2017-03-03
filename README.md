@@ -78,7 +78,6 @@ To build a VSIX that can be installed via a gallery feed on Extensions and Updat
 set Configuration=Release
 set IsExperimental=false
 build.cmd
-install.cmd
 ```
 
 Note, attempting to install `IsExperimental=false` builds of the VSIX is not recommended.
