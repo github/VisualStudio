@@ -1,10 +1,5 @@
-using System;
 using System.ComponentModel.Composition;
 using GitHub.Exports;
-using GitHub.Models;
-using GitHub.Services;
-using GitHub.UI;
-using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -13,7 +8,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.NotAGitRepository)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class NotAGitRepositoryViewModel : DialogViewModelBase, INotAGitRepositoryViewModel
+    public class NotAGitRepositoryViewModel : PanePageViewModelBase, INotAGitRepositoryViewModel
     {
     }
 }

@@ -25,7 +25,7 @@ namespace GitHub.SampleData
     }
 
     [ExcludeFromCodeCoverage]
-    public class PullRequestDetailViewModelDesigner : DialogViewModelBase, IPullRequestDetailViewModel
+    public class PullRequestDetailViewModelDesigner : PanePageViewModelBase, IPullRequestDetailViewModel
     {
         public PullRequestDetailViewModelDesigner()
         {
@@ -71,6 +71,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public bool IsCheckedOut { get; }
+        public bool IsBusy { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }

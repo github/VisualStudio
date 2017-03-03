@@ -9,7 +9,7 @@ using GitHub.ViewModels;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class LoggedOutViewModelDesigner : DialogViewModelBase, IViewModel
+    public class LoggedOutViewModelDesigner : PanePageViewModelBase, IViewModel
     {
         public LoggedOutViewModelDesigner()
         {

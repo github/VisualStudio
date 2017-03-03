@@ -13,7 +13,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [ExportViewModel(ViewType = UIViewType.NotAGitHubRepository)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class NotAGitHubRepositoryViewModel : DialogViewModelBase, INotAGitHubRepositoryViewModel
+    public class NotAGitHubRepositoryViewModel : PanePageViewModelBase, INotAGitHubRepositoryViewModel
     {
         ITeamExplorerServices teamExplorerServices;
 
