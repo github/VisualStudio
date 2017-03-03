@@ -8,7 +8,7 @@ namespace GitHub.ViewModels
     public interface IPanePageViewModel : IViewModel
     {
         /// <summary>
-        /// Gets the title for the page.
+        /// Gets the title to display in the pane when the page is shown.
         /// </summary>
         string Title { get; }
     }
