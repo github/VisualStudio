@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
-using System.Linq;
 
 namespace GitHub.VisualStudio
 {
@@ -14,6 +15,8 @@ namespace GitHub.VisualStudio
 
     // This fires before ShellInitialized and SolutionExists.
     [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
+
+    [Guid(GuidList.guidAssemblyResolverPkgString)]
     public class AssemblyResolverPackage : Package
     {
         // list of assemblies that should be resolved by name only
