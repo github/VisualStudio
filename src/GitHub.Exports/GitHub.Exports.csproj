@@ -129,6 +129,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\IHasCancel.cs" />
+    <Compile Include="UI\IHasDone.cs" />
     <Compile Include="ViewModels\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">

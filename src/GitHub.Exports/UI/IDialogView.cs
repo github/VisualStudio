@@ -2,10 +2,8 @@
 
 namespace GitHub.UI
 {
-    public interface IDialogView : IView
+    public interface IDialogView : IView, IHasDone, IHasCancel
     {
-        IObservable<object> Done { get; }
-        IObservable<object> Cancel { get; }
         IObservable<bool> IsBusy { get; }
     }
 
