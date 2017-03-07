@@ -532,7 +532,8 @@ namespace GitHub.Controllers
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
-            var dialogView = view as IDialogView;
+            var hasDone = view as IHasDone;
+            var hasCancel = view as IHasCancel;
 
             // 2FA is set up when login is set up, so nothing to do
             if (viewType == UIViewType.TwoFactor)
@@ -550,27 +551,27 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next)));
 
-                pair2fa.AddHandler(((IDialogView)pair2fa.View).Cancel
+                pair2fa.AddHandler(((IHasCancel)pair2fa.View).Cancel
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
 
-                if (dialogView != null)
+                if (hasDone != null)
                 {
-                    pair.AddHandler(dialogView.Done
+                    pair.AddHandler(hasDone.Done
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(_ => Fire(Trigger.Finish)));
                 }
             }
-            else if (dialogView != null)
+            else if (hasDone != null)
             {
-                pair.AddHandler(dialogView.Done
+                pair.AddHandler(hasDone.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Next) ? Trigger.Next : Trigger.Finish)));
             }
 
-            if (dialogView != null)
+            if (hasCancel != null)
             {
-                pair.AddHandler(dialogView.Cancel
+                pair.AddHandler(hasCancel.Cancel
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
             }

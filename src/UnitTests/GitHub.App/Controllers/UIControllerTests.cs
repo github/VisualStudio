@@ -46,8 +46,8 @@ public class UIControllerTests
             //else
                 view = Substitute.For<IDialogView, IViewFor<VM>>();
 
-            view.Done.Returns(new ReplaySubject<ViewWithData>());
-            view.Cancel.Returns(new ReplaySubject<ViewWithData>());
+            ((IHasDone)view).Done.Returns(new ReplaySubject<ViewWithData>());
+            ((IHasCancel)view).Cancel.Returns(new ReplaySubject<ViewWithData>());
 
             //(view as IHasDetailView)?.Open.Returns(new ReplaySubject<ViewWithData>());
             //(view as IHasCreationView)?.Create.Returns(new ReplaySubject<ViewWithData>());
@@ -112,14 +112,14 @@ public class UIControllerTests
 
         protected void TriggerCancel(IView view)
         {
-            var dialog = view as IDialogView;
-            ((ReplaySubject<ViewWithData>)dialog.Cancel)?.OnNext(null);
+            var v = view as IHasCancel;
+            ((ReplaySubject<ViewWithData>)v.Cancel)?.OnNext(null);
         }
 
         protected void TriggerDone(IView view)
         {
-            var dialog = view as IDialogView;
-            ((ReplaySubject<ViewWithData>)dialog.Done)?.OnNext(null);
+            var v = view as IHasDone;
+            ((ReplaySubject<ViewWithData>)v.Done)?.OnNext(null);
         }
     }
 
