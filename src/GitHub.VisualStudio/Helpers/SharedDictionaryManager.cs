@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace GitHub.VisualStudio.Helpers
 {
-    public class SharedDictionaryManager : ResourceDictionary
+    public class SharedDictionaryManager : LoadingResourceDictionary
     {
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
 

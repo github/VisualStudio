@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using GitHub.VisualStudio.Helpers;
-using GitHub.Helpers;
 
 namespace GitHub.VisualStudio.UI.Helpers
 {
-    public class SharedDictionaryManager : ResourceDictionary
+    public class SharedDictionaryManager : LoadingResourceDictionary
     {
         public SharedDictionaryManager()
         {
