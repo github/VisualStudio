@@ -100,8 +100,6 @@ namespace GitHub.UI
             this.OneWayBind(ViewModel, x => x.IsBusy, x => x.IsBusy);
         }
 
-        IObservable<bool> IView.IsBusy => this.WhenAnyValue(x => x.IsBusy);
-
         [AllowNull]
         object IViewFor.ViewModel
         {

@@ -7,7 +7,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Defines the view model for the "Sign in to GitHub" view in the GitHub pane.
     /// </summary>
-    public interface ILoggedOutViewModel : IViewModel
+    public interface ILoggedOutViewModel : IPanePageViewModel
     {
         /// <summary>
         /// Gets the command executed when the user clicks the "Sign in" link.

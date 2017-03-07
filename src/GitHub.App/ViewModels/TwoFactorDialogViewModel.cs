@@ -17,7 +17,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.TwoFactor)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
+    public class TwoFactorDialogViewModel : DialogViewModelBase, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
         bool invalidAuthenticationCode;

@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class RepositoryCreationControl : GenericRepositoryCreationControl
+    public partial class RepositoryCreationControl : GenericRepositoryCreationControl, IDialogView
     {
         public RepositoryCreationControl()
         {

@@ -13,7 +13,7 @@ using System.Linq;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestListViewModelDesigner : BaseViewModel, IPullRequestListViewModel
+    public class PullRequestListViewModelDesigner : PanePageViewModelBase, IPullRequestListViewModel
     {
         public PullRequestListViewModelDesigner()
         {

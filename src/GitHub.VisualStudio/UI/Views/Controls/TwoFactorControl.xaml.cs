@@ -18,7 +18,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.TwoFactor)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class TwoFactorControl : GenericTwoFactorControl
+    public partial class TwoFactorControl : GenericTwoFactorControl, IDialogView
     {
         public TwoFactorControl()
         {

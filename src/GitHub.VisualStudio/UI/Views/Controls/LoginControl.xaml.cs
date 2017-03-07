@@ -22,7 +22,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.Login)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class LoginControl : GenericLoginControl
+    public partial class LoginControl : GenericLoginControl, IDialogView
     {
         IDisposable errorHandler;
 

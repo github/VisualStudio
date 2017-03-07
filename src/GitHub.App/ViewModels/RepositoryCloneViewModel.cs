@@ -28,7 +28,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : DialogViewModelBase, IRepositoryCloneViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 

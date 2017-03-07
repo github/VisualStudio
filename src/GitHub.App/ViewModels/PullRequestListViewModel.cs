@@ -21,7 +21,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestListViewModel : BaseViewModel, IPullRequestListViewModel, IDisposable
+    public class PullRequestListViewModel : PanePageViewModelBase, IPullRequestListViewModel, IDisposable
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
