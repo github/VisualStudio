@@ -1,7 +1,7 @@
 ﻿<local:GenericPullRequestListView x:Class="GitHub.VisualStudio.UI.Views.PullRequestListView"
                                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                  xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                  xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                   xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"

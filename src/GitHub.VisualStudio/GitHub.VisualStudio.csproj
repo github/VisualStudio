@@ -305,7 +305,6 @@
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Menus\MenuBase.cs" />
     <Compile Include="Menus\CreateGist.cs" />
-    <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Menus\OpenLink.cs" />
     <Compile Include="Menus\LinkMenuBase.cs" />
