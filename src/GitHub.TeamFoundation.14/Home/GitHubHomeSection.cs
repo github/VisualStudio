@@ -11,6 +11,8 @@ using GitHub.Primitives;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using GitHub.Extensions;
+using System.Windows.Input;
+using ReactiveUI;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -19,15 +21,22 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
     public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
+        IVisualStudioBrowser visualStudioBrowser;
 
         [ImportingConstructor]
         public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
+            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
+            IVisualStudioBrowser visualStudioBrowser)
             : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
             View = new GitHubHomeContent();
             View.DataContext = this;
+            this.visualStudioBrowser = visualStudioBrowser;
+
+            var openOnGitHub = ReactiveCommand.Create();
+            openOnGitHub.Subscribe(_ => DoOpenOnGitHub());
+            OpenOnGitHub = openOnGitHub;
         }
 
         protected async override void RepoChanged(bool changed)
@@ -93,6 +102,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             notifications.RemoveListener();
         }
 
+        void DoOpenOnGitHub()
+        {
+            visualStudioBrowser?.OpenUrl(ActiveRepo.CloneUrl.ToRepositoryUrl());
+        }
+
         protected GitHubHomeContent View
         {
             get { return SectionContent as GitHubHomeContent; }
@@ -126,5 +140,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             get { return isLoggedIn; }
             set { isLoggedIn = value; this.RaisePropertyChange(); }
         }
+
+        public ICommand OpenOnGitHub { get; }
     }
 }

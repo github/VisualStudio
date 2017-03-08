@@ -8,11 +8,14 @@
                             xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                            xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
                             DataContext="{Binding ViewModel}"
                             d:DesignHeight="300"
                             d:DesignWidth="300"
-                            mc:Ignorable="d">
-  <d:DesignProperties.DataContext>
+                            mc:Ignorable="d"
+                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.LoggedOutViewCustom}">
+    
+    <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
         <sampleData:LoggedOutViewModelDesigner />
@@ -53,13 +56,13 @@
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink Command="{Binding SignIn}"><TextBlock Text="{x:Static prop:Resources.SignInLink}"/></Hyperlink>
+                <Hyperlink Command="{Binding SignIn}" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GitHubLoggedOutSignInHyperlink}" ><TextBlock Text="{x:Static prop:Resources.SignInLink}" /></Hyperlink>
             </TextBlock>
 
             <TextBlock
                 Margin="10,0"
                 HorizontalAlignment="Center">
-                <Hyperlink Command="{Binding Register}"><TextBlock Text="{x:Static prop:Resources.CreateAccountLink}"/></Hyperlink>
+                <Hyperlink Command="{Binding Register}" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GitHubLoggedOutCreateAnAccountHyperlink}" ><TextBlock Text="{x:Static prop:Resources.CreateAccountLink}" /></Hyperlink>
             </TextBlock>
         </StackPanel>
     </StackPanel>
