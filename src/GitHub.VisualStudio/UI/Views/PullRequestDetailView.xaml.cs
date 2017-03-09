@@ -86,14 +86,16 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
-            var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-            var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
+                var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
+                var caption = $"Diff - {file.FileName}";
+                var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
 
-            Services.DifferenceService.OpenComparisonWindow2(
+                Services.DifferenceService.OpenComparisonWindow2(
                 fileNames.Item1,
                 fileNames.Item2,
-                $"{leftLabel} vs {rightLabel}",
-                file.DirectoryPath,
+                caption,
+                tooltip,
                 leftLabel,
                 rightLabel,
                 string.Empty,
