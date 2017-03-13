@@ -146,6 +146,12 @@
                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateNewHyperlink}" />
     </Grid>
 
+    <ui:FilterTextBox x:Name="filterText"
+            IsEnabled="{Binding IsLoaded}"
+            Margin="5,0,5,5"
+            DockPanel.Dock="Top" 
+            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+
     <ListView x:Name="pullRequests"
               Margin="0,0,0,0"
               VerticalAlignment="Top"
