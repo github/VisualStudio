@@ -525,15 +525,15 @@ namespace GitHub.Controllers
             if (!firstTime)
                 return;
 
-            SetupView(viewType, view);
+            SetupView(viewType, view.ViewModel);
         }
 
-        void SetupView(UIViewType viewType, IView view)
+        void SetupView(UIViewType viewType, IViewModel viewModel)
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
-            var hasDone = view as IHasDone;
-            var hasCancel = view as IHasCancel;
+            var hasDone = viewModel as IHasDone;
+            var hasCancel = viewModel as IHasCancel;
 
             // 2FA is set up when login is set up, so nothing to do
             if (viewType == UIViewType.TwoFactor)
@@ -551,7 +551,7 @@ namespace GitHub.Controllers
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next)));
 
-                pair2fa.AddHandler(((IHasCancel)pair2fa.View).Cancel
+                pair2fa.AddHandler(((IHasCancel)pair2fa.ViewModel).Cancel
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
 

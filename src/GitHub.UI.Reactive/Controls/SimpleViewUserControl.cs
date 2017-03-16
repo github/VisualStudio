@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,14 +13,14 @@ namespace GitHub.UI
     /// Base class for all of our user controls. This one does not import GitHub resource/styles and is used by the 
     /// publish control.
     /// </summary>
-    public class SimpleViewUserControl : UserControl, IDisposable, IActivatable
+    public class SimpleViewUserControl<TInterface, TImplementor> : UserControl, IViewFor<TInterface>, IView 
+        where TInterface : class, IViewModel
+        where TImplementor : class
     {
-        readonly Subject<object> close = new Subject<object>();
-        readonly Subject<object> cancel = new Subject<object>();
-        readonly Subject<bool> isBusy = new Subject<bool>();
-
         public SimpleViewUserControl()
         {
+            DataContextChanged += (s, e) => ViewModel = (TInterface)e.NewValue;
+
             this.WhenActivated(d =>
             {
                 d(this.Events()
@@ -30,70 +29,9 @@ namespace GitHub.UI
                     .Subscribe(key =>
                     {
                         key.Handled = true;
-                        NotifyCancel();
+                        (this.ViewModel as IDialogViewModel)?.Cancel.Execute(null);
                     }));
             });
-        }
-
-        public IObservable<object> Done => close;
-
-        public IObservable<object> Cancel => cancel;
-
-        public IObservable<bool> IsBusy => isBusy;
-
-        protected void NotifyDone()
-        {
-            if (disposed)
-                return;
-
-            close.OnNext(null);
-            close.OnCompleted();
-        }
-
-        protected void NotifyCancel()
-        {
-            if (disposed)
-                return;
-
-            cancel.OnNext(null);
-        }
-
-        protected void NotifyIsBusy(bool busy)
-        {
-            if (disposed)
-                return;
-
-            isBusy.OnNext(busy);
-        }
-
-        bool disposed;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (disposed) return;
-
-                close.Dispose();
-                cancel.Dispose();
-                isBusy.Dispose();
-                disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-    }
-
-    public class SimpleViewUserControl<TInterface, TImplementor> : SimpleViewUserControl, IViewFor<TInterface>, IView 
-        where TInterface : class, IViewModel
-        where TImplementor : class
-    {
-        public SimpleViewUserControl()
-        {
-            DataContextChanged += (s, e) => ViewModel = (TInterface)e.NewValue;
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(

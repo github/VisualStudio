@@ -129,8 +129,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI\IHasCancel.cs" />
-    <Compile Include="UI\IHasDone.cs" />
     <Compile Include="ViewModels\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
@@ -218,7 +216,7 @@
     <Compile Include="ViewModels\IHasBusy.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
-    <Compile Include="UI\IDialogView.cs" />
+    <Compile Include="UI\ICanLoad.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />
     <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
@@ -239,10 +237,8 @@
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
-    <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
-    <Compile Include="ViewModels\IDialogViewModel.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,8 @@ using GitHub.Primitives;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using GitHub.App.Factories;
+using System.Reactive;
+using GitHub.Extensions.Reactive;
 
 public class UIControllerTests
 {
@@ -40,17 +42,9 @@ public class UIControllerTests
         protected void SetupView<VM>(IExportFactoryProvider factory, GitHub.Exports.UIViewType type)
             where VM : class, IViewModel
         {
-            IDialogView view;
-            //if (type == GitHub.Exports.UIViewType.PRList)
-            //    view = Substitutes.For<IView, IViewFor<VM>, IHasCreationView, IHasDetailView>();
-            //else
-                view = Substitute.For<IDialogView, IViewFor<VM>>();
-
-            ((IHasDone)view).Done.Returns(new ReplaySubject<ViewWithData>());
-            ((IHasCancel)view).Cancel.Returns(new ReplaySubject<ViewWithData>());
-
-            //(view as IHasDetailView)?.Open.Returns(new ReplaySubject<ViewWithData>());
-            //(view as IHasCreationView)?.Create.Returns(new ReplaySubject<ViewWithData>());
+            var view = Substitute.For<IView, IViewFor<VM>>();
+            var viewModel = factory.GetViewModel(type).Value;
+            view.ViewModel.Returns(viewModel);
 
             var e = new ExportLifetimeContext<IView>(view, () => { });
             factory.GetView(type).Returns(e);
@@ -59,7 +53,13 @@ public class UIControllerTests
         protected void SetupViewModel<VM>(IExportFactoryProvider factory, GitHub.Exports.UIViewType type)
             where VM : class, IViewModel
         {
-            var v = Substitute.For<VM, INotifyPropertyChanged>();
+            var v = Substitute.For<IDialogViewModel, VM, INotifyPropertyChanged>();
+            var done = new ReplaySubject<Unit>();
+            var cancel = ReactiveCommand.Create();
+            v.Done.Returns(_ => done);
+            v.Cancel.Returns(cancel);
+            ((IHasCancel)v).Cancel.Returns(cancel.SelectUnit());
+
             var e = new ExportLifetimeContext<IViewModel>(v, () => { });
 
             factory.GetViewModel(type).Returns(e);
@@ -110,16 +110,15 @@ public class UIControllerTests
             return connection;
         }
 
-        protected void TriggerCancel(IView view)
+        protected void TriggerCancel(IViewModel viewModel)
         {
-            var v = view as IHasCancel;
-            ((ReplaySubject<ViewWithData>)v.Cancel)?.OnNext(null);
+            ((IDialogViewModel)viewModel).Cancel.Execute(null);
         }
 
-        protected void TriggerDone(IView view)
+        protected void TriggerDone(IViewModel viewModel)
         {
-            var v = view as IHasDone;
-            ((ReplaySubject<ViewWithData>)v.Done)?.OnNext(null);
+            var hasDone = (IHasDone)viewModel;
+            ((ISubject<Unit>)hasDone.Done).OnNext(Unit.Default);
         }
     }
 
@@ -146,7 +145,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                     }
                 });
@@ -181,7 +180,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                     }
                 });
@@ -213,7 +212,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                     }
                 });
@@ -249,7 +248,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                     }
                 });
@@ -283,11 +282,11 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
                             // login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                     }
                 });
@@ -328,12 +327,12 @@ public class UIControllerTests
                             // login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
                             // continue by triggering done on login view
-                            var v = (IDialogView)factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
-                            TriggerDone(v);
+                            var vm2 = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).ViewModel;
+                            TriggerDone(vm2);
                             break;
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                     }
                 });
@@ -375,7 +374,7 @@ public class UIControllerTests
                             var vm = (IDialogViewModel)factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.TwoFactor).ViewModel;
                             vm.IsShowing.Returns(false);
                             RaisePropertyChange(vm, "IsShowing");
-                            TriggerCancel(uc);
+                            TriggerCancel(data.View.ViewModel);
                             break;
                         }
                         case 3: {
@@ -389,8 +388,8 @@ public class UIControllerTests
                             Assert.IsAssignableFrom<IViewFor<ITwoFactorDialogViewModel>>(uc);
                             // login
                             cons.Add(SetupConnection(provider, hosts, hosts.GitHubHost));
-                            var v = (IDialogView)factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).View;
-                            TriggerDone(v);
+                            var vm2 = factory.CreateViewAndViewModel(GitHub.Exports.UIViewType.Login).ViewModel;
+                            TriggerDone(vm2);
                             break;
                         }
                         case 5: {
@@ -434,7 +433,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCloneViewModel>>(uc);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                     }
                 });
@@ -472,7 +471,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryCreationViewModel>>(uc);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                     }
                 });
@@ -512,7 +511,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
                             ((IGitHubServiceProvider)provider).Received().AddService(uiController, connection);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                     }
                 });
@@ -549,7 +548,7 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IRepositoryPublishViewModel>>(uc);
                             ((IGitHubServiceProvider)provider).Received().AddService(uiController, connection);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                     }
                 });
@@ -598,18 +597,18 @@ public class UIControllerTests
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<ILogoutRequiredViewModel>>(uc);
                             host.IsLoggedIn.Returns(false);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                         case 2:
                             Assert.IsAssignableFrom<IViewFor<ILoginControlViewModel>>(uc);
                             // login
                             host.IsLoggedIn.Returns(true);
                             host.SupportsGist.Returns(true);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                         case 3:
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                         default:
                             Assert.True(false, "Received more views than expected");
@@ -662,7 +661,7 @@ public class UIControllerTests
                     {
                         case 1:
                             Assert.IsAssignableFrom<IViewFor<IGistCreationViewModel>>(uc);
-                            TriggerDone(uc);
+                            TriggerDone(data.View.ViewModel);
                             break;
                         default:
                             Assert.True(false, "Received more views than expected");

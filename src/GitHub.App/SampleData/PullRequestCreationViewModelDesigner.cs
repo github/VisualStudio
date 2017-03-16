@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
+using System;
+using System.Reactive;
 
 namespace GitHub.SampleData
 {
@@ -46,5 +48,6 @@ namespace GitHub.SampleData
 
         public ReactivePropertyValidator BranchValidator { get; }
 
+        public override IObservable<Unit> Done { get; }
     }
 }

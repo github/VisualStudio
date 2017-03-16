@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Authentication;
@@ -97,7 +98,7 @@ namespace GitHub.ViewModels
                     : null);
             var resend = ResendCodeCommand.Select(_ => RecoveryOptionResult.RetryOperation)
                 .Do(_ => error.ChallengeResult = TwoFactorChallengeResult.RequestResendCode);
-            var cancel = CancelCommand.Select(_ => RecoveryOptionResult.CancelOperation);
+            var cancel = Cancel.Select(_ => RecoveryOptionResult.CancelOperation);
             return Observable.Merge(ok, cancel, resend)
                 .Take(1)
                 .Do(_ => IsAuthenticationCodeSent = error.ChallengeResult == TwoFactorChallengeResult.RequestResendCode);
@@ -146,5 +147,7 @@ namespace GitHub.ViewModels
         {
             get { return showErrorMessage.Value; }
         }
+
+        public override IObservable<Unit> Done => Observable.Never<Unit>();
     }
 }

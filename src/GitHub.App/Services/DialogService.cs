@@ -30,7 +30,7 @@ namespace GitHub.Services
             {
                 var vm = x.View.ViewModel as IBaseCloneViewModel;
 
-                ((IHasDone)x.View).Done.Subscribe(_ =>
+                ((IDialogViewModel)x.View.ViewModel).Done.Subscribe(_ =>
                 {
                     basePath = vm?.BaseRepositoryPath;
                     repository = vm?.SelectedRepository;
@@ -58,7 +58,7 @@ namespace GitHub.Services
                     vm.SelectedRepository = repository;
                 }
 
-                ((IHasDone)x.View).Done.Subscribe(_ =>
+                ((IDialogViewModel)x.View.ViewModel).Done.Subscribe(_ =>
                 {
                     basePath = vm?.BaseRepositoryPath;
                 });

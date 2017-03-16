@@ -186,6 +186,8 @@ namespace GitHub.SampleData
             get;
             set;
         }
+
+        public override IObservable<Unit> Done { get; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -228,12 +230,6 @@ namespace GitHub.SampleData
             {
                 return true;
             }
-        }
-
-        public bool IsPublishing
-        {
-            get;
-            private set;
         }
 
         public IReactiveCommand<ProgressState> PublishRepository
@@ -423,6 +419,8 @@ namespace GitHub.SampleData
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done { get; }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection

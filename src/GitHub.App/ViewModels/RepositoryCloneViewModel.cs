@@ -277,5 +277,7 @@ namespace GitHub.ViewModels
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done => CloneCommand.SelectUnit();
     }
 }

@@ -14,6 +14,8 @@ using NullGuard;
 using ReactiveUI;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -52,6 +54,11 @@ namespace GitHub.ViewModels
         }
 
         public IReactiveCommand<ProgressState> Logout { get; }
+
+        public override IObservable<Unit> Done
+        {
+            get { return Logout.Where(x => x == ProgressState.Success).SelectUnit(); }
+        }
 
         IObservable<ProgressState> OnLogout(object unused)
         {

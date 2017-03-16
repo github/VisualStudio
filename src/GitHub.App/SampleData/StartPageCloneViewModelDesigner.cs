@@ -15,5 +15,6 @@ namespace GitHub.SampleData
         public ICommand BrowseForDirectory { get; }
         public IReactiveCommand<object> CloneCommand { get; }
         public IRepositoryModel SelectedRepository { get; set; }
+        public override IObservable<Unit> Done { get; }
     }
 }

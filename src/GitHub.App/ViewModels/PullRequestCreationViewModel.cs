@@ -17,6 +17,7 @@ using NLog;
 using System.Globalization;
 using GitHub.Extensions;
 using System.Reactive.Disposables;
+using System.Reactive;
 
 namespace GitHub.ViewModels
 {
@@ -95,7 +96,7 @@ namespace GitHub.ViewModels
                 .Where(x => !x.IsValid && x.DisplayValidationError)
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
-            createPullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
+            CreatePullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
                 _ => service
                     .CreatePullRequest(repositoryHost, activeRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
@@ -217,8 +218,7 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
 
-        IReactiveCommand<IPullRequestModel> createPullRequest;
-        public IReactiveCommand<IPullRequestModel> CreatePullRequest => createPullRequest;
+        public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
 
         string title;
         public string PRTitle
@@ -247,5 +247,7 @@ namespace GitHub.ViewModels
             get { return branchValidator; }
             set { this.RaiseAndSetIfChanged(ref branchValidator, value); }
         }
+
+        public override IObservable<Unit> Done => CreatePullRequest.SelectUnit();
     }
 }
