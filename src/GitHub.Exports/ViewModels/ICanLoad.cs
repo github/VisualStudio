@@ -1,6 +1,7 @@
 ﻿using System;
+using GitHub.UI;
 
-namespace GitHub.UI
+namespace GitHub.ViewModels
 {
     public interface ICanLoad
     {

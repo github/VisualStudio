@@ -139,9 +139,7 @@
 
       <ui:GitHubActionLink Grid.Column="1"
                            HorizontalAlignment="Right"
-                           Command="{Binding CreatePR,
-                                             RelativeSource={RelativeSource FindAncestor,
-                                                                            AncestorType={x:Type local:PullRequestListView}}}"
+                           Command="{Binding CreatePullRequest}"
                            Content="Create New"
                            AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.CreateNewHyperlink}" />
     </Grid>

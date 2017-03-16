@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GitHub.App;
@@ -25,7 +26,6 @@ namespace GitHub.ViewModels
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        readonly ReactiveCommand<object> openPullRequestCommand;
         readonly IRepositoryHost repositoryHost;
         readonly ILocalRepositoryModel repository;
         readonly TrackingCollection<IAccount> trackingAuthors;
@@ -56,8 +56,6 @@ namespace GitHub.ViewModels
             this.listSettings = settings.UIState
                 .GetOrCreateRepositoryState(repository.CloneUrl)
                 .PullRequests;
-
-            openPullRequestCommand = ReactiveCommand.Create();
 
             States = new List<PullRequestState> {
                 new PullRequestState { IsOpen = true, Name = "Open" },
@@ -92,6 +90,10 @@ namespace GitHub.ViewModels
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
+            OpenPullRequest = ReactiveCommand.Create();
+            OpenPullRequest.Subscribe(DoOpenPullRequest);
+            CreatePullRequest = ReactiveCommand.Create();
+            CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -171,11 +173,6 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selectedPullRequest, value); }
         }
 
-        public ICommand OpenPullRequest
-        {
-            get { return openPullRequestCommand; }
-        }
-
         IReadOnlyList<PullRequestState> states;
         public IReadOnlyList<PullRequestState> States
         {
@@ -229,6 +226,12 @@ namespace GitHub.ViewModels
             get { return emptyUser; }
         }
 
+        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
+        public IObservable<ViewWithData> Load => load;
+
+        public ReactiveCommand<object> OpenPullRequest { get; }
+        public ReactiveCommand<object> CreatePullRequest { get; }
+
         bool disposed;
         protected void Dispose(bool disposing)
         {
@@ -255,6 +258,18 @@ namespace GitHub.ViewModels
             listSettings.SelectedAssignee = SelectedAssignee?.Login;
             listSettings.SelectedAuthor = SelectedAuthor?.Login;
             settings.Save();
+        }
+
+        void DoOpenPullRequest(object pullRequest)
+        {
+            var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = pullRequest };
+            load.OnNext(d);
+        }
+
+        void DoCreatePullRequest()
+        {
+            var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
+            load.OnNext(d);
         }
     }
 }

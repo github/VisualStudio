@@ -130,7 +130,7 @@ namespace GitHub.Controllers
                 {
                     disposablesForCurrentView?.Clear();
 
-                    var action = view as ICanLoad;
+                    var action = view.ViewModel as ICanLoad;
                     if (action != null)
                     {
                         disposablesForCurrentView.Add(action?.Load.Subscribe(d =>
