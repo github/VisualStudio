@@ -11,7 +11,7 @@
     <PreviewImage>Resources\preview_200x200.png</PreviewImage>
     <Tags>GitHub;git;open source;source control;branch;pull request;team explorer;commit;publish</Tags>
   </Metadata>
-  <Installation AllUsers="false" Experimental="true">
+  <Installation AllUsers="true" Experimental="true">
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0,15.0]" />
   </Installation>
   <Dependencies>

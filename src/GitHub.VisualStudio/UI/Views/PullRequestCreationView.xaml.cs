@@ -17,12 +17,6 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestCreationView()
         {
             InitializeComponent();
-
-            this.WhenActivated(d =>
-            {
-                d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
-                d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
-            });
         }
     }
 }

@@ -18,7 +18,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
     [ExportView(ViewType=UIViewType.Gist)]
     [PartCreationPolicy(CreationPolicy.NonShared)] 
-    public partial class GistCreationControl : GenericGistCreationControl, IDialogView
+    public partial class GistCreationControl : GenericGistCreationControl
     {
         [ImportingConstructor]
         public GistCreationControl(
@@ -48,8 +48,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                         var ns = serviceProvider.TryGetService<IStatusBarNotificationService>();
                         ns?.ShowMessage(UI.Resources.gistCreatedMessage);
-
-                        NotifyDone();
                     });
 
                 d(notifications.Listen()

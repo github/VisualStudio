@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Api;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using NLog;
@@ -132,5 +134,7 @@ namespace GitHub.ViewModels
             get { return fileName; }
             set { this.RaiseAndSetIfChanged(ref fileName, value); }
         }
+
+        public override IObservable<Unit> Done => CreateGist.Where(x => x != null).SelectUnit();
     }
 }

@@ -21,7 +21,7 @@ namespace GitHub.VisualStudio.UI.Views
 
     [ExportView(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class PullRequestListView : GenericPullRequestListView, ICanLoad
+    public partial class PullRequestListView : GenericPullRequestListView, IDisposable, ICanLoad
     {
         readonly Subject<int> open = new Subject<int>();
         readonly Subject<object> create = new Subject<object>();
@@ -75,17 +75,14 @@ namespace GitHub.VisualStudio.UI.Views
         public IObservable<ViewWithData> Load => load;
 
         bool disposed;
-        protected override void Dispose(bool disposing)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
+        public void Dispose()
         {
-            base.Dispose(disposing);
-            if (disposing)
-            {
-                if (disposed) return;
+            if (disposed) return;
 
-                open.Dispose();
-                create.Dispose();
-                disposed = true;
-            }
+            open.Dispose();
+            create.Dispose();
+            disposed = true;
         }
     }
 }

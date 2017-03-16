@@ -29,16 +29,12 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.StartPageClone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class StartPageCloneView : GenericStartPageCloneView, IDialogView
+    public partial class StartPageCloneView : GenericStartPageCloneView
     {
         public StartPageCloneView()
         {
             InitializeComponent();
 
-            this.WhenActivated(d =>
-            {
-                d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
-            });
             IsVisibleChanged += (s, e) =>
             {
                 if (IsVisible)

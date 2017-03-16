@@ -18,7 +18,7 @@
                                        d:DataContext="{d:DesignInstance Type=sampleData:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
                                        mc:Ignorable="d"
                                        AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerSyncGitHubRepositoryPublishCustom}" 
-                                       IsEnabled="{Binding IsPublishing, Converter={ui:InverseBooleanConverter}}">
+                                       IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}">
    
   <UserControl.Resources>
     <ResourceDictionary>

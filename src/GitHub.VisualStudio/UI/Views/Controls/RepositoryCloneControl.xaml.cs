@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.Clone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class RepositoryCloneControl : GenericRepositoryCloneControl, IDialogView
+    public partial class RepositoryCloneControl : GenericRepositoryCloneControl
     {
         readonly Dictionary<string, RepositoryGroup> groups = new Dictionary<string, RepositoryGroup>();
 
@@ -49,7 +49,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             this.WhenActivated(d =>
             {
                 d(repositoryList.Events().MouseDoubleClick.InvokeCommand(this, x => x.ViewModel.CloneCommand));
-                d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
             });
 
             IsVisibleChanged += (s, e) =>

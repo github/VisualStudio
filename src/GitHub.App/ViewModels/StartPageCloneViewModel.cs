@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.App;
 using GitHub.Exports;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
@@ -156,5 +157,7 @@ namespace GitHub.ViewModels
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done => CloneCommand.SelectUnit();
     }
 }

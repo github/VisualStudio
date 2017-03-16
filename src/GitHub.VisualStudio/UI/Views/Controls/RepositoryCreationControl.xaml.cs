@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     /// </summary>
     [ExportView(ViewType=UIViewType.Create)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class RepositoryCreationControl : GenericRepositoryCreationControl, IDialogView
+    public partial class RepositoryCreationControl : GenericRepositoryCreationControl
     {
         public RepositoryCreationControl()
         {
@@ -50,8 +50,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.BindCommand(ViewModel, vm => vm.BrowseForDirectory, v => v.browsePathButton));
 
                 d(userErrorMessages.RegisterHandler<PublishRepositoryUserError>(clearErrorWhenChanged));
-
-                ViewModel.CreateRepository.Subscribe(_ => NotifyDone());
             });
             IsVisibleChanged += (s, e) =>
             {

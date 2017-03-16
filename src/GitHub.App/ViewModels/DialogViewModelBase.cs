@@ -2,13 +2,16 @@
 using ReactiveUI;
 using NullGuard;
 using GitHub.UI;
+using System;
+using System.Reactive;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
     /// <summary>
     /// Base class for view models that can be dismissed, such as dialogs.
     /// </summary>
-    public class DialogViewModelBase : ReactiveObject, IReactiveDialogViewModel, IHasBusy
+    public abstract class DialogViewModelBase : ReactiveObject, IDialogViewModel, IHasBusy
     {
         protected ObservableAsPropertyHelper<bool> isShowing;
         string title;
@@ -19,14 +22,14 @@ namespace GitHub.ViewModels
         /// </summary>
         protected DialogViewModelBase()
         {
-            CancelCommand = ReactiveCommand.Create();
+            Cancel = ReactiveCommand.Create();
         }
 
         /// <inheritdoc/>
-        public IReactiveCommand<object> CancelCommand { get; protected set; }
+        public abstract IObservable<Unit> Done { get; }
 
         /// <inheritdoc/>
-        public ICommand Cancel { get { return CancelCommand; } }
+        public ReactiveCommand<object> Cancel { get; }
 
         /// <inheritdoc/>
         public string Title
@@ -45,6 +48,9 @@ namespace GitHub.ViewModels
             get { return isBusy; }
             set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
+
+        /// <inheritdoc/>
+        IObservable<Unit> IHasCancel.Cancel => Cancel.SelectUnit();
 
         /// <inheritdoc/>
         public virtual void Initialize([AllowNull] ViewWithData data)
