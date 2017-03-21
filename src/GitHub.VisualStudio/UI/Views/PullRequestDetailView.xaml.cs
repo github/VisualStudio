@@ -87,19 +87,24 @@ namespace GitHub.VisualStudio.UI.Views
                 var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
+                var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
+                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
+
+                if (!ViewModel.IsCheckedOut)
+                {
+                    options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
 
                 Services.DifferenceService.OpenComparisonWindow2(
-                fileNames.Item1,
-                fileNames.Item2,
-                caption,
-                tooltip,
-                leftLabel,
-                rightLabel,
-                string.Empty,
-                string.Empty,
-                (int)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
+                    fileNames.Item1,
+                    fileNames.Item2,
+                    caption,
+                    tooltip,
+                    leftLabel,
+                    rightLabel,
+                    string.Empty,
+                    string.Empty,
+                    (uint)options);
             }
             catch (Exception e)
             {
