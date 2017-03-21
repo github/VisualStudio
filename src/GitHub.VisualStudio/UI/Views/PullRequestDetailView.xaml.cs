@@ -41,7 +41,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
-                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x).Forget()));
+                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x)));
                 d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x).Forget()));
             });
         }
@@ -65,15 +65,12 @@ namespace GitHub.VisualStudio.UI.Views
             browser.OpenUrl(url);
         }
 
-        async Task DoOpenFile(IPullRequestFileNode file)
+        void DoOpenFile(IPullRequestFileNode file)
         {
             try
             {
-                var fileName = await ViewModel.ExtractFile(file);
-                var window = Services.Dte.ItemOperations.OpenFile(fileName);
-
-                // If the file we extracted isn't the current file on disk, make the window read-only.
-                window.Document.ReadOnly = fileName != file.DirectoryPath;
+                var fileName = ViewModel.GetLocalFilePath(file);
+                Services.Dte.ItemOperations.OpenFile(fileName);
             }
             catch (Exception e)
             {

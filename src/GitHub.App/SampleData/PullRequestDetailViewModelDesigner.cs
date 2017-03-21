@@ -84,12 +84,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
 
-        public Task<string> ExtractFile(IPullRequestFileNode file)
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             return null;
         }
 
-        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        public string GetLocalFilePath(IPullRequestFileNode file)
         {
             return null;
         }
