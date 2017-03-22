@@ -162,7 +162,7 @@
                           Foreground="{DynamicResource GitHubAccentBrush}"
                           IsIndeterminate="True"
                           Style="{DynamicResource GitHubProgressBar}"
-                          Visibility="{Binding IsLoading, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}" />
+                          Visibility="{Binding IsBusy, Mode=OneWay, Converter={ui:BooleanToVisibilityConverter}}" />
 
     <StackPanel x:Name="loadingFailedPanel"
                 Margin="0,4,0,4"
