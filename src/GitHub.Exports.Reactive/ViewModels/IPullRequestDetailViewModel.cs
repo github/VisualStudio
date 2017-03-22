@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
@@ -97,7 +98,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
-        IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
+        IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }
 
         /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
