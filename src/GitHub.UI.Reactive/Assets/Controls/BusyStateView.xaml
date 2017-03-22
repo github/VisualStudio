@@ -9,17 +9,29 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:BusyStateView}">
                     <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
                         <Grid.Resources>
                             <BooleanToVisibilityConverter x:Key="b2v"/>
                         </Grid.Resources>
-                        
+
+                        <ui:GitHubProgressBar Foreground="{DynamicResource GitHubAccentBrush}"
+                                              IsIndeterminate="True"
+                                              Style="{DynamicResource GitHubProgressBar}"
+                                              Visibility="{TemplateBinding IsBusy, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+
                         <c:Spinner Name="spinner" 
+                                   Grid.Row="1"
                                    Width="48"
                                    Height="48"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Visibility="{TemplateBinding IsBusy, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
-                        <ContentPresenter Visibility="{TemplateBinding IsBusy, Converter={ui:BooleanToInverseHiddenVisibilityConverter}}"/>
+                                   Visibility="{TemplateBinding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
+                        <ContentPresenter Grid.Row="1" 
+                                          Visibility="{TemplateBinding IsLoading, Converter={ui:BooleanToInverseHiddenVisibilityConverter}}"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
