@@ -12,8 +12,8 @@ namespace GitHub.ViewModels
     /// - When <see cref="IHasBusy.IsBusy"/> is true: There is data to display but that data is
     /// being updated or is in the process of being loaded.
     /// </remarks>
-    public interface IHasBusy
+    public interface IHasLoading
     {
-        bool IsBusy { get; }
+        bool IsLoading { get; }
     }
 }

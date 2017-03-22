@@ -25,7 +25,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
-    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IHasBusy
+    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
@@ -39,6 +39,7 @@ namespace GitHub.ViewModels
         IPullRequestUpdateState updateState;
         string operationError;
         bool isBusy;
+        bool isLoading;
         bool isCheckedOut;
         bool isFromFork;
         bool isInCheckout;
@@ -147,12 +148,21 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the view model is loading.
+        /// Gets a value indicating whether the view model is updating.
         /// </summary>
         public bool IsBusy
         {
             get { return isBusy; }
             private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the view model is loading.
+        /// </summary>
+        public bool IsLoading
+        {
+            get { return isLoading; }
+            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
         /// <summary>
@@ -253,7 +263,10 @@ namespace GitHub.ViewModels
         {
             var prNumber = data?.Data != null ? (int)data.Data : Model.Number;
 
-            IsBusy = true;
+            if (Model == null)
+                IsLoading = true;
+            else
+                IsBusy = true;
 
             OperationError = null;
             modelService.GetPullRequest(repository, prNumber)
@@ -351,7 +364,7 @@ namespace GitHub.ViewModels
                 UpdateState = null;
             }
 
-            IsBusy = false;
+            IsLoading = IsBusy = false;
 
             if (!isInCheckout)
             {
