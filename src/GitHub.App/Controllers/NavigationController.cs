@@ -130,10 +130,10 @@ namespace GitHub.Controllers
                 {
                     disposablesForCurrentView?.Clear();
 
-                    var action = view.ViewModel as ICanLoad;
+                    var action = view.ViewModel as ICanNavigate;
                     if (action != null)
                     {
-                        disposablesForCurrentView.Add(action?.Load.Subscribe(d =>
+                        disposablesForCurrentView.Add(action?.Navigate.Subscribe(d =>
                         {
                             LoadView(connection, d, onViewLoad);
                         }));

@@ -216,7 +216,7 @@
     <Compile Include="ViewModels\IHasBusy.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
-    <Compile Include="ViewModels\ICanLoad.cs" />
+    <Compile Include="ViewModels\ICanNavigate.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />
     <Compile Include="ViewModels\IGitHubInvitationSection.cs" />

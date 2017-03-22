@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
         }
     }
 
-    public interface IPullRequestListViewModel : IViewModel, ICanLoad
+    public interface IPullRequestListViewModel : IViewModel, ICanNavigate
     {
         ITrackingCollection<IPullRequestModel> PullRequests { get; }
         IPullRequestModel SelectedPullRequest { get; }
