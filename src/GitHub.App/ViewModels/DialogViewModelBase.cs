@@ -46,7 +46,7 @@ namespace GitHub.ViewModels
         public bool IsBusy
         {
             get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
+            protected set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
         /// <inheritdoc/>
