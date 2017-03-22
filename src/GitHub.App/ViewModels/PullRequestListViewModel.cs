@@ -227,7 +227,7 @@ namespace GitHub.ViewModels
         }
 
         readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
-        public IObservable<ViewWithData> Load => load;
+        public IObservable<ViewWithData> Navigate => load;
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
