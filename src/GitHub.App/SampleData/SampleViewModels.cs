@@ -374,11 +374,6 @@ namespace GitHub.SampleData
 
         public new string Title { get { return "Clone a GitHub Repository"; } }
 
-        public bool IsLoading
-        {
-            get { return false; }
-        }
-
         public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
         {
             get;
