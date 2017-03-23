@@ -39,6 +39,7 @@ namespace GitHub.ViewModels
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
+        bool isCheckedOut;
         bool isFromFork;
         bool isInCheckout;
 
@@ -103,7 +104,7 @@ namespace GitHub.ViewModels
             SubscribeOperationError(Push);
 
             OpenOnGitHub = ReactiveCommand.Create();
-            OpenFile = ReactiveCommand.Create();
+            OpenFile = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
             DiffFile = ReactiveCommand.Create();
         }
 
@@ -143,6 +144,15 @@ namespace GitHub.ViewModels
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request branch is checked out.
+        /// </summary>
+        public bool IsCheckedOut
+        {
+            get { return isCheckedOut; }
+            private set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
         }
 
         /// <summary>
@@ -269,9 +279,10 @@ namespace GitHub.ViewModels
             }
 
             var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
-            var isCheckedOut = localBranches.Contains(repository.CurrentBranch);
 
-            if (isCheckedOut)
+            IsCheckedOut = localBranches.Contains(repository.CurrentBranch);
+
+            if (IsCheckedOut)
             {
                 var divergence = await pullRequestsService.CalculateHistoryDivergence(repository, Model.Number);
                 var pullEnabled = divergence.BehindBy > 0;
@@ -340,17 +351,6 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets the specified file as it appears in the pull request.
-        /// </summary>
-        /// <param name="file">The file or directory node.</param>
-        /// <returns>The path to the extracted file.</returns>
-        public Task<string> ExtractFile(IPullRequestFileNode file)
-        {
-            var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractFile(repository, modelService, model.Head.Sha, path, file.Sha).ToTask();
-        }
-
-        /// <summary>
         /// Gets the before and after files needed for viewing a diff.
         /// </summary>
         /// <param name="file">The changed file.</param>
@@ -358,7 +358,17 @@ namespace GitHub.ViewModels
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path, file.Sha).ToTask();
+            return pullRequestsService.ExtractDiffFiles(repository, modelService, model, path, file.Sha, IsCheckedOut).ToTask();
+        }
+
+        /// <summary>
+        /// Gets the full path to a file in the working directory.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>The full path to the file in the working directory.</returns>
+        public string GetLocalFilePath(IPullRequestFileNode file)
+        {
+            return Path.Combine(repository.LocalPath, file.DirectoryPath, file.FileName);
         }
 
         void SubscribeOperationError(ReactiveCommand<Unit> command)

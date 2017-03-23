@@ -80,6 +80,11 @@ namespace GitHub.ViewModels
         string TargetBranchDisplayName { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request branch is checked out.
+        /// </summary>
+        bool IsCheckedOut { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the pull request comes from a fork.
         /// </summary>
         bool IsFromFork { get; }
@@ -140,17 +145,17 @@ namespace GitHub.ViewModels
         ReactiveCommand<object> DiffFile { get; }
 
         /// <summary>
-        /// Gets the specified file as it appears in the pull request.
-        /// </summary>
-        /// <param name="file">The file or directory node.</param>
-        /// <returns>The path to the extracted file.</returns>
-        Task<string> ExtractFile(IPullRequestFileNode file);
-
-        /// <summary>
         /// Gets the before and after files needed for viewing a diff.
         /// </summary>
         /// <param name="file">The changed file.</param>
         /// <returns>A tuple containing the full path to the before and after files.</returns>
         Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file);
+
+        /// <summary>
+        /// Gets the full path to a file in the working directory.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>The full path to the file in the working directory.</returns>
+        string GetLocalFilePath(IPullRequestFileNode file);
     }
 }
