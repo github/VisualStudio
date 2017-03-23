@@ -120,13 +120,18 @@ namespace GitHub.Services
         /// <param name="pullRequest">The pull request details.</param>
         /// <param name="fileName">The filename relative to the repository root.</param>
         /// <param name="fileSha">The SHA of the file in the pull request.</param>
-        /// <returns>The filenames of the left and right files for the diff.</returns>
+        /// <param name="isPullRequestBranchCheckedOut">
+        /// Whether the pull request branch is currently checked out. If so the right file returned
+        /// will be the path to the file in the working directory.
+        /// </param>
+        /// <returns>The paths of the left and right files for the diff.</returns>
         IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestModel pullRequest,
             string fileName,
-            string fileSha);
+            string fileSha,
+            bool isPullRequestBranchCheckedOut);
 
         /// <summary>
         /// Remotes all unused remotes that were created by GitHub for Visual Studio to track PRs
