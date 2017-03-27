@@ -9,8 +9,8 @@ using Rothko;
 
 namespace GitHub.Services
 {
-    [Export]
-    public class GitCloneCommandLineService
+    [Export(typeof(IGitCloneCommandLineService))]
+    public class GitCloneCommandLineService : IGitCloneCommandLineService
     {
         IVsAppCommandLine vsAppCommandLine;
         IVSGitServices vsGitServices;
@@ -33,15 +33,27 @@ namespace GitHub.Services
             this.operatingSystem = operatingSystem;
         }
 
-        public void IfCloneOptionTryOpenRepository()
+        public string FindGitCloneOption()
         {
-            var cloneUrl = FindCloneOption();
-            if (cloneUrl == null)
+
+            if (vsAppCommandLine == null)
             {
-                return;
+                return null;
             }
 
-            TryOpenRepository(cloneUrl);
+            int isPresent;
+            string optionValue;
+            if (ErrorHandler.Failed(vsAppCommandLine.GetOption("GitClone", out isPresent, out optionValue)))
+            {
+                return null;
+            }
+
+            if (isPresent == 0)
+            {
+                return null;
+            }
+
+            return optionValue;
         }
 
         public bool TryOpenRepository(string cloneUrl)
@@ -122,29 +134,6 @@ namespace GitHub.Services
                 Trace.WriteLine(e);
                 return null;
             }
-        }
-
-        public string FindCloneOption()
-        {
-
-            if(vsAppCommandLine == null)
-            {
-                return null;
-            }
-
-            int isPresent;
-            string optionValue;
-            if (ErrorHandler.Failed(vsAppCommandLine.GetOption("GitClone", out isPresent, out optionValue)))
-            {
-                return null;
-            }
-
-            if (isPresent == 0)
-            {
-                return null;
-            }
-
-            return optionValue;
         }
     }
 }

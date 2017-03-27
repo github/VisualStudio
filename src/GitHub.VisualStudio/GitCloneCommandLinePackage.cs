@@ -18,8 +18,12 @@ namespace GitHub.VisualStudio
             try
             {
                 var sp = (IGitHubServiceProvider)GetService(typeof(IGitHubServiceProvider));
-                var gitCloneCommandLineService = sp.ExportProvider.GetExportedValue<GitCloneCommandLineService>();
-                gitCloneCommandLineService.IfCloneOptionTryOpenRepository();
+                var gitCloneCommandLineService = sp.ExportProvider.GetExportedValue<IGitCloneCommandLineService>();
+                var cloneUrl = gitCloneCommandLineService.FindGitCloneOption();
+                if(cloneUrl != null)
+                {
+                    gitCloneCommandLineService.TryOpenRepository(cloneUrl);
+                }
             }
             catch(Exception e)
             {
