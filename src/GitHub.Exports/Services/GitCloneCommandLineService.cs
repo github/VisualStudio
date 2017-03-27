@@ -18,9 +18,9 @@ namespace GitHub.Services
         IOperatingSystem operatingSystem;
 
         [ImportingConstructor]
-        public GitCloneCommandLineService(IGitHubServiceProvider sp, IVSGitServices vsGitServices,
+        internal GitCloneCommandLineService(IGitHubServiceProvider sp, IVSGitServices vsGitServices,
             ITeamExplorerServices teamExplorerServices, IVSServices vsServices, IOperatingSystem operatingSystem)
-            : this(sp.GetService<IVsAppCommandLine>(), vsGitServices, teamExplorerServices, vsServices, operatingSystem)
+            : this(sp.TryGetService<IVsAppCommandLine>(), vsGitServices, teamExplorerServices, vsServices, operatingSystem)
         {
         }
 
@@ -44,9 +44,19 @@ namespace GitHub.Services
             TryOpenRepository(cloneUrl);
         }
 
-        bool TryOpenRepository(string cloneUrl)
+        public bool TryOpenRepository(string cloneUrl)
         {
-            return TryOpenKnownRepository(cloneUrl) || TryOpenLocalClonePath(cloneUrl);
+            if(TryOpenLocalClonePath(cloneUrl))
+            {
+                return true;
+            }
+
+            if(TryOpenKnownRepository(cloneUrl))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         bool TryOpenKnownRepository(string cloneUrl)
@@ -116,6 +126,12 @@ namespace GitHub.Services
 
         public string FindCloneOption()
         {
+
+            if(vsAppCommandLine == null)
+            {
+                return null;
+            }
+
             int isPresent;
             string optionValue;
             if (ErrorHandler.Failed(vsAppCommandLine.GetOption("GitClone", out isPresent, out optionValue)))
