@@ -2,6 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using GitHub.Primitives;
 using Rothko;
@@ -30,9 +31,12 @@ namespace GitHub.Services
             this.vsGitServices = vsGitServices;
             this.vsServices = vsServices;
             this.operatingSystem = operatingSystem;
+        }
 
-            var cloneUrl = FindCloneUrl();
-            if(cloneUrl == null)
+        public void IfCloneOptionTryOpenRepository()
+        {
+            var cloneUrl = FindCloneOption();
+            if (cloneUrl == null)
             {
                 return;
             }
@@ -110,11 +114,15 @@ namespace GitHub.Services
             }
         }
 
-        string FindCloneUrl()
+        public string FindCloneOption()
         {
             int isPresent;
             string optionValue;
-            vsAppCommandLine.GetOption("GitClone", out isPresent, out optionValue);
+            if (ErrorHandler.Failed(vsAppCommandLine.GetOption("GitClone", out isPresent, out optionValue)))
+            {
+                return null;
+            }
+
             if (isPresent == 0)
             {
                 return null;
