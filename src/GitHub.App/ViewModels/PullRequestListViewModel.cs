@@ -226,8 +226,8 @@ namespace GitHub.ViewModels
             get { return emptyUser; }
         }
 
-        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
-        public IObservable<ViewWithData> Navigate => load;
+        readonly Subject<ViewWithData> navigate = new Subject<ViewWithData>();
+        public IObservable<ViewWithData> Navigate => navigate;
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
@@ -263,13 +263,13 @@ namespace GitHub.ViewModels
         void DoOpenPullRequest(object pullRequest)
         {
             var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = pullRequest };
-            load.OnNext(d);
+            navigate.OnNext(d);
         }
 
         void DoCreatePullRequest()
         {
             var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
-            load.OnNext(d);
+            navigate.OnNext(d);
         }
     }
 }
