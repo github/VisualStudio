@@ -197,6 +197,8 @@ namespace GitHub.ViewModels
         /// </summary>
         public IReactiveCommand<Unit> CreateRepository { get; private set; }
 
+        public override IObservable<Unit> Done => CreateRepository;
+
         protected override NewRepository GatherRepositoryInfo()
         {
             var gitHubRepository = base.GatherRepositoryInfo();

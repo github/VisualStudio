@@ -82,6 +82,7 @@ namespace GitHub.Controllers
     */
 
     using App.Factories;
+    using ViewModels;
     using StateMachineType = StateMachine<UIViewType, UIController.Trigger>;
 
     public class UIController : IUIController
@@ -524,13 +525,15 @@ namespace GitHub.Controllers
             if (!firstTime)
                 return;
 
-            SetupView(viewType, view);
+            SetupView(viewType, view.ViewModel);
         }
 
-        void SetupView(UIViewType viewType, IView view)
+        void SetupView(UIViewType viewType, IViewModel viewModel)
         {
             var list = GetObjectsForFlow(activeFlow);
             var pair = list[viewType];
+            var hasDone = viewModel as IHasDone;
+            var hasCancel = viewModel as IHasCancel;
 
             // 2FA is set up when login is set up, so nothing to do
             if (viewType == UIViewType.TwoFactor)
@@ -543,29 +546,35 @@ namespace GitHub.Controllers
             if (viewType == UIViewType.Login)
             {
                 var pair2fa = list[UIViewType.TwoFactor];
-                pair2fa.AddHandler(pair2fa.ViewModel.WhenAny(x => x.IsShowing, x => x.Value)
+                pair2fa.AddHandler(((IDialogViewModel)pair2fa.ViewModel).WhenAny(x => x.IsShowing, x => x.Value)
                     .Where(x => x)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(Trigger.Next)));
 
-                pair2fa.AddHandler(pair2fa.View.Cancel
+                pair2fa.AddHandler(((IHasCancel)pair2fa.ViewModel).Cancel
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
 
-                pair.AddHandler(view.Done
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => Fire(Trigger.Finish)));
+                if (hasDone != null)
+                {
+                    pair.AddHandler(hasDone.Done
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(_ => Fire(Trigger.Finish)));
+                }
             }
-            else
+            else if (hasDone != null)
             {
-                pair.AddHandler(view.Done
+                pair.AddHandler(hasDone.Done
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Next) ? Trigger.Next : Trigger.Finish)));
             }
 
-            pair.AddHandler(view.Cancel
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
+            if (hasCancel != null)
+            {
+                pair.AddHandler(hasCancel.Cancel
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => Fire(uiStateMachine.CanFire(Trigger.Cancel) ? Trigger.Cancel : Trigger.Finish)));
+            }
         }
 
         /// <summary>
