@@ -41,7 +41,7 @@ namespace GitHub.VisualStudio.UI.Views
             this.WhenActivated(d =>
             {
                 d(ViewModel.OpenOnGitHub.Subscribe(_ => DoOpenOnGitHub()));
-                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x).Forget()));
+                d(ViewModel.OpenFile.Subscribe(x => DoOpenFile((IPullRequestFileNode)x)));
                 d(ViewModel.DiffFile.Subscribe(x => DoDiffFile((IPullRequestFileNode)x).Forget()));
             });
         }
@@ -65,15 +65,12 @@ namespace GitHub.VisualStudio.UI.Views
             browser.OpenUrl(url);
         }
 
-        async Task DoOpenFile(IPullRequestFileNode file)
+        void DoOpenFile(IPullRequestFileNode file)
         {
             try
             {
-                var fileName = await ViewModel.ExtractFile(file);
-                var window = Services.Dte.ItemOperations.OpenFile(fileName);
-
-                // If the file we extracted isn't the current file on disk, make the window read-only.
-                window.Document.ReadOnly = fileName != file.DirectoryPath;
+                var fileName = ViewModel.GetLocalFilePath(file);
+                Services.Dte.ItemOperations.OpenFile(fileName);
             }
             catch (Exception e)
             {
@@ -90,19 +87,24 @@ namespace GitHub.VisualStudio.UI.Views
                 var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
+                var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
+                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
+
+                if (!ViewModel.IsCheckedOut)
+                {
+                    options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
 
                 Services.DifferenceService.OpenComparisonWindow2(
-                fileNames.Item1,
-                fileNames.Item2,
-                caption,
-                tooltip,
-                leftLabel,
-                rightLabel,
-                string.Empty,
-                string.Empty,
-                (int)(__VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary |
-                    __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary));
+                    fileNames.Item1,
+                    fileNames.Item2,
+                    caption,
+                    tooltip,
+                    leftLabel,
+                    rightLabel,
+                    string.Empty,
+                    string.Empty,
+                    (uint)options);
             }
             catch (Exception e)
             {

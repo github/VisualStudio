@@ -1,17 +1,15 @@
-﻿using System.Windows.Input;
-using ReactiveUI;
-using NullGuard;
-using GitHub.UI;
-using System;
+﻿using System;
 using System.Reactive;
 using GitHub.Extensions.Reactive;
+using NullGuard;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
     /// <summary>
     /// Base class for view models that can be dismissed, such as dialogs.
     /// </summary>
-    public abstract class DialogViewModelBase : ReactiveObject, IDialogViewModel, IHasBusy
+    public abstract class DialogViewModelBase : ViewModelBase, IDialogViewModel, IHasBusy
     {
         protected ObservableAsPropertyHelper<bool> isShowing;
         string title;
@@ -51,10 +49,5 @@ namespace GitHub.ViewModels
 
         /// <inheritdoc/>
         IObservable<Unit> IHasCancel.Cancel => Cancel.SelectUnit();
-
-        /// <inheritdoc/>
-        public virtual void Initialize([AllowNull] ViewWithData data)
-        {
-        }
     }
 }

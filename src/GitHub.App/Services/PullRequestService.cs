@@ -287,7 +287,8 @@ namespace GitHub.Services
             IModelService modelService,
             IPullRequestModel pullRequest,
             string fileName,
-            string fileSha)
+            string fileSha,
+            bool isPullRequestBranchCheckedOut)
         {
             return Observable.Defer(async () =>
             {
@@ -300,7 +301,9 @@ namespace GitHub.Services
 
                 // The right file - if it comes from a fork - may not be fetched so fall back to
                 // getting the file contents from the model service.
-                var right = await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
+                var right = isPullRequestBranchCheckedOut ?
+                    Path.Combine(repository.LocalPath, fileName) :
+                    await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
 
                 if (left == null)
                 {
