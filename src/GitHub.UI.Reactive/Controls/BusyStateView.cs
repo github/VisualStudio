@@ -98,7 +98,7 @@ namespace GitHub.UI
     }
 
     public class BusyStateView<TInterface, TImplementor> : BusyStateView, IViewFor<TInterface>, IView
-        where TInterface : class, IViewModel, IHasLoading
+        where TInterface : class, IViewModel
         where TImplementor : class
     {
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
