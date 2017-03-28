@@ -71,6 +71,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public bool IsBusy { get; }
+        public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
         public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; }
@@ -85,12 +86,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }
 
-        public Task<string> ExtractFile(IPullRequestFileNode file)
+        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             return null;
         }
 
-        public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
+        public string GetLocalFilePath(IPullRequestFileNode file)
         {
             return null;
         }
