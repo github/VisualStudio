@@ -59,7 +59,7 @@
             Margin="0,-3,5,0"
             Content="{Binding Title}"
             ToolTip="{Binding Title}"
-            Command="{Binding DataContext.OpenPullRequest, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
+            Command="{Binding ViewModel.OpenPullRequest, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PullRequestListView}}}"
             CommandParameter="{Binding Number}"/>
         
         <ui:OcticonImage x:Name="comment_icon"
