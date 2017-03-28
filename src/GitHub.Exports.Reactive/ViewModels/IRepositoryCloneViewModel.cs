@@ -20,11 +20,6 @@ namespace GitHub.ViewModels
         bool FilterTextIsEnabled { get; }
 
         /// <summary>
-        /// Whether or not we are currently loading repositories.
-        /// </summary>
-        bool IsLoading { get; }
-
-        /// <summary>
         /// If true, then we failed to load the repositories.
         /// </summary>
         bool LoadingFailed { get; }

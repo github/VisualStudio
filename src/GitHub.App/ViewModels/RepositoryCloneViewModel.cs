@@ -35,7 +35,6 @@ namespace GitHub.ViewModels
         readonly IRepositoryHost repositoryHost;
         readonly IOperatingSystem operatingSystem;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        bool isLoading;
         bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
@@ -66,13 +65,13 @@ namespace GitHub.ViewModels
             repositories.Filter = FilterRepository;
             repositories.NewerComparer = OrderedComparer<IRemoteRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
 
-            filterTextIsEnabled = this.WhenAny(x => x.IsLoading,
+            filterTextIsEnabled = this.WhenAny(x => x.IsBusy,
                 loading => loading.Value || repositories.UnfilteredCount > 0 && !LoadingFailed)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
 
             this.WhenAny(
                 x => x.repositories.UnfilteredCount,
-                x => x.IsLoading,
+                x => x.IsBusy,
                 x => x.LoadingFailed,
                 (unfilteredCount, loading, failed) =>
                 {
@@ -124,17 +123,17 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
-            IsLoading = true;
+            IsBusy = true;
             repositoryHost.ModelService.GetRepositories(repositories);
             repositories.OriginalCompleted.Subscribe(
                 _ => { }
                 , ex =>
                 {
                     LoadingFailed = true;
-                    IsLoading = false;
+                    IsBusy = false;
                     log.Error("Error while loading repositories", ex);
                 },
-                () => IsLoading = false
+                () => IsBusy = false
             );
             repositories.Subscribe();
         }
@@ -242,12 +241,6 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return filterText; }
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
-        }
-
-        public bool IsLoading
-        {
-            get { return isLoading; }
-            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
         public bool LoadingFailed

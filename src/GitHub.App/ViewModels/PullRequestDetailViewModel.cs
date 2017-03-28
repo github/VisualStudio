@@ -25,7 +25,7 @@ namespace GitHub.ViewModels
     [ExportViewModel(ViewType = UIViewType.PRDetail)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [NullGuard(ValidationFlags.None)]
-    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IHasBusy
+    public class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
     {
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
@@ -35,10 +35,12 @@ namespace GitHub.ViewModels
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
         string body;
+        IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
         string operationError;
         bool isBusy;
+        bool isLoading;
         bool isCheckedOut;
         bool isFromFork;
         bool isInCheckout;
@@ -147,7 +149,7 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the view model is loading.
+        /// Gets a value indicating whether the view model is updating.
         /// </summary>
         public bool IsBusy
         {
@@ -161,6 +163,15 @@ namespace GitHub.ViewModels
         {
             get { return isCheckedOut; }
             private set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the view model is loading.
+        /// </summary>
+        public bool IsLoading
+        {
+            get { return isLoading; }
+            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
         /// <summary>
@@ -212,7 +223,11 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
-        public IReactiveList<IPullRequestChangeNode> ChangedFilesTree { get; } = new ReactiveList<IPullRequestChangeNode>();
+        public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree
+        {
+            get { return changedFilesTree; }
+            private set { this.RaiseAndSetIfChanged(ref changedFilesTree, value); }
+        }
 
         /// <summary>
         /// Gets a command that checks out the pull request locally.
@@ -252,7 +267,10 @@ namespace GitHub.ViewModels
         {
             var prNumber = data?.Data != null ? (int)data.Data : Model.Number;
 
-            IsBusy = true;
+            if (Model == null)
+                IsLoading = true;
+            else
+                IsBusy = true;
 
             OperationError = null;
             modelService.GetPullRequest(repository, prNumber)
@@ -276,15 +294,8 @@ namespace GitHub.ViewModels
             TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
-            ChangedFilesTree.Clear();
-
-            var treeChanges = await pullRequestsService.GetTreeChanges(repository, pullRequest);
-
-            // WPF doesn't support AddRange here so iterate through the changes.
-            foreach (var change in CreateChangedFilesTree(pullRequest, treeChanges).Children)
-            {
-                ChangedFilesTree.Add(change);
-            }
+            var changes = await pullRequestsService.GetTreeChanges(repository, pullRequest);
+            ChangedFilesTree = CreateChangedFilesTree(pullRequest, changes).Children.ToList();
 
             var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
 
@@ -350,7 +361,7 @@ namespace GitHub.ViewModels
                 UpdateState = null;
             }
 
-            IsBusy = false;
+            IsLoading = IsBusy = false;
 
             if (!isInCheckout)
             {
