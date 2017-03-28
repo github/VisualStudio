@@ -47,11 +47,10 @@ namespace GitHub
 
                 var assembly = Assembly.LoadFrom(assemblyFile);
                 assemblyDicts.Add(assemblyFile, assembly);
-                Trace.WriteLine("Loaded " + assemblyFile + " for " + value);
             }
             catch(Exception e)
             {
-                Trace.WriteLine(e);
+                Trace.WriteLine($"Error loading assembly for '{value}': {e}");
             }
         }
 
