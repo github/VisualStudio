@@ -1,19 +1,21 @@
 ﻿using GitHub.Exports;
 using GitHub.Services;
+using GitHub.VisualStudio.UI;
 using NullGuard;
 using System;
+using System.Windows;
 
 namespace GitHub.VisualStudio.Menus
 {
-    public class OpenLink: LinkMenuBase, IDynamicMenuHandler
+    public class BlameLink : LinkMenuBase, IDynamicMenuHandler
     {
-        public OpenLink(IGitHubServiceProvider serviceProvider)
+        public BlameLink(IGitHubServiceProvider serviceProvider)
             : base(serviceProvider)
         {
         }
 
         public Guid Guid => GuidList.guidContextMenuSet;
-        public int CmdId => PkgCmdIDList.openLinkCommand;
+        public int CmdId => PkgCmdIDList.blameCommand;
 
         public async void Activate([AllowNull]object data = null)
         {
@@ -21,7 +23,7 @@ namespace GitHub.VisualStudio.Menus
             if (!isgithub)
                 return;
 
-            var link = await GenerateLink(LinkType.Blob);
+            var link = await GenerateLink(LinkType.Blame);
             if (link == null)
                 return;
             var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
