@@ -13,6 +13,9 @@ using System.Diagnostics;
 using GitHub.Extensions;
 using System.Windows.Input;
 using ReactiveUI;
+using GitHub.VisualStudio.UI;
+using GitHub.Settings;
+using System.Windows.Threading;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -21,22 +24,59 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
     public class GitHubHomeSection : TeamExplorerSectionBase, IGitHubHomeSection
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
-        IVisualStudioBrowser visualStudioBrowser;
+        const string TrainingUrl = "https://services.github.com/on-demand/windows/visual-studio";
+        const string DocsUrl = "https://visualstudio.github.com/docs";
+
+        readonly IVisualStudioBrowser visualStudioBrowser;
+        readonly ITeamExplorerServices teamExplorerServices;
+        readonly IPackageSettings settings;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
         public GitHubHomeSection(IGitHubServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IVisualStudioBrowser visualStudioBrowser)
+            ISimpleApiClientFactory apiFactory,
+            ITeamExplorerServiceHolder holder,
+            IVisualStudioBrowser visualStudioBrowser,
+            ITeamExplorerServices teamExplorerServices,
+            IPackageSettings settings,
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
             Title = "GitHub";
             View = new GitHubHomeContent();
             View.DataContext = this;
             this.visualStudioBrowser = visualStudioBrowser;
+            this.teamExplorerServices = teamExplorerServices;
+            this.settings = settings;
+            this.usageTracker = usageTracker;
 
             var openOnGitHub = ReactiveCommand.Create();
             openOnGitHub.Subscribe(_ => DoOpenOnGitHub());
             OpenOnGitHub = openOnGitHub;
+
+            // We want to display a welcome message but only if Team Explorer isn't
+            // already displaying the "Install 3rd Party Tools" message. To do this
+            // we need to set a timer and check in the tick as at this point the message
+            // won't be initialized.
+            if (!settings.HideTeamExplorerWelcomeMessage)
+            {
+                var timer = new DispatcherTimer();
+                timer.Interval = new TimeSpan(10);
+                timer.Tick += (s, e) =>
+                {
+                    timer.Stop();
+                    if (!IsGitToolsMessageVisible())
+                    {
+                        ShowWelcomeMessage();
+                    }
+                };
+                timer.Start();
+            }
+        }
+
+        bool IsGitToolsMessageVisible()
+        {
+            return teamExplorerServices.IsNotificationVisible(new Guid("DF785C7C-8454-4836-9686-D1C4A01D0BB9"));
         }
 
         protected async override void RepoChanged(bool changed)
@@ -105,6 +145,36 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         void DoOpenOnGitHub()
         {
             visualStudioBrowser?.OpenUrl(ActiveRepo.CloneUrl.ToRepositoryUrl());
+        }
+
+        void ShowWelcomeMessage()
+        {
+            var welcomeMessageGuid = new Guid("C529627F-8AA6-4FDB-82EB-4BFB7DB753C3");
+            teamExplorerServices.ShowMessage(
+                Resources.TeamExplorerWelcomeMessage,
+                new RelayCommand(o =>
+                {
+                    var str = o.ToString();
+
+                    switch (str)
+                    {
+                        case "show-training":
+                            visualStudioBrowser.OpenUrl(new Uri(TrainingUrl));
+                            usageTracker.IncrementWelcomeTrainingClicks().Forget();
+                            break;
+                        case "show-docs":
+                            visualStudioBrowser.OpenUrl(new Uri(DocsUrl));
+                            usageTracker.IncrementWelcomeDocsClicks().Forget();
+                            break;
+                        case "dont-show-again":
+                            teamExplorerServices.HideNotification(welcomeMessageGuid);
+                            settings.HideTeamExplorerWelcomeMessage = true;
+                            settings.Save();
+                            break;
+                    }
+                }),
+                false,
+                welcomeMessageGuid);
         }
 
         protected GitHubHomeContent View

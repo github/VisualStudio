@@ -12,7 +12,12 @@
         "type": "object",
         "typename": "UIState",
         "default": 'null'
-    }
+    },
+	{
+		"name": "HideTeamExplorerWelcomeMessage",
+		"type": "bool",
+		"default": 'false'
+	}
     ]
 }
 */
@@ -26,5 +31,6 @@ namespace GitHub.Settings
         void Save();
         bool CollectMetrics { get; set; }
         UIState UIState { get; set; }
+        bool HideTeamExplorerWelcomeMessage { get; set; }
     }
 }
