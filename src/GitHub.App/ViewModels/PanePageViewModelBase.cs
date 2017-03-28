@@ -7,7 +7,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Base class for view models that appear as a page in a navigable pane, such as the GitHub pane.
     /// </summary>
-    public class PanePageViewModelBase : ReactiveObject, IPanePageViewModel
+    public class PanePageViewModelBase : ViewModelBase, IPanePageViewModel
     {
         string title;
 
@@ -24,11 +24,6 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return title; }
             protected set { this.RaiseAndSetIfChanged(ref title, value); }
-        }
-
-        /// <inheritdoc/>
-        public virtual void Initialize([AllowNull] ViewWithData data)
-        {
         }
     }
 }
