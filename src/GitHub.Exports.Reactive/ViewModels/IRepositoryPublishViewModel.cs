@@ -15,11 +15,6 @@ namespace GitHub.ViewModels
         IReactiveCommand<ProgressState> PublishRepository { get; }
 
         /// <summary>
-        /// True when publishing is in progress.
-        /// </summary>
-        bool IsPublishing { get; }
-
-        /// <summary>
         /// Determines whether the host combo box is visible. Only true if the user is logged into more than one host.
         /// </summary>
         bool IsHostComboBoxVisible { get; }

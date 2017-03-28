@@ -1,4 +1,5 @@
-﻿using GitHub.Services;
+﻿using GitHub.Exports;
+using GitHub.Services;
 using GitHub.VisualStudio.UI;
 using NullGuard;
 using System;
@@ -23,7 +24,7 @@ namespace GitHub.VisualStudio.Menus
             if (!isgithub)
                 return;
 
-            var link = await GenerateLink();
+            var link = await GenerateLink(LinkType.Blob);
             if (link == null)
                 return;
             try
@@ -38,12 +39,6 @@ namespace GitHub.VisualStudio.Menus
                 var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.Error_FailedToCopyToClipboard);
             }
-        }
-
-        public bool CanShow()
-        {
-            var githubRepoCheckTask = IsCurrentFileInGitHubRepository();
-            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
         }
     }
 }

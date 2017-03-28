@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows;
@@ -14,6 +15,9 @@ namespace GitHub.UI
     {
         public static readonly DependencyProperty IsBusyProperty =
             DependencyProperty.Register(nameof(IsBusy), typeof(bool), typeof(BusyStateView));
+
+        public static readonly DependencyProperty IsLoadingProperty =
+            DependencyProperty.Register(nameof(IsLoading), typeof(bool), typeof(BusyStateView));
 
         readonly Subject<object> close = new Subject<object>();
         readonly Subject<object> cancel = new Subject<object>();
@@ -48,6 +52,12 @@ namespace GitHub.UI
         {
             get { return (bool)GetValue(IsBusyProperty); }
             set { SetValue(IsBusyProperty, value); }
+        }
+
+        public bool IsLoading
+        {
+            get { return (bool)GetValue(IsLoadingProperty); }
+            set { SetValue(IsLoadingProperty, value); }
         }
 
         protected void NotifyDone()
@@ -88,19 +98,38 @@ namespace GitHub.UI
     }
 
     public class BusyStateView<TInterface, TImplementor> : BusyStateView, IViewFor<TInterface>, IView
-        where TInterface : class, IViewModel, IHasBusy
+        where TInterface : class, IViewModel
         where TImplementor : class
     {
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
             "ViewModel", typeof(TInterface), typeof(TImplementor), new PropertyMetadata(null));
 
+        IDisposable subscriptions;
+
         public BusyStateView()
         {
-            DataContextChanged += (s, e) => ViewModel = (TInterface)e.NewValue;
-            this.OneWayBind(ViewModel, x => x.IsBusy, x => x.IsBusy);
-        }
+            DataContextChanged += (s, e) =>
+            {
+                subscriptions?.Dispose();
+                ViewModel = (TInterface)e.NewValue;
 
-        IObservable<bool> IView.IsBusy => this.WhenAnyValue(x => x.IsBusy);
+                var hasLoading = ViewModel as IHasLoading;
+                var hasBusy = ViewModel as IHasBusy;
+                var subs = new CompositeDisposable();
+
+                if (hasLoading != null)
+                {
+                    subs.Add(this.OneWayBind(hasLoading, x => x.IsLoading, x => x.IsLoading));
+                }
+
+                if (hasBusy != null)
+                {
+                    subs.Add(this.OneWayBind(hasBusy, x => x.IsBusy, x => x.IsBusy));
+                }
+
+                subscriptions = subs;
+            };
+        }
 
         [AllowNull]
         object IViewFor.ViewModel

@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class RepositoryCreationViewModelDesigner : BaseViewModel, IRepositoryCreationViewModel
+    public class RepositoryCreationViewModelDesigner : DialogViewModelBase, IRepositoryCreationViewModel
     {
         public RepositoryCreationViewModelDesigner()
         {
@@ -186,6 +186,8 @@ namespace GitHub.SampleData
             get;
             set;
         }
+
+        public override IObservable<Unit> Done { get; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -228,12 +230,6 @@ namespace GitHub.SampleData
             {
                 return true;
             }
-        }
-
-        public bool IsPublishing
-        {
-            get;
-            private set;
         }
 
         public IReactiveCommand<ProgressState> PublishRepository
@@ -329,7 +325,7 @@ namespace GitHub.SampleData
         }
     }
 
-    public class RepositoryCloneViewModelDesigner : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModelDesigner : DialogViewModelBase, IRepositoryCloneViewModel
     {
         public RepositoryCloneViewModelDesigner()
         {
@@ -378,11 +374,6 @@ namespace GitHub.SampleData
 
         public new string Title { get { return "Clone a GitHub Repository"; } }
 
-        public bool IsLoading
-        {
-            get { return false; }
-        }
-
         public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
         {
             get;
@@ -423,6 +414,8 @@ namespace GitHub.SampleData
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done { get; }
     }
 
     public class GitHubHomeSectionDesigner : IGitHubHomeSection

@@ -21,11 +21,10 @@ namespace GitHub.VisualStudio.UI.Views
 
     [ExportView(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class PullRequestListView : GenericPullRequestListView, ICanLoad
+    public partial class PullRequestListView : GenericPullRequestListView, IDisposable
     {
         readonly Subject<int> open = new Subject<int>();
         readonly Subject<object> create = new Subject<object>();
-        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
 
         public PullRequestListView()
         {
@@ -36,18 +35,6 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestListView(IGitHubServiceProvider serviceProvider)
         {
             InitializeComponent();
-
-            OpenPR = new RelayCommand(x =>
-            {
-                var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = x };
-                load.OnNext(d);
-            });
-
-            CreatePR = new RelayCommand(x =>
-            {
-                var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
-                load.OnNext(d);
-            });
 
             OpenPROnGitHub = new RelayCommand(x =>
             {
@@ -69,23 +56,16 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         public ICommand OpenPROnGitHub { get; set; }
-        public ICommand OpenPR { get; set; }
-        public ICommand CreatePR { get; set; }
-
-        public IObservable<ViewWithData> Load => load;
 
         bool disposed;
-        protected override void Dispose(bool disposing)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
+        public void Dispose()
         {
-            base.Dispose(disposing);
-            if (disposing)
-            {
-                if (disposed) return;
+            if (disposed) return;
 
-                open.Dispose();
-                create.Dispose();
-                disposed = true;
-            }
+            open.Dispose();
+            create.Dispose();
+            disposed = true;
         }
     }
 }

@@ -35,10 +35,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         {
             InitializeComponent();
 
-            this.WhenActivated(d =>
-            {
-                d(ViewModel.CloneCommand.Subscribe(_ => NotifyDone()));
-            });
             IsVisibleChanged += (s, e) =>
             {
                 if (IsVisible)
