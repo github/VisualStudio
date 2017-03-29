@@ -21,7 +21,7 @@ using System.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericRepositoryCloneControl : SimpleViewUserControl<IRepositoryCloneViewModel, RepositoryCloneControl>
+    public class GenericRepositoryCloneControl : ViewBase<IRepositoryCloneViewModel, RepositoryCloneControl>
     {}
 
     /// <summary>

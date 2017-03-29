@@ -21,7 +21,7 @@ using System.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericStartPageCloneView : SimpleViewUserControl<IBaseCloneViewModel, StartPageCloneView>
+    public class GenericStartPageCloneView : ViewBase<IBaseCloneViewModel, StartPageCloneView>
     {}
 
     /// <summary>

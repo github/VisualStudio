@@ -10,7 +10,7 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericTwoFactorControl : SimpleViewUserControl<ITwoFactorDialogViewModel, TwoFactorControl>
+    public class GenericTwoFactorControl : ViewBase<ITwoFactorDialogViewModel, TwoFactorControl>
     { }
 
     /// <summary>

@@ -30,7 +30,7 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <UserControl.Resources>
+    <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
@@ -78,7 +78,7 @@
 
             <conv:BranchNameConverter x:Key="BranchNameConverter" />
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Control.Resources>
 
     <Grid VerticalAlignment="Top" 
           MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GenericPullRequestCreationView}}}"

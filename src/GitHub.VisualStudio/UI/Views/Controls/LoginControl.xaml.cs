@@ -12,7 +12,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericLoginControl : SimpleViewUserControl<ILoginControlViewModel, LoginControl>
+    public class GenericLoginControl : ViewBase<ILoginControlViewModel, LoginControl>
     { }
 
     /// <summary>

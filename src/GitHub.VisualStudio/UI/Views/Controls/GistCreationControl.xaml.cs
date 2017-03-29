@@ -13,7 +13,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericGistCreationControl : SimpleViewUserControl<IGistCreationViewModel, GistCreationControl>
+    public class GenericGistCreationControl : ViewBase<IGistCreationViewModel, GistCreationControl>
     { }
 
     [ExportView(ViewType=UIViewType.Gist)]

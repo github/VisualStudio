@@ -15,7 +15,7 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericRepositoryCreationControl : SimpleViewUserControl<IRepositoryCreationViewModel, RepositoryCreationControl>
+    public class GenericRepositoryCreationControl : ViewBase<IRepositoryCreationViewModel, RepositoryCreationControl>
     { }
 
     /// <summary>

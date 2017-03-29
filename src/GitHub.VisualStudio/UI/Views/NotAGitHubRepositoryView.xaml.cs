@@ -5,7 +5,7 @@ using GitHub.ViewModels;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericNotAGitHubRepositoryView : SimpleViewUserControl<INotAGitHubRepositoryViewModel, GenericNotAGitHubRepositoryView>
+    public class GenericNotAGitHubRepositoryView : ViewBase<INotAGitHubRepositoryViewModel, GenericNotAGitHubRepositoryView>
     {
     }
 

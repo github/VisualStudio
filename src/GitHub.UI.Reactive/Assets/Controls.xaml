@@ -11,6 +11,5 @@
         <ResourceDictionary Source="Controls\GitHubTabControl.xaml" />
         <ResourceDictionary Source="Controls\FilteredComboBox.xaml" />
         <ResourceDictionary Source="Controls\GitHubComboBox.xaml" />
-        <ResourceDictionary Source="Controls\BusyStateView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -20,7 +20,7 @@
                                        AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TeamExplorerSyncGitHubRepositoryPublishCustom}" 
                                        IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}">
    
-  <UserControl.Resources>
+  <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
@@ -45,7 +45,7 @@
             <Setter Property="Height" Value="23" />
         </Style>
     </ResourceDictionary>
-  </UserControl.Resources>
+  </Control.Resources>
 
   <StackPanel Margin="8,6,18,0"
               Orientation="Vertical"
