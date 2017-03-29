@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericLogoutRequiredControl : SimpleViewUserControl<ILogoutRequiredViewModel, LogoutRequiredControl>
+    public class GenericLogoutRequiredControl : ViewBase<ILogoutRequiredViewModel, LogoutRequiredControl>
     { }
 
     /// <summary>

@@ -12,14 +12,14 @@
     d:DesignWidth="300"
     mc:Ignorable="d">
 
-  <UserControl.Resources>
+  <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
-  </UserControl.Resources>
+  </Control.Resources>
 
   <DockPanel>
     <StackPanel Margin="10" Orientation="Vertical">

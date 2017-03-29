@@ -183,7 +183,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="DialogUserControl" TargetType="UserControl">
+    <Style x:Key="DialogUserControl" TargetType="Control">
         <Setter Property="Margin" Value="30,30,30,0" />
     </Style>
     

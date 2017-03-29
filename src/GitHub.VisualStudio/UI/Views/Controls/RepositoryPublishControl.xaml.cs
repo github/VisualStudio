@@ -14,7 +14,7 @@ using GitHub.Services;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericRepositoryPublishControl : SimpleViewUserControl<IRepositoryPublishViewModel, RepositoryPublishControl>
+    public class GenericRepositoryPublishControl : ViewBase<IRepositoryPublishViewModel, RepositoryPublishControl>
     { }
     
     [ExportView(ViewType=UIViewType.Publish)]

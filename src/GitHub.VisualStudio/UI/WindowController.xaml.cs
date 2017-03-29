@@ -53,7 +53,7 @@ namespace GitHub.VisualStudio.UI
             if (viewModel != null)
                 Title = viewModel.Title;
 
-            var control = view as UserControl;
+            var control = view as Control;
             if (control != null)
             {
                 Container.Children.Clear();

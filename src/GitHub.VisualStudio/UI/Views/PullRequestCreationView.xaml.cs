@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericPullRequestCreationView : SimpleViewUserControl<IPullRequestCreationViewModel, GenericPullRequestCreationView>
+    public class GenericPullRequestCreationView : ViewBase<IPullRequestCreationViewModel, GenericPullRequestCreationView>
     { }
 
     [ExportView(ViewType = UIViewType.PRCreation)]
