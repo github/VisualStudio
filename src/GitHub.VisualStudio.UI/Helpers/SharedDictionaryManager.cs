@@ -8,6 +8,7 @@ namespace GitHub.VisualStudio.UI.Helpers
 {
     public class SharedDictionaryManager : LoadingResourceDictionary
     {
+#if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         public SharedDictionaryManager()
         {
             currentTheme = Colors.DetectTheme();
@@ -16,7 +17,6 @@ namespace GitHub.VisualStudio.UI.Helpers
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         string currentTheme;
 
-#if !XAML_DESIGNER
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
         static string baseThemeUri = "pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/";
 

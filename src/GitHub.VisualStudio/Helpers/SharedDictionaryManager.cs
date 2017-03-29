@@ -7,6 +7,7 @@ namespace GitHub.VisualStudio.Helpers
 {
     public class SharedDictionaryManager : LoadingResourceDictionary
     {
+#if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();
 
         Uri sourceUri;
@@ -26,5 +27,6 @@ namespace GitHub.VisualStudio.Helpers
                 resourceDicts.Add(value, this);
             }
         }
+#endif
     }
 }

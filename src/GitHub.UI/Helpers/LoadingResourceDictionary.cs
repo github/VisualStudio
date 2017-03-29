@@ -9,6 +9,7 @@ namespace GitHub
 {
     public class LoadingResourceDictionary : ResourceDictionary
     {
+#if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         static Dictionary<string, Assembly> assemblyDicts = new Dictionary<string, Assembly>();
 
         public new Uri Source
@@ -71,5 +72,6 @@ namespace GitHub
 
             return path.Substring(1, componentIndex - 1);
         }
+#endif
     }
 }
