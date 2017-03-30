@@ -25,4 +25,5 @@ Use GitHub for Visual Studio to manage your projects and work with Pull Requests
   - [Viewing the selected code on GitHub]()
   - [Copying the URL of the selected code's location on GitHub]()
   - [Viewing the selected code in blame view on GitHub]()
+- [Using the GitHub Toolbar](using-the-github-toolbar.md)
 - [Contact a human](https://github.com/contact)
