@@ -1,4 +1,4 @@
-# Review a pull request in Visual Studio
+# Reviewing a pull request in Visual Studio
 
 GitHub for Visual Studio provides facilities for reviewing a pull request directly in Visual Studio.
 

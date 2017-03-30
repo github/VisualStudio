@@ -1,6 +1,4 @@
-## Sending a pull request
-
-> You must be [logged in to GitHub](../getting-started/authenticating-to-github.md) to create a Pull Request
+# Creating a pull request
 
 1. Open a solution in a GitHub repository.
 2. Open **Team Explorer** and click the **Pull Requests** button to open the **GitHub** pane. TODO: screenshot
