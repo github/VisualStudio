@@ -11,6 +11,8 @@ namespace GitHub.UI.UnitTests
         {
             [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
             [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
+            [TestCase("file:///x:/Project/src/GitHub.UI/SharedDictionary.xaml", Description = "This is a design time URL")]
+            [TestCase("file:///x:/Project/src/GitHub.VisualStudio.UI/SharedDictionary.xaml", Description = "This is a design time URL")]
             [RequiresThread(System.Threading.ApartmentState.STA)]
             public void SetSourceOnDifferentInstances_ExpectTheSameObjects(params string[] urls)
             {
