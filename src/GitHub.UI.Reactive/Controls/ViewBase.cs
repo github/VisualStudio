@@ -213,8 +213,11 @@ namespace GitHub.UI
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            subscriptions?.Dispose();
-            subscriptions = null;
+            if (disposing)
+            {
+                subscriptions?.Dispose();
+                subscriptions = null;
+            }
         }
     }
 }
