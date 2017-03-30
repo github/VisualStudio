@@ -16,7 +16,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -132,7 +132,7 @@ namespace GitHub.VisualStudio.UI.Views
                 () => true,
                 () =>
                 {
-                    browser.OpenUrl(new Uri("https://visualstudio.github.com/docs"));
+                    browser.OpenUrl(new Uri(GitHubUrls.Documentation));
                     usageTracker.IncrementGitHubPaneHelpClicks().Forget();
                 },
                 true);

@@ -16,6 +16,7 @@ using ReactiveUI;
 using GitHub.VisualStudio.UI;
 using GitHub.Settings;
 using System.Windows.Threading;
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -25,7 +26,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
         const string TrainingUrl = "https://services.github.com/on-demand/windows/visual-studio";
-        const string DocsUrl = "https://visualstudio.github.com/docs";
 
         readonly IVisualStudioBrowser visualStudioBrowser;
         readonly ITeamExplorerServices teamExplorerServices;
@@ -76,7 +76,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         bool IsGitToolsMessageVisible()
         {
-            return teamExplorerServices.IsNotificationVisible(new Guid("DF785C7C-8454-4836-9686-D1C4A01D0BB9"));
+            return teamExplorerServices.IsNotificationVisible(new Guid(Guids.TeamExplorerInstall3rdPartyGitTools));
         }
 
         protected async override void RepoChanged(bool changed)
@@ -149,7 +149,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         void ShowWelcomeMessage()
         {
-            var welcomeMessageGuid = new Guid("C529627F-8AA6-4FDB-82EB-4BFB7DB753C3");
+            var welcomeMessageGuid = new Guid(Guids.TeamExplorerWelcomeMessage);
             teamExplorerServices.ShowMessage(
                 Resources.TeamExplorerWelcomeMessage,
                 new RelayCommand(o =>
@@ -163,7 +163,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                             usageTracker.IncrementWelcomeTrainingClicks().Forget();
                             break;
                         case "show-docs":
-                            visualStudioBrowser.OpenUrl(new Uri(DocsUrl));
+                            visualStudioBrowser.OpenUrl(new Uri(GitHubUrls.Documentation));
                             usageTracker.IncrementWelcomeDocsClicks().Forget();
                             break;
                         case "dont-show-again":
