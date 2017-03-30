@@ -21,4 +21,8 @@ Use GitHub for Visual Studio to manage your projects and work with Pull Requests
   - [Viewing history](https://www.visualstudio.com/en-us/docs/git/tutorial/history)
   - [Ignoring files](https://www.visualstudio.com/en-us/docs/git/tutorial/ignore-files)
 - [Creating Gists](creating-gists.md)
+- [Viewing existing code on GitHub](viewing-code-on-github.md)
+  - [Viewing the selected code on GitHub]()
+  - [Copying the URL of the selected code's location on GitHub]()
+  - [Viewing the selected code in blame view on GitHub]()
 - [Contact a human](https://github.com/contact)
