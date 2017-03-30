@@ -23,7 +23,8 @@
         <Binding>
             <Binding.Source>
                 <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
-                                                               TargetBranchDisplayName="master-is-always-stable">
+                                                               TargetBranchDisplayName="master-is-always-stable"
+                                                               Mergeable="Mergable">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
@@ -275,11 +276,42 @@
                 </ui:GitHubActionLink>
 
                 <!-- Merge button/status -->
-                <DockPanel Grid.Column="2" Grid.Row="3">
-                    <Button HorizontalAlignment="Left" Command="{Binding Merge}">
+                <Grid Grid.Column="2" Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" VerticalAlignment="Center" Command="{Binding Merge}">
                         Merge pull request
                     </Button>
-                </DockPanel>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Mergeable}" Value="Unmergeable">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        This branch has conflicts that must be resolved.
+                    </TextBlock>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Mergeable}" Value="Unknown">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        The mergability of the pull request is being calculated.
+                    </TextBlock>
+                </Grid>
                 
                 <!-- Files changed -->
                 <ui:SectionControl Name="changesSection" 

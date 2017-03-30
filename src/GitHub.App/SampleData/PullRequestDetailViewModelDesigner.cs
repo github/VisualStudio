@@ -78,7 +78,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
-        public MergeableState Mergeable { get; }
+        public MergeableState Mergeable { get; set; }
         public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
