@@ -1,6 +1,6 @@
 # Contributing to Projects with GitHub for Visual Studio
 
-Use GitHub for Visual Studio to manage your projects and work with Pull Requests.
+Use GitHub for Visual Studio to manage your projects and work with pull requests.
 
 ### Table of Contents
 
@@ -8,7 +8,7 @@ Use GitHub for Visual Studio to manage your projects and work with Pull Requests
   - [Publishing an existing project to GitHub](publishing-an-existing-project-to-github.md)
   - [Creating an empty repository from Visual Studio](creating-an-empty-repository-from-visual-studio.md)
   - [Cloning a repository to Visual Studio](cloning-a-repository-to-visual-studio.md)
-- Working with Pull Requests
+- Working with pull requests
   - [Viewing pull requests for a repository](view-the-pull-requests-for-a-repository.md)
   - [Sending a pull request](sending-a-pull-request.md)
   - [Reviewing a pull request in Visual Studio](review-a-pull-request-in-visual-studio.md)
@@ -20,10 +20,10 @@ Use GitHub for Visual Studio to manage your projects and work with Pull Requests
   - [Working with branches](https://www.visualstudio.com/en-us/docs/git/tutorial/branches)
   - [Viewing history](https://www.visualstudio.com/en-us/docs/git/tutorial/history)
   - [Ignoring files](https://www.visualstudio.com/en-us/docs/git/tutorial/ignore-files)
-- [Creating Gists](creating-gists.md)
+- [Creating gists](creating-gists.md)
 - [Viewing existing code on GitHub](viewing-code-on-github.md)
   - [Viewing the selected code on GitHub]()
   - [Copying the URL of the selected code's location on GitHub]()
   - [Viewing the selected code in blame view on GitHub]()
-- [Using the GitHub Toolbar](using-the-github-toolbar.md)
+- [Using the GitHub toolbar](using-the-github-toolbar.md)
 - [Contact a human](https://github.com/contact)

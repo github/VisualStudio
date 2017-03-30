@@ -17,4 +17,3 @@ After you provide your GitHub or GitHub Enterprise credentials to GitHub for Vis
 
 5. If desired, change the local path where the repository will be cloned into, or leave the default as-is. Click **Clone**.
 6. In Team Explorer, under the list of repositories, locate the repository and double-click to open the project in Visual Studio.
-
