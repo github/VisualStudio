@@ -5,7 +5,6 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GitHub.App;
 using GitHub.Collections;
@@ -82,11 +81,11 @@ namespace GitHub.ViewModels
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
+                .Where(x => PullRequests != null && x != EmptyUser && !IsBusy)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && IsLoaded)
+                .Where(x => PullRequests != null && x != EmptyUser && !IsBusy)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
@@ -100,7 +99,7 @@ namespace GitHub.ViewModels
         {
             base.Initialize(data);
 
-            IsLoaded = false;
+            IsBusy = true;
 
             PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
             pullRequests.Subscribe(pr =>
@@ -134,7 +133,7 @@ namespace GitHub.ViewModels
                         SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
                     }
  
-                    IsLoaded = true;
+                    IsBusy = false;
                     UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
                 });
         }
@@ -149,11 +148,11 @@ namespace GitHub.ViewModels
                      (aut == null || aut.Equals(pr.Author));
         }
 
-        bool isLoaded;
-        public bool IsLoaded
+        bool isBusy;
+        public bool IsBusy
         {
-            get { return isLoaded; }
-            private set { this.RaiseAndSetIfChanged(ref isLoaded, value); }
+            get { return isBusy; }
+            private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
         ITrackingCollection<IPullRequestModel> pullRequests;

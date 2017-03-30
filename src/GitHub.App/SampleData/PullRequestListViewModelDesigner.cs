@@ -67,6 +67,7 @@ namespace GitHub.SampleData
         public ObservableCollection<IAccount> Assignees { get; set; }
         public IAccount SelectedAssignee { get; set; }
         public IObservable<ViewWithData> Navigate { get; }
+        public bool IsBusy { get; }
 
         public ReactiveCommand<object> OpenPullRequest { get; }
         public ReactiveCommand<object> CreatePullRequest { get; }
