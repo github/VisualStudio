@@ -31,6 +31,7 @@ namespace GitHub.ViewModels
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
+        readonly bool constructing;
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -46,6 +47,7 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IPackageSettings settings)
         {
+            constructing = true;
             this.repositoryHost = repositoryHost;
             this.repository = repository;
             this.settings = settings;
@@ -81,11 +83,11 @@ namespace GitHub.ViewModels
                 .Subscribe(s => UpdateFilter(s, SelectedAssignee, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAssignee, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && !IsBusy)
+                .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, a, SelectedAuthor));
 
             this.WhenAny(x => x.SelectedAuthor, x => x.Value)
-                .Where(x => PullRequests != null && x != EmptyUser && !IsBusy)
+                .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
@@ -93,6 +95,8 @@ namespace GitHub.ViewModels
             OpenPullRequest.Subscribe(DoOpenPullRequest);
             CreatePullRequest = ReactiveCommand.Create();
             CreatePullRequest.Subscribe(_ => DoCreatePullRequest());
+
+            constructing = false;
         }
 
         public override void Initialize([AllowNull] ViewWithData data)
@@ -146,6 +150,7 @@ namespace GitHub.ViewModels
                 (!state.IsOpen.HasValue || state.IsOpen == pr.IsOpen) &&
                      (ass == null || ass.Equals(pr.Assignee)) &&
                      (aut == null || aut.Equals(pr.Author));
+            SaveSettings();
         }
 
         bool isBusy;
@@ -240,7 +245,6 @@ namespace GitHub.ViewModels
                 pullRequests.Dispose();
                 trackingAuthors.Dispose();
                 trackingAssignees.Dispose();
-                SaveSettings();
                 disposed = true;
             }
         }
@@ -253,10 +257,13 @@ namespace GitHub.ViewModels
 
         void SaveSettings()
         {
-            listSettings.SelectedState = SelectedState.Name;
-            listSettings.SelectedAssignee = SelectedAssignee?.Login;
-            listSettings.SelectedAuthor = SelectedAuthor?.Login;
-            settings.Save();
+            if (!constructing)
+            {
+                listSettings.SelectedState = SelectedState.Name;
+                listSettings.SelectedAssignee = SelectedAssignee?.Login;
+                listSettings.SelectedAuthor = SelectedAuthor?.Login;
+                settings.Save();
+            }
         }
 
         void DoOpenPullRequest(object pullRequest)
