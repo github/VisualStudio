@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
+using GitHub.Helpers;
 
 namespace GitHub.UI.Helpers
 {
-    public class SharedDictionaryManager : LoadingResourceDictionary
+    public class SharedDictionaryManager : SharedDictionaryManagerBase
     {
 #if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         static readonly Dictionary<Uri, ResourceDictionary> resourceDicts = new Dictionary<Uri, ResourceDictionary>();

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="AppDomainContext.cs" />
     <Compile Include="ResourceDictionaryUtilities.cs" />
+    <Compile Include="SharedDictionaryManagerBaseTests.cs" />
     <Compile Include="SharedDictionaryManagerTests.cs" />
     <Compile Include="LoadingResourceDictionaryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

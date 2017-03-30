@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using GitHub.VisualStudio.Helpers;
+using GitHub.Helpers;
 
 namespace GitHub.VisualStudio.UI.Helpers
 {
-    public class SharedDictionaryManager : LoadingResourceDictionary
+    public class SharedDictionaryManager : SharedDictionaryManagerBase
     {
 #if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         public SharedDictionaryManager()

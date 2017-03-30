@@ -110,6 +110,7 @@
     <Compile Include="Converters\StickieListItemConverter.cs" />
     <Compile Include="Helpers\LoadingResourceDictionary.cs" />
     <Compile Include="Helpers\ScrollViewerUtilities.cs" />
+    <Compile Include="Helpers\SharedDictionaryManagerBase.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
