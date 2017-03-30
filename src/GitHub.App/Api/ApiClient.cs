@@ -19,6 +19,7 @@ using Octokit.Internal;
 using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.Api
 {
@@ -157,6 +158,11 @@ namespace GitHub.Api
         public IObservable<LicenseMetadata> GetLicenses()
         {
             return gitHubClient.Miscellaneous.GetAllLicenses();
+        }
+
+        public IObservable<PullRequestMerge> Merge(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Merge(owner, name, number, new MergePullRequest());
         }
 
         public HostAddress HostAddress { get; }

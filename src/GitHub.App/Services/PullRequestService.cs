@@ -44,7 +44,11 @@ namespace GitHub.Services
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os, IUsageTracker usageTracker)
+        public PullRequestService(
+            IGitClient gitClient,
+            IGitService gitService,
+            IOperatingSystem os,
+            IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;

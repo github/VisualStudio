@@ -7,9 +7,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
@@ -29,6 +31,7 @@ namespace GitHub.ViewModels
     {
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
+        readonly IApiClient apiClient;
         readonly IPullRequestService pullRequestsService;
         readonly IUsageTracker usageTracker;
         IPullRequestModel model;
@@ -61,6 +64,7 @@ namespace GitHub.ViewModels
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                  connectionRepositoryHostMap.CurrentRepositoryHost.ApiClient,
                   pullRequestsService,
                   usageTracker)
         {
@@ -76,11 +80,13 @@ namespace GitHub.ViewModels
         public PullRequestDetailViewModel(
             ILocalRepositoryModel repository,
             IModelService modelService,
+            IApiClient apiClient,
             IPullRequestService pullRequestsService,
             IUsageTracker usageTracker)
         {
             this.repository = repository;
             this.modelService = modelService;
+            this.apiClient = apiClient;
             this.pullRequestsService = pullRequestsService;
             this.usageTracker = usageTracker;
 
@@ -547,7 +553,8 @@ namespace GitHub.ViewModels
 
         IObservable<Unit> DoMerge(object unused)
         {
-            throw new NotImplementedException();
+            // TODO: Work out what Merged == false means.
+            return apiClient.Merge(repository.Owner, repository.Name, Model.Number).SelectUnit();
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

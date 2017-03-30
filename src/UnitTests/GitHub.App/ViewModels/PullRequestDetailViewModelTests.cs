@@ -3,6 +3,7 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -477,6 +478,7 @@ namespace UnitTests.GitHub.App.ViewModels
             var vm = new PullRequestDetailViewModel(
                 repository,
                 Substitute.For<IModelService>(),
+                Substitute.For<IApiClient>(),
                 pullRequestService,
                 Substitute.For<IUsageTracker>());
 
