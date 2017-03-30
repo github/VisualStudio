@@ -9,8 +9,8 @@ Use GitHub for Visual Studio to manage your projects and work with pull requests
   - [Creating an empty repository from Visual Studio](creating-an-empty-repository-from-visual-studio.md)
   - [Cloning a repository to Visual Studio](cloning-a-repository-to-visual-studio.md)
 - Working with pull requests
-  - [Viewing pull requests for a repository](view-the-pull-requests-for-a-repository.md)
-  - [Sending a pull request](sending-a-pull-request.md)
+  - [Viewing pull requests for a repository](viewing-the-pull-requests-for-a-repository.md)
+  - [Creating a pull request](creating-a-pull-request.md)
   - [Reviewing a pull request in Visual Studio](review-a-pull-request-in-visual-studio.md)
   - [Making changes to a pull request](making-changes-to-a-pull-request.md)
 - Operations provided by Visual Studio
@@ -22,8 +22,8 @@ Use GitHub for Visual Studio to manage your projects and work with pull requests
   - [Ignoring files](https://www.visualstudio.com/en-us/docs/git/tutorial/ignore-files)
 - [Creating gists](creating-gists.md)
 - [Viewing existing code on GitHub](viewing-code-on-github.md)
-  - [Viewing the selected code on GitHub]()
-  - [Copying the URL of the selected code's location on GitHub]()
-  - [Viewing the selected code in blame view on GitHub]()
+  - [Viewing the selected code on GitHub](viewing-code-on-github.md#viewing-the-selected-code-on-github)
+  - [Copying the URL of the selected code's location on GitHub](viewing-code-on-github.md#copying-the-url-of-the-selected-codes-location-on-github)
+  - [Viewing the selected code in blame view on GitHub](viewing-code-on-github.md#viewing-the-selected-code-in-blame-view-on-github)
 - [Using the GitHub toolbar](using-the-github-toolbar.md)
 - [Contact a human](https://github.com/contact)

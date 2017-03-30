@@ -1,6 +1,6 @@
 # Creating an empty repository from Visual Studio
 
-1. Sign in to GitHub
+1. [Sign in](authenticating-to-github) to GitHub.
 
 2. Open **Team Explorer** by clicking on its tab next to *Solution Explorer*, or via the *View* menu.
 
@@ -12,7 +12,7 @@
 
    ![image](images/create-link.png)
 
-5. In the **Create a GitHub Repository** dialog, enter a name, description and local path for the repository. 
+5. In the **Create a GitHub Repository** dialog, enter a name, description and local path for the repository.
 
    ![image](images/create-dialog.png)
 
