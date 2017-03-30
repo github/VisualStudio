@@ -105,6 +105,7 @@ namespace GitHub.UI
             "ViewModel", typeof(TInterface), typeof(TImplementor), new PropertyMetadata(null));
 
         IDisposable subscriptions;
+        bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewBase{TInterface, TImplementor}"/> class.
@@ -213,10 +214,15 @@ namespace GitHub.UI
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposed)
             {
-                subscriptions?.Dispose();
-                subscriptions = null;
+                if (disposing)
+                {
+                    subscriptions?.Dispose();
+                    subscriptions = null;
+                }
+
+                disposed = true;
             }
         }
     }
