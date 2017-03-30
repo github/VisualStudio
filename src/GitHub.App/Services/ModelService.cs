@@ -406,7 +406,8 @@ namespace GitHub.Services
                 Head = Create(prCacheItem.Head),
                 State = prCacheItem.State.HasValue ? 
                     prCacheItem.State.Value : 
-                    prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,                
+                    prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,
+                Mergeable = prCacheItem.Mergeable,
             };
         }
 
@@ -533,6 +534,7 @@ namespace GitHub.Services
                 State = GetState(pr);
                 IsOpen = pr.State == ItemState.Open;
                 Merged = pr.Merged;
+                Mergeable = pr.Mergeable;
                 Key = Number.ToString(CultureInfo.InvariantCulture);
                 Timestamp = UpdatedAt;
             }
@@ -548,12 +550,13 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public string Body { get; set; }
+            public bool? Mergeable { get; set; }
             public IList<PullRequestFileCacheItem> ChangedFiles { get; set; } = new PullRequestFileCacheItem[0];
 
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
 
-            // This fields exists only for compatibility with old caches. The State property should be used.
+            // These fields exists only for compatibility with old caches. The State property should be used.
             public bool? IsOpen { get; set; }
             public bool? Merged { get; set; }
 

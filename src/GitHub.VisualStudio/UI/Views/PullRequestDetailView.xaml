@@ -244,6 +244,7 @@
                     <RowDefinition Height="Auto"/> <!-- Author and open time -->
                     <RowDefinition Height="Auto"/> <!-- PR body -->
                     <RowDefinition Height="Auto"/> <!-- View on github link -->
+                    <RowDefinition Height="Auto"/> <!-- Merge button/status -->
                     <RowDefinition Height="Auto"/> <!-- Files changed -->
                 </Grid.RowDefinitions>
 
@@ -273,9 +274,16 @@
                     View conversation on GitHub
                 </ui:GitHubActionLink>
 
+                <!-- Merge button/status -->
+                <DockPanel Grid.Column="2" Grid.Row="3">
+                    <Button HorizontalAlignment="Left" Command="{Binding Merge}">
+                        Merge pull request
+                    </Button>
+                </DockPanel>
+                
                 <!-- Files changed -->
                 <ui:SectionControl Name="changesSection" 
-                                   Grid.Row="3"
+                                   Grid.Row="4"
                                    IsExpanded="True"
                                    HeaderText="{Binding Model.ChangedFiles.Count, StringFormat={x:Static prop:Resources.ChangesCountFormat}}"
                                    Margin="0 5 10 0">

@@ -23,6 +23,7 @@ namespace GitHub.Models
         int CommitCount { get; }
         bool IsOpen { get; }
         bool Merged { get; }
+        bool? Mergeable { get; }
         bool HasNewComments { get; }
         GitReferenceModel Base { get; }
         GitReferenceModel Head { get; }

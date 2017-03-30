@@ -125,6 +125,13 @@ namespace GitHub.Models
         public bool IsOpen => State == PullRequestStateEnum.Open;
         public bool Merged => State == PullRequestStateEnum.Merged;
 
+        bool? mergeable;
+        public bool? Mergeable
+        {
+            get { return mergeable; }
+            set { mergeable = value; this.RaisePropertyChange(); }
+        }
+
         int commentCount;
         public int CommentCount
         {

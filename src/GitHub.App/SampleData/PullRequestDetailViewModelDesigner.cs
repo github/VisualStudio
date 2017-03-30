@@ -78,6 +78,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsCheckedOut { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
+        public MergeableState Mergeable { get; }
         public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;
         public IPullRequestCheckoutState CheckoutState { get; set; }
         public IPullRequestUpdateState UpdateState { get; set; }
@@ -86,6 +87,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit> Checkout { get; }
         public ReactiveCommand<Unit> Pull { get; }
         public ReactiveCommand<Unit> Push { get; }
+        public ReactiveCommand<Unit> Merge { get; }
         public ReactiveCommand<object> OpenOnGitHub { get; }
         public ReactiveCommand<object> OpenFile { get; }
         public ReactiveCommand<object> DiffFile { get; }

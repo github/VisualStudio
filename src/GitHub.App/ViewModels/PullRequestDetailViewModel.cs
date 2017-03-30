@@ -35,6 +35,7 @@ namespace GitHub.ViewModels
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
         string body;
+        MergeableState mergeable;
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
         IPullRequestUpdateState updateState;
@@ -104,6 +105,10 @@ namespace GitHub.ViewModels
                     .Select(x => x != null && x.PushEnabled),
                 DoPush);
             SubscribeOperationError(Push);
+
+            Merge = ReactiveCommand.CreateAsyncObservable(
+                this.WhenAnyValue(x => x.Mergeable, x => x == MergeableState.Mergable),
+                DoMerge);
 
             OpenOnGitHub = ReactiveCommand.Create();
             OpenFile = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsCheckedOut));
@@ -193,6 +198,15 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request can be merged.
+        /// </summary>
+        public MergeableState Mergeable
+        {
+            get { return mergeable; }
+            private set { this.RaiseAndSetIfChanged(ref mergeable, value); }
+        }
+
+        /// <summary>
         /// Gets the state associated with the <see cref="Checkout"/> command.
         /// </summary>
         public IPullRequestCheckoutState CheckoutState
@@ -243,6 +257,11 @@ namespace GitHub.ViewModels
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
         public ReactiveCommand<Unit> Push { get; }
+
+        /// <summary>
+        /// Gets a command that merges the pull request.
+        /// </summary>
+        public ReactiveCommand<Unit> Merge { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
@@ -359,6 +378,26 @@ namespace GitHub.ViewModels
 
                 CheckoutState = new CheckoutCommandState(caption, disabled);
                 UpdateState = null;
+            }
+
+            if (pullRequest.State == PullRequestStateEnum.Open)
+            {
+                if (pullRequest.Mergeable == true)
+                {
+                    Mergeable = MergeableState.Mergable;
+                }
+                else if (pullRequest.Mergeable == false)
+                {
+                    Mergeable = MergeableState.Unmergeable;
+                }
+                else if (pullRequest.Mergeable == null)
+                {
+                    Mergeable = MergeableState.Unknown;
+                }
+            }
+            else
+            {
+                Mergeable = MergeableState.Closed;
             }
 
             IsLoading = IsBusy = false;
@@ -504,6 +543,11 @@ namespace GitHub.ViewModels
         {
             return pullRequestsService.Push(repository)
                 .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
+        }
+
+        IObservable<Unit> DoMerge(object unused)
+        {
+            throw new NotImplementedException();
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

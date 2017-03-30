@@ -28,6 +28,14 @@ namespace GitHub.ViewModels
         string ToolTip { get; }
     }
 
+    public enum MergeableState
+    {
+        Mergable,
+        Unmergeable,
+        Unknown,
+        Closed,
+    }
+
     /// <summary>
     /// Holds immutable state relating to the <see cref="IPullRequestDetailViewModel.Pull"/> and
     /// <see cref="IPullRequestDetailViewModel.Push"/> commands.
@@ -96,6 +104,11 @@ namespace GitHub.ViewModels
         string Body { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the pull request can be merged.
+        /// </summary>
+        MergeableState Mergeable { get; }
+
+        /// <summary>
         /// Gets the changed files as a tree.
         /// </summary>
         IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree { get; }
@@ -129,6 +142,11 @@ namespace GitHub.ViewModels
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
         ReactiveCommand<Unit> Push { get; }
+
+        /// <summary>
+        /// Gets a command that merges the pull request.
+        /// </summary>
+        ReactiveCommand<Unit> Merge { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
