@@ -62,12 +62,14 @@ namespace GitHub.VisualStudio.UI.Views
         {
             base.Dispose(disposing);
 
-            if (disposed) return;
-
-            if (disposing)
+            if (!disposed)
             {
-                open.Dispose();
-                create.Dispose();
+                if (disposing)
+                {
+                    open.Dispose();
+                    create.Dispose();
+                }
+
                 disposed = true;
             }
         }
