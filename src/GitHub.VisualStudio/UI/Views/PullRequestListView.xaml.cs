@@ -58,16 +58,18 @@ namespace GitHub.VisualStudio.UI.Views
         public ICommand OpenPROnGitHub { get; set; }
 
         bool disposed;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
 
             if (disposed) return;
 
-            open.Dispose();
-            create.Dispose();
-            disposed = true;
+            if (disposing)
+            {
+                open.Dispose();
+                create.Dispose();
+                disposed = true;
+            }
         }
     }
 }
