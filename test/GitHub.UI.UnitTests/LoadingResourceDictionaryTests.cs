@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using NUnit.Framework;
 
-namespace GitHub.UI.Tests
+namespace GitHub.UI.UnitTests
 {
     public class LoadingResourceDictionaryTests
     {
@@ -45,7 +44,7 @@ namespace GitHub.UI.Tests
                 internal int CountMergedDictionaries(string url)
                 {
                     var target = new LoadingResourceDictionary();
-                    var packUri = ToPackUri(url);
+                    var packUri = ResourceDictionaryUtilities.ToPackUri(url);
 
                     target.Source = packUri;
 
@@ -75,55 +74,12 @@ namespace GitHub.UI.Tests
                 internal int CountMergedDictionaries(string url)
                 {
                     var target = new ResourceDictionary();
-                    var packUri = ToPackUri(url);
+                    var packUri = ResourceDictionaryUtilities.ToPackUri(url);
 
                     target.Source = packUri;
 
                     return target.MergedDictionaries.Count;
                 }
-            }
-        }
-
-        static Uri ToPackUri(string url)
-        {
-            if (!UriParser.IsKnownScheme("pack"))
-            {
-                // Register the pack scheme.
-                new Application();
-            }
-
-            return new Uri(url);
-        }
-
-        class AppDomainContext : IDisposable
-        {
-            AppDomain domain;
-
-            public AppDomainContext(AppDomainSetup setup)
-            {
-                var friendlyName = GetType().FullName;
-                domain = AppDomain.CreateDomain(friendlyName, null, setup);
-            }
-
-            public T CreateInstance<T>()
-            {
-                return (T)domain.CreateInstanceFromAndUnwrap(typeof(T).Assembly.CodeBase, typeof(T).FullName);
-            }
-
-            public void Dispose()
-            {
-                AppDomain.Unload(domain);
-            }
-        }
-
-        static void DumpResourceDictionary(ResourceDictionary rd, string indent = "")
-        {
-            var source = rd.Source?.ToString() ?? "null";
-
-            Trace.WriteLine(indent + source + rd.GetType().FullName);
-            foreach (var child in rd.MergedDictionaries)
-            {
-                DumpResourceDictionary(child, indent + "  ");
             }
         }
     }
