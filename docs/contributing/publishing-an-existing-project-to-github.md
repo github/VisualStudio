@@ -1,7 +1,7 @@
 # Publishing an existing project to GitHub
 
 1. Open a solution in Visual Studio.
-2. If solution is not already initialized as a git repository, select **Add to Source Control** from the **File** menu. TODO: screenshot
+2. If solution is not already initialized as a Git repository, select **Add to Source Control** from the **File** menu. TODO: screenshot
 3. Open **Team Explorer**. TODO: screenshot
 4. In Team Explorer, click **Sync**. TODO: screenshot
 5. Click the **Publish to GitHub** button. TODO: screenshot

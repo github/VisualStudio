@@ -1,4 +1,4 @@
-# Creating Gists
+# Creating gists
 
 > You must be [logged in to GitHub](../getting-started/authenticating-to-github.md) to create a Gist
 
@@ -21,4 +21,3 @@ GitHub for Visual Studio enables easy creation of gists directly from the Visual
 6. Click **Create**.
 
 7. Once the gist is created it will be opened in your browser.
-
