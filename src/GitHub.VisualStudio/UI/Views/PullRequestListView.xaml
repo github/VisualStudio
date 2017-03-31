@@ -115,15 +115,13 @@
 
       <WrapPanel Grid.Column="0" HorizontalAlignment="Stretch">
 
-        <ui:LinkDropDown IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}"
-                         ItemsSource="{Binding States}"
+        <ui:LinkDropDown ItemsSource="{Binding States}"
                          SelectedItem="{Binding SelectedState}"
                          AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListStatusFilterComboBox}" />
 
         <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:LinkDropDown Header="Assignee"
-                         IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}"
                          ItemsSource="{Binding Source={StaticResource AssigneeCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAssignee}"
                          AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAssigneeFilterComboBox}"/>
@@ -131,7 +129,6 @@
         <Separator Style="{StaticResource VerticalSeparator}" />
 
         <ui:LinkDropDown Header="Author"
-                         IsEnabled="{Binding IsBusy, Converter={ui:InverseBooleanConverter}}"
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"
                          AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAuthorFilterComboBox}" />          
