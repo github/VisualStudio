@@ -17,7 +17,6 @@ namespace GitHub.VisualStudio.UI.Helpers
             isInDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
         }
 
-#if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         public SharedDictionaryManager()
         {
             if (!isInDesignMode)
@@ -77,6 +76,5 @@ namespace GitHub.VisualStudio.UI.Helpers
             currentTheme = Colors.DetectTheme();
             Source = uri;
         }
-#endif
     }
 }
