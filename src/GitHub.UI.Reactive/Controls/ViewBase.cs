@@ -105,7 +105,6 @@ namespace GitHub.UI
             "ViewModel", typeof(TInterface), typeof(TImplementor), new PropertyMetadata(null));
 
         IDisposable subscriptions;
-        bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewBase{TInterface, TImplementor}"/> class.
@@ -146,14 +145,6 @@ namespace GitHub.UI
                         (this.ViewModel as IDialogViewModel)?.Cancel.Execute(null);
                     }));
             });
-        }
-
-        /// <summary>
-        /// The control finalizer.
-        /// </summary>
-        ~ViewBase()
-        {
-            Dispose(false);
         }
 
         /// <summary>
@@ -200,15 +191,7 @@ namespace GitHub.UI
             get { return ViewModel; }
         }
 
-        /// <summary>
-        /// Releases the managed resources held by the control.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
+        bool disposed;
         /// <summary>
         /// Releases the managed or unmanaged resources held by the control.
         /// </summary>
@@ -224,6 +207,23 @@ namespace GitHub.UI
 
                 disposed = true;
             }
+        }
+
+        /// <summary>
+        /// The control finalizer.
+        /// </summary>
+        ~ViewBase()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Releases the managed resources held by the control.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
