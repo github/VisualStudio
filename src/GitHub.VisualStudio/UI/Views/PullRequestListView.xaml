@@ -26,7 +26,7 @@
     </Binding>
   </d:DesignProperties.DataContext>
 
-  <UserControl.Resources>
+  <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
@@ -103,7 +103,7 @@
       </CollectionViewSource>
         
    </ResourceDictionary>
-  </UserControl.Resources>
+  </Control.Resources>
 
   <DockPanel Margin="6,6,6,0">
 

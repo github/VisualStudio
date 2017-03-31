@@ -18,7 +18,7 @@
                             mc:Ignorable="d"
                             AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GitHubPaneView}">
 
-  <UserControl.Resources>
+  <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
@@ -41,7 +41,7 @@
         </Setter>
       </Style>
     </ResourceDictionary>
-  </UserControl.Resources>
+  </Control.Resources>
 
   <DockPanel>
         <control:InfoPanel x:Name="infoPanel" MessageType="{Binding MessageType}" Message="{Binding Message}" VerticalAlignment="Top" DockPanel.Dock="Top"></control:InfoPanel>

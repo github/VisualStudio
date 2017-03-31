@@ -107,8 +107,7 @@
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
-    <Compile Include="Controls\BusyStateView.cs" />
-    <Compile Include="Controls\SimpleViewUserControl.cs" />
+    <Compile Include="Controls\ViewBase.cs" />
     <Compile Include="Controls\TwoFactorInput.xaml.cs">
       <DependentUpon>TwoFactorInput.xaml</DependentUpon>
     </Compile>
@@ -130,10 +129,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Assets\Controls.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Assets\Controls\BusyStateView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -167,6 +162,10 @@
     </Page>
     <Page Include="SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

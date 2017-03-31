@@ -16,7 +16,7 @@ using System.Reactive.Disposables;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericPullRequestListView : SimpleViewUserControl<IPullRequestListViewModel, PullRequestListView>
+    public class GenericPullRequestListView : ViewBase<IPullRequestListViewModel, PullRequestListView>
     { }
 
     [ExportView(ViewType = UIViewType.PRList)]
@@ -58,14 +58,20 @@ namespace GitHub.VisualStudio.UI.Views
         public ICommand OpenPROnGitHub { get; set; }
 
         bool disposed;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
+            base.Dispose(disposing);
 
-            open.Dispose();
-            create.Dispose();
-            disposed = true;
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    open.Dispose();
+                    create.Dispose();
+                }
+
+                disposed = true;
+            }
         }
     }
 }
