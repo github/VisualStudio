@@ -28,7 +28,7 @@ If the pull request is from a fork then a remote will be added to the forked rep
 
 ## Comparing files
 
-To compare the contents of a file in the pull request with its content on the target branch, double click a file in the **Changed Files** tree. This will open the Visual Studio diff viewer.
+To compare the contents of a file in the pull request with its content on the target branch, double click a file in the **Changed Files** tree. This will open the Visual Studio diff viewer. If the pull request has been checked out, the right hand pane will be editable.
 
 ![image](images/pr-diff-files.png)
 
