@@ -2,8 +2,8 @@
 using System.IO;
 using System.Windows;
 using System.Reflection;
-using System.Diagnostics;
 using System.Collections.Generic;
+using GitHub.VisualStudio;
 
 namespace GitHub
 {
@@ -29,7 +29,7 @@ namespace GitHub
                 var assemblyName = FindAssemblyNameFromPackUri(value);
                 if (assemblyName == null)
                 {
-                    Trace.WriteLine("Couldn't find assembly name in: " + value);
+                    VsOutputLogger.WriteLine($"Couldn't find assembly name in '{value}'.");
                     return;
                 }
 
@@ -42,7 +42,7 @@ namespace GitHub
 
                 if (!File.Exists(assemblyFile))
                 {
-                    Trace.WriteLine("Couldn't find assembly at: " + assemblyFile);
+                    VsOutputLogger.WriteLine($"Couldn't find assembly at '{assemblyFile}'.");
                     return;
                 }
 
@@ -51,21 +51,21 @@ namespace GitHub
             }
             catch(Exception e)
             {
-                Trace.WriteLine($"Error loading assembly for '{value}': {e}");
+                VsOutputLogger.WriteLine($"Error loading assembly for '{value}': {e}");
             }
         }
 
         static string FindAssemblyNameFromPackUri(Uri packUri)
         {
             var path = packUri.LocalPath;
-            if(!path.StartsWith("/"))
+            if (!path.StartsWith("/"))
             {
                 return null;
             }
 
             var component = ";component/";
             int componentIndex = path.IndexOf(component, 1);
-            if(componentIndex == -1)
+            if (componentIndex == -1)
             {
                 return null;
             }
