@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
+using System.ComponentModel;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.PlatformUI;
 using GitHub.VisualStudio.Helpers;
 using GitHub.Helpers;
@@ -9,10 +10,20 @@ namespace GitHub.VisualStudio.UI.Helpers
 {
     public class SharedDictionaryManager : SharedDictionaryManagerBase
     {
+        static bool isInDesignMode;
+
+        static SharedDictionaryManager()
+        {
+            isInDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
+        }
+
 #if !XAML_DESIGNER // XAML Designer doesn't work if `Source` property has been replaced.
         public SharedDictionaryManager()
         {
-            currentTheme = Colors.DetectTheme();
+            if (!isInDesignMode)
+            {
+                currentTheme = Colors.DetectTheme();
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
@@ -28,14 +39,17 @@ namespace GitHub.VisualStudio.UI.Helpers
             get { return sourceUri; }
             set
             {
-                if (value.ToString() == "pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml")
+                if (!isInDesignMode)
                 {
-                    if (!themed)
+                    if (value.ToString() == "pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml")
                     {
-                        themed = true;
-                        VSColorTheme.ThemeChanged += OnThemeChange;
+                        if (!themed)
+                        {
+                            themed = true;
+                            VSColorTheme.ThemeChanged += OnThemeChange;
+                        }
+                        value = new Uri(baseThemeUri + "Theme" + currentTheme + ".xaml");
                     }
-                    value = new Uri(baseThemeUri + "Theme" + currentTheme + ".xaml");
                 }
 
                 sourceUri = value;
