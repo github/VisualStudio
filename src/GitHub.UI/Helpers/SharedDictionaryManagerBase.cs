@@ -22,15 +22,25 @@ namespace GitHub.Helpers
                 return inUri;
             }
 
-            var localPath = inUri.LocalPath;
-            if (!localPath.EndsWith(@"\SharedDictionary.xaml"))
+            var url = inUri.ToString();
+            var assemblyPrefix = "/src/";
+            var assemblyIndex = url.LastIndexOf(assemblyPrefix);
+            if(assemblyIndex == -1)
             {
                 return inUri;
             }
 
-            var fileName = Path.GetFileName(localPath);
-            var assemblyName = Path.GetFileName(Path.GetDirectoryName(localPath));
-            return new Uri($"pack://application:,,,/{assemblyName};component/{fileName}");
+            assemblyIndex += assemblyPrefix.Length;
+            var pathIndex = url.IndexOf('/', assemblyIndex);
+            if(pathIndex == -1)
+            {
+                return inUri;
+            }
+
+            var assemblyName = url.Substring(assemblyIndex, pathIndex - assemblyIndex);
+            var path = url.Substring(pathIndex + 1);
+
+            return new Uri($"pack://application:,,,/{assemblyName};component/{path}");
         }
     }
 }
