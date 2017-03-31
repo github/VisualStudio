@@ -200,7 +200,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\GitHubVSAutomationIDs\GithubVSAutomationIDs\GithubVSTestAutomationIDs.csproj">
+    <ProjectReference Include="..\..\submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj">
       <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
       <Name>GithubVSTestAutomationIDs</Name>
     </ProjectReference>
