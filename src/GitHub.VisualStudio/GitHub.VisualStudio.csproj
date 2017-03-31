@@ -100,7 +100,7 @@
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- Only deploy extension when building inside Visual Studio -->
     <DeployExtension>false</DeployExtension>
-  </PropertyGroup>  
+  </PropertyGroup>
   <PropertyGroup Condition="$(Buildtype) == 'Internal'">
     <AssemblyOriginatorKeyFile>..\..\script\Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -585,7 +585,7 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\GitHubVSAutomationIDs\GithubVSAutomationIDs\GithubVSTestAutomationIDs.csproj">
+    <ProjectReference Include="..\..\submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj">
       <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
       <Name>GithubVSTestAutomationIDs</Name>
     </ProjectReference>

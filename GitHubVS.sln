@@ -104,9 +104,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.UI", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.StartPage", "src\GitHub.StartPage\GitHub.StartPage.csproj", "{50E277B8-8580-487A-8F8E-5C3B9FBF0F77}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubVSAutomationIDs", "GitHubVSAutomationIDs", "{4405C20E-A72A-4807-9480-14E9BB558347}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubVSTestAutomationIDs", "GitHubVSTestAutomationIDs", "{4405C20E-A72A-4807-9480-14E9BB558347}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubVSTestAutomationIDs", "submodules\GitHubVSAutomationIDs\GithubVSAutomationIDs\GithubVSTestAutomationIDs.csproj", "{665078F4-5875-431D-A2CC-421849B43328}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubVSTestAutomationIDs", "submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj", "{665078F4-5875-431D-A2CC-421849B43328}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
