@@ -6,7 +6,7 @@ When a topic branch is [checked out](review-a-pull-request-in-visual-studio.md),
 
 If a Pull Request is checked out and the author adds new commits to the branch, then the option will be given to pull the changes locally. This works both for pull requests from the same repository and from a fork.
 
-TODO: screenshot
+![](images/pr-pull-changes.png)
 
 ## Pushing changes
 
