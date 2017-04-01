@@ -200,10 +200,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj">
-      <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
-      <Name>GithubVSTestAutomationIDs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>

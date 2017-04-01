@@ -585,10 +585,6 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj">
-      <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
-      <Name>GithubVSTestAutomationIDs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>

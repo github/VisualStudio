@@ -8,7 +8,7 @@
                                   xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
                                   xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-                                  xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
+                                  xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                                   mc:Ignorable="d"
                                   d:DesignWidth="414"
                                   d:DesignHeight="440"

@@ -172,10 +172,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj">
-      <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
-      <Name>GithubVSTestAutomationIDs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj">
       <Project>{600998c4-54dd-4755-bfa8-6f44544d8e2e}</Project>
       <Name>ReactiveUI.Events_Net45</Name>

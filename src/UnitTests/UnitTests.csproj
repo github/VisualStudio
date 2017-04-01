@@ -280,10 +280,6 @@
       <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
       <Name>Akavache_Net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs\GitHubVSTestAutomationIDs.csproj">
-      <Project>{665078f4-5875-431d-a2cc-421849b43328}</Project>
-      <Name>GithubVSTestAutomationIDs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674B69B8-0780-4D54-AE2B-C15821FA51CB}</Project>
       <Name>Octokit.Reactive</Name>

@@ -10,7 +10,7 @@
                             xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                             xmlns:view="clr-namespace:GitHub.VisualStudio.UI.Views"
                             xmlns:control="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
-                            xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
+                            xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                             Background="{DynamicResource GitHubVsToolWindowBackground}"
                             Foreground="{DynamicResource GitHubVsToolWindowText}"
                             d:DesignHeight="300"
