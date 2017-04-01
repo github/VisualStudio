@@ -6,7 +6,6 @@ using System.Windows.Input;
 using GitHub.Extensions;
 using NullGuard;
 using System.Globalization;
-using GitHub.VisualStudio.TestAutomation;
 
 namespace GitHub.UI
 {
