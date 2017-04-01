@@ -5,7 +5,7 @@
                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
 
     <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml"/>
+        <cache:ThemeDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ActionLinkButton.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubComboBox.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/Buttons.xaml"/>
