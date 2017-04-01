@@ -1,18 +1,40 @@
 ﻿using System;
-using System.IO;
+using System.Windows;
+using System.Collections.Generic;
 
 namespace GitHub.Helpers
 {
-    public class SharedDictionaryManagerBase : LoadingResourceDictionary
+    public class SharedDictionaryManagerBase : ResourceDictionary
     {
-        public new Uri Source
+        static IDictionary<Uri, ResourceDictionary> sharedDictionaries;
+
+        static SharedDictionaryManagerBase()
+        {
+            sharedDictionaries = new Dictionary<Uri, ResourceDictionary>();
+        }
+
+        public virtual new Uri Source
         {
             get { return base.Source; }
             set
             {
                 value = FixDesignTimeUri(value);
-                base.Source = value;
+                var rd = GetResourceDictionary(value);
+                MergedDictionaries.Clear();
+                MergedDictionaries.Add(rd);
             }
+        }
+
+        ResourceDictionary GetResourceDictionary(Uri uri)
+        {
+            ResourceDictionary rd;
+            if (!sharedDictionaries.TryGetValue(uri, out rd))
+            {
+                rd = new LoadingResourceDictionary { Source = uri };
+                sharedDictionaries[uri] = rd;
+            }
+
+            return rd;
         }
 
         public static Uri FixDesignTimeUri(Uri inUri)
