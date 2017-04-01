@@ -7,10 +7,13 @@ namespace GitHub.Helpers
     public class SharedDictionaryManagerBase : ResourceDictionary
     {
         static IDictionary<Uri, ResourceDictionary> sharedDictionaries;
+        static IList<IDisposable> disposables;
 
         static SharedDictionaryManagerBase()
         {
-            sharedDictionaries = new Dictionary<Uri, ResourceDictionary>();
+            // Avoid leaking resources at design time.
+            sharedDictionaries = GetAppDomainSharedDictionaries();
+            disposables = GetAppDomainDisposables();
         }
 
         public virtual new Uri Source
@@ -22,6 +25,13 @@ namespace GitHub.Helpers
                 var rd = GetResourceDictionary(value);
                 MergedDictionaries.Clear();
                 MergedDictionaries.Add(rd);
+
+                // Remember dictionaries that need disposing of.
+                var disposable = this as IDisposable;
+                if (disposable != null && !disposables.Contains(disposable))
+                {
+                    disposables.Add(disposable);
+                }
             }
         }
 
@@ -47,14 +57,14 @@ namespace GitHub.Helpers
             var url = inUri.ToString();
             var assemblyPrefix = "/src/";
             var assemblyIndex = url.LastIndexOf(assemblyPrefix);
-            if(assemblyIndex == -1)
+            if (assemblyIndex == -1)
             {
                 return inUri;
             }
 
             assemblyIndex += assemblyPrefix.Length;
             var pathIndex = url.IndexOf('/', assemblyIndex);
-            if(pathIndex == -1)
+            if (pathIndex == -1)
             {
                 return inUri;
             }
@@ -63,6 +73,40 @@ namespace GitHub.Helpers
             var path = url.Substring(pathIndex + 1);
 
             return new Uri($"pack://application:,,,/{assemblyName};component/{path}");
+        }
+
+        static IDictionary<Uri, ResourceDictionary> GetAppDomainSharedDictionaries()
+        {
+            var name = typeof(SharedDictionaryManagerBase).FullName + ".SharedDictionaries";
+            var sharedDictionaries = GetAppDomainData<Dictionary<Uri, ResourceDictionary>>(name);
+
+            sharedDictionaries.Clear();
+            return sharedDictionaries;
+        }
+
+        static IList<IDisposable> GetAppDomainDisposables()
+        {
+            var name = typeof(SharedDictionaryManagerBase).FullName + ".Disposables";
+            var disposables = GetAppDomainData<List<IDisposable>>(name);
+            foreach (var disposable in disposables)
+            {
+                disposable.Dispose();
+            }
+
+            disposables.Clear();
+            return disposables;
+        }
+
+        static T GetAppDomainData<T>(string name) where T : new()
+        {
+            var data = (T)AppDomain.CurrentDomain.GetData(name);
+            if (data == null)
+            {
+                data = new T();
+                AppDomain.CurrentDomain.SetData(name, data);
+            }
+
+            return data;
         }
     }
 }
