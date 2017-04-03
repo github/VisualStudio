@@ -35,7 +35,7 @@ namespace GitHub.Services
             this.operatingSystem = operatingSystem;
         }
 
-        public string FindGitCloneOption()
+        public UriString FindGitHubCloneOption()
         {
             if (vsAppCommandLine == null)
             {
@@ -54,17 +54,17 @@ namespace GitHub.Services
                 return null;
             }
 
-            return optionValue;
+            return FindGitHubCloneUri(optionValue);
         }
 
-        public bool TryOpenRepository(string cloneUrl)
+        public bool TryOpenRepository(UriString cloneUri)
         {
-            if(TryOpenLocalClonePath(cloneUrl))
+            if (TryOpenLocalClonePath(cloneUri))
             {
                 return true;
             }
 
-            if(TryOpenKnownRepository(cloneUrl))
+            if(TryOpenKnownRepository(cloneUri))
             {
                 return true;
             }
@@ -72,12 +72,12 @@ namespace GitHub.Services
             return false;
         }
 
-        bool TryOpenKnownRepository(string cloneUrl)
+        bool TryOpenKnownRepository(UriString cloneUri)
         {
             var repos = vsGitServices.GetKnownRepositories();
             foreach (var repo in repos)
             {
-                if (cloneUrl == repo.CloneUrl)
+                if (cloneUri.ToString() == repo.CloneUrl)
                 {
                     if(vsServices.TryOpenRepository(repo.LocalPath))
                     {
@@ -89,14 +89,8 @@ namespace GitHub.Services
             return false;
         }
 
-        bool TryOpenLocalClonePath(string cloneUrl)
+        bool TryOpenLocalClonePath(UriString cloneUri)
         {
-            var cloneUri = FindGitHubCloneUri(cloneUrl);
-            if(cloneUri == null)
-            {
-                return false;
-            }
-
             var clonePath = vsGitServices.GetLocalClonePathFromGitProvider();
             if(clonePath == null)
             {

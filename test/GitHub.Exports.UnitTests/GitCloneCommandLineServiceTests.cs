@@ -14,16 +14,20 @@ namespace GitHub.Services.Tests
     {
         public class TheFindGitCloneOptionMethod
         {
-            [Test]
-            public void OptionExists()
+            [TestCase("https://github.com/foo/bar", "https://github.com/foo/bar")]
+            [TestCase("https://not-github.com/github/VisualStudio", null)]
+            [TestCase("https://github.com/github", null)]
+            [TestCase("https://github.com", null)]
+            [TestCase("NOT_A_URL", null)]
+            public void OptionExists(string gitCloneUrl, string expectUrl)
             {
-                var gitCloneUrl = "https://github.com/foo/bar";
+                var expectUri = expectUrl != null ? new UriString(expectUrl) : null;
                 var vsAppCommandLine = CreateVsAppCommandLine(gitCloneUrl);
                 var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null, null);
 
-                var cloneOption = target.FindGitCloneOption();
+                var cloneOption = target.FindGitHubCloneOption();
 
-                Assert.That(cloneOption, Is.EqualTo(gitCloneUrl));
+                Assert.That(cloneOption, Is.EqualTo(expectUri));
             }
 
             [Test]
@@ -32,7 +36,7 @@ namespace GitHub.Services.Tests
                 var vsAppCommandLine = CreateVsAppCommandLine(null);
                 var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null, null);
 
-                var cloneOption = target.FindGitCloneOption();
+                var cloneOption = target.FindGitHubCloneOption();
 
                 Assert.That(cloneOption, Is.Null);
             }
@@ -44,7 +48,7 @@ namespace GitHub.Services.Tests
                 var vsAppCommandLine = CreateVsAppCommandLine(gitCloneUrl, errorCode: VSConstants.E_FAIL);
                 var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null, null);
 
-                var cloneOption = target.FindGitCloneOption();
+                var cloneOption = target.FindGitHubCloneOption();
 
                 Assert.That(cloneOption, Is.Null);
             }
@@ -56,7 +60,7 @@ namespace GitHub.Services.Tests
                 var target = new GitCloneCommandLineService(
                     vsAppCommandLine, null, null, null, null);
 
-                var cloneOption = target.FindGitCloneOption();
+                var cloneOption = target.FindGitHubCloneOption();
 
                 Assert.That(cloneOption, Is.Null);
             }
@@ -68,10 +72,6 @@ namespace GitHub.Services.Tests
             [TestCase("https://github.com/github/VisualStudio", @"x:\clone_path", @"x:\clone_path\GITHUB\VISUALSTUDIO", true)]
             [TestCase("https://github.com/github/VisualStudio", @"x:\clone_path", null, false)]
             [TestCase("https://github.com/github/VisualStudio", null, null, false, Description = "LocalClonePath is null")]
-            [TestCase("https://not-github.com/github/VisualStudio", @"x:\clone_path", @"x:\clone_path\github\VisualStudio", false)]
-            [TestCase("https://github.com/github", @"x:\clone_path", @"x:\clone_path\github", false, Description = "No repo")]
-            [TestCase("https://github.com", @"x:\clone_path", @"x:\clone_path", false, Description = "No owner")]
-            [TestCase("NOT_A_URL", @"x:\clone_path", @"x:\clone_path", false, Description = "Not a URL")]
             public void RepoExistsOnLocalClonePath_TryOpenRepository(
                 string repoUrl, string clonePath, string localPath, bool tryOpenRepo)
             {
@@ -81,6 +81,7 @@ namespace GitHub.Services.Tests
                 var operatingSystem = CreateOperatingSystemWithDirectory(localPath);
                 var target = new GitCloneCommandLineService(
                     null, vsGitServices, null, vsServices, operatingSystem);
+                var repoUri = new UriString(repoUrl);
 
                 var opened = target.TryOpenRepository(repoUrl);
 

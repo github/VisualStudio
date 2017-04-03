@@ -1,9 +1,11 @@
-﻿namespace GitHub.Services
+﻿using GitHub.Primitives;
+
+namespace GitHub.Services
 {
     public interface IGitCloneCommandLineService
     {
         /// <summary>
-        /// Find the '/GitClone' option which might be passed into Visual Studio.
+        /// Find when a GitHub URL has been passed into Visual Studio using the '/GitClone' option.
         /// </summary>
         /// <example>
         /// This is used by the 'git-client' URL protocol hendler.
@@ -11,14 +13,14 @@
         /// will open Visual Studio with
         /// /GitClone https://github.com/github/VisualStudio
         /// </example>
-        /// <returns>The /GitClone option or null.</returns>
-        string FindGitCloneOption();
+        /// <returns>A GitHub URI or null.</returns>
+        UriString FindGitHubCloneOption();
 
         /// <summary>
         /// Open a repository if one exists relative to LocalClonePath or is in list of KnownRepositories.
         /// </summary>
-        /// <param name="cloneUrl"></param>
+        /// <param name="cloneUri"></param>
         /// <returns>True if repository was opened.</returns>
-        bool TryOpenRepository(string cloneUrl);
+        bool TryOpenRepository(UriString cloneUri);
     }
 }
