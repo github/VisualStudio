@@ -8,7 +8,7 @@ namespace GitHub.VisualStudio
 {
     [Guid(PackageGuidString)]
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [ProvideAppCommandLine("GitClone", typeof(GitCloneCommandLinePackage), Arguments = "1", DemandLoad = 1)]
+    [ProvideAppCommandLine(GitCloneCommandLineService.GitCloneSwitch, typeof(GitCloneCommandLinePackage), Arguments = "1", DemandLoad = 1)]
     public sealed class GitCloneCommandLinePackage : Package
     {
         public const string PackageGuidString = "379dad24-c111-4d73-89ff-e8f91cab68db";

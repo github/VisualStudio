@@ -12,6 +12,8 @@ namespace GitHub.Services
     [Export(typeof(IGitCloneCommandLineService))]
     public class GitCloneCommandLineService : IGitCloneCommandLineService
     {
+        public const string GitCloneSwitch = "GitClone";
+
         IVsAppCommandLine vsAppCommandLine;
         IVSGitServices vsGitServices;
         IVSServices vsServices;
@@ -35,7 +37,6 @@ namespace GitHub.Services
 
         public string FindGitCloneOption()
         {
-
             if (vsAppCommandLine == null)
             {
                 return null;
@@ -43,7 +44,7 @@ namespace GitHub.Services
 
             int isPresent;
             string optionValue;
-            if (ErrorHandler.Failed(vsAppCommandLine.GetOption("GitClone", out isPresent, out optionValue)))
+            if (ErrorHandler.Failed(vsAppCommandLine.GetOption(GitCloneSwitch, out isPresent, out optionValue)))
             {
                 return null;
             }
