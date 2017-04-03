@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         readonly IPackageSettings packageSettings;
-        readonly IVSServices vsServices;
+        readonly IVSGitServices vsGitServices;
         readonly int sectionIndex;
         readonly IDialogService dialogService;
         readonly IRepositoryCloneService cloneService;
@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings packageSettings,
-            IVSServices vsServices,
+            IVSGitServices vsGitServices,
             IRepositoryCloneService cloneService,
             IDialogService dialogService,
             int index)
@@ -114,7 +114,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             sectionIndex = index;
 
             this.packageSettings = packageSettings;
-            this.vsServices = vsServices;
+            this.vsGitServices = vsGitServices;
             this.cloneService = cloneService;
             this.dialogService = dialogService;
 
@@ -380,7 +380,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
             if (!Equals(SelectedRepository, old))
             {
-                var opened = vsServices.TryOpenRepository(SelectedRepository.LocalPath);
+                var opened = vsGitServices.TryOpenRepository(SelectedRepository.LocalPath);
                 if (!opened)
                 {
                     // TryOpenRepository might fail because dir no longer exists. Let user find solution themselves.

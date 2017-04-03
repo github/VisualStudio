@@ -241,7 +241,7 @@
     <Compile Include="GitHub.App\ViewModels\RepositoryPublishViewModelTests.cs" />
     <Compile Include="GitHub.Exports.Reactive\Caches\AccountCacheItemTests.cs" />
     <Compile Include="GitHub.Exports\GitServiceTests.cs" />
-    <Compile Include="GitHub.Exports\VSServicesTests.cs" />
+    <Compile Include="GitHub.TeamFoundation\TeamExplorerServicesTests.cs" />
     <Compile Include="GitHub.Exports\HostAddressTests.cs" />
     <Compile Include="GitHub.Exports\LocalRepositoryModelTests.cs" />
     <Compile Include="GitHub.Extensions\GuardTests.cs" />

@@ -23,7 +23,7 @@ namespace GitHub.Services.Tests
             {
                 var expectUri = expectUrl != null ? new UriString(expectUrl) : null;
                 var vsAppCommandLine = CreateVsAppCommandLine(gitCloneUrl);
-                var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null, null);
+                var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null);
 
                 var cloneOption = target.FindGitHubCloneOption();
 
@@ -34,7 +34,7 @@ namespace GitHub.Services.Tests
             public void OptionDoesNotExist()
             {
                 var vsAppCommandLine = CreateVsAppCommandLine(null);
-                var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null, null);
+                var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null);
 
                 var cloneOption = target.FindGitHubCloneOption();
 
@@ -46,7 +46,7 @@ namespace GitHub.Services.Tests
             {
                 var gitCloneUrl = "https://github.com/foo/bar";
                 var vsAppCommandLine = CreateVsAppCommandLine(gitCloneUrl, errorCode: VSConstants.E_FAIL);
-                var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null, null);
+                var target = new GitCloneCommandLineService(vsAppCommandLine, null, null, null);
 
                 var cloneOption = target.FindGitHubCloneOption();
 
@@ -58,7 +58,7 @@ namespace GitHub.Services.Tests
             {
                 IVsAppCommandLine vsAppCommandLine = null;
                 var target = new GitCloneCommandLineService(
-                    vsAppCommandLine, null, null, null, null);
+                    vsAppCommandLine, null, null, null);
 
                 var cloneOption = target.FindGitHubCloneOption();
 
@@ -75,12 +75,11 @@ namespace GitHub.Services.Tests
             public void RepoExistsOnLocalClonePath_TryOpenRepository(
                 string repoUrl, string clonePath, string localPath, bool tryOpenRepo)
             {
-                var vsGitServices = Substitute.For<IVSGitServices>();
+                IVSGitServices vsGitServices = CreateVSGitServices();
                 vsGitServices.GetLocalClonePathFromGitProvider().Returns(clonePath);
-                var vsServices = CreateVSServices();
                 var operatingSystem = CreateOperatingSystemWithDirectory(localPath);
                 var target = new GitCloneCommandLineService(
-                    null, vsGitServices, null, vsServices, operatingSystem);
+                    null, vsGitServices, null, operatingSystem);
                 var repoUri = new UriString(repoUrl);
 
                 var opened = target.TryOpenRepository(repoUrl);
@@ -88,11 +87,11 @@ namespace GitHub.Services.Tests
                 Assert.That(opened, Is.EqualTo(tryOpenRepo));
                 if (tryOpenRepo)
                 {
-                    vsServices.Received(1).TryOpenRepository(Arg.Is<string>(s => IgnoreCase(s, localPath)));
+                    vsGitServices.Received(1).TryOpenRepository(Arg.Is<string>(s => IgnoreCase(s, localPath)));
                 }
                 else
                 {
-                    vsServices.DidNotReceiveWithAnyArgs().TryOpenRepository(null);
+                    vsGitServices.DidNotReceiveWithAnyArgs().TryOpenRepository(null);
                 }
             }
 
@@ -101,34 +100,32 @@ namespace GitHub.Services.Tests
             {
                 var repoUrl = "https://github.com/known/known";
                 var localPath = @"x:\repo\path";
-                var vsGitServices = Substitute.For<IVSGitServices>();
+                var vsGitServices = CreateVSGitServices();
                 var knownRepos = CreateKnownRepository(repoUrl, localPath);
                 vsGitServices.GetKnownRepositories().Returns(knownRepos);
-                var vsServices = CreateVSServices();
                 var operatingSystem = Substitute.For<IOperatingSystem>();
                 var target = new GitCloneCommandLineService(
-                    null, vsGitServices, null, vsServices, operatingSystem);
+                    null, vsGitServices, null, operatingSystem);
 
                 var opened = target.TryOpenRepository(repoUrl);
 
                 Assert.That(opened, Is.True);
-                vsServices.Received(1).TryOpenRepository(localPath);
+                vsGitServices.Received(1).TryOpenRepository(localPath);
             }
 
             [Test]
             public void UnknownRepo_DontOpenRepository()
             {
                 var repoUrl = "https://github.com/unknown/unknown";
-                var vsGitServices = Substitute.For<IVSGitServices>();
-                var vsServices = CreateVSServices();
+                var vsGitServices = CreateVSGitServices();
                 var operatingSystem = Substitute.For<IOperatingSystem>();
                 var target = new GitCloneCommandLineService(
-                    null, vsGitServices, null, vsServices, operatingSystem);
+                    null, vsGitServices, null, operatingSystem);
 
                 var opened = target.TryOpenRepository(repoUrl);
 
                 Assert.That(opened, Is.False);
-                vsServices.DidNotReceiveWithAnyArgs().TryOpenRepository(null);
+                vsGitServices.DidNotReceiveWithAnyArgs().TryOpenRepository(null);
             }
 
 
@@ -141,27 +138,26 @@ namespace GitHub.Services.Tests
                 var localPath = @"x:\repo\path";
                 var clonePath = @"x:\clone_path";
                 var expectedPath = $"{clonePath}\\{owner}\\{repo}";
-                var vsGitServices = Substitute.For<IVSGitServices>();
                 var knownRepos = CreateKnownRepository(repoUrl, localPath);
+                var vsGitServices = CreateVSGitServices();
                 vsGitServices.GetKnownRepositories().Returns(knownRepos);
                 vsGitServices.GetLocalClonePathFromGitProvider().Returns(clonePath);
-                var vsServices = CreateVSServices();
                 var operatingSystem = CreateOperatingSystemWithDirectory(expectedPath);
-                var target = new GitCloneCommandLineService(null, vsGitServices, null, vsServices, operatingSystem);
+                var target = new GitCloneCommandLineService(null, vsGitServices, null, operatingSystem);
 
                 var opened = target.TryOpenRepository(repoUrl);
 
                 Assert.That(opened, Is.True);
-                vsServices.Received(1).TryOpenRepository(expectedPath);
-                vsServices.Received(1).TryOpenRepository(Arg.Any<string>());
+                vsGitServices.Received(1).TryOpenRepository(expectedPath);
+                vsGitServices.Received(1).TryOpenRepository(Arg.Any<string>());
             }
         }
 
-        static IVSServices CreateVSServices()
+        static IVSGitServices CreateVSGitServices()
         {
-            var vsServices = Substitute.For<IVSServices>();
-            vsServices.TryOpenRepository(Arg.Any<string>()).Returns(true);
-            return vsServices;
+            var vsGitServices = Substitute.For<IVSGitServices>();
+            vsGitServices.TryOpenRepository(Arg.Any<string>()).Returns(true);
+            return vsGitServices;
         }
 
         static IOperatingSystem CreateOperatingSystemWithDirectory(string dirPath = null)
@@ -190,7 +186,9 @@ namespace GitHub.Services.Tests
         {
             var outPresent = (repoUrl == null) ? 0 : 1;
             var vsAppCommandLine = Substitute.For<IVsAppCommandLine>();
-            vsAppCommandLine.GetOption("GitClone", out int present, out string optionValue).Returns(
+            int present;
+            string optionValue;
+            vsAppCommandLine.GetOption("GitClone", out present, out optionValue).Returns(
                 x => { x[1] = outPresent; x[2] = repoUrl; return errorCode; });
             return vsAppCommandLine;
         }

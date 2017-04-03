@@ -20,7 +20,7 @@ namespace GitHub.VisualStudio
                 var sp = (IGitHubServiceProvider)GetService(typeof(IGitHubServiceProvider));
                 var gitCloneCommandLineService = sp.ExportProvider.GetExportedValue<IGitCloneCommandLineService>();
                 var gitHubUri = gitCloneCommandLineService.FindGitHubCloneOption();
-                if(gitHubUri != null)
+                if (gitHubUri != null)
                 {
                     gitCloneCommandLineService.TryOpenRepository(gitHubUri);
                 }

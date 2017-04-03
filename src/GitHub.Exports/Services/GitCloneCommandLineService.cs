@@ -16,22 +16,20 @@ namespace GitHub.Services
 
         IVsAppCommandLine vsAppCommandLine;
         IVSGitServices vsGitServices;
-        IVSServices vsServices;
         IOperatingSystem operatingSystem;
 
         [ImportingConstructor]
         internal GitCloneCommandLineService(IGitHubServiceProvider sp, IVSGitServices vsGitServices,
             ITeamExplorerServices teamExplorerServices, IVSServices vsServices, IOperatingSystem operatingSystem)
-            : this(sp.TryGetService<IVsAppCommandLine>(), vsGitServices, teamExplorerServices, vsServices, operatingSystem)
+            : this(sp.TryGetService<IVsAppCommandLine>(), vsGitServices, teamExplorerServices, operatingSystem)
         {
         }
 
         public GitCloneCommandLineService(IVsAppCommandLine vsAppCommandLine, IVSGitServices vsGitServices,
-            ITeamExplorerServices teamExplorerServices, IVSServices vsServices, IOperatingSystem operatingSystem)
+            ITeamExplorerServices teamExplorerServices, IOperatingSystem operatingSystem)
         {
             this.vsAppCommandLine = vsAppCommandLine;
             this.vsGitServices = vsGitServices;
-            this.vsServices = vsServices;
             this.operatingSystem = operatingSystem;
         }
 
@@ -64,7 +62,7 @@ namespace GitHub.Services
                 return true;
             }
 
-            if(TryOpenKnownRepository(cloneUri))
+            if (TryOpenKnownRepository(cloneUri))
             {
                 return true;
             }
@@ -79,7 +77,7 @@ namespace GitHub.Services
             {
                 if (cloneUri.ToString() == repo.CloneUrl)
                 {
-                    if(vsServices.TryOpenRepository(repo.LocalPath))
+                    if (vsGitServices.TryOpenRepository(repo.LocalPath))
                     {
                         return true;
                     }
@@ -92,7 +90,7 @@ namespace GitHub.Services
         bool TryOpenLocalClonePath(UriString cloneUri)
         {
             var clonePath = vsGitServices.GetLocalClonePathFromGitProvider();
-            if(clonePath == null)
+            if (clonePath == null)
             {
                 return false;
             }
@@ -104,7 +102,7 @@ namespace GitHub.Services
                 return false;
             }
 
-            return vsServices.TryOpenRepository(repoPath);
+            return vsGitServices.TryOpenRepository(repoPath);
         }
 
         static UriString FindGitHubCloneUri(string cloneUrl)
@@ -117,7 +115,7 @@ namespace GitHub.Services
                     return null;
                 }
 
-                if(string.IsNullOrEmpty(uriString.Owner) || string.IsNullOrEmpty(uriString.RepositoryName))
+                if (string.IsNullOrEmpty(uriString.Owner) || string.IsNullOrEmpty(uriString.RepositoryName))
                 {
                     return null;
                 }
