@@ -248,6 +248,7 @@
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
+    <Compile Include="GitHub.UI\TestAutomation\ResourceValueTests.cs" />
     <Compile Include="GitHub.UI\TwoFactorInputTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\ConnectionManagerTests.cs" />
     <Compile Include="GitHub.VisualStudio\Services\RepositoryPublishServiceTests.cs" />
