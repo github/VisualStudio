@@ -7,7 +7,7 @@ using GitHub.Helpers;
 
 namespace GitHub.VisualStudio.UI.Helpers
 {
-    public class ThemeDictionaryManager : SharedDictionaryManagerBase, IDisposable
+    public sealed class ThemeDictionaryManager : SharedDictionaryManagerBase, IDisposable
     {
         static bool isInDesignMode;
         Uri baseThemeUri;
@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.UI.Helpers
 
         public void Dispose()
         {
-            if(baseThemeUri != null)
+            if (baseThemeUri != null)
             {
                 baseThemeUri = null;
                 if (!isInDesignMode)
@@ -64,7 +64,7 @@ namespace GitHub.VisualStudio.UI.Helpers
             }
 
             var currentTheme = Colors.DetectTheme();
-            return new Uri(baseThemeUri, $"Theme{currentTheme}.xaml");
+            return new Uri(baseThemeUri, "Theme" + currentTheme + ".xaml");
         }
     }
 }
