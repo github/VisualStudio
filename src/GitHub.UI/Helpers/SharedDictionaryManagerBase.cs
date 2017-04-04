@@ -8,6 +8,7 @@ namespace GitHub.Helpers
     {
         static IDictionary<Uri, ResourceDictionary> sharedDictionaries;
         static IList<IDisposable> disposables;
+        Uri source;
 
         static SharedDictionaryManagerBase()
         {
@@ -18,9 +19,11 @@ namespace GitHub.Helpers
 
         public virtual new Uri Source
         {
-            get { return base.Source; }
+            get { return source; }
             set
             {
+                source = value;
+
                 value = FixDesignTimeUri(value);
                 var rd = GetResourceDictionary(value);
                 MergedDictionaries.Clear();
