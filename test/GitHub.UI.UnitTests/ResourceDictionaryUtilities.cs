@@ -30,18 +30,12 @@ namespace GitHub.UI.UnitTests
             if (source != null)
             {
                 writer.WriteLine(indent + source + " (" + rd.GetType().FullName + ") # " + rd.GetHashCode());
-                foreach (var child in rd.MergedDictionaries)
-                {
-                    DumpResourceDictionary(writer, child, indent + "  ");
-                }
+                indent += "  ";
             }
-            else
+
+            foreach (var child in rd.MergedDictionaries)
             {
-                // ignore our empty nodes
-                foreach (var child in rd.MergedDictionaries)
-                {
-                    DumpResourceDictionary(writer, child, indent);
-                }
+                DumpResourceDictionary(writer, child, indent);
             }
         }
     }
