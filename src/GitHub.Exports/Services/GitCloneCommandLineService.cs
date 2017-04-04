@@ -19,14 +19,12 @@ namespace GitHub.Services
         IOperatingSystem operatingSystem;
 
         [ImportingConstructor]
-        internal GitCloneCommandLineService(IGitHubServiceProvider sp, IVSGitServices vsGitServices,
-            ITeamExplorerServices teamExplorerServices, IVSServices vsServices, IOperatingSystem operatingSystem)
-            : this(sp.TryGetService<IVsAppCommandLine>(), vsGitServices, teamExplorerServices, operatingSystem)
+        internal GitCloneCommandLineService(IGitHubServiceProvider sp, IVSGitServices vsGitServices, IOperatingSystem operatingSystem)
+            : this(sp.TryGetService<IVsAppCommandLine>(), vsGitServices, operatingSystem)
         {
         }
 
-        public GitCloneCommandLineService(IVsAppCommandLine vsAppCommandLine, IVSGitServices vsGitServices,
-            ITeamExplorerServices teamExplorerServices, IOperatingSystem operatingSystem)
+        public GitCloneCommandLineService(IVsAppCommandLine vsAppCommandLine, IVSGitServices vsGitServices, IOperatingSystem operatingSystem)
         {
             this.vsAppCommandLine = vsAppCommandLine;
             this.vsGitServices = vsGitServices;
