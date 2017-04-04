@@ -10,7 +10,7 @@
                                        xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                        xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
                                        xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-                                       xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
+                                       xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                                        Margin="0"
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
