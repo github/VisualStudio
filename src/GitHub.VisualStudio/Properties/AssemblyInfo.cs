@@ -14,5 +14,3 @@ using Microsoft.VisualStudio.Shell;
 [assembly: ProvideCodeBase(AssemblyName = "LibGit2Sharp", CodeBase = @"$PackageFolder$\LibGit2Sharp.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Splat", CodeBase = @"$PackageFolder$\Splat.dll")]
 [assembly: ProvideCodeBase(AssemblyName = "Rothko", CodeBase = @"$PackageFolder$\Rothko.dll")]
-[assembly: ProvideCodeBase(AssemblyName = "GitHub.VisualStudio.TestAutomation.AutomationIDs",
-    CodeBase = @"$PackageFolder$\GitHub.VisualStudio.TestAutomation.AutomationIDs.dll")]
