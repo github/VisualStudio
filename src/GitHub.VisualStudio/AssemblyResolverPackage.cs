@@ -11,10 +11,10 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.VisualStudio
 {
     // This is the Git service GUID, which fires early and is used by GitHubService.
-    [ProvideAutoLoad(Guids.GitSccProviderId)]
+    //[ProvideAutoLoad(Guids.GitSccProviderId)]
 
     // This fires before ShellInitialized and SolutionExists.
-    [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
+    //[ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
 
     [Guid(GuidList.guidAssemblyResolverPkgString)]
     public class AssemblyResolverPackage : Package
