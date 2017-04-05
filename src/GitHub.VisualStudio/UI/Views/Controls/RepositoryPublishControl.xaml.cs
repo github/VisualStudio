@@ -14,7 +14,7 @@ using GitHub.Services;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericRepositoryPublishControl : SimpleViewUserControl<IRepositoryPublishViewModel, RepositoryPublishControl>
+    public class GenericRepositoryPublishControl : ViewBase<IRepositoryPublishViewModel, RepositoryPublishControl>
     { }
     
     [ExportView(ViewType=UIViewType.Publish)]
@@ -35,13 +35,8 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                     if (state == ProgressState.Success)
                     {
                         teServices.ShowMessage(UI.Resources.RepositoryPublishedMessage);
-                        NotifyDone();
                     }
                 });
-
-                d(this.WhenAny(x => x.ViewModel.IsPublishing, x => x.Value)
-                    .Subscribe(x => NotifyIsBusy(x)));
-
 
                 d(notifications.Listen()
                     .Where(n => n.Type == Notification.NotificationType.Error)

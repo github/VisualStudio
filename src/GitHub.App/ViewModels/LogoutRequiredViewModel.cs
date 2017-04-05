@@ -14,12 +14,14 @@ using NullGuard;
 using ReactiveUI;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.LogoutRequired)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class LogoutRequiredViewModel : BaseViewModel, ILogoutRequiredViewModel
+    public class LogoutRequiredViewModel : DialogViewModelBase, ILogoutRequiredViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
         readonly IRepositoryHosts repositoryHosts;
@@ -52,6 +54,11 @@ namespace GitHub.ViewModels
         }
 
         public IReactiveCommand<ProgressState> Logout { get; }
+
+        public override IObservable<Unit> Done
+        {
+            get { return Logout.Where(x => x == ProgressState.Success).SelectUnit(); }
+        }
 
         IObservable<ProgressState> OnLogout(object unused)
         {

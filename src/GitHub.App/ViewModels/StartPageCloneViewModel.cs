@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using GitHub.App;
 using GitHub.Exports;
+using GitHub.Extensions.Reactive;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Validation;
@@ -20,7 +21,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.StartPageClone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class StartPageCloneViewModel : BaseViewModel, IBaseCloneViewModel
+    public class StartPageCloneViewModel : DialogViewModelBase, IBaseCloneViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
@@ -156,5 +157,7 @@ namespace GitHub.ViewModels
             get;
             private set;
         }
+
+        public override IObservable<Unit> Done => CloneCommand.SelectUnit();
     }
 }

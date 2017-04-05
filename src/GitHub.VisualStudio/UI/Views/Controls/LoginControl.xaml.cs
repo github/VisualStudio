@@ -1,6 +1,7 @@
 ﻿using System;
+using System.ComponentModel.Composition;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows;
 using System.Windows.Input;
 using GitHub.Controls;
 using GitHub.Exports;
@@ -8,13 +9,10 @@ using GitHub.Extensions;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
-using System.ComponentModel.Composition;
-using GitHub.UserErrors;
-using System.Reactive.Disposables;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericLoginControl : SimpleViewUserControl<ILoginControlViewModel, LoginControl>
+    public class GenericLoginControl : ViewBase<ILoginControlViewModel, LoginControl>
     { }
 
     /// <summary>
@@ -35,14 +33,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
-                ViewModel.AuthenticationResults
-                    .Subscribe(ret =>
-                {
-                    if (ret == Authentication.AuthenticationResult.Success)
-                    {
-                        NotifyDone();
-                    }
-                });
 
                 d(Disposable.Create(() => errorHandler.Dispose()));
             });

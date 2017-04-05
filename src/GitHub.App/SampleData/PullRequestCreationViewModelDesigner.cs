@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
+using System;
+using System.Reactive;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestCreationViewModelDesigner : BaseViewModel, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModelDesigner : DialogViewModelBase, IPullRequestCreationViewModel
     {
         public PullRequestCreationViewModelDesigner()
         {
@@ -46,5 +48,6 @@ namespace GitHub.SampleData
 
         public ReactivePropertyValidator BranchValidator { get; }
 
+        public override IObservable<Unit> Done { get; }
     }
 }

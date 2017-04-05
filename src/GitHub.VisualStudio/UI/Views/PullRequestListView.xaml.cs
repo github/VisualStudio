@@ -16,16 +16,15 @@ using System.Reactive.Disposables;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericPullRequestListView : SimpleViewUserControl<IPullRequestListViewModel, PullRequestListView>
+    public class GenericPullRequestListView : ViewBase<IPullRequestListViewModel, PullRequestListView>
     { }
 
     [ExportView(ViewType = UIViewType.PRList)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class PullRequestListView : GenericPullRequestListView, ICanLoad
+    public partial class PullRequestListView : GenericPullRequestListView, IDisposable
     {
         readonly Subject<int> open = new Subject<int>();
         readonly Subject<object> create = new Subject<object>();
-        readonly Subject<ViewWithData> load = new Subject<ViewWithData>();
 
         public PullRequestListView()
         {
@@ -36,18 +35,6 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestListView(IGitHubServiceProvider serviceProvider)
         {
             InitializeComponent();
-
-            OpenPR = new RelayCommand(x =>
-            {
-                var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = x };
-                load.OnNext(d);
-            });
-
-            CreatePR = new RelayCommand(x =>
-            {
-                var d = new ViewWithData(UIControllerFlow.PullRequestCreation);
-                load.OnNext(d);
-            });
 
             OpenPROnGitHub = new RelayCommand(x =>
             {
@@ -69,21 +56,20 @@ namespace GitHub.VisualStudio.UI.Views
         }
 
         public ICommand OpenPROnGitHub { get; set; }
-        public ICommand OpenPR { get; set; }
-        public ICommand CreatePR { get; set; }
-
-        public IObservable<ViewWithData> Load => load;
 
         bool disposed;
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (disposing)
-            {
-                if (disposed) return;
 
-                open.Dispose();
-                create.Dispose();
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    open.Dispose();
+                    create.Dispose();
+                }
+
                 disposed = true;
             }
         }

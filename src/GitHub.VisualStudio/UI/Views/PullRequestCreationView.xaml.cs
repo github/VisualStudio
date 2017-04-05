@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericPullRequestCreationView : SimpleViewUserControl<IPullRequestCreationViewModel, GenericPullRequestCreationView>
+    public class GenericPullRequestCreationView : ViewBase<IPullRequestCreationViewModel, GenericPullRequestCreationView>
     { }
 
     [ExportView(ViewType = UIViewType.PRCreation)]
@@ -17,12 +17,6 @@ namespace GitHub.VisualStudio.UI.Views
         public PullRequestCreationView()
         {
             InitializeComponent();
-
-            this.WhenActivated(d =>
-            {
-                d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
-                d(ViewModel.CreatePullRequest.Subscribe(_ => NotifyDone()));
-            });
         }
     }
 }

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Net;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using GitHub.Authentication;
-using GitHub.Info;
 using GitHub.Models;
-using GitHub.Primitives;
-using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
-using Octokit;
 using ReactiveUI;
 using Xunit;
 
@@ -18,7 +13,47 @@ public class LoginControlViewModelTests
     public class TheAuthenticationResultsCommand : TestBaseClass
     {
         [Fact]
-        public async void AllowsLoginFromEnterpriseAfterGitHubLoginHasFailed()
+        public async Task SucessfulGitHubLoginSignalsDone()
+        {
+            var repositoryHosts = Substitute.For<IRepositoryHosts>();
+
+            var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
+            var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+                Observable.Return(AuthenticationResult.Success));
+            gitHubLogin.Login.Returns(gitHubLoginCommand);
+            var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
+
+            var loginViewModel = new LoginControlViewModel(repositoryHosts, gitHubLogin, enterpriseLogin);
+            var signalled = false;
+
+            loginViewModel.Done.Subscribe(_ => signalled = true);
+            await gitHubLoginCommand.ExecuteAsync();
+
+            Assert.True(signalled);
+        }
+
+        [Fact]
+        public async Task FailedGitHubLoginDoesNotSignalDone()
+        {
+            var repositoryHosts = Substitute.For<IRepositoryHosts>();
+
+            var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
+            var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+                Observable.Return(AuthenticationResult.CredentialFailure));
+            gitHubLogin.Login.Returns(gitHubLoginCommand);
+            var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
+
+            var loginViewModel = new LoginControlViewModel(repositoryHosts, gitHubLogin, enterpriseLogin);
+            var signalled = false;
+
+            loginViewModel.Done.Subscribe(_ => signalled = true);
+            await gitHubLoginCommand.ExecuteAsync();
+
+            Assert.False(signalled);
+        }
+
+        [Fact]
+        public async Task AllowsLoginFromEnterpriseAfterGitHubLoginHasFailed()
         {
             var repositoryHosts = Substitute.For<IRepositoryHosts>();
 

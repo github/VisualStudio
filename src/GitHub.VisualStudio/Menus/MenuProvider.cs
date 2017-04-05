@@ -50,7 +50,8 @@ namespace GitHub.VisualStudio.Menus
             {
                 new CopyLink(serviceProvider),
                 new CreateGist(serviceProvider),
-                new OpenLink(serviceProvider)
+                new OpenLink(serviceProvider),
+                new BlameLink(serviceProvider)
             };
         }
     }
