@@ -11,7 +11,7 @@ Use GitHub for Visual Studio to manage your projects and work with pull requests
 - Working with pull requests
   - [Viewing pull requests for a repository](viewing-the-pull-requests-for-a-repository.md)
   - [Creating a pull request](creating-a-pull-request.md)
-  - [Reviewing a pull request in Visual Studio](review-a-pull-request-in-visual-studio.md)
+  - [Reviewing a pull request in Visual Studio](reviewing-a-pull-request-in-visual-studio.md)
   - [Making changes to a pull request](making-changes-to-a-pull-request.md)
 - Operations provided by Visual Studio
   - [Committing](https://www.visualstudio.com/en-us/docs/git/tutorial/commits)
