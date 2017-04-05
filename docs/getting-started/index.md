@@ -1,4 +1,4 @@
-# Setting up GitHub for Visual Studio
+# Getting Started with GitHub for Visual Studio
 
 ## [Installing GitHub for Visual Studio](installing-github-for-visual-studio.md)
 
