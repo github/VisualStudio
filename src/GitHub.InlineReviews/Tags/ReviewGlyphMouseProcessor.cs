@@ -39,8 +39,7 @@ namespace GitHub.InlineReviews.Tags
 
                 if (tag != null)
                 {
-                    var snapshotPoint = tag.Span.Start.GetPoint(textView.TextBuffer, PositionAffinity.Predecessor);
-                    var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(snapshotPoint.Value.Position, PointTrackingMode.Positive);
+                    var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
 
                     var session = peekBroker.TriggerPeekSession(
                         textView,
