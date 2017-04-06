@@ -51,12 +51,6 @@ namespace GitHub.VisualStudio
             await GetServiceAsync(typeof(IUsageTracker));
 
             InitializeMenus().Forget();
-
-            // HACK: VS isn't loading this package automatically.
-            IVsShell shell = GetService(typeof(SVsShell)) as IVsShell;
-            var guid = new Guid(Guids.InlineReviewsPackageId);
-            IVsPackage package;
-            shell.LoadPackage(ref guid, out package);
         }
 
         async Task InitializeMenus()
