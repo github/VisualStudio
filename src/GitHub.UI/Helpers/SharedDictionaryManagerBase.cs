@@ -1,53 +1,111 @@
 ﻿using System;
 using System.Windows;
 using System.Collections.Generic;
+using NullGuard;
 
 namespace GitHub.Helpers
 {
     public class SharedDictionaryManagerBase : ResourceDictionary
     {
-        static IDictionary<Uri, ResourceDictionary> sharedDictionaries;
-        static IList<IDisposable> disposables;
+        CachingFactory factory;
         Uri source;
 
-        static SharedDictionaryManagerBase()
+        public SharedDictionaryManagerBase() : this(GetCurrentDomainCachingFactory())
         {
-            // Avoid leaking resources at design time.
-            sharedDictionaries = GetAppDomainSharedDictionaries();
-            disposables = GetAppDomainDisposables();
+        }
+
+        public SharedDictionaryManagerBase(CachingFactory factory)
+        {
+            this.factory = factory;
         }
 
         public virtual new Uri Source
         {
-            get { return source; }
+            // Just in case the designer checks this property.
+            [return: AllowNull]
+            get
+            {
+                return source;
+            }
+
             set
             {
                 source = value;
 
                 value = FixDesignTimeUri(value);
-                var rd = GetResourceDictionary(value);
+                var rd = factory.GetOrCreateResourceDictionary(this, value);
                 MergedDictionaries.Clear();
                 MergedDictionaries.Add(rd);
+            }
+        }
 
-                // Remember dictionaries that need disposing of.
-                var disposable = this as IDisposable;
-                if (disposable != null && !disposables.Contains(disposable))
+        public static CachingFactory GetCurrentDomainCachingFactory()
+        {
+            var dataName = typeof(CachingFactory).FullName;
+            var data = AppDomain.CurrentDomain.GetData(dataName);
+
+            var cachingFactory = data as CachingFactory;
+            if(cachingFactory != null)
+            {
+                return cachingFactory;
+            }
+
+            var disposable = data as IDisposable;
+            if(disposable != null)
+            {
+                disposable.Dispose();
+            }
+
+            cachingFactory = new CachingFactory();
+            AppDomain.CurrentDomain.SetData(dataName, cachingFactory);
+            return cachingFactory;
+        }
+
+        public class CachingFactory : IDisposable
+        {
+            IDictionary<Uri, ResourceDictionary> sharedDictionaries;
+            ISet<IDisposable> disposables;
+
+            public CachingFactory()
+            {
+                sharedDictionaries = new Dictionary<Uri, ResourceDictionary>();
+                disposables = new HashSet<IDisposable>();
+            }
+
+            public void Dispose()
+            {
+                foreach (var disposable in disposables)
+                {
+                    disposable.Dispose();
+                }
+
+                disposables.Clear();
+                sharedDictionaries.Clear();
+            }
+
+            public ResourceDictionary GetOrCreateResourceDictionary(ResourceDictionary owner, Uri uri)
+            {
+                TryAddDisposable(owner);
+
+                ResourceDictionary rd;
+                if (!sharedDictionaries.TryGetValue(uri, out rd))
+                {
+                    rd = new LoadingResourceDictionary { Source = uri };
+                    sharedDictionaries[uri] = rd;
+                }
+
+                return rd;
+            }
+
+            // Remember subtypes that need disposing of.
+            public void TryAddDisposable(object owner)
+            {
+                var disposable = owner as IDisposable;
+                if (disposable != null)
                 {
                     disposables.Add(disposable);
                 }
             }
-        }
-
-        ResourceDictionary GetResourceDictionary(Uri uri)
-        {
-            ResourceDictionary rd;
-            if (!sharedDictionaries.TryGetValue(uri, out rd))
-            {
-                rd = new LoadingResourceDictionary { Source = uri };
-                sharedDictionaries[uri] = rd;
-            }
-
-            return rd;
         }
 
         public static Uri FixDesignTimeUri(Uri inUri)
@@ -76,40 +134,6 @@ namespace GitHub.Helpers
             var path = url.Substring(pathIndex + 1);
 
             return new Uri($"pack://application:,,,/{assemblyName};component/{path}");
-        }
-
-        static IDictionary<Uri, ResourceDictionary> GetAppDomainSharedDictionaries()
-        {
-            var name = typeof(SharedDictionaryManagerBase).FullName + ".SharedDictionaries";
-            var sharedDictionaries = GetAppDomainData<Dictionary<Uri, ResourceDictionary>>(name);
-
-            sharedDictionaries.Clear();
-            return sharedDictionaries;
-        }
-
-        static IList<IDisposable> GetAppDomainDisposables()
-        {
-            var name = typeof(SharedDictionaryManagerBase).FullName + ".Disposables";
-            var disposables = GetAppDomainData<List<IDisposable>>(name);
-            foreach (var disposable in disposables)
-            {
-                disposable.Dispose();
-            }
-
-            disposables.Clear();
-            return disposables;
-        }
-
-        static T GetAppDomainData<T>(string name) where T : new()
-        {
-            var data = (T)AppDomain.CurrentDomain.GetData(name);
-            if (data == null)
-            {
-                data = new T();
-                AppDomain.CurrentDomain.SetData(name, data);
-            }
-
-            return data;
         }
     }
 }
