@@ -8,7 +8,7 @@ namespace GitHub.InlineReviews
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.InlineReviewsPackageId)]
-    [ProvideAutoLoad(UIContextGuids80.EmptySolution)]
+    [ProvideAutoLoad(UIContextGuids80.CodeWindow)]
     public class InlineReviewsPackage : Package
     {
         protected override void Initialize()
