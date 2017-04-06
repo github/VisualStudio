@@ -22,21 +22,11 @@ namespace GitHub.InlineReviews.Peek
 
         public void AugmentPeekSession(IPeekSession session, IList<IPeekableItem> peekableItems)
         {
-            if (session.RelationshipName == ReviewPeekRelationship.Instance.Name)
+            var options = session.CreationOptions as ReviewPeekSessionCreationOptions;
+
+            if (session.RelationshipName == ReviewPeekRelationship.Instance.Name && options != null)
             {
-                var triggerPoint = session.GetTriggerPoint(textBuffer.CurrentSnapshot);
-
-                if (triggerPoint.HasValue)
-                {
-                    var line = session.TextView.GetTextViewLineContainingBufferPosition(triggerPoint.Value);
-
-                    if (line != null)
-                    {
-                        var aggregator = tagAggregatorFactory.CreateTagAggregator<ReviewTag>(session.TextView);
-                        var comments = aggregator.GetTags(line.ExtentAsMappingSpan).Select(x => x.Tag.Comment);
-                        peekableItems.Add(new ReviewPeekableItem(comments.ToList()));
-                    }
-                }
+                peekableItems.Add(new ReviewPeekableItem(options.Comments));
             }
         }
 

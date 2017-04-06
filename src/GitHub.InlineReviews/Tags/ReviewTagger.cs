@@ -41,14 +41,15 @@ namespace GitHub.InlineReviews.Tags
 
                     var spanComments = comments.Where(x =>
                         x.Position >= startLine &&
-                        x.Position <= endLine);
+                        x.Position <= endLine)
+                        .GroupBy(x => x.Position);
 
-                    foreach (var comment in spanComments)
+                    foreach (var entry in spanComments)
                     {
-                        var line = span.Snapshot.GetLineFromLineNumber(comment.Position);
+                        var line = span.Snapshot.GetLineFromLineNumber(entry.Key);
                         yield return new TagSpan<ReviewTag>(
                             new SnapshotSpan(line.Start, line.End),
-                            new ReviewTag(comment.Original));
+                            new ReviewTag(entry.Select(x => x.Original)));
                     }
                 }
             }

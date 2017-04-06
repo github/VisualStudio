@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GitHub.Models;
 using Microsoft.VisualStudio.Text.Editor;
 
@@ -6,11 +7,11 @@ namespace GitHub.InlineReviews.Tags
 {
     class ReviewTag : IGlyphTag
     {
-        public ReviewTag(IPullRequestReviewCommentModel comment)
+        public ReviewTag(IEnumerable<IPullRequestReviewCommentModel> comments)
         {
-            Comment = comment;
+            Comments = new List<IPullRequestReviewCommentModel>(comments);
         }
 
-        public IPullRequestReviewCommentModel Comment { get; }
+        public IList<IPullRequestReviewCommentModel> Comments { get; }
     }
 }

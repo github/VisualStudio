@@ -40,12 +40,8 @@ namespace GitHub.InlineReviews.Tags
                 if (tag != null)
                 {
                     var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-
-                    var session = peekBroker.TriggerPeekSession(
-                        textView,
-                        trackingPoint,
-                        ReviewPeekRelationship.Instance.Name);
-
+                    var options = new ReviewPeekSessionCreationOptions(textView, trackingPoint, tag.Tag.Comments);
+                    var session = peekBroker.TriggerPeekSession(options);
                     e.Handled = true;
                 }
             }
