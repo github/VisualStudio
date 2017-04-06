@@ -3,8 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:GitHub.InlineReviews.Peek"
+             xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
              mc:Ignorable="d" d:DesignHeight="100" d:DesignWidth="300">
+    <d:DesignProperties.DataContext>
+        <sample:PullRequestReviewCommentDesigner/>
+    </d:DesignProperties.DataContext>
+
+    <UserControl.Resources>
+        <Style x:Key="DocumentStyle" TargetType="FlowDocument">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="PagePadding" Value="0"/>
+
+            <Style.Resources>
+                <Style TargetType="Image">
+                    <Setter Property="Stretch" Value="UniformToFill" />
+                    <Setter Property="StretchDirection" Value="DownOnly" />
+                    <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -15,8 +39,20 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Image Grid.Column="0" Grid.RowSpan="2" Height="32" Margin="4 2" VerticalAlignment="Top" Source="{Binding User.AvatarUrl}"/>
-        <TextBlock Grid.Column="1" Grid.Row="0" FontWeight="Bold" Margin="2" Text="{Binding User.Login}"/>
-        <TextBlock Grid.Column="1" Grid.Row="1" Margin="2" Text="{Binding Body}"/>
+        <controls:AccountAvatar Grid.RowSpan="2"
+                                Margin="4 2"
+                                Width="32" 
+                                Height="32" 
+                                VerticalAlignment="Top"
+                                Account="{Binding User}"/>
+        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
+            <TextBlock Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+        </StackPanel>
+        <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                           Margin="2"
+                           DocumentStyle="{StaticResource DocumentStyle}"
+                           RawContent="{Binding Body}"
+                           ScrollViewer.VerticalScrollBarVisibility="Auto"/>
     </Grid>
 </UserControl>
