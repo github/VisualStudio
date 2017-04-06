@@ -662,6 +662,12 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
+      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
+      <Name>GitHub.InlineReviews</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
       <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
       <Name>GitHub.StartPage</Name>

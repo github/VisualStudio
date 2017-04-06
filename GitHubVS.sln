@@ -106,6 +106,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.StartPage", "src\Git
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.UI.UnitTests", "test\GitHub.UI.UnitTests\GitHub.UI.UnitTests.csproj", "{110B206F-8554-4B51-BF86-94DAA32F5E26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.InlineReviews", "src\GitHub.InlineReviews\GitHub.InlineReviews.csproj", "{7F5ED78B-74A3-4406-A299-70CFB5885B8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -560,6 +562,22 @@ Global
 		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|Any CPU.Build.0 = Release|Any CPU
 		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|x86.ActiveCfg = Release|Any CPU
 		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|x86.Build.0 = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Publish|x86.ActiveCfg = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Publish|x86.Build.0 = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|x86.Build.0 = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|Any CPU.ActiveCfg = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|Any CPU.Build.0 = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|x86.ActiveCfg = Release|Any CPU
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

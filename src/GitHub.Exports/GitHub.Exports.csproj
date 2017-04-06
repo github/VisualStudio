@@ -129,6 +129,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\IPullRequestReviewCommentModel.cs" />
+    <Compile Include="Services\IPullRequestReviewSession.cs" />
     <Compile Include="ViewModels\IHasLoading.cs" />
     <Compile Include="ViewModels\IPanePageViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

@@ -30,6 +30,7 @@ namespace GitHub.ViewModels
         readonly ILocalRepositoryModel repository;
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
+        readonly IPullRequestReviewSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -57,10 +58,12 @@ namespace GitHub.ViewModels
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
+            IPullRequestReviewSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
                   pullRequestsService,
+                  sessionManager,
                   usageTracker)
         {
         }
@@ -76,11 +79,13 @@ namespace GitHub.ViewModels
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
+            IPullRequestReviewSessionManager sessionManager,
             IUsageTracker usageTracker)
         {
             this.repository = repository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
+            this.sessionManager = sessionManager;
             this.usageTracker = usageTracker;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -367,6 +372,8 @@ namespace GitHub.ViewModels
             {
                 pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
             }
+
+            StartReviewSession();
         }
 
         /// <summary>
@@ -472,6 +479,19 @@ namespace GitHub.ViewModels
                     }
                 default:
                     return null;
+            }
+        }
+
+        void StartReviewSession()
+        {
+            if (IsCheckedOut)
+            {
+                var session = new PullRequestReviewSession(repository, Model.Comments);
+                sessionManager.NotifySessionChanged(session);
+            }
+            else
+            {
+                sessionManager.NotifySessionChanged(null);
             }
         }
 

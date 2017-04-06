@@ -160,6 +160,7 @@ namespace GitHub.Models
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
         public IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
+        public IReadOnlyCollection<IPullRequestReviewCommentModel> Comments { get; set; } = new IPullRequestReviewCommentModel[0];
 
         IAccount assignee;
         [AllowNull]

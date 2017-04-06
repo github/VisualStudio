@@ -246,6 +246,11 @@ namespace GitHub.Api
             return gitHubClient.PullRequest.Files(owner, name, number);
         }
 
+        public IObservable<PullRequestReviewComment> GetPullRequestReviewComments(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Comment.GetAll(owner, name, number);
+        }
+
         public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
         {
             return gitHubClient.PullRequest.GetAllForRepository(owner, name,
