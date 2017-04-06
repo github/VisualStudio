@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -30,5 +31,6 @@ namespace GitHub.Services
         LibGit2Sharp.IRepository GetActiveRepo();
         IEnumerable<ILocalRepositoryModel> GetKnownRepositories();
         string SetDefaultProjectPath(string path);
+        bool TryOpenRepository(string directory);
     }
 }

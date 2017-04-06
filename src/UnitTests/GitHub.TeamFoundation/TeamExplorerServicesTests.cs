@@ -7,7 +7,7 @@ using Xunit;
 using DTE = EnvDTE.DTE;
 using Rothko;
 
-public class VSServicesTests
+public class TeamExplorerServicesTests
 {
     public class TheTryOpenRepositoryMethod : TestBaseClass
     {
@@ -15,7 +15,7 @@ public class VSServicesTests
         public void NoExceptions_ReturnsTrue()
         {
             var repoDir = @"x:\repo";
-            var target = CreateVSServices(repoDir);
+            var target = CreateVSGitServices(repoDir);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -29,7 +29,7 @@ public class VSServicesTests
             var dte = Substitute.For<DTE>();
             dte.Solution.When(s => s.Create(Arg.Any<string>(), Arg.Any<string>())).Do(
                 ci => { throw new COMException(); });
-            var target = CreateVSServices(repoDir, dte: dte);
+            var target = CreateVSGitServices(repoDir, dte: dte);
 
             var success = target.TryOpenRepository("");
 
@@ -44,7 +44,7 @@ public class VSServicesTests
             //var directoryInfo = Substitute.For<IDirectoryInfo>();
             //directoryInfo.Exists.Returns(false);
             //os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
-            var target = CreateVSServices(null, os: os);
+            var target = CreateVSGitServices(null, os: os);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -55,14 +55,14 @@ public class VSServicesTests
         public void DeleteThrowsIOException_ReturnTrue()
         {
             var repoDir = @"x:\repo";
-            var tempDir = Path.Combine(repoDir, ".vs", VSServices.TempSolutionName);
+            var tempDir = Path.Combine(repoDir, ".vs", VSGitServices.TempSolutionName);
             var os = Substitute.For<IOperatingSystem>();
             var directoryInfo = Substitute.For<IDirectoryInfo>();
             directoryInfo.Exists.Returns(true);
             os.Directory.GetDirectory(tempDir).Returns(directoryInfo);
             directoryInfo.When(di => di.Delete(true)).Do(
                 ci => { throw new IOException(); });
-            var target = CreateVSServices(repoDir, os: os);
+            var target = CreateVSGitServices(repoDir, os: os);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -73,19 +73,19 @@ public class VSServicesTests
         public void SolutionCreate_DeleteVsSolutionSubdir()
         {
             var repoDir = @"x:\repo";
-            var tempDir = Path.Combine(repoDir, ".vs", VSServices.TempSolutionName);
+            var tempDir = Path.Combine(repoDir, ".vs", VSGitServices.TempSolutionName);
             var os = Substitute.For<IOperatingSystem>();
             var directoryInfo = Substitute.For<IDirectoryInfo>();
             directoryInfo.Exists.Returns(true);
             os.Directory.GetDirectory(tempDir).Returns(directoryInfo);
-            var target = CreateVSServices(repoDir, os: os);
+            var target = CreateVSGitServices(repoDir, os: os);
 
             var success = target.TryOpenRepository(repoDir);
 
             directoryInfo.Received().Delete(true);
         }
 
-        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null)
+        VSGitServices CreateVSGitServices(string repoDir, IOperatingSystem os = null, DTE dte = null)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
@@ -100,29 +100,7 @@ public class VSServicesTests
             var provider = Substitute.For<IGitHubServiceProvider>();
             provider.TryGetService<DTE>().Returns(dte);
             provider.TryGetService<IOperatingSystem>().Returns(os);
-            return new VSServices(provider);
+            return new VSGitServices(provider);
         }
-    }
-
-    public class TheCloneMethod : TestBaseClass
-    {
-        /*
-        [Theory]
-        [InlineData(true, CloneOptions.RecurseSubmodule)]
-        [InlineData(false, CloneOptions.None)]
-        public void CallsCloneOnVsProvidedCloneService(bool recurseSubmodules, CloneOptions expectedCloneOptions)
-        {
-            var provider = Substitute.For<IUIProvider>();
-            var gitRepositoriesExt = Substitute.For<IGitRepositoriesExt>();
-            provider.GetService(typeof(IGitRepositoriesExt)).Returns(gitRepositoriesExt);
-            provider.TryGetService(typeof(IGitRepositoriesExt)).Returns(gitRepositoriesExt);
-            var vsServices = new VSServices(provider);
-
-            vsServices.Clone("https://github.com/github/visualstudio", @"c:\fake\ghfvs", recurseSubmodules);
-
-            gitRepositoriesExt.Received()
-                .Clone("https://github.com/github/visualstudio", @"c:\fake\ghfvs", expectedCloneOptions);
-        }
-        */
     }
 }
