@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="GitHub.InlineReviews.Views.CommentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.InlineReviews.Peek"
+             mc:Ignorable="d" d:DesignHeight="100" d:DesignWidth="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Image Grid.Column="0" Grid.RowSpan="2" Height="32" Margin="4 2" VerticalAlignment="Top" Source="{Binding User.AvatarUrl}"/>
+        <TextBlock Grid.Column="1" Grid.Row="0" FontWeight="Bold" Margin="2" Text="{Binding User.Login}"/>
+        <TextBlock Grid.Column="1" Grid.Row="1" Margin="2" Text="{Binding Body}"/>
+    </Grid>
+</UserControl>

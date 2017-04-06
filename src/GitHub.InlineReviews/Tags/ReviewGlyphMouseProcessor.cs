@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Input;
+using GitHub.InlineReviews.Peek;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -41,10 +42,10 @@ namespace GitHub.InlineReviews.Tags
                     var snapshotPoint = tag.Span.Start.GetPoint(textView.TextBuffer, PositionAffinity.Predecessor);
                     var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(snapshotPoint.Value.Position, PointTrackingMode.Positive);
 
-                    //var session = peekBroker.TriggerPeekSession(
-                    //    textView,
-                    //    trackingPoint,
-                    //    ReviewPeekRelationship.Instance.Name);
+                    var session = peekBroker.TriggerPeekSession(
+                        textView,
+                        trackingPoint,
+                        ReviewPeekRelationship.Instance.Name);
 
                     e.Handled = true;
                 }

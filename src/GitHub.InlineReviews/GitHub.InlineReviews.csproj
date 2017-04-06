@@ -54,6 +54,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InlineReviewsPackage.cs" />
+    <Compile Include="Peek\ReviewPeekableItem.cs" />
+    <Compile Include="Peek\ReviewPeekableItemSource.cs" />
+    <Compile Include="Peek\ReviewPeekableItemSourceProvider.cs" />
+    <Compile Include="Peek\ReviewPeekableResultSource.cs" />
+    <Compile Include="Peek\ReviewPeekRelationship.cs" />
+    <Compile Include="Peek\ReviewPeekResult.cs" />
+    <Compile Include="Peek\ReviewPeekResultPresentation.cs" />
+    <Compile Include="Peek\ReviewPeekResultPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tags\ReviewGlyph.xaml.cs">
       <DependentUpon>ReviewGlyph.xaml</DependentUpon>
@@ -64,6 +72,13 @@
     <Compile Include="Tags\ReviewTag.cs" />
     <Compile Include="Tags\ReviewTagger.cs" />
     <Compile Include="Tags\ReviewTaggerProvider.cs" />
+    <Compile Include="ViewModels\CommentBlockViewModel.cs" />
+    <Compile Include="Views\CommentBlockView.xaml.cs">
+      <DependentUpon>CommentBlockView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CommentView.xaml.cs">
+      <DependentUpon>CommentView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
@@ -238,6 +253,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Tags\ReviewGlyph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CommentBlockView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CommentView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
