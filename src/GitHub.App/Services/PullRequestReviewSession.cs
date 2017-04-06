@@ -8,14 +8,16 @@ namespace GitHub.Services
 {
     public class PullRequestReviewSession : IPullRequestReviewSession
     {
-        List<IPullRequestReviewCommentModel> comments;
+        static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
+        Dictionary<string, List<IPullRequestReviewCommentModel>> comments;
 
         public PullRequestReviewSession(
             ILocalRepositoryModel repository,
             IEnumerable<IPullRequestReviewCommentModel> comments)
         {
             Repository = repository;
-            this.comments = new List<IPullRequestReviewCommentModel>(comments);
+            this.comments = comments.GroupBy(x => x.Path)
+                .ToDictionary(x => x.Key, x => x.ToList());
         }
 
         public ILocalRepositoryModel Repository { get; }
@@ -23,7 +25,9 @@ namespace GitHub.Services
         public IEnumerable<IPullRequestReviewCommentModel> GetCommentsForFile(string filePath)
         {
             var relativePath = RootedPathToRelativePath(filePath).Replace('\\', '/');
-            return comments.Where(x => x.Path == relativePath);
+            var result = Empty;
+            comments.TryGetValue(relativePath, out result);
+            return result ?? Empty;
         }
 
         string RootedPathToRelativePath(string path)
