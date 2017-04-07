@@ -5,6 +5,11 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 using GitHub.Services;
 using GitHub.Models;
+using System.IO;
+using LibGit2Sharp;
+using GitHub.InlineReviews.Models;
+using GitHub.InlineReviews.Services;
+using System.Threading.Tasks;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -12,13 +17,19 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly ITextBuffer buffer;
         readonly IPullRequestReviewSessionManager sessionManager;
+        readonly IInlineCommentBuilder builder;
         readonly IDisposable subscription;
-        List<InlineComment> comments;
+        string path;
+        IList<InlineCommentModel> comments;
 
-        public ReviewTagger(ITextBuffer buffer, IPullRequestReviewSessionManager sessionManager)
+        public ReviewTagger(
+            ITextBuffer buffer,
+            IPullRequestReviewSessionManager sessionManager,
+            IInlineCommentBuilder builder)
         {
             this.buffer = buffer;
             this.sessionManager = sessionManager;
+            this.builder = builder;
             this.buffer.Changed += Buffer_Changed;
             subscription = sessionManager.SessionChanged.Subscribe(SessionChanged);
         }
@@ -40,9 +51,9 @@ namespace GitHub.InlineReviews.Tags
                     var endLine = span.End.GetContainingLine().LineNumber;
 
                     var spanComments = comments.Where(x =>
-                        x.Position >= startLine &&
-                        x.Position <= endLine)
-                        .GroupBy(x => x.Position);
+                        x.LineNumber >= startLine &&
+                        x.LineNumber <= endLine)
+                        .GroupBy(x => x.LineNumber);
 
                     foreach (var entry in spanComments)
                     {
@@ -55,35 +66,37 @@ namespace GitHub.InlineReviews.Tags
             }
         }
 
-        void SessionChanged(IPullRequestReviewSession session)
+        static string RootedPathToRelativePath(string path, string basePath)
         {
-            if (session != null)
+            if (Path.IsPathRooted(path))
             {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                comments = CreateInlineComments(session.GetCommentsForFile(document.FilePath));
-
-                var entireFile = new SnapshotSpan(buffer.CurrentSnapshot, 0, buffer.CurrentSnapshot.Length);
-                TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(entireFile));
-            }
-            else
-            {
-                comments = null;
-            }
-        }
-
-        List<InlineComment> CreateInlineComments(IEnumerable<IPullRequestReviewCommentModel> comments)
-        {
-            var result = new List<InlineComment>();
-
-            foreach (var comment in comments)
-            {
-                if (comment.Position.HasValue)
+                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
                 {
-                    result.Add(new InlineComment(comment));
+                    return path.Substring(basePath.Length + 1);
                 }
             }
 
-            return result;
+            return null;
+        }
+
+        void NotifyTagsChanged()
+        {
+            var entireFile = new SnapshotSpan(buffer.CurrentSnapshot, 0, buffer.CurrentSnapshot.Length);
+            TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(entireFile));
+        }
+
+        async void SessionChanged(IPullRequestReviewSession session)
+        {
+            comments = null;
+            NotifyTagsChanged();
+
+            if (session != null)
+            {
+                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+                path = RootedPathToRelativePath(document.FilePath, session.Repository.LocalPath);
+                comments = await builder.Build(path, session);
+                NotifyTagsChanged();
+            }
         }
 
         void Buffer_Changed(object sender, TextContentChangedEventArgs e)
@@ -98,26 +111,6 @@ namespace GitHub.InlineReviews.Tags
                     {
                         comment.UpdatePosition(line.LineNumber, change.LineCountDelta);
                     }
-                }
-            }
-        }
-
-        class InlineComment
-        {
-            public InlineComment(IPullRequestReviewCommentModel original)
-            {
-                Position = original.Position.Value - 1;
-                Original = original;
-            }
-
-            public int Position { get; private set; }
-            public IPullRequestReviewCommentModel Original { get; }
-
-            public void UpdatePosition(int editLine, int editDelta)
-            {
-                if (Position >= editLine)
-                {
-                    Position += editDelta;
                 }
             }
         }

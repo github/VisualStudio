@@ -246,6 +246,7 @@
     <Compile Include="GitHub.Exports\LocalRepositoryModelTests.cs" />
     <Compile Include="GitHub.Extensions\GuardTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
+    <Compile Include="GitHub.InlineReviews\InlineCommentBuilderTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
     <Compile Include="GitHub.UI\TestAutomation\ResourceValueTests.cs" />
@@ -260,6 +261,11 @@
     <Compile Include="Helpers\TestBaseClass.cs" />
     <Compile Include="Helpers\TestLoginCache.cs" />
     <Compile Include="Helpers\TestSharedCache.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Substitutes.cs" />
     <Compile Include="TestDoubles\FakeCommitLog.cs" />
     <Compile Include="TestDoubles\FakeMenuCommandService.cs" />
@@ -333,6 +339,10 @@
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
+      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
+      <Name>GitHub.InlineReviews</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
       <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
       <Name>GitHub.TeamFoundation.14</Name>
@@ -363,6 +373,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <None Include="Resources\pr-573-apiclient-diff.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

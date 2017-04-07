@@ -486,7 +486,7 @@ namespace GitHub.ViewModels
         {
             if (IsCheckedOut)
             {
-                var session = new PullRequestReviewSession(repository, Model.Comments);
+                var session = new PullRequestReviewSession(Model, repository);
                 sessionManager.NotifySessionChanged(session);
             }
             else

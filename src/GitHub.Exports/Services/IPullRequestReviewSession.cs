@@ -6,6 +6,9 @@ namespace GitHub.Services
 {
     public interface IPullRequestReviewSession
     {
-        IEnumerable<IPullRequestReviewCommentModel> GetCommentsForFile(string filePath);
+        IPullRequestModel PullRequest { get; }
+        ILocalRepositoryModel Repository { get; }
+
+        IReadOnlyList<IPullRequestReviewCommentModel> GetCommentsForFile(string path);
     }
 }

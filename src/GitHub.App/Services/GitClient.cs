@@ -159,6 +159,35 @@ namespace GitHub.Services
             });
         }
 
+        public Task<Patch> Compare(
+            IRepository repository,
+            string sha1,
+            string sha2,
+            string path)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
+            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var commit1 = repository.Lookup<Commit>(sha1);
+                var commit2 = repository.Lookup<Commit>(sha2);
+
+                if (commit1 != null && commit2 != null)
+                {
+                    return repository.Diff.Compare<Patch>(
+                        commit1.Tree,
+                        commit2.Tree,
+                        new[] { path });
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+
         public Task<T> GetConfig<T>(IRepository repository, string key)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
