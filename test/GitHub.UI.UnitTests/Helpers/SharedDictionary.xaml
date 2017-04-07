@@ -1,10 +1,2 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
-                    xmlns:cache="clr-namespace:GitHub.UI.UnitTests"
-                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
-
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/GitHub.UI;component/Assets/Styles.xaml" />
-    </ResourceDictionary.MergedDictionaries>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 </ResourceDictionary>
