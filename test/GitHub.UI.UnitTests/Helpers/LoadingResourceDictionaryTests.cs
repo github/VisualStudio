@@ -10,8 +10,8 @@ namespace GitHub.UI.Helpers.UnitTests
         public class TheSourceProperty
         {
             [Description("Load assembly using LoadFrom away from application base")]
-            [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
-            [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
+            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
             [RequiresThread(System.Threading.ApartmentState.STA)]
             public void SetInLoadFromContext(string url)
             {
@@ -27,8 +27,8 @@ namespace GitHub.UI.Helpers.UnitTests
             }
 
             [Description("Load assembly using LoadFrom on application base")]
-            [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
-            [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
+            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
             [RequiresThread(System.Threading.ApartmentState.STA)]
             public void SetInLoadContext(string url)
             {
@@ -56,8 +56,8 @@ namespace GitHub.UI.Helpers.UnitTests
         public class TheResourceDictionarySourceProperty
         {
             [Description("This shows why LoadingResourceDictionary is necessary")]
-            [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
-            [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
+            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
             public void SetInLoadFromContext(string url)
             {
                 var setup = new AppDomainSetup { ApplicationBase = "NOTHING_HERE" };

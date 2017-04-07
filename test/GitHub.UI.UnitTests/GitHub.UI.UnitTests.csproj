@@ -58,6 +58,7 @@
     <Compile Include="Helpers\SharedDictionaryManagerBaseTests.cs" />
     <Compile Include="Helpers\SharedDictionaryManagerTests.cs" />
     <Compile Include="Helpers\LoadingResourceDictionaryTests.cs" />
+    <Compile Include="Helpers\Urls.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

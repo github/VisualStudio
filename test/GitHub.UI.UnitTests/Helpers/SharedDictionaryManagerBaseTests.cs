@@ -16,9 +16,9 @@ namespace GitHub.UI.Helpers.UnitTests
                 [Test]
                 public void ReturnsResourceDictionary()
                 {
-                    using (var factory = new SharedDictionaryManagerBase.CachingFactory())
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
                     {
-                        var uri = ResourceDictionaryUtilities.ToPackUri("pack://application:,,,/GitHub.UI.UnitTests;component/Helpers/SharedDictionary.xaml");
+                        var uri = ResourceDictionaryUtilities.ToPackUri(Urls.Test_SharedDictionary_PackUrl);
                         var owner = new ResourceDictionary();
 
                         var resourceDictionary = factory.GetOrCreateResourceDictionary(owner, uri);
@@ -30,9 +30,9 @@ namespace GitHub.UI.Helpers.UnitTests
                 [Test]
                 public void ReturnsCachedResourceDictionary()
                 {
-                    using (var factory = new SharedDictionaryManagerBase.CachingFactory())
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
                     {
-                        var uri = ResourceDictionaryUtilities.ToPackUri("pack://application:,,,/GitHub.UI.UnitTests;component/Helpers/SharedDictionary.xaml");
+                        var uri = ResourceDictionaryUtilities.ToPackUri(Urls.Test_SharedDictionary_PackUrl);
                         var owner = new ResourceDictionary();
 
                         var resourceDictionary1 = factory.GetOrCreateResourceDictionary(owner, uri);
@@ -48,7 +48,7 @@ namespace GitHub.UI.Helpers.UnitTests
                 [Test]
                 public void CallsDisposeOnDisposable()
                 {
-                    using (var factory = new SharedDictionaryManagerBase.CachingFactory())
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
                     {
                         var disposable = Substitute.For<IDisposable>();
                         factory.TryAddDisposable(disposable);
@@ -62,7 +62,7 @@ namespace GitHub.UI.Helpers.UnitTests
                 [Test]
                 public void AddedTwice_DisposeCalledOnce()
                 {
-                    using (var factory = new SharedDictionaryManagerBase.CachingFactory())
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
                     {
                         var disposable = Substitute.For<IDisposable>();
                         factory.TryAddDisposable(disposable);
@@ -81,12 +81,12 @@ namespace GitHub.UI.Helpers.UnitTests
             [Test]
             public void CalledTwice_DisposeNotCalled()
             {
-                using (var factory = SharedDictionaryManagerBase.GetCurrentDomainCachingFactory())
+                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
                 {
                     var disposable = Substitute.For<IDisposable>();
                     factory.TryAddDisposable(disposable);
 
-                    SharedDictionaryManagerBase.GetCurrentDomainCachingFactory();
+                    SharedDictionaryManager.GetCurrentDomainCachingFactory();
 
                     disposable.Received(0).Dispose();
                 }
@@ -95,12 +95,12 @@ namespace GitHub.UI.Helpers.UnitTests
             [Test]
             public void InvokeMethodOnNewAssembly_DisposeCalled()
             {
-                using (var factory = SharedDictionaryManagerBase.GetCurrentDomainCachingFactory())
+                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
                 {
                     var disposable = Substitute.For<IDisposable>();
                     factory.TryAddDisposable(disposable);
 
-                    using (InvokeMethodOnNewAssembly(SharedDictionaryManagerBase.GetCurrentDomainCachingFactory))
+                    using (InvokeMethodOnNewAssembly(SharedDictionaryManager.GetCurrentDomainCachingFactory))
                     {
                         disposable.Received(1).Dispose();
                     }
@@ -121,14 +121,16 @@ namespace GitHub.UI.Helpers.UnitTests
 
         public class TheFixDesignTimeUriMethod
         {
-            [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml", "pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
-            [TestCase("file:///x:/solution/src/GitHub.VisualStudio.UI/SharedDictionary.xaml", "pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
-            [TestCase("file:///x:/solution/src/GitHub.VisualStudio.UI/Styles/GitHubComboBox.xaml", "pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubComboBox.xaml")]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl, Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_FileUrl, Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
+
+
+            [TestCase(Urls.GitHub_VisualStudio_UI_Styles_GitHubComboBox_FileUrl, Urls.GitHub_VisualStudio_UI_Styles_GitHubComboBox_PackUrl)]
             public void FixDesignTimeUri(string inUrl, string outUrl)
             {
                 var inUri = ResourceDictionaryUtilities.ToPackUri(inUrl);
 
-                var outUri = SharedDictionaryManagerBase.FixDesignTimeUri(inUri);
+                var outUri = SharedDictionaryManager.FixDesignTimeUri(inUri);
 
                 Assert.That(outUri.ToString(), Is.EqualTo(outUrl));
             }
@@ -136,13 +138,13 @@ namespace GitHub.UI.Helpers.UnitTests
 
         public class TheSourceProperty
         {
-            [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
+            [TestCase(Urls.Test_SharedDictionary_PackUrl)]
             public void IsEqualToSet(string url)
             {
-                using (SharedDictionaryManagerBase.GetCurrentDomainCachingFactory())
+                using (SharedDictionaryManager.GetCurrentDomainCachingFactory())
                 {
                     var uri = ResourceDictionaryUtilities.ToPackUri(url);
-                    var target = new SharedDictionaryManagerBase();
+                    var target = new SharedDictionaryManager();
 
                     target.Source = uri;
 

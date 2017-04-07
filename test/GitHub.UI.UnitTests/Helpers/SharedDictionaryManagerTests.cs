@@ -8,10 +8,10 @@ namespace GitHub.UI.Helpers.UnitTests
     {
         public class TheSourceProperty
         {
-            [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
-            [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
-            [TestCase("file:///x:/Project/src/GitHub.UI/SharedDictionary.xaml", Description = "This is a design time URL")]
-            [TestCase("file:///x:/Project/src/GitHub.VisualStudio.UI/SharedDictionary.xaml", Description = "This is a design time URL")]
+            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_UI_SharedDictionary_FileUrl, Description = "This is a design time URL")]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_FileUrl, Description = "This is a design time URL")]
             [RequiresThread(System.Threading.ApartmentState.STA)]
             public void SetSourceOnDifferentInstances_ExpectTheSameObjects(string url)
             {
@@ -28,8 +28,8 @@ namespace GitHub.UI.Helpers.UnitTests
             }
 
             // This is why we need `SharedDictionaryManager`.
-            [TestCase("pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml")]
-            [TestCase("pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml")]
+            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
             [RequiresThread(System.Threading.ApartmentState.STA)]
             public void SetResourceDictionarySourceOnDifferentInstances_ExpectDifferentObjects(string url)
             {
