@@ -74,7 +74,6 @@
     <Compile Include="Colors.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Helpers\ThemeDictionaryManager.cs" />
-    <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="RepositoryOrigin.cs" />
     <Compile Include="Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>

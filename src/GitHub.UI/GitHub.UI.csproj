@@ -98,7 +98,7 @@
     <Compile Include="Converters\StickieListItemConverter.cs" />
     <Compile Include="Helpers\LoadingResourceDictionary.cs" />
     <Compile Include="Helpers\ScrollViewerUtilities.cs" />
-    <Compile Include="Helpers\SharedDictionaryManagerBase.cs" />
+    <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -163,7 +163,6 @@
     <Compile Include="Converters\VerticalOffsetToVisibilityConverter.cs" />
     <Compile Include="Helpers\BindingProxy.cs" />
     <Compile Include="Helpers\GitHubBrushes.cs" />
-    <Compile Include="Helpers\SharedDictionaryManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Assets\Controls\GitHubLinkButton.xaml">
