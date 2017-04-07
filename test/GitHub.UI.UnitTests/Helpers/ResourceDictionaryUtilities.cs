@@ -17,6 +17,18 @@ namespace GitHub.UI.Helpers.UnitTests
             return new Uri(url);
         }
 
+        public static string DumpMergedDictionaries(ResourceDictionary target, string url)
+        {
+            SetProperty(target, "Source", ToPackUri(url));
+            return DumpResourceDictionary(target);
+        }
+
+        static void SetProperty(object target, string name, object value)
+        {
+            var prop = target.GetType().GetProperty(name);
+            prop.SetValue(target, value);
+        }
+
         public static string DumpResourceDictionary(ResourceDictionary rd, string indent = "")
         {
             var writer = new StringWriter();

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace GitHub.UI.Helpers.UnitTests
 {
-    public class LoadingResourceDictionaryTests
+    public class LoadingResourceDictionaryIntegrationTests
     {
         public class TheSourceProperty
         {
@@ -16,14 +16,15 @@ namespace GitHub.UI.Helpers.UnitTests
             public void SetInLoadFromContext(string url)
             {
                 var setup = new AppDomainSetup { ApplicationBase = "NOTHING_HERE" };
-                using (var context = new AppDomainContext(setup))
+                AppDomainContext.Invoke(setup, () =>
                 {
-                    var remote = context.CreateInstance<LoadingResourceDictionaryContext>();
+                    var target = new LoadingResourceDictionary();
+                    var packUri = ResourceDictionaryUtilities.ToPackUri(url);
 
-                    int count = remote.CountMergedDictionaries(url);
+                    target.Source = packUri;
 
-                    Assert.That(count, Is.GreaterThan(0));
-                }
+                    Assert.That(target.MergedDictionaries.Count, Is.GreaterThan(0));
+                });
             }
 
             [Description("Load assembly using LoadFrom on application base")]
@@ -32,24 +33,12 @@ namespace GitHub.UI.Helpers.UnitTests
             [RequiresThread(System.Threading.ApartmentState.STA)]
             public void SetInLoadContext(string url)
             {
-                var local = new LoadingResourceDictionaryContext();
+                var target = new LoadingResourceDictionary();
+                var packUri = ResourceDictionaryUtilities.ToPackUri(url);
 
-                int count = local.CountMergedDictionaries(url);
+                target.Source = packUri;
 
-                Assert.That(count, Is.GreaterThan(0));
-            }
-
-            class LoadingResourceDictionaryContext : MarshalByRefObject
-            {
-                internal int CountMergedDictionaries(string url)
-                {
-                    var target = new LoadingResourceDictionary();
-                    var packUri = ResourceDictionaryUtilities.ToPackUri(url);
-
-                    target.Source = packUri;
-
-                    return target.MergedDictionaries.Count;
-                }
+                Assert.That(target.MergedDictionaries.Count, Is.GreaterThan(0));
             }
         }
 
@@ -65,20 +54,17 @@ namespace GitHub.UI.Helpers.UnitTests
                 {
                     var remote = context.CreateInstance<ResourceDictionaryContext>();
 
-                    Assert.Throws<FileNotFoundException>(() => remote.CountMergedDictionaries(url));
+                    Assert.Throws<FileNotFoundException>(() => remote.CountResourceDictionaryAndSetSource(url));
                 }
             }
 
             class ResourceDictionaryContext : MarshalByRefObject
             {
-                internal int CountMergedDictionaries(string url)
+                internal void CountResourceDictionaryAndSetSource(string url)
                 {
                     var target = new ResourceDictionary();
                     var packUri = ResourceDictionaryUtilities.ToPackUri(url);
-
                     target.Source = packUri;
-
-                    return target.MergedDictionaries.Count;
                 }
             }
         }
