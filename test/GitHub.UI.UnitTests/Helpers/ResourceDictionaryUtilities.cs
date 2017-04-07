@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 
-namespace GitHub.UI.UnitTests
+namespace GitHub.UI.Helpers.UnitTests
 {
     class ResourceDictionaryUtilities
     {

@@ -3,7 +3,7 @@ using System.Windows;
 using System.ComponentModel;
 using Microsoft.VisualStudio.PlatformUI;
 using GitHub.VisualStudio.Helpers;
-using GitHub.Helpers;
+using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Helpers
 {

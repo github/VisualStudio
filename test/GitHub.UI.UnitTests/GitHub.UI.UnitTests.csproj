@@ -53,11 +53,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDomainContext.cs" />
-    <Compile Include="ResourceDictionaryUtilities.cs" />
-    <Compile Include="SharedDictionaryManagerBaseTests.cs" />
-    <Compile Include="SharedDictionaryManagerTests.cs" />
-    <Compile Include="LoadingResourceDictionaryTests.cs" />
+    <Compile Include="Helpers\AppDomainContext.cs" />
+    <Compile Include="Helpers\ResourceDictionaryUtilities.cs" />
+    <Compile Include="Helpers\SharedDictionaryManagerBaseTests.cs" />
+    <Compile Include="Helpers\SharedDictionaryManagerTests.cs" />
+    <Compile Include="Helpers\LoadingResourceDictionaryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -78,7 +78,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="SharedDictionary.xaml">
+    <Page Include="Helpers\SharedDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

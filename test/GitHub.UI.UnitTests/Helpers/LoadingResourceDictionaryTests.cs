@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows;
 using NUnit.Framework;
 
-namespace GitHub.UI.UnitTests
+namespace GitHub.UI.Helpers.UnitTests
 {
     public class LoadingResourceDictionaryTests
     {

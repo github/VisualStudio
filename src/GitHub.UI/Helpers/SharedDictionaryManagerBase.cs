@@ -3,7 +3,7 @@ using System.Windows;
 using System.Collections.Generic;
 using NullGuard;
 
-namespace GitHub.Helpers
+namespace GitHub.UI.Helpers
 {
     public class SharedDictionaryManagerBase : ResourceDictionary
     {

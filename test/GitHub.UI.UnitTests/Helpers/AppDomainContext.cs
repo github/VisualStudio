@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GitHub.UI.UnitTests
+namespace GitHub.UI.Helpers.UnitTests
 {
     public class AppDomainContext : IDisposable
     {
