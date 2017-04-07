@@ -7,7 +7,7 @@ using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.UI.Helpers
 {
-    public sealed class ThemeDictionaryManager : SharedDictionaryManagerBase, IDisposable
+    public sealed class ThemeDictionaryManager : SharedDictionaryManager, IDisposable
     {
         static bool isInDesignMode;
         Uri baseThemeUri;
