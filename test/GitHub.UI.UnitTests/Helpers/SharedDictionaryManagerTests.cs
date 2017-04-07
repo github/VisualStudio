@@ -1,75 +1,152 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
+using System.Reflection;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace GitHub.UI.Helpers.UnitTests
 {
-    public partial class SharedDictionaryManagerTests
+    public class SharedDictionaryManagerTests
     {
+        public class TheCachingFactoryClass
+        {
+            public class TheGetOrCreateResourceDictionaryMethod
+            {
+                [Test]
+                public void ReturnsResourceDictionary()
+                {
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
+                    {
+                        var uri = ResourceDictionaryUtilities.ToPackUri(Urls.Test_SharedDictionary_PackUrl);
+                        var owner = new ResourceDictionary();
+
+                        var resourceDictionary = factory.GetOrCreateResourceDictionary(owner, uri);
+
+                        Assert.That(resourceDictionary, Is.Not.Null);
+                    }
+                }
+
+                [Test]
+                public void ReturnsCachedResourceDictionary()
+                {
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
+                    {
+                        var uri = ResourceDictionaryUtilities.ToPackUri(Urls.Test_SharedDictionary_PackUrl);
+                        var owner = new ResourceDictionary();
+
+                        var resourceDictionary1 = factory.GetOrCreateResourceDictionary(owner, uri);
+                        var resourceDictionary2 = factory.GetOrCreateResourceDictionary(owner, uri);
+
+                        Assert.That(resourceDictionary1, Is.EqualTo(resourceDictionary2));
+                    }
+                }
+            }
+
+            public class TheDisposeMethod
+            {
+                [Test]
+                public void CallsDisposeOnDisposable()
+                {
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
+                    {
+                        var disposable = Substitute.For<IDisposable>();
+                        factory.TryAddDisposable(disposable);
+
+                        factory.Dispose();
+
+                        disposable.Received(1).Dispose();
+                    }
+                }
+
+                [Test]
+                public void AddedTwice_DisposeCalledOnce()
+                {
+                    using (var factory = new SharedDictionaryManager.CachingFactory())
+                    {
+                        var disposable = Substitute.For<IDisposable>();
+                        factory.TryAddDisposable(disposable);
+                        factory.TryAddDisposable(disposable);
+
+                        factory.Dispose();
+
+                        disposable.Received(1).Dispose();
+                    }
+                }
+            }
+        }
+
+        public class TheGetCurrentDomainCachingFactoryMethod
+        {
+            [Test]
+            public void CalledTwice_DisposeNotCalled()
+            {
+                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                {
+                    var disposable = Substitute.For<IDisposable>();
+                    factory.TryAddDisposable(disposable);
+
+                    SharedDictionaryManager.GetCurrentDomainCachingFactory();
+
+                    disposable.Received(0).Dispose();
+                }
+            }
+
+            [Test]
+            public void InvokeMethodOnNewAssembly_DisposeCalled()
+            {
+                using (var factory = SharedDictionaryManager.GetCurrentDomainCachingFactory())
+                {
+                    var disposable = Substitute.For<IDisposable>();
+                    factory.TryAddDisposable(disposable);
+
+                    using (InvokeMethodOnNewAssembly(SharedDictionaryManager.GetCurrentDomainCachingFactory))
+                    {
+                        disposable.Received(1).Dispose();
+                    }
+                }
+            }
+
+            static IDisposable InvokeMethodOnNewAssembly<T>(Func<T> func)
+            {
+                var declaringType = func.Method.DeclaringType;
+                var location = declaringType.Assembly.Location;
+                var bytes = File.ReadAllBytes(location);
+                var asm = Assembly.Load(bytes);
+                var type = asm.GetType(declaringType.FullName);
+                var method = type.GetMethod(func.Method.Name);
+                return (IDisposable)method.Invoke(null, null);
+            }
+        }
+
+        public class TheFixDesignTimeUriMethod
+        {
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl, Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_FileUrl, Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
+            [TestCase(Urls.GitHub_VisualStudio_UI_Styles_GitHubComboBox_FileUrl, Urls.GitHub_VisualStudio_UI_Styles_GitHubComboBox_PackUrl)]
+            public void FixDesignTimeUri(string inUrl, string outUrl)
+            {
+                var inUri = ResourceDictionaryUtilities.ToPackUri(inUrl);
+
+                var outUri = SharedDictionaryManager.FixDesignTimeUri(inUri);
+
+                Assert.That(outUri.ToString(), Is.EqualTo(outUrl));
+            }
+        }
+
         public class TheSourceProperty
         {
-            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
-            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
-            [TestCase(Urls.GitHub_UI_SharedDictionary_FileUrl, Description = "This is a design time URL")]
-            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_FileUrl, Description = "This is a design time URL")]
-            [RequiresThread(System.Threading.ApartmentState.STA)]
-            public void SetSourceOnDifferentInstances_ExpectTheSameObjects(string url)
+            [TestCase(Urls.Test_SharedDictionary_PackUrl)]
+            public void IsEqualToSet(string url)
             {
-                var setup = new AppDomainSetup { ApplicationBase = "NOTHING_HERE" };
-                using (var context = new AppDomainContext(setup))
+                using (SharedDictionaryManager.GetCurrentDomainCachingFactory())
                 {
-                    var remote = context.CreateInstance<SharedDictionaryManagerContext>();
-                    string expectDump = remote.DumpMergedDictionariesSharedDictionaryManager(url);
-
-                    var dump = remote.DumpMergedDictionariesSharedDictionaryManager(url);
-
-                    Assert.That(dump, Is.EqualTo(expectDump));
-                }
-            }
-
-            // This is why we need `SharedDictionaryManager`.
-            [TestCase(Urls.GitHub_UI_SharedDictionary_PackUrl)]
-            [TestCase(Urls.GitHub_VisualStudio_UI_SharedDictionary_PackUrl)]
-            [RequiresThread(System.Threading.ApartmentState.STA)]
-            public void SetResourceDictionarySourceOnDifferentInstances_ExpectDifferentObjects(string url)
-            {
-                var setup = new AppDomainSetup { ApplicationBase = "NOTHING_HERE" };
-                using (var context = new AppDomainContext(setup))
-                {
-                    var remote = context.CreateInstance<SharedDictionaryManagerContext>();
-                    string expectDump = remote.DumpMergedDictionariesLoadingResourceDictionary(url);
-
-                    var dump = remote.DumpMergedDictionariesLoadingResourceDictionary(url);
-
-                    Assert.That(dump, Is.Not.EqualTo(expectDump));
-                }
-            }
-
-            class SharedDictionaryManagerContext : MarshalByRefObject
-            {
-                internal string DumpMergedDictionariesLoadingResourceDictionary(string url)
-                {
-                    var target = new LoadingResourceDictionary();
-                    return DumpMergedDictionaries(target, url);
-                }
-
-                internal string DumpMergedDictionariesSharedDictionaryManager(string url)
-                {
+                    var uri = ResourceDictionaryUtilities.ToPackUri(url);
                     var target = new SharedDictionaryManager();
-                    return DumpMergedDictionaries(target, url);
-                }
 
-                string DumpMergedDictionaries(ResourceDictionary target, string url)
-                {
-                    SetProperty(target, "Source", ResourceDictionaryUtilities.ToPackUri(url));
+                    target.Source = uri;
 
-                    return ResourceDictionaryUtilities.DumpResourceDictionary(target);
-                }
-
-                static void SetProperty(object target, string name, object value)
-                {
-                    var prop = target.GetType().GetProperty(name);
-                    prop.SetValue(target, value);
+                    Assert.That(target.Source, Is.EqualTo(uri));
                 }
             }
         }
