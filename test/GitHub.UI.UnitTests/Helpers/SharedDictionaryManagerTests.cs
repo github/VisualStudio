@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Windows;
 using NUnit.Framework;
-using GitHub.UI.Helpers;
 
-namespace GitHub.UI.UnitTests
+namespace GitHub.UI.Helpers.UnitTests
 {
     public partial class SharedDictionaryManagerTests
     {

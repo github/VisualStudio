@@ -1,4 +1,4 @@
-﻿using GitHub.Helpers;
+﻿using GitHub.UI.Helpers;
 
 namespace GitHub.VisualStudio.Helpers
 {

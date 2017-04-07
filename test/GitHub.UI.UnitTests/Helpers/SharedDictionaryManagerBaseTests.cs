@@ -4,9 +4,8 @@ using System.Windows;
 using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
-using GitHub.Helpers;
 
-namespace GitHub.UI.UnitTests
+namespace GitHub.UI.Helpers.UnitTests
 {
     public class SharedDictionaryManagerBaseTests
     {
@@ -19,7 +18,7 @@ namespace GitHub.UI.UnitTests
                 {
                     using (var factory = new SharedDictionaryManagerBase.CachingFactory())
                     {
-                        var uri = ResourceDictionaryUtilities.ToPackUri("pack://application:,,,/GitHub.UI.UnitTests;component/SharedDictionary.xaml");
+                        var uri = ResourceDictionaryUtilities.ToPackUri("pack://application:,,,/GitHub.UI.UnitTests;component/Helpers/SharedDictionary.xaml");
                         var owner = new ResourceDictionary();
 
                         var resourceDictionary = factory.GetOrCreateResourceDictionary(owner, uri);
@@ -33,7 +32,7 @@ namespace GitHub.UI.UnitTests
                 {
                     using (var factory = new SharedDictionaryManagerBase.CachingFactory())
                     {
-                        var uri = ResourceDictionaryUtilities.ToPackUri("pack://application:,,,/GitHub.UI.UnitTests;component/SharedDictionary.xaml");
+                        var uri = ResourceDictionaryUtilities.ToPackUri("pack://application:,,,/GitHub.UI.UnitTests;component/Helpers/SharedDictionary.xaml");
                         var owner = new ResourceDictionary();
 
                         var resourceDictionary1 = factory.GetOrCreateResourceDictionary(owner, uri);
