@@ -94,6 +94,12 @@ namespace GitHub.InlineReviews.Tags
             {
                 var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
                 path = RootedPathToRelativePath(document.FilePath, session.Repository.LocalPath);
+                if(path == null)
+                {
+                    // Ignore files outside of repo.
+                    return;
+                }
+
                 comments = await builder.Build(path, session);
                 NotifyTagsChanged();
             }
