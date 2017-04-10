@@ -98,6 +98,6 @@ namespace GitHub.Info
         /// <summary>
         /// The URL for the GitHub for Visual Studio documentation.
         /// </summary>
-        public const string Documentation = "https://visualstudio.github.com/docs";
+        public const string Documentation = "https://github.com/github/VisualStudio/tree/master/docs";
     }
 }
