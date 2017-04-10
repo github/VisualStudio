@@ -8,10 +8,10 @@ The name and email that will be displayed with your commits can be set from Team
 
 2. Click the **Settings** button in Team Explorer.
 
-   ![image](images/settings-button.png)
+   ![The settings button in Team Explorer pane](images/settings-button.png)
 
 3. Click **Global Settings** in the Team Explorer Settings page
 
-   ![image](images/global-settings-link.png)
+   ![The global settings button in the Team Explorer settings page](images/global-settings-link.png)
 
 4. Enter the name and email that you would like to appear in commits.
