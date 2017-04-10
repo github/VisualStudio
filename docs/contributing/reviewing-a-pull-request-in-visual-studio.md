@@ -6,7 +6,7 @@ GitHub for Visual Studio provides facilities for reviewing a pull request direct
 
 2. Open **Team Explorer** and click the **Pull Requests** button to open the **GitHub** pane.
 
-   ![image](images/pull-requests-button.png)
+   ![Pull Requests button in the Team Explorer pane](images/pull-requests-button.png)
 
 3. Click the title of the pull request to be reviewed.
 
@@ -14,13 +14,13 @@ GitHub for Visual Studio provides facilities for reviewing a pull request direct
 
 The Pull Request Details view shows the current state of the pull request, including information about who created the pull request, the source and target branch, and the files changed.
 
-![image](images/pr-details.png)
+![The details of a single pull request in the GitHub pane](images/pr-details.png)
 
 ## Checking out a pull request
 
 To check out the pull request branch, click the **Checkout [branch]** link where [branch] is the name of the branch that will be checked out.
 
-![image](images/pr-details-checkout-link.png)
+![Location of the checkout link in the GitHub pull request details page](images/pr-details-checkout-link.png)
 
 If the pull request is from a fork then a remote will be added to the forked repository and the branch checked out locally. This remote will automatically be cleaned up when the local branch is deleted.
 
@@ -30,6 +30,6 @@ If the pull request is from a fork then a remote will be added to the forked rep
 
 To compare the contents of a file in the pull request with its content on the target branch, double click a file in the **Changed Files** tree. This will open the Visual Studio diff viewer. If the pull request has been checked out, the right hand pane will be editable.
 
-![image](images/pr-diff-files.png)
+![Diff of two files in the Visual Studio diff viewer](images/pr-diff-files.png)
 
 If the pull request is checked out, right clicking on a file on the **Changed Files** tree and selecting **Open File** will open the file for editing in Visual Studio.
