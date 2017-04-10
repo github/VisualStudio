@@ -2,7 +2,7 @@
 
 The GitHub pane toolbar provides a way to navigate between views, refresh views, and open the current view on GitHub.
 
-![Toolbar](images/github-pane-toolbar.png)
+![The GitHub pane toolbar](images/github-pane-toolbar.png)
 
 1. Open a solution in a GitHub repository.
 2. Open **Team Explorer** and click the **Pull Requests** button to open the **GitHub** pane.
