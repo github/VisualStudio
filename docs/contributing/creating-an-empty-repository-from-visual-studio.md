@@ -6,15 +6,15 @@
 
 3. Click the **Manage Connections** toolbar button.
 
-   ![image](images/manage-connections.png)
+   ![The manage connections toolbar button in Team Explorer](images/manage-connections.png)
 
 4. Click the **Create** link next to the account you want to create the repository in.
 
-   ![image](images/create-link.png)
+   ![The create link in the Team Explorer pane](images/create-link.png)
 
 5. In the **Create a GitHub Repository** dialog, enter a name, description and local path for the repository.
 
-   ![image](images/create-dialog.png)
+    ![The create a GitHub repository dialog](images/create-dialog.png)
 
 6. Select a license for the repository.
 
@@ -24,4 +24,4 @@
 
 9. When the repository is created, click the **Create a new Project or Solution** link in Team Explorer to create a project or solution in the repository.
 
-![image](images/successful-creation-message.png)
+    ![Successful repository creation message at the top of the Team Explorer pane](images/successful-creation-message.png)
