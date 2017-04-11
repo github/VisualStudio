@@ -10,11 +10,11 @@ GitHub for Visual Studio enables easy creation of gists directly from the Visual
 
 4. Right click and select **Create a GitHub Gist** from the **GitHub** submenu.
 
-   ![image](images/create-gist-menu.png)
+   ![Location of Create A GitHub Gist in the GitHub submenu](images/create-gist-menu.png)
 
 5. In the **Create a GitHub Gist** dialog, check that the filename is correct and optionally add a description.
 
-   ![image](images/create-gist-dialog.png)
+   ![GitHub Gist creation dialog window](images/create-gist-dialog.png)
 
 6. If you want the gist to be private, check the **Private Gist** checkbox.
 
