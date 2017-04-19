@@ -172,11 +172,10 @@ namespace GitHub.ViewModels
         bool disposed; // To detect redundant calls
         void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
                 disposed = true;
-
                 disposables.Dispose();
             }
         }

@@ -76,17 +76,16 @@ namespace GitHub.Caches
         bool disposed;
         protected virtual void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
-
+                disposed = true;
                 UserAccount.Dispose();
                 UserAccount.Shutdown.Wait();
                 LocalMachine.Dispose();
                 LocalMachine.Shutdown.Wait();
                 Secure.Dispose();
                 Secure.Shutdown.Wait();
-                disposed = true;
             }
         }
 

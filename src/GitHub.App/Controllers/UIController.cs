@@ -681,9 +681,9 @@ namespace GitHub.Controllers
         bool disposed; // To detect redundant calls
         protected virtual void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
                 disposed = true;
 
                 Debug.WriteLine("Disposing ({0})", GetHashCode());

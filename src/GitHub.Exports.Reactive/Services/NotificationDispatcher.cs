@@ -78,9 +78,9 @@ namespace GitHub.Services
         bool disposed; // To detect redundant calls
         void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
                 disposed = true;
                 notifications.Dispose();
             }

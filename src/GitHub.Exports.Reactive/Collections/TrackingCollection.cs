@@ -1191,15 +1191,13 @@ namespace GitHub.Collections
 
         void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (!disposed)
-                {
-                    disposed = true;
-                    pumpDisposables.Dispose();
-                    disposables.Dispose();
-                    cache = null;
-                }
+                disposed = true;
+                pumpDisposables.Dispose();
+                disposables.Dispose();
+                cache = null;
             }
         }
 

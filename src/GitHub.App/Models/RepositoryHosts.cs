@@ -206,10 +206,10 @@ namespace GitHub.Models
         bool disposed;
         protected void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
-
+                disposed = true;
                 try
                 {
                     connectionManager.DoLogin -= RunLoginHandler;
@@ -219,7 +219,6 @@ namespace GitHub.Models
                 {
                     log.Warn("Exception occured while disposing RepositoryHosts", e);
                 }
-                disposed = true;
             }
         }
 

@@ -197,15 +197,12 @@ namespace GitHub.UI
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (disposed) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    subscriptions?.Dispose();
-                    subscriptions = null;
-                }
-
                 disposed = true;
+                subscriptions?.Dispose();
+                subscriptions = null;
             }
         }
 

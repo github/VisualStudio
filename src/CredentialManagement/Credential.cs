@@ -63,12 +63,12 @@ namespace GitHub.Authentication.CredentialManagement
         bool disposed;
         void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
+                disposed = true;
                 SecurePassword.Clear();
                 SecurePassword.Dispose();
-                disposed = true;
             }
         }
 

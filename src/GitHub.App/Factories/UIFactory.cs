@@ -92,14 +92,14 @@ namespace GitHub.App.Factories
         bool disposed = false;
         void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
+                disposed = true;
                 if (!handlers.IsDisposed)
                     handlers.Dispose();
                 view?.Dispose();
                 viewModel?.Dispose();
-                disposed = true;
             }
         }
         public void Dispose()

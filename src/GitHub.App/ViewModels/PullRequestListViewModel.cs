@@ -239,13 +239,13 @@ namespace GitHub.ViewModels
         bool disposed;
         protected void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
+                disposed = true;
                 pullRequests.Dispose();
                 trackingAuthors.Dispose();
                 trackingAssignees.Dispose();
-                disposed = true;
             }
         }
 

@@ -28,14 +28,14 @@ namespace GitHub.Authentication.CredentialManagement
         bool disposed;
         private void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
+                disposed = true;
                 if (Count > 0)
                 {
                     ForEach(cred => cred.Dispose());
                 }
-                disposed = true;
             }
         }
 

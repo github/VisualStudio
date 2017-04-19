@@ -28,11 +28,6 @@ namespace GitHub.UI.Helpers.UnitTests
             domain = AppDomain.CreateDomain(friendlyName, null, setup);
         }
 
-        public void Dispose()
-        {
-            AppDomain.Unload(domain);
-        }
-
         public void Invoke(Action remoteAction)
         {
             var targetType = remoteAction.Target.GetType();
@@ -54,6 +49,24 @@ namespace GitHub.UI.Helpers.UnitTests
         {
             return (T)domain.CreateInstanceFromAndUnwrap(typeof(T).Assembly.CodeBase, typeof(T).FullName);
         }
+
+        bool disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposed) return;
+            if (disposing)
+            {
+                disposed = true;
+                AppDomain.Unload(domain);
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
 
         class Remote : MarshalByRefObject
         {

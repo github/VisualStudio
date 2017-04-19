@@ -229,16 +229,14 @@ namespace GitHub.Controllers
         bool disposed = false;
         protected void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (!disposed)
-                {
-                    disposed = true;
-                    disposablesForCurrentView.Dispose();
-                    reusableControllers.Values.ForEach(c => uiProvider.StopUI(c));
-                    reusableControllers.Clear();
-                    history.Clear();
-                }
+                disposed = true;
+                disposablesForCurrentView.Dispose();
+                reusableControllers.Values.ForEach(c => uiProvider.StopUI(c));
+                reusableControllers.Clear();
+                history.Clear();
             }
         }
 

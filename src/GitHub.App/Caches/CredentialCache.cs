@@ -256,14 +256,13 @@ namespace GitHub.Caches
         bool disposed;
         void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
-
+                disposed = true;
                 Scheduler = null;
                 shutdown.OnNext(Unit.Default);
                 shutdown.OnCompleted();
-                disposed = true;
             }
         }
         public void Dispose()

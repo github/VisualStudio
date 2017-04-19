@@ -56,9 +56,9 @@ namespace GitHub.Factories
         bool disposed;
         protected virtual void Dispose(bool disposing)
         {
+            if (disposed) return;
             if (disposing)
             {
-                if (disposed) return;
                 disposed = true;
                 hosts.Dispose();
             }
