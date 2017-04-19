@@ -9,7 +9,7 @@ GitHub for Visual Studio enables easy navigation to code that exists on GitHub d
 
 ## Viewing the selected code on GitHub
 1. Right click and select **Open on GitHub** from the **GitHub** submenu.
-![Open on GitHub](images/open-on-github.png)
+![Open on GitHub selection in the GitHub context submenu](images/open-on-github.png)
 2. Your browser will open and navigate to the code on GitHub.
 
 ## Copying the URL of the selected code's location on GitHub
