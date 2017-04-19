@@ -1,20 +1,23 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
     <PropertyGroup>
       <SolutionFile>GitHubVS.sln</SolutionFile>
-      <OutputDirectory>$(MSBuildProjectDirectory)</OutputDirectory>
+      <BuildDirectory>$(MSBuildProjectDirectory)\build</BuildDirectory>
+      <ProductComponentDirectory>$(MSBuildProjectDirectory)\build\ProductComponent</ProductComponentDirectory>
+      <VsixFileName>GitHub.VisualStudio.vsix</VsixFileName>
     </PropertyGroup>
     <ItemGroup>  
         <ProjectToBuild Include="$(SolutionFile)">
-            <Properties>Configuration=Debug;IsExperimental=true;IsProductComponent=false;TargetVsixContainer=$(OutputDirectory)\GitHubVS_Debug.vsix</Properties>
+            <Properties>Configuration=Debug;IsExperimental=true;IsProductComponent=false</Properties>
         </ProjectToBuild>  
         <ProjectToBuild Include="$(SolutionFile)">
-            <Properties>Configuration=Release;IsExperimental=false;IsProductComponent=false;TargetVsixContainer=$(OutputDirectory)\GitHubVS_Release.vsix</Properties>
+            <Properties>Configuration=Release;IsExperimental=false;IsProductComponent=false</Properties>
         </ProjectToBuild>  
         <ProjectToBuild Include="$(SolutionFile)">
-            <Properties>Configuration=Release;IsExperimental=false;IsProductComponent=true;TargetVsixContainer=$(OutputDirectory)\GitHubVS_ProductComponent.vsix</Properties>
+            <Properties>Configuration=Release;IsExperimental=false;IsProductComponent=true;TargetVsixContainer=$(ProductComponentDirectory)\$(VsixFileName)</Properties>
         </ProjectToBuild>  
     </ItemGroup>  
-    <Target Name="Build">  
+    <Target Name="Build">
+        <MakeDir Directories="$(ProductComponentDirectory)"/>  
         <MSBuild Targets="GitHub_VisualStudio" Projects="@(ProjectToBuild)"/>  
     </Target>  
 </Project>  
