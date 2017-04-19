@@ -7,11 +7,12 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 using GitHub.VisualStudio.UI;
+using GitHub.TeamFoundation;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    [TeamExplorerNavigationItem(PulseNavigationItemId, NavigationItemPriority.Pulse)]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
+    //[ResolvingTeamExplorerNavigationItem(PulseNavigationItemId, NavigationItemPriority.Pulse)]
+    //[PartCreationPolicy(CreationPolicy.NonShared)]
     public class PulseNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PulseNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA2";

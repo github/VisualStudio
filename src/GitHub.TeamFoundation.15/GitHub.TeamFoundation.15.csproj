@@ -205,6 +205,9 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Services\VSGitServices.cs">
       <Link>Services\VSGitServices.cs</Link>
     </Compile>
+    <Compile Include="..\GitHub.TeamFoundation.14\TeamFoundationResolver.cs">
+      <Link>TeamFoundationResolver.cs</Link>
+    </Compile>
     <Compile Include="RegistryHelper.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>

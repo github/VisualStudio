@@ -12,11 +12,12 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using GitHub.Models;
+using GitHub.TeamFoundation;
 
 namespace GitHub.VisualStudio.Base
 {
-    [Export(typeof(ITeamExplorerServiceHolder))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
+    //[Export(typeof(ITeamExplorerServiceHolder))]
+    //[PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();
@@ -29,6 +30,11 @@ namespace GitHub.VisualStudio.Base
 
         // ActiveRepositories PropertyChanged event comes in on a non-main thread
         readonly SynchronizationContext syncContext;
+
+        static TeamExplorerServiceHolder()
+        {
+            TeamFoundationResolver.Resolve(() => typeof(IGitExt));
+        }
 
         public TeamExplorerServiceHolder()
         {

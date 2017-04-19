@@ -7,11 +7,12 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 using GitHub.VisualStudio.UI;
+using GitHub.TeamFoundation;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    [TeamExplorerNavigationItem(GraphsNavigationItemId, NavigationItemPriority.Graphs)]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
+    //[ResolvingTeamExplorerNavigationItem(GraphsNavigationItemId, NavigationItemPriority.Graphs)]
+    //[PartCreationPolicy(CreationPolicy.NonShared)]
     public class GraphsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string GraphsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA5";
