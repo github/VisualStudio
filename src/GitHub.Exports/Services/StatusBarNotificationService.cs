@@ -22,12 +22,13 @@ namespace GitHub.Services
 
         public void HideNotification(Guid guid)
         {
-            throw new NotImplementedException();
+            // status bar only shows text, this is a noop
         }
 
         public bool IsNotificationVisible(Guid guid)
         {
-            throw new NotImplementedException();
+            // it's only text, there's no way of checking
+            return false;
         }
 
         public void ShowError(string message)
