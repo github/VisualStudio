@@ -27,7 +27,8 @@ namespace GitHub.InlineReviews.Tags
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
-            return new ReviewTagger(buffer, sessionManager, builder) as ITagger<T>;
+            return buffer.Properties.GetOrCreateSingletonProperty(()=> 
+                new ReviewTagger(buffer, sessionManager, builder)) as ITagger<T>;
         }
     }
 }
