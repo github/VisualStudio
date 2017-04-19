@@ -18,7 +18,7 @@ namespace GitHub.UI.Helpers.UnitTests
 
         public AppDomainContext(AppDomainSetup setup = null)
         {
-            if(setup == null)
+            if (setup == null)
             {
                 setup = new AppDomainSetup();
                 setup.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory; // don't use the process base dir
