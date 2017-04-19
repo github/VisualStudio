@@ -419,6 +419,7 @@
     <Content Include="GitHub.VisualStudio.imagemanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Settings\generated\PackageSettingsGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -462,6 +463,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Resources\icons\link_external.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\icons\question.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

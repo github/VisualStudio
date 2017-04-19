@@ -16,7 +16,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
+using GitHub.Info;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -34,6 +34,7 @@ namespace GitHub.VisualStudio.UI.Views
         readonly IConnectionManager connectionManager;
         readonly IUIProvider uiProvider;
         readonly IVisualStudioBrowser browser;
+        readonly IUsageTracker usageTracker;
         NavigationController navController;
 
         bool disabled;
@@ -43,12 +44,14 @@ namespace GitHub.VisualStudio.UI.Views
         [ImportingConstructor]
         public GitHubPaneViewModel(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder,
-            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser)
+            IConnectionManager cm, IRepositoryHosts hosts, IUIProvider uiProvider, IVisualStudioBrowser vsBrowser,
+            IUsageTracker usageTracker)
             : base(serviceProvider, apiFactory, holder)
         {
             this.connectionManager = cm;
             this.hosts = hosts;
             this.uiProvider = uiProvider;
+            this.usageTracker = usageTracker;
 
             CancelCommand = ReactiveCommand.Create();
             Title = "GitHub";
@@ -122,6 +125,15 @@ namespace GitHub.VisualStudio.UI.Views
                             browser.OpenUrl(ActiveRepoUri.ToRepositoryUrl());
                             break;
                     }
+                },
+                true);
+
+           serviceProvider.AddCommandHandler(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.helpCommand,
+                () => true,
+                () =>
+                {
+                    browser.OpenUrl(new Uri(GitHubUrls.Documentation));
+                    usageTracker.IncrementGitHubPaneHelpClicks().Forget();
                 },
                 true);
 

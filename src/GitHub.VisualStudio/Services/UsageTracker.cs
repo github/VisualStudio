@@ -171,6 +171,27 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementWelcomeDocsClicks()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfWelcomeDocsClicks;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementWelcomeTrainingClicks()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfWelcomeTrainingClicks;
+            SaveUsage(usage);
+        }
+
+        public async Task IncrementGitHubPaneHelpClicks()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfGitHubPaneHelpClicks;
+            SaveUsage(usage);
+        }
+
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
