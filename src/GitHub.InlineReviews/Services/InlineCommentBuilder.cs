@@ -32,28 +32,39 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(path, nameof(path));
             Guard.ArgumentNotNull(session, nameof(session));
 
-            var result = new List<InlineCommentModel>();
-            var repo = GitService.GitServiceHelper.GetRepository(session.Repository.LocalPath);
-            var changes = await gitClient.Compare(
-                repo,
-                session.PullRequest.Head.Sha,
-                session.PullRequest.Base.Sha,
-                path);
             var comments = session.GetCommentsForFile(path);
-            var diffPositions = comments
-                .Where(x => x.Position.HasValue)
-                .Select(x => x.Position.Value)
-                .OrderBy(x => x)
-                .Distinct();
-            var lineMap = MapDiffPositions(changes.Content, diffPositions);
+            var result = new List<InlineCommentModel>();
 
-            foreach (var comment in comments)
+            if (comments.Count == 0)
+                return result;
+
+            var commentsByCommit = comments
+                .OrderBy(x => x.Id)
+                .GroupBy(x => x.CommitId);
+
+            foreach (var commit in commentsByCommit)
             {
-                int lineNumber;
+                var repo = GitService.GitServiceHelper.GetRepository(session.Repository.LocalPath);
+                var changes = await gitClient.Compare(
+                    repo,
+                    session.PullRequest.Base.Sha,
+                    commit.Key,
+                    path);
+                var diffPositions = comments
+                    .Where(x => x.Position.HasValue)
+                    .Select(x => x.Position.Value)
+                    .OrderBy(x => x)
+                    .Distinct();
+                var lineMap = MapDiffPositions(changes.Content, diffPositions);
 
-                if (comment.Position.HasValue && lineMap.TryGetValue(comment.Position.Value, out lineNumber))
+                foreach (var comment in commit)
                 {
-                    result.Add(new InlineCommentModel(lineNumber, comment));
+                    int lineNumber;
+
+                    if (comment.Position.HasValue && lineMap.TryGetValue(comment.Position.Value, out lineNumber))
+                    {
+                        result.Add(new InlineCommentModel(lineNumber, comment));
+                    }
                 }
             }
 
@@ -89,7 +100,7 @@ namespace GitHub.InlineReviews.Services
                     if (line.StartsWith("@@"))
                     {
                         if (sourceLine == -1) diffLine = 0;
-                        sourceLine = ReadLineFromHunkHeader(line) - 1;
+                        sourceLine = ReadLineFromHunkHeader(line) - 2;
                     }
 
                     if (positionEnumerator.Current == diffLine)

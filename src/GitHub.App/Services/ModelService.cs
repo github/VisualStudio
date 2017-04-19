@@ -410,7 +410,9 @@ namespace GitHub.Services
                         Id = x.Id,
                         Path = x.Path,
                         Position = x.Position,
+                        OriginalPosition = x.OriginalPosition,
                         CommitId = x.CommitId,
+                        OriginalCommitId = x.OriginalCommitId,
                         DiffHunk = x.DiffHunk,
                         User = Create(x.User),
                         Body = x.Body,
@@ -629,7 +631,9 @@ namespace GitHub.Services
                 Id = comment.Id;
                 Path = comment.Path;
                 Position = comment.Position;
+                OriginalPosition = comment.OriginalPosition;
                 CommitId = comment.CommitId;
+                OriginalCommitId = comment.OriginalCommitId;
                 DiffHunk = comment.DiffHunk;
                 User = new AccountCacheItem(comment.User);
                 Body = comment.Body;
@@ -639,7 +643,9 @@ namespace GitHub.Services
             public int Id { get; }
             public string Path { get; set; }
             public int? Position { get; set; }
+            public int? OriginalPosition { get; set; }
             public string CommitId { get; set; }
+            public string OriginalCommitId { get; set; }
             public string DiffHunk { get; set; }
             public AccountCacheItem User { get; set; }
             public string Body { get; set; }

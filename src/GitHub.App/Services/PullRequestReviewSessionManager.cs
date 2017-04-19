@@ -7,7 +7,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IPullRequestReviewSessionManager))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestReviewSessionManager : IPullRequestReviewSessionManager
+    public class PullRequestReviewSessionManager : IPullRequestReviewSessionManager, IDisposable
     {
         BehaviorSubject<IPullRequestReviewSession> sessionChanged = new BehaviorSubject<IPullRequestReviewSession>(null);
 
@@ -16,6 +16,12 @@ namespace GitHub.Services
         public void NotifySessionChanged([AllowNull] IPullRequestReviewSession session)
         {
             sessionChanged.OnNext(session);
+        }
+
+        public void Dispose()
+        {
+            sessionChanged.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

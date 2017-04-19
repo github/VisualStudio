@@ -9,7 +9,9 @@ namespace GitHub.InlineReviews.SampleData
         public int Id => 1;
         public string Path => string.Empty;
         public int? Position => 1;
+        public int? OriginalPosition => 1;
         public string CommitId => null;
+        public string OriginalCommitId => null;
         public string DiffHunk => null;
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User => new AccountDesigner { Login = "shana", IsUser = true };
