@@ -45,13 +45,13 @@ namespace GitHub.UI.Helpers
             var data = AppDomain.CurrentDomain.GetData(dataName);
 
             var cachingFactory = data as CachingFactory;
-            if(cachingFactory != null)
+            if (cachingFactory != null)
             {
                 return cachingFactory;
             }
 
             var disposable = data as IDisposable;
-            if(disposable != null)
+            if (disposable != null)
             {
                 disposable.Dispose();
             }
