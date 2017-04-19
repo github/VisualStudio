@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-             xmlns:cache="clr-namespace:GitHub.VisualStudio.UI.Helpers"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
              mc:Ignorable="d"
              DataContext="{Binding ViewModel}" d:DesignWidth="230" d:DesignHeight="120"

@@ -1,9 +1,9 @@
 ﻿<local:GenericRepositoryCreationControl x:Class="GitHub.VisualStudio.UI.Views.Controls.RepositoryCreationControl"
                                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                        xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                        xmlns:helpers="clr-namespace:GitHub.VisualStudio.Helpers"
                                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                                        xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
+                                        xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                         xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
                                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                         xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
@@ -114,7 +114,7 @@
                 <ui:PromptTextBox x:Name="nameText"
                           Grid.Row="0"
                           Grid.Column="1"
-                          MaxLength="{x:Static cache:Constants.MaxRepositoryNameLength}"
+                          MaxLength="{x:Static helpers:Constants.MaxRepositoryNameLength}"
                           Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" 
                           AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.RepositoryNameTextBox}" />
 

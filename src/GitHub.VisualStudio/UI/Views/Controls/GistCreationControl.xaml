@@ -5,7 +5,7 @@
                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                  xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                   xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
                                   xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
