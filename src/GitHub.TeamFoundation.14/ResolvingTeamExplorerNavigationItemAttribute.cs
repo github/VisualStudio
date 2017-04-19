@@ -4,18 +4,20 @@ using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.TeamFoundation
 {
-    //[MetadataAttribute]
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
+    [MetadataAttribute]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class ResolvingTeamExplorerNavigationItemAttribute : ExportAttribute
     {
-        //public string Id { get; }
-        //public int Priority { get; }
-        //public string TargetPageId { get; set; }
+        public string Id { get; private set; }
+        public int Priority { get; private set; }
+        public string TargetPageId { get; set; }
 
-        public ResolvingTeamExplorerNavigationItemAttribute(/*string id, int priority*/)
+        public ResolvingTeamExplorerNavigationItemAttribute(string id, int priority)
             : base(TeamFoundationResolver.Resolve(() => typeof(ITeamExplorerNavigationItem)))
         {
-            //Id = id;
-            //Priority = priority;
+            Id = id;
+            Priority = priority;
         }
     }
 }
