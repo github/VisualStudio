@@ -72,17 +72,6 @@ namespace GitHub.UI.Helpers
                 disposables = new HashSet<IDisposable>();
             }
 
-            public void Dispose()
-            {
-                foreach (var disposable in disposables)
-                {
-                    disposable.Dispose();
-                }
-
-                disposables.Clear();
-                sharedDictionaries.Clear();
-            }
-
             public ResourceDictionary GetOrCreateResourceDictionary(ResourceDictionary owner, Uri uri)
             {
                 TryAddDisposable(owner);
@@ -105,6 +94,29 @@ namespace GitHub.UI.Helpers
                 {
                     disposables.Add(disposable);
                 }
+            }
+
+            bool disposed;
+            void Dispose(bool disposing)
+            {
+                if (disposed) return;
+                if (disposing)
+                {
+                    disposed = true;
+                    foreach (var disposable in disposables)
+                    {
+                        disposable.Dispose();
+                    }
+
+                    disposables.Clear();
+                    sharedDictionaries.Clear();
+                }
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
             }
         }
 
