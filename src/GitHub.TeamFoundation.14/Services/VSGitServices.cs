@@ -14,7 +14,6 @@ using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
-using GitHub.VisualStudio.TeamExplorer;
 
 namespace GitHub.Services
 {

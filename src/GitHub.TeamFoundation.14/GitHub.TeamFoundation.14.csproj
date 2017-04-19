@@ -121,15 +121,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\TeamExplorerServiceHolderFactory.cs" />
     <Compile Include="NavigationItemFactory.cs" />
-    <Compile Include="Services\VSGitServicesFactory.cs" />
     <Compile Include="RegistryHelper.cs" />
     <Compile Include="ResolvingTeamExplorerNavigationItemAttribute.cs" />
     <Compile Include="ResolvingTeamExplorerSectionAttribute.cs" />
     <Compile Include="SectionFactory.cs" />
-    <Compile Include="Services\VSGitServices.cs" />
     <Compile Include="Services\TeamExplorerServicesFactory.cs" />
-    <Compile Include="Base\TeamExplorerServiceHolderFactory.cs" />
+    <Compile Include="Services\VSGitServices.cs" />
+    <Compile Include="Services\VSGitServicesFactory.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Base\EnsureLoggedInSection.cs" />
     <Compile Include="Base\TeamExplorerInvitationBase.cs" />

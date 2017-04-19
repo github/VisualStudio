@@ -238,3 +238,4 @@ WiX.Toolset.DummyFile.txt
 nunit-UnitTests.xml
 nunit-TrackingCollectionTests.xml
 GitHubVS.sln.DotSettings
+/.ncrunch/GitHub.UI.UnitTests.v3.ncrunchproject

@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
 using System.ComponentModel.Composition;
 using GitHub.Api;
-using GitHub.Models;
 using GitHub.Services;
-using GitHub.Settings;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio.TeamExplorer.Home;
-using GitHub.VisualStudio.TeamExplorer.Connect;
 
 namespace GitHub.VisualStudio.TeamExplorer
 {
+    // For some reason this doesn't work when `Shared` (buttons don't appear).
+    // [Export, PartCreationPolicy(CreationPolicy.Shared)]
     [Export, PartCreationPolicy(CreationPolicy.NonShared)]
     public class NavigationItemFactory
     {
@@ -61,7 +59,7 @@ namespace GitHub.VisualStudio.TeamExplorer
             }
         }
 
-        //[ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA3", NavigationItemPriority.PullRequests)]
+        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA3", NavigationItemPriority.PullRequests)]
         //[ExportMetadata("Id", "5245767A-B657-4F8E-BFEE-F04159F1DDA3" /*PullRequestsNavigationItem.PullRequestsNavigationItemId*/)]
         //[ExportMetadata("Priority", NavigationItemPriority.PullRequests)]
         //[ExportMetadata("TargetPageId", null)]

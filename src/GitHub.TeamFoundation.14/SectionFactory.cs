@@ -36,7 +36,6 @@ namespace GitHub.VisualStudio.TeamExplorer
             IDialogService dialogService,
             IVisualStudioBrowser visualStudioBrowser)
         {
-            Trace.WriteLine("============================ GitHubConnectSections =============================");
             this.serviceProvider = serviceProvider;
             this.apiFactory = apiFactory;
             this.holder = holder;

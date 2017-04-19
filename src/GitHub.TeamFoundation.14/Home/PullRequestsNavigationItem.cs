@@ -14,7 +14,7 @@ using GitHub.TeamFoundation;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    //[TeamExplorerNavigationItem(PullRequestsNavigationItemId, NavigationItemPriority.PullRequests)]
+    //[ResolvingTeamExplorerNavigationItem(PullRequestsNavigationItemId, NavigationItemPriority.PullRequests)]
     //[PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {

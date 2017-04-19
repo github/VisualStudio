@@ -4,7 +4,8 @@ using Microsoft.TeamFoundation.Controls;
 
 namespace GitHub.TeamFoundation
 {
-    //[MetadataAttribute]
+    [MetadataAttribute]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]
     public class ResolvingTeamExplorerSectionAttribute : ExportAttribute
     {
         //public string Id { get; }
