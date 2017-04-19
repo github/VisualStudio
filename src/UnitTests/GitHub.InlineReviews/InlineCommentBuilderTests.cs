@@ -16,7 +16,7 @@ namespace UnitTests.GitHub.InlineReviews
             var diff = Resources.pr_573_apiclient_diff;
             var result = target.MapDiffPositions(diff, new[] { 31 });
 
-            Assert.Equal(87, result[31]);
+            Assert.Equal(86, result[31]);
         }
     }
 }
