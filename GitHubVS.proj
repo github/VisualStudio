@@ -1,0 +1,33 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <Import Project="tools\MSBuild-Tasks\Zip.tasks" />
+    
+    <PropertyGroup>
+      <SolutionFile>GitHubVS.sln</SolutionFile>
+      <BuildDirectory>$(MSBuildProjectDirectory)\build</BuildDirectory>
+      <ProductComponentDirectory>$(MSBuildProjectDirectory)\build\ProductComponent</ProductComponentDirectory>
+      <ExtensionName>GitHub.VisualStudio</ExtensionName>
+    </PropertyGroup>
+    
+    <ItemGroup>  
+        <ProjectToBuild Include="$(SolutionFile)">
+            <Properties>Configuration=Debug;IsExperimental=true;IsProductComponent=false</Properties>
+        </ProjectToBuild>  
+        <ProjectToBuild Include="$(SolutionFile)">
+            <Properties>Configuration=Release;IsExperimental=false;IsProductComponent=false</Properties>
+        </ProjectToBuild>  
+        <ProjectToBuild Include="$(SolutionFile)">
+            <Properties>Configuration=Release;IsExperimental=false;IsProductComponent=true;TargetVsixContainer=$(ProductComponentDirectory)\$(ExtensionName).vsix</Properties>
+        </ProjectToBuild>  
+    </ItemGroup>  
+    
+    <Target Name="Build">
+        <MakeDir Directories="$(ProductComponentDirectory)"/>
+        <MSBuild Targets="GitHub_VisualStudio" Projects="@(ProjectToBuild)"/>
+        <Zip
+          InputFileNames="$(ProductComponentDirectory)\$(ExtensionName).vsix;$(ProductComponentDirectory)\$(ExtensionName).json"
+          OutputFileName="$(ProductComponentDirectory)\$(ExtensionName).zip"
+          OverwriteExistingFile="true" />
+    </Target>  
+    
+</Project>  
