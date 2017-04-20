@@ -259,29 +259,6 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> ExtractFile(
-            ILocalRepositoryModel repository,
-            IModelService modelService,
-            string commitSha,
-            string fileName,
-            string fileSha)
-        {
-            return Observable.Defer(async () =>
-            {
-                var repo = gitService.GetRepository(repository.LocalPath);
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name);
-                var result = await GetFileFromRepositoryOrApi(repository, repo, modelService, commitSha, fileName, fileSha);
-
-                if (result == null)
-                {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{commitSha}");
-                }
-
-                return Observable.Return(result);
-            });
-        }
-
         public IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
             IModelService modelService,
@@ -297,7 +274,7 @@ namespace GitHub.Services
                 await gitClient.Fetch(repo, remote.Name);
 
                 // The left file is the target of the PR so this should already be fetched.
-                var left = await gitClient.ExtractFile(repo, pullRequest.Base.Sha, fileName);
+                var left = await ExtractToTempFile(repo, pullRequest.Base.Sha, fileName);
 
                 // The right file - if it comes from a fork - may not be fetched so fall back to
                 // getting the file contents from the model service.
@@ -317,18 +294,6 @@ namespace GitHub.Services
 
                 return Observable.Return(Tuple.Create(left, right));
             });
-        }
-
-        async Task<string> GetFileFromRepositoryOrApi(
-            ILocalRepositoryModel repository,
-            IRepository repo,
-            IModelService modelService,
-            string commitSha,
-            string fileName,
-            string fileSha)
-        {
-            return await gitClient.ExtractFile(repo, commitSha, fileName) ??
-                   await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
         }
 
         public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
@@ -384,6 +349,35 @@ namespace GitHub.Services
 
             return uniqueName;
         }
+
+        async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName)
+        {
+            var contents = await gitClient.ExtractFile(repo, commitSha, fileName);
+
+            if (contents == null)
+                return null;
+
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
+            var tempFile = Path.Combine(tempDir, tempFileName);
+
+            Directory.CreateDirectory(tempDir);
+            File.WriteAllText(tempFile, contents);
+            return tempFile;
+        }
+
+        async Task<string> GetFileFromRepositoryOrApi(
+            ILocalRepositoryModel repository,
+            IRepository repo,
+            IModelService modelService,
+            string commitSha,
+            string fileName,
+            string fileSha)
+        {
+            return await ExtractToTempFile(repo, commitSha, fileName) ??
+                   await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+        }
+
 
         IEnumerable<string> GetLocalBranchesInternal(
             ILocalRepositoryModel localRepository,

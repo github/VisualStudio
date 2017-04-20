@@ -131,7 +131,7 @@ namespace GitHub.Services
         /// <param name="commitSha">The SHA of the commit.</param>
         /// <param name="fileName">The path to the file, relative to the repository.</param>
         /// <returns>
-        /// The filename of a temporary file containing the file contents.
+        /// The contents of the file, or null if the file was not found at the specified commit.
         /// </returns>
         Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
     }

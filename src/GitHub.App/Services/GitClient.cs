@@ -268,36 +268,14 @@ namespace GitHub.Services
         }
 
         [return: AllowNull]
-        public async Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
+        public Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
-            var commit = repository.Lookup<Commit>(commitSha);
-
-            if (commit == null)
+            return Task.Factory.StartNew(() =>
             {
-                return null;
-            }
-
-            var blob = commit[fileName]?.Target as Blob;
-            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
-            var tempFile = Path.Combine(tempDir, tempFileName);
-
-            Directory.CreateDirectory(tempDir);
-
-            if (blob != null)
-            {
-                using (var source = blob.GetContentStream(new FilteringOptions(fileName)))
-                using (var destination = File.OpenWrite(tempFile))
-                {
-                    await source.CopyToAsync(destination);
-                }
-            }
-            else
-            {
-                File.Create(tempFile).Dispose();
-            }
-
-            return tempFile;
+                var commit = repository.Lookup<Commit>(commitSha);
+                var blob = commit?[fileName]?.Target as Blob;
+                return blob?.GetContentText();
+            });
         }
 
         static bool IsCanonical(string s)
