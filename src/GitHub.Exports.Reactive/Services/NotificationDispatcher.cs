@@ -54,18 +54,18 @@ namespace GitHub.Services
             handler?.ShowMessage(message);
         }
 
-        public void ShowMessage(string message, ICommand command)
+        public void ShowMessage(string message, ICommand command, bool showToolTips = true, Guid guid = default(Guid))
         {
             notifications.OnNext(new Notification(message, Notification.NotificationType.Message, command));
             var handler = notificationHandlers.TryPeek();
-            handler?.ShowMessage(message, command);
+            handler?.ShowMessage(message, command, showToolTips, guid);
         }
 
         public void ShowWarning(string message)
         {
             notifications.OnNext(new Notification(message, Notification.NotificationType.Warning));
             var handler = notificationHandlers.TryPeek();
-            handler.ShowWarning(message);
+            handler?.ShowWarning(message);
         }
 
         public void ShowError(string message)
@@ -73,6 +73,18 @@ namespace GitHub.Services
             notifications.OnNext(new Notification(message, Notification.NotificationType.Error));
             var handler = notificationHandlers.TryPeek();
             handler?.ShowError(message);
+        }
+
+        public void HideNotification(Guid guid)
+        {
+            var handler = notificationHandlers.TryPeek();
+            handler?.HideNotification(guid);
+        }
+
+        public bool IsNotificationVisible(Guid guid)
+        {
+            var handler = notificationHandlers.TryPeek();
+            return handler?.IsNotificationVisible(guid) ?? false;
         }
 
         bool disposed; // To detect redundant calls

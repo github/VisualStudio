@@ -12,8 +12,10 @@ namespace GitHub.VisualStudio
         public const string GitHubServiceProviderId = "76909E1A-9D58-41AB-8957-C26B9550787B";
         public const string StartPagePackageId = "3b764d23-faf7-486f-94c7-b3accc44a70e";
         public const string CodeContainerProviderId = "6CE146CB-EF57-4F2C-A93F-5BA685317660";
+        public const string TeamExplorerWelcomeMessage = "C529627F-8AA6-4FDB-82EB-4BFB7DB753C3";
 
         // VisualStudio IDs
         public const string GitSccProviderId = "11B8E6D7-C08B-4385-B321-321078CDD1F8";
+        public const string TeamExplorerInstall3rdPartyGitTools = "DF785C7C-8454-4836-9686-D1C4A01D0BB9";
     }
 }

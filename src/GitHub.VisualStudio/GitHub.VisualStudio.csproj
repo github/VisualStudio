@@ -20,7 +20,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.2.0.9</ApplicationVersion>
+    <ApplicationVersion>2.2.0.10</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
@@ -405,6 +405,7 @@
     <Content Include="GitHub.VisualStudio.imagemanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Settings\generated\PackageSettingsGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -448,6 +449,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Resources\icons\link_external.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\icons\question.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
