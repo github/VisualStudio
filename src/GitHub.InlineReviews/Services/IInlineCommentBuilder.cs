@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GitHub.InlineReviews.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -9,6 +10,7 @@ namespace GitHub.InlineReviews.Services
     {
         Task<IList<InlineCommentModel>> Build(
             string path,
+            ITextSnapshot snapshot,
             IPullRequestReviewSession session);
     }
 }

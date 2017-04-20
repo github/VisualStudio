@@ -100,7 +100,7 @@ namespace GitHub.InlineReviews.Tags
                     return;
                 }
 
-                comments = await builder.Build(path, session);
+                comments = await builder.Build(path, buffer.CurrentSnapshot, session);
                 NotifyTagsChanged();
             }
         }

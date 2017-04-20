@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using DiffPlex;
+using DiffPlex.DiffBuilder;
+using DiffPlex.DiffBuilder.Model;
+using DiffPlex.Model;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
+using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -15,18 +22,22 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class InlineCommentBuilder : IInlineCommentBuilder
     {
+        readonly IGitService gitService;
         readonly IGitClient gitClient;
 
         [ImportingConstructor]
-        public InlineCommentBuilder(IGitClient gitClient)
+        public InlineCommentBuilder(IGitService gitService, IGitClient gitClient)
         {
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
 
+            this.gitService = gitService;
             this.gitClient = gitClient;
         }
 
         public async Task<IList<InlineCommentModel>> Build(
             string path,
+            ITextSnapshot snapshot,
             IPullRequestReviewSession session)
         {
             Guard.ArgumentNotNull(path, nameof(path));
@@ -39,31 +50,29 @@ namespace GitHub.InlineReviews.Services
                 return result;
 
             var commentsByCommit = comments
-                .OrderBy(x => x.Id)
-                .GroupBy(x => x.CommitId);
+                .Where(x => x.OriginalPosition.HasValue)
+                .OrderBy(x => x.OriginalPosition)
+                .ThenBy(x => x.Id)
+                .GroupBy(x => x.OriginalCommitId);
+            var repo = gitService.GetRepository(session.Repository.LocalPath);
+            var current = snapshot.GetText();
+            var differ = new InlineDiffBuilder(new Differ());
 
             foreach (var commit in commentsByCommit)
             {
-                var repo = GitService.GitServiceHelper.GetRepository(session.Repository.LocalPath);
-                var changes = await gitClient.Compare(
-                    repo,
-                    session.PullRequest.Base.Sha,
-                    commit.Key,
-                    path);
-                var diffPositions = comments
-                    .Where(x => x.Position.HasValue)
-                    .Select(x => x.Position.Value)
-                    .OrderBy(x => x)
-                    .Distinct();
-                var lineMap = MapDiffPositions(changes.Content, diffPositions);
+                var baseSha = session.PullRequest.Base.Sha;
+                var @base = await gitClient.ExtractFile(repo, baseSha, path) ?? string.Empty;
+                var snapshotDiff = BuildDiff(differ.BuildDiffModel(@base, current));
+                var inlineComments = CreateInlineComments(commit);
 
-                foreach (var comment in commit)
+                foreach (var comment in inlineComments)
                 {
-                    int lineNumber;
+                    var match = snapshotDiff.IndexOf(comment.DiffHunk);
 
-                    if (comment.Position.HasValue && lineMap.TryGetValue(comment.Position.Value, out lineNumber))
+                    if (match != -1)
                     {
-                        result.Add(new InlineCommentModel(lineNumber, comment));
+                        comment.LineNumber = LineFromPosition(snapshotDiff, match) + comment.DiffHunkLines - 1;
+                        result.Add(comment);
                     }
                 }
             }
@@ -71,66 +80,46 @@ namespace GitHub.InlineReviews.Services
             return result;
         }
 
-        /// <summary>
-        /// Maps lines in a diff to lines in the source file.
-        /// </summary>
-        /// <param name="diff">The diff.</param>
-        /// <param name="positions">The diff lines to map.</param>
-        /// <returns>
-        /// A dictionary mapping 1-based diff line numbers to 0-based file line numbers.
-        /// </returns>
-        public IDictionary<int, int> MapDiffPositions(string diff, IEnumerable<int> positions)
+        static string BuildDiff(DiffPaneModel diffModel)
         {
-            Guard.ArgumentNotNull(diff, nameof(diff));
-            Guard.ArgumentNotNull(positions, nameof(positions));
+            var builder = new StringBuilder();
 
-            var diffLine = -1;
-            var sourceLine = -1;
-            var positionEnumerator = positions.GetEnumerator();
-            var result = new Dictionary<int, int>();
-
-            positionEnumerator.MoveNext();
-
-            using (var reader = new StringReader(diff))
+            foreach (var line in diffModel.Lines)
             {
-                string line;
-
-                while ((line = reader.ReadLine()) != null)
+                switch (line.Type)
                 {
-                    if (line.StartsWith("@@"))
-                    {
-                        if (sourceLine == -1) diffLine = 0;
-                        sourceLine = ReadLineFromHunkHeader(line) - 2;
-                    }
-
-                    if (positionEnumerator.Current == diffLine)
-                    {
-                        result.Add(diffLine, sourceLine);
-                        if (!positionEnumerator.MoveNext()) break;
-                    }
-
-                    if (diffLine >= 0)
-                    {
-                        ++diffLine;
-                        if (!line.StartsWith('-')) ++sourceLine;
-                    }
+                    case ChangeType.Inserted:
+                        builder.Append('+');
+                        break;
+                    case ChangeType.Deleted:
+                        builder.Append('-');
+                        break;
+                    default:
+                        builder.Append(' ');
+                        break;
                 }
+
+                builder.AppendLine(line.Text);
+            }
+
+            return builder.ToString();
+        }
+
+        static IList<InlineCommentModel> CreateInlineComments(IEnumerable<IPullRequestReviewCommentModel> comments)
+        {
+            return comments.Select(x => new InlineCommentModel(x)).ToList();
+        }
+
+        static int LineFromPosition(string s, int position)
+        {
+            var result = 0;
+
+            for (var i = 0; i < position; ++i)
+            {
+                if (s[i] == '\n') ++result;
             }
 
             return result;
-        }
-
-        int ReadLineFromHunkHeader(string line)
-        {
-            int plus = line.IndexOf('+');
-            int comma = line.IndexOf(',', plus);
-            return int.Parse(line.Substring(plus + 1, comma - (plus + 1)));
-        }
-
-        public class ChunkRange
-        {
-            public int DiffLine { get; set; }
-            public int SourceLine { get; set; }
         }
     }
 }

@@ -246,7 +246,6 @@
     <Compile Include="GitHub.Exports\LocalRepositoryModelTests.cs" />
     <Compile Include="GitHub.Extensions\GuardTests.cs" />
     <Compile Include="GitHub.Extensions\UriExtensionTests.cs" />
-    <Compile Include="GitHub.InlineReviews\InlineCommentBuilderTests.cs" />
     <Compile Include="GitHub.Primitives\UriStringTests.cs" />
     <Compile Include="GitHub.UI\Converters.cs" />
     <Compile Include="GitHub.UI\TestAutomation\ResourceValueTests.cs" />
@@ -373,7 +372,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <None Include="Resources\pr-573-apiclient-diff.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

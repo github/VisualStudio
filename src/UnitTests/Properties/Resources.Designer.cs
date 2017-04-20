@@ -59,31 +59,5 @@ namespace UnitTests.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to diff --git a/src/GitHub.App/Api/ApiClient.cs b/src/GitHub.App/Api/ApiClient.cs
-        ///index 6745236..79adcf3 100644
-        ///--- a/src/GitHub.App/Api/ApiClient.cs
-        ///+++ b/src/GitHub.App/Api/ApiClient.cs
-        ///@@ -8,6 +8,7 @@
-        /// using System.Security.Cryptography;
-        /// using System.Text;
-        /// using GitHub.Primitives;
-        ///+using NLog;
-        /// using NullGuard;
-        /// using Octokit;
-        /// using Octokit.Reactive;
-        ///@@ -18,8 +19,6 @@
-        /// using System.Collections.Generic;
-        /// using GitHub.Models;
-        /// using GitHub.Extensions;
-        ///-using GitHub.Infrastructure;
-        ///-using S [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string pr_573_apiclient_diff {
-            get {
-                return ResourceManager.GetString("pr_573_apiclient_diff", resourceCulture);
-            }
-        }
     }
 }
