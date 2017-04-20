@@ -43,10 +43,15 @@ namespace GitHub.Services
             manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
         }
 
-        public void ShowMessage(string message, ICommand command)
+        public void ShowMessage(string message, ICommand command, bool showToolTips = true, Guid guid = default(Guid))
         {
             manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
-            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
+            manager?.ShowNotification(
+                message,
+                NotificationType.Information,
+                showToolTips ? NotificationFlags.None : NotificationFlags.NoTooltips,
+                command,
+                guid);
         }
 
         public void ShowWarning(string message)
@@ -61,10 +66,22 @@ namespace GitHub.Services
             manager?.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
         }
 
+        public void HideNotification(Guid guid)
+        {
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            manager?.HideNotification(guid);
+        }
+
         public void ClearNotifications()
         {
             manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             manager?.ClearNotifications();
+        }
+
+        public bool IsNotificationVisible(Guid guid)
+        {
+            manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
+            return manager?.IsNotificationVisible(guid) ?? false;
         }
     }
 }

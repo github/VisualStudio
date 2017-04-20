@@ -20,7 +20,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.2.0.9</ApplicationVersion>
+    <ApplicationVersion>2.2.0.11</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
@@ -64,7 +64,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
@@ -81,21 +81,6 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <DeployExtension>False</DeployExtension>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'XamlDesign|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;XAML_DESIGNER</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CreateVsixContainer>True</CreateVsixContainer>
-    <DeployExtension>True</DeployExtension>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- Only deploy extension when building inside Visual Studio -->
@@ -312,7 +297,6 @@
     <Compile Include="Menus\BlameLink.cs" />
     <Compile Include="Menus\MenuBase.cs" />
     <Compile Include="Menus\CreateGist.cs" />
-    <Compile Include="Helpers\SharedDictionaryManager.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Menus\OpenLink.cs" />
     <Compile Include="Menus\LinkMenuBase.cs" />
@@ -421,6 +405,7 @@
     <Content Include="GitHub.VisualStudio.imagemanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Settings\generated\PackageSettingsGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -464,6 +449,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Resources\icons\link_external.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\icons\question.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

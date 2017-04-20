@@ -378,4 +378,9 @@
   <data name="OpenPROnGitHubToolTip" xml:space="preserve">
     <value>View Pull Request on GitHub</value>
   </data>
+  <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
+    <value>Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
+
+[Don't show this again](dont-show-again)</value>
+  </data>
 </root>

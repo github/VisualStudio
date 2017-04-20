@@ -27,6 +27,9 @@ namespace GitHub.Models
         public int NumberOfForkPullRequestsCheckedOut { get; set; }
         public int NumberOfForkPullRequestPulls { get; set; }
         public int NumberOfForkPullRequestPushes { get; set; }
+        public int NumberOfWelcomeDocsClicks { get; set; }
+        public int NumberOfWelcomeTrainingClicks { get; set; }
+        public int NumberOfGitHubPaneHelpClicks { get; set; }
 
         public UsageModel Clone(bool includeWeekly, bool includeMonthly)
         {
@@ -55,6 +58,9 @@ namespace GitHub.Models
                 NumberOfForkPullRequestsCheckedOut = NumberOfForkPullRequestsCheckedOut,
                 NumberOfForkPullRequestPulls = NumberOfForkPullRequestPulls,
                 NumberOfForkPullRequestPushes = NumberOfForkPullRequestPushes,
+                NumberOfWelcomeDocsClicks = NumberOfWelcomeDocsClicks,
+                NumberOfWelcomeTrainingClicks = NumberOfWelcomeTrainingClicks,
+                NumberOfGitHubPaneHelpClicks = NumberOfGitHubPaneHelpClicks,
             };
         }
     }
