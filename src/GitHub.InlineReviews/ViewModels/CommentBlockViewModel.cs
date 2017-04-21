@@ -9,9 +9,9 @@ namespace GitHub.InlineReviews.ViewModels
     {
         public CommentBlockViewModel()
         {
-            Comments = new ObservableCollection<InlineCommentModel>();
+            Comments = new ObservableCollection<IPullRequestReviewCommentModel>();
         }
 
-        public ObservableCollection<InlineCommentModel> Comments { get; }
+        public ObservableCollection<IPullRequestReviewCommentModel> Comments { get; }
     }
 }

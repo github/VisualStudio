@@ -51,7 +51,7 @@ namespace GitHub.InlineReviews.Peek
 
             foreach (var comment in result.Comments)
             {
-                viewModel.Comments.Add(comment);
+                viewModel.Comments.Add(comment.Original);
             }
 
             view.DataContext = viewModel;
