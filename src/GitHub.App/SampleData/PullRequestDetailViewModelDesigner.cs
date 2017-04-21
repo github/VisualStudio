@@ -56,9 +56,9 @@ This requires that errors be propagated from the viewmodel to the view and from 
             var gitHubDir = new PullRequestDirectoryNode("GitHub");
             var modelsDir = new PullRequestDirectoryNode("Models");
             var repositoriesDir = new PullRequestDirectoryNode("Repositories");
-            var itrackingBranch = new PullRequestFileNode(repoPath, @"GitHub\Models\ITrackingBranch.cs", "abc", PullRequestFileStatus.Modified, null);
-            var oldBranchModel = new PullRequestFileNode(repoPath, @"GitHub\Models\OldBranchModel.cs", "abc", PullRequestFileStatus.Removed, null);
-            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", "abc", PullRequestFileStatus.Added, "add");
+            var itrackingBranch = new PullRequestFileNode(repoPath, @"GitHub\Models\ITrackingBranch.cs", "abc", PullRequestFileStatus.Modified, null, 2);
+            var oldBranchModel = new PullRequestFileNode(repoPath, @"GitHub\Models\OldBranchModel.cs", "abc", PullRequestFileStatus.Removed, null, 0);
+            var concurrentRepositoryConnection = new PullRequestFileNode(repoPath, @"GitHub\Repositories\ConcurrentRepositoryConnection.cs", "abc", PullRequestFileStatus.Added, "add", 0);
 
             repositoriesDir.Files.Add(concurrentRepositoryConnection);
             modelsDir.Directories.Add(repositoriesDir);

@@ -412,12 +412,17 @@ namespace GitHub.ViewModels
 
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
+                var commentCount = pullRequest.Comments
+                    .Where(x => x.Path == changedFile.FileName && x.Position.HasValue)
+                    .Count();
+
                 var node = new PullRequestFileNode(
                     repository.LocalPath,
                     changedFile.FileName,
                     changedFile.Sha,
                     changedFile.Status,
-                    GetStatusDisplay(changedFile, changes));
+                    GetStatusDisplay(changedFile, changes),
+                    commentCount);
                 var dir = GetDirectory(node.DirectoryPath, dirs);
                 dir.Files.Add(node);
             }

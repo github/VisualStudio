@@ -18,7 +18,14 @@ namespace GitHub.ViewModels
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
-        public PullRequestFileNode(string repositoryPath, string path, string sha, PullRequestFileStatus status, [AllowNull] string statusDisplay)
+        /// <param name="commentCount">The number of review comments on the file.</param>
+        public PullRequestFileNode(
+            string repositoryPath,
+            string path,
+            string sha,
+            PullRequestFileStatus status,
+            [AllowNull] string statusDisplay,
+            int commentCount)
         {
             FileName = Path.GetFileName(path);
             DirectoryPath = Path.GetDirectoryName(path);
@@ -26,6 +33,7 @@ namespace GitHub.ViewModels
             Sha = sha;
             Status = status;
             StatusDisplay = statusDisplay;
+            CommentCount = commentCount;
         }
 
         /// <summary>
@@ -57,5 +65,10 @@ namespace GitHub.ViewModels
         /// Gets the string to display in the [message] box next to the filename.
         /// </summary>
         public string StatusDisplay { [return: AllowNull] get; }
+
+        /// <summary>
+        /// Gets the number of review comments on the file.
+        /// </summary>
+        public int CommentCount { get; }
     }
 }
