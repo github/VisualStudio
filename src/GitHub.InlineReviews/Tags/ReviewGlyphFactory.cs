@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
@@ -13,7 +9,11 @@ namespace GitHub.InlineReviews.Tags
     {
         public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
         {
-            return new ReviewGlyph();
+            var reviewTag = (ReviewTag)tag;
+            return new ReviewGlyph()
+            {
+                Opacity = reviewTag.NeedsUpdate ? 0.5 : 1,
+            };
         }
     }
 }

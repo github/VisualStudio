@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -12,12 +13,12 @@ namespace GitHub.InlineReviews.Peek
         public ReviewPeekSessionCreationOptions(
             ITextView textView,
             ITrackingPoint triggerPoint,
-            IList<IPullRequestReviewCommentModel> comments)
+            IList<InlineCommentModel> comments)
             : base(textView, ReviewPeekRelationship.Instance.Name, triggerPoint)
         {
             Comments = comments;
         }
 
-        public IList<IPullRequestReviewCommentModel> Comments { get; }
+        public IList<InlineCommentModel> Comments { get; }
     }
 }

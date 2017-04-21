@@ -17,7 +17,9 @@ namespace GitHub.Services
         {
             PullRequest = pullRequest;
             Repository = repository;
-            this.comments = pullRequest.Comments.GroupBy(x => x.Path)
+            this.comments = pullRequest.Comments
+                .OrderBy(x => x.Id)
+                .GroupBy(x => x.Path)
                 .ToDictionary(x => x.Key, x => x.ToList());
         }
 

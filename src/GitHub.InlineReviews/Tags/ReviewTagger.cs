@@ -1,35 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Tagging;
-using GitHub.Services;
-using GitHub.Models;
 using System.IO;
-using LibGit2Sharp;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
-using System.Threading.Tasks;
+using GitHub.Services;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Tagging;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class ReviewTagger : ITagger<ReviewTag>, IDisposable
+    sealed class ReviewTagger : ITagger<ReviewTag>, IDisposable
     {
+        readonly IGitService gitService;
+        readonly IGitClient gitClient;
         readonly ITextBuffer buffer;
         readonly IPullRequestReviewSessionManager sessionManager;
-        readonly IInlineCommentBuilder builder;
         readonly IDisposable subscription;
+        readonly Subject<ITextSnapshot> signalRebuild;
         string path;
+        InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
 
         public ReviewTagger(
+            IGitService gitService,
+            IGitClient gitClient,
             ITextBuffer buffer,
-            IPullRequestReviewSessionManager sessionManager,
-            IInlineCommentBuilder builder)
+            IPullRequestReviewSessionManager sessionManager)
         {
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
+            Guard.ArgumentNotNull(buffer, nameof(buffer));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+
+            this.gitService = gitService;
+            this.gitClient = gitClient;
             this.buffer = buffer;
             this.sessionManager = sessionManager;
-            this.builder = builder;
+
+            signalRebuild = new Subject<ITextSnapshot>();
+            signalRebuild.Throttle(TimeSpan.FromMilliseconds(500))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => Rebuild(x).Forget());
+
             this.buffer.Changed += Buffer_Changed;
             subscription = sessionManager.SessionChanged.Subscribe(SessionChanged);
         }
@@ -60,7 +79,7 @@ namespace GitHub.InlineReviews.Tags
                         var line = span.Snapshot.GetLineFromLineNumber(entry.Key);
                         yield return new TagSpan<ReviewTag>(
                             new SnapshotSpan(line.Start, line.End),
-                            new ReviewTag(entry.Select(x => x.Original)));
+                            new ReviewTag(entry));
                     }
                 }
             }
@@ -85,6 +104,13 @@ namespace GitHub.InlineReviews.Tags
             TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(entireFile));
         }
 
+        void NotifyTagsChanged(int lineNumber)
+        {
+            var line = buffer.CurrentSnapshot.GetLineFromLineNumber(lineNumber);
+            var span = new SnapshotSpan(buffer.CurrentSnapshot, line.Start, line.Length);
+            TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
+        }
+
         async void SessionChanged(IPullRequestReviewSession session)
         {
             comments = null;
@@ -94,14 +120,14 @@ namespace GitHub.InlineReviews.Tags
             {
                 var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
                 path = RootedPathToRelativePath(document.FilePath, session.Repository.LocalPath);
-                if(path == null)
-                {
-                    // Ignore files outside of repo.
-                    return;
-                }
 
-                comments = await builder.Build(path, buffer.CurrentSnapshot, session);
-                NotifyTagsChanged();
+                if (path != null)
+                {
+                    var repository = gitService.GetRepository(session.Repository.LocalPath);
+                    commentBuilder = new InlineCommentBuilder(gitClient, session, repository, path);
+                    comments = await commentBuilder.Update(buffer.CurrentSnapshot);
+                    NotifyTagsChanged();
+                }
             }
         }
 
@@ -115,8 +141,27 @@ namespace GitHub.InlineReviews.Tags
 
                     foreach (var comment in comments)
                     {
-                        comment.UpdatePosition(line.LineNumber, change.LineCountDelta);
+                        if (comment.UpdatePosition(line.LineNumber, change.LineCountDelta))
+                        {
+                            NotifyTagsChanged(comment.LineNumber);
+                        }
                     }
+                }
+            }
+
+            signalRebuild.OnNext(buffer.CurrentSnapshot);
+        }
+
+        async Task Rebuild(ITextSnapshot snapshot)
+        {
+            if (buffer.CurrentSnapshot == snapshot)
+            {
+                var updated = await commentBuilder.Update(snapshot);
+
+                if (buffer.CurrentSnapshot == snapshot)
+                {
+                    comments = updated;
+                    NotifyTagsChanged();
                 }
             }
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.InlineReviews.Services;
+using GitHub.Extensions;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -13,22 +13,29 @@ namespace GitHub.InlineReviews.Tags
     [TagType(typeof(ReviewTag))]
     class ReviewTaggerProvider : ITaggerProvider
     {
+        readonly IGitService gitService;
+        readonly IGitClient gitClient;
         readonly IPullRequestReviewSessionManager sessionManager;
-        readonly IInlineCommentBuilder builder;
 
         [ImportingConstructor]
         public ReviewTaggerProvider(
-            IPullRequestReviewSessionManager sessionManager,
-            IInlineCommentBuilder builder)
+            IGitService gitService,
+            IGitClient gitClient,
+            IPullRequestReviewSessionManager sessionManager)
         {
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+
+            this.gitService = gitService;
+            this.gitClient = gitClient;
             this.sessionManager = sessionManager;
-            this.builder = builder;
         }
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
             return buffer.Properties.GetOrCreateSingletonProperty(()=> 
-                new ReviewTagger(buffer, sessionManager, builder)) as ITagger<T>;
+                new ReviewTagger(gitService, gitClient, buffer, sessionManager)) as ITagger<T>;
         }
     }
 }

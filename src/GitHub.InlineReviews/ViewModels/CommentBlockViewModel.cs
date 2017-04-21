@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using GitHub.InlineReviews.Models;
 using GitHub.Models;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -8,9 +9,9 @@ namespace GitHub.InlineReviews.ViewModels
     {
         public CommentBlockViewModel()
         {
-            Comments = new ObservableCollection<IPullRequestReviewCommentModel>();
+            Comments = new ObservableCollection<InlineCommentModel>();
         }
 
-        public ObservableCollection<IPullRequestReviewCommentModel> Comments { get; }
+        public ObservableCollection<InlineCommentModel> Comments { get; }
     }
 }

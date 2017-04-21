@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{11569514-5AE5-4B5B-92A2-F10B0967DE5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F5ED78B-74A3-4406-A299-70CFB5885B8B} = {7F5ED78B-74A3-4406-A299-70CFB5885B8B}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2FA6-4A22-8B33-69F698A18CF1}"
 	ProjectSection(SolutionItems) = preProject
@@ -446,10 +449,6 @@ Global
 		{110B206F-8554-4B51-BF86-94DAA32F5E26}.Release|Any CPU.Build.0 = Release|Any CPU
 		{110B206F-8554-4B51-BF86-94DAA32F5E26}.Release|x86.ActiveCfg = Release|Any CPU
 		{110B206F-8554-4B51-BF86-94DAA32F5E26}.Release|x86.Build.0 = Release|Any CPU
-		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|Any CPU.ActiveCfg = Release|Any CPU
-		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|Any CPU.Build.0 = Release|Any CPU
-		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|x86.ActiveCfg = Release|Any CPU
-		{110B206F-8554-4B51-BF86-94DAA32F5E26}.XamlDesign|x86.Build.0 = Release|Any CPU
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -462,10 +461,6 @@ Global
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|x86.ActiveCfg = Release|Any CPU
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.Release|x86.Build.0 = Release|Any CPU
-		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|Any CPU.ActiveCfg = Release|Any CPU
-		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|Any CPU.Build.0 = Release|Any CPU
-		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|x86.ActiveCfg = Release|Any CPU
-		{7F5ED78B-74A3-4406-A299-70CFB5885B8B}.XamlDesign|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

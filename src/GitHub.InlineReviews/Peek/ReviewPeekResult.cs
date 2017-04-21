@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.Models;
+using GitHub.InlineReviews.Models;
 
 namespace GitHub.InlineReviews.Peek
 {
     class ReviewPeekResult : IPeekResult
     {
-        public ReviewPeekResult(IList<IPullRequestReviewCommentModel> comments)
+        public ReviewPeekResult(IList<InlineCommentModel> comments)
         {
             this.Comments = comments;
         }
 
         public bool CanNavigateTo => true;
-        public IList<IPullRequestReviewCommentModel> Comments { get; }
+        public IList<InlineCommentModel> Comments { get; }
 
         public IPeekResultDisplayInfo DisplayInfo { get; }
             = new PeekResultDisplayInfo("Review", null, "GitHub Review", "GitHub Review");

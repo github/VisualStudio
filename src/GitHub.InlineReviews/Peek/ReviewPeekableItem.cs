@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.Models;
+using GitHub.InlineReviews.Models;
 
 namespace GitHub.InlineReviews.Peek
 {
     class ReviewPeekableItem : IPeekableItem
     {
-        readonly IList<IPullRequestReviewCommentModel> comments;
+        readonly IList<InlineCommentModel> comments;
 
-        public ReviewPeekableItem(IList<IPullRequestReviewCommentModel> comments)
+        public ReviewPeekableItem(IList<InlineCommentModel> comments)
         {
             this.comments = comments;
         }
