@@ -135,16 +135,11 @@ namespace GitHub.InlineReviews.Tags
         {
             if (comments != null)
             {
-                foreach (var change in e.Changes)
+                foreach (var comment in comments)
                 {
-                    var line = buffer.CurrentSnapshot.GetLineFromPosition(change.OldPosition);
-
-                    foreach (var comment in comments)
+                    if (comment.Update(buffer.CurrentSnapshot))
                     {
-                        if (comment.UpdatePosition(line.LineNumber, change.LineCountDelta))
-                        {
-                            NotifyTagsChanged(comment.LineNumber);
-                        }
+                        NotifyTagsChanged(comment.LineNumber);
                     }
                 }
             }

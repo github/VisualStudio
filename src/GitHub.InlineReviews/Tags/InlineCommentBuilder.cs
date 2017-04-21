@@ -65,8 +65,10 @@ namespace GitHub.InlineReviews.Services
 
                     if (match != -1)
                     {
-                        var line = LineFromPosition(snapshotDiff, match) + hunk.LineCount - 1;
-                        result.Add(new InlineCommentModel(line, comment));
+                        var lineNumber = LineFromPosition(snapshotDiff, match) + hunk.LineCount - 1;
+                        var snapshotLine = snapshot.GetLineFromLineNumber(lineNumber);
+                        var trackingPoint = snapshot.CreateTrackingPoint(snapshotLine.Start, PointTrackingMode.Positive);
+                        result.Add(new InlineCommentModel(lineNumber, comment, trackingPoint));
                     }
                 }
 
