@@ -282,11 +282,6 @@ namespace GitHub.Services
                     Path.Combine(repository.LocalPath, fileName) :
                     await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
 
-                if (left == null)
-                {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Base.Sha}");
-                }
-
                 if (right == null)
                 {
                     throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Head.Sha}");
@@ -352,17 +347,13 @@ namespace GitHub.Services
 
         async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName)
         {
-            var contents = await gitClient.ExtractFile(repo, commitSha, fileName);
-
-            if (contents == null)
-                return null;
-
+            var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
             var tempFile = Path.Combine(tempDir, tempFileName);
 
             Directory.CreateDirectory(tempDir);
-            File.WriteAllText(tempFile, contents);
+            File.WriteAllText(tempFile, contents, Encoding.UTF8);
             return tempFile;
         }
 
