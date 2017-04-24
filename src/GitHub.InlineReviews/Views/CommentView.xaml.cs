@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Views
 {
@@ -8,6 +9,11 @@ namespace GitHub.InlineReviews.Views
         public CommentView()
         {
             InitializeComponent();
+        }
+
+        private void ReplyPlaceholder_GotFocus(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ((ICommentViewModel)DataContext).BeginEdit();
         }
     }
 }

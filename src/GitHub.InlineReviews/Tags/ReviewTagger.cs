@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.Tags
         readonly IPullRequestReviewSessionManager sessionManager;
         readonly IDisposable subscription;
         readonly Subject<ITextSnapshot> signalRebuild;
-        string path;
+        IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
 
@@ -79,7 +79,7 @@ namespace GitHub.InlineReviews.Tags
                         var line = span.Snapshot.GetLineFromLineNumber(entry.Key);
                         yield return new TagSpan<ReviewTag>(
                             new SnapshotSpan(line.Start, line.End),
-                            new ReviewTag(entry));
+                            new ReviewTag(session, entry));
                     }
                 }
             }
@@ -113,6 +113,7 @@ namespace GitHub.InlineReviews.Tags
 
         async void SessionChanged(IPullRequestReviewSession session)
         {
+            this.session = session;
             comments = null;
             NotifyTagsChanged();
 

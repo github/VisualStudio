@@ -3,56 +3,127 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls;assembly=GitHub.VisualStudio.UI"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
-             mc:Ignorable="d" d:DesignHeight="100" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:PullRequestReviewCommentDesigner/>
+        <sample:PullRequestReviewCommentDesigner State="Editing">
+            <sample:PullRequestReviewCommentDesigner.Body>
+                You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
+            </sample:PullRequestReviewCommentDesigner.Body>
+        </sample:PullRequestReviewCommentDesigner>
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>
-        <Style x:Key="DocumentStyle" TargetType="FlowDocument">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="TextAlignment" Value="Left"/>
-            <Setter Property="PagePadding" Value="0"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="DocumentStyle" TargetType="FlowDocument">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="TextAlignment" Value="Left"/>
+                <Setter Property="PagePadding" Value="0"/>
 
-            <Style.Resources>
-                <Style TargetType="Image">
-                    <Setter Property="Stretch" Value="UniformToFill" />
-                    <Setter Property="StretchDirection" Value="DownOnly" />
-                    <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
-                </Style>
-            </Style.Resources>
-        </Style>
+                <Style.Resources>
+                    <Style TargetType="Image">
+                        <Setter Property="Stretch" Value="UniformToFill" />
+                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="MaxWidth" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type ui:MarkdownViewer}}}"/>
+                    </Style>
+                </Style.Resources>
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
-    
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <controls:AccountAvatar Grid.RowSpan="2"
+    <Grid>
+        <!-- Displays an existing comment-->
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="FrameworkElement">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding State}" Value="None">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <controls:AccountAvatar Grid.RowSpan="2"
                                 Margin="4 2"
                                 Width="32" 
                                 Height="32" 
                                 VerticalAlignment="Top"
                                 Account="{Binding User}"/>
-        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
-            <TextBlock Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
-            <TextBlock Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
-        </StackPanel>
-        <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
-                           Margin="2"
-                           DocumentStyle="{StaticResource DocumentStyle}"
-                           RawContent="{Binding Body}"
-                           ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Margin="2 0" FontWeight="Bold" Text="{Binding User.Login}"/>
+                <TextBlock Margin="2 0" Opacity="0.75" Text="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"/>
+            </StackPanel>
+
+            <ui:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                               Margin="2"
+                               DocumentStyle="{StaticResource DocumentStyle}"
+                               RawContent="{Binding Body}"
+                               ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+        </Grid>
+
+        <!-- Displays edit view or a reply placeholder-->
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="FrameworkElement">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding State}" Value="Placeholder">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding State}" Value="Editing">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <controls:AccountAvatar Grid.RowSpan="2"
+                                Margin="4 2"
+                                Width="32" 
+                                Height="32" 
+                                VerticalAlignment="Top"
+                                Account="{Binding User}"/>
+
+            <ui:PromptTextBox Grid.Column="1"
+                              Margin="0"
+                              VerticalAlignment="Center"
+                              GotFocus="ReplyPlaceholder_GotFocus">
+                <ui:PromptTextBox.Style>
+                    <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
+                        <Setter Property="PromptText" Value="Reply..."/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding State}" Value="Editing">
+                                <Setter Property="PromptText" Value="Leave a comment"/>
+                                <Setter Property="MinHeight" Value="100"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:PromptTextBox.Style>
+            </ui:PromptTextBox>
+        </Grid>
     </Grid>
 </UserControl>

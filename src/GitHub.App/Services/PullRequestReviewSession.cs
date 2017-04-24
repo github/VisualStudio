@@ -14,9 +14,11 @@ namespace GitHub.Services
         Dictionary<string, List<IPullRequestReviewCommentModel>> comments;
 
         public PullRequestReviewSession(
+            IAccount user,
             IPullRequestModel pullRequest,
             ILocalRepositoryModel repository)
         {
+            User = user;
             PullRequest = pullRequest;
             Repository = repository;
             this.comments = pullRequest.Comments
@@ -25,6 +27,7 @@ namespace GitHub.Services
                 .ToDictionary(x => x.Key, x => x.ToList());
         }
 
+        public IAccount User { get; }
         public IPullRequestModel PullRequest { get; }
         public ILocalRepositoryModel Repository { get; }
 

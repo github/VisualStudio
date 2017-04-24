@@ -82,7 +82,9 @@
     <Compile Include="Tags\ReviewTag.cs" />
     <Compile Include="Tags\ReviewTagger.cs" />
     <Compile Include="Tags\ReviewTaggerProvider.cs" />
-    <Compile Include="ViewModels\CommentBlockViewModel.cs" />
+    <Compile Include="ViewModels\CommentThreadViewModel.cs" />
+    <Compile Include="ViewModels\CommentViewModel.cs" />
+    <Compile Include="ViewModels\ICommentViewModel.cs" />
     <Compile Include="Views\CommentBlockView.xaml.cs">
       <DependentUpon>CommentBlockView.xaml</DependentUpon>
     </Compile>
@@ -104,6 +106,10 @@
     <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
       <Project>{1CE2D235-8072-4649-BA5A-CFB1AF8776E0}</Project>
       <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</Project>

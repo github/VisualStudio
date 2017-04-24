@@ -26,7 +26,7 @@ namespace GitHub.InlineReviews.Peek
 
             if (session.RelationshipName == ReviewPeekRelationship.Instance.Name && options != null)
             {
-                peekableItems.Add(new ReviewPeekableItem(options.Comments));
+                peekableItems.Add(new ReviewPeekableItem(options.Session, options.Comments));
             }
         }
 

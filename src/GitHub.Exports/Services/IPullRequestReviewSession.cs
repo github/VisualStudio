@@ -6,6 +6,7 @@ namespace GitHub.Services
 {
     public interface IPullRequestReviewSession
     {
+        IAccount User { get; }
         IPullRequestModel PullRequest { get; }
         ILocalRepositoryModel Repository { get; }
         string CompareViewHackPath { get; }

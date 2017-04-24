@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.InlineReviews.Views;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Peek
 {
     class ReviewPeekResultPresentation : IPeekResultPresentation
     {
+        readonly IAccount user;
         readonly ReviewPeekResult result;
 
         public bool IsDirty => false;
@@ -46,14 +47,8 @@ namespace GitHub.InlineReviews.Peek
 
         public UIElement Create(IPeekSession session, IPeekResultScrollState scrollState)
         {
-            var viewModel = new CommentBlockViewModel();
+            var viewModel = new CommentThreadViewModel(result.Session.User, result.Comments);
             var view = new CommentBlockView();
-
-            foreach (var comment in result.Comments)
-            {
-                viewModel.Comments.Add(comment.Original);
-            }
-
             view.DataContext = viewModel;
             return view;
         }

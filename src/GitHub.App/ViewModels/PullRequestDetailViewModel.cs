@@ -61,10 +61,10 @@ namespace GitHub.ViewModels
             IPullRequestReviewSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
-                  connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
-                  pullRequestsService,
-                  sessionManager,
-                  usageTracker)
+                   connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
+                   pullRequestsService,
+                   sessionManager,
+                   usageTracker)
         {
         }
 
@@ -373,7 +373,7 @@ namespace GitHub.ViewModels
                 pullRequestsService.RemoveUnusedRemotes(repository).Subscribe(_ => { });
             }
 
-            StartReviewSession();
+            await StartReviewSession();
         }
 
         /// <summary>
@@ -487,11 +487,12 @@ namespace GitHub.ViewModels
             }
         }
 
-        void StartReviewSession()
+        async Task StartReviewSession()
         {
             if (IsCheckedOut)
             {
-                var session = new PullRequestReviewSession(Model, repository);
+                var user = await modelService.GetCurrentUser();
+                var session = new PullRequestReviewSession(user, Model, repository);
                 sessionManager.NotifySessionChanged(session);
             }
             else
