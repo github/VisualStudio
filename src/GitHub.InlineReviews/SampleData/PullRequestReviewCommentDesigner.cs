@@ -15,6 +15,7 @@ namespace GitHub.InlineReviews.SampleData
         }
 
         public string Body { get; set; }
+        public string ErrorMessage { get; set; }
         public CommentState State { get; set; }
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }

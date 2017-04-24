@@ -110,6 +110,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <controls:AccountAvatar Grid.RowSpan="2"
@@ -140,7 +141,24 @@
                 </ui:PromptTextBox.Style>
             </ui:PromptTextBox>
 
-            <StackPanel Name="buttons" Grid.Column="1" Grid.Row="1" 
+            <DockPanel Grid.Column="1" Grid.Row="1"
+                       Margin="0 4"
+                       HorizontalAlignment="Left" 
+                       TextBlock.Foreground="Red">
+                <DockPanel.Style>
+                    <Style TargetType="FrameworkElement">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DockPanel.Style>
+                <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
+                <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
+            </DockPanel>
+            
+            <StackPanel Grid.Column="1" Grid.Row="2" 
                         Margin="0 4" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal">

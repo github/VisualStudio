@@ -10,9 +10,10 @@ namespace GitHub.InlineReviews.ViewModels
     class CommentViewModel : ReactiveObject, ICommentViewModel
     {
         string body;
-        string undoBody;
+        string errorMessage;
         CommentState state;
         DateTimeOffset updatedAt;
+        string undoBody;
 
         public CommentViewModel(
             CommentThreadViewModel thread,
@@ -58,6 +59,12 @@ namespace GitHub.InlineReviews.ViewModels
         {
             get { return body; }
             set { this.RaiseAndSetIfChanged(ref body, value); }
+        }
+
+        public string ErrorMessage
+        {
+            get { return this.errorMessage; }
+            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
         }
 
         public CommentState State
@@ -110,6 +117,7 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 State = undoBody == null ? CommentState.Placeholder : CommentState.None;
                 Body = undoBody;
+                ErrorMessage = null;
                 undoBody = null;
             }
         }
@@ -118,13 +126,14 @@ namespace GitHub.InlineReviews.ViewModels
         {
             try
             {
+                ErrorMessage = null;
                 CommentId = await Thread.AddReply(Body);
                 State = CommentState.None;
                 UpdatedAt = DateTimeOffset.Now;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Handle error.
+                ErrorMessage = e.Message;
             }
         }
     }

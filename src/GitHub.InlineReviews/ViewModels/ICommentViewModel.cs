@@ -15,6 +15,7 @@ namespace GitHub.InlineReviews.ViewModels
     interface ICommentViewModel
     {
         string Body { get; set; }
+        string ErrorMessage { get; }
         CommentState State { get; }
         DateTimeOffset UpdatedAt { get; }
         IAccount User { get; }
