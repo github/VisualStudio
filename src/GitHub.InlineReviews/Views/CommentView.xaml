@@ -158,10 +158,12 @@
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
             
-            <StackPanel Grid.Column="1" Grid.Row="2" 
+            <StackPanel Name="buttonPanel"
+                        Grid.Column="1" Grid.Row="2" 
                         Margin="0 4" 
                         HorizontalAlignment="Left"
-                        Orientation="Horizontal">
+                        Orientation="Horizontal"
+                        IsVisibleChanged="buttonPanel_IsVisibleChanged">
                 <StackPanel.Style>
                     <Style TargetType="FrameworkElement">
                         <Setter Property="Visibility" Value="Collapsed"/>

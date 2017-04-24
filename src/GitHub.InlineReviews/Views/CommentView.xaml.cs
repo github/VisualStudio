@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Threading;
 using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Views
@@ -19,6 +19,14 @@ namespace GitHub.InlineReviews.Views
             if (command?.CanExecute(null) == true)
             {
                 command.Execute(null);
+            }
+        }
+
+        private void buttonPanel_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            if (buttonPanel.IsVisible)
+            {
+                BringIntoView();
             }
         }
     }

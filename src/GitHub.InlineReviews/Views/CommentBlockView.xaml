@@ -6,21 +6,23 @@
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              Padding="8">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <ItemsControl ItemsSource="{Binding Comments}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <local:CommentView/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+            <ItemsControl ItemsSource="{Binding Comments}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:CommentView/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-        <!-- Reply TextBox etc here -->
-    </Grid>
+            <!-- Reply TextBox etc here -->
+        </Grid>
+    </ScrollViewer>
 </UserControl>
