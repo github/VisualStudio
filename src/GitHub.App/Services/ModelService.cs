@@ -41,6 +41,11 @@ namespace GitHub.Services
             this.avatarProvider = avatarProvider;
         }
 
+        public IObservable<IAccount> GetCurrentUser()
+        {
+            return GetUserFromCache().Select(Create);
+        }
+
         public IObservable<GitIgnoreItem> GetGitIgnoreTemplates()
         {
             return Observable.Defer(() =>
@@ -138,7 +143,7 @@ namespace GitHub.Services
                 .Concat(GetAllRepositoriesForAllOrganizations());
         }
 
-        public IObservable<AccountCacheItem> GetUserFromCache()
+        IObservable<AccountCacheItem> GetUserFromCache()
         {
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
