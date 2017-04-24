@@ -3,20 +3,23 @@ using System.Windows;
 using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.InlineReviews.Views;
-using GitHub.Models;
+using GitHub.Api;
 
 namespace GitHub.InlineReviews.Peek
 {
     class ReviewPeekResultPresentation : IPeekResultPresentation
     {
-        readonly IAccount user;
+        readonly IApiClient apiClient;
         readonly ReviewPeekResult result;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
 
-        public ReviewPeekResultPresentation(ReviewPeekResult result)
+        public ReviewPeekResultPresentation(
+            IApiClient apiClient,
+            ReviewPeekResult result)
         {
+            this.apiClient = apiClient;
             this.result = result;
         }
 
@@ -47,7 +50,10 @@ namespace GitHub.InlineReviews.Peek
 
         public UIElement Create(IPeekSession session, IPeekResultScrollState scrollState)
         {
-            var viewModel = new CommentThreadViewModel(result.Session.User, result.Comments);
+            var viewModel = new CommentThreadViewModel(
+                apiClient,
+                result.Session,
+                result.Comments);
             var view = new CommentBlockView();
             view.DataContext = viewModel;
             return view;

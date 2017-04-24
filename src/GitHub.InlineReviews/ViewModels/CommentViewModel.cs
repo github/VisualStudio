@@ -12,6 +12,7 @@ namespace GitHub.InlineReviews.ViewModels
         string body;
         string undoBody;
         CommentState state;
+        DateTimeOffset updatedAt;
 
         public CommentViewModel(
             CommentThreadViewModel thread,
@@ -65,11 +66,16 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref state, value); }
         }
 
+        public DateTimeOffset UpdatedAt
+        {
+            get { return updatedAt; }
+            private set { this.RaiseAndSetIfChanged(ref updatedAt, value); }
+        }
+
         public int CommentId { get; private set; }
         public IAccount CurrentUser { get; }
         public CommentThreadViewModel Thread { get; }
         public IAccount User { get; }
-        public DateTimeOffset UpdatedAt { get; }
 
         public ReactiveCommand<object> BeginEdit { get; }
         public ReactiveCommand<object> CancelEdit { get; }
@@ -108,9 +114,18 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        Task DoCommitEdit(object unused)
+        async Task DoCommitEdit(object unused)
         {
-            throw new NotImplementedException();
+            try
+            {
+                CommentId = await Thread.AddReply(Body);
+                State = CommentState.None;
+                UpdatedAt = DateTimeOffset.Now;
+            }
+            catch (Exception)
+            {
+                // Handle error.
+            }
         }
     }
 }

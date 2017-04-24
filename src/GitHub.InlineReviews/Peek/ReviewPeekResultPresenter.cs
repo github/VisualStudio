@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.Extensions;
-using GitHub.Models;
+using GitHub.Factories;
+using GitHub.Primitives;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Utilities;
 
@@ -11,12 +11,12 @@ namespace GitHub.InlineReviews.Peek
     [Name("GitHub Review Peek Presenter")]
     class ReviewPeekResultPresenter : IPeekResultPresenter
     {
-        readonly IConnectionManager connectionManager;
+        readonly IApiClientFactory apiClientFactory;
 
         [ImportingConstructor]
-        public ReviewPeekResultPresenter(IConnectionManager connectionManager)
+        public ReviewPeekResultPresenter(IApiClientFactory apiClientFactory)
         {
-            this.connectionManager = connectionManager;
+            this.apiClientFactory = apiClientFactory;
         }
 
         public IPeekResultPresentation TryCreatePeekResultPresentation(IPeekResult result)
@@ -25,7 +25,9 @@ namespace GitHub.InlineReviews.Peek
 
             if (review != null)
             {
-                return new ReviewPeekResultPresentation(review);
+                var hostAddress = HostAddress.Create(review.Session.Repository.CloneUrl.Host);
+                var apiClient = apiClientFactory.Create(hostAddress);
+                return new ReviewPeekResultPresentation(apiClient, review);
             }
 
             return null;
