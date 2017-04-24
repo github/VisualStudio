@@ -22,7 +22,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="Button" BasedOn="{StaticResource GitHubVsButton}"/>
+
             <Style x:Key="DocumentStyle" TargetType="FlowDocument">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="12"/>
@@ -53,10 +57,12 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -101,6 +107,11 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
             <controls:AccountAvatar Grid.RowSpan="2"
                                 Margin="4 2"
                                 Width="32" 
@@ -109,7 +120,11 @@
                                 Account="{Binding User}"/>
 
             <ui:PromptTextBox Grid.Column="1"
+                              AcceptsReturn="True"
+                              AcceptsTab="True"
                               Margin="0"
+                              Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
+                              TextWrapping="Wrap"
                               VerticalAlignment="Center"
                               GotFocus="ReplyPlaceholder_GotFocus">
                 <ui:PromptTextBox.Style>
@@ -117,13 +132,31 @@
                         <Setter Property="PromptText" Value="Reply..."/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding State}" Value="Editing">
-                                <Setter Property="PromptText" Value="Leave a comment"/>
                                 <Setter Property="MinHeight" Value="100"/>
+                                <Setter Property="PromptText" Value="Leave a comment"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </ui:PromptTextBox.Style>
             </ui:PromptTextBox>
+
+            <StackPanel Name="buttons" Grid.Column="1" Grid.Row="1" 
+                        Margin="0 4" 
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="FrameworkElement">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding State}" Value="Editing">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Button Command="{Binding CommitEdit}">Comment</Button>
+                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}">Cancel</Button>
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

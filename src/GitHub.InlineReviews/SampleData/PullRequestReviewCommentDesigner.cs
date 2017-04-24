@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.SampleData;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
@@ -17,8 +19,8 @@ namespace GitHub.InlineReviews.SampleData
         public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IAccount User { get; set; }
 
-        public void BeginEdit()
-        {
-        }
+        public ReactiveCommand<object> BeginEdit { get; }
+        public ReactiveCommand<object> CancelEdit { get; }
+        public ReactiveCommand<Unit> CommitEdit { get; }
     }
 }

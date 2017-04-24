@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -17,6 +19,8 @@ namespace GitHub.InlineReviews.ViewModels
         DateTimeOffset UpdatedAt { get; }
         IAccount User { get; }
 
-        void BeginEdit();
+        ReactiveCommand<object> BeginEdit { get; }
+        ReactiveCommand<object> CancelEdit { get; }
+        ReactiveCommand<Unit> CommitEdit { get; }
     }
 }

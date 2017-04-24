@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Input;
 using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Views
@@ -13,7 +14,12 @@ namespace GitHub.InlineReviews.Views
 
         private void ReplyPlaceholder_GotFocus(object sender, System.Windows.RoutedEventArgs e)
         {
-            ((ICommentViewModel)DataContext).BeginEdit();
+            var command = ((ICommentViewModel)DataContext)?.BeginEdit;
+
+            if (command?.CanExecute(null) == true)
+            {
+                command.Execute(null);
+            }
         }
     }
 }

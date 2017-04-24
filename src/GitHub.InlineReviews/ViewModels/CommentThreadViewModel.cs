@@ -10,14 +10,14 @@ namespace GitHub.InlineReviews.ViewModels
     class CommentThreadViewModel
     {
         public CommentThreadViewModel(
-            IAccount user,
+            IAccount currentUser,
             IEnumerable<InlineCommentModel> comments)
         {
             var commentViewModels = comments
-                .Select(x => new CommentViewModel(this, x.Original))
+                .Select(x => new CommentViewModel(this, currentUser, x.Original))
                 .Concat(new[]
                 {
-                    new CommentViewModel(this, user),
+                    CommentViewModel.CreatePlaceholder(this, currentUser),
                 });
 
             Comments = new ObservableCollection<CommentViewModel>(commentViewModels);
