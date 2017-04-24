@@ -22,9 +22,10 @@ namespace GitHub.InlineReviews.Tags
         readonly IGitClient gitClient;
         readonly ITextBuffer buffer;
         readonly IPullRequestReviewSessionManager sessionManager;
-        readonly IDisposable subscription;
+        readonly IDisposable managerSubscription;
         readonly Subject<ITextSnapshot> signalRebuild;
         IPullRequestReviewSession session;
+        IDisposable sessionSubscription;
         InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
 
@@ -50,14 +51,15 @@ namespace GitHub.InlineReviews.Tags
                 .Subscribe(x => Rebuild(x).Forget());
 
             this.buffer.Changed += Buffer_Changed;
-            subscription = sessionManager.SessionChanged.Subscribe(SessionChanged);
+            managerSubscription = sessionManager.SessionChanged.Subscribe(SessionChanged);
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
         public void Dispose()
         {
-            subscription.Dispose();
+            sessionSubscription?.Dispose();
+            managerSubscription.Dispose();
         }
 
         public IEnumerable<ITagSpan<ReviewTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -113,7 +115,13 @@ namespace GitHub.InlineReviews.Tags
 
         async void SessionChanged(IPullRequestReviewSession session)
         {
-            this.session = session;
+            if (this.session != session)
+            {
+                this.session = session;
+                sessionSubscription?.Dispose();
+                sessionSubscription = session?.Changed.Subscribe(_ => SessionChanged(session));
+            }
+
             comments = null;
             NotifyTagsChanged();
 

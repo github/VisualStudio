@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.InlineReviews.Models;
+using GitHub.Models;
 using GitHub.Services;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -47,6 +48,20 @@ namespace GitHub.InlineReviews.ViewModels
                 lastCommentId.CommentId);
 
             Comments.Add(CommentViewModel.CreatePlaceholder(this, session.User));
+
+            session.AddComment(new PullRequestReviewCommentModel
+            {
+                Body = result.Body,
+                CommitId = result.CommitId,
+                DiffHunk = result.DiffHunk,
+                Id = result.Id,
+                OriginalCommitId = result.OriginalCommitId,
+                OriginalPosition = result.OriginalPosition,
+                Path = result.Path,
+                Position = result.Position,
+                UpdatedAt = result.UpdatedAt,
+                User = session.User,
+            });
 
             return result.Id;
         }
