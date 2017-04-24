@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using GitHub.Models;
+using NullGuard;
 
 namespace GitHub.Services
 {
+    [NullGuard(ValidationFlags.None)]
     public class PullRequestReviewSession : IPullRequestReviewSession
     {
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
@@ -26,11 +28,19 @@ namespace GitHub.Services
         public IPullRequestModel PullRequest { get; }
         public ILocalRepositoryModel Repository { get; }
 
+        public string CompareViewHackPath { get; private set; }
+
         public IReadOnlyList<IPullRequestReviewCommentModel> GetCommentsForFile(string path)
         {
             List<IPullRequestReviewCommentModel> result;
             path = path.Replace('\\', '/');
             return comments.TryGetValue(path, out result) ? result : Empty;
+        }
+
+        public IDisposable OpeningCompareViewHack(string path)
+        {
+            CompareViewHackPath = path;
+            return Disposable.Create(() => CompareViewHackPath = null);
         }
     }
 }

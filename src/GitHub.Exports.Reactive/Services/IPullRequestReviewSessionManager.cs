@@ -7,5 +7,6 @@ namespace GitHub.Services
         IObservable<IPullRequestReviewSession> SessionChanged { get; }
 
         void NotifySessionChanged(IPullRequestReviewSession session);
+        IDisposable OpeningCompareViewHack(string path);
     }
 }

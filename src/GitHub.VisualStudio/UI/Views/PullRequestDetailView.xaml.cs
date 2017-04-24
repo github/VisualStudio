@@ -19,7 +19,11 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Differencing;
+using Microsoft.VisualStudio.TextManager.Interop;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
@@ -83,8 +87,9 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
-                var leftLabel = $"{file.FileName};{ViewModel.TargetBranchDisplayName}";
-                var rightLabel = $"{file.FileName};PR {ViewModel.Model.Number}";
+                var path = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var leftLabel = $"{path};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = $"{path};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
@@ -95,16 +100,21 @@ namespace GitHub.VisualStudio.UI.Views
                     options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
                 }
 
-                Services.DifferenceService.OpenComparisonWindow2(
-                    fileNames.Item1,
-                    fileNames.Item2,
-                    caption,
-                    tooltip,
-                    leftLabel,
-                    rightLabel,
-                    string.Empty,
-                    string.Empty,
-                    (uint)options);
+                var sessionManager = Services.DefaultExportProvider.GetExportedValue<IPullRequestReviewSessionManager>();
+
+                using (sessionManager.OpeningCompareViewHack(path))
+                {
+                    Services.DifferenceService.OpenComparisonWindow2(
+                        fileNames.Item1,
+                        fileNames.Item2,
+                        caption,
+                        tooltip,
+                        leftLabel,
+                        rightLabel,
+                        string.Empty,
+                        string.Empty,
+                        (uint)options);
+                }
             }
             catch (Exception e)
             {

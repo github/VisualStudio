@@ -118,8 +118,17 @@ namespace GitHub.InlineReviews.Tags
 
             if (session != null)
             {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                path = RootedPathToRelativePath(document.FilePath, session.Repository.LocalPath);
+                string path;
+
+                if (session.CompareViewHackPath == null)
+                {
+                    var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+                    path = RootedPathToRelativePath(document.FilePath, session.Repository.LocalPath);
+                }
+                else
+                {
+                    path = session.CompareViewHackPath;
+                }
 
                 if (path != null)
                 {
