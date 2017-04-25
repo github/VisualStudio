@@ -337,7 +337,6 @@
     <Compile Include="TeamFoundation\ResolvingTeamExplorerNavigationItemAttribute.cs" />
     <Compile Include="TeamFoundation\ResolvingTeamExplorerSectionAttribute.cs" />
     <Compile Include="TeamFoundation\SectionFactory.cs" />
-    <Compile Include="TeamFoundation\Settings.cs" />
     <Compile Include="TeamFoundation\TeamExplorerServiceHolderFactory.cs" />
     <Compile Include="TeamFoundation\TeamExplorerServicesFactory.cs" />
     <Compile Include="TeamFoundation\TeamFoundationResolver.cs" />
