@@ -8,16 +8,16 @@ namespace GitHub.TeamFoundation
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]
     public class ResolvingTeamExplorerSectionAttribute : ExportAttribute
     {
-        //public string Id { get; }
-        //public string ParentPageId { get; }
-        //public int Priority { get; }
+        public string Id { get; }
+        public string ParentPageId { get; }
+        public int Priority { get; }
 
-        public ResolvingTeamExplorerSectionAttribute(/*string id, string parentPageId, int priority*/)
+        public ResolvingTeamExplorerSectionAttribute(string id, string parentPageId, int priority)
             : base(TeamFoundationResolver.Resolve(() => typeof(ITeamExplorerSection)))
         {
-            //Id = id;
-            //ParentPageId = parentPageId;
-            //Priority = priority;
+            Id = id;
+            ParentPageId = parentPageId;
+            Priority = priority;
         }
     }
 }

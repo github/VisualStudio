@@ -7,9 +7,8 @@ using GitHub.VisualStudio.TeamExplorer.Home;
 
 namespace GitHub.VisualStudio.TeamExplorer
 {
-    // For some reason this doesn't work when `Shared` (buttons don't appear).
-    // [Export, PartCreationPolicy(CreationPolicy.Shared)]
-    [Export, PartCreationPolicy(CreationPolicy.NonShared)]
+    // This doesn't work if `CreationPolicy.Shared`.
+    [Export, PartCreationPolicy(CreationPolicy.Any)]
     public class NavigationItemFactory
     {
         IGitHubServiceProvider serviceProvider;
@@ -33,10 +32,8 @@ namespace GitHub.VisualStudio.TeamExplorer
             this.menuProvider = menuProvider;
         }
 
-        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA5", NavigationItemPriority.Graphs)]
-        //[ExportMetadata("Id", "5245767A-B657-4F8E-BFEE-F04159F1DDA5" /*GraphsNavigationItem.GraphsNavigationItemId*/)]
-        //[ExportMetadata("Priority", NavigationItemPriority.Graphs /*NavigationItemPriority.Graphs*/)]
-        //[ExportMetadata("TargetPageId", null)]
+        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA5" /*GraphsNavigationItem.GraphsNavigationItemId*/,
+            NavigationItemPriority.Graphs)]
         public object Graphs
         {
             get
@@ -46,10 +43,8 @@ namespace GitHub.VisualStudio.TeamExplorer
             }
         }
 
-        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA4", NavigationItemPriority.Issues)]
-        //[ExportMetadata("Id", "5245767A-B657-4F8E-BFEE-F04159F1DDA4" /*IssuesNavigationItem.IssuesNavigationItemId*/)]
-        //[ExportMetadata("Priority", NavigationItemPriority.Issues)]
-        //[ExportMetadata("TargetPageId", null)]
+        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA4" /*IssuesNavigationItem.IssuesNavigationItemId*/,
+            NavigationItemPriority.Issues)]
         public object Issues
         {
             get
@@ -59,10 +54,8 @@ namespace GitHub.VisualStudio.TeamExplorer
             }
         }
 
-        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA3", NavigationItemPriority.PullRequests)]
-        //[ExportMetadata("Id", "5245767A-B657-4F8E-BFEE-F04159F1DDA3" /*PullRequestsNavigationItem.PullRequestsNavigationItemId*/)]
-        //[ExportMetadata("Priority", NavigationItemPriority.PullRequests)]
-        //[ExportMetadata("TargetPageId", null)]
+        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA3" /*PullRequestsNavigationItem.PullRequestsNavigationItemId*/,
+            NavigationItemPriority.PullRequests)]
         public object PullRequests
         {
             get
@@ -72,10 +65,8 @@ namespace GitHub.VisualStudio.TeamExplorer
             }
         }
 
-        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA2", NavigationItemPriority.Pulse)]
-        //[ExportMetadata("Id", "5245767A-B657-4F8E-BFEE-F04159F1DDA2" /*PulseNavigationItem.PulseNavigationItemId*/)]
-        //[ExportMetadata("Priority", NavigationItemPriority.Pulse)]
-        //[ExportMetadata("TargetPageId", null)]
+        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA2" /*PulseNavigationItem.PulseNavigationItemId*/,
+            NavigationItemPriority.Pulse)]
         public object Pulse
         {
             get
@@ -85,10 +76,8 @@ namespace GitHub.VisualStudio.TeamExplorer
             }
         }
 
-        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA1", NavigationItemPriority.Wiki)]
-        //[ExportMetadata("Id", "5245767A-B657-4F8E-BFEE-F04159F1DDA1" /*WikiNavigationItem.WikiNavigationItemId*/)]
-        //[ExportMetadata("Priority", NavigationItemPriority.Wiki)]
-        //[ExportMetadata("TargetPageId", null)]
+        [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA1" /*WikiNavigationItem.WikiNavigationItemId*/,
+            NavigationItemPriority.Wiki)]
         public object Wiki
         {
             get
