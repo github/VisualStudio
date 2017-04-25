@@ -9,13 +9,10 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolderFactory
     {
-        public TeamExplorerServiceHolderFactory()
+        [ImportingConstructor]
+        public TeamExplorerServiceHolderFactory(TeamFoundationResolver teamFoundationResolver)
         {
-            TeamFoundationResolver.Resolve(
-                () => typeof(Microsoft.VisualStudio.TeamFoundation.Git.Extensibility.IGitExt));
-
-            TeamExplorerServiceHolder = (ITeamExplorerServiceHolder)TeamFoundationResolver.Resolve(
-                () => new TeamExplorerServiceHolder());
+            TeamExplorerServiceHolder = new TeamExplorerServiceHolder();
         }
 
         [Export(typeof(ITeamExplorerServiceHolder))]

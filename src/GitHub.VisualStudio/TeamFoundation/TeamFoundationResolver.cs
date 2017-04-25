@@ -1,10 +1,13 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
+using System.Diagnostics;
+using System.ComponentModel.Composition;
 
 namespace GitHub.TeamFoundation
 {
-    class TeamFoundationResolver : IDisposable
+    [Export]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class TeamFoundationResolver : IDisposable
     {
         internal static Type Resolve(Func<Type> func)
         {
@@ -51,5 +54,4 @@ namespace GitHub.TeamFoundation
             return null;
         }
     }
-
 }

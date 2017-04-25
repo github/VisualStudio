@@ -1,7 +1,6 @@
 ﻿// Guids.cs
 // MUST match guids.h
 using Microsoft.TeamFoundation.Controls;
-using System;
 
 namespace GitHub.VisualStudio
 {

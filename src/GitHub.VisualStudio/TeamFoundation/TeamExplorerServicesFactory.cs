@@ -8,16 +8,13 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServicesFactory
     {
-        readonly Lazy<ITeamExplorerServices> teamExplorerServices;
-
         [ImportingConstructor]
-        public TeamExplorerServicesFactory(IGitHubServiceProvider serviceProvider)
+        public TeamExplorerServicesFactory(TeamFoundationResolver teamFoundationResolver, IGitHubServiceProvider serviceProvider)
         {
-            teamExplorerServices = new Lazy<ITeamExplorerServices>(() =>
-                (ITeamExplorerServices)TeamFoundationResolver.Resolve(() => new TeamExplorerServices(serviceProvider)));
+            TeamExplorerServices = new TeamExplorerServices(serviceProvider);
         }
 
         [Export(typeof(ITeamExplorerServices))]
-        public ITeamExplorerServices TeamExplorerServices => teamExplorerServices.Value;
+        public ITeamExplorerServices TeamExplorerServices { get; }
     }
 }

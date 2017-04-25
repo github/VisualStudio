@@ -8,16 +8,13 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServicesFactory
     {
-        readonly Lazy<IVSGitServices> vsGitServices;
-
         [ImportingConstructor]
-        public VSGitServicesFactory(IGitHubServiceProvider serviceProvider)
+        public VSGitServicesFactory(TeamFoundationResolver teamFoundationResolver, IGitHubServiceProvider serviceProvider)
         {
-            vsGitServices = new Lazy<IVSGitServices>(() =>
-                (IVSGitServices)TeamFoundationResolver.Resolve(() => new VSGitServices(serviceProvider)));
+            VSGitServices = new VSGitServices(serviceProvider);
         }
 
         [Export(typeof(IVSGitServices))]
-        public IVSGitServices VSGitServices => vsGitServices.Value;
+        public IVSGitServices VSGitServices { get; }
     }
 }
