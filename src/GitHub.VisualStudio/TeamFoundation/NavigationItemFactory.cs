@@ -47,7 +47,7 @@ namespace GitHub.VisualStudio.TeamExplorer
 
         [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA2" /*PulseNavigationItem.PulseNavigationItemId*/,
             NavigationItemPriority.Pulse)]
-        public object Pulse => new PullRequestsNavigationItem(serviceProvider, apiFactory, holder, menuProvider);
+        public object Pulse => new PulseNavigationItem(serviceProvider, apiFactory, browser, holder);
 
         [ResolvingTeamExplorerNavigationItem("5245767A-B657-4F8E-BFEE-F04159F1DDA1" /*WikiNavigationItem.WikiNavigationItemId*/,
             NavigationItemPriority.Wiki)]
