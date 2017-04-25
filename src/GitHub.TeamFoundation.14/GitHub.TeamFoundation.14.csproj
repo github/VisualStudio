@@ -138,6 +138,7 @@
     <Compile Include="Home\PullRequestsNavigationItem.cs" />
     <Compile Include="Home\PulseNavigationItem.cs" />
     <Compile Include="Home\WikiNavigationItem.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Sync\EnsureLoggedInSectionSync.cs" />
     <Compile Include="Sync\GitHubPublishSection.cs" />
     <Compile Include="Services\TeamExplorerServices.cs" />

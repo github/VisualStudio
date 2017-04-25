@@ -9,8 +9,8 @@ using Microsoft.VisualStudio.Shell;
 namespace GitHub.Services
 {
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
-    //[Export(typeof(ITeamExplorerServices))]
-    //[PartCreationPolicy(CreationPolicy.Shared)]
+    [Export(typeof(ITeamExplorerServices))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServices : ITeamExplorerServices
     {
         readonly IGitHubServiceProvider serviceProvider;
@@ -23,7 +23,7 @@ namespace GitHub.Services
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         ITeamExplorerNotificationManager manager;
 
-        //[ImportingConstructor]
+        [ImportingConstructor]
         public TeamExplorerServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;

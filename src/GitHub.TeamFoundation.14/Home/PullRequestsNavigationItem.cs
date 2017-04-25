@@ -10,12 +10,11 @@ using GitHub.VisualStudio.UI;
 using System.Linq;
 using GitHub.Extensions;
 using GitHub.Exports;
-using GitHub.TeamFoundation;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    //[ResolvingTeamExplorerNavigationItem(PullRequestsNavigationItemId, NavigationItemPriority.PullRequests)]
-    //[PartCreationPolicy(CreationPolicy.NonShared)]
+    [TeamExplorerNavigationItem(PullRequestsNavigationItemId, NavigationItemPriority.PullRequests)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestsNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string PullRequestsNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA3";

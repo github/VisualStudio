@@ -15,8 +15,8 @@ using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
-    //[Export(typeof(ITeamExplorerServiceHolder))]
-    //[PartCreationPolicy(CreationPolicy.Shared)]
+    [Export(typeof(ITeamExplorerServiceHolder))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
         readonly Dictionary<object, Action<ILocalRepositoryModel>> activeRepoHandlers = new Dictionary<object, Action<ILocalRepositoryModel>>();

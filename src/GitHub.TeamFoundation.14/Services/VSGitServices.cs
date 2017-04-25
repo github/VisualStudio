@@ -18,8 +18,8 @@ using ReactiveUI;
 namespace GitHub.Services
 {
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
-    //[Export(typeof(IVSGitServices))]
-    //[PartCreationPolicy(CreationPolicy.Shared)]
+    [Export(typeof(IVSGitServices))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServices : IVSGitServices
     {
         readonly IGitHubServiceProvider serviceProvider;
@@ -33,7 +33,7 @@ namespace GitHub.Services
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         IGitExt gitExtService;
 
-        //[ImportingConstructor]
+        [ImportingConstructor]
         public VSGitServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;

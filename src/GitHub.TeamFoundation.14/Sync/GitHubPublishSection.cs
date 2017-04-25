@@ -23,8 +23,8 @@ using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio.TeamExplorer.Sync
 {
-    //[TeamExplorerSection(GitHubPublishSectionId, TeamExplorerPageIds.GitCommits, 10)]
-    //[PartCreationPolicy(CreationPolicy.NonShared)]
+    [TeamExplorerSection(GitHubPublishSectionId, TeamExplorerPageIds.GitCommits, 10)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitHubPublishSection : TeamExplorerSectionBase, IGitHubInvitationSection
     {
         public const string GitHubPublishSectionId = "92655B52-360D-4BF5-95C5-D9E9E596AC76";

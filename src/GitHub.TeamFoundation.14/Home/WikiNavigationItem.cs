@@ -7,12 +7,11 @@ using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using GitHub.UI;
 using GitHub.VisualStudio.UI;
-using GitHub.TeamFoundation;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
-    //[ResolvingTeamExplorerNavigationItem(WikiNavigationItemId, NavigationItemPriority.Wiki)]
-    //[PartCreationPolicy(CreationPolicy.NonShared)]
+    [TeamExplorerNavigationItem(WikiNavigationItemId, NavigationItemPriority.Wiki)]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class WikiNavigationItem : TeamExplorerNavigationItemBase
     {
         public const string WikiNavigationItemId = "5245767A-B657-4F8E-BFEE-F04159F1DDA1";
