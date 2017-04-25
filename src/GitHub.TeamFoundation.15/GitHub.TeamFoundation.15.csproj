@@ -190,6 +190,9 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Home\WikiNavigationItem.cs">
       <Link>Home\WikiNavigationItem.cs</Link>
     </Compile>
+    <Compile Include="..\GitHub.TeamFoundation.14\RegistryHelper.cs">
+      <Link>RegistryHelper.cs</Link>
+    </Compile>
     <Compile Include="..\GitHub.TeamFoundation.14\Sync\EnsureLoggedInSectionSync.cs">
       <Link>Sync\EnsureLoggedInSectionSync.cs</Link>
     </Compile>
@@ -202,12 +205,14 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Services\VSGitServices.cs">
       <Link>Services\VSGitServices.cs</Link>
     </Compile>
-    <Compile Include="RegistryHelper.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\GitHub.TeamFoundation.14\TeamFoundationVersion.cs">
+      <Link>TeamFoundationVersion.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="app.config" />

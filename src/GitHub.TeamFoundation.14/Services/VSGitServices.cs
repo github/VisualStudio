@@ -63,7 +63,7 @@ namespace GitHub.Services
         public async Task Clone(string cloneUrl, string clonePath, bool recurseSubmodules, object progress = null)
         {
 #if (!TEAMEXPLORER14)
-            if (TeamFoundationVersion >= 15)
+            if (TeamFoundationVersion.Major >= 15)
             {
                 await Clone15(cloneUrl, clonePath, recurseSubmodules, progress);
                 return;
@@ -71,8 +71,6 @@ namespace GitHub.Services
 #endif
             await Clone14(cloneUrl, clonePath, recurseSubmodules);
         }
-
-        static int TeamFoundationVersion => typeof(IGitRepositoriesExt).Assembly.GetName().Version.Major;
 
         async Task Clone14(string cloneUrl, string clonePath, bool recurseSubmodules)
         {

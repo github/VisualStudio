@@ -141,6 +141,7 @@
     <Compile Include="Sync\EnsureLoggedInSectionSync.cs" />
     <Compile Include="Sync\GitHubPublishSection.cs" />
     <Compile Include="Services\TeamExplorerServices.cs" />
+    <Compile Include="TeamFoundationVersion.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
