@@ -27,6 +27,7 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.Exports.Reactive" Path="|GitHub.Exports.Reactive|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GitHub.App" Path="|GitHub.App|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="GitHub.StartPage" Path="|GitHub.StartPage;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="GitHub.TeamFoundation.15" Path="|GitHub.TeamFoundation.15|" AssemblyName="|GitHub.TeamFoundation.15;AssemblyName|" />
   </Assets>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0.25824.0,16.0)" DisplayName="Visual Studio core editor" />
