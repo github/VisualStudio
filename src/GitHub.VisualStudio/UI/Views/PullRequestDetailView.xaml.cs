@@ -21,6 +21,8 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -55,6 +57,9 @@ namespace GitHub.VisualStudio.UI.Views
 
         [Import]
         IVisualStudioBrowser VisualStudioBrowser { get; set; }
+
+        [Import]
+        IEditorOptionsFactoryService EditorOptionsFactoryService { get; set; }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
@@ -104,7 +109,7 @@ namespace GitHub.VisualStudio.UI.Views
 
                 using (sessionManager.OpeningCompareViewHack(path))
                 {
-                    Services.DifferenceService.OpenComparisonWindow2(
+                    var frame = Services.DifferenceService.OpenComparisonWindow2(
                         fileNames.Item1,
                         fileNames.Item2,
                         caption,
@@ -114,12 +119,25 @@ namespace GitHub.VisualStudio.UI.Views
                         string.Empty,
                         string.Empty,
                         (uint)options);
+
+                    object docView;
+                    frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
+                    var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
+                    EnableGlyphMargin(diffViewer.LeftView);
+                    EnableGlyphMargin(diffViewer.RightView);
+                    EnableGlyphMargin(diffViewer.InlineView);
                 }
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
             }
+        }
+
+        void EnableGlyphMargin(IPropertyOwner propertyOwner)
+        {
+            var editorOptions = EditorOptionsFactoryService.GetOptions(propertyOwner);
+            editorOptions.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
