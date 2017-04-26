@@ -1,14 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
+using GitHub.VisualStudio;
 
 namespace GitHub.TeamFoundation
 {
     [Export]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class TeamFoundationResolver : IDisposable
+    public sealed class TeamFoundationResolver : IDisposable
     {
         const string BindingPath = @"CommonExtensions\Microsoft\TeamFoundation\Team Explorer";
         const string AssemblyStartsWith = "Microsoft.TeamFoundation.";
@@ -42,6 +43,7 @@ namespace GitHub.TeamFoundation
         // C:\Users\<user>\AppData\Local\Microsoft\VisualStudio\14.0\ProjectAssemblies\ffp8wnnz01\Microsoft.TeamFoundation.Controls.dll
         //
         // This method ensures that our resolver has a chance to resolve it first.
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", Justification = "I like $ strings")]
         static void TryAddPriorityAssemblyResolve(AppDomain domain, ResolveEventHandler handler)
         {
             try
@@ -57,7 +59,7 @@ namespace GitHub.TeamFoundation
             }
             catch (Exception e)
             {
-                Trace.WriteLine("Couldn't add priority AssemblyResolve handler (adding normal handler): " + e);
+                VsOutputLogger.WriteLine($"Couldn't add priority AssemblyResolve handler (adding normal handler): {e}");
                 domain.AssemblyResolve += handler;
             }
         }
@@ -67,12 +69,16 @@ namespace GitHub.TeamFoundation
             AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods",
+            Justification = "Assembly.LoadFrom is normal for AssemblyResolve event")]
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", Justification = "I like $ strings")]
         Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
             {
                 var name = args.Name;
-                if (name.StartsWith(AssemblyStartsWith) && name.EndsWith(AssemblyEndsWith))
+                if (name.StartsWith(AssemblyStartsWith, StringComparison.Ordinal) &&
+                    name.EndsWith(AssemblyEndsWith, StringComparison.Ordinal))
                 {
                     var assemblyName = new AssemblyName(name);
                     var path = GetTeamExplorerPath(assemblyName.Name);
@@ -80,11 +86,13 @@ namespace GitHub.TeamFoundation
                     {
                         return Assembly.LoadFrom(path);
                     }
+
+                    VsOutputLogger.WriteLine($"Couldn't find TeamFoundation assembly '{args.Name}' at {path}.");
                 }
             }
             catch (Exception e)
             {
-                Trace.WriteLine("Couldn't resolve TeamFoundation assembly: " + e);
+                VsOutputLogger.WriteLine($"Couldn't resolve TeamFoundation assembly '{args.Name}': {e}");
             }
 
             return null;

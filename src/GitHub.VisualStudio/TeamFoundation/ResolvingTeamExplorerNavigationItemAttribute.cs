@@ -7,7 +7,7 @@ namespace GitHub.TeamFoundation
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]
-    public class ResolvingTeamExplorerNavigationItemAttribute : ExportAttribute
+    public sealed class ResolvingTeamExplorerNavigationItemAttribute : ExportAttribute
     {
         public string Id { get; private set; }
         public int Priority { get; private set; }

@@ -6,7 +6,7 @@ namespace GitHub.TeamFoundation
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]
-    public class ResolvingTeamExplorerSectionAttribute : ExportAttribute
+    public sealed class ResolvingTeamExplorerSectionAttribute : ExportAttribute
     {
         public string Id { get; }
         public string ParentPageId { get; }
