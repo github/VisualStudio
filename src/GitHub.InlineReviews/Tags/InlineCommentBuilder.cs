@@ -19,8 +19,9 @@ namespace GitHub.InlineReviews.Services
     {
         readonly IGitClient gitClient;
         readonly IPullRequestReviewSession session;
-        readonly string path;
         readonly IRepository repository;
+        readonly string path;
+        readonly string tabsToSpaces;
         readonly IReadOnlyList<IPullRequestReviewCommentModel> comments;
         readonly InlineDiffBuilder differ = new InlineDiffBuilder(new Differ());
         Dictionary<int, DiffHunk> diffHunks;
@@ -30,7 +31,8 @@ namespace GitHub.InlineReviews.Services
             IGitClient gitClient,
             IPullRequestReviewSession session,
             IRepository repository,
-            string path)
+            string path,
+            int? tabsToSpaces)
         {
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(session, nameof(session));
@@ -41,6 +43,11 @@ namespace GitHub.InlineReviews.Services
             this.session = session;
             this.repository = repository;
             this.path = path;
+            
+            if (tabsToSpaces.HasValue)
+            {
+                this.tabsToSpaces = new string(' ', tabsToSpaces.Value);
+            }
 
             comments = session.GetCommentsForFile(path);
         }
@@ -93,13 +100,18 @@ namespace GitHub.InlineReviews.Services
 
                 foreach (var line in lines)
                 {
-                    builder.AppendLine(line);
+                    builder.AppendLine(TabsToSpaces(line));
                     ++count;
                 }
 
                 var hunk = new DiffHunk(builder.ToString(), count);
                 diffHunks.Add(comment.Id, hunk);
             }
+        }
+
+        string TabsToSpaces(string s)
+        {
+            return tabsToSpaces != null ? s.Replace("\t", tabsToSpaces) : s;
         }
 
         async Task ExtractBaseCommit()

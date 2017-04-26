@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 
@@ -24,6 +24,7 @@ namespace GitHub.InlineReviews.Tags
         readonly IPullRequestReviewSessionManager sessionManager;
         readonly IDisposable subscription;
         readonly Subject<ITextSnapshot> signalRebuild;
+        readonly int? tabsToSpaces;
         IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
@@ -31,6 +32,7 @@ namespace GitHub.InlineReviews.Tags
         public ReviewTagger(
             IGitService gitService,
             IGitClient gitClient,
+            ITextView view,
             ITextBuffer buffer,
             IPullRequestReviewSessionManager sessionManager)
         {
@@ -43,6 +45,11 @@ namespace GitHub.InlineReviews.Tags
             this.gitClient = gitClient;
             this.buffer = buffer;
             this.sessionManager = sessionManager;
+
+            if (view.Options.GetOptionValue<bool>("Tabs/ConvertTabsToSpaces"))
+            {
+                tabsToSpaces = view.Options.GetOptionValue<int>("Tabs/TabSize");
+            }
 
             signalRebuild = new Subject<ITextSnapshot>();
             signalRebuild.Throttle(TimeSpan.FromMilliseconds(500))
@@ -136,7 +143,7 @@ namespace GitHub.InlineReviews.Tags
                 if (path != null)
                 {
                     var repository = gitService.GetRepository(session.Repository.LocalPath);
-                    commentBuilder = new InlineCommentBuilder(gitClient, session, repository, path);
+                    commentBuilder = new InlineCommentBuilder(gitClient, session, repository, path, tabsToSpaces);
                     comments = await commentBuilder.Update(buffer.CurrentSnapshot);
                     NotifyTagsChanged();
                 }
