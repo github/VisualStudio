@@ -413,7 +413,7 @@ namespace GitHub.ViewModels
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
                 var commentCount = pullRequest.Comments
-                    .Where(x => x.Path == changedFile.FileName && x.Position.HasValue)
+                    .Where(x => x.Path == changedFile.FileName && x.OriginalPosition.HasValue)
                     .Count();
 
                 var node = new PullRequestFileNode(
