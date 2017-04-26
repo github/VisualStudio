@@ -11,21 +11,21 @@ using Task = System.Threading.Tasks.Task;
 using GitHub.Extensions;
 using System.Threading.Tasks;
 using GitHub.Helpers;
+using System.Threading;
 
 namespace GitHub.Services
 {
-    public class UsageTracker : IUsageTracker
+    public sealed class UsageTracker : IUsageTracker, IDisposable
     {
         const string StoreFileName = "ghfvs.usage";
         static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
 
         readonly IGitHubServiceProvider gitHubServiceProvider;
-        readonly DispatcherTimer timer;
-
         IMetricsService client;
         IConnectionManager connectionManager;
         IPackageSettings userSettings;
         IVSServices vsservices;
+        Timer timer;
         string storePath;
         bool firstRun = true;
 
@@ -61,13 +61,16 @@ namespace GitHub.Services
             };
             dirCreate = (path) => System.IO.Directory.CreateDirectory(path);
 
-            this.timer = new DispatcherTimer(
-                TimeSpan.FromMinutes(3),
-                DispatcherPriority.Background,
+            this.timer = new Timer(
                 TimerTick,
-                ThreadingHelper.MainThreadDispatcher);
+                null,
+                TimeSpan.FromMinutes(3),
+                TimeSpan.FromHours(8));
+        }
 
-            RunTimer();
+        public void Dispose()
+        {
+            timer?.Dispose();
         }
 
         public async Task IncrementLaunchCount()
@@ -244,14 +247,7 @@ namespace GitHub.Services
             writeAllText(storePath, json, Encoding.UTF8);
         }
 
-        void RunTimer()
-        {
-            // The timer first ticks after 3 minutes to allow things to settle down after startup.
-            // This will be changed to 8 hours after the first tick by the TimerTick method.
-            timer.Start();
-        }
-
-        void TimerTick(object sender, EventArgs e)
+        void TimerTick(object state)
         {
             TimerTick()
                 .Catch(ex =>
@@ -268,13 +264,13 @@ namespace GitHub.Services
             if (firstRun)
             {
                 await IncrementLaunchCount();
-                timer.Interval = TimeSpan.FromHours(8);
                 firstRun = false;
             }
 
             if (client == null || !userSettings.CollectMetrics)
             {
-                timer.Stop();
+                timer.Dispose();
+                timer = null;
                 return;
             }
 
