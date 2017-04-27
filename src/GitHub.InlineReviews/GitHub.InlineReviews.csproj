@@ -92,6 +92,7 @@
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">

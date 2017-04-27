@@ -46,9 +46,9 @@ namespace GitHub.InlineReviews.Tags
             this.buffer = buffer;
             this.sessionManager = sessionManager;
 
-            if (view.Options.GetOptionValue<bool>("Tabs/ConvertTabsToSpaces"))
+            if (view.Options.GetOptionValue("Tabs/ConvertTabsToSpaces", false))
             {
-                tabsToSpaces = view.Options.GetOptionValue<int>("Tabs/TabSize");
+                tabsToSpaces = view.Options.GetOptionValue<int?>("Tabs/TabSize", null);
             }
 
             signalRebuild = new Subject<ITextSnapshot>();
