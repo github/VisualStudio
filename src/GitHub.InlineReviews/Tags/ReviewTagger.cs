@@ -12,6 +12,7 @@ using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 
@@ -160,18 +161,30 @@ namespace GitHub.InlineReviews.Tags
                 NotifyTagsChanged();
             }
 
-            if (session != null)
-            {
-                string path = RootedPathToRelativePath(fullPath, session.Repository.LocalPath);
+            if (session == null) return;
 
-                if (path != null)
-                {
-                    var repository = gitService.GetRepository(session.Repository.LocalPath);
-                    commentBuilder = new InlineCommentBuilder(gitClient, session, repository, path, tabsToSpaces);
-                    comments = await commentBuilder.Update(buffer.CurrentSnapshot);
-                    NotifyTagsChanged();
-                }
+            string path = RootedPathToRelativePath(fullPath, session.Repository.LocalPath);
+
+            if (path == null) return;
+
+            var snapshot = buffer.CurrentSnapshot;
+
+            if (diffLeftHandSide)
+            {
+                // If we're tagging the LHS of a diff, then the snapshot will be the base commit
+                // (as you'd expect) but that means that the diff will be empty, so get the RHS
+                // snapshot from the view for the comparison.
+                var projection = view.TextSnapshot as IProjectionSnapshot;
+                snapshot = projection?.SourceSnapshots.Count == 2 ? projection.SourceSnapshots[1] : null;
             }
+
+            if (snapshot == null) return;
+
+            var repository = gitService.GetRepository(session.Repository.LocalPath);
+            commentBuilder = new InlineCommentBuilder(gitClient, session, repository, path, tabsToSpaces);
+
+            comments = await commentBuilder.Update(snapshot);
+            NotifyTagsChanged();
         }
 
         void Buffer_Changed(object sender, TextContentChangedEventArgs e)
