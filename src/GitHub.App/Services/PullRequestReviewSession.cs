@@ -34,7 +34,6 @@ namespace GitHub.Services
         public IAccount User { get; }
         public IPullRequestModel PullRequest { get; }
         public ILocalRepositoryModel Repository { get; }
-        public string CompareViewHackPath { get; private set; }
         public IObservable<Unit> Changed => changed;
 
         public void AddComment(IPullRequestReviewCommentModel comment)
@@ -56,12 +55,6 @@ namespace GitHub.Services
             List<IPullRequestReviewCommentModel> result;
             path = path.Replace('\\', '/');
             return comments.TryGetValue(path, out result) ? result : Empty;
-        }
-
-        public IDisposable OpeningCompareViewHack(string path)
-        {
-            CompareViewHackPath = path;
-            return Disposable.Create(() => CompareViewHackPath = null);
         }
 
         public void Dispose()

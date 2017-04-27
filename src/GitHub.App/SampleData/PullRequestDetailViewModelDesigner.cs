@@ -71,6 +71,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         }
 
         public IPullRequestModel Model { get; }
+        public ILocalRepositoryModel Repository { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public bool IsLoading { get; }

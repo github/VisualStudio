@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
+using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -21,10 +22,14 @@ namespace GitHub.InlineReviews.Tags
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly ITextBuffer buffer;
+        readonly ITextView view;
         readonly IPullRequestReviewSessionManager sessionManager;
-        readonly IDisposable subscription;
         readonly Subject<ITextSnapshot> signalRebuild;
         readonly int? tabsToSpaces;
+        bool initialized;
+        string fullPath;
+        bool diffLeftHandSide;
+        IDisposable subscription;
         IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
@@ -44,6 +49,7 @@ namespace GitHub.InlineReviews.Tags
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.buffer = buffer;
+            this.view = view;
             this.sessionManager = sessionManager;
 
             if (view.Options.GetOptionValue("Tabs/ConvertTabsToSpaces", false))
@@ -57,21 +63,23 @@ namespace GitHub.InlineReviews.Tags
                 .Subscribe(x => Rebuild(x).Forget());
 
             this.buffer.Changed += Buffer_Changed;
-            subscription = sessionManager.SessionChanged
-                .SelectMany(x => Observable.Return(x).Concat(x.Changed.Select(_ => x)))
-                .Subscribe(SessionChanged);
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
         public void Dispose()
         {
-            subscription.Dispose();
+            subscription?.Dispose();
         }
 
         public IEnumerable<ITagSpan<ReviewTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            if (comments != null)
+            if (!initialized)
+            {
+                // Sucessful initialization will call NotifyTagsChanged, causing this method to be re-called.
+                Initialize();
+            }
+            else if (comments != null)
             {
                 foreach (var span in spans)
                 {
@@ -107,6 +115,28 @@ namespace GitHub.InlineReviews.Tags
             return null;
         }
 
+        void Initialize()
+        {
+            var bufferTag = buffer.Properties.GetProperty<CompareBufferTag>(typeof(CompareBufferTag), null);
+
+            if (bufferTag != null)
+            {
+                fullPath = bufferTag.Path;
+                diffLeftHandSide = bufferTag.IsLeftBuffer;
+            }
+            else
+            {
+                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+                fullPath = document.FilePath;
+            }
+
+            subscription = sessionManager.SessionChanged
+                .SelectMany(x => Observable.Return(x).Concat(x.Changed.Select(_ => x)))
+                .Subscribe(SessionChanged);
+
+            initialized = true;
+        }
+
         void NotifyTagsChanged()
         {
             var entireFile = new SnapshotSpan(buffer.CurrentSnapshot, 0, buffer.CurrentSnapshot.Length);
@@ -123,22 +153,16 @@ namespace GitHub.InlineReviews.Tags
         async void SessionChanged(IPullRequestReviewSession session)
         {
             this.session = session;
-            comments = null;
-            NotifyTagsChanged();
+
+            if (comments != null)
+            {
+                comments = null;
+                NotifyTagsChanged();
+            }
 
             if (session != null)
             {
-                string path;
-
-                if (session.CompareViewHackPath == null)
-                {
-                    var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                    path = RootedPathToRelativePath(document.FilePath, session.Repository.LocalPath);
-                }
-                else
-                {
-                    path = session.CompareViewHackPath;
-                }
+                string path = RootedPathToRelativePath(fullPath, session.Repository.LocalPath);
 
                 if (path != null)
                 {

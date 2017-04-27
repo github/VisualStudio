@@ -10,12 +10,10 @@ namespace GitHub.Services
         IAccount User { get; }
         IPullRequestModel PullRequest { get; }
         ILocalRepositoryModel Repository { get; }
-        string CompareViewHackPath { get; }
 
         IObservable<Unit> Changed { get; }
 
         void AddComment(IPullRequestReviewCommentModel comment);
         IReadOnlyList<IPullRequestReviewCommentModel> GetCommentsForFile(string path);
-        IDisposable OpeningCompareViewHack(string path);
     }
 }

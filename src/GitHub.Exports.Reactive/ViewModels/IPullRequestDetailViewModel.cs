@@ -71,6 +71,11 @@ namespace GitHub.ViewModels
         IPullRequestModel Model { get; }
 
         /// <summary>
+        /// Gets the repository that the pull request relates to.
+        /// </summary>
+        ILocalRepositoryModel Repository { get; }
+
+        /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
         /// </summary>
         string SourceBranchDisplayName { get; }

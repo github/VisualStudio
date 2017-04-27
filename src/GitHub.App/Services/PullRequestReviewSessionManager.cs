@@ -11,24 +11,12 @@ namespace GitHub.Services
     public class PullRequestReviewSessionManager : IPullRequestReviewSessionManager, IDisposable
     {
         readonly BehaviorSubject<IPullRequestReviewSession> sessionChanged = new BehaviorSubject<IPullRequestReviewSession>(null);
-        IPullRequestReviewSession current;
 
         public IObservable<IPullRequestReviewSession> SessionChanged => sessionChanged;
 
         public void NotifySessionChanged([AllowNull] IPullRequestReviewSession session)
         {
-            current = session;
             sessionChanged.OnNext(session);
-        }
-
-        public IDisposable OpeningCompareViewHack(string path)
-        {
-            if (current != null)
-            {
-                return current.OpeningCompareViewHack(path);
-            }
-
-            return Disposable.Empty;
         }
 
         public void Dispose()

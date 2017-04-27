@@ -27,6 +27,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.TextManager.Interop;
 using ReactiveUI;
+using GitHub.Models;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -92,9 +93,10 @@ namespace GitHub.VisualStudio.UI.Views
             try
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
-                var path = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
-                var leftLabel = $"{path};{ViewModel.TargetBranchDisplayName}";
-                var rightLabel = $"{path};PR {ViewModel.Model.Number}";
+                var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
+                var fullPath = System.IO.Path.Combine(ViewModel.Repository.LocalPath, relativePath);
+                var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
+                var rightLabel = $"{relativePath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
                 var tooltip = $"{leftLabel}\nvs.\n{rightLabel}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
@@ -105,33 +107,37 @@ namespace GitHub.VisualStudio.UI.Views
                     options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
                 }
 
-                var sessionManager = Services.DefaultExportProvider.GetExportedValue<IPullRequestReviewSessionManager>();
+                var frame = Services.DifferenceService.OpenComparisonWindow2(
+                    fileNames.Item1,
+                    fileNames.Item2,
+                    caption,
+                    tooltip,
+                    leftLabel,
+                    rightLabel,
+                    string.Empty,
+                    string.Empty,
+                    (uint)options);
 
-                using (sessionManager.OpeningCompareViewHack(path))
-                {
-                    var frame = Services.DifferenceService.OpenComparisonWindow2(
-                        fileNames.Item1,
-                        fileNames.Item2,
-                        caption,
-                        tooltip,
-                        leftLabel,
-                        rightLabel,
-                        string.Empty,
-                        string.Empty,
-                        (uint)options);
-
-                    object docView;
-                    frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
-                    var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
-                    EnableGlyphMargin(diffViewer.LeftView);
-                    EnableGlyphMargin(diffViewer.RightView);
-                    EnableGlyphMargin(diffViewer.InlineView);
-                }
+                object docView;
+                frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
+                var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
+                AddCompareBufferTag(diffViewer.LeftView.TextBuffer, fullPath, true);
+                AddCompareBufferTag(diffViewer.RightView.TextBuffer, fullPath, false);
+                EnableGlyphMargin(diffViewer.LeftView);
+                EnableGlyphMargin(diffViewer.RightView);
+                EnableGlyphMargin(diffViewer.InlineView);
             }
             catch (Exception e)
             {
                 ShowErrorInStatusBar("Error opening file", e);
             }
+        }
+
+        void AddCompareBufferTag(ITextBuffer buffer, string path, bool isLeftBuffer)
+        {
+            buffer.Properties.AddProperty(
+                typeof(CompareBufferTag),
+                new CompareBufferTag(path, isLeftBuffer));
         }
 
         void EnableGlyphMargin(IPropertyOwner propertyOwner)
