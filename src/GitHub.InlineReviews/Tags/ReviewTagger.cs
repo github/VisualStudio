@@ -22,6 +22,7 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly IGitService gitService;
         readonly IGitClient gitClient;
+        readonly IDiffService diffService;
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestReviewSessionManager sessionManager;
@@ -29,7 +30,7 @@ namespace GitHub.InlineReviews.Tags
         readonly int? tabsToSpaces;
         bool initialized;
         string fullPath;
-        bool diffLeftHandSide;
+        bool leftHandSide;
         IDisposable subscription;
         IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
@@ -38,17 +39,20 @@ namespace GitHub.InlineReviews.Tags
         public ReviewTagger(
             IGitService gitService,
             IGitClient gitClient,
+            IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
             IPullRequestReviewSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
+            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
 
             this.gitService = gitService;
             this.gitClient = gitClient;
+            this.diffService = diffService;
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
@@ -123,7 +127,7 @@ namespace GitHub.InlineReviews.Tags
             if (bufferTag != null)
             {
                 fullPath = bufferTag.Path;
-                diffLeftHandSide = bufferTag.IsLeftBuffer;
+                leftHandSide = bufferTag.IsLeftBuffer;
             }
             else
             {
@@ -169,7 +173,7 @@ namespace GitHub.InlineReviews.Tags
 
             var snapshot = buffer.CurrentSnapshot;
 
-            if (diffLeftHandSide)
+            if (leftHandSide)
             {
                 // If we're tagging the LHS of a diff, then the snapshot will be the base commit
                 // (as you'd expect) but that means that the diff will be empty, so get the RHS
@@ -181,7 +185,14 @@ namespace GitHub.InlineReviews.Tags
             if (snapshot == null) return;
 
             var repository = gitService.GetRepository(session.Repository.LocalPath);
-            commentBuilder = new InlineCommentBuilder(gitClient, session, repository, path, tabsToSpaces);
+            commentBuilder = new InlineCommentBuilder(
+                gitClient,
+                diffService,
+                session,
+                repository,
+                path,
+                leftHandSide,
+                tabsToSpaces);
 
             comments = await commentBuilder.Update(snapshot);
             NotifyTagsChanged();

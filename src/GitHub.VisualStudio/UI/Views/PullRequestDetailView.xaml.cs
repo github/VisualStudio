@@ -135,9 +135,9 @@ namespace GitHub.VisualStudio.UI.Views
 
         void AddCompareBufferTag(ITextBuffer buffer, string path, bool isLeftBuffer)
         {
-            buffer.Properties.AddProperty(
+            buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(CompareBufferTag),
-                new CompareBufferTag(path, isLeftBuffer));
+                () => new CompareBufferTag(path, isLeftBuffer));
         }
 
         void EnableGlyphMargin(IPropertyOwner propertyOwner)

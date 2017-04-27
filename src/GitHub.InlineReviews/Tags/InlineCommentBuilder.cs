@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DiffPlex;
-using DiffPlex.DiffBuilder;
-using DiffPlex.DiffBuilder.Model;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -18,20 +16,23 @@ namespace GitHub.InlineReviews.Services
     public class InlineCommentBuilder
     {
         readonly IGitClient gitClient;
+        readonly IDiffService diffService;
         readonly IPullRequestReviewSession session;
         readonly IRepository repository;
         readonly string path;
+        readonly bool leftHandSide;
         readonly string tabsToSpaces;
         readonly IReadOnlyList<IPullRequestReviewCommentModel> comments;
-        readonly InlineDiffBuilder differ = new InlineDiffBuilder(new Differ());
-        Dictionary<int, DiffHunk> diffHunks;
+        Dictionary<int, List<DiffLine>> diffHunks;
         string baseCommit;
 
         public InlineCommentBuilder(
             IGitClient gitClient,
+            IDiffService diffService,
             IPullRequestReviewSession session,
             IRepository repository,
             string path,
+            bool leftHandSide,
             int? tabsToSpaces)
         {
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
@@ -40,9 +41,11 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(path, nameof(path));
 
             this.gitClient = gitClient;
+            this.diffService = diffService;
             this.session = session;
             this.repository = repository;
             this.path = path;
+            this.leftHandSide = leftHandSide;
             
             if (tabsToSpaces.HasValue)
             {
@@ -62,17 +65,17 @@ namespace GitHub.InlineReviews.Services
             return await Task.Run(() =>
             {
                 var current = snapshot.GetText();
-                var snapshotDiff = BuildDiff(differ.BuildDiffModel(baseCommit, current));
+                var snapshotDiff = diffService.Diff(baseCommit, current, 4).ToList();
                 var result = new List<InlineCommentModel>();
 
                 foreach (var comment in comments)
                 {
                     var hunk = diffHunks[comment.Id];
-                    var match = snapshotDiff.IndexOf(hunk.Text);
+                    var match = Match(snapshotDiff, hunk);
+                    var lineNumber = GetLineNumber(match);
 
-                    if (match != -1)
+                    if (lineNumber != -1)
                     {
-                        var lineNumber = LineFromPosition(snapshotDiff, match) + hunk.LineCount - 1;
                         var snapshotLine = snapshot.GetLineFromLineNumber(lineNumber);
                         var trackingPoint = snapshot.CreateTrackingPoint(snapshotLine.Start, PointTrackingMode.Positive);
                         result.Add(new InlineCommentModel(lineNumber, comment, trackingPoint));
@@ -85,28 +88,35 @@ namespace GitHub.InlineReviews.Services
 
         void BuildDiffHunks()
         {
-            diffHunks = new Dictionary<int, DiffHunk>();
+            diffHunks = new Dictionary<int, List<DiffLine>>();
 
             foreach (var comment in comments)
             {
-                // This can definitely be done more efficiently!
-                var lines = ReadLines(comment.DiffHunk)
-                    .Reverse()
-                    .Take(5)
-                    .TakeWhile(x => !x.StartsWith("@@"))
-                    .Reverse();
-                var builder = new StringBuilder();
-                var count = 0;
-
-                foreach (var line in lines)
-                {
-                    builder.AppendLine(TabsToSpaces(line));
-                    ++count;
-                }
-
-                var hunk = new DiffHunk(builder.ToString(), count);
-                diffHunks.Add(comment.Id, hunk);
+                var last = diffService.ParseFragment(comment.DiffHunk).Last();
+                diffHunks.Add(comment.Id, last.Lines.Reverse().Take(5).ToList());
             }
+        }
+
+        DiffLine Match(IEnumerable<DiffChunk> diff, List<DiffLine> target)
+        {
+            int j = 0;
+
+            foreach (var source in diff)
+            {
+                for (var i = source.Lines.Count - 1; i >= 0; --i)
+                {
+                    if (source.Lines[i].Content == target[j].Content)
+                    {
+                        if (++j == target.Count) return source.Lines[i + j - 1];
+                    }
+                    else
+                    {
+                        j = 0;
+                    }
+                }
+            }
+
+            return null;
         }
 
         string TabsToSpaces(string s)
@@ -122,66 +132,17 @@ namespace GitHub.InlineReviews.Services
                 path) ?? string.Empty;
         }
 
-        static string BuildDiff(DiffPaneModel diffModel)
+        int GetLineNumber(DiffLine line)
         {
-            var builder = new StringBuilder();
-
-            foreach (var line in diffModel.Lines)
+            if (line != null)
             {
-                switch (line.Type)
-                {
-                    case ChangeType.Inserted:
-                        builder.Append('+');
-                        break;
-                    case ChangeType.Deleted:
-                        builder.Append('-');
-                        break;
-                    default:
-                        builder.Append(' ');
-                        break;
-                }
-
-                builder.AppendLine(line.Text);
+                if (leftHandSide && line.OldLineNumber != -1)
+                    return line.OldLineNumber - 1;
+                if (!leftHandSide && line.NewLineNumber != -1)
+                    return line.NewLineNumber - 1;
             }
 
-            return builder.ToString();
-        }
-
-        static int LineFromPosition(string s, int position)
-        {
-            var result = 0;
-
-            for (var i = 0; i < position; ++i)
-            {
-                if (s[i] == '\n') ++result;
-            }
-
-            return result;
-        }
-
-        static IEnumerable<string> ReadLines(string s)
-        {
-            using (var reader = new StringReader(s))
-            {
-                string line;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    yield return line;
-                }
-            }
-        }
-
-        class DiffHunk
-        {
-            public DiffHunk(string text, int lineCount)
-            {
-                Text = text;
-                LineCount = lineCount;
-            }
-
-            public string Text { get; }
-            public int LineCount { get; }
+            return -1;
         }
     }
 }
