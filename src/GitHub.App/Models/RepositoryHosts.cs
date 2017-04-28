@@ -180,6 +180,7 @@ namespace GitHub.Models
                 var host = await RepositoryHostFactory.Create(address);
                 return host.LogInFromCache()
                     .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Do(result =>
                     {
                         bool successful = result.IsSuccess();
@@ -199,6 +200,7 @@ namespace GitHub.Models
             var address = host.Address;
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             return host.LogOut()
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Do(result =>
                 {
                     // reset the logged out host property to null
