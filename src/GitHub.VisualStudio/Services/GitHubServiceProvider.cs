@@ -39,6 +39,15 @@ namespace GitHub.VisualStudio
         public GitHubProviderDispatcher([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
         {
             theRealProvider = serviceProvider.GetService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+            if (theRealProvider == null)
+            {
+                // GitHubPackage didn't run, so we're probably in Blend and we need to create an instance of 
+                // GitHubServiceProvider and register it manually so that the next time this code runs,
+                // this won't be null anymore
+                var serviceContainer = new ServiceProviderPackage(); 
+                serviceContainer.InitializeServices(true);
+                theRealProvider = (serviceContainer as IServiceProvider).GetService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+            }
         }
 
         public ExportProvider ExportProvider => theRealProvider.ExportProvider;

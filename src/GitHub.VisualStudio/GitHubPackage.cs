@@ -128,6 +128,15 @@ namespace GitHub.VisualStudio
 
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            return Task.CompletedTask;
+        }
+
+        public Task InitializeServices(bool runInit = false)
+        {
+            if (runInit)
+            {
+                Initialize();
+            }
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
             AddService(typeof(IMenuProvider), CreateService, true);
