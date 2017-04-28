@@ -22,7 +22,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
 
-                target.IsBusy = true;
+                target.OkCommand.ExecuteAsync();
                 target.Show(new TwoFactorRequiredUserError(exception));
 
                 Assert.False(target.IsBusy);
@@ -115,7 +115,7 @@ namespace UnitTests.GitHub.App.ViewModels
                 var task = target.Show(userError).ToTask();
 
                 target.AuthenticationCode = "123456";
-                target.CancelCommand.Execute(null);
+                target.Cancel.Execute(null);
                 var result = await task;
 
                 Assert.False(target.IsBusy);
@@ -132,7 +132,7 @@ namespace UnitTests.GitHub.App.ViewModels
 
                 Assert.Equal(TwoFactorType.Sms, target.TwoFactorType);
 
-                target.CancelCommand.Execute(null);
+                target.Cancel.Execute(null);
                 await task;
 
                 // TwoFactorType must be cleared here as the UIController uses it as a trigger

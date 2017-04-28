@@ -1,14 +1,12 @@
-﻿using GitHub.Exports;
+﻿using System.ComponentModel.Composition;
+using GitHub.Exports;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
-using System;
-using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericLogoutRequiredControl : SimpleViewUserControl<ILogoutRequiredViewModel, LogoutRequiredControl>
+    public class GenericLogoutRequiredControl : ViewBase<ILogoutRequiredViewModel, LogoutRequiredControl>
     { }
 
     /// <summary>
@@ -26,11 +24,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
             {
                 d(this.BindCommand(ViewModel, vm => vm.Logout, v => v.logoutButton));
                 d(this.BindCommand(ViewModel, vm => vm.Cancel, v => v.cancelButton));
-
-                d(ViewModel.Logout
-                    .Where(x => x == ProgressState.Success)
-                    .Subscribe(_ => NotifyDone()));
-                d(ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
             });
         }
     }

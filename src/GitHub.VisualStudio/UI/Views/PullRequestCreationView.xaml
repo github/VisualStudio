@@ -2,7 +2,7 @@
                                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                                      xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                      xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                       xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                                       xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
                                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,7 +13,7 @@
                                       xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                       xmlns:conv="clr-namespace:GitHub.UI.Converters;assembly=GitHub.UI"
                                       xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
-                                      xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
+                                      xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
@@ -30,7 +30,7 @@
         </Binding>
     </d:DesignProperties.DataContext>
 
-    <UserControl.Resources>
+    <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
@@ -78,7 +78,7 @@
 
             <conv:BranchNameConverter x:Key="BranchNameConverter" />
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Control.Resources>
 
     <Grid VerticalAlignment="Top" 
           MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:GenericPullRequestCreationView}}}"

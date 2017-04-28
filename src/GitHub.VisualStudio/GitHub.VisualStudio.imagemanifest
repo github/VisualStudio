@@ -11,6 +11,7 @@
     <ID Name="link_external" Value="6"/>
     <ID Name="clippy" Value="7"/>
     <ID Name="logo_toolbar" Value="8"/>
+    <ID Name="question" Value="9"/>
   </Symbols>
 
   <Images>
@@ -37,6 +38,9 @@
     </Image>
     <Image Guid="$(guidImages)" ID="$(logo_toolbar)">
       <Source Uri="$(Resources)/mark_github_toolbar.xaml" />
+    </Image>
+    <Image Guid="$(guidImages)" ID="$(question)">
+      <Source Uri="$(Resources)/question.xaml" />
     </Image>
   </Images>
 </ImageManifest>

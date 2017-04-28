@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface IPullRequestCreationViewModel : IReactiveViewModel
+    public interface IPullRequestCreationViewModel : IDialogViewModel, IPanePageViewModel
     {
         IBranch SourceBranch { get; set; }
         IBranch TargetBranch { get; set; }

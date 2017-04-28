@@ -129,6 +129,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\IHasLoading.cs" />
+    <Compile Include="ViewModels\IPanePageViewModel.cs" />
+    <Compile Include="ViewModels\IViewModel.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
@@ -212,10 +215,11 @@
     <Compile Include="Settings\RepositoryUIState.cs" />
     <Compile Include="Settings\UIState.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Compile Include="UI\IView.cs" />
     <Compile Include="ViewModels\IHasBusy.cs" />
     <Compile Include="ViewModels\IInfoPanel.cs" />
     <Compile Include="ViewModels\IServiceProviderAware.cs" />
-    <Compile Include="UI\IView.cs" />
+    <Compile Include="ViewModels\ICanNavigate.cs" />
     <Compile Include="UI\Octicon.cs" />
     <Compile Include="ViewModels\IGitHubConnectSection.cs" />
     <Compile Include="ViewModels\IGitHubInvitationSection.cs" />
@@ -236,10 +240,8 @@
     <Compile Include="Services\IWikiProbe.cs" />
     <Compile Include="Services\WikiProbe.cs" />
     <Compile Include="ViewModels\IGitHubPaneViewModel.cs" />
-    <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="Primitives\HostAddress.cs" />
     <Compile Include="UI\IUIController.cs" />
-    <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="Models\IPullRequestModel.cs" />
   </ItemGroup>
   <ItemGroup>

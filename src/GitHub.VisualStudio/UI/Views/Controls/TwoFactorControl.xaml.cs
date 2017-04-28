@@ -10,7 +10,7 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericTwoFactorControl : SimpleViewUserControl<ITwoFactorDialogViewModel, TwoFactorControl>
+    public class GenericTwoFactorControl : ViewBase<ITwoFactorDialogViewModel, TwoFactorControl>
     { }
 
     /// <summary>
@@ -39,7 +39,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 d(this.OneWayBind(ViewModel, vm => vm.ShowErrorMessage, view => view.authenticationFailedLabel.Visibility));
                 d(this.ViewModel.ResendCodeCommand.Subscribe(_ => SetFocus()));
                 d(this.ViewModel.OkCommand.Subscribe(_ => SetFocus()));
-                d(this.ViewModel.CancelCommand.Subscribe(_ => NotifyCancel()));
             });
             IsVisibleChanged += (s, e) =>
             {

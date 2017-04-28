@@ -790,6 +790,17 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thanks for installing GitHub for Visual Studio. Why not take a look at our [training](show-training) or [documentation](show-docs)?
+        ///
+        ///[Don&apos;t show this again](dont-show-again).
+        /// </summary>
+        public static string TeamExplorerWelcomeMessage {
+            get {
+                return ResourceManager.GetString("TeamExplorerWelcomeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Title (required).
         /// </summary>
         public static string TitleRequired {

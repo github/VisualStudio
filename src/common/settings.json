@@ -10,6 +10,11 @@
         "type": "object",
         "typename": "UIState",
         "default": 'null'
-    }
+    },
+	{
+		"name": "HideTeamExplorerWelcomeMessage",
+		"type": "bool",
+		"default": 'false'
+	}
     ]
 }

@@ -8,23 +8,23 @@
     xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
     xmlns:helpers="clr-namespace:GitHub.Helpers;assembly=GitHub.UI"
     xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
-    xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
     xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
-    xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
+    xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
     mc:Ignorable="d"
     d:DesignWidth="414"
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
     AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
-    <UserControl.Resources>
+    <Control.Resources>
         <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
             <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Control.Resources>
   
     <StackPanel
         Style="{DynamicResource DialogContainerStackPanel}"

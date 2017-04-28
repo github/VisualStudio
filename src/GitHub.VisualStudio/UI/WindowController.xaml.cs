@@ -49,11 +49,11 @@ namespace GitHub.VisualStudio.UI
 
         public void Load(IView view)
         {
-            var viewModel = view.ViewModel as IViewModel;
+            var viewModel = view.ViewModel as IDialogViewModel;
             if (viewModel != null)
                 Title = viewModel.Title;
 
-            var control = view as UserControl;
+            var control = view as Control;
             if (control != null)
             {
                 Container.Children.Clear();

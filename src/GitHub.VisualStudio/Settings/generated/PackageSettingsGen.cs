@@ -12,7 +12,12 @@
         "type": "object",
         "typename": "UIState",
         "default": 'null'
-    }
+    },
+	{
+		"name": "HideTeamExplorerWelcomeMessage",
+		"type": "bool",
+		"default": 'false'
+	}
     ]
 }
 */
@@ -40,17 +45,26 @@ namespace GitHub.VisualStudio.Settings {
             set { uIState  = value; this.RaisePropertyChange(); }
         }
 
+        bool hideTeamExplorerWelcomeMessage;
+        public bool HideTeamExplorerWelcomeMessage
+        {
+            get { return hideTeamExplorerWelcomeMessage; }
+            set { hideTeamExplorerWelcomeMessage  = value; this.RaisePropertyChange(); }
+        }
+
 
         void LoadSettings()
         {
             CollectMetrics = (bool)settingsStore.Read("CollectMetrics", true);
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
+            HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
         }
 
         void SaveSettings()
         {
             settingsStore.Write("CollectMetrics", CollectMetrics);
             settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
+            settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
         }
 
     }

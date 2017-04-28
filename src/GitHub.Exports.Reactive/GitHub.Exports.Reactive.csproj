@@ -99,6 +99,9 @@
     <Compile Include="Services\IPullRequestService.cs" />
     <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
+    <Compile Include="ViewModels\IHasCancel.cs" />
+    <Compile Include="ViewModels\IHasDone.cs" />
+    <Compile Include="ViewModels\ILoginViewModel.cs" />
     <Compile Include="ViewModels\INotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\INotAGitHubRepositoryViewModel.cs" />
     <Compile Include="ViewModels\ILoggedOutViewModel.cs" />
@@ -119,7 +122,7 @@
     <Compile Include="ViewModels\IPullRequestDirectoryNode.cs" />
     <Compile Include="ViewModels\IPullRequestFileNode.cs" />
     <Compile Include="ViewModels\IPullRequestListViewModel.cs" />
-    <Compile Include="ViewModels\IReactiveViewModel.cs" />
+    <Compile Include="ViewModels\IDialogViewModel.cs" />
     <Compile Include="ViewModels\IBaseCloneViewModel.cs" />
     <Compile Include="ViewModels\IRepositoryCreationTarget.cs" />
     <Compile Include="ViewModels\IRepositoryForm.cs" />

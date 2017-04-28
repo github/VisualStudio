@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Authentication;
@@ -17,7 +18,7 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.TwoFactor)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
+    public class TwoFactorDialogViewModel : DialogViewModelBase, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
         bool invalidAuthenticationCode;
@@ -41,7 +42,7 @@ namespace GitHub.ViewModels
                 (code, busy) => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6 && !busy.Value);
 
             OkCommand = ReactiveCommand.Create(canVerify);
-            CancelCommand.Subscribe(_ => TwoFactorType = TwoFactorType.None);
+            Cancel.Subscribe(_ => TwoFactorType = TwoFactorType.None);
             NavigateLearnMore = ReactiveCommand.Create();
             NavigateLearnMore.Subscribe(x => browser.OpenUrl(GitHubUrls.TwoFactorLearnMore));
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
@@ -97,7 +98,7 @@ namespace GitHub.ViewModels
             var resend = ResendCodeCommand.Select(_ => RecoveryOptionResult.RetryOperation)
                 .Select(_ => TwoFactorChallengeResult.RequestResendCode)
                 .Do(_ => IsAuthenticationCodeSent = true);
-            var cancel = CancelCommand.Select(_ => default(TwoFactorChallengeResult));
+            var cancel = Cancel.Select(_ => default(TwoFactorChallengeResult));
             return Observable.Merge(ok, cancel, resend).Take(1);
         }
 
@@ -144,5 +145,7 @@ namespace GitHub.ViewModels
         {
             get { return showErrorMessage.Value; }
         }
+
+        public override IObservable<Unit> Done => Observable.Never<Unit>();
     }
 }

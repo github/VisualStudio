@@ -38,6 +38,10 @@
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
 
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup" priority="0x0502">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
+
       <Group guid="guidContextMenuSet" id="idGitHubContextMenuGroup">
       </Group>
 
@@ -130,6 +134,14 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubToolbarCmdSet" id="helpCommand" type="Button">
+        <Icon guid="guidImages" id="question" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Help</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x0100" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
@@ -159,6 +171,17 @@
           <ButtonText>Copy link to clipboard</ButtonText>
         </Strings>
       </Button>
+
+      <Button guid="guidContextMenuSet" id="idBlameCommand" type="Button">
+        <Icon guid="guidImages" id="link_external" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Blame</ButtonText>
+        </Strings>
+      </Button>
+      
     </Buttons>
 
   </Commands>
@@ -195,6 +218,11 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
+    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x103">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+
     <!-- Standard toolbar commands -->
     <CommandPlacement guid="guidGitHubToolbarCmdSet" id="backCommand" priority="0x100">
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
@@ -215,6 +243,10 @@
 
     <CommandPlacement guid="guidGitHubToolbarCmdSet" id="githubCommand" priority="0x103">
       <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="helpCommand" priority="0x111">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup"/>
     </CommandPlacement>
 
     <!-- Show GitHub pane command -->
@@ -255,17 +287,20 @@
       <IDSymbol name="link_external" value="6"/>
       <IDSymbol name="clippy" value="7"/>
       <IDSymbol name="logo_toolbar" value="8"/>
+      <IDSymbol name="question" value="9"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
       <IDSymbol name="idGitHubToolbarMenuGroup" value="0x1110" />
       <IDSymbol name="idGitHubToolbarMenuGroup1" value="0x1111" />
+      <IDSymbol name="idGitHubToolbarHelpMenuGroup" value="0x1112" />
       <IDSymbol name="idGitHubToolbar" value="0x1120" />
       <IDSymbol name="backCommand" value="0x300" />
       <IDSymbol name="forwardCommand" value="0x301" />
       <IDSymbol name="refreshCommand" value="0x302" />
       <IDSymbol name="pullRequestCommand" value="0x310" />
       <IDSymbol name="githubCommand" value="0x320" />
+      <IDSymbol name="helpCommand" value="0x321" />
     </GuidSymbol>
 
     <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">
@@ -275,6 +310,8 @@
       <IDSymbol name="openLinkCommand" value="0x100" />
       <IDSymbol name="copyLinkCommand" value="0x101"/>
       <IDSymbol name="idCreateGistCommand" value="0x0400" />
+      <IDSymbol name="idBlameCommand" value="0x0500" />
+
     </GuidSymbol>
     
     <GuidSymbol name="GUID_XAML_EDITOR" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">

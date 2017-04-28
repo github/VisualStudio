@@ -132,6 +132,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\ViewModelBase.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
@@ -213,7 +214,8 @@
     <Compile Include="UserErrors\PublishRepositoryUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryOnFreeAccountUserError.cs" />
     <Compile Include="UserErrors\PrivateRepositoryQuotaExceededUserError.cs" />
-    <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\PanePageViewModelBase.cs" />
+    <Compile Include="ViewModels\DialogViewModelBase.cs" />
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\NotAGitRepositoryViewModel.cs" />

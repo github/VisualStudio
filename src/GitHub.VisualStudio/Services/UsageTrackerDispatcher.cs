@@ -29,5 +29,8 @@ namespace GitHub.Services
         public Task IncrementPullRequestCheckOutCount(bool fork) => inner.IncrementPullRequestCheckOutCount(fork);
         public Task IncrementPullRequestPullCount(bool fork) => inner.IncrementPullRequestPullCount(fork);
         public Task IncrementPullRequestPushCount(bool fork) => inner.IncrementPullRequestPushCount(fork);
+        public Task IncrementWelcomeDocsClicks() => inner.IncrementWelcomeDocsClicks();
+        public Task IncrementWelcomeTrainingClicks() => inner.IncrementWelcomeTrainingClicks();
+        public Task IncrementGitHubPaneHelpClicks() => inner.IncrementGitHubPaneHelpClicks();
     }
 }

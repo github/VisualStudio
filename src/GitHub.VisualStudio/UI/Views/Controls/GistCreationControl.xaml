@@ -5,22 +5,22 @@
                                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                   xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views.Controls"
                                   xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
-                                  xmlns:cache="clr-namespace:GitHub.VisualStudio.Helpers"
+                                  xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                   xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
                                   xmlns:uirx="clr-namespace:GitHub.UI;assembly=GitHub.UI.Reactive"
-                                  xmlns:automation="clr-namespace:GitHub.VisualStudio.TestAutomation;assembly=GitHub.VisualStudio.TestAutomation.AutomationIDs"
+                                  xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
                                   mc:Ignorable="d"
                                   d:DesignWidth="414"
                                   d:DesignHeight="440"
                                   AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.GistCreationControlCustom}">
-    <UserControl.Resources>
+    <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </Control.Resources>
     <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
         <ui:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,10,0,-10" Panel.ZIndex="100" DockPanel.Dock="Top" />
 
