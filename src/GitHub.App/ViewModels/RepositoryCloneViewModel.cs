@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
+using GitHub.App;
 using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -15,23 +19,23 @@ using NLog;
 using NullGuard;
 using ReactiveUI;
 using Rothko;
+using System.Collections.ObjectModel;
+using GitHub.Collections;
+using GitHub.UI;
+using GitHub.Extensions.Reactive;
 
 namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType=UIViewType.Clone)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class RepositoryCloneViewModel : BaseViewModel, IRepositoryCloneViewModel
+    public class RepositoryCloneViewModel : DialogViewModelBase, IRepositoryCloneViewModel
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IRepositoryHost repositoryHost;
-        readonly IRepositoryCloneService cloneService;
         readonly IOperatingSystem operatingSystem;
-        readonly IVSServices vsServices;
-        readonly IReactiveCommand<IReadOnlyList<IRepositoryModel>> loadRepositoriesCommand;
         readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
-        readonly ObservableAsPropertyHelper<bool> isLoading;
-        readonly ObservableAsPropertyHelper<bool> noRepositoriesFound;
+        bool noRepositoriesFound;
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
         bool loadingFailed;
@@ -40,72 +44,101 @@ namespace GitHub.ViewModels
         RepositoryCloneViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             IRepositoryCloneService repositoryCloneService,
-            IOperatingSystem operatingSystem,
-            IVSServices vsServices)
-            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem, vsServices)
+            IOperatingSystem operatingSystem)
+            : this(connectionRepositoryHostMap.CurrentRepositoryHost, repositoryCloneService, operatingSystem)
         { }
-        
+
+
         public RepositoryCloneViewModel(
             IRepositoryHost repositoryHost,
             IRepositoryCloneService cloneService,
-            IOperatingSystem operatingSystem,
-            IVSServices vsServices)
+            IOperatingSystem operatingSystem)
         {
             this.repositoryHost = repositoryHost;
-            this.cloneService = cloneService;
             this.operatingSystem = operatingSystem;
-            this.vsServices = vsServices;
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CloneTitle, repositoryHost.Title);
-            Repositories = new ReactiveList<IRepositoryModel>();
-            loadRepositoriesCommand = ReactiveCommand.CreateAsyncObservable(OnLoadRepositories);
-            isLoading = this.WhenAny(x => x.LoadingFailed, x => x.Value)
-                .CombineLatest(loadRepositoriesCommand.IsExecuting, (failed, loading) => !failed && loading)
-                .ToProperty(this, x => x.IsLoading);
-            loadRepositoriesCommand.Subscribe(Repositories.AddRange);
-            filterTextIsEnabled = this.WhenAny(x => x.Repositories.Count, x => x.Value > 0)
+
+            Repositories = new TrackingCollection<IRemoteRepositoryModel>();
+            repositories.ProcessingDelay = TimeSpan.Zero;
+            repositories.Comparer = OrderedComparer<IRemoteRepositoryModel>.OrderBy(x => x.Owner).ThenBy(x => x.Name).Compare;
+            repositories.Filter = FilterRepository;
+            repositories.NewerComparer = OrderedComparer<IRemoteRepositoryModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+
+            filterTextIsEnabled = this.WhenAny(x => x.IsBusy,
+                loading => loading.Value || repositories.UnfilteredCount > 0 && !LoadingFailed)
                 .ToProperty(this, x => x.FilterTextIsEnabled);
-            noRepositoriesFound = this.WhenAny(x => x.FilterTextIsEnabled, x => x.IsLoading, x => x.LoadingFailed
-                , (any, loading, failed) => !any.Value && !loading.Value && !failed.Value)
-                .ToProperty(this, x => x.NoRepositoriesFound);
 
-            var filterResetSignal = this.WhenAny(x => x.FilterText, x => x.Value)
+            this.WhenAny(
+                x => x.repositories.UnfilteredCount,
+                x => x.IsBusy,
+                x => x.LoadingFailed,
+                (unfilteredCount, loading, failed) =>
+                {
+                    if (loading.Value)
+                        return false;
+
+                    if (failed.Value)
+                        return false;
+
+                    return unfilteredCount.Value == 0;
+                })
+                .Subscribe(x =>
+                {
+                    NoRepositoriesFound = x;
+                });
+
+            this.WhenAny(x => x.FilterText, x => x.Value)
                 .DistinctUntilChanged(StringComparer.OrdinalIgnoreCase)
-                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler);
+                .Throttle(TimeSpan.FromMilliseconds(100), RxApp.MainThreadScheduler)
+                .Subscribe(_ => repositories.Filter = FilterRepository);
 
-            FilteredRepositories = Repositories.CreateDerivedCollection(
-                x => x,
-                filter: FilterRepository,
-                signalReset: filterResetSignal
-            );
+            var baseRepositoryPath = this.WhenAny(
+                x => x.BaseRepositoryPath,
+                x => x.SelectedRepository,
+                (x, y) => x.Value);
 
-            BaseRepositoryPathValidator = this.CreateBaseRepositoryPathValidator();
+            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(baseRepositoryPath)
+                .IfNullOrEmpty(Resources.RepositoryCreationClonePathEmpty)
+                .IfTrue(x => x.Length > 200, Resources.RepositoryCreationClonePathTooLong)
+                .IfContainsInvalidPathChars(Resources.RepositoryCreationClonePathInvalidCharacters)
+                .IfPathNotRooted(Resources.RepositoryCreationClonePathInvalid)
+                .IfTrue(IsAlreadyRepoAtPath, Resources.RepositoryNameValidatorAlreadyExists);
 
             var canCloneObservable = this.WhenAny(
                 x => x.SelectedRepository,
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value != null && y.Value);
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
-            CloneCommand = ReactiveCommand.CreateAsyncObservable(canCloneObservable, OnCloneRepository);
+            CloneCommand = ReactiveCommand.Create(canCloneObservable);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
                 .Subscribe();
             BaseRepositoryPath = cloneService.DefaultClonePath;
+            NoRepositoriesFound = true;
         }
 
-        IObservable<IReadOnlyList<IRepositoryModel>> OnLoadRepositories(object value)
+        public override void Initialize([AllowNull] ViewWithData data)
         {
-            return repositoryHost.ModelService.GetRepositories()
-                .Catch<IReadOnlyList<IRepositoryModel>, Exception>(ex =>
+            base.Initialize(data);
+
+            IsBusy = true;
+            repositoryHost.ModelService.GetRepositories(repositories);
+            repositories.OriginalCompleted.Subscribe(
+                _ => { }
+                , ex =>
                 {
+                    LoadingFailed = true;
+                    IsBusy = false;
                     log.Error("Error while loading repositories", ex);
-                    return Observable.Start(() => LoadingFailed = true, RxApp.MainThreadScheduler)
-                        .Select(_ => new IRepositoryModel[] { });
-                });
+                },
+                () => IsBusy = false
+            );
+            repositories.Subscribe();
         }
-       
-        bool FilterRepository(IRepositoryModel repo)
+
+        bool FilterRepository(IRemoteRepositoryModel repo, int position, IList<IRemoteRepositoryModel> list)
         {
             if (string.IsNullOrWhiteSpace(FilterText))
                 return true;
@@ -114,24 +147,47 @@ namespace GitHub.ViewModels
             return repo.Name.IndexOf(FilterText ?? "", StringComparison.OrdinalIgnoreCase) != -1;
         }
 
-        IObservable<Unit> OnCloneRepository(object state)
+        bool IsAlreadyRepoAtPath(string path)
+        {
+            Debug.Assert(path != null, "RepositoryCloneViewModel.IsAlreadyRepoAtPath cannot be passed null as a path parameter.");
+
+            bool isAlreadyRepoAtPath = false;
+
+            if (SelectedRepository != null)
+            {
+                string potentialPath = Path.Combine(path, SelectedRepository.Name);
+                isAlreadyRepoAtPath = operatingSystem.Directory.Exists(potentialPath);
+            }
+
+            return isAlreadyRepoAtPath;
+        }
+
+        IObservable<Unit> ShowBrowseForDirectoryDialog()
         {
             return Observable.Start(() =>
             {
-                var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                // The following is a noop if the directory already exists.
-                operatingSystem.Directory.CreateDirectory(BaseRepositoryPath);
-                return cloneService.CloneRepository(repository.CloneUrl, repository.Name, BaseRepositoryPath);
-            })
-            .SelectMany(_ => _)
-            .Catch<Unit, Exception>(e =>
-            {
-                var repository = SelectedRepository;
-                Debug.Assert(repository != null, "Should not be able to attempt to clone a repo when it's null");
-                vsServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, repository.Name));
-                return Observable.Return(Unit.Default);
-            });
+                // We store this in a local variable to prevent it changing underneath us while the
+                // folder dialog is open.
+                var localBaseRepositoryPath = BaseRepositoryPath;
+                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath, Resources.BrowseForDirectory);
+
+                if (!browseResult.Success)
+                    return;
+
+                var directory = browseResult.DirectoryPath ?? localBaseRepositoryPath;
+
+                try
+                {
+                    BaseRepositoryPath = directory;
+                }
+                catch (Exception e)
+                {
+                    // TODO: We really should limit this to exceptions we know how to handle.
+                    log.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
+                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
+                }
+            }, RxApp.MainThreadScheduler);
         }
 
         /// <summary>
@@ -145,28 +201,16 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Fires off the cloning process
+        /// Signals that the user clicked the clone button.
         /// </summary>
-        public IReactiveCommand<Unit> CloneCommand { get; private set; }
+        public IReactiveCommand<object> CloneCommand { get; private set; }
 
-        IReactiveList<IRepositoryModel> repositories;
-        /// <summary>
-        /// List of repositories as returned by the server
-        /// </summary>
-        public IReactiveList<IRepositoryModel> Repositories
+        TrackingCollection<IRemoteRepositoryModel> repositories;
+        public ObservableCollection<IRemoteRepositoryModel> Repositories
         {
+            [return: AllowNull]
             get { return repositories; }
-            private set { this.RaiseAndSetIfChanged(ref repositories, value); }
-        }
-
-        IReactiveDerivedList<IRepositoryModel> filteredRepositories;
-        /// <summary>
-        /// List of repositories as filtered by user
-        /// </summary>
-        public IReactiveDerivedList<IRepositoryModel> FilteredRepositories
-        {
-            get { return filteredRepositories; }
-            private set { this.RaiseAndSetIfChanged(ref filteredRepositories, value); }
+            private set { this.RaiseAndSetIfChanged(ref repositories, (TrackingCollection<IRemoteRepositoryModel>)value); }
         }
 
         IRepositoryModel selectedRepository;
@@ -199,16 +243,6 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref filterText, value); }
         }
 
-        public bool IsLoading
-        {
-            get { return isLoading.Value; }
-        }
-
-        public IReactiveCommand<IReadOnlyList<IRepositoryModel>> LoadRepositoriesCommand
-        {
-            get { return loadRepositoriesCommand; }
-        }
-
         public bool LoadingFailed
         {
             get { return loadingFailed; }
@@ -217,7 +251,8 @@ namespace GitHub.ViewModels
 
         public bool NoRepositoriesFound
         {
-            get { return noRepositoriesFound.Value; }
+            get { return noRepositoriesFound; }
+            private set { this.RaiseAndSetIfChanged(ref noRepositoriesFound, value); }
         }
 
         public ICommand BrowseForDirectory
@@ -236,32 +271,6 @@ namespace GitHub.ViewModels
             private set;
         }
 
-        IObservable<Unit> ShowBrowseForDirectoryDialog()
-        {
-            return Observable.Start(() =>
-            {
-                // We store this in a local variable to prevent it changing underneath us while the
-                // folder dialog is open.
-                var localBaseRepositoryPath = BaseRepositoryPath;
-                var browseResult = operatingSystem.Dialog.BrowseForDirectory(localBaseRepositoryPath, Resources.BrowseForDirectory);
-
-                if (!browseResult.Success)
-                    return;
-
-                var directory = browseResult.DirectoryPath ?? localBaseRepositoryPath;
-
-                try
-                {
-                    BaseRepositoryPath = directory;
-                }
-                catch (Exception e)
-                {
-                    // TODO: We really should limit this to exceptions we know how to handle.
-                    log.Error(string.Format(CultureInfo.InvariantCulture,
-                        "Failed to set base repository path.{0}localBaseRepositoryPath = \"{1}\"{0}BaseRepositoryPath = \"{2}\"{0}Chosen directory = \"{3}\"",
-                        System.Environment.NewLine, localBaseRepositoryPath ?? "(null)", BaseRepositoryPath ?? "(null)", directory ?? "(null)"), e);
-                }
-            }, RxApp.MainThreadScheduler);
-        }
+        public override IObservable<Unit> Done => CloneCommand.SelectUnit();
     }
 }

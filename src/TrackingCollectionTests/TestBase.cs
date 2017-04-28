@@ -74,24 +74,29 @@ public class TestBase
         source.OnNext(item);
     }
 
+    /// <summary>
+    /// This will create a new Thing with CreatedAt and UpdatedAt set to 0
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     protected Thing GetThing(int id)
     {
-        return new Thing { Number = id };
+        return GetThing(id, 0, 0, "Run 1");
     }
 
     protected Thing GetThing(int id, int minutes)
     {
-        return new Thing { Number = id, Title = "Run 1", CreatedAt = Now + TimeSpan.FromMinutes(minutes), UpdatedAt = Now + TimeSpan.FromMinutes(minutes) };
+        return GetThing(id, minutes, minutes, "Run 1");
     }
 
     protected Thing GetThing(int id, int minutesc, int minutesu)
     {
-        return new Thing { Number = id, Title = "Run 1", CreatedAt = Now + TimeSpan.FromMinutes(minutesc), UpdatedAt = Now + TimeSpan.FromMinutes(minutesu) };
+        return GetThing(id, minutesc, minutesu, "Run 1");
     }
 
     protected Thing GetThing(int id, string title)
     {
-        return new Thing { Number = id, Title = "Run 1" };
+        return GetThing(id, 0, 0, title);
     }
 
     protected Thing GetThing(int id, int minutesc, int minutesu, string title)

@@ -7,28 +7,34 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using GitHub.Authentication;
 using GitHub.Primitives;
 using NLog;
 using NullGuard;
 using Octokit;
 using Octokit.Reactive;
 using ReactiveUI;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using Octokit.Internal;
+using System.Collections.Generic;
+using GitHub.Models;
+using GitHub.Extensions;
 
 namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
-
+        const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
+        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly Uri userEndpoint = new Uri("user", UriKind.Relative);
 
         readonly IObservableGitHubClient gitHubClient;
         // There are two sets of authorization scopes, old and new:
         // The old scopes must be used by older versions of Enterprise that don't support the new scopes:
-        readonly string[] oldAuthorizationScopes = { "user", "repo" };
+        readonly string[] oldAuthorizationScopes = { "user", "repo", "gist" };
         // These new scopes include write:public_key, which allows us to add public SSH keys to an account:
-        readonly string[] newAuthorizationScopes = { "user", "repo", "write:public_key" };
+        readonly string[] newAuthorizationScopes = { "user", "repo", "gist", "write:public_key" };
         readonly static Lazy<string> lazyNote = new Lazy<string>(() => ProductName + " on " + GetMachineNameSafe());
         readonly static Lazy<string> lazyFingerprint = new Lazy<string>(GetFingerprint);
 
@@ -53,9 +59,35 @@ namespace GitHub.Api
             return (isUser ? client.Create(repository) : client.Create(login, repository));
         }
 
-        public IObservable<User> GetUser()
+        public IObservable<Gist> CreateGist(NewGist newGist)
         {
-            return gitHubClient.User.Current();
+            return gitHubClient.Gist.Create(newGist);
+        }
+
+        public IObservable<UserAndScopes> GetUser()
+        {
+            return GetUserInternal().ToObservable();
+        }
+
+        async Task<UserAndScopes> GetUserInternal()
+        {
+            var response = await gitHubClient.Connection.Get<User>(
+                userEndpoint, null, null).ConfigureAwait(false);
+            var scopes = default(string[]);
+
+            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
+            {
+                scopes = response.HttpResponse.Headers[ScopesHeader]
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .ToArray();
+            }
+            else
+            {
+                log.Error($"Error reading scopes: /user succeeded but {ScopesHeader} was not present.");
+            }
+
+            return new UserAndScopes(response.Body, scopes);
         }
 
         public IObservable<ApplicationAuthorization> GetOrCreateApplicationAuthenticationCode(
@@ -96,7 +128,14 @@ namespace GitHub.Api
 
         public IObservable<Organization> GetOrganizations()
         {
-            return gitHubClient.Organization.GetAllForCurrent();
+            // Organization.GetAllForCurrent doesn't return all of the information we need (we 
+            // need information about the plan the organization is on in order to enable/disable
+            // the "Private Repository" checkbox in the "Create Repository" dialog). To get this
+            // we have to do an Organization.Get on each repository received.
+            return gitHubClient.Organization
+                .GetAllForCurrent()
+                .Select(x => gitHubClient.Organization.Get(x.Login))
+                .Merge();
         }
 
         public IObservable<Repository> GetUserRepositories(RepositoryType repositoryType)
@@ -121,8 +160,6 @@ namespace GitHub.Api
         }
 
         public HostAddress HostAddress { get; }
-
-        public ITwoFactorChallengeHandler TwoFactorChallengeHandler { get; private set; }
 
         static string GetSha256Hash(string input)
         {
@@ -197,6 +234,55 @@ namespace GitHub.Api
         public IObservable<Unit> DeleteApplicationAuthorization(int id, [AllowNull]string twoFactorAuthorizationCode)
         {
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
+        }
+
+        public IObservable<PullRequest> GetPullRequest(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Get(owner, name, number);
+        }
+
+        public IObservable<PullRequestFile> GetPullRequestFiles(string owner, string name, int number)
+        {
+            return gitHubClient.PullRequest.Files(owner, name, number);
+        }
+
+        public IObservable<PullRequest> GetPullRequestsForRepository(string owner, string name)
+        {
+            return gitHubClient.PullRequest.GetAllForRepository(owner, name,
+                new PullRequestRequest {
+                    State = ItemStateFilter.All,
+                    SortProperty = PullRequestSort.Updated,
+                    SortDirection = SortDirection.Descending
+                });
+        }
+
+        public IObservable<PullRequest> CreatePullRequest(NewPullRequest pullRequest, string owner, string repo)
+        {
+            return gitHubClient.PullRequest.Create(owner, repo, pullRequest);
+        }
+
+        public IObservable<Repository> GetRepositories()
+        {
+            return gitHubClient.Repository.GetAllForCurrent();
+        }
+
+        public IObservable<Branch> GetBranches(string owner, string repo)
+        {
+#pragma warning disable CS0618
+            // GetAllBranches is obsolete, but don't want to introduce the change to fix the
+            // warning in the PR, so disabling for now.
+            return gitHubClient.Repository.GetAllBranches(owner, repo);
+#pragma warning restore
+        }
+
+        public IObservable<Repository> GetRepository(string owner, string repo)
+        {
+            return gitHubClient.Repository.Get(owner, repo);
+        }
+
+        public IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path)
+        {
+            return gitHubClient.Repository.Content.GetAllContentsByRef(owner, name, reference, path);
         }
     }
 }

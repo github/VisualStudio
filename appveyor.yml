@@ -1,0 +1,28 @@
+version: '{build}'
+install:
+- ps: >-
+    $full_build = Test-Path env:GHFVS_KEY
+
+    git submodule init
+    
+    git submodule sync
+
+    if ($full_build) {
+      $fileContent = "-----BEGIN RSA PRIVATE KEY-----`n"
+      $fileContent += $env:GHFVS_KEY.Replace(' ', "`n")
+      $fileContent += "`n-----END RSA PRIVATE KEY-----`n"
+      Set-Content c:\users\appveyor\.ssh\id_rsa $fileContent
+    } else {
+      git submodule deinit script
+    }
+
+    git submodule update --recursive --force
+
+    nuget restore GitHubVS.sln
+build_script:
+- cmd: msbuild "GitHubVS.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0
+test_script:
+- ps: >-
+    scripts\Run-Nunit.ps1 TrackingCollectionTests 180 Release -AppVeyor
+
+    scripts\Run-Xunit.ps1 UnitTests 180 Release -AppVeyor

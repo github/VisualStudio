@@ -5,7 +5,6 @@
 
     <Style x:Key="OcticonImage" TargetType="{x:Type ui:OcticonImage}">
         <Setter Property="Focusable" Value="False" />
-        <Setter Property="Foreground" Value="Black" />
         <Setter Property="Height" Value="16" />
         <Setter Property="Width" Value="16" />
         <Setter Property="HorizontalAlignment" Value="Center" />
@@ -18,7 +17,7 @@
                             <ui:OcticonPath 
                                 Fill="{TemplateBinding Foreground}" 
                                 Icon="{TemplateBinding Icon}"
-                                Height="1024" 
+                                Height="16" 
                                 SnapsToDevicePixels="True" />
                         </Viewbox>
                     </ui:FixedAspectRatioPanel>

@@ -31,35 +31,32 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        public Credential() : this(null, null, null)
-        {
-        }
+        public Credential() : this(null, (string)null)
+        {}
 
-        public Credential([AllowNull]string username) : this(username, null, null)
+        public Credential(
+            [AllowNull]string username,
+            [AllowNull]SecureString password,
+            [AllowNull]string target = null)
         {
-        }
-
-        public Credential([AllowNull]string username, [AllowNull]string password)
-            : this(username, password, null, CredentialType.Generic)
-        {
-        }
-
-        public Credential([AllowNull]string username, [AllowNull]string password, [AllowNull]string target)
-            : this(username, password, target, CredentialType.Generic)
-        {
+            Username = username;
+            SecurePassword = password;
+            Target = target;
+            Type = CredentialType.Generic;
+            PersistenceType = PersistenceType.LocalComputer;
+            _lastWriteTime = DateTime.MinValue;
         }
 
         public Credential(
             [AllowNull]string username,
             [AllowNull]string password,
-            [AllowNull]string target,
-            [AllowNull]CredentialType type)
+            [AllowNull]string target = null)
         {
             Username = username;
             Password = password;
             Target = target;
-            Type = type;
-            PersistenceType = PersistenceType.Session;
+            Type = CredentialType.Generic;
+            PersistenceType = PersistenceType.LocalComputer;
             _lastWriteTime = DateTime.MinValue;
         }
 

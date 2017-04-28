@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubInvitationContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
+             mc:Ignorable="d"
+             DataContext="{Binding ViewModel}" d:DesignWidth="230" d:DesignHeight="120"
+             KeyboardNavigation.TabNavigation="Local"
+             Background="{DynamicResource GitHubVsToolWindowBackground}">
+
+    <UserControl.Style>
+        <Style TargetType="{x:Type UserControl}">
+            <Setter Property="Margin" Value="-2,0,6,0" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource GitHubVsCommandBarHover}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ui:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style x:Key="VSStyledButton" BasedOn="{StaticResource VsButtonStyleKey}" TargetType="{x:Type Button}"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border Margin="-8,0" Background="Transparent" Focusable="true" KeyboardNavigation.TabIndex="0">
+
+    <StackPanel Margin="16,0" Background="Transparent">
+
+        <Grid Margin="0,6,0,6" Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ui:OcticonImage
+                x:Name="octokit"
+                Height="32"
+                Width="32"
+                VerticalAlignment="Center" 
+                Margin="0,2,8,2"
+                Icon="mark_github"
+                Foreground="{DynamicResource GitHubVsToolWindowText}" />
+
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" Grid.Column="1">
+                <TextBlock TextTrimming="CharacterEllipsis" FontWeight="SemiBold" Text="{Binding Name}"/>
+                <TextBlock TextTrimming="CharacterEllipsis" Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding Provider}"/>
+            </StackPanel>
+
+        </Grid>
+        <TextBlock  Margin="0,0,0,6" MaxHeight="100" TextWrapping="Wrap" TextTrimming="WordEllipsis" Text="{Binding Description}" />
+        <Grid Margin="0,0,0,6" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.TabIndex="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" KeyboardNavigation.TabIndex="0" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="login" Click="connect_Click" Content="{x:Static prop:Resources.LoginLink}"
+                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBlock Grid.Column="1" Margin="3,0,3,0"
+                    Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{x:Static prop:Resources.orText}"
+                   Foreground="{DynamicResource GitHubVsToolWindowText}" />
+            <Button Grid.Column="2" KeyboardNavigation.TabIndex="1" Style="{StaticResource ActionLinkButton}" HorizontalAlignment="Left" x:Name="signup" Click="signup_Click" Content="{x:Static prop:Resources.SignUpLink}"
+                    Visibility="{Binding ShowSignup, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="3" KeyboardNavigation.TabIndex="2" HorizontalAlignment="Right" x:Name="connect" Click="connect_Click" Content="{x:Static prop:Resources.PublishToGitHubButton}"
+                    Visibility="{Binding ShowGetStarted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </Grid>
+
+    </StackPanel>
+
+    </Border>
+</UserControl>

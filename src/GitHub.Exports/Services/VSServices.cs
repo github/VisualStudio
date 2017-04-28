@@ -1,214 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.ComponentModel.Composition;
 using System.Globalization;
-using System.Linq;
-using System.Windows.Input;
-using GitHub.Extensions;
-using GitHub.Models;
 using GitHub.VisualStudio;
-using Microsoft.TeamFoundation.Controls;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using Microsoft.Win32;
+using DTE = EnvDTE.DTE;
+using Rothko;
 
 namespace GitHub.Services
 {
-    public interface IVSServices
-    {
-        string GetLocalClonePathFromGitProvider();
-        void Clone(string cloneUrl, string clonePath, bool recurseSubmodules);
-        string GetActiveRepoPath();
-        LibGit2Sharp.IRepository GetActiveRepo();
-        IEnumerable<ISimpleRepositoryModel> GetKnownRepositories();
-        string SetDefaultProjectPath(string path);
-
-        void ShowMessage(string message);
-        void ShowMessage(string message, ICommand command);
-        void ShowWarning(string message);
-        void ShowError(string message);
-        void ClearNotifications();
-
-        void ActivityLogMessage(string message);
-        void ActivityLogWarning(string message);
-        void ActivityLogError(string message);
-    }
-
     [Export(typeof(IVSServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IGitHubServiceProvider serviceProvider;
+
+        // Use a prefix (~$) that is defined in the default VS gitignore.
+        public const string TempSolutionName = "~$GitHubVSTemp$~";
+
 
         [ImportingConstructor]
-        public VSServices(IServiceProvider serviceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-        // The Default Repository Path that VS uses is hidden in an internal
-        // service 'ISccSettingsService' registered in an internal service
-        // 'ISccServiceHost' in an assembly with no public types that's
-        // always loaded with VS if the git service provider is loaded
-        public string GetLocalClonePathFromGitProvider()
+        string vsVersion;
+        public string VSVersion
         {
-            string ret = string.Empty;
-
-            try
+            get
             {
-                ret = PokeTheRegistryForLocalClonePath();
-            }
-            catch (Exception ex)
-            {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the default cloning path from the registry '{0}'", ex));
-            }
-            return ret;
-        }
-
-        public void Clone(string cloneUrl, string clonePath, bool recurseSubmodules)
-        {
-            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
-            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
-        }
-
-        public LibGit2Sharp.IRepository GetActiveRepo()
-        {
-            var gitExt = serviceProvider.GetService<IGitExt>();
-            return gitExt.ActiveRepositories.Any()
-                ? serviceProvider.GetService<IGitService>().GetRepo(gitExt.ActiveRepositories.First())
-                : serviceProvider.GetSolution().GetRepoFromSolution();
-        }
-
-        public string GetActiveRepoPath()
-        {
-            var gitExt = serviceProvider.GetService<IGitExt>();
-            if (gitExt.ActiveRepositories.Any())
-                return gitExt.ActiveRepositories.First().RepositoryPath;
-            var repo = serviceProvider.GetSolution().GetRepoFromSolution();
-            return repo?.Info?.Path ?? string.Empty;
-        }
-
-        public IEnumerable<ISimpleRepositoryModel> GetKnownRepositories()
-        {
-            try
-            {
-                return PokeTheRegistryForRepositoryList();
-            }
-            catch (Exception ex)
-            {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
-                return Enumerable.Empty<ISimpleRepositoryModel>();
+                if (vsVersion == null)
+                    vsVersion = GetVSVersion();
+                return vsVersion;
             }
         }
 
-        const string TEGitKey = @"Software\Microsoft\VisualStudio\14.0\TeamFoundation\GitSourceControl";
-        static RegistryKey OpenGitKey(string path)
-        {
-            return Registry.CurrentUser.OpenSubKey(TEGitKey + "\\" + path, true);
-        }
-
-        static IEnumerable<ISimpleRepositoryModel> PokeTheRegistryForRepositoryList()
-        {
-            using (var key = OpenGitKey("Repositories"))
-            {
-                return key.GetSubKeyNames().Select(x =>
-                {
-                    using (var subkey = key.OpenSubKey(x))
-                    {
-                        try
-                        {
-                            var path = subkey?.GetValue("Path") as string;
-                            if (path != null)
-                                return new SimpleRepositoryModel(path);
-                        }
-                        catch (Exception ex)
-                        {
-                            VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository from the registry '{0}'", ex));
-                        }
-                        return null;
-                    }
-                })
-                .Where(x => x != null)
-                .ToList();
-            }
-        }
-
-        static string PokeTheRegistryForLocalClonePath()
-        {
-            using (var key = OpenGitKey("General"))
-            {
-                return (string)key?.GetValue("DefaultRepositoryPath", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-            }
-        }
-
-        const string NewProjectDialogKeyPath = @"Software\Microsoft\VisualStudio\14.0\NewProjectDialog";
-        const string MRUKeyPath = "MRUSettingsLocalProjectLocationEntries";
-        public string SetDefaultProjectPath(string path)
-        {
-            string old;
-            using (var newProjectKey = Registry.CurrentUser.OpenSubKey(NewProjectDialogKeyPath, true))
-            {
-                using (var mruKey = newProjectKey?.OpenSubKey(MRUKeyPath, true))
-                {
-                    if (mruKey == null)
-                        return String.Empty;
-
-                    // is this already the default path? bail
-                    old = (string)mruKey.GetValue("Value0", string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-                    if (String.Equals(path.TrimEnd('\\'), old.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase))
-                        return old;
-
-                    // grab the existing list of recent paths, throwing away the last one
-                    var numEntries = (int)mruKey.GetValue("MaximumEntries", 5);
-                    var entries = new List<string>(numEntries);
-                    for (int i = 0; i < numEntries - 1; i++)
-                    {
-                        var val = (string)mruKey.GetValue("Value" + i, String.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames);
-                        if (!String.IsNullOrEmpty(val))
-                            entries.Add(val);
-                    }
-
-                    newProjectKey.SetValue("LastUsedNewProjectPath", path);
-                    mruKey.SetValue("Value0", path);
-                    // bump list of recent paths one entry down
-                    for (int i = 0; i < entries.Count; i++)
-                        mruKey.SetValue("Value" + (i+1), entries[i]);
-                }
-            }
-            return old;
-        }
-
-        public void ShowMessage(string message)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, null, default(Guid));
-        }
-
-        public void ShowMessage(string message, ICommand command)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Information, NotificationFlags.None, command, default(Guid));
-        }
-
-        public void ShowWarning(string message)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Warning, NotificationFlags.None, null, default(Guid));
-        }
-
-        public void ShowError(string message)
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ShowNotification(message, NotificationType.Error, NotificationFlags.None, null, default(Guid));
-        }
-
-        public void ClearNotifications()
-        {
-            var manager = serviceProvider.TryGetService<ITeamExplorer>() as ITeamExplorerNotificationManager;
-            manager?.ClearNotifications();
-        }
 
         public void ActivityLogMessage(string message)
         {
@@ -242,6 +71,99 @@ namespace GitHub.Services
                             Info.ApplicationInfo.ApplicationSafeName, message)))
                     Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
             }
+        }
+
+        /// <summary>Open a repository in Team Explorer</summary>
+        /// <remarks>
+        /// There doesn't appear to be a command that directly opens a target repo.
+        /// Our workaround is to create, open and delete a solution in the repo directory.
+        /// This triggers an event that causes the target repo to open. ;)
+        /// </remarks>
+        /// <param name="repoPath">The path to the repository to open</param>
+        /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
+        public bool TryOpenRepository(string repoPath)
+        {
+            var os = serviceProvider.TryGetService<IOperatingSystem>();
+            if (os == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                return false;
+            }
+
+            var dte = serviceProvider.TryGetService<DTE>();
+            if (dte == null)
+            {
+                VsOutputLogger.WriteLine("TryOpenRepository couldn't find DTE service.");
+                return false;
+            }
+
+            var repoDir = os.Directory.GetDirectory(repoPath);
+            if(!repoDir.Exists)
+            {
+                return false;
+            }
+
+            bool solutionCreated = false;
+            try
+            {
+                dte.Solution.Create(repoPath, TempSolutionName);
+                solutionCreated = true;
+
+                dte.Solution.Close(false); // Don't create a .sln file when we close.
+            }
+            catch (Exception e)
+            {
+                VsOutputLogger.WriteLine("Error opening repository. {0}", e);
+            }
+            finally
+            {
+                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName);
+            }
+            return solutionCreated;
+        }
+
+        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName)
+        {
+            var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
+            try
+            {
+                // Clean up the dummy solution's subdirectory inside `.vs`.
+                var vsTempDir = os.Directory.GetDirectory(vsTempPath);
+                if (vsTempDir.Exists)
+                {
+                    vsTempDir.Delete(true);
+                }
+            }
+            catch (Exception e)
+            {
+                VsOutputLogger.WriteLine("Couldn't clean up {0}. {1}", vsTempPath, e);
+            }
+        }
+
+        const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
+        const string EnvVersionKey = "EnvVersion";
+        string GetVSVersion()
+        {
+            var version = typeof(Microsoft.VisualStudio.Shell.ActivityLog).Assembly.GetName().Version;
+            var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}.{2}_Config\\SplashInfo", RegistryRootKey, version.Major, version.Minor);
+            try
+            {
+                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                {
+                    var value = (string)key.GetValue(EnvVersionKey, String.Empty);
+                    if (!String.IsNullOrEmpty(value))
+                        return value;
+                }
+                // fallback to poking the CommonIDE assembly, which most closely follows the advertised version.
+                var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.StartsWith("Microsoft.VisualStudio.CommonIDE", StringComparison.OrdinalIgnoreCase));
+                if (asm != null)
+                    return asm.GetName().Version.ToString();
+            }
+            catch(Exception ex)
+            {
+                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error getting the Visual Studio version '{0}'", ex));
+            }
+            return version.ToString();
         }
     }
 }

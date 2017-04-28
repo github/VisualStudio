@@ -12,6 +12,14 @@ using GitHub.Services;
 using NSubstitute;
 using Octokit;
 using Xunit;
+using System.Globalization;
+using System.Reactive.Subjects;
+using System.Threading;
+using GitHub.Models;
+using GitHub.Primitives;
+using GitHub.Collections;
+using ReactiveUI;
+using static GitHub.Services.ModelService;
 
 public class ModelServiceTests
 {
@@ -52,56 +60,25 @@ public class ModelServiceTests
         [Fact]
         public async Task CanRetrieveAndCacheGitIgnores()
         {
-            var templates = new[] { "dotnet", "peanuts", "bloomcounty" };
+            var data = new[] { "dotnet", "peanuts", "bloomcounty" };
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetGitIgnoreTemplates().Returns(templates.ToObservable());
+            apiClient.GetGitIgnoreTemplates().Returns(data.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetGitIgnoreTemplates();
+            var fetched = await modelService.GetGitIgnoreTemplates().ToList();
 
-            Assert.Equal(4, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
-            Assert.Equal("dotnet", fetched[1].Name);
-            Assert.Equal("peanuts", fetched[2].Name);
-            Assert.Equal("bloomcounty", fetched[3].Name);
-            var cached = await cache.GetObject<IReadOnlyList<string>>("gitignores");
-            Assert.Equal(3, cached.Count);
-            Assert.Equal("dotnet", cached[0]);
-            Assert.Equal("peanuts", cached[1]);
-            Assert.Equal("bloomcounty", cached[2]);
-        }
+            Assert.Equal(3, fetched.Count);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i], fetched[i].Name);
 
-        [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionnWhenGitIgnoreEndpointNotFound()
-        {
-            var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetGitIgnoreTemplates()
-                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
-            var cache = new InMemoryBlobCache();
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var indexKey = CacheIndex.GitIgnoresPrefix;
+            var cached = await cache.GetObject<CacheIndex>(indexKey);
+            Assert.Equal(3, cached.Keys.Count);
 
-            var fetched = await modelService.GetGitIgnoreTemplates();
-
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
-        }
-
-        [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
-        {
-            var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetGitIgnoreTemplates()
-                .Returns(Observable.Throw<string>(new NotFoundException("Not Found", HttpStatusCode.NotFound)));
-            var cache = Substitute.For<IBlobCache>();
-            cache.Get(Args.String)
-                .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
-            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
-
-            var fetched = await modelService.GetGitIgnoreTemplates();
-
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
+            var items = await cache.GetObjects<GitIgnoreCacheItem>(cached.Keys).Take(1);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i], items[indexKey + "|" + data[i]].Name);
         }
     }
 
@@ -110,30 +87,34 @@ public class ModelServiceTests
         [Fact]
         public async Task CanRetrieveAndCacheLicenses()
         {
-            var licenses = new[]
+            var data = new[]
             {
                 new LicenseMetadata("mit", "MIT", new Uri("https://github.com/")),
                 new LicenseMetadata("apache", "Apache", new Uri("https://github.com/"))
             };
+
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetLicenses().Returns(licenses.ToObservable());
+            apiClient.GetLicenses().Returns(data.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetLicenses();
+            var fetched = await modelService.GetLicenses().ToList();
 
-            Assert.Equal(3, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
-            Assert.Equal("MIT", fetched[1].Name);
-            Assert.Equal("Apache", fetched[2].Name);
-            var cached = await cache.GetObject<IReadOnlyList<ModelService.LicenseCacheItem>>("licenses");
-            Assert.Equal(2, cached.Count);
-            Assert.Equal("mit", cached[0].Key);
-            Assert.Equal("apache", cached[1].Key);
+            Assert.Equal(2, fetched.Count);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i].Name, fetched[i].Name);
+
+            var indexKey = CacheIndex.LicensesPrefix;
+            var cached = await cache.GetObject<CacheIndex>(indexKey);
+            Assert.Equal(2, cached.Keys.Count);
+
+            var items = await cache.GetObjects<LicenseCacheItem>(cached.Keys).Take(1);
+            for (int i = 0; i < data.Length; i++)
+                Assert.Equal(data[i].Name, items[indexKey + "|" + data[i].Key].Name);
         }
 
         [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionWhenLicenseApiNotFound()
+        public async Task ReturnsEmptyIfLicenseApiNotFound()
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetLicenses()
@@ -141,14 +122,13 @@ public class ModelServiceTests
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetLicenses();
+            var fetched = await modelService.GetLicenses().ToList();
 
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
+            Assert.Equal(0, fetched.Count);
         }
 
         [Fact]
-        public async Task ReturnsCollectionOnlyContainingTheNoneOptionIfCacheReadFails()
+        public async Task ReturnsEmptyIfCacheReadFails()
         {
             var apiClient = Substitute.For<IApiClient>();
             var cache = Substitute.For<IBlobCache>();
@@ -156,10 +136,9 @@ public class ModelServiceTests
                 .Returns(Observable.Throw<byte[]>(new InvalidOperationException("Unknown")));
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
-            var fetched = await modelService.GetLicenses();
+            var fetched = await modelService.GetLicenses().ToList();
 
-            Assert.Equal(1, fetched.Count);
-            Assert.Equal("None", fetched[0].Name);
+            Assert.Equal(0, fetched.Count);
         }
     }
 
@@ -174,7 +153,7 @@ public class ModelServiceTests
                 CreateOctokitOrganization("fake")
             };
             var apiClient = Substitute.For<IApiClient>();
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("snoopy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("snoopy")));
             apiClient.GetOrganizations().Returns(orgs.ToObservable());
             var cache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
@@ -228,8 +207,8 @@ public class ModelServiceTests
             // This should be impossible, but let's pretend it does happen.
             var users = new[]
             {
-                CreateOctokitUser("peppermintpatty"),
-                CreateOctokitUser("peppermintpatty")
+                CreateUserAndScopes("peppermintpatty"),
+                CreateUserAndScopes("peppermintpatty")
             };
             var apiClient = Substitute.For<IApiClient>();
             apiClient.GetUser().Returns(users.ToObservable());
@@ -381,26 +360,214 @@ public class ModelServiceTests
             var apiClient = Substitute.For<IApiClient>();
             var cache = Substitute.For<IBlobCache>();
             cache.InvalidateAll().Returns(Observable.Return(Unit.Default));
+            var received = false;
+            cache.Vacuum().Returns(x =>
+            {
+                received = true;
+                return Observable.Return(Unit.Default);
+            });
             var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
 
             await modelService.InvalidateAll();
-
-            cache.Received().Vacuum();
+            Assert.True(received);
         }
     }
 
-    static User CreateOctokitUser(string login)
+    public class TheGetPullRequestsMethod : TestBaseClass
     {
-        return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false);
-    }
+        [Fact(Skip = "Pull requests always refresh from the server now. Migrate this test to data that doesn't require constant refreshing.")]
+        public async Task NonExpiredIndexReturnsCache()
+        {
+            var expected = 5;
 
-    static Organization CreateOctokitOrganization(string login)
-    {
-        return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
-    }
+            var username = "octocat";
+            var reponame = "repo";
 
-    static Repository CreateRepository(string owner, string name)
-    {
-        return new Repository("https://url", "https://url", "https://url", "https://url", "https://url", "https://url", "https://url", 1, CreateOctokitUser(owner), name, "fullname", "description", "https://url", "c#", false, false, 0, 0, 0, "master", 0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, new RepositoryPermissions(), null, null, null, true, false, false);
+            var cache = new InMemoryBlobCache();
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = CreateOctokitUser(username);
+            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var act = modelService.GetAccounts().ToEnumerable().First().First();
+
+            var repo = Substitute.For<ILocalRepositoryModel>();
+            repo.Name.Returns(reponame);
+            repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
+
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
+
+            var prcache = Enumerable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
+
+            // seed the cache
+            prcache
+                .Select(item => new PullRequestCacheItem(item))
+                .Select(item => item.Save<PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
+                .ToList();
+
+            var prlive = Observable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow))
+                .DelaySubscription(TimeSpan.FromMilliseconds(10));
+
+            apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
+
+            await modelService.InsertUser(new AccountCacheItem(user));
+
+            ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
+            modelService.GetPullRequests(repo, col);
+            col.ProcessingDelay = TimeSpan.Zero;
+
+            col.Subscribe();
+            await col.OriginalCompleted;
+
+            Assert.Equal(expected, col.Count);
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Cache")))).ToArray());
+        }
+
+        [Fact]
+        public async Task ExpiredIndexReturnsLive()
+        {
+            var expected = 5;
+
+            var username = "octocat";
+            var reponame = "repo";
+
+            var cache = new InMemoryBlobCache();
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = CreateOctokitUser(username);
+            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var act = modelService.GetAccounts().ToEnumerable().First().First();
+
+            var repo = Substitute.For<ILocalRepositoryModel>();
+            repo.Name.Returns(reponame);
+            repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
+
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
+
+            var prcache = Enumerable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
+
+            // seed the cache
+            prcache
+                .Select(item => new ModelService.PullRequestCacheItem(item))
+                .Select(item => item.Save<ModelService.PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
+                .ToList();
+
+            // expire the index
+            var indexobj = await cache.GetObject<CacheIndex>(indexKey);
+            indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(6);
+            await cache.InsertObject(indexKey, indexobj);
+
+            var prlive = Observable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow))
+                .DelaySubscription(TimeSpan.FromMilliseconds(10));
+
+            apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
+
+            await modelService.InsertUser(new AccountCacheItem(user));
+
+            ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
+            modelService.GetPullRequests(repo, col);
+            col.ProcessingDelay = TimeSpan.Zero;
+
+            var count = 0;
+            var done = new ReplaySubject<Unit>();
+            done.OnNext(Unit.Default);
+            done.Subscribe();
+
+            col.Subscribe(t =>
+            {
+                if (++count == expected * 2)
+                {
+                    done.OnCompleted();
+                }
+            }, () => { });
+
+            await done;
+
+            Assert.Collection(col, col.Select(x => new Action<IPullRequestModel>(t => Assert.True(x.Title.StartsWith("Live")))).ToArray());
+        }
+
+        [Fact]
+        public async Task ExpiredIndexClearsItems()
+        {
+            var expected = 5;
+
+            var username = "octocat";
+            var reponame = "repo";
+
+            var cache = new InMemoryBlobCache();
+            var apiClient = Substitute.For<IApiClient>();
+            var modelService = new ModelService(apiClient, cache, Substitute.For<IAvatarProvider>());
+            var user = CreateOctokitUser(username);
+            apiClient.GetUser().Returns(Observable.Return(new UserAndScopes(user, null)));
+            apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
+            var act = modelService.GetAccounts().ToEnumerable().First().First();
+
+            var repo = Substitute.For<ILocalRepositoryModel>();
+            repo.Name.Returns(reponame);
+            repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
+
+            var indexKey = string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, user.Login, repo.Name);
+
+            var prcache = Enumerable.Range(1, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Cache " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
+
+            // seed the cache
+            prcache
+                .Select(item => new ModelService.PullRequestCacheItem(item))
+                .Select(item => item.Save<ModelService.PullRequestCacheItem>(cache, indexKey).ToEnumerable().First())
+                .SelectMany(item => CacheIndex.AddAndSaveToIndex(cache, indexKey, item).ToEnumerable())
+                .ToList();
+
+            // expire the index
+            var indexobj = await cache.GetObject<CacheIndex>(indexKey);
+            indexobj.UpdatedAt = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(6);
+            await cache.InsertObject(indexKey, indexobj);
+
+            var prlive = Observable.Range(5, expected)
+                .Select(id => CreatePullRequest(user, id, ItemState.Open, "Live " + id, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0))
+                .DelaySubscription(TimeSpan.FromMilliseconds(10));
+
+            apiClient.GetPullRequestsForRepository(user.Login, repo.Name).Returns(prlive);
+
+            await modelService.InsertUser(new AccountCacheItem(user));
+
+            ITrackingCollection<IPullRequestModel> col = new TrackingCollection<IPullRequestModel>();
+            modelService.GetPullRequests(repo, col);
+            col.ProcessingDelay = TimeSpan.Zero;
+
+            var count = 0;
+            var done = new ReplaySubject<Unit>();
+            done.OnNext(Unit.Default);
+            done.Subscribe();
+
+            col.Subscribe(t =>
+            {
+                // we get all the items from the cache (items 1-5), all the items from the live (items 5-9),
+                // and 4 deletions (items 1-4) because the cache expired the items that were not
+                // a part of the live data
+                if (++count == 14)
+                {
+                    done.OnCompleted();
+                }
+            }, () => { });
+
+            await done;
+
+            Assert.Equal(5, col.Count);
+            Assert.Collection(col, 
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(5, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(6, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(7, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(8, t.Number); },
+                t => { Assert.True(t.Title.StartsWith("Live")); Assert.Equal(9, t.Number); }
+            );
+        }
     }
 }

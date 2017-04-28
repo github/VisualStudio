@@ -16,12 +16,12 @@ namespace GitHub.Services
             manager = cm;
             HostAddress = hostAddress;
             Username = userName;
-            Repositories = new ObservableCollection<ISimpleRepositoryModel>();
+            Repositories = new ObservableCollection<ILocalRepositoryModel>();
         }
 
         public HostAddress HostAddress { get; private set; }
         public string Username { get; private set; }
-        public ObservableCollection<ISimpleRepositoryModel> Repositories { get; }
+        public ObservableCollection<ILocalRepositoryModel> Repositories { get; }
 
         public IObservable<IConnection> Login()
         {

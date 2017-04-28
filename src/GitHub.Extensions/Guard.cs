@@ -6,15 +6,29 @@ using System.Linq;
 
 namespace GitHub.Extensions
 {
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     public static class Guard
     {
+        public static void ArgumentNotNull(object value, string name)
+        {
+            if (value != null) return;
+            string message = String.Format(CultureInfo.InvariantCulture, "Failed Null Check on '{0}'", name);
+#if DEBUG
+            if (!InUnitTestRunner)
+            {
+                Debug.Fail(message);
+            }
+#endif
+            throw new ArgumentNullException(name, message);
+        }
+
         public static void ArgumentNonNegative(int value, string name)
         {
             if (value > -1) return;
 
             var message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must be non-negative", name);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -23,16 +37,16 @@ namespace GitHub.Extensions
         }
 
         /// <summary>
-        ///   Checks a string argument to ensure it isn't null or empty.
+        /// Checks a string argument to ensure it isn't null or empty.
         /// </summary>
         /// <param name = "value">The argument value to check.</param>
         /// <param name = "name">The name of the argument.</param>
         public static void ArgumentNotEmptyString(string value, string name)
         {
-            if (value.Length > 0) return;
+            if (value?.Length > 0) return;
             string message = String.Format(CultureInfo.InvariantCulture, "The value for '{0}' must not be empty", name);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -49,7 +63,7 @@ namespace GitHub.Extensions
                 name,
                 minValue);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -67,7 +81,7 @@ namespace GitHub.Extensions
                 minValue,
                 maxValue);
 #if DEBUG
-            if (!InUnitTestRunner())
+            if (!InUnitTestRunner)
             {
                 Debug.Fail(message);
             }
@@ -76,31 +90,7 @@ namespace GitHub.Extensions
         }
 
         // Borrowed from Splat.
-        static bool InUnitTestRunner()
-        {
-            var testAssemblies = new[] {
-                "CSUNIT",
-                "NUNIT",
-                "XUNIT",
-                "MBUNIT",
-                "PEX.",
-                "NBEHAVE",
-            };
 
-            try
-            {
-                return SearchForAssembly(testAssemblies);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        static bool SearchForAssembly(IEnumerable<string> assemblyList)
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Any(x => assemblyList.Any(name => x.FullName.ToUpperInvariant().Contains(name)));
-        }
+        public static bool InUnitTestRunner { get; } = Splat.ModeDetector.InUnitTestRunner();
     }
 }

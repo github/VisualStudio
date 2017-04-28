@@ -5,6 +5,7 @@ using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using System.Reactive.Disposables;
 
 namespace GitHub.Factories
 {
@@ -17,6 +18,8 @@ namespace GitHub.Factories
         readonly ILoginCache loginCache;
         readonly IAvatarProvider avatarProvider;
         readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
+        readonly CompositeDisposable hosts = new CompositeDisposable();
+        readonly IUsageTracker usage;
 
         [ImportingConstructor]
         public RepositoryHostFactory(
@@ -24,13 +27,15 @@ namespace GitHub.Factories
             IHostCacheFactory hostCacheFactory,
             ILoginCache loginCache,
             IAvatarProvider avatarProvider,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler)
+            ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            IUsageTracker usage)
         {
             this.apiClientFactory = apiClientFactory;
             this.hostCacheFactory = hostCacheFactory;
             this.loginCache = loginCache;
             this.avatarProvider = avatarProvider;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
+            this.usage = usage;
         }
 
         public IRepositoryHost Create(HostAddress hostAddress)
@@ -38,8 +43,14 @@ namespace GitHub.Factories
             var apiClient = apiClientFactory.Create(hostAddress);
             var hostCache = hostCacheFactory.Create(hostAddress);
             var modelService = new ModelService(apiClient, hostCache, avatarProvider);
+            var host = new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler, usage);
+            hosts.Add(host);
+            return host;
+        }
 
-            return new RepositoryHost(apiClient, modelService, loginCache, twoFactorChallengeHandler);
+        public void Remove(IRepositoryHost host)
+        {
+            hosts.Remove(host);
         }
 
         bool disposed;
@@ -48,10 +59,8 @@ namespace GitHub.Factories
             if (disposing)
             {
                 if (disposed) return;
-
-                loginCache.Dispose();
-                avatarProvider.Dispose();
                 disposed = true;
+                hosts.Dispose();
             }
         }
 

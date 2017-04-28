@@ -37,6 +37,18 @@
       <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" priority="0x0501">
         <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
       </Group>
+
+      <Group guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup" priority="0x0502">
+        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbar" />
+      </Group>
+
+      <Group guid="guidContextMenuSet" id="idGitHubContextMenuGroup">
+      </Group>
+
+      <Group guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup" priority="0x0000">
+        <Parent guid="guidContextMenuSet" id="idGitHubContextMenu"/>
+      </Group>
+
     </Groups>
 
     <Menus>
@@ -46,22 +58,21 @@
           <CommandName>Window Toolbar</CommandName>
         </Strings>
       </Menu>
-    </Menus>
-    
-    <!--Buttons section. -->
-    <!--This section defines the elements the user can interact with, like a menu command or a button 
-        or combo box in a toolbar. -->
-    <Buttons>
-     <!--To define a menu group you have to specify its ID, the parent menu and its display priority. 
-          The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
-          the CommandFlag node.
-          You can add more than one CommandFlag node e.g.:
-              <CommandFlag>DefaultInvisible</CommandFlag>
-              <CommandFlag>DynamicVisibility</CommandFlag>
-          If you do not want an image next to your command, remove the Icon node /> -->
 
-      <Button guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100" type="Button">
-        <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup" />
+      <Menu guid="guidContextMenuSet" id="idGitHubContextMenu" priority="0x200" type="Menu">
+        <Parent guid="guidContextMenuSet" id="idGitHubContextMenuGroup" />
+        <Strings>
+          <ButtonText>GitHub</ButtonText>
+          <CommandName>GitHub</CommandName>
+        </Strings>
+      </Menu>
+
+    </Menus>
+
+    <!-- Parenting of buttons is done in the CommandPlacements section -->
+    <Buttons>
+
+      <Button guid="guidGitHubCmdSet" id="addConnectionCommand" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -69,8 +80,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
+      <Button guid="guidGitHubCmdSet" id="showGitHubPaneCommand" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -79,44 +89,177 @@
       </Button>
 
       <!--- Toolbar buttons -->
-      <Button guid="guidGitHubToolbarCmdSet" id="backCommand" priority="0x0100" type="Button">
-        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
+      <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
         <Icon guid="guidImages" id="arrow_left" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Back</ButtonText>
         </Strings>
       </Button>
 
-      <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" priority="0x0101" type="Button">
-        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
+      <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" type="Button">
         <Icon guid="guidImages" id="arrow_right" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Forward</ButtonText>
         </Strings>
       </Button>
 
-      <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" priority="0x0102" type="Button">
-        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup" />
+      <Button guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" type="Button">
         <Icon guid="guidImages" id="pullrequest" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Pull Requests</ButtonText>
         </Strings>
       </Button>
 
-      <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" priority="0x0110" type="Button">
-        <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1" />
+      <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
         <Icon guid="guidImages" id="refresh" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <ButtonText></ButtonText>
+          <ButtonText>Refresh</ButtonText>
         </Strings>
       </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
+        <Icon guid="guidImages" id="logo_toolbar" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>View on GitHub</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubToolbarCmdSet" id="helpCommand" type="Button">
+        <Icon guid="guidImages" id="question" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Help</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x0100" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Create a GitHub Gist</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="openLinkCommand" type="Button">
+        <Icon guid="guidImages" id="link_external" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Open on GitHub</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="copyLinkCommand" type="Button">
+        <Icon guid="guidImages" id="clippy" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Copy link to clipboard</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidContextMenuSet" id="idBlameCommand" type="Button">
+        <Icon guid="guidImages" id="link_external" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Blame</ButtonText>
+        </Strings>
+      </Button>
+      
     </Buttons>
 
   </Commands>
+
+  <CommandPlacements>
+    
+    <!-- context menu -->
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
+      <Parent guid="GUID_XAML_EDITOR" id="ID_XAML_CTXT"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
+      <Parent guid="GUID_HTML_EDITOR" id="ID_HTML_CTXT"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
+      <Parent guid="GUID_JSON_EDITOR" id="ID_JSON_CTXT"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idGitHubContextMenuGroup" priority="0x1000">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+    </CommandPlacement>
+
+    <!-- open and copy link to GitHub commands -->
+    <CommandPlacement guid="guidContextMenuSet" id="openLinkCommand" priority="0x100">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="copyLinkCommand" priority="0x101">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x102">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x103">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+
+    <!-- Standard toolbar commands -->
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="backCommand" priority="0x100">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="forwardCommand" priority="0x101">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="refreshCommand" priority="0x110">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup1"/>
+    </CommandPlacement>
+
+    <!-- Feature commands (open pull requests, etc) -->
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="pullRequestCommand" priority="0x102">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="githubCommand" priority="0x103">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidGitHubToolbarCmdSet" id="helpCommand" priority="0x111">
+      <Parent guid="guidGitHubToolbarCmdSet" id="idGitHubToolbarHelpMenuGroup"/>
+    </CommandPlacement>
+
+    <!-- Show GitHub pane command -->
+    <CommandPlacement guid="guidGitHubCmdSet" id="showGitHubPaneCommand" priority="0x0100">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+    </CommandPlacement>
+
+    <!-- Add Connection (Team Explorer) command -->
+    <CommandPlacement guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100">
+      <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup"/>
+    </CommandPlacement>
+
+  </CommandPlacements>
   
   <Symbols>
     <!-- This is the package guid. -->
@@ -141,16 +284,46 @@
       <IDSymbol name="arrow_right" value="3" />
       <IDSymbol name="refresh" value="4" />
       <IDSymbol name="pullrequest" value="5" />
+      <IDSymbol name="link_external" value="6"/>
+      <IDSymbol name="clippy" value="7"/>
+      <IDSymbol name="logo_toolbar" value="8"/>
+      <IDSymbol name="question" value="9"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubToolbarCmdSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
       <IDSymbol name="idGitHubToolbarMenuGroup" value="0x1110" />
       <IDSymbol name="idGitHubToolbarMenuGroup1" value="0x1111" />
+      <IDSymbol name="idGitHubToolbarHelpMenuGroup" value="0x1112" />
       <IDSymbol name="idGitHubToolbar" value="0x1120" />
       <IDSymbol name="backCommand" value="0x300" />
       <IDSymbol name="forwardCommand" value="0x301" />
       <IDSymbol name="refreshCommand" value="0x302" />
       <IDSymbol name="pullRequestCommand" value="0x310" />
+      <IDSymbol name="githubCommand" value="0x320" />
+      <IDSymbol name="helpCommand" value="0x321" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidContextMenuSet" value="{31057D08-8C3C-4C5B-9F91-8682EA08EC27}">
+      <IDSymbol name="idGitHubContextMenu" value="0x1000" />
+      <IDSymbol name="idGitHubContextMenuGroup" value="0x1001" />
+      <IDSymbol name="idGitHubContextSubMenuGroup" value="0x1002" />
+      <IDSymbol name="openLinkCommand" value="0x100" />
+      <IDSymbol name="copyLinkCommand" value="0x101"/>
+      <IDSymbol name="idCreateGistCommand" value="0x0400" />
+      <IDSymbol name="idBlameCommand" value="0x0500" />
+
+    </GuidSymbol>
+    
+    <GuidSymbol name="GUID_XAML_EDITOR" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">
+      <IDSymbol name="ID_XAML_CTXT" value="259"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="GUID_HTML_EDITOR" value="{78F03954-2FB8-4087-8CE7-59D71710B3BB}">
+      <IDSymbol name="ID_HTML_CTXT" value="1"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="GUID_JSON_EDITOR" value="{F718CA06-CF4F-4A0C-9106-E79E9EE5E7CD}">
+      <IDSymbol name="ID_JSON_CTXT" value="3"/>
     </GuidSymbol>
 
   </Symbols>

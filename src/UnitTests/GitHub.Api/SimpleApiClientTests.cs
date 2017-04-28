@@ -9,6 +9,15 @@ using Xunit;
 
 public class SimpleApiClientTests
 {
+    public class TheCtor : TestBaseClass
+    {
+        public void Throws()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SimpleApiClient(null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new SimpleApiClient("https://github.com/github/visualstudio", null, null, null));
+        }
+    }
+
     public class TheGetRepositoryMethod
     {
         [Fact]
@@ -21,7 +30,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -43,7 +51,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -73,7 +80,6 @@ public class SimpleApiClientTests
             wikiProbe.ProbeAsync(repository)
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -94,7 +100,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -123,7 +128,6 @@ public class SimpleApiClientTests
                 .Returns(_ => Task.FromResult(probeResult), _ => { throw new Exception("Only call it once"); });
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -144,7 +148,6 @@ public class SimpleApiClientTests
             var enterpriseProbe = Substitute.For<IEnterpriseProbeTask>();
             var wikiProbe = Substitute.For<IWikiProbe>();
             var client = new SimpleApiClient(
-                gitHubHost,
                 "https://github.com/github/visualstudio",
                 gitHubClient,
                 new Lazy<IEnterpriseProbeTask>(() => enterpriseProbe),
@@ -156,10 +159,87 @@ public class SimpleApiClientTests
         }
     }
 
+    public class TheIsIsAuthenticatedMethod
+    {
+        [Fact]
+        public void ReturnsFalseWhenCredentialsNotSet()
+        {
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Credentials.Returns((Credentials)null);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReturnsFalseWhenAuthenicationTypeIsAnonymous()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.Credentials=Credentials.Anonymous;
+
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Returns(connection);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenLoginIsSetToBasicAuth()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.Credentials.Returns(new Credentials("username", "password"));
+
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Returns(connection);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void ReturnsTrueWhenLoginIsSetToOAuth()
+        {
+            var connection = Substitute.For<IConnection>();
+            connection.Credentials.Returns(new Credentials("token"));
+
+            var gitHubClient = Substitute.For<IGitHubClient>();
+            gitHubClient.Connection.Returns(connection);
+
+            var client = new SimpleApiClient(
+                "https://github.com/github/visualstudio",
+                gitHubClient,
+                null,
+                null);
+
+            var result = client.IsAuthenticated();
+            Assert.True(result);
+        }
+    }
+
     private static Repository CreateRepository(int id, bool hasWiki)
     {
-        return new Repository("", "", "", "", "", "", "", id, new User(), "", "", "", "", "", false, false, 0, 0, 0, "",
-            0, null, DateTimeOffset.Now, DateTimeOffset.Now, new RepositoryPermissions(), new User(), null, null, false,
+        return new Repository("", "", "", "", "", "", "",
+            id, new User(), "", "", "", "", "", false, false, 0, 0, "",
+            0, null, DateTimeOffset.Now, DateTimeOffset.Now, new RepositoryPermissions(), null, null, false,
             hasWiki, false);
     }
 }

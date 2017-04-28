@@ -1,28 +1,21 @@
-﻿using System;
-using System.ComponentModel.Composition.Hosting;
+﻿using GitHub.Exports;
 using GitHub.Models;
 using GitHub.UI;
-using System.Windows.Controls;
+using GitHub.VisualStudio;
+using System;
+using System.Runtime.InteropServices;
 
 namespace GitHub.Services
 {
+    [Guid(Guids.UIProviderId)]
     public interface IUIProvider
     {
-        ExportProvider ExportProvider { get; }
-        IServiceProvider GitServiceProvider { get; set; }
-        object GetService(Type t);
-        T GetService<T>();
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        Ret GetService<T, Ret>() where Ret : class;
-
-        object TryGetService(Type t);
-        T TryGetService<T>() where T : class;
-
-        void AddService(Type t, object instance);
-        void RemoveService(Type t);
-
-        IObservable<UserControl> SetupUI(UIControllerFlow controllerFlow, IConnection connection);
-        void RunUI();
-        void RunUI(UIControllerFlow controllerFlow, IConnection connection);
+        IUIController Configure(UIControllerFlow flow, IConnection connection = null, ViewWithData data = null);
+        IUIController Run(UIControllerFlow flow);
+        void RunInDialog(UIControllerFlow flow, IConnection connection = null);
+        void RunInDialog(IUIController controller);
+        IView GetView(UIViewType which, ViewWithData data = null);
+        void StopUI(IUIController controller);
+        void Run(IUIController controller);
     }
 }

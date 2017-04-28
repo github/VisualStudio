@@ -9,6 +9,7 @@ using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
+using ReactiveUI;
 using Xunit;
 
 public class LoginToGitHubViewModelTests
@@ -25,12 +26,19 @@ public class LoginToGitHubViewModelTests
                 .Returns(_ => Observable.Throw<AuthenticationResult>(new ForbiddenException(response)));
             var browser = Substitute.For<IVisualStudioBrowser>();
             var loginViewModel = new LoginToGitHubViewModel(repositoryHosts, browser);
+            var message = "";
 
-            loginViewModel.Login.Execute(null);
+            using (UserError.RegisterHandler<UserError>(x =>
+                {
+                    message = x.ErrorMessage;
+                    return Observable.Return(RecoveryOptionResult.RetryOperation);
+                }))
+            {
+                loginViewModel.Login.Execute(null);
+            }
 
-            Assert.True(loginViewModel.ShowLogInFailedError);
-            Assert.Equal("Make sure to use your password and not a Personal Access token to log in.",
-                loginViewModel.LoginFailedMessage);
+            Assert.Equal("Make sure to use your password and not a Personal Access token to sign in.",
+                message);
         }
     }
 

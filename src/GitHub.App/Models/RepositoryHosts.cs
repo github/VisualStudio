@@ -39,24 +39,8 @@ namespace GitHub.Models
             this.connectionManager = connectionManager;
 
             RepositoryHostFactory = repositoryHostFactory;
-            disposables.Add(repositoryHostFactory);
             GitHubHost = DisconnectedRepositoryHost;
             EnterpriseHost = DisconnectedRepositoryHost;
-
-            var initialCacheLoadObs = sharedCache.UserAccount.GetObject<Uri>(EnterpriseHostApiBaseUriCacheKey)
-                .Catch<Uri, KeyNotFoundException>(_ => Observable.Return<Uri>(null))
-                .Catch<Uri, Exception>(ex =>
-                {
-                    log.Warn("Failed to get Enterprise host URI from cache.", ex);
-                    return Observable.Return<Uri>(null);
-                })
-                .WhereNotNull()
-                .Select(HostAddress.Create)
-                .Where(x => connectionManager.Connections.Any(c => c.HostAddress.Equals(x)))
-                .Select(repositoryHostFactory.Create)
-                .Do(x => EnterpriseHost = x)
-                .Do(disposables.Add)
-                .SelectUnit();
 
             var persistEntepriseHostObs = this.WhenAny(x => x.EnterpriseHost, x => x.Value)
                 .Skip(1)  // The first value will be null or something already in the db
@@ -101,9 +85,7 @@ namespace GitHub.Models
                 {
                     var host = LookupHost(x.HostAddress);
                     if (host.Address != x.HostAddress)
-                    {
                         host = RepositoryHostFactory.Create(x.HostAddress);
-                    }
                     return host;
                 })
                 .Select(h => LogOut(h))
@@ -112,7 +94,7 @@ namespace GitHub.Models
 
             // Wait until we've loaded (or failed to load) an enterprise uri from the db and then
             // start tracking changes to the EnterpriseHost property and persist every change to the db
-            disposables.Add(Observable.Concat(initialCacheLoadObs, persistEntepriseHostObs).Subscribe());
+            disposables.Add(persistEntepriseHostObs.Subscribe());
         }
 
         IObservable<IConnection> RunLoginHandler(IConnection connection)
@@ -147,7 +129,6 @@ namespace GitHub.Models
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
-            disposables.Add(host);
             return host.LogIn(usernameOrEmail, password)
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
@@ -161,11 +142,20 @@ namespace GitHub.Models
                     );
                     if (successful)
                     {
+                        // Make sure that GitHubHost/EnterpriseHost are set when the connections
+                        // changed event is raised and likewise that the connection is added when
+                        // the property changed notification is sent.
                         if (isDotCom)
-                            GitHubHost = host;
+                            githubHost = host;
                         else
-                            EnterpriseHost = host;
+                            enterpriseHost = host;
+
                         connectionManager.AddConnection(address, usernameOrEmail);
+
+                        if (isDotCom)
+                            this.RaisePropertyChanged(nameof(GitHubHost));
+                        else
+                            this.RaisePropertyChanged(nameof(EnterpriseHost));
                     }
                 });
         }
@@ -180,7 +170,6 @@ namespace GitHub.Models
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             var host = RepositoryHostFactory.Create(address);
-            disposables.Add(host);
             return host.LogInFromCache()
                 .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
                 .Do(result =>
@@ -210,7 +199,7 @@ namespace GitHub.Models
                     else
                         EnterpriseHost = null;
                     connectionManager.RemoveConnection(address);
-                    disposables.Remove(host);
+                    RepositoryHostFactory.Remove(host);
                 });
         }
 

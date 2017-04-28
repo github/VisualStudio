@@ -28,7 +28,8 @@ namespace GitHub.UI
             new FrameworkPropertyMetadata(defaultValue: Octicon.mark_github, flags:
                 FrameworkPropertyMetadataOptions.AffectsArrange |
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
-                FrameworkPropertyMetadataOptions.AffectsRender
+                FrameworkPropertyMetadataOptions.AffectsRender,
+                propertyChangedCallback: OnIconChanged
             )
         );
 
@@ -84,6 +85,10 @@ namespace GitHub.UI
                 path.Freeze();
 
             return path;
+        }
+        static void OnIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            d.SetValue(Path.DataProperty, OcticonPath.GetGeometryForIcon((Octicon)e.NewValue));
         }
     }
 }

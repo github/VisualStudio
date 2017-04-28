@@ -11,5 +11,6 @@ namespace GitHub.Api
         Task<Repository> GetRepository();
         bool HasWiki();
         bool IsEnterprise();
+        bool IsAuthenticated();
     }
 }

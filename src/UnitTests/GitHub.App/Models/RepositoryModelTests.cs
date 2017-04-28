@@ -12,7 +12,6 @@ public class RepositoryModelTests
     public class ComparisonTests : TestBaseClass
     {
         [Theory]
-        [InlineData("a name", "https://github.com/github/VisualStudio", null, "a name", "https://github.com/github/VisualStudio", null)]
         [InlineData("a name", "https://github.com/github/VisualStudio", @"C:\some\path", "a name", "https://github.com/github/VisualStudio", @"C:\some\path")]
         [InlineData("a name", "https://github.com/github/VisualStudio", @"c:\some\path", "a name", "https://github.com/github/VisualStudio", @"C:\some\path")]
         [InlineData("a name", "https://github.com/github/VisualStudio", @"C:\some\path", "a name", "https://github.com/github/VisualStudio", @"c:\some\path")]
@@ -21,64 +20,70 @@ public class RepositoryModelTests
         [InlineData("a name", "https://github.com/github/VisualStudio", @"C:\some\path\", "a name", "https://github.com/github/VisualStudio", @"c:\some\path\")]
         public void SameContentEqualsTrue(string name1, string url1, string path1, string name2, string url2, string path2)
         {
-            var a = new SimpleRepositoryModel(name1, new UriString(url1), path1);
-            var b = new SimpleRepositoryModel(name2, new UriString(url2), path2);
+            var a = new LocalRepositoryModel(name1, new UriString(url1), path1);
+            var b = new LocalRepositoryModel(name2, new UriString(url2), path2);
             Assert.Equal(a, b);
             Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
         [Theory]
-        [InlineData("a name", "https://github.com/github/VisualStudio", "a name", "https://github.com/github/VisualStudio")]
-        public void SameContentEqualsTrue2(string name1, string url1, string name2, string url2)
+        [InlineData(1, "a name", "https://github.com/github/VisualStudio", 1, "a name", "https://github.com/github/VisualStudio")]
+        public void SameContentEqualsTrue2(long id1, string name1, string url1, long id2, string name2, string url2)
         {
             var account = Substitute.For<IAccount>();
-            var a = new RepositoryModel(name1, new UriString(url1), false, false, account);
-            var b = new RepositoryModel(name2, new UriString(url2), false, false, account);
+            var a = new RemoteRepositoryModel(id1, name1, new UriString(url1), false, false, account);
+            var b = new RemoteRepositoryModel(id2, name2, new UriString(url2), false, false, account);
             Assert.Equal(a, b);
             Assert.False(a == b);
             Assert.Equal(a.GetHashCode(), b.GetHashCode());
         }
 
         [Theory]
-        [InlineData("a name1", "https://github.com/github/VisualStudio", "a name", "https://github.com/github/VisualStudio")]
-        public void DifferentContentEqualsFalse(string name1, string url1, string name2, string url2)
+        [InlineData(1, "a name1", "https://github.com/github/VisualStudio", 2, "a name", "https://github.com/github/VisualStudio")]
+        public void DifferentContentEqualsFalse(long id1, string name1, string url1, long id2, string name2, string url2)
         {
             var account = Substitute.For<IAccount>();
-            var a = new RepositoryModel(name1, new UriString(url1), false, false, account);
-            var b = new RepositoryModel(name2, new UriString(url2), false, false, account);
+            var a = new RemoteRepositoryModel(id1, name1, new UriString(url1), false, false, account);
+            var b = new RemoteRepositoryModel(id2, name2, new UriString(url2), false, false, account);
             Assert.NotEqual(a, b);
             Assert.False(a == b);
             Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
         }
     }
 
-    public class PathConstructorTests : TempFileBaseClass
+    [Collection("PackageServiceProvider global data tests")]
+    public class PathConstructorTests : TestBaseClass
     {
         [Fact]
         public void NoRemoteUrl()
         {
-            var provider = Substitutes.ServiceProvider;
-            Services.PackageServiceProvider = provider;
-            var gitservice = provider.GetGitService();
-            var repo = Substitute.For<IRepository>();
-            var path = Directory.CreateSubdirectory("repo-name");
-            gitservice.GetUri(path.FullName).Returns((UriString)null);
-            var model = new SimpleRepositoryModel(path.FullName);
-            Assert.Equal("repo-name", model.Name);
+            using (var temp = new TempDirectory())
+            {
+                var provider = Substitutes.ServiceProvider;
+                var gitservice = provider.GetGitService();
+                var repo = Substitute.For<IRepository>();
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+                gitservice.GetUri(path.FullName).Returns((UriString)null);
+                var model = new LocalRepositoryModel(path.FullName);
+                Assert.Equal("repo-name", model.Name);
+            }
         }
 
         [Fact]
         public void WithRemoteUrl()
         {
-            var provider = Substitutes.ServiceProvider;
-            Services.PackageServiceProvider = provider;
-            var gitservice = provider.GetGitService();
-            var repo = Substitute.For<IRepository>();
-            var path = Directory.CreateSubdirectory("repo-name");
-            gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-            var model = new SimpleRepositoryModel(path.FullName);
-            Assert.Equal("user/repo-name", model.Name);
+            using (var temp = new TempDirectory())
+            {
+                var provider = Substitutes.ServiceProvider;
+                var gitservice = provider.GetGitService();
+                var repo = Substitute.For<IRepository>();
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+                gitservice.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
+                var model = new LocalRepositoryModel(path.FullName);
+                Assert.Equal("repo-name", model.Name);
+                Assert.Equal("user", model.Owner);
+            }
         }
     }
 

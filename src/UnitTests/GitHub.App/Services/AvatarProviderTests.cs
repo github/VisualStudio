@@ -17,7 +17,7 @@ public class AvatarProviderTests
 {
     public class TheDefaultOrgBitmapImageProperty : TestBaseClass
     {
-        [STAFact]
+        [Fact]
         public async Task CanBeAccessedFromMultipleThreads()
         {
             var blobCache = new InMemoryBlobCache();
@@ -42,7 +42,7 @@ public class AvatarProviderTests
 
     public class TheDefaultUserBitmapImageProperty : TestBaseClass
     {
-        [STAFact]
+        [Fact]
         public async Task CanBeAccessedFromMultipleThreads()
         {
             var blobCache = new InMemoryBlobCache();
@@ -67,7 +67,7 @@ public class AvatarProviderTests
 
     public class TheGetAvatarMethod : TestBaseClass
     {
-        [STAFact]
+        [Fact]
         public async Task GetsAvatarFromCache()
         {
             var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");
@@ -86,7 +86,7 @@ public class AvatarProviderTests
             AssertSameImage(expectedImage, retrieved);
         }
 
-        [STAFact]
+        [Fact]
         public async Task RetrievesGitHubAvatar()
         {
             var expectedImage = AvatarProvider.CreateBitmapImage("pack://application:,,,/GitHub.App;component/Images/default_org_avatar.png");

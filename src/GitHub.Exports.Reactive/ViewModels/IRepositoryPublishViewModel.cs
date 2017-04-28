@@ -1,22 +1,18 @@
 ﻿using System.Reactive;
 using GitHub.Models;
 using ReactiveUI;
+using System.Collections.ObjectModel;
 
 namespace GitHub.ViewModels
 {
     public interface IRepositoryPublishViewModel : IRepositoryForm
     {
-        ReactiveList<IConnection> Connections { get; }
+        ObservableCollection<IConnection> Connections { get; }
 
         /// <summary>
         /// Command that creates the repository.
         /// </summary>
-        IReactiveCommand<Unit> PublishRepository { get; }
-
-        /// <summary>
-        /// True when publishing is in progress.
-        /// </summary>
-        bool IsPublishing { get; }
+        IReactiveCommand<ProgressState> PublishRepository { get; }
 
         /// <summary>
         /// Determines whether the host combo box is visible. Only true if the user is logged into more than one host.
@@ -27,10 +23,14 @@ namespace GitHub.ViewModels
         /// The selected host to publish to.
         /// </summary>
         IConnection SelectedConnection { get; set; }
-
-        /// <summary>
-        /// Sets the default repository name when prepopulating the form.
-        /// </summary>
-        string DefaultRepositoryName { get; }
     }
+
+    public enum ProgressState
+    {
+        Idle,
+        Running,
+        Success,
+        Fail
+    }
+
 }

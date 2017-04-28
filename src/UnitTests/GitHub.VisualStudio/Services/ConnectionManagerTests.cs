@@ -24,7 +24,7 @@ public class ConnectionManagerTests
                 .Returns(@"c:\fake");
             operatingSystem.File.Exists(@"c:\fake\GHfVS\ghfvs.connections").Returns(true);
             operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns(cacheData);
-            var manager = new ConnectionManager(program, operatingSystem, Substitutes.IVSServices);
+            var manager = new ConnectionManager(program, operatingSystem, Substitutes.IVSGitServices);
 
             var connections = manager.Connections;
 
@@ -49,7 +49,7 @@ public class ConnectionManagerTests
                 .Returns(@"c:\fake");
             operatingSystem.File.Exists(@"c:\fake\GHfVS\ghfvs.connections").Returns(true);
             operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns(cacheJson);
-            var manager = new ConnectionManager(program, operatingSystem, Substitutes.IVSServices);
+            var manager = new ConnectionManager(program, operatingSystem, Substitutes.IVSGitServices);
 
             var connections = manager.Connections;
 
@@ -67,7 +67,7 @@ public class ConnectionManagerTests
                 .Returns(@"c:\fake");
             operatingSystem.File.Exists(@"c:\fake\GHfVS\ghfvs.connections").Returns(true);
             operatingSystem.File.ReadAllText(@"c:\fake\GHfVS\ghfvs.connections", Encoding.UTF8).Returns("");
-            var manager = new ConnectionManager(program, operatingSystem, Substitutes.IVSServices);
+            var manager = new ConnectionManager(program, operatingSystem, Substitutes.IVSGitServices);
 
             manager.Connections.Add(new Connection(manager, HostAddress.GitHubDotComHostAddress, "coolio"));
 

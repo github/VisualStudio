@@ -30,7 +30,7 @@ namespace GitHub.Api
         public ISimpleApiClient Create(UriString repositoryUrl)
         {
             var hostAddress = HostAddress.Create(repositoryUrl);
-            return cache.GetOrAdd(repositoryUrl, new SimpleApiClient(hostAddress, repositoryUrl,
+            return cache.GetOrAdd(repositoryUrl, new SimpleApiClient(repositoryUrl,
                 new GitHubClient(productHeader, new SimpleCredentialStore(hostAddress), hostAddress.ApiUri),
                 lazyEnterpriseProbe, lazyWikiProbe));
         }

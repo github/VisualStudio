@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace GitHub.Primitives
     /// </remarks>
     [SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "GetObjectData is implemented in the base class")]
     [Serializable]
+    [TypeConverter(typeof(UriStringConverter))]
     public class UriString : StringEquivalent<UriString>, IEquatable<UriString>
     {
         //static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
@@ -29,8 +31,7 @@ namespace GitHub.Primitives
 
         public UriString(string uriString) : base(NormalizePath(uriString))
         {
-            if (uriString == null) throw new ArgumentNullException(nameof(uriString), "Cannot create a null UriString");
-            if (uriString.Length == 0) return;
+            if (uriString == null || uriString.Length == 0) return;
             if (Uri.TryCreate(uriString, UriKind.Absolute, out url))
             {
                 if (!url.IsFile)
@@ -249,7 +250,7 @@ namespace GitHub.Primitives
 
         bool IEquatable<UriString>.Equals(UriString other)
         {
-            return other != null && ToString().Equals(other.ToString());
+            return other != null && Equals(ToString(), other.ToString());
         }
     }
 }

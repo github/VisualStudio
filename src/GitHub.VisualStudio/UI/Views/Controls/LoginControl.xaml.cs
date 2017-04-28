@@ -1,6 +1,7 @@
 ﻿using System;
+using System.ComponentModel.Composition;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows;
 using System.Windows.Input;
 using GitHub.Controls;
 using GitHub.Exports;
@@ -8,11 +9,10 @@ using GitHub.Extensions;
 using GitHub.UI;
 using GitHub.ViewModels;
 using ReactiveUI;
-using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericLoginControl : SimpleViewUserControl<ILoginControlViewModel, LoginControl>
+    public class GenericLoginControl : ViewBase<ILoginControlViewModel, LoginControl>
     { }
 
     /// <summary>
@@ -22,26 +22,21 @@ namespace GitHub.VisualStudio.UI.Views.Controls
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class LoginControl : GenericLoginControl
     {
+        IDisposable errorHandler;
+
         public LoginControl()
         {
             InitializeComponent();
-
-            DataContextChanged += (s, e) => ViewModel = (ILoginControlViewModel)e.NewValue;
 
             this.WhenActivated(d =>
             {
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
                 SetupSelectedAndVisibleTabBindings(d);
-                ViewModel.AuthenticationResults
-                    .Subscribe(ret =>
-                {
-                    if (ret == Authentication.AuthenticationResult.Success)
-                    {
-                        NotifyDone();
-                    }
-                });
+
+                d(Disposable.Create(() => errorHandler.Dispose()));
             });
+
             IsVisibleChanged += (s, e) =>
             {
                 if (IsVisible)
@@ -61,13 +56,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.Login, v => v.dotComLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.IsLoggingIn, v => v.dotComLogInButton.ShowSpinner));
-
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigateForgotPassword, v => v.dotComForgotPasswordLink.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigatePricing, v => v.pricingLink.Command));
-
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowLogInFailedError, v => v.dotComLoginFailedMessage.Visibility));
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.LoginFailedMessage, v => v.dotComLoginFailedMessage.Message));
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.ShowConnectingToHostFailed, v => v.dotComConnectionFailedMessage.Visibility));
         }
 
         void SetupEnterpriseBindings(Action<IDisposable> d)
@@ -85,13 +74,7 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Login, v => v.enterpriseLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, v => v.enterpriseLogInButton.ShowSpinner));
-
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateForgotPassword, v => v.enterpriseForgotPasswordLink.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateLearnMore, v => v.learnMoreLink.Command));
-
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowLogInFailedError, v => v.enterpriseLoginFailedMessage.Visibility));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.LoginFailedMessage, v => v.enterpriseLoginFailedMessage.Message));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.ShowConnectingToHostFailed, v => v.enterpriseConnectingFailedMessage.Visibility));
         }
 
         void SetupSelectedAndVisibleTabBindings(Action<IDisposable> d)
@@ -113,6 +96,26 @@ namespace GitHub.VisualStudio.UI.Views.Controls
                 .Select(x => x == LoginMode.EnterpriseOnly)
                 .Where(x => x == true)
                 .BindTo(this, v => v.enterpriseTab.IsSelected));
+        }
+
+        void hostTabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // This is a bit ugly but it's the simplest way I could think of dealing with it: there can only
+            // be one UserErrorMessages control active at any time and we need one for each tab. Register/unregister
+            // them here when the tab is changed.
+            var clearErrorWhen = Observable.Return(false);
+
+            errorHandler?.Dispose();
+
+            switch (hostTabControl.SelectedIndex)
+            {
+                case 0:
+                    errorHandler = dotComErrorMessage.RegisterHandler<UserError>(clearErrorWhen);
+                    break;
+                case 1:
+                    errorHandler = enterpriseErrorMessage.RegisterHandler<UserError>(clearErrorWhen);
+                    break;
+            }
         }
     }
 }

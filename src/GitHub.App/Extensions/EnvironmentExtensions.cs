@@ -25,5 +25,10 @@ namespace GitHub.Extensions
         {
             return Path.Combine(environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), ApplicationInfo.ApplicationName);
         }
+
+        public static string GetUserRepositoriesPath(this Rothko.IEnvironment environment)
+        {
+            return Path.Combine(environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Source", "Repos");
+        }
     }
 }

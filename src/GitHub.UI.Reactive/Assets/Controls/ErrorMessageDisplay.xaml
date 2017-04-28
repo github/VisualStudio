@@ -25,7 +25,7 @@
                             <ui:OcticonPath
                                 x:Name="icon"
                                 Icon="{TemplateBinding Icon}"
-                                Height="1024"
+                                Height="16"
                                 Fill="{TemplateBinding IconFill}" />
                         </Viewbox>
                         <ContentPresenter

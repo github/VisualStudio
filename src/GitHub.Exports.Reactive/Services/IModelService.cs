@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
+using GitHub.Collections;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -15,9 +17,16 @@ namespace GitHub.Services
         IObservable<AccountCacheItem> GetUserFromCache();
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
-        IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories();
-        IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
-        IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
+        ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);
+        IObservable<LicenseItem> GetLicenses();
+        IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
+        IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number);
+        ITrackingCollection<IPullRequestModel> GetPullRequests(ILocalRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
+        IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+            IBranch sourceBranch, IBranch targetBranch,
+            string title, string body);
+        IObservable<IBranch> GetBranches(IRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
+        IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
     }
 }

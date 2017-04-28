@@ -4,22 +4,25 @@ using EnvDTE80;
 using GitHub.Info;
 using GitHub.Primitives;
 using GitHub.Services;
-using LibGit2Sharp;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 
 namespace GitHub.VisualStudio
 {
     public static class Services
     {
-        public static IServiceProvider PackageServiceProvider { get; set; }
+        /// <summary>
+        /// Gets a service provider which can be used by unit tests to inject services.
+        /// </summary>
+        public static IServiceProvider UnitTestServiceProvider { get; set; }
 
         /// <summary>
         /// Three ways of getting a service. First, trying the passed-in <paramref name="provider"/>,
-        /// then <see cref="PackageServiceProvider"/>, then <see cref="T:Microsoft.VisualStudio.Shell.Package"/>
+        /// then <see cref="UnitTestServiceProvider"/>, then <see cref="T:Microsoft.VisualStudio.Shell.Package"/>
         /// If the passed-in provider returns null, try PackageServiceProvider or Package, returning the fetched value
         /// regardless of whether it's null or not. Package.GetGlobalService is never called if PackageServiceProvider is set.
         /// This is on purpose, to support easy unit testing outside VS.
@@ -35,10 +38,12 @@ namespace GitHub.VisualStudio
                 ret = provider.GetService(typeof(T)) as Ret;
             if (ret != null)
                 return ret;
-            if (PackageServiceProvider != null)
-                return PackageServiceProvider.GetService(typeof(T)) as Ret;
+            if (UnitTestServiceProvider != null)
+                return UnitTestServiceProvider.GetService(typeof(T)) as Ret;
             return Package.GetGlobalService(typeof(T)) as Ret;
         }
+
+        public static IGitHubServiceProvider GitHubServiceProvider => GetGlobalService<IGitHubServiceProvider, IGitHubServiceProvider>();
 
         public static IComponentModel ComponentModel => GetGlobalService<SComponentModel, IComponentModel>();
         public static ExportProvider DefaultExportProvider => ComponentModel.DefaultExportProvider;
@@ -81,6 +86,10 @@ namespace GitHub.VisualStudio
         // ReSharper disable once SuspiciousTypeConversion.Global
         public static DTE2 Dte2 => Dte as DTE2;
 
+        public static IVsUIShell UIShell => GetGlobalService<SVsUIShell, IVsUIShell>();
+
+        public static IVsDifferenceService DifferenceService => GetGlobalService<SVsDifferenceService, IVsDifferenceService>();
+
         public static IVsActivityLog GetActivityLog(this IServiceProvider provider)
         {
             return GetGlobalService<SVsActivityLog, IVsActivityLog>(provider);
@@ -99,6 +108,16 @@ namespace GitHub.VisualStudio
             if (solutionDir == null)
                 return null;
             return GitService.GitServiceHelper.GetUri(solutionDir);
+        }
+
+        /// <summary>
+        /// Gets the file name of the currently active document in the text editor, 
+        /// or null if there there is no active document.
+        /// </summary>
+        public static string GetFileNameFromActiveDocument()
+        {
+            var fullName = Dte2?.ActiveDocument?.FullName;
+            return Path.GetFileName(fullName);
         }
     }
 }

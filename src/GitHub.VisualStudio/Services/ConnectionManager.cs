@@ -8,6 +8,7 @@ using System.Text;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Primitives;
+using System.Threading.Tasks;
 
 namespace GitHub.VisualStudio
 {
@@ -27,7 +28,7 @@ namespace GitHub.VisualStudio
     public class ConnectionManager : IConnectionManager
     {
         readonly string cachePath;
-        readonly IVSServices vsServices;
+        readonly IVSGitServices vsGitServices;
         const string cacheFile = "ghfvs.connections";
 
         public event Func<IConnection, IObservable<IConnection>> DoLogin;
@@ -40,9 +41,9 @@ namespace GitHub.VisualStudio
         Action<string> dirCreate;
 
         [ImportingConstructor]
-        public ConnectionManager(IProgram program, IVSServices services)
+        public ConnectionManager(IProgram program, IVSGitServices vsGitServices)
         {
-            vsServices = services;
+            this.vsGitServices = vsGitServices;
             fileExists = (path) => System.IO.File.Exists(path);
             readAllText = (path, encoding) => System.IO.File.ReadAllText(path, encoding);
             writeAllText = (path, content) => System.IO.File.WriteAllText(path, content);
@@ -61,9 +62,9 @@ namespace GitHub.VisualStudio
             Connections.CollectionChanged += RefreshConnections;
         }
 
-        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os, IVSServices services)
+        public ConnectionManager(IProgram program, Rothko.IOperatingSystem os, IVSGitServices vsGitServices)
         {
-            vsServices = services;
+            this.vsGitServices = vsGitServices;
             fileExists = (path) => os.File.Exists(path);
             readAllText = (path, encoding) => os.File.ReadAllText(path, encoding);
             writeAllText = (path, content) => os.File.WriteAllText(path, content);
@@ -126,9 +127,9 @@ namespace GitHub.VisualStudio
             Connections.Remove(connection);
         }
 
-        public void RefreshRepositories()
+        public async Task RefreshRepositories()
         {
-            var list = vsServices.GetKnownRepositories();
+            var list = await Task.Run(() => vsGitServices.GetKnownRepositories());
             list.GroupBy(r => Connections.FirstOrDefault(c => r.CloneUrl != null && c.HostAddress.Equals(HostAddress.Create(r.CloneUrl))))
                 .Where(g => g.Key != null)
                 .ForEach(g =>

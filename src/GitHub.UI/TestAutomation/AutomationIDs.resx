@@ -1,0 +1,519 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CreateAGitHubRepositoryWindow" xml:space="preserve">
+    <value>CreateAGitHubRepositoryWindow</value>
+  </data>
+  <data name="GitHubInfoPanel" xml:space="preserve">
+    <value>GitHubInfoPanel</value>
+  </data>
+  <data name="GitHubTabItem" xml:space="preserve">
+    <value>GitHubTabItem</value>
+  </data>
+  <data name="PullRequestCreationViewCustom" xml:space="preserve">
+    <value>PullRequestCreationViewCustom</value>
+  </data>
+  <data name="PullRequestCreationDetailPane" xml:space="preserve">
+    <value>PullRequestCreationDetailPane</value>
+  </data>
+  <data name="PullRequestListViewCustom" xml:space="preserve">
+    <value>PullRequestListViewCustom</value>
+  </data>
+  <data name="PullRequestCreationCancelButton" xml:space="preserve">
+    <value>PullRequestCreationCancelButton</value>
+  </data>
+  <data name="PullRequestCreationCreateButton" xml:space="preserve">
+    <value>PullRequestCreationCreateButton</value>
+  </data>
+  <data name="PullRequestTargetBranchComboBox" xml:space="preserve">
+    <value>PullRequestTargetBranchComboBox</value>
+  </data>
+  <data name="PullRequestCreationDescriptionTextBox" xml:space="preserve">
+    <value>PullRequestCreationDescriptionTextBox</value>
+  </data>
+  <data name="PullRequestCreationTitleTextBox" xml:space="preserve">
+    <value>PullRequestCreationTitleTextBox</value>
+  </data>
+  <data name="PullRequestListFilterAssigneesDropDown" xml:space="preserve">
+    <value>PullRequestListFilterAssigneesDropDown</value>
+  </data>
+  <data name="PullRequestSourceBranchHyperlink" xml:space="preserve">
+    <value>PullRequestSourceBranchHyperlink</value>
+  </data>
+  <data name="CreatedPullRequestAuthorImage" xml:space="preserve">
+    <value>CreatedPullRequestAuthorImage</value>
+  </data>
+  <data name="CreatedPullRequestDetailsTextBlock" xml:space="preserve">
+    <value>CreatedPullRequestDetailsTextBlock</value>
+  </data>
+  <data name="CreatedPullRequestListItem" xml:space="preserve">
+    <value>CreatedPullRequestListItem</value>
+  </data>
+  <data name="CreatedPullRequestNumberHyperlink" xml:space="preserve">
+    <value>CreatedPullRequestNumberHyperlink</value>
+  </data>
+  <data name="CreatedPullRequestTitleHyperlink" xml:space="preserve">
+    <value>CreatedPullRequestTitleHyperlink</value>
+  </data>
+  <data name="CreateNewHyperlink" xml:space="preserve">
+    <value>CreateNewHyperlink</value>
+  </data>
+  <data name="PullRequestListAssigneeFilterComboBox" xml:space="preserve">
+    <value>PullRequestListAssigneeFilterComboBox</value>
+  </data>
+  <data name="PullRequestListAuthorFilterComboBox" xml:space="preserve">
+    <value>PullRequestListAuthorFilterComboBox</value>
+  </data>
+  <data name="PullRequestListStatusFilterComboBox" xml:space="preserve">
+    <value>PullRequestListStatusFilterComboBox</value>
+  </data>
+  <data name="SelectABranchComboBox" xml:space="preserve">
+    <value>SelectABranchComboBox</value>
+  </data>
+  <data name="PullRequestRepositoryNameTextBlock" xml:space="preserve">
+    <value>PullRequestRepositoryNameTextBlock</value>
+  </data>
+  <data name="AccountComboBox" xml:space="preserve">
+    <value>AccountComboBox</value>
+  </data>
+  <data name="AccountListBoxItem" xml:space="preserve">
+    <value>AccountListBoxItem</value>
+  </data>
+  <data name="CloneAGitHubRepositoryWindow" xml:space="preserve">
+    <value>CloneAGitHubRepositoryWindow</value>
+  </data>
+  <data name="CloneRepositoryButton" xml:space="preserve">
+    <value>CloneRepositoryButton</value>
+  </data>
+  <data name="CloneRepositoryCloseButton" xml:space="preserve">
+    <value>CloneRepositoryCloseButton</value>
+  </data>
+  <data name="CloneRepositoryLocalPathBrowsePathButton" xml:space="preserve">
+    <value>CloneRepositoryLocalPathBrowsePathButton</value>
+  </data>
+  <data name="CloneRepositoryLocalPathCustom" xml:space="preserve">
+    <value>CloneRepositoryLocalPathCustom</value>
+  </data>
+  <data name="CloneRepositoryTitleBar" xml:space="preserve">
+    <value>CloneRepositoryTitleBar</value>
+  </data>
+  <data name="ConnectToGitHubCloseButton" xml:space="preserve">
+    <value>ConnectToGitHubCloseButton</value>
+  </data>
+  <data name="ConnectToGitHubTitleBar" xml:space="preserve">
+    <value>ConnectToGitHubTitleBar</value>
+  </data>
+  <data name="ConnectToGitHubWindow" xml:space="preserve">
+    <value>ConnectToGitHubWindow</value>
+  </data>
+  <data name="CreateAGitHubGistControl" xml:space="preserve">
+    <value>CreateAGitHubGistControl</value>
+  </data>
+  <data name="CreateAGitHubGistTitleBar" xml:space="preserve">
+    <value>CreateAGitHubGistTitleBar</value>
+  </data>
+  <data name="CreateGistButton" xml:space="preserve">
+    <value>CreateGistButton</value>
+  </data>
+  <data name="CreateRepositoryButton" xml:space="preserve">
+    <value>CreateRepositoryButton</value>
+  </data>
+  <data name="CreateRepositoryCloseButton" xml:space="preserve">
+    <value>CreateRepositoryCloseButton</value>
+  </data>
+  <data name="CreateRepositoryLocalPathBrowseButton" xml:space="preserve">
+    <value>CreateRepositoryLocalPathBrowseButton</value>
+  </data>
+  <data name="CreateRepositoryLocalPathTextBox" xml:space="preserve">
+    <value>CreateRepositoryLocalPathTextBox</value>
+  </data>
+  <data name="CreateRepositoryTitleBar" xml:space="preserve">
+    <value>CreateRepositoryTitleBar</value>
+  </data>
+  <data name="DontHaveDotcomAccountTextBlock" xml:space="preserve">
+    <value>DontHaveDotcomAccountTextBlock</value>
+  </data>
+  <data name="DontHaveEnterpriseTextBlock" xml:space="preserve">
+    <value>DontHaveEnterpriseTextBlock</value>
+  </data>
+  <data name="DotcomPasswordTextBox" xml:space="preserve">
+    <value>DotcomPasswordTextBox</value>
+  </data>
+  <data name="DotcomSignInButton" xml:space="preserve">
+    <value>DotcomSignInButton</value>
+  </data>
+  <data name="DotcomSignUpHyperlink" xml:space="preserve">
+    <value>DotcomSignUpHyperlink</value>
+  </data>
+  <data name="DotcomUsernameEmailTextBox" xml:space="preserve">
+    <value>DotcomUsernameEmailTextBox</value>
+  </data>
+  <data name="EnterpriseLearnMoreHyperlink" xml:space="preserve">
+    <value>EnterpriseLearnMoreHyperlink</value>
+  </data>
+  <data name="EnterprisePasswordTextBox" xml:space="preserve">
+    <value>EnterprisePasswordTextBox</value>
+  </data>
+  <data name="EnterpriseServerAddressTextBox" xml:space="preserve">
+    <value>EnterpriseServerAddressTextBox</value>
+  </data>
+  <data name="EnterpriseSignInButton" xml:space="preserve">
+    <value>EnterpriseSignInButton</value>
+  </data>
+  <data name="EnterpriseUsernameEmailTextBox" xml:space="preserve">
+    <value>EnterpriseUsernameEmailTextBox</value>
+  </data>
+  <data name="GistAccountImage" xml:space="preserve">
+    <value>GistAccountImage</value>
+  </data>
+  <data name="GistAccountNameTextBlock" xml:space="preserve">
+    <value>GistAccountNameTextBlock</value>
+  </data>
+  <data name="GistCreationControlCustom" xml:space="preserve">
+    <value>GistCreationControlCustom</value>
+  </data>
+  <data name="GistDescriptionTextBlock" xml:space="preserve">
+    <value>GistDescriptionTextBlock</value>
+  </data>
+  <data name="GistDescriptionTextBox" xml:space="preserve">
+    <value>GistDescriptionTextBox</value>
+  </data>
+  <data name="GistErrorMessageTextBlock" xml:space="preserve">
+    <value>GistErrorMessageTextBlock</value>
+  </data>
+  <data name="GistFileNameTextBlock" xml:space="preserve">
+    <value>GistFileNameTextBlock</value>
+  </data>
+  <data name="GistFileNameTextBox" xml:space="preserve">
+    <value>GistFileNameTextBox</value>
+  </data>
+  <data name="GitignoreComboBox" xml:space="preserve">
+    <value>GitignoreComboBox</value>
+  </data>
+  <data name="GitignoreFilterTextBox" xml:space="preserve">
+    <value>GitignoreFilterTextBox</value>
+  </data>
+  <data name="GitignoreListBoxItem" xml:space="preserve">
+    <value>GitignoreListBoxItem</value>
+  </data>
+  <data name="GitignorePopupWindow" xml:space="preserve">
+    <value>GitignorePopupWindow</value>
+  </data>
+  <data name="GitignoreTextBlock" xml:space="preserve">
+    <value>GitignoreTextBlock</value>
+  </data>
+  <data name="LicenseComboBox" xml:space="preserve">
+    <value>LicenseComboBox</value>
+  </data>
+  <data name="LicenseFilterTextBox" xml:space="preserve">
+    <value>LicenseFilterTextBox</value>
+  </data>
+  <data name="LicenseListBoxItem" xml:space="preserve">
+    <value>LicenseListBoxItem</value>
+  </data>
+  <data name="LicensePopupWindow" xml:space="preserve">
+    <value>LicensePopupWindow</value>
+  </data>
+  <data name="LicenseTextBlock" xml:space="preserve">
+    <value>LicenseTextBlock</value>
+  </data>
+  <data name="PrivateGistCheckBox" xml:space="preserve">
+    <value>PrivateGistCheckBox</value>
+  </data>
+  <data name="PrivateRepositoryCheckBox" xml:space="preserve">
+    <value>PrivateRepositoryCheckBox</value>
+  </data>
+  <data name="RepositoryCloneControlCustom" xml:space="preserve">
+    <value>RepositoryCloneControlCustom</value>
+  </data>
+  <data name="RepositoryCreationControlCustom" xml:space="preserve">
+    <value>RepositoryCreationControlCustom</value>
+  </data>
+  <data name="RepositoryDescriptionTextBlock" xml:space="preserve">
+    <value>RepositoryDescriptionTextBlock</value>
+  </data>
+  <data name="RepositoryDescriptionTextBox" xml:space="preserve">
+    <value>RepositoryDescriptionTextBox</value>
+  </data>
+  <data name="RepositoryGroupItem" xml:space="preserve">
+    <value>RepositoryGroupItem</value>
+  </data>
+  <data name="RepositoryListBoxItem" xml:space="preserve">
+    <value>RepositoryListBoxItem</value>
+  </data>
+  <data name="RepositoryNameTextBlock" xml:space="preserve">
+    <value>RepositoryNameTextBlock</value>
+  </data>
+  <data name="RepositoryNameTextBox" xml:space="preserve">
+    <value>RepositoryNameTextBox</value>
+  </data>
+  <data name="SearchRepositoryTextBox" xml:space="preserve">
+    <value>SearchRepositoryTextBox</value>
+  </data>
+  <data name="SignInCustom" xml:space="preserve">
+    <value>SignInCustom</value>
+  </data>
+  <data name="SignInDotcomHostTabItem" xml:space="preserve">
+    <value>SignInDotcomHostTabItem</value>
+  </data>
+  <data name="SignInEnterpriseHostTabItem" xml:space="preserve">
+    <value>SignInEnterpriseHostTabItem</value>
+  </data>
+  <data name="SignInHostTab" xml:space="preserve">
+    <value>SignInHostTab</value>
+  </data>
+  <data name="TwoFactorAuthenticationCloseButton" xml:space="preserve">
+    <value>TwoFactorAuthenticationCloseButton</value>
+  </data>
+  <data name="TwoFactorAuthenticationCustom" xml:space="preserve">
+    <value>TwoFactorAuthenticationCustom</value>
+  </data>
+  <data name="TwoFactorAuthenticationInformationTextBlock" xml:space="preserve">
+    <value>TwoFactorAuthenticationInformationTextBlock</value>
+  </data>
+  <data name="TwoFactorAuthenticationLearnMoreHyperlink" xml:space="preserve">
+    <value>TwoFactorAuthenticationLearnMoreHyperlink</value>
+  </data>
+  <data name="TwoFactorAuthenticationTitleBar" xml:space="preserve">
+    <value>TwoFactorAuthenticationTitleBar</value>
+  </data>
+  <data name="TwoFactorAuthenticationWindow" xml:space="preserve">
+    <value>TwoFactorAuthenticationWindow</value>
+  </data>
+  <data name="TwoFactorAuthenticatonInputCustom" xml:space="preserve">
+    <value>TwoFactorAuthenticatonInputCustom</value>
+  </data>
+  <data name="TwoFactorAuthenticatonVerifyButton" xml:space="preserve">
+    <value>TwoFactorAuthenticatonVerifyButton</value>
+  </data>
+  <data name="CloneHyperlink" xml:space="preserve">
+    <value>CloneHyperlink</value>
+  </data>
+  <data name="ConnectToGitHubMenuItem" xml:space="preserve">
+    <value>ConnectToGitHubMenuItem</value>
+  </data>
+  <data name="CreateHyperlink" xml:space="preserve">
+    <value>CreateHyperlink</value>
+  </data>
+  <data name="GitHubConnectContentCustom" xml:space="preserve">
+    <value>GitHubConnectContentCustom</value>
+  </data>
+  <data name="GitHubHomeContentCustom" xml:space="preserve">
+    <value>GitHubHomeContentCustom</value>
+  </data>
+  <data name="SignInHyperlink" xml:space="preserve">
+    <value>SignInHyperlink</value>
+  </data>
+  <data name="SignOutHyperlink" xml:space="preserve">
+    <value>SignOutHyperlink</value>
+  </data>
+  <data name="TeamExplorerConnectGitHubSectionButton" xml:space="preserve">
+    <value>TeamExplorerConnectGitHubSectionButton</value>
+  </data>
+  <data name="TeamExplorerConnectGitHubSectionTextBlock" xml:space="preserve">
+    <value>TeamExplorerConnectGitHubSectionTextBlock</value>
+  </data>
+  <data name="TeamExplorerHomeGitHubSectionButton" xml:space="preserve">
+    <value>TeamExplorerHomeGitHubSectionButton</value>
+  </data>
+  <data name="TeamExplorerHomeGitHubSectionTextBlock" xml:space="preserve">
+    <value>TeamExplorerHomeGitHubSectionTextBlock</value>
+  </data>
+  <data name="TeamExplorerRepositoryListBoxItem" xml:space="preserve">
+    <value>TeamExplorerRepositoryListBoxItem</value>
+  </data>
+  <data name="TeamExplorerRepositoryListView" xml:space="preserve">
+    <value>TeamExplorerRepositoryListView</value>
+  </data>
+  <data name="TeamExplorerRepositoryNameTextBlock" xml:space="preserve">
+    <value>TeamExplorerRepositoryNameTextBlock</value>
+  </data>
+  <data name="TeamExplorerRepositoryURLTextBlock" xml:space="preserve">
+    <value>TeamExplorerRepositoryURLTextBlock</value>
+  </data>
+  <data name="TeamExplorerPrivateRepositoryCheckBox" xml:space="preserve">
+    <value>TeamExplorerPrivateRepositoryCheckBox</value>
+  </data>
+  <data name="TeamExplorerPublishAccountComboBox" xml:space="preserve">
+    <value>TeamExplorerPublishAccountComboBox</value>
+  </data>
+  <data name="TeamExplorerPublishHostComboBox" xml:space="preserve">
+    <value>TeamExplorerPublishHostComboBox</value>
+  </data>
+  <data name="TeamExplorerPublishRepositoryButton" xml:space="preserve">
+    <value>TeamExplorerPublishRepositoryButton</value>
+  </data>
+  <data name="TeamExplorerPublishRepositoryDescriptionTextBox" xml:space="preserve">
+    <value>TeamExplorerPublishRepositoryDescriptionTextBox</value>
+  </data>
+  <data name="TeamExplorerPublishRepositoryNameTextBox" xml:space="preserve">
+    <value>TeamExplorerPublishRepositoryNameTextBox</value>
+  </data>
+  <data name="TeamExplorerSyncGitHubRepositoryPublishCustom" xml:space="preserve">
+    <value>TeamExplorerSyncGitHubRepositoryPublishCustom</value>
+  </data>
+  <data name="TeamExplorerSyncGitHubSectionButton" xml:space="preserve">
+    <value>TeamExplorerSyncGitHubSectionButton</value>
+  </data>
+  <data name="TeamExplorerSyncGitHubSectionTextBlock" xml:space="preserve">
+    <value>TeamExplorerSyncGitHubSectionTextBlock</value>
+  </data>
+  <data name="GitHubInfoPanelCancelButton" xml:space="preserve">
+    <value>GitHubInfoPanelCancelButton</value>
+  </data>
+  <data name="GitHubInfoPanelMessageDocument" xml:space="preserve">
+    <value>GitHubInfoPanelMessageDocument</value>
+  </data>
+  <data name="GitHubToolBar" xml:space="preserve">
+    <value>GitHubToolBar</value>
+  </data>
+  <data name="GitHubToolBarBackImage" xml:space="preserve">
+    <value>GitHubToolBarBackImage</value>
+  </data>
+  <data name="GitHubToolBarForwardImage" xml:space="preserve">
+    <value>GitHubToolBarForwardImage</value>
+  </data>
+  <data name="GitHubToolBarPullRequestImage" xml:space="preserve">
+    <value>GitHubToolBarPullRequestImage</value>
+  </data>
+  <data name="GitHubToolBarRefreshImage" xml:space="preserve">
+    <value>GitHubToolBarRefreshImage</value>
+  </data>
+  <data name="GitHubLoggedOutCreateAnAccountHyperlink" xml:space="preserve">
+    <value>GitHubLoggedOutCreateAnAccountHyperlink</value>
+  </data>
+  <data name="GitHubLoggedOutSignInHyperlink" xml:space="preserve">
+    <value>GitHubLoggedOutSignInHyperlink</value>
+  </data>
+  <data name="LoggedOutViewCustom" xml:space="preserve">
+    <value>LoggedOutViewCustom</value>
+  </data>
+  <data name="PowerfulCollaborationTextBlock" xml:space="preserve">
+    <value>PowerfulCollaborationTextBlock</value>
+  </data>
+  <data name="SignInToGitHubTextBlock" xml:space="preserve">
+    <value>SignInToGitHubTextBlock</value>
+  </data>
+  <data name="GitHubPaneView" xml:space="preserve">
+    <value>GitHubPaneView</value>
+  </data>
+  <data name="TwoFactorAuthenticationInputStackPanel" xml:space="preserve">
+    <value>TwoFactorAuthenticationInputStackPanel</value>
+  </data>
+</root>

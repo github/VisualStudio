@@ -13,6 +13,7 @@ namespace GitHub.Models
         IApiClient ApiClient { get; }
         IModelService ModelService { get; }
         bool IsLoggedIn { get; }
+        bool SupportsGist { get; }
         string Title { get; }
 
         IObservable<AuthenticationResult> LogIn(string usernameOrEmail, string password);

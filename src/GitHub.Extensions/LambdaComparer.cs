@@ -10,11 +10,11 @@ namespace GitHub.Collections
         readonly Func<T, int> lambdaHash;
 
         public LambdaComparer(Func<T, T, int> lambdaComparer) :
-            this(lambdaComparer, o => 0)
+            this(lambdaComparer, null)
         {
         }
 
-        LambdaComparer(Func<T, T, int> lambdaComparer, Func<T, int> lambdaHash)
+        public LambdaComparer(Func<T, T, int> lambdaComparer, [AllowNull] Func<T, int> lambdaHash)
         {
             this.lambdaComparer = lambdaComparer;
             this.lambdaHash = lambdaHash;
@@ -32,7 +32,9 @@ namespace GitHub.Collections
 
         public int GetHashCode([AllowNull] T obj)
         {
-            return lambdaHash(obj);
+            return lambdaHash != null
+                ? lambdaHash(obj)
+                : obj?.GetHashCode() ?? 0;
         }
     }
 }

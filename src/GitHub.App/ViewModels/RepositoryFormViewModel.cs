@@ -12,7 +12,7 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Base class for the Repository publish/create dialogs. It represents the details about the repository itself.
     /// </summary>
-    public abstract class RepositoryFormViewModel : BaseViewModel
+    public abstract class RepositoryFormViewModel : DialogViewModelBase
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 
@@ -97,6 +97,7 @@ namespace GitHub.ViewModels
 
         public bool ShowUpgradeToMicroPlanWarning { get; private set; }
 
+        [AllowNull]
         public ICommand UpgradeAccountPlan { get; private set; }
 
         protected IObservable<bool> CanKeepPrivateObservable { get; private set; }

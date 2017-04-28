@@ -77,7 +77,14 @@ namespace GitHub.VisualStudio
             await System.Threading.Tasks.Task.Delay(500);
             lock(fileLock)
             {
-                File.AppendAllText(defaultLogPath, msg, Encoding.UTF8);
+                // TODO: Fix this properly
+                try
+                {
+                    File.AppendAllText(defaultLogPath, msg, Encoding.UTF8);
+                }
+                catch(Exception)
+                {
+                }
             }
         }
     }

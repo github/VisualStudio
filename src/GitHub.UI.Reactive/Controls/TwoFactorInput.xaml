@@ -4,10 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:automation="clr-namespace:GitHub.UI.TestAutomation;assembly=GitHub.UI"
     mc:Ignorable="d" 
     Width="256"
     d:DesignHeight="47"
-    d:DesignWidth="262">
+    d:DesignWidth="262"
+    AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticatonInputCustom}">
     <UserControl.Resources>
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="Width" Value="36"/>
@@ -18,12 +20,12 @@
             <Setter Property="FontSize" Value="20px" />
         </Style>
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" UseLayoutRounding="True" SnapsToDevicePixels="True">
-        <TextBox x:Name="one" />
-        <TextBox x:Name="two" />
-        <TextBox x:Name="three" />
-        <TextBox x:Name="four" />
-        <TextBox x:Name="five" />
-        <TextBox x:Name="six" Margin="0" />
+    <StackPanel Orientation="Horizontal" UseLayoutRounding="True" SnapsToDevicePixels="True" AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.TwoFactorAuthenticationInputStackPanel}">
+        <TextBox x:Name="one" />        
+        <TextBox x:Name="two" />        
+        <TextBox x:Name="three" />        
+        <TextBox x:Name="four" />        
+        <TextBox x:Name="five" />        
+        <TextBox x:Name="six" Margin="0"  />    
     </StackPanel>
 </UserControl>

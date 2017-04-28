@@ -1,0 +1,58 @@
+<ResourceDictionary 
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsBrush.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+  <Color x:Key="GitHubContextMenuIconColor">#424242</Color>
+  <SolidColorBrush x:Key="GitHubContextMenuIconBrush" Color="{StaticResource GitHubContextMenuIconColor}" PresentationOptions:Freeze="true" />
+
+  <Color x:Key="GitHubActionLinkItemColor">#FF0097FB</Color>
+  <SolidColorBrush x:Key="GitHubActionLinkItemBrush" Color="{StaticResource GitHubActionLinkItemColor}" PresentationOptions:Freeze="true" />
+  
+  <Color x:Key="GitHubHeaderSeparatorColor">#FF2D2D30</Color>
+  <SolidColorBrush x:Key="GitHubHeaderSeparatorBrush" Color="{StaticResource GitHubHeaderSeparatorColor}" PresentationOptions:Freeze="true" />
+
+  <Color x:Key="GitHubPaneTitleColor">#FFFFFFFF</Color>
+  <SolidColorBrush x:Key="GitHubPaneTitleBrush" Color="{StaticResource GitHubPaneTitleColor}" />
+
+  <SolidColorBrush x:Key="GitHubDeletedFileIconBrush" Color="{DynamicResource VsColor.GrayText}"></SolidColorBrush>
+  <SolidColorBrush x:Key="GitHubDeletedFileBrush" Color="{DynamicResource VsColor.GrayText}"></SolidColorBrush>
+
+  <SolidColorBrush x:Key="GitHubPrimaryGreenBrush" Color="#FF6CC644" />
+  <SolidColorBrush x:Key="GitHubPrimaryOrangeBrush" Color="#FFC9510C" />
+
+  <SolidColorBrush x:Key="GitHubButtonBackgroundBrush" Color="#FF3F404B" />
+  <SolidColorBrush x:Key="GitHubButtonBackgroundMouseOverBrush" Color="#54545C" />
+  <SolidColorBrush x:Key="GitHubButtonBackgroundPressedBrush" Color="#FF2F3038" />
+  <SolidColorBrush x:Key="GitHubButtonBackgroundDisabledBrush" Color="#FF3F404B" Opacity="0.3"/>
+  <SolidColorBrush x:Key="GitHubButtonForegroundBrush" Color="#FFF1F1F1" />
+  <SolidColorBrush x:Key="GitHubButtonBorderBrush" Color="#FF464646" />
+  <SolidColorBrush x:Key="GitHubButtonBorderMouseOverBrush" Color="#65656F" />
+  <SolidColorBrush x:Key="GitHubButtonBorderPressedBrush" Color="#FF2F3038" />
+
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundBrush" Color="#FF709946" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundMouseOverBrush" Color="#FF82b352" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundPressedBrush" Color="#FF82b352" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBackgroundDisabledBrush" Color="#FF709946" Opacity="0.3" />
+
+  <SolidColorBrush x:Key="GitHubPrimaryButtonForegroundBrush" Color="#FFFFFFFF" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonForegroundDisabledBrush" Color="#FF9B9B9B" />
+
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBorderBrush" Color="#FF7BA84D" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBorderMouseOverBrush" Color="#FF95CC5E" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBorderPressedBrush" Color="#FF7BA84D" />
+  <SolidColorBrush x:Key="GitHubPrimaryButtonBorderDisabledBrush" Color="#FFD4D4D4" />
+
+  <SolidColorBrush x:Key="GitHubComboBoxBackgroundBrush" Color="#FF1B1B1C" />
+  <SolidColorBrush x:Key="GitHubComboBoxBorderBrush" Color="#FF434346" />
+
+  <SolidColorBrush x:Key="GitHubTabItemSelectedBorder" Color="#FF3F3F46" />
+
+  <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FF87C3FC" />
+
+  <SolidColorBrush x:Key="GitHubBranchNameBackgroundBrush" Color="#FF4B4D50" />
+</ResourceDictionary>

@@ -2,6 +2,7 @@
 <RuleSet Name="GitHub" Description="This ruleset only includes the rules we care about. I'll be adding new ones as we fix our codebase." ToolsVersion="11.0">
   <IncludeAll Action="Error" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+        <Rule Id="CA1000" Action="None" />
         <Rule Id="CA1002" Action="None" />
         <Rule Id="CA1006" Action="None" />
         <Rule Id="CA1014" Action="None" />
@@ -39,6 +40,7 @@
         <Rule Id="CA1506" Action="None" />
         <Rule Id="CA1701" Action="None" />
         <Rule Id="CA1702" Action="None" />
+        <Rule Id="CA1703" Action="None" />
         <Rule Id="CA1704" Action="None" />
         <Rule Id="CA1707" Action="None" />
         <Rule Id="CA1708" Action="None" />
@@ -58,8 +60,10 @@
         <Rule Id="CA1724" Action="None" />
         <Rule Id="CA1725" Action="None" />
         <Rule Id="CA1726" Action="None" />
+        <Rule Id="CA1800" Action="None" />
         <Rule Id="CA1810" Action="None" />
         <Rule Id="CA1811" Action="None" />
+        <Rule Id="CA1822" Action="None" />
         <Rule Id="CA2000" Action="None" />
         <Rule Id="CA2118" Action="None" />
         <Rule Id="CA2122" Action="None" />

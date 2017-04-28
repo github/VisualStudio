@@ -54,17 +54,6 @@ namespace GitHub.ViewModels
         bool IsLoggingIn { get; }
 
         /// <summary>
-        /// Gets a value indicating whether to show log an error
-        /// message due to a failed log in.
-        /// </summary>
-        bool ShowLogInFailedError { get; }
-
-        /// <summary>
-        /// The message to show if login failed.
-        /// </summary>
-        string LoginFailedMessage { get; }
-
-        /// <summary>
         /// Gets a command which, when invoked, resets all properties 
         /// and validators.
         /// </summary>
@@ -74,12 +63,6 @@ namespace GitHub.ViewModels
         /// Gets a command which, when invoked, directs the user to
         /// a GitHub.com lost password flow.
         /// </summary>
-        IReactiveCommand<Unit> NavigateForgotPassword { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to show an error message
-        /// due to being unable to connect to the host.
-        /// </summary>
-        bool ShowConnectingToHostFailed { get; }
+        IRecoveryCommand NavigateForgotPassword { get; }
     }
 }

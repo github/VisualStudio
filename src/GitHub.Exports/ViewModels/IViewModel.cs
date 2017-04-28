@@ -1,11 +1,18 @@
-using System.Windows.Input;
+﻿using System;
+using System.ComponentModel;
+using GitHub.UI;
 
 namespace GitHub.ViewModels
 {
-    public interface IViewModel
+    /// <summary>
+    /// Base interface for all view models.
+    /// </summary>
+    public interface IViewModel : INotifyPropertyChanged
     {
-        string Title { get; }
-        ICommand Cancel { get; }
-        bool IsShowing { get; }
-	}
+        /// <summary>
+        /// Initializes the view model.
+        /// </summary>
+        /// <param name="data">An object containing the related view and the data to load.</param>
+        void Initialize(ViewWithData data);
+    }
 }

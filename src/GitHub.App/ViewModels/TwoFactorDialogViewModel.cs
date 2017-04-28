@@ -2,7 +2,9 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reactive;
 using System.Reactive.Linq;
+using GitHub.App;
 using GitHub.Authentication;
 using GitHub.Exports;
 using GitHub.Info;
@@ -16,10 +18,9 @@ namespace GitHub.ViewModels
 {
     [ExportViewModel(ViewType = UIViewType.TwoFactor)]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class TwoFactorDialogViewModel : BaseViewModel, ITwoFactorDialogViewModel
+    public class TwoFactorDialogViewModel : DialogViewModelBase, ITwoFactorDialogViewModel
     {
         bool isAuthenticationCodeSent;
-        bool isBusy;
         bool invalidAuthenticationCode;
         string authenticationCode;
         TwoFactorType twoFactorType;
@@ -41,7 +42,6 @@ namespace GitHub.ViewModels
                 (code, busy) => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6 && !busy.Value);
 
             OkCommand = ReactiveCommand.Create(canVerify);
-            CancelCommand = ReactiveCommand.Create();
             NavigateLearnMore = ReactiveCommand.Create();
             NavigateLearnMore.Subscribe(x => browser.OpenUrl(GitHubUrls.TwoFactorLearnMore));
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
@@ -98,7 +98,7 @@ namespace GitHub.ViewModels
                     : null);
             var resend = ResendCodeCommand.Select(_ => RecoveryOptionResult.RetryOperation)
                 .Do(_ => error.ChallengeResult = TwoFactorChallengeResult.RequestResendCode);
-            var cancel = CancelCommand.Select(_ => RecoveryOptionResult.CancelOperation);
+            var cancel = Cancel.Select(_ => RecoveryOptionResult.CancelOperation);
             return Observable.Merge(ok, cancel, resend)
                 .Take(1)
                 .Do(_ => IsAuthenticationCodeSent = error.ChallengeResult == TwoFactorChallengeResult.RequestResendCode);
@@ -148,10 +148,6 @@ namespace GitHub.ViewModels
             get { return showErrorMessage.Value; }
         }
 
-        public bool IsBusy
-        {
-            get { return isBusy; }
-            set { this.RaiseAndSetIfChanged(ref isBusy, value); }
-        }
+        public override IObservable<Unit> Done => Observable.Never<Unit>();
     }
 }

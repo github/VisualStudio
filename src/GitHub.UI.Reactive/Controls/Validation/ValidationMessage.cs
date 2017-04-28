@@ -17,6 +17,7 @@ namespace GitHub.UI
     public class ValidationMessage : UserControl
     {
         const double defaultTextChangeThrottle = 0.2;
+        bool userHasInteracted;
 
         public ValidationMessage()
         {
@@ -33,6 +34,7 @@ namespace GitHub.UI
                 .Do(CreateBinding)
                 .Select(control =>
                     Observable.Merge(
+                        this.WhenAnyValue(x => x.ShowError).Where(x => userHasInteracted),
                         control.Events().TextChanged
                             .Throttle(TimeSpan.FromSeconds(ShowError ? defaultTextChangeThrottle : TextChangeThrottle),
                             RxApp.MainThreadScheduler)
@@ -120,6 +122,7 @@ namespace GitHub.UI
         void ShowValidateError(bool showError)
         {
             IsShowingMessage = showError;
+            userHasInteracted = true;
 
             if (ValidatesControl == null || !IsAdornerEnabled()) return;
 

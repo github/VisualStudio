@@ -4,16 +4,14 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface ITwoFactorDialogViewModel : IViewModel
+    public interface ITwoFactorDialogViewModel : IDialogViewModel
     {
         ReactiveCommand<object> OkCommand { get; }
-        ReactiveCommand<object> CancelCommand { get; }
         ReactiveCommand<object> NavigateLearnMore { get; }
         ReactiveCommand<object> ResendCodeCommand { get; }
 
         IObservable<RecoveryOptionResult> Show(UserError error);
 
-        bool IsBusy { get; }
         bool IsSms { get; }
         bool IsAuthenticationCodeSent { get; }
         bool ShowErrorMessage { get; }

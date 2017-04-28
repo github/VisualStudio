@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(SolutionDir)\lib\Microsoft.TextTemplating.targets" />
+  <PropertyGroup>
+    <TransformOnBuild>false</TransformOnBuild>
+    <TransformOutOfDateOnly>true</TransformOutOfDateOnly>
+    <PackageDir>$(SolutionDir)\packages</PackageDir>
+  </PropertyGroup>
+<!-- Tell the MSBuild T4 task to make the property available: -->
+  <ItemGroup>
+    <T4ParameterValues Include="PackageDir">
+      <Value>$(PackageDir)</Value>
+   </T4ParameterValues>
+  </ItemGroup>
+</Project>

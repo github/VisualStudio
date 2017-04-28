@@ -27,11 +27,12 @@ public class RepositoryHostTests
             apiClient.GetOrCreateApplicationAuthenticationCode(
                 Args.TwoFactorChallengCallback, Args.String, Args.Boolean)
                 .Returns(Observable.Return(new ApplicationAuthorization("S3CR3TS")));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("baymax")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("baymax", "aPassword");
 
@@ -53,11 +54,12 @@ public class RepositoryHostTests
             apiClient.GetOrCreateApplicationAuthenticationCode(
                 Args.TwoFactorChallengCallback, Args.String, Args.Boolean)
                 .Returns(Observable.Throw<ApplicationAuthorization>(new NotFoundException("", HttpStatusCode.BadGateway)));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await host.LogIn("jiminy", "cricket"));
 
@@ -81,11 +83,12 @@ public class RepositoryHostTests
             // Throw a 404 on the retry with the old scopes:
             apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, true, false)
                 .Returns(Observable.Throw<ApplicationAuthorization>(new NotFoundException("Also not there", HttpStatusCode.NotFound)));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("Cthulu")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("Cthulu")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             var result = await host.LogIn("Cthulu", "aPassword");
 
@@ -105,23 +108,34 @@ public class RepositoryHostTests
         {
             var apiClient = Substitute.For<IApiClient>();
             apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            bool received1 = false, received2 = false;
             apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, false, true)
-                .Returns(Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException()));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
+                .Returns(_ =>
+                {
+                    received1 = true;
+                    return Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException());
+                });
+
+            apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback,
+                Args.String,
+                true,
+                Args.Boolean)
+                .Returns(_ =>
+                {
+                    received2 = true;
+                    return Observable.Throw<ApplicationAuthorization>(new TwoFactorChallengeFailedException());
+                });
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await host.LogIn("aUsername", "aPassowrd");
 
-            apiClient.Received()
-                .GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, false, true);
-            apiClient.DidNotReceive().GetOrCreateApplicationAuthenticationCode(
-                Args.TwoFactorChallengCallback,
-                Args.String,
-                true,
-                Args.Boolean);
+            Assert.True(received1);
+            Assert.False(received2);
             Assert.False(host.IsLoggedIn);
             var loginInfo = await loginCache.GetLoginAsync(HostAddress.GitHubDotComHostAddress);
             Assert.Equal("", loginInfo.UserName);
@@ -138,11 +152,12 @@ public class RepositoryHostTests
                 .Returns(Observable.Throw<ApplicationAuthorization>(new ApiException("Bad scopes", (HttpStatusCode)422)));
             apiClient.GetOrCreateApplicationAuthenticationCode(Args.TwoFactorChallengCallback, null, true, false)
                 .Returns(Observable.Return(new ApplicationAuthorization("T0k3n")));
-            apiClient.GetUser().Returns(Observable.Return(CreateOctokitUser("jiminy")));
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("jiminy")));
             var hostCache = new InMemoryBlobCache();
             var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
             var loginCache = new TestLoginCache();
-            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>());
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
             await host.LogIn("jiminy", "aPassowrd");
 
@@ -151,15 +166,63 @@ public class RepositoryHostTests
             Assert.Equal("jiminy", loginInfo.UserName);
             Assert.Equal("T0k3n", loginInfo.Password);
         }
-    }
 
-    static User CreateOctokitUser(string login)
-    {
-        return new User("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", false);
-    }
+        [Fact]
+        public async Task SupportsGistIsTrueWhenGistScopeIsPresent()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax", new[] { "gist" })));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginCache = new TestLoginCache();
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
 
-    static Organization CreateOctokitOrganization(string login)
-    {
-        return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
+            var result = await host.LogIn("baymax", "aPassword");
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            Assert.True(host.SupportsGist);
+        }
+
+        [Fact]
+        public async Task SupportsGistIsFalseWhenGistScopeIsNotPresent()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax", new[] { "foo" })));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginCache = new TestLoginCache();
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+
+            var result = await host.LogIn("baymax", "aPassword");
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            Assert.False(host.SupportsGist);
+        }
+
+        [Fact]
+        public async Task SupportsGistIsTrueWhenScopesAreNull()
+        {
+            // TODO: Check assumptions here. From my conversation with @shana it seems that the first login
+            // will be done with basic auth and from then on a token will be used. So if it's the first login,
+            // it's from this version and so gists will be supported. However I've been unable to repro this
+            // behavior.
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.HostAddress.Returns(HostAddress.GitHubDotComHostAddress);
+            apiClient.GetUser().Returns(Observable.Return(CreateUserAndScopes("baymax")));
+            var hostCache = new InMemoryBlobCache();
+            var modelService = new ModelService(apiClient, hostCache, Substitute.For<IAvatarProvider>());
+            var loginCache = new TestLoginCache();
+            var usage = Substitute.For<IUsageTracker>();
+            var host = new RepositoryHost(apiClient, modelService, loginCache, Substitute.For<ITwoFactorChallengeHandler>(), usage);
+
+            var result = await host.LogIn("baymax", "aPassword");
+
+            Assert.Equal(AuthenticationResult.Success, result);
+            Assert.True(host.SupportsGist);
+        }
     }
 }

@@ -16,9 +16,11 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+build/
 
 # Roslyn cache directories
 *.ide/
+.vs/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

@@ -8,9 +8,9 @@ using GitHub.Services;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.UI;
-using GitHub.VisualStudio.Base;
 using GitHub.ViewModels;
 using System.Diagnostics;
+using GitHub.VisualStudio.UI.Views;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -26,36 +26,57 @@ namespace GitHub.VisualStudio.UI
     /// implementation of the IVsUIElementPane interface.
     /// </para>
     /// </remarks>
-    [Guid("6b0fdc0a-f28e-47a0-8eed-cc296beff6d2")]
-    public class GitHubPane : ToolWindowPane
+    [Guid(GitHubPaneGuid)]
+    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
+    public class GitHubPane : ToolWindowPane, IServiceProviderAware, IViewHost
     {
+        public const string GitHubPaneGuid = "6b0fdc0a-f28e-47a0-8eed-cc296beff6d2";
+        bool initialized = false;
+
+        IView View
+        {
+            get { return Content as IView; }
+            set { Content = value; }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public GitHubPane() : base(null)
         {
             Caption = "GitHub";
-
-            // Set the image that will appear on the tab of the window frame
-            // when docked with an other window
-            // The resource ID correspond to the one defined in the resx file
-            // while the Index is the offset in the bitmap strip. Each image in
-            // the strip being 16x16.
-            BitmapResourceID = 301;
-            BitmapIndex = 1;
+            
+            BitmapImageMoniker = new Microsoft.VisualStudio.Imaging.Interop.ImageMoniker()
+            {
+                Guid = GuidList.guidImageMoniker,
+                Id = 1
+            };
             ToolBar = new CommandID(GuidList.guidGitHubToolbarCmdSet, PkgCmdIDList.idGitHubToolbar);
             ToolBarLocation = (int)VSTWT_LOCATION.VSTWT_TOP;
-
-            var factory = this.GetExportedValue<IUIProvider>().GetService<IExportFactoryProvider>();
-            // placeholder logic to load the view until the UIController is able to do it for us
-            Content = factory.GetView(Exports.UIViewType.GitHubPane).Value;
-            (Content as UserControl).DataContext = factory.GetViewModel(Exports.UIViewType.GitHubPane).Value;
+            var provider = Services.GitHubServiceProvider;
+            var uiProvider = provider.GetServiceSafe<IUIProvider>();
+            View = uiProvider.GetView(Exports.UIViewType.GitHubPane);
         }
 
         protected override void Initialize()
         {
             base.Initialize();
-            var vm = (Content as IView).ViewModel as IServiceProviderAware;
-            Debug.Assert(vm != null);
-            vm?.Initialize(this);
+            Initialize(this);
+        }
+
+        public void Initialize(IServiceProvider serviceProvider)
+        {
+            if (!initialized)
+            {
+                initialized = true;
+
+                var vm = View.ViewModel as IServiceProviderAware;
+                Debug.Assert(vm != null);
+                vm?.Initialize(serviceProvider);
+            }
+        }
+
+        public void ShowView(ViewWithData data)
+        {
+            View.ViewModel?.Initialize(data);
         }
     }
 }

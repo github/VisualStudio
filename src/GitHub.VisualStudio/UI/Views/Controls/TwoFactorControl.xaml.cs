@@ -10,7 +10,7 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericTwoFactorControl : SimpleViewUserControl<ITwoFactorDialogViewModel, TwoFactorControl>
+    public class GenericTwoFactorControl : ViewBase<ITwoFactorDialogViewModel, TwoFactorControl>
     { }
 
     /// <summary>
@@ -23,8 +23,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
         public TwoFactorControl()
         {
             InitializeComponent();
-
-            DataContextChanged += (s, e) => ViewModel = (ITwoFactorDialogViewModel)e.NewValue;
 
             this.WhenActivated(d =>
             {

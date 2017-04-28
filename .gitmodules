@@ -1,21 +1,18 @@
 [submodule "submodules/rothko"]
 	path = submodules/rothko
-	url = https://github.com/Haacked/Rothko.git
+	url = https://github.com/editor-tools/Rothko.git
 [submodule "submodules/reactiveui"]
 	path = submodules/reactiveui
-	url = https://github.com/shana/ReactiveUI
+	url = https://github.com/editor-tools/ReactiveUI
 [submodule "submodules/octokit.net"]
 	path = submodules/octokit.net
-	url = https://github.com/shana/Octokit.Net
+	url = https://github.com/editor-tools/Octokit.Net
 [submodule "submodules/splat"]
 	path = submodules/splat
-	url = https://github.com/shana/splat.git
+	url = https://github.com/editor-tools/splat.git
 [submodule "submodules/akavache"]
 	path = submodules/akavache
-	url = https://github.com/shana/Akavache
-[submodule "submodules/libgit2sharp"]
-	path = submodules/libgit2sharp
-	url = https://github.com/shana/libgit2sharp.git
+	url = https://github.com/editor-tools/Akavache
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts

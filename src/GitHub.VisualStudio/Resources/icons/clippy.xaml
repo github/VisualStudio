@@ -1,0 +1,18 @@
+﻿<Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         Width="1024" Height="1024">
+  <Border BorderBrush="Transparent" BorderThickness="1">
+    <ui:OcticonImage xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+                     xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                     Foreground="{DynamicResource GitHubContextMenuIconBrush}"
+                     Icon="clippy">
+      <ui:OcticonImage.Resources>
+        <ResourceDictionary>
+          <ResourceDictionary.MergedDictionaries>
+            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+          </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+      </ui:OcticonImage.Resources>
+    </ui:OcticonImage>
+  </Border>
+</Viewbox>

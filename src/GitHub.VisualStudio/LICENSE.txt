@@ -9,8 +9,8 @@ IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS EULA, DO NOT INSTALL, USE OR COP
  • You must agree to all of the terms of this EULA to use this Software.
  • If so, you may use the Software for free and for any lawful purpose.
  • This Software automatically communicates with GitHub servers 
-    for three reasons: (1) to receive and install updates; (2) to send error
-    reports; and (3) to send anonymized usage information. You can view
+    for two reasons: (1) to send error reports; and
+    (2) to send anonymized usage information. You can view
     sample data to see what information is sent, and you may opt out of
     sending the anonymized usage data.
  • This Software is provided "as-is" with no warranties, and you agree
@@ -41,6 +41,25 @@ This EULA entitles you to install as many copies of the Software as you want, an
 
  4. You may not remove or alter any proprietary notices or marks on
      the Software.
+
+			PRIVACY NOTICES
+
+The Software automatically communicates with GitHub servers for two purposes: (1) sending error reports; and (2) sending anonymized usage data so we may improve the Software. If you would like to learn more about the specific information we send, please visit https://visualstudio.github.com/samples.html. You may opt out of sending the anonymized usage data, but if you do not want the Software to send error reports, you must uninstall the Software.
+
+ 1. ERROR REPORTS. In order to help us improve the Software, when the
+     Software encounters certain errors, it will automatically send some
+     information to GitHub about the error (as described at the URL
+     above).
+     This feature may not be disabled. If you do not want to send error
+     reports to GitHub, you must uninstall the Software.
+
+ 2. ANONYMIZED USAGE DATA. GitHub collects anonymized data about
+     your usage of the Software to help us make it more awesome.
+     Approximately once a day the Software sends such data
+     (as described in more detail at the URL above) to GitHub's servers.
+     If you do not want to send anonymized usage data to GitHub,
+     you may opt out by changing your settings in the
+     Visual Studio Options dialog under the GitHub section.
 
 		  OPEN-SOURCE NOTICES
 

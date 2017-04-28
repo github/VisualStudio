@@ -9,11 +9,14 @@ using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using Octokit;
-using ReactiveUI;
 using Rothko;
 using UnitTests;
 using Xunit;
 using GitHub.Extensions;
+using GitHub.SampleData;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Reactive.Subjects;
 
 public class RepositoryCreationViewModelTests
 {
@@ -30,8 +33,9 @@ public class RepositoryCreationViewModelTests
         creationService = creationService ?? provider.GetRepositoryCreationService();
         var avatarProvider = provider.GetAvatarProvider();
         var connection = provider.GetConnection();
+        var usageTracker = Substitute.For<IUsageTracker>();
 
-        return new RepositoryCreationViewModel(repositoryHost, os, creationService, avatarProvider);
+        return new RepositoryCreationViewModel(repositoryHost, os, creationService, usageTracker);
     }
 
     public class TheSafeRepositoryNameProperty : TestBaseClass
@@ -281,7 +285,7 @@ public class RepositoryCreationViewModelTests
         {
             var provider = Substitutes.ServiceProvider;
             var operatingSystem = provider.GetOperatingSystem();
-            operatingSystem.File.Exists(@"c:\fake\foo\.git\HEAD").Returns(exists);
+            operatingSystem.Directory.Exists(@"c:\fake\foo").Returns(exists);
             var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\";
 
@@ -325,14 +329,14 @@ public class RepositoryCreationViewModelTests
         [Fact]
         public void IsPopulatedByTheRepositoryHost()
         {
-            var accounts = new ReactiveList<IAccount>() { Substitute.For<IAccount>(), Substitute.For<IAccount>() };
+            var accounts = new List<IAccount> { new AccountDesigner(), new AccountDesigner() };
             var repositoryHost = Substitute.For<IRepositoryHost>();
             repositoryHost.ModelService.GetAccounts().Returns(Observable.Return(accounts));
             var vm = new RepositoryCreationViewModel(
                 repositoryHost,
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IRepositoryCreationService>(),
-                Substitute.For<IAvatarProvider>());
+                Substitute.For<IUsageTracker>());
 
             Assert.Equal(vm.Accounts[0], vm.SelectedAccount);
             Assert.Equal(2, vm.Accounts.Count);
@@ -342,11 +346,10 @@ public class RepositoryCreationViewModelTests
     public class TheGitIgnoreTemplatesProperty : TestBaseClass
     {
         [Fact]
-        public void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
+        public async void IsPopulatedByTheApiAndSortedWithRecommendedFirst()
         {
             var gitIgnoreTemplates = new[]
             {
-                "None",
                 "VisualStudio",
                 "Node",
                 "Waf",
@@ -358,8 +361,11 @@ public class RepositoryCreationViewModelTests
             hosts.LookupHost(Args.HostAddress).Returns(host);
             host.ModelService
                 .GetGitIgnoreTemplates()
-                .Returns(gitIgnoreTemplates.ToObservable().ToReadOnlyList());
+                .Returns(gitIgnoreTemplates.ToObservable());
             var vm = GetMeAViewModel(provider);
+
+            // this is how long the default collection waits to process about 5 things with the default UI settings
+            await Task.Delay(100);
 
             var result = vm.GitIgnoreTemplates;
 
@@ -380,11 +386,10 @@ public class RepositoryCreationViewModelTests
     public class TheLicensesProperty : TestBaseClass
     {
         [Fact]
-        public void IsPopulatedByTheModelService()
+        public async void IsPopulatedByTheModelService()
         {
             var licenses = new[]
             {
-                LicenseItem.None,
                 new LicenseItem("apache-2.0", "Apache License 2.0"),
                 new LicenseItem("mit", "MIT License"),
                 new LicenseItem("agpl-3.0", "GNU Affero GPL v3.0"),
@@ -396,8 +401,11 @@ public class RepositoryCreationViewModelTests
             hosts.LookupHost(Args.HostAddress).Returns(host);
             host.ModelService
                 .GetLicenses()
-                .Returns(licenses.ToObservable().ToReadOnlyList());
+                .Returns(licenses.ToObservable());
             var vm = GetMeAViewModel(provider);
+
+            // this is how long the default collection waits to process about 5 things with the default UI settings
+            await Task.Delay(100);
 
             var result = vm.Licenses;
 
@@ -420,11 +428,10 @@ public class RepositoryCreationViewModelTests
     public class TheSelectedGitIgnoreProperty : TestBaseClass
     {
         [Fact]
-        public void DefaultsToVisualStudio()
+        public async void DefaultsToVisualStudio()
         {
             var gitignores = new[]
             {
-                GitIgnoreItem.None,
                 GitIgnoreItem.Create("C++"),
                 GitIgnoreItem.Create("Node"),
                 GitIgnoreItem.Create("VisualStudio"),
@@ -435,8 +442,11 @@ public class RepositoryCreationViewModelTests
             hosts.LookupHost(Args.HostAddress).Returns(host);
             host.ModelService
                 .GetGitIgnoreTemplates()
-                .Returns(gitignores.ToObservable().ToReadOnlyList());
+                .Returns(gitignores.ToObservable());
             var vm = GetMeAViewModel(provider);
+
+            // this is how long the default collection waits to process about 5 things with the default UI settings
+            await Task.Delay(100);
 
             Assert.Equal("VisualStudio", vm.SelectedGitIgnoreTemplate.Name);
         }
@@ -456,7 +466,7 @@ public class RepositoryCreationViewModelTests
             hosts.LookupHost(Args.HostAddress).Returns(host);
             host.ModelService
                 .GetGitIgnoreTemplates()
-                .Returns(gitignores.ToObservable().ToReadOnlyList());
+                .Returns(gitignores.ToObservable());
             var vm = GetMeAViewModel(provider);
 
             Assert.Equal("None", vm.SelectedGitIgnoreTemplate.Name);
@@ -495,7 +505,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -526,7 +536,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -558,7 +568,7 @@ public class RepositoryCreationViewModelTests
             var hosts = provider.GetRepositoryHosts();
             var host = hosts.GitHubHost;
             hosts.LookupHost(Args.HostAddress).Returns(host);
-            host.ModelService.GetAccounts().Returns(Observable.Return(new ReactiveList<IAccount> { account }));
+            host.ModelService.GetAccounts().Returns(Observable.Return(new List<IAccount> { account }));
             var vm = GetMeAViewModel(provider);
             vm.RepositoryName = "Krieger";
             vm.BaseRepositoryPath = @"c:\dev";
@@ -594,7 +604,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel();
             vm.RepositoryName = repositoryName;
             vm.BaseRepositoryPath = baseRepositoryPath;
-            var reactiveCommand = vm.CreateRepository as ReactiveCommand<Unit>;
+            var reactiveCommand = vm.CreateRepository as ReactiveUI.ReactiveCommand<Unit>;
 
             bool result = reactiveCommand.CanExecute(null);
 
