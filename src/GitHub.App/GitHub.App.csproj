@@ -221,7 +221,7 @@
     <Compile Include="ViewModels\PanePageViewModelBase.cs" />
     <Compile Include="ViewModels\DialogViewModelBase.cs" />
     <Compile Include="Models\ConnectionRepositoryHostMap.cs" />
-    <Compile Include="ViewModels\CloneSyncViewModel.cs" />
+    <Compile Include="Services\SynchronizeForkService.cs" />
     <Compile Include="ViewModels\GistCreationViewModel.cs" />
     <Compile Include="ViewModels\NotAGitRepositoryViewModel.cs" />
     <Compile Include="ViewModels\NotAGitHubRepositoryViewModel.cs" />

@@ -790,7 +790,16 @@ namespace GitHub.VisualStudio.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Thanks for installing GitHub for Visual Studio. Why not take a look at our [training](show-training) or [documentation](show-docs)?
+        ///   Looks up a localized string similar to Synchronize.
+        /// </summary>
+        public static string SynchronizeFork {
+            get {
+                return ResourceManager.GetString("SynchronizeFork", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
         ///
         ///[Don&apos;t show this again](dont-show-again).
         /// </summary>

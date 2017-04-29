@@ -89,6 +89,9 @@
       <DependentUpon>InfoPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\DrawingExtensions.cs" />
+    <Compile Include="UI\Views\SynchronizeForkWithUpstream.xaml.cs">
+      <DependentUpon>SynchronizeForkWithUpstream.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Views\GitHubConnectContent.xaml.cs">
       <DependentUpon>GitHubConnectContent.xaml</DependentUpon>
     </Compile>
@@ -173,6 +176,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\Controls\InfoPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Views\SynchronizeForkWithUpstream.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -22,6 +22,22 @@ namespace GitHub.Extensions
         }
 
         [return: AllowNull]
+        public static async Task<bool> Catch(this Task source, Func<Exception, bool> handler = null)
+        {
+            try
+            {
+                await source;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (handler != null)
+                    return handler(ex);
+                return false;
+            }
+        }
+
+        [return: AllowNull]
         public static async Task Catch(this Task source, Action<Exception> handler = null)
         {
             try

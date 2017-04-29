@@ -141,6 +141,9 @@
   <data name="CreateLink" xml:space="preserve">
     <value>Create</value>
   </data>
+  <data name="SynchronizeFork" xml:space="preserve">
+    <value>Synchronize</value>
+  </data>
   <data name="DescriptionOptional" xml:space="preserve">
     <value>Description (Optional)</value>
   </data>
@@ -203,9 +206,6 @@
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
     <value>Graphs</value>
-  </data>
-  <data name="SynchronizeCloneText" xml:space="preserve">
-    <value>Synchronize Clone</value>
   </data>
   <data name="GitHubPublishSectionTitle" xml:space="preserve">
     <value>Publish to GitHub</value>

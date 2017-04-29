@@ -1,4 +1,5 @@
 ﻿using GitHub.Models;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace GitHub.VisualStudio.TeamExplorer.Connect
@@ -11,5 +12,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         bool OpenRepository();
         IConnection SectionConnection { get; }
         ICommand Clone { get; }
+    }
+
+}
+
+namespace GitHub.VisualStudio.TeamExplorer.Sync
+{
+    public interface ISynchronizeForkWithUpstreamSection
+    {
+        Task Synchronize();
     }
 }

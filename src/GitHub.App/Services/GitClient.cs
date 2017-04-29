@@ -10,6 +10,7 @@ using LibGit2Sharp;
 using NullGuard;
 using System.Diagnostics;
 using NLog;
+using GitHub.Helpers;
 
 namespace GitHub.Services
 {
@@ -60,6 +61,15 @@ namespace GitHub.Services
                     repository.Network.Push(remote, "HEAD", remoteRef, pushOptions);
                 }
             });
+        }
+
+        public async Task Push(IRepository repository, Branch branch)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotNull(branch, nameof(branch));
+
+            await ThreadingHelper.SwitchToPoolThreadAsync();
+            repository.Network.Push(branch, pushOptions);
         }
 
         public Task Fetch(IRepository repository, string remoteName)

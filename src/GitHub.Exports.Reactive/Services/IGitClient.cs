@@ -122,5 +122,7 @@ namespace GitHub.Services
         /// The filename of a temporary file containing the file contents.
         /// </returns>
         Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
+
+        Task Push(IRepository repository, Branch branch);
     }
 }
