@@ -23,7 +23,8 @@
         <Binding>
             <Binding.Source>
                 <sampleData:PullRequestDetailViewModelDesigner SourceBranchDisplayName="shana/error-handling-a-ridiculously-long-branch-name-because-why-not"
-                                                               TargetBranchDisplayName="master-is-always-stable">
+                                                               TargetBranchDisplayName="master-is-always-stable"
+                                                               CommentCount="10">
                     <!--
                     <sampleData:PullRequestDetailViewModelDesigner.CheckoutState>
                         <sampleData:PullRequestCheckoutStateDesigner Caption="Checkout error-handling/>
@@ -158,13 +159,23 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Opacity="0.5" Margin="0 2 0 0" VerticalAlignment="Top"
+                    <TextBlock Grid.Column="0" Opacity="0.5" VerticalAlignment="Center"
                                Text="{Binding Model.UpdatedAt, StringFormat={x:Static prop:Resources.UpdatedFormat}, Converter={ui:DurationToStringConverter}, Mode=OneWay}"/>
 
                     <Rectangle Grid.Column="1" Margin="5" Width="1" Height="12" VerticalAlignment="Top" Style="{DynamicResource Separator}" />
 
-                    <!-- Checkout pull request button -->
-                    <ui:GitHubActionLink Command="{Binding Checkout}"
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center">
+                        <ui:OcticonImage Icon="comment_discussion" Margin="0 0 0 -3"/>
+                        <Hyperlink>
+                            <Run Text="{Binding CommentCount}"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </Grid>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                <!-- Checkout pull request button -->
+                <ui:GitHubActionLink Command="{Binding Checkout}"
                                          Content="{Binding CheckoutState.Caption}"
                                          Grid.Column="2"
                                          VerticalAlignment="Center"
@@ -173,58 +184,58 @@
                                          ToolTip="{Binding CheckoutState.ToolTip}"
                                          ToolTipService.ShowOnDisabled="True"/>
 
-                    <!-- Pull/push buttons -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
-                                Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
-                        <ui:OcticonImage Icon="arrow_down"/>
-                        <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
-                        <ui:GitHubActionLink Content="Pull"
+                <!-- Pull/push buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                            Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToInverseVisibilityConverter}}">
+                    <ui:OcticonImage Icon="arrow_down"/>
+                    <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
+                    <ui:GitHubActionLink Content="Pull"
                                              Command="{Binding Pull}"
                                              Margin="4,0"
                                              ToolTip="{Binding UpdateState.PullToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
-                        <ui:OcticonImage Icon="arrow_up"/>
-                        <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
-                        <ui:GitHubActionLink Content="Push"
+                    <ui:OcticonImage Icon="arrow_up"/>
+                    <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
+                    <ui:GitHubActionLink Content="Push"
                                              Command="{Binding Push}"
                                              Margin="4,0"
                                              ToolTip="{Binding UpdateState.PushToolTip}"
                                              ToolTipService.ShowOnDisabled="True"
                                              VerticalAlignment="Center"/>
-                    </StackPanel>
+                </StackPanel>
 
-                    <!-- Branch checked out and up-to-date -->
-                    <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap" Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
-                        <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
-                                            <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
-                                        </MultiDataTrigger.Conditions>
-                                        <MultiDataTrigger.Setters>
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </MultiDataTrigger.Setters>
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
-            </StackPanel>
+                <!-- Branch checked out and up-to-date -->
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ui:BooleanToVisibilityConverter}}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
+                                        <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                    <ui:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
+                    <Run Text="{x:Static prop:Resources.LocalBranchUpToDate}"/>
+                </TextBlock>
 
+            </Grid>
+            
             <!-- Git operation error message -->
-
             <TextBox Grid.Column="0"
                      Grid.ColumnSpan="3"
                      Grid.Row="2"
                      Foreground="Red" 
-                     Margin="0 0 0 0"
+                     Margin="0 2 0 0"
                      Text="{Binding OperationError, Mode=OneWay}"
                      VerticalAlignment="Center"
                      TextWrapping="Wrap"
@@ -366,7 +377,9 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                                 <ui:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0"/>
-                                                <Run Text="{Binding CommentCount, Mode=OneWay}"/>
+                                                <Hyperlink>
+                                                    <Run Text="{Binding CommentCount, Mode=OneWay}"/>
+                                                </Hyperlink>
                                             </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>

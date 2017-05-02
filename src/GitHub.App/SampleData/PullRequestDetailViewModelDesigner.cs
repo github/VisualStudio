@@ -74,6 +74,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ILocalRepositoryModel Repository { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
+        public int CommentCount { get; set; }
         public bool IsLoading { get; }
         public bool IsBusy { get; }
         public bool IsCheckedOut { get; }

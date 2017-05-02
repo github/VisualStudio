@@ -34,6 +34,7 @@ namespace GitHub.ViewModels
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
+        int commentCount;
         string body;
         IReadOnlyList<IPullRequestChangeNode> changedFilesTree;
         IPullRequestCheckoutState checkoutState;
@@ -155,6 +156,15 @@ namespace GitHub.ViewModels
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
+        }
+
+        /// <summary>
+        /// Gets the number of comments made on the pull request.
+        /// </summary>
+        public int CommentCount
+        {
+            get { return commentCount; }
+            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
         }
 
         /// <summary>
@@ -301,6 +311,7 @@ namespace GitHub.ViewModels
             IsFromFork = pullRequestsService.IsPullRequestFromFork(Repository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
+            CommentCount = pullRequest.Comments.Count;
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             var changes = await pullRequestsService.GetTreeChanges(Repository, pullRequest);
@@ -416,7 +427,7 @@ namespace GitHub.ViewModels
 
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
-                var commentCount = pullRequest.Comments
+                var fileCommentCount = pullRequest.Comments
                     .Where(x => x.Path == changedFile.FileName && x.OriginalPosition.HasValue)
                     .Count();
 
@@ -426,7 +437,7 @@ namespace GitHub.ViewModels
                     changedFile.Sha,
                     changedFile.Status,
                     GetStatusDisplay(changedFile, changes),
-                    commentCount);
+                    fileCommentCount);
                 var dir = GetDirectory(node.DirectoryPath, dirs);
                 dir.Files.Add(node);
             }

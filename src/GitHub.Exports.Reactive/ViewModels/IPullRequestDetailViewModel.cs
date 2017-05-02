@@ -86,6 +86,11 @@ namespace GitHub.ViewModels
         string TargetBranchDisplayName { get; }
 
         /// <summary>
+        /// Gets the number of comments made on the pull request.
+        /// </summary>
+        int CommentCount { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the pull request branch is checked out.
         /// </summary>
         bool IsCheckedOut { get; }
