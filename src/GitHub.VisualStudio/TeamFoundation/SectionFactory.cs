@@ -23,6 +23,9 @@ namespace GitHub.VisualStudio.TeamFoundation
         IDialogService dialogService;
         Lazy<IVisualStudioBrowser> visualStudioBrowser;
         Lazy<IRepositoryHosts> repositoryHosts;
+        Lazy<ITeamExplorerServices> teamExplorerServices;
+        Lazy<IPackageSettings> packageSettings;
+        Lazy<IUsageTracker> usageTracker;
 
         [ImportingConstructor]
         public SectionFactory(
@@ -36,7 +39,10 @@ namespace GitHub.VisualStudio.TeamFoundation
             IRepositoryCloneService cloneService,
             IDialogService dialogService,
             Lazy<IVisualStudioBrowser> visualStudioBrowser,
-            Lazy<IRepositoryHosts> repositoryHosts)
+            Lazy<IRepositoryHosts> repositoryHosts,
+            Lazy<ITeamExplorerServices> teamExplorerServices,
+            Lazy<IPackageSettings> packageSettings,
+            Lazy<IUsageTracker> usageTracker)
         {
             this.serviceProvider = serviceProvider;
             this.apiFactory = apiFactory;
@@ -48,10 +54,14 @@ namespace GitHub.VisualStudio.TeamFoundation
             this.dialogService = dialogService;
             this.visualStudioBrowser = visualStudioBrowser;
             this.repositoryHosts = repositoryHosts;
+            this.teamExplorerServices = teamExplorerServices;
+            this.packageSettings = packageSettings;
+            this.usageTracker = usageTracker;
         }
 
         [ResolvingTeamExplorerSection(GitHubHomeSection.GitHubHomeSectionId, TeamExplorerPageIds.Home, 10)]
-        public object Home => new GitHubHomeSection(serviceProvider, apiFactory, holder, visualStudioBrowser.Value);
+        public object Home => new GitHubHomeSection(serviceProvider, apiFactory, holder, visualStudioBrowser.Value,
+            teamExplorerServices.Value, packageSettings.Value, usageTracker.Value);
 
         [ResolvingTeamExplorerSection(GitHubConnectSection0.GitHubConnectSection0Id, TeamExplorerPageIds.Connect, 10)]
         public object Connect0 => new GitHubConnectSection0(serviceProvider, apiFactory, holder, manager, settings, vsServices, cloneService, dialogService);
