@@ -167,7 +167,7 @@
                     <TextBlock Grid.Column="2" VerticalAlignment="Center">
                         <ui:OcticonImage Icon="comment_discussion" Margin="0 0 0 -3"/>
                         <Hyperlink>
-                            <Run Text="{Binding CommentCount}"/>
+                            <Run Text="{Binding CommentCount, Mode=OneWay}"/>
                         </Hyperlink>
                     </TextBlock>
                 </Grid>
