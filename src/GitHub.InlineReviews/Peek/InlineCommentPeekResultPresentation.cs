@@ -7,17 +7,17 @@ using GitHub.Api;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class ReviewPeekResultPresentation : IPeekResultPresentation
+    class InlineCommentPeekResultPresentation : IPeekResultPresentation
     {
         readonly IApiClient apiClient;
-        readonly ReviewPeekResult result;
+        readonly InlineCommentPeekResult result;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
 
-        public ReviewPeekResultPresentation(
+        public InlineCommentPeekResultPresentation(
             IApiClient apiClient,
-            ReviewPeekResult result)
+            InlineCommentPeekResult result)
         {
             this.apiClient = apiClient;
             this.result = result;

@@ -12,14 +12,14 @@ namespace GitHub.InlineReviews.Tags
     [Name("ReviewGlyph")]
     [Order(Before = "VsTextMarker")]
     [ContentType("code")]
-    [TagType(typeof(ReviewTag))]
-    class ReviewGlyphFactoryProvider : IGlyphFactoryProvider, IGlyphMouseProcessorProvider
+    [TagType(typeof(InlineCommentTag))]
+    class InlineCommentGlyphFactoryProvider : IGlyphFactoryProvider, IGlyphMouseProcessorProvider
     {
         readonly IPeekBroker peekBroker;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
 
         [ImportingConstructor]
-        public ReviewGlyphFactoryProvider(
+        public InlineCommentGlyphFactoryProvider(
             IPeekBroker peekBroker,
             IViewTagAggregatorFactoryService tagAggregatorFactory)
         {
@@ -29,16 +29,16 @@ namespace GitHub.InlineReviews.Tags
 
         public IGlyphFactory GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
         {
-            return new ReviewGlyphFactory();
+            return new InlineCommentGlyphFactory();
         }
 
         public IMouseProcessor GetAssociatedMouseProcessor(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin margin)
         {
-            return new ReviewGlyphMouseProcessor(
+            return new InlineCommentGlyphMouseProcessor(
                 peekBroker,
                 wpfTextViewHost.TextView,
                 margin,
-                tagAggregatorFactory.CreateTagAggregator<ReviewTag>(wpfTextViewHost.TextView));
+                tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(wpfTextViewHost.TextView));
         }
     }
 }

@@ -12,8 +12,8 @@ namespace GitHub.InlineReviews.Tags
 {
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
-    [TagType(typeof(ReviewTag))]
-    class ReviewTaggerProvider : IViewTaggerProvider
+    [TagType(typeof(InlineCommentTag))]
+    class InlineCommentTaggerProvider : IViewTaggerProvider
     {
         readonly IGitService gitService;
         readonly IGitClient gitClient;
@@ -21,7 +21,7 @@ namespace GitHub.InlineReviews.Tags
         readonly IPullRequestReviewSessionManager sessionManager;
 
         [ImportingConstructor]
-        public ReviewTaggerProvider(
+        public InlineCommentTaggerProvider(
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
@@ -40,7 +40,7 @@ namespace GitHub.InlineReviews.Tags
         public ITagger<T> CreateTagger<T>(ITextView view, ITextBuffer buffer) where T : ITag
         {
             return buffer.Properties.GetOrCreateSingletonProperty(()=> 
-                new ReviewTagger(
+                new InlineCommentTagger(
                     gitService,
                     gitClient,
                     diffService,

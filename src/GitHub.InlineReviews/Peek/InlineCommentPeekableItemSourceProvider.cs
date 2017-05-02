@@ -4,26 +4,24 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
-using GitHub.InlineReviews.Tags;
 
 namespace GitHub.InlineReviews.Peek
 {
     [Export(typeof(IPeekableItemSourceProvider))]
     [ContentType("text")]
-    [Name("GitHub Peekable Review Provider")]
-    class ReviewPeekableItemSourceProvider : IPeekableItemSourceProvider
+    class InlineCommentPeekableItemSourceProvider : IPeekableItemSourceProvider
     {
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
 
         [ImportingConstructor]
-        public ReviewPeekableItemSourceProvider(IViewTagAggregatorFactoryService tagAggregatorFactory)
+        public InlineCommentPeekableItemSourceProvider(IViewTagAggregatorFactoryService tagAggregatorFactory)
         {
             this.tagAggregatorFactory = tagAggregatorFactory;
         }
 
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
         {
-            return new ReviewPeekableItemSource(textBuffer, tagAggregatorFactory);
+            return new InlineCommentPeekableItemSource(textBuffer, tagAggregatorFactory);
         }
     }
 }

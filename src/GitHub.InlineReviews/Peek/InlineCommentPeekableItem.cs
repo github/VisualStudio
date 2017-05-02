@@ -6,12 +6,12 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class ReviewPeekableItem : IPeekableItem
+    class InlineCommentPeekableItem : IPeekableItem
     {
         readonly IPullRequestReviewSession session;
         readonly IList<InlineCommentModel> comments;
 
-        public ReviewPeekableItem(
+        public InlineCommentPeekableItem(
             IPullRequestReviewSession session,
             IList<InlineCommentModel> comments)
         {
@@ -21,11 +21,11 @@ namespace GitHub.InlineReviews.Peek
 
         public string DisplayName => "GitHub Code Review";
 
-        public IEnumerable<IPeekRelationship> Relationships => new[] { ReviewPeekRelationship.Instance };
+        public IEnumerable<IPeekRelationship> Relationships => new[] { InlineCommentPeekRelationship.Instance };
 
         public IPeekResultSource GetOrCreateResultSource(string relationshipName)
         {
-            return new ReviewPeekableResultSource(session, comments);
+            return new InlineCommentPeekableResultSource(session, comments);
         }
     }
 }

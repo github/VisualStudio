@@ -18,7 +18,7 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.Tags
 {
-    sealed class ReviewTagger : ITagger<ReviewTag>, IDisposable
+    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
         readonly IGitService gitService;
         readonly IGitClient gitClient;
@@ -36,7 +36,7 @@ namespace GitHub.InlineReviews.Tags
         InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
 
-        public ReviewTagger(
+        public InlineCommentTagger(
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
@@ -77,7 +77,7 @@ namespace GitHub.InlineReviews.Tags
             subscription?.Dispose();
         }
 
-        public IEnumerable<ITagSpan<ReviewTag>> GetTags(NormalizedSnapshotSpanCollection spans)
+        public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             if (!initialized)
             {
@@ -99,9 +99,9 @@ namespace GitHub.InlineReviews.Tags
                     foreach (var entry in spanComments)
                     {
                         var line = span.Snapshot.GetLineFromLineNumber(entry.Key);
-                        yield return new TagSpan<ReviewTag>(
+                        yield return new TagSpan<InlineCommentTag>(
                             new SnapshotSpan(line.Start, line.End),
-                            new ReviewTag(session, entry));
+                            new InlineCommentTag(session, entry));
                     }
                 }
             }

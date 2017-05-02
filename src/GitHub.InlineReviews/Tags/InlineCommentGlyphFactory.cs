@@ -5,12 +5,12 @@ using Microsoft.VisualStudio.Text.Formatting;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class ReviewGlyphFactory : IGlyphFactory
+    class InlineCommentGlyphFactory : IGlyphFactory
     {
         public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
         {
-            var reviewTag = (ReviewTag)tag;
-            return new ReviewGlyph()
+            var reviewTag = (InlineCommentTag)tag;
+            return new InlineCommentGlyph()
             {
                 Opacity = reviewTag.NeedsUpdate ? 0.5 : 1,
             };

@@ -6,9 +6,9 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class ReviewPeekResult : IPeekResult
+    class InlineCommentPeekResult : IPeekResult
     {
-        public ReviewPeekResult(
+        public InlineCommentPeekResult(
             IPullRequestReviewSession session,
             IList<InlineCommentModel> comments)
         {

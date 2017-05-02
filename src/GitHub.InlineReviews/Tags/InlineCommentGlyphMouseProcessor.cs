@@ -9,18 +9,18 @@ using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class ReviewGlyphMouseProcessor : MouseProcessorBase
+    class InlineCommentGlyphMouseProcessor : MouseProcessorBase
     {
         readonly IPeekBroker peekBroker;
         readonly ITextView textView;
         readonly IWpfTextViewMargin margin;
-        readonly ITagAggregator<ReviewTag> tagAggregator;
+        readonly ITagAggregator<InlineCommentTag> tagAggregator;
 
-        public ReviewGlyphMouseProcessor(
+        public InlineCommentGlyphMouseProcessor(
             IPeekBroker peekBroker,
             ITextView textView,
             IWpfTextViewMargin margin,
-            ITagAggregator<ReviewTag> aggregator)
+            ITagAggregator<InlineCommentTag> aggregator)
         {
             this.peekBroker = peekBroker;
             this.textView = textView;
@@ -40,7 +40,7 @@ namespace GitHub.InlineReviews.Tags
                 if (tag != null)
                 {
                     var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-                    var options = new ReviewPeekSessionCreationOptions(textView, trackingPoint, tag.Tag.Session, tag.Tag.Comments);
+                    var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, tag.Tag.Session, tag.Tag.Comments);
                     var session = peekBroker.TriggerPeekSession(options);
                     e.Handled = true;
                 }

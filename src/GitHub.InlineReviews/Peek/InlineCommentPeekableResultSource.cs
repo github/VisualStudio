@@ -7,12 +7,12 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class ReviewPeekableResultSource : IPeekResultSource
+    class InlineCommentPeekableResultSource : IPeekResultSource
     {
         readonly IPullRequestReviewSession session;
         readonly IList<InlineCommentModel> comments;
 
-        public ReviewPeekableResultSource(
+        public InlineCommentPeekableResultSource(
             IPullRequestReviewSession session,
             IList<InlineCommentModel> comments)
         {
@@ -22,7 +22,7 @@ namespace GitHub.InlineReviews.Peek
 
         public void FindResults(string relationshipName, IPeekResultCollection resultCollection, CancellationToken cancellationToken, IFindPeekResultsCallback callback)
         {
-            resultCollection.Add(new ReviewPeekResult(session, comments));
+            resultCollection.Add(new InlineCommentPeekResult(session, comments));
         }
     }
 }

@@ -7,9 +7,9 @@ using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class ReviewTag : IGlyphTag
+    class InlineCommentTag : IGlyphTag
     {
-        public ReviewTag(IPullRequestReviewSession session, IEnumerable<InlineCommentModel> comments)
+        public InlineCommentTag(IPullRequestReviewSession session, IEnumerable<InlineCommentModel> comments)
         {
             Comments = new List<InlineCommentModel>(comments);
             Session = session;

@@ -3,21 +3,21 @@ using Microsoft.VisualStudio.Language.Intellisense;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class ReviewPeekRelationship : IPeekRelationship
+    class InlineCommentPeekRelationship : IPeekRelationship
     {
-        static ReviewPeekRelationship instance;
+        static InlineCommentPeekRelationship instance;
 
-        private ReviewPeekRelationship()
+        private InlineCommentPeekRelationship()
         {
         }
 
-        public static ReviewPeekRelationship Instance
+        public static InlineCommentPeekRelationship Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new ReviewPeekRelationship();
+                    instance = new InlineCommentPeekRelationship();
                 }
 
                 return instance;

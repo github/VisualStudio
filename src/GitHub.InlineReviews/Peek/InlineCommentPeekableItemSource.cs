@@ -7,12 +7,12 @@ using GitHub.InlineReviews.Tags;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class ReviewPeekableItemSource : IPeekableItemSource
+    class InlineCommentPeekableItemSource : IPeekableItemSource
     {
         readonly ITextBuffer textBuffer;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
 
-        public ReviewPeekableItemSource(
+        public InlineCommentPeekableItemSource(
             ITextBuffer textBuffer,
             IViewTagAggregatorFactoryService tagAggregatorFactory)
         {
@@ -22,11 +22,11 @@ namespace GitHub.InlineReviews.Peek
 
         public void AugmentPeekSession(IPeekSession session, IList<IPeekableItem> peekableItems)
         {
-            var options = session.CreationOptions as ReviewPeekSessionCreationOptions;
+            var options = session.CreationOptions as InlineCommentPeekSessionCreationOptions;
 
-            if (session.RelationshipName == ReviewPeekRelationship.Instance.Name && options != null)
+            if (session.RelationshipName == InlineCommentPeekRelationship.Instance.Name && options != null)
             {
-                peekableItems.Add(new ReviewPeekableItem(options.Session, options.Comments));
+                peekableItems.Add(new InlineCommentPeekableItem(options.Session, options.Comments));
             }
         }
 

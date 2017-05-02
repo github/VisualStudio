@@ -3,31 +3,29 @@ using System.ComponentModel.Composition;
 using GitHub.Factories;
 using GitHub.Primitives;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Utilities;
 
 namespace GitHub.InlineReviews.Peek
 {
     [Export(typeof(IPeekResultPresenter))]
-    [Name("GitHub Review Peek Presenter")]
-    class ReviewPeekResultPresenter : IPeekResultPresenter
+    class InlineCommentPeekResultPresenter : IPeekResultPresenter
     {
         readonly IApiClientFactory apiClientFactory;
 
         [ImportingConstructor]
-        public ReviewPeekResultPresenter(IApiClientFactory apiClientFactory)
+        public InlineCommentPeekResultPresenter(IApiClientFactory apiClientFactory)
         {
             this.apiClientFactory = apiClientFactory;
         }
 
         public IPeekResultPresentation TryCreatePeekResultPresentation(IPeekResult result)
         {
-            var review = result as ReviewPeekResult;
+            var review = result as InlineCommentPeekResult;
 
             if (review != null)
             {
                 var hostAddress = HostAddress.Create(review.Session.Repository.CloneUrl.Host);
                 var apiClient = apiClientFactory.Create(hostAddress);
-                return new ReviewPeekResultPresentation(apiClient, review);
+                return new InlineCommentPeekResultPresentation(apiClient, review);
             }
 
             return null;
