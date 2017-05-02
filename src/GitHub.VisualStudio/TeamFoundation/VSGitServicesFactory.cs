@@ -1,11 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.TeamFoundation;
+using GitHub.Services;
 
-namespace GitHub.Services
+namespace GitHub.VisualStudio.TeamFoundation
 {
-    [Export]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServicesFactory
     {
         [ImportingConstructor]

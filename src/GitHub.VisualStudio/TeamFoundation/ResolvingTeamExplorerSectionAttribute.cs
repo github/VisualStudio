@@ -2,7 +2,7 @@
 using System.ComponentModel.Composition;
 using Microsoft.TeamFoundation.Controls;
 
-namespace GitHub.TeamFoundation
+namespace GitHub.VisualStudio.TeamFoundation
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]

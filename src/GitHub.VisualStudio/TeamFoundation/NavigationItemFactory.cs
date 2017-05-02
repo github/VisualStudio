@@ -2,13 +2,10 @@
 using System.ComponentModel.Composition;
 using GitHub.Api;
 using GitHub.Services;
-using GitHub.TeamFoundation;
 using GitHub.VisualStudio.TeamExplorer.Home;
 
-namespace GitHub.VisualStudio.TeamExplorer
+namespace GitHub.VisualStudio.TeamFoundation
 {
-    // Doesn't work if `CreationPolicy.Shared`.
-    [Export, PartCreationPolicy(CreationPolicy.NonShared)]
     public class NavigationItemFactory
     {
         IGitHubServiceProvider serviceProvider;

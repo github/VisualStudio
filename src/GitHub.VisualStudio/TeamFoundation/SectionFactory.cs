@@ -4,16 +4,13 @@ using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
-using GitHub.TeamFoundation;
 using GitHub.VisualStudio.TeamExplorer.Home;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
 
-namespace GitHub.VisualStudio.TeamExplorer
+namespace GitHub.VisualStudio.TeamFoundation
 {
-    // Doesn't work if `CreationPolicy.Shared`.
-    [Export, PartCreationPolicy(CreationPolicy.NonShared)]
     public class SectionFactory
     {
         IGitHubServiceProvider serviceProvider;

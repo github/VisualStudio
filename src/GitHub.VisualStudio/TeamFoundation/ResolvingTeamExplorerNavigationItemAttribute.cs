@@ -2,7 +2,7 @@
 using System.ComponentModel.Composition;
 using Microsoft.TeamFoundation.Controls;
 
-namespace GitHub.TeamFoundation
+namespace GitHub.VisualStudio.TeamFoundation
 {
     [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [MetadataAttribute]

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Services;
-using GitHub.TeamFoundation;
+using GitHub.VisualStudio.Base;
 
-namespace GitHub.VisualStudio.Base
+namespace GitHub.VisualStudio.TeamFoundation
 {
-    [Export]
-    [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolderFactory
     {
         [ImportingConstructor]

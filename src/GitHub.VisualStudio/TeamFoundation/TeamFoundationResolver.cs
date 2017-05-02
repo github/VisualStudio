@@ -3,9 +3,8 @@ using System.IO;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
-using GitHub.VisualStudio;
 
-namespace GitHub.TeamFoundation
+namespace GitHub.VisualStudio.TeamFoundation
 {
     [Export]
     [PartCreationPolicy(CreationPolicy.Shared)]
@@ -37,7 +36,7 @@ namespace GitHub.TeamFoundation
         }
 
         // NOTE: This is a workaround for https://github.com/github/VisualStudio/issues/923#issuecomment-287537118
-        // A consistent repro was to open Vsiaul Studio 2015 by double clicking on GitHubVS.sln.
+        // A consistent repro was to open Visual Studio 2015 by double clicking on GitHubVS.sln.
         // The `Microsoft.TeamFoundation.Controls.dll` assembly referenced by this solution would
         // be copied to and loaded from the following location:
         // C:\Users\<user>\AppData\Local\Microsoft\VisualStudio\14.0\ProjectAssemblies\ffp8wnnz01\Microsoft.TeamFoundation.Controls.dll
