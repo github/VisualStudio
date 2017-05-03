@@ -331,7 +331,7 @@
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
-    <Compile Include="TeamFoundation\ITeamFoundationResolver.cs" />
+    <Compile Include="TeamFoundation\IResolver.cs" />
     <Compile Include="TeamFoundation\NavigationItemFactory.cs" />
     <Compile Include="TeamFoundation\ResolvingTeamExplorerNavigationItemAttribute.cs" />
     <Compile Include="TeamFoundation\ResolvingTeamExplorerSectionAttribute.cs" />
@@ -339,6 +339,7 @@
     <Compile Include="TeamFoundation\TeamExplorerServiceHolderFactory.cs" />
     <Compile Include="TeamFoundation\TeamExplorerServicesFactory.cs" />
     <Compile Include="TeamFoundation\TeamFoundationResolver.cs" />
+    <Compile Include="TeamFoundation\PriorityAssemblyResolver.cs" />
     <Compile Include="TeamFoundation\VSGitServicesFactory.cs" />
     <Compile Include="UI\GitHubPane.cs" />
     <Compile Include="UI\Views\Controls\GistCreationControl.xaml.cs">
