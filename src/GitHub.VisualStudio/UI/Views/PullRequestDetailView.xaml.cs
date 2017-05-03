@@ -121,11 +121,15 @@ namespace GitHub.VisualStudio.UI.Views
                 object docView;
                 frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
+
                 AddCompareBufferTag(diffViewer.LeftView.TextBuffer, fullPath, true);
                 AddCompareBufferTag(diffViewer.RightView.TextBuffer, fullPath, false);
-                EnableGlyphMargin(diffViewer.LeftView);
-                EnableGlyphMargin(diffViewer.RightView);
-                EnableGlyphMargin(diffViewer.InlineView);
+
+                diffViewer.ViewMode = DifferenceViewMode.Inline;
+
+                diffViewer.LeftView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
+                diffViewer.RightView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
+                diffViewer.InlineView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
             }
             catch (Exception e)
             {
@@ -138,12 +142,6 @@ namespace GitHub.VisualStudio.UI.Views
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(CompareBufferTag),
                 () => new CompareBufferTag(path, isLeftBuffer));
-        }
-
-        void EnableGlyphMargin(IPropertyOwner propertyOwner)
-        {
-            var editorOptions = EditorOptionsFactoryService.GetOptions(propertyOwner);
-            editorOptions.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
         }
 
         void ShowErrorInStatusBar(string message, Exception e)
