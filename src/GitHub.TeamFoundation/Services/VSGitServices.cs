@@ -62,13 +62,12 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task Clone(string cloneUrl, string clonePath, bool recurseSubmodules, object progress = null)
         {
-#if (!TEAMEXPLORER14)
             if (TeamFoundationVersion.Major >= 15)
             {
                 await Clone15(cloneUrl, clonePath, recurseSubmodules, progress);
                 return;
             }
-#endif
+
             await Clone14(cloneUrl, clonePath, recurseSubmodules);
         }
 
@@ -82,7 +81,6 @@ namespace GitHub.Services
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
         }
 
-#if (!TEAMEXPLORER14)
         public async Task Clone15(string cloneUrl, string clonePath, bool recurseSubmodules, object progress = null)
         {
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
@@ -95,7 +93,6 @@ namespace GitHub.Services
                 await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
         }
-#endif
 
         IGitRepositoryInfo GetRepoFromVS()
         {
