@@ -55,8 +55,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             OpenOnGitHub = openOnGitHub;
 
             // We want to display a welcome message but only if Team Explorer isn't
-            // already displaying the "Install 3rd Party Tools" message. To do this
-            // we need to set a timer and check in the tick as at this point the message
+            // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
+            // To do this we need to set a timer and check in the tick as at this point the message
             // won't be initialized.
             if (!settings.HideTeamExplorerWelcomeMessage)
             {
@@ -65,7 +65,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 timer.Tick += (s, e) =>
                 {
                     timer.Stop();
-                    if (!IsGitToolsMessageVisible())
+                    if (!IsGitToolsMessageVisible() && IsVisible)
                     {
                         ShowWelcomeMessage();
                     }
