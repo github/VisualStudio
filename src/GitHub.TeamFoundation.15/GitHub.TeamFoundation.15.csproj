@@ -199,6 +199,9 @@
     <Compile Include="..\GitHub.TeamFoundation.14\Sync\GitHubPublishSection.cs">
       <Link>Sync\GitHubPublishSection.cs</Link>
     </Compile>
+    <Compile Include="..\GitHub.TeamFoundation.14\Sync\SynchronizeForkWithUpstreamSection.cs">
+      <Link>Sync\SynchronizeForkWithUpstreamSection.cs</Link>
+    </Compile>
     <Compile Include="..\GitHub.TeamFoundation.14\Services\TeamExplorerServices.cs">
       <Link>Services\TeamExplorerServices.cs</Link>
     </Compile>
