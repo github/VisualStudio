@@ -10,6 +10,8 @@ using LibGit2Sharp;
 using NullGuard;
 using System.Diagnostics;
 using NLog;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace GitHub.Services
 {
@@ -275,6 +277,20 @@ namespace GitHub.Services
                 var commit = repository.Lookup<Commit>(commitSha);
                 var blob = commit?[fileName]?.Target as Blob;
                 return blob?.GetContentText();
+            });
+        }
+
+        public Task<bool> IsModified(IRepository repository, string path, string contents)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
+                {
+                    var repoContents = (repository.Head[path].Target as Blob)?.GetContentText();
+                    return !contents.EqualsIgnoringLineEndings(repoContents);
+                }
+
+                return true;
             });
         }
 

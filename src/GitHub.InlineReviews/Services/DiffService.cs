@@ -106,6 +106,10 @@ namespace GitHub.InlineReviews.Services
                             NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
                         };
                     }
+                    else if (line == "\\ No newline at end of file")
+                    {
+                        break;
+                    }
                     else if (chunk != null)
                     {
                         var type = GetLineChange(line[0]);
@@ -151,7 +155,7 @@ namespace GitHub.InlineReviews.Services
                 case ' ': return DiffChangeType.None;
                 case '+': return DiffChangeType.Add;
                 case '-': return DiffChangeType.Delete;
-                default: throw new InvalidDataException(@"Invalid diff line change char: '{c}'.");
+                default: throw new InvalidDataException($"Invalid diff line change char: '{c}'.");
             }
         }
     }

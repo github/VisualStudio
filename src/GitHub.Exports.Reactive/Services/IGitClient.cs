@@ -134,5 +134,15 @@ namespace GitHub.Services
         /// The contents of the file, or null if the file was not found at the specified commit.
         /// </returns>
         Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
+
+        /// <summary>
+        /// Checks whether the latest commit of a file in the repository has the specified file
+        /// contents.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="path">The relative path to the file.</param>
+        /// <param name="contents">The file contents to test.</param>
+        /// <returns></returns>
+        Task<bool> IsModified(IRepository repository, string path, string contents);
     }
 }

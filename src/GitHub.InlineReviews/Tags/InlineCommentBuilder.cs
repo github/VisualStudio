@@ -55,7 +55,7 @@ namespace GitHub.InlineReviews.Services
             comments = session.GetCommentsForFile(path);
         }
 
-        public async Task<IList<InlineCommentModel>> Update(ITextSnapshot snapshot)
+        public async Task<IList<InlineCommentModel>> BuildComments(ITextSnapshot snapshot)
         {
             Guard.ArgumentNotNull(snapshot, nameof(snapshot));
 
@@ -84,6 +84,34 @@ namespace GitHub.InlineReviews.Services
 
                 return result;
             });
+        }
+
+        public async Task<IList<int>> GetAddCommentLines(ITextSnapshot snapshot)
+        {
+            Guard.ArgumentNotNull(snapshot, nameof(snapshot));
+
+            var result = new List<int>();
+
+            if (!await gitClient.IsModified(repository, path, snapshot.GetText()))
+            {
+                var patch = await gitClient.Compare(
+                    repository,
+                    session.PullRequest.Base.Sha,
+                    repository.Head.Tip.Sha,
+                    path);
+                var diff = diffService.ParseFragment(patch.Content);
+
+                foreach (var chunk in diff)
+                {
+                    foreach (var line in chunk.Lines)
+                    {
+                        if (line.NewLineNumber != -1)
+                            result.Add(line.NewLineNumber);
+                    }
+                }
+            }
+
+            return result;
         }
 
         void BuildDiffHunks()

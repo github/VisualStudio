@@ -35,6 +35,7 @@ namespace GitHub.InlineReviews.Tags
         IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
         IList<InlineCommentModel> comments;
+        IList<int> addCommentLines;
 
         public InlineCommentTagger(
             IGitService gitService,
@@ -194,7 +195,9 @@ namespace GitHub.InlineReviews.Tags
                 leftHandSide,
                 tabsToSpaces);
 
-            comments = await commentBuilder.Update(snapshot);
+            comments = await commentBuilder.BuildComments(snapshot);
+            addCommentLines = await commentBuilder.GetAddCommentLines(snapshot);
+
             NotifyTagsChanged();
         }
 
@@ -218,11 +221,13 @@ namespace GitHub.InlineReviews.Tags
         {
             if (buffer.CurrentSnapshot == snapshot)
             {
-                var updated = await commentBuilder.Update(snapshot);
+                var newComments = await commentBuilder.BuildComments(snapshot);
+                var newCommentLines = await commentBuilder.GetAddCommentLines(snapshot);
 
                 if (buffer.CurrentSnapshot == snapshot)
                 {
-                    comments = updated;
+                    comments = newComments;
+                    addCommentLines = newCommentLines;
                     NotifyTagsChanged();
                 }
             }
