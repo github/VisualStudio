@@ -10,6 +10,16 @@ namespace GitHub.InlineReviews.Views
         public CommentView()
         {
             InitializeComponent();
+            this.Loaded += CommentView_Loaded;
+        }
+
+        private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (buttonPanel.IsVisible)
+            {
+                BringIntoView();
+                body.Focus();
+            }
         }
 
         private void ReplyPlaceholder_GotFocus(object sender, System.Windows.RoutedEventArgs e)

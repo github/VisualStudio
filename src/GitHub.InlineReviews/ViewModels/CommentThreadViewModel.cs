@@ -24,14 +24,24 @@ namespace GitHub.InlineReviews.ViewModels
             this.apiClient = apiClient;
             this.session = session;
 
-            var commentViewModels = comments
-                .Select(x => new CommentViewModel(this, session.User, x.Original))
-                .Concat(new[]
-                {
-                    CommentViewModel.CreatePlaceholder(this, session.User),
-                });
+            if (comments != null)
+            {
+                var commentViewModels = comments
+                    .Select(x => new CommentViewModel(this, session.User, x.Original))
+                    .Concat(new[]
+                    {
+                        CommentViewModel.CreatePlaceholder(this, session.User),
+                    });
 
-            Comments = new ObservableCollection<CommentViewModel>(commentViewModels);
+                Comments = new ObservableCollection<CommentViewModel>(commentViewModels);
+            }
+            else
+            {
+                var placeholder = CommentViewModel.CreatePlaceholder(this, session.User);
+                placeholder.BeginEdit.Execute(null);
+                Comments = new ObservableCollection<CommentViewModel>();
+                Comments.Add(placeholder);
+            }
         }
 
         public ObservableCollection<CommentViewModel> Comments { get; }

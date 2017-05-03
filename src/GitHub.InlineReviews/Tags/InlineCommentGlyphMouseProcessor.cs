@@ -16,13 +16,13 @@ namespace GitHub.InlineReviews.Tags
         readonly IPeekBroker peekBroker;
         readonly ITextView textView;
         readonly IWpfTextViewMargin margin;
-        readonly ITagAggregator<ShowInlineCommentTag> tagAggregator;
+        readonly ITagAggregator<InlineCommentTag> tagAggregator;
 
         public InlineCommentGlyphMouseProcessor(
             IPeekBroker peekBroker,
             ITextView textView,
             IWpfTextViewMargin margin,
-            ITagAggregator<ShowInlineCommentTag> aggregator)
+            ITagAggregator<InlineCommentTag> aggregator)
         {
             this.peekBroker = peekBroker;
             this.textView = textView;
@@ -54,8 +54,9 @@ namespace GitHub.InlineReviews.Tags
 
                 if (tag != null)
                 {
+                    var showTag = tag.Tag as ShowInlineCommentTag;
                     var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-                    var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, tag.Tag.Session, tag.Tag.Comments);
+                    var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, tag.Tag.Session, showTag?.Comments);
                     var session = peekBroker.TriggerPeekSession(options);
                     e.Handled = true;
                 }

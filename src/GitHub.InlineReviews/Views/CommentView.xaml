@@ -120,7 +120,8 @@
                                 VerticalAlignment="Top"
                                 Account="{Binding User}"/>
 
-            <ui:PromptTextBox Grid.Column="1"
+            <ui:PromptTextBox Name="body"
+                              Grid.Column="1"
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               Margin="0"

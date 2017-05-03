@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.Tags
                 peekBroker,
                 wpfTextViewHost.TextView,
                 margin,
-                tagAggregatorFactory.CreateTagAggregator<ShowInlineCommentTag>(wpfTextViewHost.TextView));
+                tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(wpfTextViewHost.TextView));
         }
     }
 }
