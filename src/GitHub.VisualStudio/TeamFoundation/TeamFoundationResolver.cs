@@ -7,23 +7,53 @@ using System.ComponentModel.Composition;
 namespace GitHub.VisualStudio.TeamFoundation
 {
     [Export(typeof(ITeamFoundationResolver))]
-    public sealed class TeamFoundationResolver : ITeamFoundationResolver, IDisposable
+    public class TeamFoundationResolver : ITeamFoundationResolver, IDisposable
     {
-        const string BindingPath = @"CommonExtensions\Microsoft\TeamFoundation\Team Explorer";
-        const string AssemblyStartsWith = "Microsoft.TeamFoundation.";
-        const string AssemblyEndsWith = ", PublicKeyToken=b03f5f7f11d50a3a";
+        bool disposed;
 
-        internal static Type Resolve(Func<Type> func)
+        readonly string bindingPath;
+        readonly string assemblyStartsWith;
+        readonly string assemblyEndsWith;
+
+        public TeamFoundationResolver() : this(@"CommonExtensions\Microsoft\TeamFoundation\Team Explorer",
+            "Microsoft.TeamFoundation.", ", PublicKeyToken=b03f5f7f11d50a3a")
+        {
+            TryAddPriorityAssemblyResolve(AppDomain.CurrentDomain, CurrentDomain_AssemblyResolve);
+        }
+
+        public TeamFoundationResolver(string bindingPath, string assemblyStartsWith, string assemblyEndsWith)
+        {
+            this.bindingPath = bindingPath;
+            this.assemblyStartsWith = assemblyStartsWith;
+            this.assemblyEndsWith = assemblyEndsWith;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+                disposed = true;
+            }
+        }
+
+        public static Type Resolve(Func<Type> func)
         {
             using (new TeamFoundationResolver())
             {
                 return func();
             }
-        }
-
-        internal TeamFoundationResolver()
-        {
-            TryAddPriorityAssemblyResolve(AppDomain.CurrentDomain, CurrentDomain_AssemblyResolve);
         }
 
         // NOTE: This is a workaround for https://github.com/github/VisualStudio/issues/923#issuecomment-287537118
@@ -54,11 +84,6 @@ namespace GitHub.VisualStudio.TeamFoundation
             }
         }
 
-        public void Dispose()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
-        }
-
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods",
             Justification = "Assembly.LoadFrom is normal for AssemblyResolve event")]
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", Justification = "I like $ strings")]
@@ -67,8 +92,8 @@ namespace GitHub.VisualStudio.TeamFoundation
             try
             {
                 var name = args.Name;
-                if (name.StartsWith(AssemblyStartsWith, StringComparison.Ordinal) &&
-                    name.EndsWith(AssemblyEndsWith, StringComparison.Ordinal))
+                if (name.StartsWith(assemblyStartsWith, StringComparison.Ordinal) &&
+                    name.EndsWith(assemblyEndsWith, StringComparison.Ordinal))
                 {
                     var assemblyName = new AssemblyName(name);
                     var path = GetTeamExplorerPath(assemblyName.Name);
@@ -88,9 +113,9 @@ namespace GitHub.VisualStudio.TeamFoundation
             return null;
         }
 
-        static string GetTeamExplorerPath(string name)
+        string GetTeamExplorerPath(string name)
         {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, BindingPath, name + ".dll");
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, bindingPath, name + ".dll");
         }
     }
 }
