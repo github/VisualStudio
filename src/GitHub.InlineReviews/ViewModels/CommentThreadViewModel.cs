@@ -109,7 +109,7 @@ namespace GitHub.InlineReviews.ViewModels
                 body,
                 CommitSha,
                 FilePath.Replace("\\", "/"),
-                DiffLine).ToTask();
+                DiffLine + 1).ToTask();
         }
 
         Task<PullRequestReviewComment> PostReply(string body, int replyTo)

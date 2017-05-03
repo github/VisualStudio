@@ -104,6 +104,7 @@ namespace GitHub.InlineReviews.Services
                         {
                             OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value),
                             NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
+                            DiffLine = diffLine,
                         };
                     }
                     else if (line == "\\ No newline at end of file")

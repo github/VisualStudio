@@ -114,16 +114,20 @@ namespace GitHub.InlineReviews.Tags
                     repository.Head.Tip.Sha,
                     path);
                 var diff = diffService.ParseFragment(patch.Content);
+                var startLine = -1;
 
                 foreach (var chunk in diff)
                 {
+                    if (startLine == -1)
+                        startLine = chunk.DiffLine + 1;
+
                     foreach (var line in chunk.Lines)
                     {
                         if (line.NewLineNumber != -1 && !linesWithComments[line.NewLineNumber - 1])
                         {
                             result.Add(new AddCommentModel(
                                 repository.Head.Tip.Sha,
-                                line.DiffLineNumber,
+                                line.DiffLineNumber - startLine,
                                 line.NewLineNumber - 1));
                         }
                     }

@@ -8,6 +8,7 @@ namespace GitHub.InlineReviews.Models
     {
         public int OldLineNumber { get; set; }
         public int NewLineNumber { get; set; }
+        public int DiffLine { get; set; }
         public IList<DiffLine> Lines { get; } = new List<DiffLine>();
 
         public override string ToString()
