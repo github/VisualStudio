@@ -9,11 +9,11 @@ namespace GitHub.InlineReviews.Peek
     class InlineCommentPeekableItem : IPeekableItem
     {
         readonly IPullRequestReviewSession session;
-        readonly IList<InlineCommentModel> comments;
+        readonly IReadOnlyList<InlineCommentModel> comments;
 
         public InlineCommentPeekableItem(
             IPullRequestReviewSession session,
-            IList<InlineCommentModel> comments)
+            IReadOnlyList<InlineCommentModel> comments)
         {
             this.session = session;
             this.comments = comments;

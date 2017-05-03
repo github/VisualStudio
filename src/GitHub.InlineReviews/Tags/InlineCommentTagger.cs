@@ -34,8 +34,8 @@ namespace GitHub.InlineReviews.Tags
         IDisposable subscription;
         IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
-        IList<InlineCommentModel> comments;
-        IList<int> addCommentLines;
+        IReadOnlyList<InlineCommentModel> comments;
+        IReadOnlyList<int> addCommentLines;
 
         public InlineCommentTagger(
             IGitService gitService,
@@ -100,9 +100,20 @@ namespace GitHub.InlineReviews.Tags
                     foreach (var entry in spanComments)
                     {
                         var line = span.Snapshot.GetLineFromLineNumber(entry.Key);
-                        yield return new TagSpan<InlineCommentTag>(
+                        yield return new TagSpan<ShowInlineCommentTag>(
                             new SnapshotSpan(line.Start, line.End),
-                            new InlineCommentTag(session, entry));
+                            new ShowInlineCommentTag(session, entry));
+                    }
+
+                    foreach (var lineNumber in addCommentLines)
+                    {
+                        if (lineNumber >= startLine && lineNumber <= endLine)
+                        {
+                            var line = span.Snapshot.GetLineFromLineNumber(lineNumber);
+                            yield return new TagSpan<InlineCommentTag>(
+                                new SnapshotSpan(line.Start, line.End),
+                                new AddInlineCommentTag(session));
+                        }
                     }
                 }
             }
@@ -195,8 +206,9 @@ namespace GitHub.InlineReviews.Tags
                 leftHandSide,
                 tabsToSpaces);
 
-            comments = await commentBuilder.BuildComments(snapshot);
-            addCommentLines = await commentBuilder.GetAddCommentLines(snapshot);
+            var result = await commentBuilder.Update(snapshot);
+            comments = result.Comments;
+            addCommentLines = result.AddCommentLines;
 
             NotifyTagsChanged();
         }
@@ -221,13 +233,12 @@ namespace GitHub.InlineReviews.Tags
         {
             if (buffer.CurrentSnapshot == snapshot)
             {
-                var newComments = await commentBuilder.BuildComments(snapshot);
-                var newCommentLines = await commentBuilder.GetAddCommentLines(snapshot);
+                var result = await commentBuilder.Update(snapshot);
 
                 if (buffer.CurrentSnapshot == snapshot)
                 {
-                    comments = newComments;
-                    addCommentLines = newCommentLines;
+                    comments = result.Comments;
+                    addCommentLines = result.AddCommentLines;
                     NotifyTagsChanged();
                 }
             }

@@ -78,14 +78,20 @@
     <Compile Include="SampleData\PullRequestReviewCommentDesigner.cs" />
     <Compile Include="Services\DiffService.cs" />
     <Compile Include="Services\IDiffService.cs" />
+    <Compile Include="Tags\AddInlineCommentTag.cs" />
     <Compile Include="Tags\InlineCommentBuilder.cs" />
-    <Compile Include="Tags\InlineCommentGlyph.xaml.cs">
-      <DependentUpon>InlineCommentGlyph.xaml</DependentUpon>
+    <Compile Include="Tags\InlineCommentBuilderResult.cs" />
+    <Compile Include="Tags\AddInlineCommentGlyph.xaml.cs">
+      <DependentUpon>AddInlineCommentGlyph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tags\ShowInlineCommentGlyph.xaml.cs">
+      <DependentUpon>ShowInlineCommentGlyph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tags\InlineCommentGlyphFactory.cs" />
     <Compile Include="Tags\InlineCommentGlyphFactoryProvider.cs" />
     <Compile Include="Tags\InlineCommentGlyphMouseProcessor.cs" />
     <Compile Include="Tags\InlineCommentTag.cs" />
+    <Compile Include="Tags\ShowInlineCommentTag.cs" />
     <Compile Include="Tags\InlineCommentTagger.cs" />
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
@@ -312,7 +318,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Tags\InlineCommentGlyph.xaml">
+    <Page Include="Tags\AddInlineCommentGlyph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tags\ShowInlineCommentGlyph.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -9,10 +9,11 @@ namespace GitHub.InlineReviews.Tags
 {
     [Export(typeof(IGlyphFactoryProvider))]
     [Export(typeof(IGlyphMouseProcessorProvider))]
-    [Name("ReviewGlyph")]
+    [Name("InlineCommentGlyph")]
     [Order(Before = "VsTextMarker")]
     [ContentType("code")]
-    [TagType(typeof(InlineCommentTag))]
+    [TagType(typeof(AddInlineCommentTag))]
+    [TagType(typeof(ShowInlineCommentTag))]
     class InlineCommentGlyphFactoryProvider : IGlyphFactoryProvider, IGlyphMouseProcessorProvider
     {
         readonly IPeekBroker peekBroker;
@@ -38,7 +39,7 @@ namespace GitHub.InlineReviews.Tags
                 peekBroker,
                 wpfTextViewHost.TextView,
                 margin,
-                tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(wpfTextViewHost.TextView));
+                tagAggregatorFactory.CreateTagAggregator<ShowInlineCommentTag>(wpfTextViewHost.TextView));
         }
     }
 }

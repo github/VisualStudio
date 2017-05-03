@@ -9,11 +9,22 @@ namespace GitHub.InlineReviews.Tags
     {
         public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
         {
-            var reviewTag = (InlineCommentTag)tag;
-            return new InlineCommentGlyph()
+            var addTag = tag as AddInlineCommentTag;
+            var showTag = tag as ShowInlineCommentTag;
+
+            if (addTag != null)
             {
-                Opacity = reviewTag.NeedsUpdate ? 0.5 : 1,
-            };
+                return new AddInlineCommentGlyph();
+            }
+            else if (showTag != null)
+            {
+                return new ShowInlineCommentGlyph()
+                {
+                    Opacity = showTag.NeedsUpdate ? 0.5 : 1,
+                };
+            }
+
+            return null;
         }
     }
 }

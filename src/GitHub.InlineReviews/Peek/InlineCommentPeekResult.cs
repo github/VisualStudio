@@ -10,14 +10,14 @@ namespace GitHub.InlineReviews.Peek
     {
         public InlineCommentPeekResult(
             IPullRequestReviewSession session,
-            IList<InlineCommentModel> comments)
+            IReadOnlyList<InlineCommentModel> comments)
         {
             this.Session = session;
             this.Comments = comments;
         }
 
         public bool CanNavigateTo => true;
-        public IList<InlineCommentModel> Comments { get; }
+        public IReadOnlyList<InlineCommentModel> Comments { get; }
         public IPullRequestReviewSession Session { get; }
 
         public IPeekResultDisplayInfo DisplayInfo { get; }

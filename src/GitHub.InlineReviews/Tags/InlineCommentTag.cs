@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GitHub.InlineReviews.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineCommentTag : IGlyphTag
+    abstract class InlineCommentTag : IGlyphTag
     {
-        public InlineCommentTag(IPullRequestReviewSession session, IEnumerable<InlineCommentModel> comments)
+        public InlineCommentTag(IPullRequestReviewSession session)
         {
-            Comments = new List<InlineCommentModel>(comments);
             Session = session;
         }
 
-        public IList<InlineCommentModel> Comments { get; }
-        public bool NeedsUpdate => Comments.Any(x => x.NeedsUpdate);
         public IPullRequestReviewSession Session { get; }
     }
 }

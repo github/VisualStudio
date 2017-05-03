@@ -1,19 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
+using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 
-namespace GitHub.InlineReviews.Services
+namespace GitHub.InlineReviews.Tags
 {
-    public class InlineCommentBuilder
+    class InlineCommentBuilder
     {
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
@@ -55,18 +55,19 @@ namespace GitHub.InlineReviews.Services
             comments = session.GetCommentsForFile(path);
         }
 
-        public async Task<IList<InlineCommentModel>> BuildComments(ITextSnapshot snapshot)
+        public async Task<InlineCommentBuilderResult> Update(ITextSnapshot snapshot)
         {
             Guard.ArgumentNotNull(snapshot, nameof(snapshot));
 
             if (diffHunks == null) BuildDiffHunks();
             if (baseCommit == null) await ExtractBaseCommit();
 
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
                 var current = snapshot.GetText();
                 var snapshotDiff = diffService.Diff(baseCommit, current, 4).ToList();
-                var result = new List<InlineCommentModel>();
+                var inlineComments = new List<InlineCommentModel>();
+                var linesWithComments = new BitArray(snapshot.LineCount);
 
                 foreach (var comment in comments)
                 {
@@ -78,15 +79,28 @@ namespace GitHub.InlineReviews.Services
                     {
                         var snapshotLine = snapshot.GetLineFromLineNumber(lineNumber);
                         var trackingPoint = snapshot.CreateTrackingPoint(snapshotLine.Start, PointTrackingMode.Positive);
-                        result.Add(new InlineCommentModel(lineNumber, comment, trackingPoint));
+                        inlineComments.Add(new InlineCommentModel(lineNumber, comment, trackingPoint));
+                        linesWithComments.Set(lineNumber, true);
                     }
                 }
 
-                return result;
+                var addCommentLines = await GetAddCommentLines(snapshot, linesWithComments);
+                return new InlineCommentBuilderResult(inlineComments, addCommentLines);
             });
         }
 
-        public async Task<IList<int>> GetAddCommentLines(ITextSnapshot snapshot)
+        void BuildDiffHunks()
+        {
+            diffHunks = new Dictionary<int, List<DiffLine>>();
+
+            foreach (var comment in comments)
+            {
+                var last = diffService.ParseFragment(comment.DiffHunk).Last();
+                diffHunks.Add(comment.Id, last.Lines.Reverse().Take(5).ToList());
+            }
+        }
+
+        async Task<List<int>> GetAddCommentLines(ITextSnapshot snapshot, BitArray linesWithComments)
         {
             Guard.ArgumentNotNull(snapshot, nameof(snapshot));
 
@@ -105,24 +119,13 @@ namespace GitHub.InlineReviews.Services
                 {
                     foreach (var line in chunk.Lines)
                     {
-                        if (line.NewLineNumber != -1)
-                            result.Add(line.NewLineNumber);
+                        if (line.NewLineNumber != -1 && !linesWithComments[line.NewLineNumber - 1])
+                            result.Add(line.NewLineNumber - 1);
                     }
                 }
             }
 
             return result;
-        }
-
-        void BuildDiffHunks()
-        {
-            diffHunks = new Dictionary<int, List<DiffLine>>();
-
-            foreach (var comment in comments)
-            {
-                var last = diffService.ParseFragment(comment.DiffHunk).Last();
-                diffHunks.Add(comment.Id, last.Lines.Reverse().Take(5).ToList());
-            }
         }
 
         DiffLine Match(IEnumerable<DiffChunk> diff, List<DiffLine> target)

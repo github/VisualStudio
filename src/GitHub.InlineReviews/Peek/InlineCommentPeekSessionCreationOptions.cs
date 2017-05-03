@@ -14,7 +14,7 @@ namespace GitHub.InlineReviews.Peek
             ITextView textView,
             ITrackingPoint triggerPoint,
             IPullRequestReviewSession session,
-            IList<InlineCommentModel> comments)
+            IReadOnlyList<InlineCommentModel> comments)
             : base(textView, InlineCommentPeekRelationship.Instance.Name, triggerPoint)
         {
             Session = session;
@@ -22,6 +22,6 @@ namespace GitHub.InlineReviews.Peek
         }
 
         public IPullRequestReviewSession Session { get; }
-        public IList<InlineCommentModel> Comments { get; }
+        public IReadOnlyList<InlineCommentModel> Comments { get; }
     }
 }

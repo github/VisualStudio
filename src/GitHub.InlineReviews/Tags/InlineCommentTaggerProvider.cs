@@ -12,7 +12,7 @@ namespace GitHub.InlineReviews.Tags
 {
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
-    [TagType(typeof(InlineCommentTag))]
+    [TagType(typeof(ShowInlineCommentTag))]
     class InlineCommentTaggerProvider : IViewTaggerProvider
     {
         readonly IGitService gitService;
