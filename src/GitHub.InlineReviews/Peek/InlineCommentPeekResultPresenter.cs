@@ -3,10 +3,12 @@ using System.ComponentModel.Composition;
 using GitHub.Factories;
 using GitHub.Primitives;
 using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Utilities;
 
 namespace GitHub.InlineReviews.Peek
 {
     [Export(typeof(IPeekResultPresenter))]
+    [Name("GitHub Inline Comments Peek Presenter")]
     class InlineCommentPeekResultPresenter : IPeekResultPresenter
     {
         readonly IApiClientFactory apiClientFactory;

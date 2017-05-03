@@ -9,6 +9,7 @@ namespace GitHub.InlineReviews.Peek
 {
     [Export(typeof(IPeekableItemSourceProvider))]
     [ContentType("text")]
+    [Name("GitHub Inline Comments Peekable Item Source")]
     class InlineCommentPeekableItemSourceProvider : IPeekableItemSourceProvider
     {
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
