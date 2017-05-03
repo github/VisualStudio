@@ -7,7 +7,7 @@ namespace GitHub.VisualStudio.TeamFoundation
     public class VSGitServicesFactory
     {
         [ImportingConstructor]
-        public VSGitServicesFactory(TeamFoundationResolver teamFoundationResolver, IGitHubServiceProvider serviceProvider)
+        public VSGitServicesFactory(ITeamFoundationResolver teamFoundationResolver, IGitHubServiceProvider serviceProvider)
         {
             VSGitServices = new VSGitServices(serviceProvider);
         }

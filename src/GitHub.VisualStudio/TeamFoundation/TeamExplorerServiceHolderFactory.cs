@@ -8,7 +8,7 @@ namespace GitHub.VisualStudio.TeamFoundation
     public class TeamExplorerServiceHolderFactory
     {
         [ImportingConstructor]
-        public TeamExplorerServiceHolderFactory(TeamFoundationResolver teamFoundationResolver)
+        public TeamExplorerServiceHolderFactory(ITeamFoundationResolver teamFoundationResolver)
         {
             TeamExplorerServiceHolder = new TeamExplorerServiceHolder();
         }

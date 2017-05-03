@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.TeamFoundation
 
         [ImportingConstructor]
         public NavigationItemFactory(
-            TeamFoundationResolver teamFoundationResolver,
+            ITeamFoundationResolver teamFoundationResolver,
             IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             Lazy<IVisualStudioBrowser> browser,

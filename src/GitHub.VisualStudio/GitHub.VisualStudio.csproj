@@ -331,6 +331,7 @@
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
+    <Compile Include="TeamFoundation\ITeamFoundationResolver.cs" />
     <Compile Include="TeamFoundation\NavigationItemFactory.cs" />
     <Compile Include="TeamFoundation\ResolvingTeamExplorerNavigationItemAttribute.cs" />
     <Compile Include="TeamFoundation\ResolvingTeamExplorerSectionAttribute.cs" />

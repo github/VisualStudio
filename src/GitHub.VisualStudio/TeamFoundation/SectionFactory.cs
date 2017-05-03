@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.TeamFoundation
 
         [ImportingConstructor]
         public SectionFactory(
-            TeamFoundationResolver teamFoundationResolver,
+            ITeamFoundationResolver teamFoundationResolver,
             IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,

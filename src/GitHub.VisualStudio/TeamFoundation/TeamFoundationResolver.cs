@@ -6,23 +6,14 @@ using System.ComponentModel.Composition;
 
 namespace GitHub.VisualStudio.TeamFoundation
 {
-    [Export]
-    [PartCreationPolicy(CreationPolicy.Shared)]
-    public sealed class TeamFoundationResolver : IDisposable
+    [Export(typeof(ITeamFoundationResolver))]
+    public sealed class TeamFoundationResolver : ITeamFoundationResolver, IDisposable
     {
         const string BindingPath = @"CommonExtensions\Microsoft\TeamFoundation\Team Explorer";
         const string AssemblyStartsWith = "Microsoft.TeamFoundation.";
         const string AssemblyEndsWith = ", PublicKeyToken=b03f5f7f11d50a3a";
 
         internal static Type Resolve(Func<Type> func)
-        {
-            using (new TeamFoundationResolver())
-            {
-                return func();
-            }
-        }
-
-        internal static object Resolve(Func<object> func)
         {
             using (new TeamFoundationResolver())
             {
