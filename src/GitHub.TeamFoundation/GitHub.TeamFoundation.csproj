@@ -145,78 +145,34 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\GitHub.TeamFoundation.14\Base\EnsureLoggedInSection.cs">
-      <Link>Base\EnsureLoggedInSection.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Base\TeamExplorerInvitationBase.cs">
-      <Link>Base\TeamExplorerInvitationBase.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Base\TeamExplorerNavigationItemBase.cs">
-      <Link>Base\TeamExplorerNavigationItemBase.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Base\TeamExplorerSectionBase.cs">
-      <Link>Base\TeamExplorerSectionBase.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Base\TeamExplorerServiceHolder.cs">
-      <Link>Base\TeamExplorerServiceHolder.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Connect\GitHubConnectSection.cs">
-      <Link>Connect\GitHubConnectSection.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Connect\GitHubConnectSection0.cs">
-      <Link>Connect\GitHubConnectSection0.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Connect\GitHubConnectSection1.cs">
-      <Link>Connect\GitHubConnectSection1.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Connect\GitHubInvitationSection.cs">
-      <Link>Connect\GitHubInvitationSection.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Home\GitHubHomeSection.cs">
-      <Link>Home\GitHubHomeSection.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Home\GraphsNavigationItem.cs">
-      <Link>Home\GraphsNavigationItem.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Home\IssuesNavigationItem.cs">
-      <Link>Home\IssuesNavigationItem.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Home\PullRequestsNavigationItem.cs">
-      <Link>Home\PullRequestsNavigationItem.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Home\PulseNavigationItem.cs">
-      <Link>Home\PulseNavigationItem.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Home\WikiNavigationItem.cs">
-      <Link>Home\WikiNavigationItem.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\RegistryHelper.cs">
-      <Link>RegistryHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Settings.cs">
-      <Link>Settings.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Sync\EnsureLoggedInSectionSync.cs">
-      <Link>Sync\EnsureLoggedInSectionSync.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Sync\GitHubPublishSection.cs">
-      <Link>Sync\GitHubPublishSection.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Services\TeamExplorerServices.cs">
-      <Link>Services\TeamExplorerServices.cs</Link>
-    </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\Services\VSGitServices.cs">
-      <Link>Services\VSGitServices.cs</Link>
-    </Compile>
+    <Compile Include="RegistryHelper.cs" />
+    <Compile Include="Services\TeamExplorerServices.cs" />
+    <Compile Include="Services\VSGitServices.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Sync\EnsureLoggedInSectionSync.cs" />
+    <Compile Include="Sync\GitHubPublishSection.cs" />
+    <Compile Include="TeamFoundationVersion.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
     </None>
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="..\GitHub.TeamFoundation.14\TeamFoundationVersion.cs">
-      <Link>TeamFoundationVersion.cs</Link>
-    </Compile>
+    <Compile Include="Base\EnsureLoggedInSection.cs" />
+    <Compile Include="Base\TeamExplorerInvitationBase.cs" />
+    <Compile Include="Base\TeamExplorerNavigationItemBase.cs" />
+    <Compile Include="Base\TeamExplorerSectionBase.cs" />
+    <Compile Include="Base\TeamExplorerServiceHolder.cs" />
+    <Compile Include="Connect\GitHubConnectSection.cs" />
+    <Compile Include="Connect\GitHubConnectSection0.cs" />
+    <Compile Include="Connect\GitHubConnectSection1.cs" />
+    <Compile Include="Connect\GitHubInvitationSection.cs" />
+    <Compile Include="Home\GitHubHomeSection.cs" />
+    <Compile Include="Home\GraphsNavigationItem.cs" />
+    <Compile Include="Home\IssuesNavigationItem.cs" />
+    <Compile Include="Home\PullRequestsNavigationItem.cs" />
+    <Compile Include="Home\PulseNavigationItem.cs" />
+    <Compile Include="Home\WikiNavigationItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
