@@ -96,9 +96,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI.Testing_Net45", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackingCollectionTests", "src\TrackingCollectionTests\TrackingCollectionTests.csproj", "{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.14", "src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj", "{161DBF01-1DBF-4B00-8551-C5C00F26720D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.15", "src\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj", "{161DBF01-1DBF-4B00-8551-C5C00F26720E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation", "src\GitHub.TeamFoundation\GitHub.TeamFoundation.csproj", "{161DBF01-1DBF-4B00-8551-C5C00F26720E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.UI", "src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj", "{D1DFBB0C-B570-4302-8F1E-2E3A19C41961}"
 EndProject
@@ -384,18 +382,6 @@ Global
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}.Release|x86.ActiveCfg = Release|Any CPU
 		{7B835A7D-CF94-45E8-B191-96F5A4FE26A8}.Release|x86.Build.0 = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Debug|x86.Build.0 = Debug|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Publish|Any CPU.ActiveCfg = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Publish|Any CPU.Build.0 = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Publish|x86.ActiveCfg = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Publish|x86.Build.0 = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Release|x86.ActiveCfg = Release|Any CPU
-		{161DBF01-1DBF-4B00-8551-C5C00F26720D}.Release|x86.Build.0 = Release|Any CPU
 		{161DBF01-1DBF-4B00-8551-C5C00F26720E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{161DBF01-1DBF-4B00-8551-C5C00F26720E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{161DBF01-1DBF-4B00-8551-C5C00F26720E}.Debug|x86.ActiveCfg = Debug|Any CPU
