@@ -127,7 +127,7 @@ namespace GitHub.InlineReviews.ViewModels
             try
             {
                 ErrorMessage = null;
-                CommentId = await Thread.AddReply(Body);
+                CommentId = await Thread.AddComment(Body);
                 State = CommentState.None;
                 UpdatedAt = DateTimeOffset.Now;
             }

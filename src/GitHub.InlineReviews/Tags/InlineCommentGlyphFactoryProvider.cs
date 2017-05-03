@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.Factories;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -16,14 +17,17 @@ namespace GitHub.InlineReviews.Tags
     [TagType(typeof(ShowInlineCommentTag))]
     class InlineCommentGlyphFactoryProvider : IGlyphFactoryProvider, IGlyphMouseProcessorProvider
     {
+        readonly IApiClientFactory apiClientFactory;
         readonly IPeekBroker peekBroker;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
 
         [ImportingConstructor]
         public InlineCommentGlyphFactoryProvider(
+            IApiClientFactory apiClientFactory,
             IPeekBroker peekBroker,
             IViewTagAggregatorFactoryService tagAggregatorFactory)
         {
+            this.apiClientFactory = apiClientFactory;
             this.peekBroker = peekBroker;
             this.tagAggregatorFactory = tagAggregatorFactory;
         }
@@ -36,6 +40,7 @@ namespace GitHub.InlineReviews.Tags
         public IMouseProcessor GetAssociatedMouseProcessor(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin margin)
         {
             return new InlineCommentGlyphMouseProcessor(
+                apiClientFactory,
                 peekBroker,
                 wpfTextViewHost.TextView,
                 margin,

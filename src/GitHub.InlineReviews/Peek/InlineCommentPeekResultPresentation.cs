@@ -3,24 +3,19 @@ using System.Windows;
 using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.InlineReviews.Views;
-using GitHub.Api;
 
 namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekResultPresentation : IPeekResultPresentation
     {
-        readonly IApiClient apiClient;
-        readonly InlineCommentPeekResult result;
+        readonly CommentThreadViewModel viewModel;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
 
-        public InlineCommentPeekResultPresentation(
-            IApiClient apiClient,
-            InlineCommentPeekResult result)
+        public InlineCommentPeekResultPresentation(CommentThreadViewModel viewModel)
         {
-            this.apiClient = apiClient;
-            this.result = result;
+            this.viewModel = viewModel;
         }
 
         public double ZoomLevel
@@ -50,11 +45,7 @@ namespace GitHub.InlineReviews.Peek
 
         public UIElement Create(IPeekSession session, IPeekResultScrollState scrollState)
         {
-            var viewModel = new CommentThreadViewModel(
-                apiClient,
-                result.Session,
-                result.Comments);
-            var view = new CommentBlockView();
+            var view = new CommentThreadView();
             view.DataContext = viewModel;
             return view;
         }

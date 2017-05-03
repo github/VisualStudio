@@ -64,6 +64,19 @@ namespace GitHub.Api
             string name,
             int number,
             string body,
+            string commitId,
+            string path,
+            int position)
+        {
+            var comment = new PullRequestReviewCommentCreate(body, commitId, path, position);
+            return gitHubClient.PullRequest.Comment.Create(owner, name, number, comment);
+        }
+
+        public IObservable<PullRequestReviewComment> CreatePullRequestReviewComment(
+            string owner,
+            string name,
+            int number,
+            string body,
             int inReplyTo)
         {
             var comment = new PullRequestReviewCommentReplyCreate(body, inReplyTo);

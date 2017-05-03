@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.Language.Intellisense;
-using GitHub.InlineReviews.Models;
-using GitHub.Services;
+using GitHub.Extensions;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekResult : IPeekResult
     {
-        public InlineCommentPeekResult(
-            IPullRequestReviewSession session,
-            IReadOnlyList<InlineCommentModel> comments)
+        public InlineCommentPeekResult(CommentThreadViewModel viewModel)
         {
-            this.Session = session;
-            this.Comments = comments;
+            Guard.ArgumentNotNull(viewModel, nameof(viewModel));
+
+            this.ViewModel = viewModel;
         }
 
         public bool CanNavigateTo => true;
-        public IReadOnlyList<InlineCommentModel> Comments { get; }
-        public IPullRequestReviewSession Session { get; }
+        public CommentThreadViewModel ViewModel { get; }
 
         public IPeekResultDisplayInfo DisplayInfo { get; }
             = new PeekResultDisplayInfo("Review", null, "GitHub Review", "GitHub Review");

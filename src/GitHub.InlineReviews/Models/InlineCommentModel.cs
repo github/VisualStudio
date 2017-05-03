@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Models
 {
-    public class InlineCommentModel
+    class InlineCommentModel
     {
         public InlineCommentModel(
             int lineNumber,

@@ -30,12 +30,13 @@ namespace GitHub.InlineReviews.Tags
         readonly int? tabsToSpaces;
         bool initialized;
         string fullPath;
+        string relativePath;
         bool leftHandSide;
         IDisposable subscription;
         IPullRequestReviewSession session;
         InlineCommentBuilder commentBuilder;
         IReadOnlyList<InlineCommentModel> comments;
-        IReadOnlyList<int> addCommentLines;
+        IReadOnlyList<AddCommentModel> addComments;
 
         public InlineCommentTagger(
             IGitService gitService,
@@ -105,14 +106,14 @@ namespace GitHub.InlineReviews.Tags
                             new ShowInlineCommentTag(session, entry));
                     }
 
-                    foreach (var lineNumber in addCommentLines)
+                    foreach (var addComment in addComments)
                     {
-                        if (lineNumber >= startLine && lineNumber <= endLine)
+                        if (addComment.LineNumber >= startLine && addComment.LineNumber <= endLine)
                         {
-                            var line = span.Snapshot.GetLineFromLineNumber(lineNumber);
+                            var line = span.Snapshot.GetLineFromLineNumber(addComment.LineNumber);
                             yield return new TagSpan<InlineCommentTag>(
                                 new SnapshotSpan(line.Start, line.End),
-                                new AddInlineCommentTag(session));
+                                new AddInlineCommentTag(session, addComment.CommitSha, relativePath, addComment.DiffLine));
                         }
                     }
                 }
@@ -179,9 +180,9 @@ namespace GitHub.InlineReviews.Tags
 
             if (session == null) return;
 
-            string path = RootedPathToRelativePath(fullPath, session.Repository.LocalPath);
+            relativePath = RootedPathToRelativePath(fullPath, session.Repository.LocalPath);
 
-            if (path == null) return;
+            if (relativePath == null) return;
 
             var snapshot = buffer.CurrentSnapshot;
 
@@ -202,13 +203,13 @@ namespace GitHub.InlineReviews.Tags
                 diffService,
                 session,
                 repository,
-                path,
+                relativePath,
                 leftHandSide,
                 tabsToSpaces);
 
             var result = await commentBuilder.Update(snapshot);
             comments = result.Comments;
-            addCommentLines = result.AddCommentLines;
+            addComments = result.AddComments;
 
             NotifyTagsChanged();
         }
@@ -238,7 +239,7 @@ namespace GitHub.InlineReviews.Tags
                 if (buffer.CurrentSnapshot == snapshot)
                 {
                     comments = result.Comments;
-                    addCommentLines = result.AddCommentLines;
+                    addComments = result.AddComments;
                     NotifyTagsChanged();
                 }
             }

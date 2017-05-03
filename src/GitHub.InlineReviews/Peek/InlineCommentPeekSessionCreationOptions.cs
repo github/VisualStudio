@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using GitHub.InlineReviews.Models;
-using GitHub.Services;
+using GitHub.InlineReviews.ViewModels;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -13,15 +11,12 @@ namespace GitHub.InlineReviews.Peek
         public InlineCommentPeekSessionCreationOptions(
             ITextView textView,
             ITrackingPoint triggerPoint,
-            IPullRequestReviewSession session,
-            IReadOnlyList<InlineCommentModel> comments)
+            CommentThreadViewModel viewModel)
             : base(textView, InlineCommentPeekRelationship.Instance.Name, triggerPoint)
         {
-            Session = session;
-            Comments = comments;
+            ViewModel = viewModel;
         }
 
-        public IPullRequestReviewSession Session { get; }
-        public IReadOnlyList<InlineCommentModel> Comments { get; }
+        public CommentThreadViewModel ViewModel { get; }
     }
 }

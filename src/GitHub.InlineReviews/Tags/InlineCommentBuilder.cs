@@ -100,11 +100,11 @@ namespace GitHub.InlineReviews.Tags
             }
         }
 
-        async Task<List<int>> GetAddCommentLines(ITextSnapshot snapshot, BitArray linesWithComments)
+        async Task<List<AddCommentModel>> GetAddCommentLines(ITextSnapshot snapshot, BitArray linesWithComments)
         {
             Guard.ArgumentNotNull(snapshot, nameof(snapshot));
 
-            var result = new List<int>();
+            var result = new List<AddCommentModel>();
 
             if (!await gitClient.IsModified(repository, path, snapshot.GetText()))
             {
@@ -120,7 +120,12 @@ namespace GitHub.InlineReviews.Tags
                     foreach (var line in chunk.Lines)
                     {
                         if (line.NewLineNumber != -1 && !linesWithComments[line.NewLineNumber - 1])
-                            result.Add(line.NewLineNumber - 1);
+                        {
+                            result.Add(new AddCommentModel(
+                                repository.Head.Tip.Sha,
+                                line.DiffLineNumber,
+                                line.NewLineNumber - 1));
+                        }
                     }
                 }
             }

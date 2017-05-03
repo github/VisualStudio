@@ -8,13 +8,13 @@ namespace GitHub.InlineReviews.Tags
     {
         public InlineCommentBuilderResult(
             IReadOnlyList<InlineCommentModel> comments,
-            IReadOnlyList<int> addCommentLines)
+            IReadOnlyList<AddCommentModel> addComments)
         {
             Comments = comments;
-            AddCommentLines = addCommentLines;
+            AddComments = addComments;
         }
 
         public IReadOnlyList<InlineCommentModel> Comments { get; }
-        public IReadOnlyList<int> AddCommentLines { get; }
+        public IReadOnlyList<AddCommentModel> AddComments { get; }
     }
 }

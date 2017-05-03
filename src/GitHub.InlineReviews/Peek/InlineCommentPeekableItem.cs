@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Language.Intellisense;
-using GitHub.InlineReviews.Models;
-using GitHub.Services;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItem : IPeekableItem
     {
-        readonly IPullRequestReviewSession session;
-        readonly IReadOnlyList<InlineCommentModel> comments;
+        readonly CommentThreadViewModel viewModel;
 
-        public InlineCommentPeekableItem(
-            IPullRequestReviewSession session,
-            IReadOnlyList<InlineCommentModel> comments)
+        public InlineCommentPeekableItem(CommentThreadViewModel viewModel)
         {
-            this.session = session;
-            this.comments = comments;
+            this.viewModel = viewModel;
         }
 
         public string DisplayName => "GitHub Code Review";
@@ -25,7 +20,7 @@ namespace GitHub.InlineReviews.Peek
 
         public IPeekResultSource GetOrCreateResultSource(string relationshipName)
         {
-            return new InlineCommentPeekableResultSource(session, comments);
+            return new InlineCommentPeekableResultSource(viewModel);
         }
     }
 }

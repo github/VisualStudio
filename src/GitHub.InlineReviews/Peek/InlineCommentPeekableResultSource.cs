@@ -1,28 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using Microsoft.VisualStudio.Language.Intellisense;
-using GitHub.InlineReviews.Models;
-using GitHub.Services;
+using GitHub.InlineReviews.ViewModels;
 
 namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableResultSource : IPeekResultSource
     {
-        readonly IPullRequestReviewSession session;
-        readonly IReadOnlyList<InlineCommentModel> comments;
+        readonly CommentThreadViewModel viewModel;
 
-        public InlineCommentPeekableResultSource(
-            IPullRequestReviewSession session,
-            IReadOnlyList<InlineCommentModel> comments)
+        public InlineCommentPeekableResultSource(CommentThreadViewModel viewModel)
         {
-            this.session = session;
-            this.comments = comments;
+            this.viewModel = viewModel;
         }
 
         public void FindResults(string relationshipName, IPeekResultCollection resultCollection, CancellationToken cancellationToken, IFindPeekResultsCallback callback)
         {
-            resultCollection.Add(new InlineCommentPeekResult(session, comments));
+            resultCollection.Add(new InlineCommentPeekResult(viewModel));
         }
     }
 }

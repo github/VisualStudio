@@ -61,6 +61,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="InlineReviewsPackage.cs" />
+    <Compile Include="Models\AddCommentModel.cs" />
     <Compile Include="Models\DiffChangeType.cs" />
     <Compile Include="Models\DiffChunk.cs" />
     <Compile Include="Models\DiffLine.cs" />
@@ -97,8 +98,8 @@
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="ViewModels\ICommentViewModel.cs" />
-    <Compile Include="Views\CommentBlockView.xaml.cs">
-      <DependentUpon>CommentBlockView.xaml</DependentUpon>
+    <Compile Include="Views\CommentThreadView.xaml.cs">
+      <DependentUpon>CommentThreadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
@@ -326,7 +327,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\CommentBlockView.xaml">
+    <Page Include="Views\CommentThreadView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
