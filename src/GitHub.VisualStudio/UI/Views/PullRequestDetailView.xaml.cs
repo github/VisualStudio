@@ -125,7 +125,9 @@ namespace GitHub.VisualStudio.UI.Views
                 AddCompareBufferTag(diffViewer.LeftView.TextBuffer, fullPath, true);
                 AddCompareBufferTag(diffViewer.RightView.TextBuffer, fullPath, false);
 
-                diffViewer.ViewMode = DifferenceViewMode.Inline;
+                // Set Inline mode but allow user to change.
+                diffViewer.Options.SetOptionValue(DifferenceViewerOptions.ViewModeId, DifferenceViewMode.Inline);
+                diffViewer.Options.ClearOptionValue(DifferenceViewerOptions.ViewModeId);
 
                 diffViewer.LeftView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
                 diffViewer.RightView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
