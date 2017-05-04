@@ -76,8 +76,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public bool IsLoading { get; }
         public bool IsBusy { get; }
         public bool IsCheckedOut { get; }
-        public bool IsLoading { get; }
-        public bool IsBusy { get; }
         public bool IsFromFork { get; }
         public string Body { get; }
         public IReadOnlyList<IPullRequestChangeNode> ChangedFilesTree => changedFilesTree;

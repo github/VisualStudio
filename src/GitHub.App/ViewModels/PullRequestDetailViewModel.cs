@@ -176,15 +176,6 @@ namespace GitHub.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the view model is loading.
-        /// </summary>
-        public bool IsLoading
-        {
-            get { return isLoading; }
-            private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether the pull request comes from a fork.
         /// </summary>
         public bool IsFromFork
