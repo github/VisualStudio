@@ -8,12 +8,12 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekResultPresentation : IPeekResultPresentation
     {
-        readonly CommentThreadViewModel viewModel;
+        readonly InlineCommentThreadViewModel viewModel;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
 
-        public InlineCommentPeekResultPresentation(CommentThreadViewModel viewModel)
+        public InlineCommentPeekResultPresentation(InlineCommentThreadViewModel viewModel)
         {
             this.viewModel = viewModel;
         }

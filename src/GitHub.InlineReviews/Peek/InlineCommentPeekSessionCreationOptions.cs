@@ -11,12 +11,12 @@ namespace GitHub.InlineReviews.Peek
         public InlineCommentPeekSessionCreationOptions(
             ITextView textView,
             ITrackingPoint triggerPoint,
-            CommentThreadViewModel viewModel)
+            InlineCommentThreadViewModel viewModel)
             : base(textView, InlineCommentPeekRelationship.Instance.Name, triggerPoint)
         {
             ViewModel = viewModel;
         }
 
-        public CommentThreadViewModel ViewModel { get; }
+        public InlineCommentThreadViewModel ViewModel { get; }
     }
 }

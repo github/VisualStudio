@@ -10,7 +10,7 @@
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:PullRequestReviewCommentDesigner State="Editing">
+        <sample:PullRequestReviewCommentDesigner EditState="Editing">
             <sample:PullRequestReviewCommentDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </sample:PullRequestReviewCommentDesigner.Body>
@@ -51,7 +51,7 @@
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding State}" Value="None">
+                        <DataTrigger Binding="{Binding EditState}" Value="None">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -92,10 +92,10 @@
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding State}" Value="Placeholder">
+                        <DataTrigger Binding="{Binding EditState}" Value="Placeholder">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding State}" Value="Editing">
+                        <DataTrigger Binding="{Binding EditState}" Value="Editing">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -133,7 +133,7 @@
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
                         <Setter Property="PromptText" Value="Reply..."/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding State}" Value="Editing">
+                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
                                 <Setter Property="MinHeight" Value="100"/>
                                 <Setter Property="PromptText" Value="Leave a comment"/>
                             </DataTrigger>
@@ -169,7 +169,7 @@
                     <Style TargetType="FrameworkElement">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding State}" Value="Editing">
+                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>

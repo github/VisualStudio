@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using GitHub.Factories;
+using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Peek;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Primitives;
-using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -57,28 +56,42 @@ namespace GitHub.InlineReviews.Tags
             }
         }
 
-        private CommentThreadViewModel CreateViewModel(InlineCommentTag tag)
+        InlineCommentThreadViewModel CreateViewModel(InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
             var showTag = tag as ShowInlineCommentTag;
             var repository = tag.Session.Repository;
             var apiClient = apiClientFactory.Create(HostAddress.Create(repository.CloneUrl.Host));
+            InlineCommentThreadViewModel thread;
 
             if (addTag != null)
             {
-                return new CommentThreadViewModel(
+                thread = new InlineCommentThreadViewModel(
                     apiClient,
                     tag.Session,
                     addTag.CommitSha,
                     addTag.FilePath,
                     addTag.DiffLine);
+                var placeholder = thread.AddReplyPlaceholder();
+                placeholder.BeginEdit.Execute(null);
             }
             else if (showTag != null)
             {
-                return new CommentThreadViewModel(apiClient, tag.Session, showTag.Comments);
+                thread = new InlineCommentThreadViewModel(apiClient, tag.Session);
+
+                foreach (var comment in showTag.Comments)
+                {
+                    thread.Comments.Add(new InlineCommentViewModel(thread, tag.Session.User, comment.Original));
+                }
+
+                thread.AddReplyPlaceholder();
+            }
+            else
+            {
+                throw new NotSupportedException("Unrecognised inline comment tag.");
             }
 
-            throw new NotSupportedException("Unsupported tag type.");
+            return thread;
         }
     }
 }

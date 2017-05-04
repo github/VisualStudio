@@ -7,9 +7,9 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItem : IPeekableItem
     {
-        readonly CommentThreadViewModel viewModel;
+        readonly InlineCommentThreadViewModel viewModel;
 
-        public InlineCommentPeekableItem(CommentThreadViewModel viewModel)
+        public InlineCommentPeekableItem(InlineCommentThreadViewModel viewModel)
         {
             this.viewModel = viewModel;
         }

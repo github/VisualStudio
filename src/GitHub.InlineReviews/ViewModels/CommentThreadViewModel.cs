@@ -1,125 +1,71 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Models;
 using GitHub.Models;
-using GitHub.Services;
-using Octokit;
 
 namespace GitHub.InlineReviews.ViewModels
 {
-    class CommentThreadViewModel
+    /// <summary>
+    /// Base view model for a thread of comments.
+    /// </summary>
+    abstract class CommentThreadViewModel : ICommentThreadViewModel, IDisposable
     {
-        readonly IApiClient apiClient;
+        IDisposable placeholderSubscription;
 
-        public CommentThreadViewModel(
-            IApiClient apiClient,
-            IPullRequestReviewSession session,
-            string commitSha,
-            string filePath,
-            int diffLine)
+        /// <summary>
+        /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
+        /// </summary>
+        /// <param name="currentUser">The current user.</param>
+        /// <param name="commentModels">The thread comments.</param>
+        public CommentThreadViewModel(IAccount currentUser)
         {
-            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
-            Guard.ArgumentNotNull(session, nameof(session));
-            Guard.ArgumentNotNull(commitSha, nameof(commitSha));
-            Guard.ArgumentNotNull(filePath, nameof(filePath));
+            Guard.ArgumentNotNull(currentUser, nameof(currentUser));
 
-            this.apiClient = apiClient;
-            this.Session = session;
-            CommitSha = commitSha;
-            DiffLine = diffLine;
-            FilePath = filePath;
-
-            var placeholder = CommentViewModel.CreatePlaceholder(this, session.User);
-            placeholder.BeginEdit.Execute(null);
-            Comments = new ObservableCollection<CommentViewModel>();
-            Comments.Add(placeholder);
+            Comments = new ObservableCollection<ICommentViewModel>();
+            CurrentUser = currentUser;
         }
 
-        public CommentThreadViewModel(
-            IApiClient apiClient,
-            IPullRequestReviewSession session,
-            IEnumerable<InlineCommentModel> comments)
+        /// <inheritdoc/>
+        public ObservableCollection<ICommentViewModel> Comments { get; }
+
+        /// <inheritdoc/>
+        public IAccount CurrentUser { get; }
+
+        /// <inheritdoc/>
+        public ICommentViewModel AddReplyPlaceholder()
         {
-            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
-            Guard.ArgumentNotNull(session, nameof(session));
-            Guard.ArgumentNotNull(comments, nameof(comments));
+            var placeholder = CreateReplyPlaceholder();
 
-            this.apiClient = apiClient;
-            this.Session = session;
-            CommitSha = comments.First().Original.OriginalCommitId;
-            DiffLine = comments.First().Original.OriginalPosition.Value;
-
-            var commentViewModels = comments
-                .Select(x => new CommentViewModel(this, session.User, x.Original))
-                .Concat(new[]
-                {
-                        CommentViewModel.CreatePlaceholder(this, session.User),
-                });
-
-            Comments = new ObservableCollection<CommentViewModel>(commentViewModels);
-        }
-
-        public ObservableCollection<CommentViewModel> Comments { get; }
-        public string CommitSha { get; }
-        public int DiffLine { get; }
-        public string FilePath { get; }
-        public IPullRequestReviewSession Session { get; }
-
-        public async Task<int> AddComment(string body)
-        {
-            Guard.ArgumentNotNull(body, nameof(body));
-
-            var lastComment = Comments.Where(x => x.CommentId != 0).LastOrDefault();
-            var result = lastComment != null ?
-                await PostReply(body, lastComment.CommentId) :
-                await PostComment(body);
-
-            Comments.Add(CommentViewModel.CreatePlaceholder(this, Session.User));
-
-            Session.AddComment(new PullRequestReviewCommentModel
+            placeholderSubscription = placeholder.CommitEdit.Subscribe(_ =>
             {
-                Body = result.Body,
-                CommitId = result.CommitId,
-                DiffHunk = result.DiffHunk,
-                Id = result.Id,
-                OriginalCommitId = result.OriginalCommitId,
-                OriginalPosition = result.OriginalPosition,
-                Path = result.Path,
-                Position = result.Position,
-                UpdatedAt = result.UpdatedAt,
-                User = Session.User,
+                placeholderSubscription.Dispose();
+                placeholderSubscription = null;
+                AddReplyPlaceholder();
             });
 
-            return result.Id;
+            Comments.Add(placeholder);
+
+            return placeholder;
         }
 
-        Task<PullRequestReviewComment> PostComment(string body)
+        /// <inheritdoc/>
+        public abstract Task<ICommentModel> PostComment(string body);
+
+        public void Dispose()
         {
-            return apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
-                Session.PullRequest.Number,
-                body,
-                CommitSha,
-                FilePath.Replace("\\", "/"),
-                DiffLine + 1).ToTask();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        Task<PullRequestReviewComment> PostReply(string body, int replyTo)
+        protected abstract ICommentViewModel CreateReplyPlaceholder();
+
+        protected virtual void Dispose(bool disposing)
         {
-            return apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
-                Session.PullRequest.Number,
-                body,
-                replyTo).ToTask();
+            if (disposing)
+            {
+                placeholderSubscription?.Dispose();
+            }
         }
     }
 }
