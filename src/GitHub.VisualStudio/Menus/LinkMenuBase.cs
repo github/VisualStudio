@@ -40,6 +40,12 @@ namespace GitHub.VisualStudio.Menus
             return repo.GenerateUrl(linkType, activeDocument.Name, activeDocument.StartLine, activeDocument.EndLine);
         }
 
+        public bool CanShow()
+        {
+            var githubRepoCheckTask = IsCurrentFileInGitHubRepository();
+            return githubRepoCheckTask.Wait(250) ? githubRepoCheckTask.Result : false;
+        }
+
         // Taken from http://stackoverflow.com/a/26012991/6448
         public static bool IsFileDescendantOfDirectory(string file, string directory)
         {
