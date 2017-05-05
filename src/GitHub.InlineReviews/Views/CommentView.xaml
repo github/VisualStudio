@@ -10,11 +10,11 @@
              xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <sample:PullRequestReviewCommentDesigner EditState="Editing">
-            <sample:PullRequestReviewCommentDesigner.Body>
+        <sample:CommentViewModelDesigner EditState="Editing">
+            <sample:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
-            </sample:PullRequestReviewCommentDesigner.Body>
-        </sample:PullRequestReviewCommentDesigner>
+            </sample:CommentViewModelDesigner.Body>
+        </sample:CommentViewModelDesigner>
     </d:DesignProperties.DataContext>
 
     <UserControl.Resources>

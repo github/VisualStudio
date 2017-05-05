@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Views;
+using GitHub.Services;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -18,12 +20,18 @@ namespace GitHub.InlineReviews
     {
         public void ShowPullRequestComments()
         {
-            var window = FindToolWindow(typeof(PullRequestCommentsPane), 0, true);
+            var window = (PullRequestCommentsPane)FindToolWindow(
+                typeof(PullRequestCommentsPane), 0, true);
 
             if (window?.Frame == null)
             {
                 throw new NotSupportedException("Cannot create Pull Request Comments tool window");
             }
+
+            var serviceProvider = (IGitHubServiceProvider)GetGlobalService(typeof(IGitHubServiceProvider));
+            var manager = serviceProvider.GetService<IPullRequestReviewSessionManager>();
+            var apiClientFactory = serviceProvider.GetService<IApiClientFactory>();
+            window.Initialize(manager, apiClientFactory);
 
             var windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());

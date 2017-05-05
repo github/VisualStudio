@@ -260,6 +260,11 @@ namespace GitHub.Api
             return gitHubClient.Authorization.Delete(id, twoFactorAuthorizationCode);
         }
 
+        public IObservable<IssueComment> GetIssueComments(string owner, string name, int number)
+        {
+            return gitHubClient.Issue.Comment.GetAllForIssue(owner, name, number);
+        }
+
         public IObservable<PullRequest> GetPullRequest(string owner, string name, int number)
         {
             return gitHubClient.PullRequest.Get(owner, name, number);

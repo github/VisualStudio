@@ -311,7 +311,7 @@ namespace GitHub.ViewModels
             IsFromFork = pullRequestsService.IsPullRequestFromFork(Repository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
-            CommentCount = pullRequest.Comments.Count;
+            CommentCount = pullRequest.Comments.Count +  pullRequest.ReviewComments.Count;
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             var changes = await pullRequestsService.GetTreeChanges(Repository, pullRequest);
@@ -427,7 +427,7 @@ namespace GitHub.ViewModels
 
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
-                var fileCommentCount = pullRequest.Comments
+                var fileCommentCount = pullRequest.ReviewComments
                     .Where(x => x.Path == changedFile.FileName && x.OriginalPosition.HasValue)
                     .Count();
 

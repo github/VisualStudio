@@ -7,9 +7,9 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
-    class PullRequestReviewCommentDesigner : ICommentViewModel
+    class CommentViewModelDesigner : ICommentViewModel
     {
-        public PullRequestReviewCommentDesigner()
+        public CommentViewModelDesigner()
         {
             User = new AccountDesigner { Login = "shana", IsUser = true };
         }

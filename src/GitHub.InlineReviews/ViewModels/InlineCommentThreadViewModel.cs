@@ -10,10 +10,21 @@ using Octokit;
 
 namespace GitHub.InlineReviews.ViewModels
 {
+    /// <summary>
+    /// A thread of inline comments (aka Pull Request Review Comments).
+    /// </summary>
     class InlineCommentThreadViewModel : CommentThreadViewModel
     {
         readonly IApiClient apiClient;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
+        /// </summary>
+        /// <param name="apiClient">The API client to use to post/update comments.</param>
+        /// <param name="session">The current PR review session.</param>
+        /// <param name="commitSha">The SHA of the commit that the thread relates to.</param>
+        /// <param name="filePath">The path to the file that the thread relates to.</param>
+        /// <param name="diffLine">The line in the diff that the thread relates to.</param>
         public InlineCommentThreadViewModel(
             IApiClient apiClient,
             IPullRequestReviewSession session,
@@ -28,22 +39,10 @@ namespace GitHub.InlineReviews.ViewModels
             Guard.ArgumentNotNull(filePath, nameof(filePath));
 
             this.apiClient = apiClient;
-            this.Session = session;
+            Session = session;
             CommitSha = commitSha;
             DiffLine = diffLine;
             FilePath = filePath;
-        }
-
-        public InlineCommentThreadViewModel(
-            IApiClient apiClient,
-            IPullRequestReviewSession session)
-            : base(session.User)
-        {
-            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
-            Guard.ArgumentNotNull(session, nameof(session));
-
-            this.apiClient = apiClient;
-            this.Session = session;
         }
 
         /// <summary>

@@ -32,6 +32,7 @@ namespace GitHub.Models
         IAccount Author { get; }
         IAccount Assignee { get; }
         IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; }
-        IReadOnlyCollection<IPullRequestReviewCommentModel> Comments { get; }
+        IReadOnlyCollection<ICommentModel> Comments { get; }
+        IReadOnlyCollection<IPullRequestReviewCommentModel> ReviewComments { get; }
     }
 }

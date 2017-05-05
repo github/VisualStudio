@@ -25,7 +25,7 @@ namespace GitHub.Services
             PullRequest = pullRequest;
             Repository = repository;
             changed = new Subject<Unit>();
-            this.comments = pullRequest.Comments
+            this.comments = pullRequest.ReviewComments
                 .OrderBy(x => x.Id)
                 .GroupBy(x => x.Path)
                 .ToDictionary(x => x.Key, x => x.ToList());

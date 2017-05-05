@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
-             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
-             Padding="8">
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
             <Grid.RowDefinitions>
@@ -17,7 +16,7 @@
             <ItemsControl ItemsSource="{Binding Comments}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <local:CommentView/>
+                        <local:CommentView Margin="0 4"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -77,7 +77,14 @@ namespace GitHub.InlineReviews.Tags
             }
             else if (showTag != null)
             {
-                thread = new InlineCommentThreadViewModel(apiClient, tag.Session);
+                var firstComment = showTag.Comments.First();
+
+                thread = new InlineCommentThreadViewModel(
+                    apiClient,
+                    tag.Session,
+                    firstComment.Original.OriginalCommitId,
+                    firstComment.Original.Path,
+                    firstComment.Original.OriginalPosition.Value);
 
                 foreach (var comment in showTag.Comments)
                 {

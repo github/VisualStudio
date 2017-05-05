@@ -3,15 +3,91 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             Background="{DynamicResource VsBrush.Window}"
-             Foreground="{DynamicResource VsBrush.WindowText}"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
+             xmlns:appsample="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             Foreground="{DynamicResource GitHubVsToolWindowText}"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="300" d:DesignWidth="400"
              Name="MyToolWindow">
-    <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center">PullRequestCommentsToolWindow</TextBlock>
-            <Button Content="Click me!" Width="120" Height="80" Name="button1"/>
-        </StackPanel>
-    </Grid>
+    <d:DesignProperties.DataContext>
+        <sample:PullRequestCommentsViewModelDesigner Number="734" Title="Pull Request Sorting">
+            <sample:PullRequestCommentsViewModelDesigner.Repository>
+                <appsample:RemoteRepositoryModelDesigner Owner="github" Name="VisualStudio"/>
+            </sample:PullRequestCommentsViewModelDesigner.Repository>
+            <sample:PullRequestCommentsViewModelDesigner.Conversation>
+                <sample:CommentThreadViewModelDesigner>
+                    <sample:CommentThreadViewModelDesigner.Comments>
+                        <sample:CommentViewModelDesigner>
+                            <sample:CommentViewModelDesigner.Body>
+                                Thanks @StanleyGoldman! Might also be nice to also be able to sort by PR number?
+                            </sample:CommentViewModelDesigner.Body>
+                        </sample:CommentViewModelDesigner>
+                    </sample:CommentThreadViewModelDesigner.Comments>
+                </sample:CommentThreadViewModelDesigner>
+            </sample:PullRequestCommentsViewModelDesigner.Conversation>
+            <sample:PullRequestCommentsViewModelDesigner.FileComments>
+                <sample:DiffCommentThreadViewModelDesigner Path="src/GitHub.App.ViewModels/PullRequestListViewModel.cs">
+                    <sample:DiffCommentThreadViewModelDesigner.DiffHunk xml:space="preserve">
+                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
+ 
++            this.WhenAny(x => x.SelectedSortOrder, x => x.Value)
++                .Where(x => pullRequests != null)
+            </sample:DiffCommentThreadViewModelDesigner.DiffHunk>
+                    <sample:DiffCommentThreadViewModelDesigner.Comments>
+                        <sample:CommentThreadViewModelDesigner>
+                            <sample:CommentThreadViewModelDesigner.Comments>
+                                <sample:CommentViewModelDesigner>
+                                    <sample:CommentViewModelDesigner.Body>
+                                        @StanleyGoldman Ooops, I missed a x != null check here, and it's breaking the tests. Do you want to add it or shall I?
+                                    </sample:CommentViewModelDesigner.Body>
+                                </sample:CommentViewModelDesigner>
+                            </sample:CommentThreadViewModelDesigner.Comments>
+                        </sample:CommentThreadViewModelDesigner>
+                    </sample:DiffCommentThreadViewModelDesigner.Comments>
+                </sample:DiffCommentThreadViewModelDesigner>
+            </sample:PullRequestCommentsViewModelDesigner.FileComments>
+        </sample:PullRequestCommentsViewModelDesigner>
+    </d:DesignProperties.DataContext>
+
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Top"
+                       FontSize="14.7"
+                       FontWeight="SemiBold">
+                <Run Text="{Binding Repository.Owner, Mode=OneWay}"/>
+                <Run>/</Run>
+                <Run Text="{Binding Repository.Name, Mode=OneWay}"/>
+                <Run Text="{Binding Title, Mode=OneWay}" FontWeight="Normal"/>
+                <Run Text="{Binding Number, Mode=OneWay, StringFormat={}#{0}}" FontWeight="Normal" Foreground="Gray"/>
+            </TextBlock>
+            <Grid Margin="0 4 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ui:SectionControl Grid.Row="0" HeaderText="Conversation" Margin="0 8">
+                    <local:CommentThreadView DataContext="{Binding Conversation}"/>
+                </ui:SectionControl>
+                <ui:SectionControl Grid.Row="1" HeaderText="File Comments">
+                    <local:DiffCommentThreadView DataContext="{Binding FileComments}" Margin="0 8"/>
+                </ui:SectionControl>
+            </Grid>
+        </DockPanel>
+    </ScrollViewer>
 </UserControl>
