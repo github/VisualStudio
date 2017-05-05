@@ -53,25 +53,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             var openOnGitHub = ReactiveCommand.Create();
             openOnGitHub.Subscribe(_ => DoOpenOnGitHub());
             OpenOnGitHub = openOnGitHub;
-
-            // We want to display a welcome message but only if Team Explorer isn't
-            // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
-            // To do this we need to set a timer and check in the tick as at this point the message
-            // won't be initialized.
-            if (!settings.HideTeamExplorerWelcomeMessage)
-            {
-                var timer = new DispatcherTimer();
-                timer.Interval = new TimeSpan(10);
-                timer.Tick += (s, e) =>
-                {
-                    timer.Stop();
-                    if (!IsGitToolsMessageVisible() && IsVisible)
-                    {
-                        ShowWelcomeMessage();
-                    }
-                };
-                timer.Start();
-            }
         }
 
         bool IsGitToolsMessageVisible()
@@ -106,6 +87,17 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             IsVisible = await IsAGitHubRepo();
             if (IsVisible)
             {
+                // We want to display a welcome message but only if Team Explorer isn't
+                // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
+                // To do this we need to set a timer and check in the tick as at this point the message
+                // won't be initialized.
+                if (!settings.HideTeamExplorerWelcomeMessage)
+                {
+                    if (!IsGitToolsMessageVisible())
+                    {
+                        ShowWelcomeMessage();
+                    }
+                }
                 IsLoggedIn = IsUserAuthenticated();
             }
             base.Refresh();
