@@ -26,6 +26,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
     {
         public const string GitHubHomeSectionId = "72008232-2104-4FA0-A189-61B0C6F91198";
         const string TrainingUrl = "https://services.github.com/on-demand/windows/visual-studio";
+        readonly static Guid welcomeMessageGuid = new Guid(Guids.TeamExplorerWelcomeMessage);
 
         readonly IVisualStudioBrowser visualStudioBrowser;
         readonly ITeamExplorerServices teamExplorerServices;
@@ -89,15 +90,17 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             {
                 // We want to display a welcome message but only if Team Explorer isn't
                 // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
-                if (!settings.HideTeamExplorerWelcomeMessage)
+                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
                 {
-                    if (!IsGitToolsMessageVisible())
-                    {
-                        ShowWelcomeMessage();
-                    }
+                    ShowWelcomeMessage();
                 }
                 IsLoggedIn = IsUserAuthenticated();
             }
+            else
+            {
+                teamExplorerServices.HideNotification(welcomeMessageGuid);
+            }
+
             base.Refresh();
         }
 
@@ -139,7 +142,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         void ShowWelcomeMessage()
         {
-            var welcomeMessageGuid = new Guid(Guids.TeamExplorerWelcomeMessage);
             teamExplorerServices.ShowMessage(
                 Resources.TeamExplorerWelcomeMessage,
                 new RelayCommand(o =>
