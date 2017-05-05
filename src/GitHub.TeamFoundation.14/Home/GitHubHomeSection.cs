@@ -75,11 +75,23 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
+
+                // We want to display a welcome message but only if Team Explorer isn't
+                // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
+                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
+                {
+                    ShowWelcomeMessage();
+                }
+
                 Debug.Assert(SimpleApiClient != null,
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await SimpleApiClient.GetRepository();
                 Icon = GetIcon(repo.Private, true, repo.Fork);
                 IsLoggedIn = IsUserAuthenticated();
+            }
+            else
+            {
+                teamExplorerServices.HideNotification(welcomeMessageGuid);
             }
         }
 
@@ -88,17 +100,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             IsVisible = await IsAGitHubRepo();
             if (IsVisible)
             {
-                // We want to display a welcome message but only if Team Explorer isn't
-                // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
-                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
-                {
-                    ShowWelcomeMessage();
-                }
                 IsLoggedIn = IsUserAuthenticated();
-            }
-            else
-            {
-                teamExplorerServices.HideNotification(welcomeMessageGuid);
             }
 
             base.Refresh();
