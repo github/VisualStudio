@@ -178,6 +178,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         //todo:temporary
         static int GetIso8601WeekOfYear(DateTimeOffset time)
         {
+            Calendar cal = CultureInfo.InvariantCulture.Calendar;
+
             // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
             // be the same week# as whatever Thursday, Friday or Saturday are,
             // and we always get those right
