@@ -79,7 +79,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                
                 var weekElapsed = GetIso8601WeekOfYear(settings.WelcomeMessageLastSeen) != GetIso8601WeekOfYear(DateTimeOffset.Now);
 
-                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
+                if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible() && weekElapsed)
                 {
                     ShowWelcomeMessage();
                 }
