@@ -1,30 +1,36 @@
 ﻿// This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
 /* settings.json content:
 {
-    "settings": [
+  "settings": [
     {
-        "name": "CollectMetrics",
-        "type": "bool",
-        "default": 'true'
+      "name": "CollectMetrics",
+      "type": "bool",
+      "default": "true"
     },
     {
-        "name": "UIState",
-        "type": "object",
-        "typename": "UIState",
-        "default": 'null'
+      "name": "UIState",
+      "type": "object",
+      "typename": "UIState",
+      "default": "null"
     },
-	{
-		"name": "HideTeamExplorerWelcomeMessage",
-		"type": "bool",
-		"default": 'false'
-	}
-    ]
-}
+    {
+      "name": "HideTeamExplorerWelcomeMessage",
+      "type": "bool",
+      "default": "false"
+    },
+    {
+      "name": "WelcomeMessageLastSeen",
+      "type": "DateTime",
+      "default": "DateTime.MinValue"
+    }
+  ]
+}            
 */
 
 using GitHub.Settings;
 using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
+using System;
 
 namespace GitHub.VisualStudio.Settings {
 
@@ -52,12 +58,20 @@ namespace GitHub.VisualStudio.Settings {
             set { hideTeamExplorerWelcomeMessage  = value; this.RaisePropertyChange(); }
         }
 
+        DateTime welcomeMessageLastSeen;
+        public DateTime WelcomeMessageLastSeen
+        {
+            get { return welcomeMessageLastSeen; }
+            set { welcomeMessageLastSeen  = value; this.RaisePropertyChange(); }
+        }
+
 
         void LoadSettings()
         {
             CollectMetrics = (bool)settingsStore.Read("CollectMetrics", true);
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
             HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
+            WelcomeMessageLastSeen = (DateTime)settingsStore.Read("WelcomeMessageLastSeen", DateTime.MinValue);
         }
 
         void SaveSettings()
@@ -65,6 +79,7 @@ namespace GitHub.VisualStudio.Settings {
             settingsStore.Write("CollectMetrics", CollectMetrics);
             settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
             settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
+            settingsStore.Write("WelcomeMessageLastSeen", WelcomeMessageLastSeen);
         }
 
     }

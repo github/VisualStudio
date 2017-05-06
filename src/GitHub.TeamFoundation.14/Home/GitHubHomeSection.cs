@@ -169,6 +169,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 }),
                 false,
                 welcomeMessageGuid);
+
+            settings.WelcomeMessageLastSeen = DateTime.UtcNow;
+            settings.Save();
         }
 
         protected GitHubHomeContent View
