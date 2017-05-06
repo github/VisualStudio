@@ -20,8 +20,8 @@
     },
     {
       "name": "WelcomeMessageLastSeen",
-      "type": "DateTime",
-      "default": "DateTime.MinValue"
+      "type": "DateTimeOffset",
+      "default": "DateTimeOffset.MinValue"
     }
   ]
 }            
@@ -38,6 +38,6 @@ namespace GitHub.Settings
         bool CollectMetrics { get; set; }
         UIState UIState { get; set; }
         bool HideTeamExplorerWelcomeMessage { get; set; }
-        DateTime WelcomeMessageLastSeen { get; set; }
+        DateTimeOffset WelcomeMessageLastSeen { get; set; }
     }
 }

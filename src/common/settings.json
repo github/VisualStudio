@@ -18,8 +18,8 @@
     },
     {
       "name": "WelcomeMessageLastSeen",
-      "type": "DateTime",
-      "default": "DateTime.MinValue"
+      "type": "DateTimeOffset",
+      "default": "DateTimeOffset.MinValue"
     }
   ]
 }            

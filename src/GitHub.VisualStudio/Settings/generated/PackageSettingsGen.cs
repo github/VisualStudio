@@ -20,8 +20,8 @@
     },
     {
       "name": "WelcomeMessageLastSeen",
-      "type": "DateTime",
-      "default": "DateTime.MinValue"
+      "type": "DateTimeOffset",
+      "default": "DateTimeOffset.MinValue"
     }
   ]
 }            
@@ -58,8 +58,8 @@ namespace GitHub.VisualStudio.Settings {
             set { hideTeamExplorerWelcomeMessage  = value; this.RaisePropertyChange(); }
         }
 
-        DateTime welcomeMessageLastSeen;
-        public DateTime WelcomeMessageLastSeen
+        DateTimeOffset welcomeMessageLastSeen;
+        public DateTimeOffset WelcomeMessageLastSeen
         {
             get { return welcomeMessageLastSeen; }
             set { welcomeMessageLastSeen  = value; this.RaisePropertyChange(); }
@@ -71,7 +71,7 @@ namespace GitHub.VisualStudio.Settings {
             CollectMetrics = (bool)settingsStore.Read("CollectMetrics", true);
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
             HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
-            WelcomeMessageLastSeen = (DateTime)settingsStore.Read("WelcomeMessageLastSeen", DateTime.MinValue);
+            WelcomeMessageLastSeen = (DateTimeOffset)settingsStore.Read("WelcomeMessageLastSeen", DateTimeOffset.MinValue);
         }
 
         void SaveSettings()

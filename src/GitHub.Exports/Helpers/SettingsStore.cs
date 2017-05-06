@@ -40,7 +40,7 @@ namespace GitHub.Helpers
 
             var collection = subpath != null ? Path.Combine(root, subpath) : root;
             store.CreateCollection(collection);
-            DateTime date;
+            DateTimeOffset offset;
 
             if (defaultValue is bool)
                 return store.GetBoolean(collection, property, (bool)defaultValue);
@@ -52,8 +52,8 @@ namespace GitHub.Helpers
                 return store.GetInt64(collection, property, (long)defaultValue);
             else if (defaultValue is ulong)
                 return store.GetUInt64(collection, property, (ulong)defaultValue);
-            else if (defaultValue is DateTime)
-                return DateTime.TryParse(defaultValue?.ToString(), out date) ? date : defaultValue;
+            else if (defaultValue is DateTimeOffset)
+                return DateTimeOffset.TryParse(defaultValue?.ToString(), out offset) ? offset : defaultValue;
             return store.GetString(collection, property, defaultValue?.ToString() ?? "");
         }
 

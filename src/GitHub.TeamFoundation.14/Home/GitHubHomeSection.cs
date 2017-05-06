@@ -17,6 +17,7 @@ using GitHub.VisualStudio.UI;
 using GitHub.Settings;
 using System.Windows.Threading;
 using GitHub.Info;
+using System.Globalization;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -75,9 +76,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
+               
+                var weekElapsed = GetIso8601WeekOfYear(settings.WelcomeMessageLastSeen) != GetIso8601WeekOfYear(DateTimeOffset.Now);
 
-                // We want to display a welcome message but only if Team Explorer isn't
-                // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
                 if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible())
                 {
                     ShowWelcomeMessage();
@@ -174,6 +175,21 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             settings.Save();
         }
 
+        //todo:temporary
+        static int GetIso8601WeekOfYear(DateTimeOffset time)
+        {
+            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
+            // be the same week# as whatever Thursday, Friday or Saturday are,
+            // and we always get those right
+            DayOfWeek day = cal.GetDayOfWeek(time.UtcDateTime);
+            if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+            {
+                time = time.AddDays(3);
+            }
+
+            // Return the week of our adjusted day
+            return cal.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
         protected GitHubHomeContent View
         {
             get { return SectionContent as GitHubHomeContent; }
