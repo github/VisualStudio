@@ -77,7 +77,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
                
-                var weekElapsed = GetIso8601WeekOfYear(settings.WelcomeMessageLastSeen) != GetIso8601WeekOfYear(DateTimeOffset.Now);
+                var weekElapsed = settings.WelcomeMessageLastSeen.GetIso8601WeekOfYear() != DateTimeOffset.Now.GetIso8601WeekOfYear();
 
                 if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible() && weekElapsed)
                 {
@@ -175,23 +175,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             settings.Save();
         }
 
-        //todo:temporary
-        static int GetIso8601WeekOfYear(DateTimeOffset time)
-        {
-            Calendar cal = CultureInfo.InvariantCulture.Calendar;
-
-            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
-            // be the same week# as whatever Thursday, Friday or Saturday are,
-            // and we always get those right
-            DayOfWeek day = cal.GetDayOfWeek(time.UtcDateTime);
-            if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
-            {
-                time = time.AddDays(3);
-            }
-
-            // Return the week of our adjusted day
-            return cal.GetWeekOfYear(time.UtcDateTime, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-        }
         protected GitHubHomeContent View
         {
             get { return SectionContent as GitHubHomeContent; }
