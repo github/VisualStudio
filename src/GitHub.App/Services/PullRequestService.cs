@@ -254,6 +254,20 @@ namespace GitHub.Services
             });
         }
 
+        public IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
+        {
+            return Observable.Defer(() =>
+            {
+                var repo = gitService.GetRepository(repository.LocalPath);
+                var configKey = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "branch.{0}.{1}",
+                    repo.Head.FriendlyName,
+                    SettingGHfVSPullRequest);
+                return gitClient.GetConfig<int>(repo, configKey).ToObservable();
+            });
+        }
+
         public IObservable<Unit> UnmarkLocalBranch(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>

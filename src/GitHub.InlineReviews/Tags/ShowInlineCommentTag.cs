@@ -19,6 +19,6 @@ namespace GitHub.InlineReviews.Tags
 
         public IReadOnlyList<InlineCommentModel> Comments { get; }
         public bool IsAddNewCommentTag => Comments.Count == 0;
-        public bool NeedsUpdate => Comments.Any(x => x.NeedsUpdate);
+        public bool NeedsUpdate => Comments.Any(x => x.IsStale);
     }
 }

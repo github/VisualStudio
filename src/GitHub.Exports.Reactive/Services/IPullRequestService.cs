@@ -90,6 +90,20 @@ namespace GitHub.Services
         IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
 
         /// <summary>
+        /// Gets the pull request associated with the current branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns>
+        /// An observable that produces a single value: the pull request number, or 0 if the
+        /// current branch is not a PR branch.
+        /// </returns>
+        /// <remarks>
+        /// This method does not do an API request - it simply checks the mark left in the git
+        /// config by <see cref="Checkout(ILocalRepositoryModel, IPullRequestModel, string)"/>.
+        /// </remarks>
+        IObservable<int> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
+
+        /// <summary>
         /// Removes any association between the current branch and a pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>

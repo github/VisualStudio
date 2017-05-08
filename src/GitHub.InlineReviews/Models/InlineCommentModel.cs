@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Models
 {
-    class InlineCommentModel
+    class InlineCommentModel : IInlineCommentModel
     {
         public InlineCommentModel(
             int lineNumber,
@@ -16,17 +16,16 @@ namespace GitHub.InlineReviews.Models
             TrackingPoint = trackingPoint;
         }
 
-        public bool IsAddCommentPosition => Original == null;
         public int LineNumber { get; private set; }
         public IPullRequestReviewCommentModel Original { get; }
-        public bool NeedsUpdate { get; private set; }
+        public bool IsStale { get; private set; }
         public ITrackingPoint TrackingPoint { get; }
 
         public bool Update(ITextSnapshot snapshot)
         {
             if (Original == null)
             {
-                NeedsUpdate = true;
+                IsStale = true;
                 return true;
             }
 
@@ -35,9 +34,9 @@ namespace GitHub.InlineReviews.Models
 
             if (lineNumber != LineNumber)
             {
-                var result = !NeedsUpdate;
+                var result = !IsStale;
                 LineNumber = lineNumber;
-                NeedsUpdate = true;
+                IsStale = true;
                 return result;
             }
 

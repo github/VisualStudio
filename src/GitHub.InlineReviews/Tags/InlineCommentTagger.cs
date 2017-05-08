@@ -149,7 +149,8 @@ namespace GitHub.InlineReviews.Tags
             }
 
             subscription = sessionManager.SessionChanged
-                .SelectMany(x => Observable.Return(x).Concat(x.Changed.Select(_ => x)))
+                .SelectMany(x => Observable.Return(x)
+                    .Concat(x?.Changed.Select(_ => x) ?? Observable.Empty<IPullRequestReviewSession>()))
                 .Subscribe(SessionChanged);
 
             initialized = true;

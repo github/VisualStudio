@@ -478,7 +478,6 @@ namespace UnitTests.GitHub.App.ViewModels
                 repository,
                 Substitute.For<IModelService>(),
                 pullRequestService,
-                Substitute.For<IPullRequestReviewSessionManager>(),
                 Substitute.For<IUsageTracker>());
 
             return Tuple.Create(vm, pullRequestService);
