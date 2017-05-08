@@ -132,15 +132,17 @@ namespace GitHub.Services
                 else
                 {
                     var refSpec = $"{pullRequest.Head.Ref}:{localBranchName}";
-                    var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
                     var remoteName = await CreateRemote(repo, pullRequest.Head.RepositoryCloneUrl);
 
                     await gitClient.Fetch(repo, remoteName);
                     await gitClient.Fetch(repo, remoteName, new[] { refSpec });
                     await gitClient.Checkout(repo, localBranchName);
                     await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.Head.Ref}");
-                    await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
                 }
+
+                // Store the PR number in the branch config with the key "ghfvs-pr".
+                var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
+                await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
 
                 return Observable.Return(Unit.Default);
             });
@@ -242,6 +244,10 @@ namespace GitHub.Services
                     }
 
                     await gitClient.Checkout(repo, branchName);
+
+                    // Store the PR number in the branch config with the key "ghfvs-pr".
+                    var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
+                    await gitClient.SetConfig(repo, prConfigKey, pullRequest.Number.ToString());
                 }
 
                 return Observable.Return(Unit.Default);
@@ -253,7 +259,7 @@ namespace GitHub.Services
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
-                var configKey = $"branch.{repo.Head.FriendlyName}.ghfvs-pr";
+                var configKey = $"branch.{repo.Head.FriendlyName}.{SettingGHfVSPullRequest}";
                 await gitClient.UnsetConfig(repo, configKey);
                 return Observable.Return(Unit.Default);
             });
