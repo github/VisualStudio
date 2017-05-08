@@ -53,7 +53,7 @@ namespace GitHub.Helpers
             else if (defaultValue is ulong)
                 return store.GetUInt64(collection, property, (ulong)defaultValue);
             else if (defaultValue is DateTimeOffset)
-                return DateTimeOffset.TryParse(defaultValue?.ToString(), out offset) ? offset : defaultValue;
+                return DateTimeOffset.TryParse(store.GetString(collection, property, defaultValue?.ToString() ?? ""), out offset) ? offset : defaultValue;
             return store.GetString(collection, property, defaultValue?.ToString() ?? "");
         }
 

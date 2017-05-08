@@ -76,8 +76,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
                 Icon = GetIcon(false, true, false);
-               
-                var weekElapsed = settings.WelcomeMessageLastSeen.GetIso8601WeekOfYear() != DateTimeOffset.Now.GetIso8601WeekOfYear();
+
+                var weekElapsed = DateTimeOffset.Now.GetIso8601WeekOfYear() > settings.WelcomeMessageLastSeen.GetIso8601WeekOfYear();
 
                 if (!settings.HideTeamExplorerWelcomeMessage && !IsGitToolsMessageVisible() && weekElapsed)
                 {
@@ -171,7 +171,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 false,
                 welcomeMessageGuid);
 
-            settings.WelcomeMessageLastSeen = DateTime.UtcNow;
+            settings.WelcomeMessageLastSeen = DateTimeOffset.UtcNow;
             settings.Save();
         }
 
