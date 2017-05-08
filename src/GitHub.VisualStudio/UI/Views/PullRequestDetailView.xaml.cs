@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.TextManager.Interop;
 using ReactiveUI;
 using GitHub.Models;
+using System.ComponentModel.Design;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -201,6 +202,12 @@ namespace GitHub.VisualStudio.UI.Views
                     e.Handled = false;
                 }
             }
+        }
+
+        private void ViewCommentsClick(object sender, RoutedEventArgs e)
+        {
+            var mcs = Services.GitHubServiceProvider.GetService<IMenuCommandService>();
+            mcs?.GlobalInvoke(new CommandID(GlobalCommands.CommandSetGuid, GlobalCommands.ShowPullRequestCommentsId));
         }
     }
 }

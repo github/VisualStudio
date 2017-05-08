@@ -95,7 +95,6 @@
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PullRequestCommentsPane.cs" />
-    <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
     <Compile Include="Views\PullRequestCommentsView.xaml.cs">
       <DependentUpon>PullRequestCommentsView.xaml</DependentUpon>
     </Compile>

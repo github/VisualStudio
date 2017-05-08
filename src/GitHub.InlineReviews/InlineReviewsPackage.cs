@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Views;
 using GitHub.Services;
 using GitHub.VisualStudio;
@@ -41,10 +40,9 @@ namespace GitHub.InlineReviews
         {
             base.Initialize();
             this.AddCommandHandler(
-                ShowPullRequestCommentsCommand.CommandSet,
-                ShowPullRequestCommentsCommand.CommandId,
+                GlobalCommands.CommandSetGuid,
+                GlobalCommands.ShowPullRequestCommentsId,
                 (s, e) => ShowPullRequestComments());
-            //ShowPullRequestCommentsCommand.Initialize(this);
         }
     }
 }

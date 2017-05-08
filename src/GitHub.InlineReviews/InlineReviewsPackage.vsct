@@ -42,7 +42,7 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidInlineReviewsPackageCmdSet" id="PullRequestCommentsToolWindowCommandId" priority="0x0100" type="Button">
+      <Button guid="guidGitHubCommandSet" id="PullRequestCommentsToolWindowCommandId" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
@@ -67,8 +67,8 @@
     <GuidSymbol name="guidInlineReviewsPackage" value="{248325be-4a2d-4111-b122-e7d59bf73a35}" />
 
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidInlineReviewsPackageCmdSet" value="{37c6f3ed-aa80-485a-afc3-19506c4d9aea}">
-      <IDSymbol name="PullRequestCommentsToolWindowCommandId" value="0x0100" />
+    <GuidSymbol name="guidGitHubCommandSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
+      <IDSymbol name="PullRequestCommentsToolWindowCommandId" value="0x1000" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{775aa523-6c52-4c11-9c28-823c99d15613}" >
