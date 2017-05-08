@@ -13,6 +13,7 @@ namespace GitHub.Extensions
 
     public static class DateTimeOffsetExtensions
     {
+        // http://blogs.msdn.com/b/shawnste/archive/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net.aspx
         public static int GetIso8601WeekOfYear(this DateTimeOffset time)
         {
             Calendar cal = CultureInfo.InvariantCulture.Calendar;
