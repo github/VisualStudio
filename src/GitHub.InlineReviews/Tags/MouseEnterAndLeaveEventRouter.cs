@@ -5,25 +5,62 @@ using System.Windows.Input;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class MouseEnterAndLeaveEventRouter
+    class MouseEnterAndLeaveEventRouter<T> where T : FrameworkElement
     {
-        public void MouseMove<T>(object target, MouseEventArgs e) where T : FrameworkElement
+        T previousMouseOverElement;
+
+        public void MouseMove(object target, MouseEventArgs e)
         {
-            var visitor = new Visitor<T>(this, e);
+            T mouseOverElement = null;
+            Action<T> visitAction = element =>
+            {
+                mouseOverElement = element;
+            };
+
+            var visitor = new Visitor(e, visitAction);
             visitor.Visit(target);
+
+            if (mouseOverElement != previousMouseOverElement)
+            {
+                MouseLeave(previousMouseOverElement, e);
+                MouseEnter(mouseOverElement, e);
+            }
         }
 
-        FrameworkElement MouseOverElement { get; set; }
-
-        class Visitor<T> where T : FrameworkElement
+        public void MouseLeave(object target, MouseEventArgs e)
         {
-            MouseEnterAndLeaveEventRouter router;
-            MouseEventArgs mouseEventArgs;
+            MouseLeave(previousMouseOverElement, e);
+        }
 
-            internal Visitor(MouseEnterAndLeaveEventRouter router, MouseEventArgs mouseEventArgs)
+        void MouseEnter(T element, MouseEventArgs e)
+        {
+            element?.RaiseEvent(new MouseEventArgs(e.MouseDevice, e.Timestamp)
             {
-                this.router = router;
+                RoutedEvent = Mouse.MouseEnterEvent,
+            });
+
+            previousMouseOverElement = element;
+        }
+
+        void MouseLeave(T element, MouseEventArgs e)
+        {
+            element?.RaiseEvent(new MouseEventArgs(e.MouseDevice, e.Timestamp)
+            {
+                RoutedEvent = Mouse.MouseLeaveEvent,
+            });
+
+            previousMouseOverElement = null;
+        }
+
+        class Visitor
+        {
+            MouseEventArgs mouseEventArgs;
+            Action<T> action;
+
+            internal Visitor(MouseEventArgs mouseEventArgs, Action<T> action)
+            {
                 this.mouseEventArgs = mouseEventArgs;
+                this.action = action;
             }
 
             internal void Visit(object obj)
@@ -54,22 +91,7 @@ namespace GitHub.InlineReviews.Tags
                 var point = mouseEventArgs.GetPosition(element);
                 if (point.Y >= 0 && point.Y < element.ActualHeight)
                 {
-                    if (element != router.MouseOverElement)
-                    {
-                        if (router.MouseOverElement != null)
-                        {
-                            router.MouseOverElement.RaiseEvent(new MouseEventArgs(mouseEventArgs.MouseDevice, mouseEventArgs.Timestamp)
-                            {
-                                RoutedEvent = Mouse.MouseLeaveEvent,
-                            });
-                        }
-
-                        router.MouseOverElement = element;
-                        router.MouseOverElement.RaiseEvent(new MouseEventArgs(mouseEventArgs.MouseDevice, mouseEventArgs.Timestamp)
-                        {
-                            RoutedEvent = Mouse.MouseEnterEvent,
-                        });
-                    }
+                    action(element);
                 }
             }
         }
