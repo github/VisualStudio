@@ -12,7 +12,7 @@
              Background="{DynamicResource GitHubVsToolWindowBackground}"
              Foreground="{DynamicResource GitHubVsToolWindowText}"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="400"
+             d:DesignWidth="400"
              Name="MyToolWindow">
     <d:DesignProperties.DataContext>
         <sample:PullRequestCommentsViewModelDesigner Number="734" Title="Pull Request Sorting">
@@ -85,7 +85,13 @@
                     <local:CommentThreadView DataContext="{Binding Conversation}"/>
                 </ui:SectionControl>
                 <ui:SectionControl Grid.Row="1" HeaderText="File Comments">
-                    <local:DiffCommentThreadView DataContext="{Binding FileComments}" Margin="0 8"/>
+                    <ItemsControl ItemsSource="{Binding FileComments}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <local:DiffCommentThreadView Margin="0 8"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </ui:SectionControl>
             </Grid>
         </DockPanel>

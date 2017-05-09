@@ -47,8 +47,8 @@
                 <Run Text="{Binding Path, Mode=OneWay}"/>
             </Hyperlink>
         </TextBlock>
-        <Border DockPanel.Dock="Top" Background="LightGray" Margin="0 4">
-            <TextBlock FontFamily="Consolas" Text="{Binding DiffHunk}"/>
+        <Border DockPanel.Dock="Top" Margin="0 4" BorderBrush="Silver" BorderThickness="1">
+            <local:DiffView Diff="{Binding DiffHunk}" TextBlock.FontFamily="Consolas"/>
         </Border>
         <local:CommentThreadView DataContext="{Binding Comments}"/>
     </DockPanel>
