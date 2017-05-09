@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("2.2.1.0")]
 [assembly: ComVisible(false)]
 [assembly: AssemblyCompany("GitHub, Inc.")]
-[assembly: AssemblyCopyright("Copyright © GitHub, Inc. 2014-2016")]
+[assembly: AssemblyCopyright("Copyright Â© GitHub, Inc. 2014-2016")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
