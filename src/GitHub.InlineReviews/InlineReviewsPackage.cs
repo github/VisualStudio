@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.InlineReviews.Views;
+using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -17,10 +19,10 @@ namespace GitHub.InlineReviews
     [ProvideToolWindow(typeof(PullRequestCommentsPane), DocumentLikeTool=true)]
     public class InlineReviewsPackage : Package
     {
-        public void ShowPullRequestComments()
+        public async void ShowPullRequestComments(IPullRequestModel pullRequest)
         {
             var window = (PullRequestCommentsPane)FindToolWindow(
-                typeof(PullRequestCommentsPane), 0, true);
+                typeof(PullRequestCommentsPane), pullRequest.Number, true);
 
             if (window?.Frame == null)
             {
@@ -29,8 +31,11 @@ namespace GitHub.InlineReviews
 
             var serviceProvider = (IGitHubServiceProvider)GetGlobalService(typeof(IGitHubServiceProvider));
             var manager = serviceProvider.GetService<IPullRequestReviewSessionManager>();
+            var session = await manager.GetSession(pullRequest);
+            var address = HostAddress.Create(session.Repository.CloneUrl);
             var apiClientFactory = serviceProvider.GetService<IApiClientFactory>();
-            window.Initialize(manager, apiClientFactory);
+            var apiClient = apiClientFactory.Create(address);
+            window.Initialize(session, apiClient);
 
             var windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
@@ -39,10 +44,11 @@ namespace GitHub.InlineReviews
         protected override void Initialize()
         {
             base.Initialize();
-            this.AddCommandHandler(
+            this.AddCommandHandler<IPullRequestModel>(
                 GlobalCommands.CommandSetGuid,
                 GlobalCommands.ShowPullRequestCommentsId,
-                (s, e) => ShowPullRequestComments());
+                () => true,
+                ShowPullRequestComments);
         }
     }
 }

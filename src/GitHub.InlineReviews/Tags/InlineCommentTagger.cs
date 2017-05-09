@@ -148,7 +148,7 @@ namespace GitHub.InlineReviews.Tags
                 fullPath = document.FilePath;
             }
 
-            subscription = sessionManager.SessionChanged
+            subscription = sessionManager.CurrentSession
                 .SelectMany(x => Observable.Return(x)
                     .Concat(x?.Changed.Select(_ => x) ?? Observable.Empty<IPullRequestReviewSession>()))
                 .Subscribe(SessionChanged);

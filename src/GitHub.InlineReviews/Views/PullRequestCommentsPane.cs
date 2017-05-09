@@ -4,23 +4,20 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Runtime.InteropServices;
+using GitHub.Api;
+using GitHub.Extensions;
+using GitHub.InlineReviews.ViewModels;
+using GitHub.Services;
+using Microsoft.VisualStudio.Shell;
+
 namespace GitHub.InlineReviews.Views
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using Extensions;
-    using Factories;
-    using GitHub.Services;
-    using Microsoft.VisualStudio.Shell;
-    using Primitives;
-    using ViewModels;
-
     [Guid("aa280a78-f2fa-49cd-b2f9-21426b40501f")]
     public class PullRequestCommentsPane : ToolWindowPane
     {
         readonly PullRequestCommentsView view;
-        IApiClientFactory apiClientFactory;
-        IPullRequestReviewSessionManager manager;
+        IPullRequestReviewSession session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestCommentsPane"/> class.
@@ -32,27 +29,19 @@ namespace GitHub.InlineReviews.Views
         }
 
         public void Initialize(
-            IPullRequestReviewSessionManager manager,
-            IApiClientFactory apiClientFactory)
+            IPullRequestReviewSession session,
+            IApiClient apiClient)
         {
-            Guard.ArgumentNotNull(manager, nameof(manager));
-            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
+            Guard.ArgumentNotNull(session, nameof(session));
+            Guard.ArgumentNotNull(apiClient, nameof(apiClient));
 
-            if (this.manager != null)
+            if (this.session != null)
                 return;
 
-            this.manager = manager;
-            this.apiClientFactory = apiClientFactory;
+            this.session = session;
 
-            manager.SessionChanged.Subscribe(session =>
-            {
-                if (session != null)
-                {
-                    var apiClient = apiClientFactory.Create(HostAddress.Create(session.Repository.CloneUrl));
-                    var viewModel = new PullRequestCommentsViewModel(apiClient, session);
-                    view.DataContext = viewModel;
-                }
-            });
+            var viewModel = new PullRequestCommentsViewModel(apiClient, session);
+            view.DataContext = viewModel;
         }
     }
 }

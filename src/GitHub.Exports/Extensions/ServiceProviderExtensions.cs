@@ -95,5 +95,32 @@ namespace GitHub.Extensions
             mcs.AddCommand(item);
             return item;
         }
+
+        public static OleMenuCommand AddCommandHandler<TParam>(this IServiceProvider provider,
+            Guid guid,
+            int cmdId,
+            Func<bool> canEnable,
+            Action<TParam> execute,
+            bool disable = false)
+        {
+            var mcs = provider.GetService(typeof(IMenuCommandService)) as IMenuCommandService;
+            Debug.Assert(mcs != null, "No IMenuCommandService? Something is wonky");
+            if (mcs == null)
+                return null;
+            var id = new CommandID(guid, cmdId);
+            var item = new OleMenuCommand(
+                (s, e) => execute((TParam)((OleMenuCmdEventArgs)e).InValue),
+                (s, e) => { },
+                (s, e) =>
+                {
+                    if (disable)
+                        ((OleMenuCommand)s).Enabled = canEnable();
+                    else
+                        ((OleMenuCommand)s).Visible = canEnable();
+                },
+                id);
+            mcs.AddCommand(item);
+            return item;
+        }
     }
 }

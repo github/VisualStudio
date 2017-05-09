@@ -18,7 +18,8 @@ namespace GitHub.InlineReviews.Services
         readonly IPullRequestService service;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
-        readonly BehaviorSubject<IPullRequestReviewSession> sessionChanged = new BehaviorSubject<IPullRequestReviewSession>(null);
+        readonly BehaviorSubject<IPullRequestReviewSession> currentSession = new BehaviorSubject<IPullRequestReviewSession>(null);
+        ILocalRepositoryModel repository;
         PullRequestReviewSession session;
 
         [ImportingConstructor]
@@ -37,17 +38,37 @@ namespace GitHub.InlineReviews.Services
             teamExplorerService.Subscribe(this, RepoChanged);
         }
 
-        public IObservable<IPullRequestReviewSession> SessionChanged => sessionChanged;
+        public IObservable<IPullRequestReviewSession> CurrentSession => currentSession;
 
         public void Dispose()
         {
-            sessionChanged.Dispose();
+            currentSession.Dispose();
             GC.SuppressFinalize(this);
         }
 
+        public async Task<IPullRequestReviewSession> GetSession(IPullRequestModel pullRequest)
+        {
+            if (pullRequest.Number == session?.PullRequest.Number)
+            {
+                return session;
+            }
+            else
+            {
+                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+
+                return new PullRequestReviewSession(
+                    await modelService.GetCurrentUser(),
+                    pullRequest,
+                    repository);
+            }
+        }
+
+
         async void RepoChanged(ILocalRepositoryModel repository)
         {
-            PullRequestReviewSession newSession = null;
+            PullRequestReviewSession session = null;
+
+            this.repository = repository;
 
             if (repository != null)
             {
@@ -59,7 +80,7 @@ namespace GitHub.InlineReviews.Services
 
                     if (pullRequest != null)
                     {
-                        newSession = new PullRequestReviewSession(
+                        session = new PullRequestReviewSession(
                             await modelService.GetCurrentUser(),
                             pullRequest,
                             repository);
@@ -67,8 +88,8 @@ namespace GitHub.InlineReviews.Services
                 }
             }
 
-            session = newSession;
-            sessionChanged.OnNext(session);
+            this.session = session;
+            currentSession.OnNext(this.session);
         }
 
         async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel repository)

@@ -29,6 +29,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using ReactiveUI;
 using GitHub.Models;
 using System.ComponentModel.Design;
+using Microsoft.VisualStudio.OLE.Interop;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -206,8 +207,12 @@ namespace GitHub.VisualStudio.UI.Views
 
         private void ViewCommentsClick(object sender, RoutedEventArgs e)
         {
-            var mcs = Services.GitHubServiceProvider.GetService<IMenuCommandService>();
-            mcs?.GlobalInvoke(new CommandID(GlobalCommands.CommandSetGuid, GlobalCommands.ShowPullRequestCommentsId));
+            var model = (object)ViewModel.Model;
+            Services.Dte.Commands.Raise(
+                GlobalCommands.CommandSetString,
+                GlobalCommands.ShowPullRequestCommentsId,
+                ref model,
+                null);
         }
     }
 }
