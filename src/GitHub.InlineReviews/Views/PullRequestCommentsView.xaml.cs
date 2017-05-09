@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.InlineReviews
 {
@@ -7,6 +8,7 @@ namespace GitHub.InlineReviews
         public PullRequestCommentsView()
         {
             this.InitializeComponent();
+            PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
     }
 }
