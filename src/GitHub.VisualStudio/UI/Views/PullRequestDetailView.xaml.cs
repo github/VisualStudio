@@ -24,7 +24,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericPullRequestDetailView : BusyStateView<IPullRequestDetailViewModel, GenericPullRequestDetailView>
+    public class GenericPullRequestDetailView : ViewBase<IPullRequestDetailViewModel, GenericPullRequestDetailView>
     { }
 
     [ExportView(ViewType = UIViewType.PRDetail)]

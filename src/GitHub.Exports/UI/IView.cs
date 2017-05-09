@@ -1,22 +1,21 @@
-﻿using GitHub.ViewModels;
-using System;
-using System.Windows.Input;
+﻿using System;
+using GitHub.ViewModels;
 
 namespace GitHub.UI
 {
+    /// <summary>
+    /// Base interface for all views.
+    /// </summary>
     public interface IView
     {
+        /// <summary>
+        /// Gets the view model associated with the view.
+        /// </summary>
         IViewModel ViewModel { get; }
-        IObservable<object> Done { get; }
-        IObservable<object> Cancel { get; }
-        IObservable<bool> IsBusy { get; }
-        // necessary for WPF to trigger binding events
+
+        /// <summary>
+        /// Gets or sets the WPF DataContext for the view.
+        /// </summary>
         object DataContext { get; set; }
-
-    }
-
-    public interface ICanLoad
-    {
-        IObservable<ViewWithData> Load { get; }
     }
 }

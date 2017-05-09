@@ -11,7 +11,7 @@ using System;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericGitHubPaneView : SimpleViewUserControl<IGitHubPaneViewModel, GitHubPaneView>
+    public class GenericGitHubPaneView : ViewBase<IGitHubPaneViewModel, GitHubPaneView>
     {
     }
 

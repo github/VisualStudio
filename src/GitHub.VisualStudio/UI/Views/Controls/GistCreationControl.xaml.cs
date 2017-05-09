@@ -13,12 +13,12 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views.Controls
 {
-    public class GenericGistCreationControl : SimpleViewUserControl<IGistCreationViewModel, GistCreationControl>
+    public class GenericGistCreationControl : ViewBase<IGistCreationViewModel, GistCreationControl>
     { }
 
     [ExportView(ViewType=UIViewType.Gist)]
     [PartCreationPolicy(CreationPolicy.NonShared)] 
-    public partial class GistCreationControl
+    public partial class GistCreationControl : GenericGistCreationControl
     {
         [ImportingConstructor]
         public GistCreationControl(
@@ -48,8 +48,6 @@ namespace GitHub.VisualStudio.UI.Views.Controls
 
                         var ns = serviceProvider.TryGetService<IStatusBarNotificationService>();
                         ns?.ShowMessage(UI.Resources.gistCreatedMessage);
-
-                        NotifyDone();
                     });
 
                 d(notifications.Listen()

@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI.Views
 {
-    public class GenericLoggedOutView : SimpleViewUserControl<ILoggedOutViewModel, GenericLoggedOutView>
+    public class GenericLoggedOutView : ViewBase<ILoggedOutViewModel, GenericLoggedOutView>
     {
     }
 

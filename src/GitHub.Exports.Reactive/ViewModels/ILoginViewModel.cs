@@ -3,7 +3,7 @@ using GitHub.Authentication;
 
 namespace GitHub.ViewModels
 {
-    public interface ILoginViewModel : IViewModel
+    public interface ILoginViewModel : IDialogViewModel
     {
         /// <summary>
         /// Gets an observable sequence which produces an authentication 

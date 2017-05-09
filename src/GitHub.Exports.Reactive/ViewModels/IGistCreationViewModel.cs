@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
-    public interface IGistCreationViewModel : IViewModel
+    public interface IGistCreationViewModel : IDialogViewModel
     {
         /// <summary>
         /// Gets the command to create a new gist.

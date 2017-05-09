@@ -113,9 +113,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
             controller.TransitionSignal.Subscribe(data =>
             {
-                var c = data.View;
-                SectionContent = c;
-                c.IsBusy.Subscribe(x => IsBusy = x);
+                var vm = (IHasBusy)data.View.ViewModel;
+                SectionContent = data.View;
+                vm.WhenAnyValue(x => x.IsBusy).Subscribe(x => IsBusy = x);
             },
             () =>
             {
