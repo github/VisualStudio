@@ -8,6 +8,10 @@ namespace GitHub.InlineReviews.Tags
         public AddInlineCommentGlyph()
         {
             InitializeComponent();
+
+            Visibility = System.Windows.Visibility.Hidden;
+            MouseEnter += (s, e) => Visibility = System.Windows.Visibility.Visible;
+            MouseLeave += (s, e) => Visibility = System.Windows.Visibility.Hidden;
         }
     }
 }
