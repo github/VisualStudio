@@ -5,7 +5,7 @@ using GitHub.Models;
 
 namespace GitHub.Services
 {
-    public interface IPullRequestReviewSession
+    public interface IPullRequestSession
     {
         IAccount User { get; }
         IPullRequestModel PullRequest { get; }

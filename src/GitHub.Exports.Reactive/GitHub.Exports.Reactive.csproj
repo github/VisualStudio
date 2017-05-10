@@ -96,9 +96,9 @@
     <Compile Include="Models\UserAndScopes.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />
-    <Compile Include="Services\IPullRequestReviewSession.cs" />
+    <Compile Include="Services\IPullRequestSession.cs" />
     <Compile Include="Services\IPullRequestService.cs" />
-    <Compile Include="Services\IPullRequestReviewSessionManager.cs" />
+    <Compile Include="Services\IPullRequestSessionManager.cs" />
     <Compile Include="ViewModels\IGistCreationViewModel.cs" />
     <Compile Include="Services\NotificationDispatcher.cs" />
     <Compile Include="ViewModels\IHasCancel.cs" />

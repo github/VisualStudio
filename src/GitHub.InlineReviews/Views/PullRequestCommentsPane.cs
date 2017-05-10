@@ -17,7 +17,7 @@ namespace GitHub.InlineReviews.Views
     public class PullRequestCommentsPane : ToolWindowPane
     {
         readonly PullRequestCommentsView view;
-        IPullRequestReviewSession session;
+        IPullRequestSession session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestCommentsPane"/> class.
@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.Views
         }
 
         public void Initialize(
-            IPullRequestReviewSession session,
+            IPullRequestSession session,
             IApiClient apiClient)
         {
             Guard.ArgumentNotNull(session, nameof(session));

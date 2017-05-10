@@ -27,7 +27,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="diffLine">The line in the diff that the thread relates to.</param>
         public InlineCommentThreadViewModel(
             IApiClient apiClient,
-            IPullRequestReviewSession session,
+            IPullRequestSession session,
             string commitSha,
             string filePath,
             int diffLine)
@@ -64,7 +64,7 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets the current pull request review session.
         /// </summary>
-        public IPullRequestReviewSession Session { get; }
+        public IPullRequestSession Session { get; }
 
         /// <inheritdoc/>
         public override async Task<ICommentModel> PostComment(string body)

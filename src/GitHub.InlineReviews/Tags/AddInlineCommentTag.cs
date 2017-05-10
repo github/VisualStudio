@@ -7,7 +7,7 @@ namespace GitHub.InlineReviews.Tags
     class AddInlineCommentTag : InlineCommentTag
     {
         public AddInlineCommentTag(
-            IPullRequestReviewSession session,
+            IPullRequestSession session,
             string commitSha,
             string filePath,
             int diffLine)

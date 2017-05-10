@@ -17,7 +17,7 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
-        readonly IPullRequestReviewSession session;
+        readonly IPullRequestSession session;
         readonly IRepository repository;
         readonly string path;
         readonly bool leftHandSide;
@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.Tags
         public InlineCommentBuilder(
             IGitClient gitClient,
             IDiffService diffService,
-            IPullRequestReviewSession session,
+            IPullRequestSession session,
             IRepository repository,
             string path,
             bool leftHandSide,

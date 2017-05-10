@@ -18,14 +18,14 @@ namespace GitHub.InlineReviews.Tags
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
-        readonly IPullRequestReviewSessionManager sessionManager;
+        readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
         public InlineCommentTaggerProvider(
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
-            IPullRequestReviewSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));

@@ -14,7 +14,7 @@ namespace GitHub.InlineReviews.ViewModels
 
         public PullRequestCommentsViewModel(
             IApiClient apiClient,
-            IPullRequestReviewSession session)
+            IPullRequestSession session)
         {
             this.apiClient = apiClient;
             Repository = session.Repository;

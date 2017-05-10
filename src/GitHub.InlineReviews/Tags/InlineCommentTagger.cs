@@ -25,7 +25,7 @@ namespace GitHub.InlineReviews.Tags
         readonly IDiffService diffService;
         readonly ITextBuffer buffer;
         readonly ITextView view;
-        readonly IPullRequestReviewSessionManager sessionManager;
+        readonly IPullRequestSessionManager sessionManager;
         readonly Subject<ITextSnapshot> signalRebuild;
         readonly int? tabsToSpaces;
         bool initialized;
@@ -33,7 +33,7 @@ namespace GitHub.InlineReviews.Tags
         string relativePath;
         bool leftHandSide;
         IDisposable subscription;
-        IPullRequestReviewSession session;
+        IPullRequestSession session;
         InlineCommentBuilder commentBuilder;
         IReadOnlyList<InlineCommentModel> comments;
         IReadOnlyList<AddCommentModel> addComments;
@@ -44,7 +44,7 @@ namespace GitHub.InlineReviews.Tags
             IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
-            IPullRequestReviewSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
@@ -150,7 +150,7 @@ namespace GitHub.InlineReviews.Tags
 
             subscription = sessionManager.CurrentSession
                 .SelectMany(x => Observable.Return(x)
-                    .Concat(x?.Changed.Select(_ => x) ?? Observable.Empty<IPullRequestReviewSession>()))
+                    .Concat(x?.Changed.Select(_ => x) ?? Observable.Empty<IPullRequestSession>()))
                 .Subscribe(SessionChanged);
 
             initialized = true;
@@ -169,7 +169,7 @@ namespace GitHub.InlineReviews.Tags
             TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
         }
 
-        async void SessionChanged(IPullRequestReviewSession session)
+        async void SessionChanged(IPullRequestSession session)
         {
             this.session = session;
 

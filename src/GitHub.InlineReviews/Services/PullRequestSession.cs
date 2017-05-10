@@ -8,13 +8,13 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Services
 {
-    public class PullRequestReviewSession : IPullRequestReviewSession, IDisposable
+    public class PullRequestSession : IPullRequestSession, IDisposable
     {
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
         readonly Subject<Unit> changed;
         readonly Dictionary<string, List<IPullRequestReviewCommentModel>> pullRequestComments;
 
-        public PullRequestReviewSession(
+        public PullRequestSession(
             IAccount user,
             IPullRequestModel pullRequest,
             ILocalRepositoryModel repository)

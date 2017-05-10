@@ -11,19 +11,19 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Services
 {
-    [Export(typeof(IPullRequestReviewSessionManager))]
+    [Export(typeof(IPullRequestSessionManager))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestReviewSessionManager : IPullRequestReviewSessionManager, IDisposable
+    public class PullRequestSessionManager : IPullRequestSessionManager, IDisposable
     {
         readonly IPullRequestService service;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
-        readonly BehaviorSubject<IPullRequestReviewSession> currentSession = new BehaviorSubject<IPullRequestReviewSession>(null);
+        readonly BehaviorSubject<IPullRequestSession> currentSession = new BehaviorSubject<IPullRequestSession>(null);
         ILocalRepositoryModel repository;
-        PullRequestReviewSession session;
+        PullRequestSession session;
 
         [ImportingConstructor]
-        public PullRequestReviewSessionManager(
+        public PullRequestSessionManager(
             IPullRequestService service,
             IRepositoryHosts hosts,
             ITeamExplorerServiceHolder teamExplorerService)
@@ -38,7 +38,7 @@ namespace GitHub.InlineReviews.Services
             teamExplorerService.Subscribe(this, RepoChanged);
         }
 
-        public IObservable<IPullRequestReviewSession> CurrentSession => currentSession;
+        public IObservable<IPullRequestSession> CurrentSession => currentSession;
 
         public void Dispose()
         {
@@ -46,7 +46,7 @@ namespace GitHub.InlineReviews.Services
             GC.SuppressFinalize(this);
         }
 
-        public async Task<IPullRequestReviewSession> GetSession(IPullRequestModel pullRequest)
+        public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
             if (pullRequest.Number == session?.PullRequest.Number)
             {
@@ -56,7 +56,7 @@ namespace GitHub.InlineReviews.Services
             {
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
 
-                return new PullRequestReviewSession(
+                return new PullRequestSession(
                     await modelService.GetCurrentUser(),
                     pullRequest,
                     repository);
@@ -66,7 +66,7 @@ namespace GitHub.InlineReviews.Services
 
         async void RepoChanged(ILocalRepositoryModel repository)
         {
-            PullRequestReviewSession session = null;
+            PullRequestSession session = null;
 
             this.repository = repository;
 
@@ -80,7 +80,7 @@ namespace GitHub.InlineReviews.Services
 
                     if (pullRequest != null)
                     {
-                        session = new PullRequestReviewSession(
+                        session = new PullRequestSession(
                             await modelService.GetCurrentUser(),
                             pullRequest,
                             repository);

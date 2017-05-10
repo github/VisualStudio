@@ -7,13 +7,13 @@ namespace GitHub.InlineReviews.Tags
 {
     abstract class InlineCommentTag : IGlyphTag
     {
-        public InlineCommentTag(IPullRequestReviewSession session)
+        public InlineCommentTag(IPullRequestSession session)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
             Session = session;
         }
 
-        public IPullRequestReviewSession Session { get; }
+        public IPullRequestSession Session { get; }
     }
 }

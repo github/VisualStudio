@@ -30,7 +30,7 @@ namespace GitHub.InlineReviews
             }
 
             var serviceProvider = (IGitHubServiceProvider)GetGlobalService(typeof(IGitHubServiceProvider));
-            var manager = serviceProvider.GetService<IPullRequestReviewSessionManager>();
+            var manager = serviceProvider.GetService<IPullRequestSessionManager>();
             var session = await manager.GetSession(pullRequest);
             var address = HostAddress.Create(session.Repository.CloneUrl);
             var apiClientFactory = serviceProvider.GetService<IApiClientFactory>();

@@ -9,7 +9,7 @@ namespace GitHub.InlineReviews.Tags
 {
     class ShowInlineCommentTag : InlineCommentTag
     {
-        public ShowInlineCommentTag(IPullRequestReviewSession session, IEnumerable<InlineCommentModel> comments)
+        public ShowInlineCommentTag(IPullRequestSession session, IEnumerable<InlineCommentModel> comments)
             : base(session)
         {
             Guard.ArgumentNotNull(comments, nameof(comments));
