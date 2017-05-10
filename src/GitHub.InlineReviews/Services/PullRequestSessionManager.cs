@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -15,6 +16,9 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : IPullRequestSessionManager, IDisposable
     {
+        readonly IGitService gitService;
+        readonly IGitClient gitClient;
+        readonly IDiffService diffService;
         readonly IPullRequestService service;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
@@ -24,14 +28,23 @@ namespace GitHub.InlineReviews.Services
 
         [ImportingConstructor]
         public PullRequestSessionManager(
+            IGitService gitService,
+            IGitClient gitClient,
+            IDiffService diffService,
             IPullRequestService service,
             IRepositoryHosts hosts,
             ITeamExplorerServiceHolder teamExplorerService)
         {
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
+            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
 
+            this.gitService = gitService;
+            this.gitClient = gitClient;
+            this.diffService = diffService;
             this.service = service;
             this.hosts = hosts;
             this.teamExplorerService = teamExplorerService;
@@ -57,6 +70,9 @@ namespace GitHub.InlineReviews.Services
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
 
                 return new PullRequestSession(
+                    gitService,
+                    gitClient,
+                    diffService,
                     await modelService.GetCurrentUser(),
                     pullRequest,
                     repository);
@@ -81,6 +97,9 @@ namespace GitHub.InlineReviews.Services
                     if (pullRequest != null)
                     {
                         session = new PullRequestSession(
+                            gitService,
+                            gitClient,
+                            diffService,
                             await modelService.GetCurrentUser(),
                             pullRequest,
                             repository);

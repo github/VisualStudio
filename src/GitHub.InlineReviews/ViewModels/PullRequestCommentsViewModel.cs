@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
@@ -11,12 +14,15 @@ namespace GitHub.InlineReviews.ViewModels
     class PullRequestCommentsViewModel : ReactiveObject, IPullRequestCommentsViewModel
     {
         readonly IApiClient apiClient;
+        readonly IPullRequestSession session;
 
         public PullRequestCommentsViewModel(
             IApiClient apiClient,
             IPullRequestSession session)
         {
             this.apiClient = apiClient;
+            this.session = session;
+
             Repository = session.Repository;
             Number = session.PullRequest.Number;
             Title = session.PullRequest.Title;
@@ -32,47 +38,58 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             Conversation.AddReplyPlaceholder();
-
-            FileComments = new ObservableCollection<IDiffCommentThreadViewModel>();
-
-            var commentsByPath = session.PullRequest.ReviewComments.GroupBy(x => x.Path);
-
-            foreach (var path in commentsByPath)
-            {
-                var commentsByPosition = path.GroupBy(x => Tuple.Create(x.CommitId, x.Position));
-
-                foreach (var position in commentsByPosition)
-                {
-                    var firstComment = position.First();
-                    var thread = new InlineCommentThreadViewModel(
-                        apiClient,
-                        session,
-                        firstComment.OriginalCommitId,
-                        path.Key,
-                        firstComment.OriginalPosition.Value);
-
-                    foreach (var comment in position)
-                    {
-                        thread.Comments.Add(new InlineCommentViewModel(
-                            thread,
-                            session.User,
-                            comment));
-                    }
-
-                    thread.AddReplyPlaceholder();
-
-                    FileComments.Add(new DiffCommentThreadViewModel(
-                        firstComment.DiffHunk,
-                        path.Key,
-                        thread));
-                }
-            }
         }
 
         public IRepositoryModel Repository { get; }
         public int Number { get; }
         public string Title { get; }
         public ICommentThreadViewModel Conversation { get; }
-        public ObservableCollection<IDiffCommentThreadViewModel> FileComments { get; }
+        public IReactiveList<IDiffCommentThreadViewModel> FileComments { get; }
+            = new ReactiveList<IDiffCommentThreadViewModel>();
+
+        public async Task Initialize()
+        {
+            var files = await session.GetAllFiles();
+
+            foreach (var file in files)
+            {
+                foreach (var thread in file.InlineCommentThreads)
+                {
+                    var vm = new InlineCommentThreadViewModel(
+                        apiClient,
+                        session,
+                        thread.Comments.First().CommitId,
+                        file.RelativePath,
+                        thread.LineNumber);
+
+                    foreach (var comment in thread.Comments)
+                    {
+                        vm.Comments.Add(new InlineCommentViewModel(
+                            vm,
+                            session.User,
+                            comment));
+                    }
+
+                    vm.AddReplyPlaceholder();
+
+                    FileComments.Add(new DiffCommentThreadViewModel(
+                        ToString(thread.DiffMatch),
+                        file.RelativePath,
+                        vm));
+                }
+            }
+        }
+
+        private string ToString(IList<DiffLine> diffMatch)
+        {
+            var b = new StringBuilder();
+
+            for (var i = diffMatch.Count - 1; i >= 0; --i)
+            {
+                b.AppendLine(diffMatch[i].Content);
+            }
+
+            return b.ToString();
+        }
     }
 }

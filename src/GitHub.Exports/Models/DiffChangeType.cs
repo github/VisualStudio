@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GitHub.InlineReviews.Models
+namespace GitHub.Models
 {
     public enum DiffChangeType
     {
