@@ -13,7 +13,6 @@ namespace GitHub.InlineReviews.Services
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
         readonly Subject<Unit> changed;
         readonly Dictionary<string, List<IPullRequestReviewCommentModel>> pullRequestComments;
-        readonly Dictionary<string, List<IInlineCommentModel>> inlineComments;
 
         public PullRequestReviewSession(
             IAccount user,
@@ -34,7 +33,6 @@ namespace GitHub.InlineReviews.Services
         public IPullRequestModel PullRequest { get; }
         public ILocalRepositoryModel Repository { get; }
         public IObservable<Unit> Changed => changed;
-        public IObservable<IReadOnlyList<IInlineCommentModel>> InlineComments { get; }
 
         public void AddComment(IPullRequestReviewCommentModel comment)
         {
