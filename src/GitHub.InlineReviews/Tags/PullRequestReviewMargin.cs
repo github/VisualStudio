@@ -16,7 +16,7 @@ namespace ScratchMargin
         public const string MarginName = "PullRequestReview";
         public const string GlyphMarginName = "Glyph";
 
-        IPullRequestReviewSession session;
+        IPullRequestSession session;
 
         readonly IWpfTextViewHost wpfTextViewHost;
         readonly MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph> mouseEnterAndLeaveEventRouter;
@@ -29,7 +29,7 @@ namespace ScratchMargin
 
         public PullRequestReviewMargin(
             IWpfTextViewHost wpfTextViewHost,
-            IPullRequestReviewSessionManager sessionManager,
+            IPullRequestSessionManager sessionManager,
             IApiClientFactory apiClientFactory,
             IPeekBroker peekBroker,
             IViewTagAggregatorFactoryService tagAggregatorFactory)

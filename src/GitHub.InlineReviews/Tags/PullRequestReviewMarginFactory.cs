@@ -18,14 +18,14 @@ namespace ScratchMargin
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     internal sealed class PullRequestReviewMarginFactory : IWpfTextViewMarginProvider
     {
-        Lazy<IPullRequestReviewSessionManager> sessionManager;
+        Lazy<IPullRequestSessionManager> sessionManager;
         Lazy<IApiClientFactory> apiClientFactory;
         Lazy<IPeekBroker> peekBroker;
         Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory;
 
         [ImportingConstructor]
         public PullRequestReviewMarginFactory(
-            Lazy<IPullRequestReviewSessionManager> sessionManager,
+            Lazy<IPullRequestSessionManager> sessionManager,
             Lazy<IApiClientFactory> apiClientFactory,
             Lazy<IPeekBroker> peekBroker,
             Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory)

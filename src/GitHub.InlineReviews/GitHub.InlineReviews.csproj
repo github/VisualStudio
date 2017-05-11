@@ -81,8 +81,6 @@
     <Compile Include="SampleData\PullRequestCommentsViewModelDesigner.cs" />
     <Compile Include="Services\PullRequestSession.cs" />
     <Compile Include="Services\PullRequestSessionManager.cs" />
-    <Compile Include="Services\PullRequestReviewSession.cs" />
-    <Compile Include="Services\PullRequestReviewSessionManager.cs" />
     <Compile Include="Tags\PullRequestReviewMargin.cs" />
     <Compile Include="Tags\PullRequestReviewMarginFactory.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
