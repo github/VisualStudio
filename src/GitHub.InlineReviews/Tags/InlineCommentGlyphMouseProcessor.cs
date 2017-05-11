@@ -21,7 +21,6 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextView textView;
         readonly IWpfTextViewMargin margin;
         readonly ITagAggregator<InlineCommentTag> tagAggregator;
-        readonly MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph> mouseEventRouter;
 
         public InlineCommentGlyphMouseProcessor(
             IApiClientFactory apiClientFactory,
@@ -35,18 +34,6 @@ namespace GitHub.InlineReviews.Tags
             this.textView = textView;
             this.margin = margin;
             this.tagAggregator = aggregator;
-
-            mouseEventRouter = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
-        }
-
-        public override void PostprocessMouseMove(MouseEventArgs e)
-        {
-            mouseEventRouter.MouseMove(margin.VisualElement, e);
-        }
-
-        public override void PostprocessMouseLeave(MouseEventArgs e)
-        {
-            mouseEventRouter.MouseLeave(margin.VisualElement, e);
         }
 
         public override void PreprocessMouseLeftButtonUp(MouseButtonEventArgs e)

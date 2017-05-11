@@ -12,6 +12,7 @@ namespace GitHub.InlineReviews.Tags
             Visibility = System.Windows.Visibility.Hidden;
             MouseEnter += (s, e) => Visibility = System.Windows.Visibility.Visible;
             MouseLeave += (s, e) => Visibility = System.Windows.Visibility.Hidden;
+            Background = System.Windows.Media.Brushes.Transparent;
         }
     }
 }
