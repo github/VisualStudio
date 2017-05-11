@@ -4,6 +4,9 @@ using System.Reactive.Linq;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using GitHub.Services;
+using GitHub.Factories;
+using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Text.Tagging;
 
 namespace ScratchMargin
 {
@@ -15,25 +18,28 @@ namespace ScratchMargin
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     internal sealed class PullRequestReviewMarginFactory : IWpfTextViewMarginProvider
     {
-        IPullRequestReviewSession session;
+        Lazy<IPullRequestReviewSessionManager> sessionManager;
+        Lazy<IApiClientFactory> apiClientFactory;
+        Lazy<IPeekBroker> peekBroker;
+        Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory;
 
         [ImportingConstructor]
-        public PullRequestReviewMarginFactory(IPullRequestReviewSessionManager sessionManager)
+        public PullRequestReviewMarginFactory(
+            Lazy<IPullRequestReviewSessionManager> sessionManager,
+            Lazy<IApiClientFactory> apiClientFactory,
+            Lazy<IPeekBroker> peekBroker,
+            Lazy<IViewTagAggregatorFactoryService> tagAggregatorFactory)
+
         {
-            sessionManager.CurrentSession.Subscribe(s =>
-            {
-                session = s;
-            });
+            this.sessionManager = sessionManager;
+            this.apiClientFactory = apiClientFactory;
+            this.peekBroker = peekBroker;
+            this.tagAggregatorFactory = tagAggregatorFactory;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
         {
-            if(session == null)
-            {
-                return null;
-            }
-
-            return new PullRequestReviewMargin(wpfTextViewHost);
+            return new PullRequestReviewMargin(wpfTextViewHost, sessionManager.Value, apiClientFactory.Value, peekBroker.Value, tagAggregatorFactory.Value);
         }
     }
 }

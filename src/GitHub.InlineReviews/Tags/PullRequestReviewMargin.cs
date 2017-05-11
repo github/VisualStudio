@@ -3,8 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Editor;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.Text.Tagging;
+using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.Tags;
+using GitHub.Factories;
+using GitHub.Services;
 
 namespace ScratchMargin
 {
@@ -13,14 +16,23 @@ namespace ScratchMargin
         public const string MarginName = "PullRequestReview";
         public const string GlyphMarginName = "Glyph";
 
+        IPullRequestReviewSession session;
+
         readonly IWpfTextViewHost wpfTextViewHost;
         readonly MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph> mouseEnterAndLeaveEventRouter;
+
+        readonly InlineCommentGlyphMouseProcessor mouseProcessor;
 
         private bool isDisposed;
 
         IWpfTextViewMargin glyphMargin;
 
-        public PullRequestReviewMargin(IWpfTextViewHost wpfTextViewHost)
+        public PullRequestReviewMargin(
+            IWpfTextViewHost wpfTextViewHost,
+            IPullRequestReviewSessionManager sessionManager,
+            IApiClientFactory apiClientFactory,
+            IPeekBroker peekBroker,
+            IViewTagAggregatorFactoryService tagAggregatorFactory)
         {
             this.wpfTextViewHost = wpfTextViewHost;
             wpfTextViewHost.HostControl.Loaded += HostControl_Loaded;
@@ -30,7 +42,25 @@ namespace ScratchMargin
             MouseLeave += ScratchEditorMargin_MouseLeave;
 
             ClipToBounds = true;
-            Background = new SolidColorBrush(Colors.LightGreen);
+            Background = new SolidColorBrush(Colors.LightBlue);
+
+            mouseProcessor = new InlineCommentGlyphMouseProcessor(
+                apiClientFactory,
+                peekBroker,
+                wpfTextViewHost.TextView,
+                this,
+                tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(wpfTextViewHost.TextView));
+            MouseDown += PullRequestReviewMargin_MouseDown;
+
+            sessionManager.CurrentSession.Subscribe(s =>
+            {
+                session = s;
+            });
+        }
+
+        private void PullRequestReviewMargin_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            mouseProcessor.PreprocessMouseLeftButtonUp(e);
         }
 
         void ScratchEditorMargin_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -45,6 +75,11 @@ namespace ScratchMargin
 
         private void HostControl_Loaded(object sender, RoutedEventArgs e)
         {
+            if (session == null)
+            {
+                return;
+            }
+
             glyphMargin = wpfTextViewHost.GetTextViewMargin(GlyphMarginName);
             if(glyphMargin == null || !glyphMargin.Enabled)
             {
