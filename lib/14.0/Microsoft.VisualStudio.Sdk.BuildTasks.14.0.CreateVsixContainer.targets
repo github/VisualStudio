@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Update CreateVsixContainer target to support InstallationRoot and InstallationFolder -->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <Target
+      Name="CreateVsixContainer"
+      Condition="$(CreateVsixContainer)"
+      Inputs="@(VSIXSourceItem);$(IntermediateVsixManifest)"
+      Outputs="$(TargetVsixContainer)"
+      DependsOnTargets="$(CreateVsixContainerDependsOn)">
+
+    <Message Text="Creating VSIX Container..." />
+
+    <ItemGroup>
+      <_VsixManifest Include="$(IntermediateVsixManifest)" />
+    </ItemGroup>
+
+    <CreateZipPackageLegacy
+         Condition="'$(VsixType)'!='v3'"
+         Files="@(VSIXSourceItem);$(IntermediateVsixManifest)"
+         ZipPackage="$(TargetVsixContainer)"
+         CompressionLevel="$(ZipPackageCompressionLevel)">
+      <Output TaskParameter="ZipPackage" ItemName="FileWrites" />
+      <Output TaskParameter="ZipPackage" ItemName="_CreatedVsixContainer" />
+    </CreateZipPackageLegacy>
+
+    <CreateZipPackage
+         Condition="'$(VsixType)'=='v3'"
+         SourceManifest="@(_VsixManifest)"
+         Files="@(VSIXSourceItem)"
+         ZipPackage="$(TargetVsixContainer)"
+         CompressionLevel="$(ZipPackageCompressionLevel)"
+         IsProductComponent="$(IsProductComponent)"
+         ItemsToConsider="@(None)"
+         InstallationRoot="$(ExtensionInstallationRoot)"
+         InstallationFolder="$(ExtensionInstallationFolder)">
+      <Output TaskParameter="ZipPackage" ItemName="FileWrites" />
+      <Output TaskParameter="ZipPackage" ItemName="_CreatedVsixContainer" />
+    </CreateZipPackage>
+
+    <Message Importance="High" Text="$(MSBuildProjectName) -&gt; @(_CreatedVsixContainer->'%(FullPath)')" />
+  </Target>    
+</Project>
