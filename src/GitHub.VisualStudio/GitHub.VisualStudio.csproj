@@ -18,7 +18,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.2.0.14</ApplicationVersion>
+    <ApplicationVersion>2.2.1.1</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
@@ -749,8 +749,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  
   <!-- Update CreateVsixContainer target to support InstallationRoot and InstallationFolder -->
   <Import Project="..\..\lib\14.0\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.CreateVsixContainer.targets" />
-    
 </Project>
