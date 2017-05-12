@@ -9,11 +9,17 @@ namespace GitHub.Models
     /// </summary>
     /// <remarks>
     /// A pull request session file represents the real-time state of a file in a pull request in
-    /// the IDE. It takes the pull request model and updates it to the current state of the code on
-    /// disk and in the editor.
+    /// the IDE. It represents the state of a file from the pull request model updated to the 
+    /// current state of the code on disk and in the editor.
     /// </remarks>
     public interface IPullRequestSessionFile
     {
+        /// <summary>
+        /// Gets the SHA of the current commit of the file, or null if the file has uncommitted
+        /// changes.
+        /// </summary>
+        string CommitSha { get; }
+
         /// <summary>
         /// Gets the path to the file relative to the repository.
         /// </summary>

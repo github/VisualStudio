@@ -114,16 +114,24 @@ namespace GitHub.InlineReviews.Tags
                         }
                     }
 
-                    ////foreach (var addComment in addComments)
-                    ////{
-                    ////    if (addComment.LineNumber >= startLine && addComment.LineNumber <= endLine)
-                    ////    {
-                    ////        var line = span.Snapshot.GetLineFromLineNumber(addComment.LineNumber);
-                    ////        yield return new TagSpan<InlineCommentTag>(
-                    ////            new SnapshotSpan(line.Start, line.End),
-                    ////            new AddInlineCommentTag(session, addComment.CommitSha, relativePath, addComment.DiffLine));
-                    ////    }
-                    ////}
+                    if (file.CommitSha != null)
+                    {
+                        foreach (var chunk in file.Diff)
+                        {
+                            foreach (var line in chunk.Lines)
+                            {
+                                var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
+
+                                if (lineNumber >= startLine && lineNumber <= endLine)
+                                {
+                                    var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
+                                    yield return new TagSpan<InlineCommentTag>(
+                                        new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
+                                        new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

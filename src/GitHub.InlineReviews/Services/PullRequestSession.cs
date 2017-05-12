@@ -157,6 +157,7 @@ namespace GitHub.InlineReviews.Services
             file.RelativePath = relativePath;
             file.BaseSha = PullRequest.Base.Sha;
             file.BaseCommit = await gitClient.ExtractFile(repository, file.BaseSha, relativePath);
+            file.CommitSha = await gitClient.IsModified(repository, relativePath, contents) ? null : repository.Head.Tip.Sha;
             file.Diff = diffService.Diff(file.BaseCommit, contents).ToList();
 
             var commentsByPosition = PullRequest.ReviewComments
