@@ -157,14 +157,6 @@ namespace GitHub.ViewModels
             private set { this.RaiseAndSetIfChanged(ref isBusy, value); }
         }
 
-        /// Gets a value indicating whether the pull request branch is checked out.
-        /// </summary>
-        public bool IsCheckedOut
-        {
-            get { return isCheckedOut; }
-            private set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
-        }
-
         /// <summary>
         /// Gets a value indicating whether the view model is loading.
         /// </summary>
@@ -172,6 +164,15 @@ namespace GitHub.ViewModels
         {
             get { return isLoading; }
             private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the pull request branch is checked out.
+        /// </summary>
+        public bool IsCheckedOut
+        {
+            get { return isCheckedOut; }
+            private set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
         }
 
         /// <summary>
