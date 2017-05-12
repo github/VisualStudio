@@ -60,20 +60,29 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task Clone(
-            string cloneUrl,
-            string clonePath,
-            bool recurseSubmodules,
-            object progress = null)
+        public async Task Clone(string cloneUrl, string clonePath, bool recurseSubmodules, object progress = null)
         {
-#if TEAMEXPLORER14
+            if (TeamFoundationVersion.Major >= 15)
+            {
+                await Clone15(cloneUrl, clonePath, recurseSubmodules, progress);
+                return;
+            }
+
+            await Clone14(cloneUrl, clonePath, recurseSubmodules);
+        }
+
+        async Task Clone14(string cloneUrl, string clonePath, bool recurseSubmodules)
+        {
             var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
 
             // The operation will have completed when CanClone goes false and then true again.
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1);
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
-#else
+        }
+
+        public async Task Clone15(string cloneUrl, string clonePath, bool recurseSubmodules, object progress = null)
+        {
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>)progress) ??
                 new Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>();
@@ -83,7 +92,6 @@ namespace GitHub.Services
                 typedProgress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
                 await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
-#endif
         }
 
         IGitRepositoryInfo GetRepoFromVS()

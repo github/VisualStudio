@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.VisualStudio;
 using Microsoft.Win32;
+using System.IO;
 
 namespace GitHub.TeamFoundation
 {
     internal class RegistryHelper
     {
-        const string TEGitKey = @"Software\Microsoft\VisualStudio\15.0\TeamFoundation\GitSourceControl";
         static RegistryKey OpenGitKey(string path)
         {
-            return Microsoft.Win32.Registry.CurrentUser.OpenSubKey(TEGitKey + "\\" + path, true);
+            var gitKey = string.Format(@"Software\Microsoft\VisualStudio\{0}.0\TeamFoundation\GitSourceControl\{1}",
+                TeamFoundationVersion.Major, path);
+            return Registry.CurrentUser.OpenSubKey(gitKey, true);
         }
 
         internal static IEnumerable<ILocalRepositoryModel> PokeTheRegistryForRepositoryList()
@@ -30,7 +30,7 @@ namespace GitHub.TeamFoundation
                         try
                         {
                             var path = subkey?.GetValue("Path") as string;
-                            if (path != null)
+                            if (path != null && Directory.Exists(path))
                                 return new LocalRepositoryModel(path);
                         }
                         catch (Exception)
@@ -53,7 +53,8 @@ namespace GitHub.TeamFoundation
             }
         }
 
-        const string NewProjectDialogKeyPath = @"Software\Microsoft\VisualStudio\15.0\NewProjectDialog";
+        static string NewProjectDialogKeyPath => string.Format(@"Software\Microsoft\VisualStudio\{0}.0\NewProjectDialog", TeamFoundationVersion.Major);
+
         const string MRUKeyPath = "MRUSettingsLocalProjectLocationEntries";
         internal static string SetDefaultProjectPath(string path)
         {
