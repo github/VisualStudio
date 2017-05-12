@@ -122,7 +122,7 @@ namespace GitHub.Models
                 // Try to get an authorization token, save it, then get the user to log in:
                 .SelectMany(fingerprint => ApiClient.GetOrCreateApplicationAuthenticationCode(interceptingTwoFactorChallengeHandler))
                 .SelectMany(saveAuthorizationToken)
-                .SelectMany(_ => GetUserFromApi())
+                .SelectMany(_ => GetUserFromApiWithDelay())
                 .Catch<UserAndScopes, ApiException>(firstTryEx =>
                 {
                     var exception = firstTryEx as AuthorizationException;
@@ -163,7 +163,7 @@ namespace GitHub.Models
                             })
                             // Then save the authorization token (if there is one) and get the user:
                             .SelectMany(saveAuthorizationToken)
-                            .SelectMany(_ => GetUserFromApi());
+                            .SelectMany(_ => GetUserFromApiWithDelay());
                     }
 
                     return Observable.Throw<UserAndScopes>(firstTryEx);
@@ -178,7 +178,7 @@ namespace GitHub.Models
                     // instead of 404 to signal that it's not allowed. In the name of backwards compatibility we 
                     // test for both 404 (NotFoundException) and 403 (ForbiddenException) here.
                     if (isEnterprise && (retryEx is NotFoundException || retryEx is ForbiddenException || retryEx.StatusCode == (HttpStatusCode)422))
-                        return GetUserFromApi();
+                        return GetUserFromApiWithDelay();
 
                     // Other errors are "real" so we pass them along:
                     return Observable.Throw<UserAndScopes>(retryEx);
@@ -266,6 +266,15 @@ namespace GitHub.Models
                         hostAddress.ApiUri,
                         result.IsSuccess() ? "SUCCEEDED" : "FAILED");
                 });
+        }
+
+        IObservable<UserAndScopes> GetUserFromApiWithDelay()
+        {
+            // It seems that attempting to use a token immediately sometimes fails, add a delay
+            // of 1s to allow the token to propagate.
+            return Observable.Defer(() => 
+                Observable.Timer(TimeSpan.FromMilliseconds(1000))
+                          .SelectMany(_ => ApiClient.GetUser()));
         }
 
         IObservable<UserAndScopes> GetUserFromApi()
