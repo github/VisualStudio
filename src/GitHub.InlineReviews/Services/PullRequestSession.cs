@@ -2,25 +2,30 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Text;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
-    public class PullRequestSession : IPullRequestSession, IDisposable
+    /// <summary>
+    /// A pull request session.
+    /// </summary>
+    /// <remarks>
+    /// A pull request session represents the real-time state of a pull request in the IDE.
+    /// It takes the pull request model and updates according to the current state of the
+    /// repository on disk and in the editor.
+    /// </remarks>
+    public class PullRequestSession : IPullRequestSession
     {
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
-        readonly Subject<Unit> changed = new Subject<Unit>();
-        readonly Dictionary<string, List<IPullRequestReviewCommentModel>> pullRequestComments;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         ReactiveList<IPullRequestSessionFile> files;
 
@@ -44,134 +49,168 @@ namespace GitHub.InlineReviews.Services
             User = user;
             PullRequest = pullRequest;
             Repository = repository;
-            pullRequestComments = pullRequest.ReviewComments
-                .OrderBy(x => x.Id)
-                .GroupBy(x => x.Path)
-                .ToDictionary(x => x.Key, x => x.ToList());
         }
 
+        /// <inheritdoc/>
         public IAccount User { get; }
-        public IPullRequestModel PullRequest { get; }
-        public ILocalRepositoryModel Repository { get; }
-        public IObservable<Unit> Changed => changed;
 
-        private IEnumerable<string> FilePaths
+        /// <inheritdoc/>
+        public IPullRequestModel PullRequest { get; }
+
+        /// <inheritdoc/>
+        public ILocalRepositoryModel Repository { get; }
+
+        IEnumerable<string> FilePaths
         {
             get { return PullRequest.ChangedFiles.Select(x => x.FileName); }
         }
 
-        public void AddComment(IPullRequestReviewCommentModel comment)
+        /// <inheritdoc/>
+        public async Task<IReactiveList<IPullRequestSessionFile>> GetAllFiles()
         {
-            List<IPullRequestReviewCommentModel> fileComments;
-
-            if (!pullRequestComments.TryGetValue(comment.Path, out fileComments))
+            if (files == null)
             {
-                fileComments = new List<IPullRequestReviewCommentModel>();
-                pullRequestComments.Add(comment.Path, fileComments);
+                files = await CreateAllFiles();
             }
 
-            fileComments.Add(comment);
-            changed.OnNext(Unit.Default);
+            return files;
         }
 
-        public IReadOnlyList<IPullRequestReviewCommentModel> GetCommentsForFile(string path)
+        /// <inheritdoc/>
+        public async Task<IPullRequestSessionFile> GetFile(string relativePath)
         {
-            List<IPullRequestReviewCommentModel> result;
-            path = path.Replace('\\', '/');
-            return pullRequestComments.TryGetValue(path, out result) ? result : Empty;
+            var contents = await ReadAllTextAsync(GetFullPath(relativePath));
+            return await GetFile(relativePath, contents);
         }
 
-        public async Task<IPullRequestSessionFile> GetFile(string path)
+        /// <inheritdoc/>
+        public Task<IPullRequestSessionFile> GetFile(string relativePath, ITextSnapshot snapshot)
+        {
+            var contents = snapshot.GetText();
+            return GetFile(relativePath, contents);
+        }
+
+        /// <inheritdoc/>
+        public async Task RecaluateLineNumbers(string relativePath, string contents)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            var updated = await Task.Run(() =>
+            {
+                PullRequestSessionFile file;
+
+                if (fileIndex.TryGetValue(relativePath, out file))
+                {
+                    var result = new Dictionary<IInlineCommentThreadModel, int>();
+
+                    file.Diff = diffService.Diff(file.BaseCommit, contents).ToList();
+
+                    foreach (var thread in file.InlineCommentThreads)
+                    {
+                        result[thread] = GetUpdatedLineNumber(thread, file.Diff);
+                    }
+
+                    return result;
+                }
+
+                return null;
+            });
+
+            if (updated != null)
+            {
+                foreach (var i in updated)
+                {
+                    i.Key.LineNumber = i.Value;
+                    i.Key.IsStale = false;
+                }
+            }
+        }
+
+        async Task<IPullRequestSessionFile> GetFile(string relativePath, string contents)
         {
             PullRequestSessionFile file;
 
-            if (!fileIndex.TryGetValue(path, out file))
+            relativePath = relativePath.Replace("\\", "/");
+
+            if (!fileIndex.TryGetValue(relativePath, out file))
             {
                 // TODO: Check for binary files.
-                if (FilePaths.Any(x => x == path))
+                if (FilePaths.Any(x => x == relativePath))
                 {
-                    file = await CreateFile(path);
-                    fileIndex.Add(path, file);
+                    file = await CreateFile(relativePath, contents);
+                    fileIndex.Add(relativePath, file);
                 }
                 else
                 {
-                    fileIndex.Add(path, null);
+                    fileIndex.Add(relativePath, null);
                 }
             }
 
             return file;
         }
 
-        public async Task<IReactiveList<IPullRequestSessionFile>> GetAllFiles()
+        async Task<PullRequestSessionFile> CreateFile(string relativePath, string contents)
         {
-            if (files == null)
-            {
-                files = await CreateFiles();
-            }
-
-            return files;
-        }
-
-        public void Dispose()
-        {
-            changed.Dispose();
-            GC.SuppressFinalize(this);
-        }
-
-        async Task<PullRequestSessionFile> CreateFile(string path)
-        {
-            var result = new PullRequestSessionFile();
+            var file = new PullRequestSessionFile();
             var repository = gitService.GetRepository(Repository.LocalPath);
-            var contents = await ReadAllTextAsync(path);
 
-            result.RelativePath = path;
-            result.BaseSha = PullRequest.Base.Sha;
-            result.BaseCommit = await gitClient.ExtractFile(repository, result.BaseSha, path);
-            result.Diff = diffService.Diff(result.BaseCommit, contents).ToList();
+            file.RelativePath = relativePath;
+            file.BaseSha = PullRequest.Base.Sha;
+            file.BaseCommit = await gitClient.ExtractFile(repository, file.BaseSha, relativePath);
+            file.Diff = diffService.Diff(file.BaseCommit, contents).ToList();
 
             var commentsByPosition = PullRequest.ReviewComments
-                .Where(x => x.Path == path)
+                .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
                 .OrderBy(x => x.Id)
-                .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition));
+                .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
 
             foreach (var position in commentsByPosition)
             {
                 var chunk = diffService.ParseFragment(position.First().DiffHunk);
                 var diffLines = chunk.Last().Lines.Reverse().Take(5).ToList();
-                var thread = new InlineCommentThreadModel(diffLines);
+                var thread = new InlineCommentThreadModel(
+                    relativePath,
+                    position.Key.Item1,
+                    position.Key.Item2,
+                    diffLines);
                 thread.Comments.AddRange(position);
-                result.InlineCommentThreads.Add(thread);
+                thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
+                file.InlineCommentThreads.Add(thread);
             }
 
-            return result;
+            return file;
         }
 
-        async Task<ReactiveList<IPullRequestSessionFile>> CreateFiles()
+        async Task<ReactiveList<IPullRequestSessionFile>> CreateAllFiles()
         {
             var result = new ReactiveList<IPullRequestSessionFile>();
 
             foreach (var path in FilePaths)
             {
-                result.Add(await CreateFile(path));
+                var contents = await ReadAllTextAsync(GetFullPath(path));
+                result.Add(await CreateFile(path, contents));
             }
 
             return result;
         }
 
-        void UpdateLineNumber(InlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
+        string GetFullPath(string relativePath)
+        {
+            return Path.Combine(Repository.LocalPath, relativePath);
+        }
+
+        int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
         {
             var line = Match(diff, thread.DiffMatch);
 
             if (line != null)
             {
-                thread.LineNumber = (thread.DiffLineType == DiffChangeType.Delete) ?
+                return (thread.DiffLineType == DiffChangeType.Delete) ?
                     line.OldLineNumber - 1 :
                     line.NewLineNumber - 1;
             }
-            else
-            {
-                thread.LineNumber = -1;
-            }
+
+            return -1;
         }
 
         static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
@@ -196,7 +235,7 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        static Task<string> ReadAllTextAsync(string path)
+        static async Task<string> ReadAllTextAsync(string path)
         {
             if (File.Exists(path))
             {
@@ -204,13 +243,13 @@ namespace GitHub.InlineReviews.Services
                 {
                     using (var reader = File.OpenText(path))
                     {
-                        return reader.ReadToEndAsync();
+                        return await reader.ReadToEndAsync();
                     }
                 }
                 catch { }
             }
 
-            return Task.FromResult<string>(null);
+            return null;
         }
     }
 }

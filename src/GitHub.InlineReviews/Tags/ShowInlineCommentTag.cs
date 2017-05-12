@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
+using GitHub.Models;
 using GitHub.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
     class ShowInlineCommentTag : InlineCommentTag
     {
-        public ShowInlineCommentTag(IPullRequestSession session, IEnumerable<InlineCommentModel> comments)
+        public ShowInlineCommentTag(IPullRequestSession session, IInlineCommentThreadModel thread)
             : base(session)
         {
-            Guard.ArgumentNotNull(comments, nameof(comments));
+            Guard.ArgumentNotNull(thread, nameof(thread));
 
-            Comments = new List<InlineCommentModel>(comments);
+            Thread = thread;
         }
 
-        public IReadOnlyList<InlineCommentModel> Comments { get; }
-        public bool IsAddNewCommentTag => Comments.Count == 0;
-        public bool NeedsUpdate => Comments.Any(x => x.IsStale);
+        public IInlineCommentThreadModel Thread { get; }
+        public bool IsAddNewCommentTag => Thread.Comments.Count == 0;
+        ////public bool NeedsUpdate => Thread.Any(x => x.IsStale);
     }
 }

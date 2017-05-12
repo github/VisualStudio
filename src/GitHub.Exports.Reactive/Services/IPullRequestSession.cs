@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Microsoft.VisualStudio.Text;
 using ReactiveUI;
 
 namespace GitHub.Services
@@ -17,15 +16,56 @@ namespace GitHub.Services
     /// </remarks>
     public interface IPullRequestSession
     {
+        /// <summary>
+        /// Gets the current user.
+        /// </summary>
         IAccount User { get; }
+
+        /// <summary>
+        /// Gets the pull request.
+        /// </summary>
         IPullRequestModel PullRequest { get; }
+
+        /// <summary>
+        /// Gets the pull request's repository.
+        /// </summary>
         ILocalRepositoryModel Repository { get; }
 
-        IObservable<Unit> Changed { get; }
-
-        void AddComment(IPullRequestReviewCommentModel comment);
+        /// <summary>
+        /// Gets all files touched by the pull request.
+        /// </summary>
+        /// <returns>
+        /// A list of the files touched by the pull request.
+        /// </returns>
         Task<IReactiveList<IPullRequestSessionFile>> GetAllFiles();
-        IReadOnlyList<IPullRequestReviewCommentModel> GetCommentsForFile(string path);
-        Task<IPullRequestSessionFile> GetFile(string path);
+
+        /// <summary>
+        /// Gets a file touched by the pull request.
+        /// </summary>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <returns>
+        /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
+        /// the pull request.
+        /// </returns>
+        Task<IPullRequestSessionFile> GetFile(string relativePath);
+
+        /// <summary>
+        /// Gets a file touched by the pull request.
+        /// </summary>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <param name="snapshot">The current snapshot of the file in an editor.</param>
+        /// <returns>
+        /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
+        /// the pull request.
+        /// </returns>
+        Task<IPullRequestSessionFile> GetFile(string relativePath, ITextSnapshot snapshot);
+
+        /// <summary>
+        /// Updates the line numbers of the inline comments of a file.
+        /// </summary>
+        /// <param name="relativePath">The relative path to the file.</param>
+        /// <param name="contents">The new file contents.</param>
+        /// <returns>A tack which completes when the operation has completed.</returns>
+        Task RecaluateLineNumbers(string relativePath, string contents);
     }
 }
