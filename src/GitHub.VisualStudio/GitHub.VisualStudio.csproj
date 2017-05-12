@@ -18,11 +18,11 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
-    <ApplicationVersion>2.2.0.12</ApplicationVersion>
+    <ApplicationVersion>2.2.0.14</ApplicationVersion>
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
-	<ExtensionInstallationFolder>GitHub Extension for Visual Studio</ExtensionInstallationFolder>
+    <ExtensionInstallationFolder>GitHub Extension for Visual Studio</ExtensionInstallationFolder>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
