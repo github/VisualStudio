@@ -22,6 +22,8 @@
     <OutputPath>..\..\build\$(Configuration)\</OutputPath>
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
+    <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
+    <ExtensionInstallationFolder>GitHub Extension for Visual Studio</ExtensionInstallationFolder>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -747,4 +749,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <!-- Update CreateVsixContainer target to support InstallationRoot and InstallationFolder -->
+  <Import Project="..\..\lib\14.0\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.CreateVsixContainer.targets" />
 </Project>
