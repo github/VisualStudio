@@ -34,6 +34,7 @@ git clone https://github.com/github/VisualStudio
 cd VisualStudio
 git submodule init
 git submodule deinit script
+git submodule deinit submodules/externalpackages/StartPage
 git submodule update
 ```
 
