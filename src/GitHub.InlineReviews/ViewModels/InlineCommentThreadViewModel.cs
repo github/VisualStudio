@@ -71,7 +71,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(body, nameof(body));
 
-            var lastComment = Comments.Where(x => x.Id != 0).LastOrDefault();
+            var lastComment = Comments.Where(x => x.Id != 0).FirstOrDefault();
             var result = lastComment != null ?
                 await PostReply(body, lastComment.Id) :
                 await PostNewComment(body);
