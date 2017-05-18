@@ -8,7 +8,7 @@
                     mc:Ignorable="PresentationOptions">
 
     <!-- The blue accent color used through-out the app -->
-    <Color x:Key="GitHubAccentColor">#4ea6ea</Color>
+    <Color x:Key="GitHubAccentColor">#3da4f4</Color>
     <SolidColorBrush x:Key="GitHubAccentBrush" Color="{StaticResource GitHubAccentColor}"
                      PresentationOptions:Freeze="true" />
 
