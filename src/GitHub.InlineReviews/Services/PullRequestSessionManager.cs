@@ -79,14 +79,13 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-
         async void RepoChanged(ILocalRepositoryModel repository)
         {
             PullRequestSession session = null;
 
             this.repository = repository;
 
-            if (repository != null)
+            if (repository?.CloneUrl != null)
             {
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
 
