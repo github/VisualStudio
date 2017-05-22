@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
+using System.Collections;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -92,7 +93,7 @@ namespace GitHub.InlineReviews.Tags
                 {
                     var startLine = span.Start.GetContainingLine().LineNumber;
                     var endLine = span.End.GetContainingLine().LineNumber;
-
+                    var linesWithComments = new BitArray((endLine - startLine) + 1);
                     var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
                         x.LineNumber <= endLine);
@@ -107,6 +108,7 @@ namespace GitHub.InlineReviews.Tags
                         {
                             var trackingPoint = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
                             trackingPoints[thread] = trackingPoint;
+                            linesWithComments[thread.LineNumber - startLine] = true;
 
                             yield return new TagSpan<ShowInlineCommentTag>(
                                 new SnapshotSpan(line.Start, line.End),
@@ -122,7 +124,7 @@ namespace GitHub.InlineReviews.Tags
                             {
                                 var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
 
-                                if (lineNumber >= startLine && lineNumber <= endLine)
+                                if (lineNumber >= startLine && lineNumber <= endLine && !linesWithComments[lineNumber - startLine])
                                 {
                                     var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                     yield return new TagSpan<InlineCommentTag>(
