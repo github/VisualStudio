@@ -81,33 +81,40 @@ namespace GitHub.InlineReviews.Services
 
         async void RepoChanged(ILocalRepositoryModel repository)
         {
-            PullRequestSession session = null;
-
-            this.repository = repository;
-
-            if (repository?.CloneUrl != null)
+            try
             {
-                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+                PullRequestSession session = null;
 
-                if (modelService != null)
+                this.repository = repository;
+
+                if (repository?.CloneUrl != null)
                 {
-                    var pullRequest = await GetPullRequestForTip(modelService, repository);
+                    var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
 
-                    if (pullRequest != null)
+                    if (modelService != null)
                     {
-                        session = new PullRequestSession(
-                            gitService,
-                            gitClient,
-                            diffService,
-                            await modelService.GetCurrentUser(),
-                            pullRequest,
-                            repository);
+                        var pullRequest = await GetPullRequestForTip(modelService, repository);
+
+                        if (pullRequest != null)
+                        {
+                            session = new PullRequestSession(
+                                gitService,
+                                gitClient,
+                                diffService,
+                                await modelService.GetCurrentUser(),
+                                pullRequest,
+                                repository);
+                        }
                     }
                 }
-            }
 
-            this.session = session;
-            currentSession.OnNext(this.session);
+                this.session = session;
+                currentSession.OnNext(this.session);
+            }
+            catch
+            {
+                // TODO: Log
+            }
         }
 
         async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel repository)
