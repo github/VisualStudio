@@ -31,13 +31,13 @@
                 </sample:CommentThreadViewModelDesigner>
             </sample:PullRequestCommentsViewModelDesigner.Conversation>
             <sample:PullRequestCommentsViewModelDesigner.FileComments>
-                <sample:DiffCommentThreadViewModelDesigner Path="src/GitHub.App.ViewModels/PullRequestListViewModel.cs">
+                <sample:DiffCommentThreadViewModelDesigner Path="src/GitHub.App.ViewModels/PullRequestListViewModel.cs" LineNumber="4">
                     <sample:DiffCommentThreadViewModelDesigner.DiffHunk xml:space="preserve">
                  .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
  
 +            this.WhenAny(x => x.SelectedSortOrder, x => x.Value)
 +                .Where(x => pullRequests != null)
-            </sample:DiffCommentThreadViewModelDesigner.DiffHunk>
+                </sample:DiffCommentThreadViewModelDesigner.DiffHunk>
                     <sample:DiffCommentThreadViewModelDesigner.Comments>
                         <sample:CommentThreadViewModelDesigner>
                             <sample:CommentThreadViewModelDesigner.Comments>

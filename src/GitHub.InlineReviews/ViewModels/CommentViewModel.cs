@@ -166,7 +166,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             if (EditState == CommentEditState.Editing)
             {
-                EditState = undoBody == null ? CommentEditState.Placeholder : CommentEditState.None;
+                EditState = string.IsNullOrWhiteSpace(undoBody) ? CommentEditState.Placeholder : CommentEditState.None;
                 Body = undoBody;
                 ErrorMessage = null;
                 undoBody = null;

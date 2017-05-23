@@ -1,5 +1,4 @@
-﻿using System;
-using GitHub.Extensions;
+﻿using GitHub.Extensions;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text.Editor;
 

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
@@ -11,7 +12,7 @@ namespace GitHub.InlineReviews.SampleData
         public int Number { get; set; }
         public string Title { get; set; }
         public ICommentThreadViewModel Conversation { get; set; }
-        public ObservableCollection<IDiffCommentThreadViewModel> FileComments { get; } 
-            = new ObservableCollection<IDiffCommentThreadViewModel>();
+        public IReactiveList<IDiffCommentThreadViewModel> FileComments { get; } 
+            = new ReactiveList<IDiffCommentThreadViewModel>();
     }
 }

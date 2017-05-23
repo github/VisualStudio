@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
+using System.Collections;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -27,6 +28,7 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
         readonly Subject<ITextSnapshot> signalRebuild;
+        readonly Dictionary<IInlineCommentThreadModel, ITrackingPoint> trackingPoints;
         readonly int? tabsToSpaces;
         bool initialized;
         string fullPath;
@@ -34,9 +36,7 @@ namespace GitHub.InlineReviews.Tags
         bool leftHandSide;
         IDisposable subscription;
         IPullRequestSession session;
-        InlineCommentBuilder commentBuilder;
-        IReadOnlyList<InlineCommentModel> comments;
-        IReadOnlyList<AddCommentModel> addComments;
+        IPullRequestSessionFile file;
 
         public InlineCommentTagger(
             IGitService gitService,
@@ -58,6 +58,7 @@ namespace GitHub.InlineReviews.Tags
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
+            this.trackingPoints = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
 
             if (view.Options.GetOptionValue("Tabs/ConvertTabsToSpaces", false))
             {
@@ -86,34 +87,51 @@ namespace GitHub.InlineReviews.Tags
                 // Sucessful initialization will call NotifyTagsChanged, causing this method to be re-called.
                 Initialize();
             }
-            else if (comments != null)
+            else if (file != null)
             {
                 foreach (var span in spans)
                 {
                     var startLine = span.Start.GetContainingLine().LineNumber;
                     var endLine = span.End.GetContainingLine().LineNumber;
-
-                    var spanComments = comments.Where(x =>
+                    var linesWithComments = new BitArray((endLine - startLine) + 1);
+                    var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
-                        x.LineNumber <= endLine)
-                        .GroupBy(x => x.LineNumber);
+                        x.LineNumber <= endLine);
 
-                    foreach (var entry in spanComments)
+                    foreach (var thread in spanThreads)
                     {
-                        var line = span.Snapshot.GetLineFromLineNumber(entry.Key);
-                        yield return new TagSpan<ShowInlineCommentTag>(
-                            new SnapshotSpan(line.Start, line.End),
-                            new ShowInlineCommentTag(session, entry));
+                        var snapshot = span.Snapshot;
+                        var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
+
+                        if ((leftHandSide && thread.DiffLineType == DiffChangeType.Delete) ||
+                            (!leftHandSide && thread.DiffLineType != DiffChangeType.Delete))
+                        {
+                            var trackingPoint = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
+                            trackingPoints[thread] = trackingPoint;
+                            linesWithComments[thread.LineNumber - startLine] = true;
+
+                            yield return new TagSpan<ShowInlineCommentTag>(
+                                new SnapshotSpan(line.Start, line.End),
+                                new ShowInlineCommentTag(session, thread));
+                        }
                     }
 
-                    foreach (var addComment in addComments)
+                    if (file.CommitSha != null)
                     {
-                        if (addComment.LineNumber >= startLine && addComment.LineNumber <= endLine)
+                        foreach (var chunk in file.Diff)
                         {
-                            var line = span.Snapshot.GetLineFromLineNumber(addComment.LineNumber);
-                            yield return new TagSpan<InlineCommentTag>(
-                                new SnapshotSpan(line.Start, line.End),
-                                new AddInlineCommentTag(session, addComment.CommitSha, relativePath, addComment.DiffLine));
+                            foreach (var line in chunk.Lines)
+                            {
+                                var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
+
+                                if (lineNumber >= startLine && lineNumber <= endLine && !linesWithComments[lineNumber - startLine])
+                                {
+                                    var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
+                                    yield return new TagSpan<InlineCommentTag>(
+                                        new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
+                                        new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber));
+                                }
+                            }
                         }
                     }
                 }
@@ -148,10 +166,7 @@ namespace GitHub.InlineReviews.Tags
                 fullPath = document.FilePath;
             }
 
-            subscription = sessionManager.CurrentSession
-                .SelectMany(x => Observable.Return(x)
-                    .Concat(x?.Changed.Select(_ => x) ?? Observable.Empty<IPullRequestSession>()))
-                .Subscribe(SessionChanged);
+            subscription = sessionManager.CurrentSession.Subscribe(SessionChanged);
 
             initialized = true;
         }
@@ -173,9 +188,9 @@ namespace GitHub.InlineReviews.Tags
         {
             this.session = session;
 
-            if (comments != null)
+            if (file != null)
             {
-                comments = null;
+                file = null;
                 NotifyTagsChanged();
             }
 
@@ -199,31 +214,32 @@ namespace GitHub.InlineReviews.Tags
             if (snapshot == null) return;
 
             var repository = gitService.GetRepository(session.Repository.LocalPath);
-            commentBuilder = new InlineCommentBuilder(
-                gitClient,
-                diffService,
-                session,
-                repository,
-                relativePath,
-                leftHandSide,
-                tabsToSpaces);
-
-            var result = await commentBuilder.Update(snapshot);
-            comments = result.Comments;
-            addComments = result.AddComments;
+            file = await session.GetFile(relativePath, snapshot);
 
             NotifyTagsChanged();
         }
 
         void Buffer_Changed(object sender, TextContentChangedEventArgs e)
         {
-            if (comments != null)
+            if (file != null)
             {
-                foreach (var comment in comments)
+                var snapshot = buffer.CurrentSnapshot;
+
+                foreach (var thread in file.InlineCommentThreads)
                 {
-                    if (comment.Update(buffer.CurrentSnapshot))
+                    ITrackingPoint trackingPoint;
+
+                    if (trackingPoints.TryGetValue(thread, out trackingPoint))
                     {
-                        NotifyTagsChanged(comment.LineNumber);
+                        var position = trackingPoint.GetPosition(snapshot);
+                        var lineNumber = snapshot.GetLineNumberFromPosition(position);
+
+                        if (lineNumber != thread.LineNumber)
+                        {
+                            thread.LineNumber = lineNumber;
+                            thread.IsStale = true;
+                            NotifyTagsChanged(thread.LineNumber);
+                        }
                     }
                 }
             }
@@ -235,12 +251,18 @@ namespace GitHub.InlineReviews.Tags
         {
             if (buffer.CurrentSnapshot == snapshot)
             {
-                var result = await commentBuilder.Update(snapshot);
+                await session.RecaluateLineNumbers(relativePath, buffer.CurrentSnapshot.GetText());
+
+                foreach (var thread in file.InlineCommentThreads)
+                {
+                    if (thread.LineNumber == -1)
+                    {
+                        trackingPoints.Remove(thread);
+                    }
+                }
 
                 if (buffer.CurrentSnapshot == snapshot)
                 {
-                    comments = result.Comments;
-                    addComments = result.AddComments;
                     NotifyTagsChanged();
                 }
             }

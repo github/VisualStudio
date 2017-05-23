@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews
             var address = HostAddress.Create(session.Repository.CloneUrl);
             var apiClientFactory = serviceProvider.GetService<IApiClientFactory>();
             var apiClient = apiClientFactory.Create(address);
-            window.Initialize(session, apiClient);
+            await window.Initialize(session, apiClient);
 
             var windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());

@@ -90,18 +90,16 @@ namespace GitHub.InlineReviews.Tags
             }
             else if (showTag != null)
             {
-                var firstComment = showTag.Comments.First();
-
                 thread = new InlineCommentThreadViewModel(
                     apiClient,
                     tag.Session,
-                    firstComment.Original.OriginalCommitId,
-                    firstComment.Original.Path,
-                    firstComment.Original.OriginalPosition.Value);
+                    showTag.Thread.OriginalCommitSha,
+                    showTag.Thread.RelativePath,
+                    showTag.Thread.OriginalPosition);
 
-                foreach (var comment in showTag.Comments)
+                foreach (var comment in showTag.Thread.Comments)
                 {
-                    thread.Comments.Add(new InlineCommentViewModel(thread, tag.Session.User, comment.Original));
+                    thread.Comments.Add(new InlineCommentViewModel(thread, tag.Session.User, comment));
                 }
 
                 thread.AddReplyPlaceholder();

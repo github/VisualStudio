@@ -45,6 +45,8 @@
         <TextBlock DockPanel.Dock="Top">
             <Hyperlink>
                 <Run Text="{Binding Path, Mode=OneWay}"/>
+                <Run>:</Run>
+                <Run Text="{Binding LineNumber, Mode=OneWay}"/>
             </Hyperlink>
         </TextBlock>
         <Border DockPanel.Dock="Top" Margin="0 4" BorderBrush="Silver" BorderThickness="1">

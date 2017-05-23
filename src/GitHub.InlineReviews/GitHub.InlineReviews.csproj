@@ -62,10 +62,8 @@
     </Compile>
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\AddCommentModel.cs" />
-    <Compile Include="Models\DiffChangeType.cs" />
-    <Compile Include="Models\DiffChunk.cs" />
-    <Compile Include="Models\DiffLine.cs" />
-    <Compile Include="Models\InlineCommentModel.cs" />
+    <Compile Include="Models\InlineCommentThreadModel.cs" />
+    <Compile Include="Models\PullRequestSessionFile.cs" />
     <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSourceProvider.cs" />
@@ -103,8 +101,6 @@
     <Compile Include="Services\DiffService.cs" />
     <Compile Include="Services\IDiffService.cs" />
     <Compile Include="Tags\AddInlineCommentTag.cs" />
-    <Compile Include="Tags\InlineCommentBuilder.cs" />
-    <Compile Include="Tags\InlineCommentBuilderResult.cs" />
     <Compile Include="Tags\AddInlineCommentGlyph.xaml.cs">
       <DependentUpon>AddInlineCommentGlyph.xaml</DependentUpon>
     </Compile>

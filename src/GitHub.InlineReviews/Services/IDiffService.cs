@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GitHub.InlineReviews.Models;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Services
 {

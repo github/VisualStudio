@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -9,6 +10,6 @@ namespace GitHub.InlineReviews.ViewModels
         int Number { get; }
         string Title { get; }
         ICommentThreadViewModel Conversation { get; }
-        ObservableCollection<IDiffCommentThreadViewModel> FileComments { get; }
+        IReactiveList<IDiffCommentThreadViewModel> FileComments { get; }
     }
 }

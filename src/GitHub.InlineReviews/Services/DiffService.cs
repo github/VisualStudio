@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using GitHub.InlineReviews.Models;
+using GitHub.Models;
 using Microsoft.VisualStudio.Text.Differencing;
 
 namespace GitHub.InlineReviews.Services
@@ -25,7 +26,7 @@ namespace GitHub.InlineReviews.Services
 
         public IEnumerable<DiffChunk> Diff(string left, string right, int contextLines = 3)
         {
-            var diff = vsDiff.DiffStrings(left, right, new StringDifferenceOptions
+            var diff = vsDiff.DiffStrings(left ?? string.Empty, right ?? string.Empty, new StringDifferenceOptions
             {
                 DifferenceType = StringDifferenceTypes.Line,
                 IgnoreTrimWhiteSpace = true,

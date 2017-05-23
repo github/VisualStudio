@@ -20,7 +20,7 @@ namespace GitHub.InlineReviews.Tags
             {
                 return new ShowInlineCommentGlyph()
                 {
-                    Opacity = showTag.NeedsUpdate ? 0.5 : 1,
+                    Opacity = showTag.Thread.IsStale ? 0.5 : 1,
                 };
             }
 

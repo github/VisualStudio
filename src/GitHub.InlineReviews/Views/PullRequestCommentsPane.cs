@@ -10,6 +10,7 @@ using GitHub.Extensions;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.InlineReviews.Views
 {
@@ -28,7 +29,7 @@ namespace GitHub.InlineReviews.Views
             this.Content = view = new PullRequestCommentsView();
         }
 
-        public void Initialize(
+        public async Task Initialize(
             IPullRequestSession session,
             IApiClient apiClient)
         {
@@ -41,6 +42,7 @@ namespace GitHub.InlineReviews.Views
             this.session = session;
 
             var viewModel = new PullRequestCommentsViewModel(apiClient, session);
+            await viewModel.Initialize();
             view.DataContext = viewModel;
         }
     }
