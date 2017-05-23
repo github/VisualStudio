@@ -6,6 +6,7 @@ namespace GitHub.InlineReviews.SampleData
     class DiffCommentThreadViewModelDesigner : IDiffCommentThreadViewModel
     {
         public string DiffHunk { get; set; }
+        public int LineNumber { get; set; }
         public string Path { get; set; }
         public ICommentThreadViewModel Comments { get; set; }
     }

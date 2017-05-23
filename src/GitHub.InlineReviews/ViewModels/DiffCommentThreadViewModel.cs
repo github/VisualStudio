@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -11,15 +7,18 @@ namespace GitHub.InlineReviews.ViewModels
     {
         public DiffCommentThreadViewModel(
             string diffHunk,
+            int lineNumber,
             string path,
             InlineCommentThreadViewModel comments)
         {
             DiffHunk = diffHunk;
+            LineNumber = lineNumber;
             Path = path;
             Comments = comments;
         }
 
         public string DiffHunk { get; }
+        public int LineNumber { get; }
         public string Path { get; }
         public ICommentThreadViewModel Comments { get; }
     }

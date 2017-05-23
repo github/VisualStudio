@@ -74,6 +74,7 @@ namespace GitHub.InlineReviews.ViewModels
 
                     FileComments.Add(new DiffCommentThreadViewModel(
                         ToString(thread.DiffMatch),
+                        thread.LineNumber,
                         file.RelativePath,
                         vm));
                 }
