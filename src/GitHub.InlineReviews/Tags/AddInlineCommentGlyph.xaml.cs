@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Controls;
 
 namespace GitHub.InlineReviews.Tags
@@ -9,9 +11,10 @@ namespace GitHub.InlineReviews.Tags
         {
             InitializeComponent();
 
-            Visibility = System.Windows.Visibility.Hidden;
-            MouseEnter += (s, e) => Visibility = System.Windows.Visibility.Visible;
-            MouseLeave += (s, e) => Visibility = System.Windows.Visibility.Hidden;
+            Background = Brushes.Transparent;
+            AddViewbox.Visibility = Visibility.Hidden;
+            MouseEnter += (s, e) => AddViewbox.Visibility = Visibility.Visible;
+            MouseLeave += (s, e) => AddViewbox.Visibility = Visibility.Hidden;
         }
     }
 }

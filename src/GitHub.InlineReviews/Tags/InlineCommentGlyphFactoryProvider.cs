@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace GitHub.InlineReviews.Tags
 {
+    [Export]
     [Export(typeof(IGlyphFactoryProvider))]
     [Export(typeof(IGlyphMouseProcessorProvider))]
     [Name("InlineCommentGlyph")]

@@ -60,6 +60,12 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Glyph\CanvasAndGlyphFactory.cs" />
+    <Compile Include="Glyph\GlyphData.cs" />
+    <Compile Include="Glyph\GlyphMargin.cs" />
+    <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
+    <Compile Include="Glyph\IGlyphFactories.cs" />
+    <Compile Include="Glyph\IGlyphFactory.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\AddCommentModel.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
@@ -79,6 +85,7 @@
     <Compile Include="SampleData\PullRequestCommentsViewModelDesigner.cs" />
     <Compile Include="Services\PullRequestSession.cs" />
     <Compile Include="Services\PullRequestSessionManager.cs" />
+    <Compile Include="InlineCommentMarginProvider.cs" />
     <Compile Include="ViewModels\CommentViewModel.cs" />
     <Compile Include="ViewModels\DiffCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\ICommentThreadViewModel.cs" />
