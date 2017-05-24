@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
         private readonly IWpfTextViewMargin margin;
         private readonly string marginPropertiesName;
         private readonly IWpfTextView textView;
-        internal readonly Dictionary<Type, CanvasAndGlyphFactory<TGlyphTag>> visuals; // TODO: Simplify
+        internal readonly Dictionary<Type, Canvas> visuals;
 
         public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory,
             IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName, double marginWidth)
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             this.glyphFactory = glyphFactory;
 
             glyphs = new Dictionary<UIElement, GlyphData<TGlyphTag>>();
-            visuals = new Dictionary<Type, CanvasAndGlyphFactory<TGlyphTag>>();
+            visuals = new Dictionary<Type, Canvas>();
             glyphMarginGrid = new Grid();
             glyphMarginGrid.Width = marginWidth;
             UpdateBackgroundColor();
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                     element.Background = Brushes.Transparent;
                     element.ClipToBounds = true;
                     glyphMarginGrid.Children.Add(element);
-                    visuals[type] = new CanvasAndGlyphFactory<TGlyphTag>(element);
+                    visuals[type] = element;
                 }
             }
         }
@@ -59,15 +59,10 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             Type glyphType = tag.GetType();
             if (textView.TextViewLines.IntersectsBufferSpan(span))
             {
-                if (!visuals[glyphType].HasFactory)
-                {
-                    visuals[glyphType].GlyphFactory = glyphFactory;
-                }
-
                 IWpfTextViewLine startingLine = GetStartingLine(textViewLines, span) as IWpfTextViewLine;
                 if (startingLine != null)
                 {
-                    UIElement element = visuals[glyphType].GenerateGlyph(startingLine, tag);
+                    UIElement element = glyphFactory.GenerateGlyph(startingLine, tag);
                     if (element != null)
                     {
                         element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -76,7 +71,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                         GlyphData<TGlyphTag> data = new GlyphData<TGlyphTag>(span, tag, element);
                         data.SetTop(startingLine.TextTop - textView.ViewportTop);
                         glyphs[element] = data;
-                        visuals[glyphType].GlyphCanvas.Children.Add(element);
+                        visuals[glyphType].Children.Add(element);
                     }
                 }
             }
@@ -91,7 +86,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                 if (data.VisualSpan.HasValue && span.IntersectsWith(data.VisualSpan.Value))
                 {
                     list.Add(pair.Key);
-                    visuals[data.GlyphType].GlyphCanvas.Children.Remove(data.Glyph);
+                    visuals[data.GlyphType].Children.Remove(data.Glyph);
                 }
             }
 
@@ -119,7 +114,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                     SnapshotSpan bufferSpan = data.VisualSpan.Value;
                     if (!textView.TextViewLines.IntersectsBufferSpan(bufferSpan) || GetStartingLine(newOrReformattedLines, bufferSpan) != null)
                     {
-                        visuals[data.GlyphType].GlyphCanvas.Children.Remove(data.Glyph);
+                        visuals[data.GlyphType].Children.Remove(data.Glyph);
                         continue;
                     }
 
