@@ -1,22 +1,14 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using GitHub.Factories;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Utilities;
+using GitHub.Factories;
 
 namespace GitHub.InlineReviews.Tags
 {
     [Export]
-    [Export(typeof(IGlyphFactoryProvider))]
-    [Export(typeof(IGlyphMouseProcessorProvider))]
-    [Name("InlineCommentGlyph")]
-    [Order(Before = "VsTextMarker")]
-    [ContentType("code")]
-    [TagType(typeof(AddInlineCommentTag))]
-    [TagType(typeof(ShowInlineCommentTag))]
-    class InlineCommentGlyphFactoryProvider : IGlyphFactoryProvider, IGlyphMouseProcessorProvider
+    class InlineCommentGlyphFactoryProvider : IGlyphMouseProcessorProvider
     {
         readonly IApiClientFactory apiClientFactory;
         readonly IPeekBroker peekBroker;
@@ -33,7 +25,7 @@ namespace GitHub.InlineReviews.Tags
             this.tagAggregatorFactory = tagAggregatorFactory;
         }
 
-        public IGlyphFactory GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
+        public IGlyphFactory<InlineCommentTag> GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
         {
             return new InlineCommentGlyphFactory();
         }

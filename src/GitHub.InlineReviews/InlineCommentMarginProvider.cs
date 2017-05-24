@@ -60,9 +60,9 @@ namespace GitHub.InlineReviews
 
     internal class InlineCommentGlyphFactories : IGlyphFactories<InlineCommentTag>, IGlyphFactory<InlineCommentTag>
     {
-        IGlyphFactory glyphFactory;
+        IGlyphFactory<InlineCommentTag> glyphFactory;
 
-        internal InlineCommentGlyphFactories(IGlyphFactory glyphFactory)
+        internal InlineCommentGlyphFactories(IGlyphFactory<InlineCommentTag> glyphFactory)
         {
             this.glyphFactory = glyphFactory;
         }

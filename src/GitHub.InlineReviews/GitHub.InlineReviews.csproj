@@ -111,7 +111,6 @@
     <Compile Include="Tags\AddInlineCommentGlyph.xaml.cs">
       <DependentUpon>AddInlineCommentGlyph.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
     <Compile Include="Tags\ShowInlineCommentGlyph.xaml.cs">
       <DependentUpon>ShowInlineCommentGlyph.xaml</DependentUpon>
     </Compile>

@@ -1,10 +1,10 @@
 ﻿using GitHub.Extensions;
 using GitHub.Services;
-using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Tags
 {
-    abstract class InlineCommentTag : IGlyphTag
+    abstract class InlineCommentTag : ITag
     {
         public InlineCommentTag(IPullRequestSession session)
         {
