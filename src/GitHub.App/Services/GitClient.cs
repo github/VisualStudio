@@ -280,7 +280,7 @@ namespace GitHub.Services
             });
         }
 
-        public Task<bool> IsModified(IRepository repository, string path, string contents)
+        public Task<bool> IsModified(IRepository repository, string path, [AllowNull] string contents)
         {
             return Task.Factory.StartNew(() =>
             {
