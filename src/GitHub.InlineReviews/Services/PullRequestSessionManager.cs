@@ -12,6 +12,9 @@ using GitHub.Services;
 
 namespace GitHub.InlineReviews.Services
 {
+    /// <summary>
+    /// Manages pull request sessions.
+    /// </summary>
     [Export(typeof(IPullRequestSessionManager))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : IPullRequestSessionManager, IDisposable
@@ -26,6 +29,15 @@ namespace GitHub.InlineReviews.Services
         ILocalRepositoryModel repository;
         PullRequestSession session;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestSessionManager"/> class.
+        /// </summary>
+        /// <param name="gitService">The git service to use.</param>
+        /// <param name="gitClient">The git client to use.</param>
+        /// <param name="diffService">The diff service to use.</param>
+        /// <param name="service">The pull request service to use.</param>
+        /// <param name="hosts">The repository hosts.</param>
+        /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
             IGitService gitService,
@@ -51,14 +63,19 @@ namespace GitHub.InlineReviews.Services
             teamExplorerService.Subscribe(this, RepoChanged);
         }
 
+        /// <inheritdoc/>
         public IObservable<IPullRequestSession> CurrentSession => currentSession;
 
+        /// <summary>
+        /// Disposes of the object and terminates all subscriptions.
+        /// </summary>
         public void Dispose()
         {
             currentSession.Dispose();
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
             if (pullRequest.Number == session?.PullRequest.Number)
