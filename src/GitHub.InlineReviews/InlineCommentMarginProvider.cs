@@ -25,24 +25,24 @@ namespace GitHub.InlineReviews
 
         IEditorFormatMapService editorFormatMapService;
         IViewTagAggregatorFactoryService tagAggregatorFactory;
-        InlineCommentGlyphFactoryProvider inlineCommentGlyphFactoryProvider;
+        InlineCommentGlyphMouseProcessorProvider inlineCommentGlyphMouseProcessorProvider;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            InlineCommentGlyphFactoryProvider inlineCommentGlyphFactoryProvider)
+            InlineCommentGlyphMouseProcessorProvider inlineCommentGlyphMouseProcessorProvider)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
-            this.inlineCommentGlyphFactoryProvider = inlineCommentGlyphFactoryProvider;
+            this.inlineCommentGlyphMouseProcessorProvider = inlineCommentGlyphMouseProcessorProvider;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
             var glyphFactory = new InlineCommentGlyphFactory();
             var margin = CreateMargin(glyphFactory, wpfTextViewHost, parent);
-            var mouseProcessor = inlineCommentGlyphFactoryProvider.GetAssociatedMouseProcessor(wpfTextViewHost, margin);
+            var mouseProcessor = inlineCommentGlyphMouseProcessorProvider.GetAssociatedMouseProcessor(wpfTextViewHost, margin);
             margin.VisualElement.PreviewMouseLeftButtonUp += (s, e) => mouseProcessor.PreprocessMouseLeftButtonUp(e);
             return margin;
         }

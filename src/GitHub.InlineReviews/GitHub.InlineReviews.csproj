@@ -114,7 +114,7 @@
       <DependentUpon>ShowInlineCommentGlyph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tags\InlineCommentGlyphFactory.cs" />
-    <Compile Include="Tags\InlineCommentGlyphFactoryProvider.cs" />
+    <Compile Include="Tags\InlineCommentGlyphMouseProcessorProvider.cs" />
     <Compile Include="Tags\InlineCommentGlyphMouseProcessor.cs" />
     <Compile Include="Tags\InlineCommentTag.cs" />
     <Compile Include="Tags\ShowInlineCommentTag.cs" />

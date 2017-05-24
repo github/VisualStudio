@@ -8,14 +8,14 @@ using GitHub.Factories;
 namespace GitHub.InlineReviews.Tags
 {
     [Export]
-    class InlineCommentGlyphFactoryProvider : IGlyphMouseProcessorProvider
+    class InlineCommentGlyphMouseProcessorProvider : IGlyphMouseProcessorProvider
     {
         readonly IApiClientFactory apiClientFactory;
         readonly IPeekBroker peekBroker;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
 
         [ImportingConstructor]
-        public InlineCommentGlyphFactoryProvider(
+        public InlineCommentGlyphMouseProcessorProvider(
             IApiClientFactory apiClientFactory,
             IPeekBroker peekBroker,
             IViewTagAggregatorFactoryService tagAggregatorFactory)
