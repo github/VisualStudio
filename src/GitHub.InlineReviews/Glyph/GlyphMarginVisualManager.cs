@@ -13,15 +13,15 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
     internal class GlyphMarginVisualManager<TGlyphTag> where TGlyphTag: ITag
     {
         private readonly IEditorFormatMap editorFormatMap;
-        private readonly IGlyphFactories<TGlyphTag> glyphFactories;
+        private readonly IGlyphFactory<TGlyphTag> glyphFactory;
         internal readonly Grid glyphMarginGrid;
         internal Dictionary<UIElement, GlyphData<TGlyphTag>> glyphs;
         private readonly IWpfTextViewMargin margin;
         private readonly string marginPropertiesName;
         private readonly IWpfTextView textView;
-        internal readonly Dictionary<Type, CanvasAndGlyphFactory<TGlyphTag>> visuals;
+        internal readonly Dictionary<Type, CanvasAndGlyphFactory<TGlyphTag>> visuals; // TODO: Simplify
 
-        public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactories<TGlyphTag> glyphFactories,
+        public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory,
             IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName, double marginWidth)
         {
             this.textView = textView;
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             this.editorFormatMap = editorFormatMap;
             this.editorFormatMap.FormatMappingChanged += new EventHandler<FormatItemsEventArgs>(this.OnFormatMappingChanged);
             this.textView.Closed += new EventHandler(this.OnTextViewClosed);
-            this.glyphFactories = glyphFactories;
+            this.glyphFactory = glyphFactory;
 
             glyphs = new Dictionary<UIElement, GlyphData<TGlyphTag>>();
             visuals = new Dictionary<Type, CanvasAndGlyphFactory<TGlyphTag>>();
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             glyphMarginGrid.Width = marginWidth;
             UpdateBackgroundColor();
 
-            foreach (Type type in glyphFactories.GetTagTypes())
+            foreach (Type type in glyphFactory.GetTagTypes())
             {
                 if (!visuals.ContainsKey(type))
                 {
@@ -61,11 +61,10 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             {
                 if (!visuals[glyphType].HasFactory)
                 {
-                    var factory = glyphFactories.InstantiateGlyphFactory(glyphType, textView, margin);
-                    visuals[glyphType].GlyphFactory = factory;
+                    visuals[glyphType].GlyphFactory = glyphFactory;
                 }
 
-                IWpfTextViewLine startingLine = GetStartingLine(textViewLines, (Span) span) as IWpfTextViewLine;
+                IWpfTextViewLine startingLine = GetStartingLine(textViewLines, span) as IWpfTextViewLine;
                 if (startingLine != null)
                 {
                     UIElement element = visuals[glyphType].GenerateGlyph(startingLine, tag);

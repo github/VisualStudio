@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
@@ -25,6 +26,11 @@ namespace GitHub.InlineReviews.Tags
             }
 
             return null;
+        }
+
+        public IEnumerable<Type> GetTagTypes()
+        {
+            return new[] { typeof(ShowInlineCommentTag), typeof(AddInlineCommentTag) };
         }
     }
 }

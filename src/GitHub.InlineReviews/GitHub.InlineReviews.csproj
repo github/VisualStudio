@@ -64,7 +64,6 @@
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
-    <Compile Include="Glyph\IGlyphFactories.cs" />
     <Compile Include="Glyph\IGlyphFactory.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\AddCommentModel.cs" />

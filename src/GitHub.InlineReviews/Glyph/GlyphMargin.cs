@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.Text.Editor
 
         public GlyphMargin(
             IWpfTextViewHost wpfTextViewHost,
-            IGlyphFactories<TGlyphTag> glyphFactories,
+            IGlyphFactory<TGlyphTag> glyphFactory,
             ITagAggregator<TGlyphTag> tagAggregator,
             IEditorFormatMap editorFormatMap,
             string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.Text.Editor
             this.marginName = marginName;
             this.handleZoom = handleZoom;
 
-            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactories,
+            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory,
                 this, editorFormatMap, marginPropertiesName, marginWidth);
 
             marginVisual = visualManager.MarginVisual;

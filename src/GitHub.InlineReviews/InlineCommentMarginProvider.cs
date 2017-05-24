@@ -40,47 +40,20 @@ namespace GitHub.InlineReviews
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
-            var glyphFactory = inlineCommentGlyphFactoryProvider.GetGlyphFactory(wpfTextViewHost.TextView, parent); // HACK: Using parent margin.
-            var glyphFactories = new InlineCommentGlyphFactories(glyphFactory);
-            var margin = CreateMargin(glyphFactories, wpfTextViewHost, parent);
+            var glyphFactory = new InlineCommentGlyphFactory();
+            var margin = CreateMargin(glyphFactory, wpfTextViewHost, parent);
             var mouseProcessor = inlineCommentGlyphFactoryProvider.GetAssociatedMouseProcessor(wpfTextViewHost, margin);
             margin.VisualElement.PreviewMouseLeftButtonUp += (s, e) => mouseProcessor.PreprocessMouseLeftButtonUp(e);
             return margin;
         }
 
-        IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactories<TGlyphTag> glyphFactories,
+        IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory,
             IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactories, tagAggregator,
+            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, tagAggregator,
                 editorFormatMapService.GetEditorFormatMap(wpfTextViewHost.TextView),
                 MarginPropertiesName, MarginName, true, 17.0);
         }
     }
-
-    internal class InlineCommentGlyphFactories : IGlyphFactories<InlineCommentTag>, IGlyphFactory<InlineCommentTag>
-    {
-        IGlyphFactory<InlineCommentTag> glyphFactory;
-
-        internal InlineCommentGlyphFactories(IGlyphFactory<InlineCommentTag> glyphFactory)
-        {
-            this.glyphFactory = glyphFactory;
-        }
-
-        public IEnumerable<Type> GetTagTypes()
-        {
-            return new[] { typeof(ShowInlineCommentTag), typeof(AddInlineCommentTag) };
-        }
-
-        public IGlyphFactory<InlineCommentTag> InstantiateGlyphFactory(Type glyphType, IWpfTextView textView, IWpfTextViewMargin margin)
-        {
-            return this;
-        }
-
-        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
-        {
-            return glyphFactory.GenerateGlyph(line, tag);
-        }
-    }
 }
-

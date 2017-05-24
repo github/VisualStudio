@@ -25,11 +25,6 @@ namespace GitHub.InlineReviews.Tags
             this.tagAggregatorFactory = tagAggregatorFactory;
         }
 
-        public IGlyphFactory<InlineCommentTag> GetGlyphFactory(IWpfTextView view, IWpfTextViewMargin margin)
-        {
-            return new InlineCommentGlyphFactory();
-        }
-
         public IMouseProcessor GetAssociatedMouseProcessor(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin margin)
         {
             return new InlineCommentGlyphMouseProcessor(
