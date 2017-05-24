@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
-using Microsoft.VisualStudio.Text.Formatting;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Text.Tagging;
+using Microsoft.VisualStudio.Text.Formatting;
 
 namespace Microsoft.VisualStudio.Text.Editor
 {

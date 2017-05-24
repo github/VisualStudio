@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
 
         public GlyphData(SnapshotSpan visualSpan, TGlyphTag tag, UIElement element)
         {
-            VisualSpan = new SnapshotSpan?(visualSpan);
+            VisualSpan = visualSpan;
             GlyphType = tag.GetType();
             Glyph = element;
 
@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
 
         public void SetSnapshot(ITextSnapshot snapshot)
         {
-            VisualSpan = new SnapshotSpan?(VisualSpan.Value.TranslateTo(snapshot, SpanTrackingMode.EdgeInclusive));
+            VisualSpan = VisualSpan.Value.TranslateTo(snapshot, SpanTrackingMode.EdgeInclusive);
         }
 
         public void SetTop(double top)

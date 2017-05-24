@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Controls;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
@@ -12,14 +12,15 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
 {
     internal class GlyphMarginVisualManager<TGlyphTag> where TGlyphTag: ITag
     {
-        private readonly IEditorFormatMap editorFormatMap;
-        private readonly IGlyphFactory<TGlyphTag> glyphFactory;
-        internal readonly Grid glyphMarginGrid;
-        internal Dictionary<UIElement, GlyphData<TGlyphTag>> glyphs;
-        private readonly IWpfTextViewMargin margin;
-        private readonly string marginPropertiesName;
-        private readonly IWpfTextView textView;
-        internal readonly Dictionary<Type, Canvas> visuals;
+        readonly IEditorFormatMap editorFormatMap;
+        readonly IGlyphFactory<TGlyphTag> glyphFactory;
+        readonly Grid glyphMarginGrid;
+        readonly IWpfTextViewMargin margin;
+        readonly string marginPropertiesName;
+        readonly IWpfTextView textView;
+        readonly Dictionary<Type, Canvas> visuals;
+
+        Dictionary<UIElement, GlyphData<TGlyphTag>> glyphs;
 
         public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory,
             IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName, double marginWidth)
@@ -42,7 +43,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             {
                 if (!visuals.ContainsKey(type))
                 {
-                    Canvas element = new Canvas();
+                    var element = new Canvas();
                     element.Background = Brushes.Transparent;
                     element.ClipToBounds = true;
                     glyphMarginGrid.Children.Add(element);
@@ -55,20 +56,20 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
 
         public void AddGlyph(TGlyphTag tag, SnapshotSpan span)
         {
-            IWpfTextViewLineCollection textViewLines = textView.TextViewLines;
-            Type glyphType = tag.GetType();
+            var textViewLines = textView.TextViewLines;
+            var glyphType = tag.GetType();
             if (textView.TextViewLines.IntersectsBufferSpan(span))
             {
-                IWpfTextViewLine startingLine = GetStartingLine(textViewLines, span) as IWpfTextViewLine;
+                var startingLine = GetStartingLine(textViewLines, span) as IWpfTextViewLine;
                 if (startingLine != null)
                 {
-                    UIElement element = glyphFactory.GenerateGlyph(startingLine, tag);
+                    var element = glyphFactory.GenerateGlyph(startingLine, tag);
                     if (element != null)
                     {
                         element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                         double length = (17.0 - element.DesiredSize.Width) / 2.0;
                         Canvas.SetLeft(element, length);
-                        GlyphData<TGlyphTag> data = new GlyphData<TGlyphTag>(span, tag, element);
+                        var data = new GlyphData<TGlyphTag>(span, tag, element);
                         data.SetTop(startingLine.TextTop - textView.ViewportTop);
                         glyphs[element] = data;
                         visuals[glyphType].Children.Add(element);
@@ -79,10 +80,10 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
 
         public void RemoveGlyphsByVisualSpan(SnapshotSpan span)
         {
-            List<UIElement> list = new List<UIElement>();
-            foreach (KeyValuePair<UIElement, GlyphData<TGlyphTag>> pair in glyphs)
+            var list = new List<UIElement>();
+            foreach (var pair in glyphs)
             {
-                GlyphData<TGlyphTag> data = pair.Value;
+                var data = pair.Value;
                 if (data.VisualSpan.HasValue && span.IntersectsWith(data.VisualSpan.Value))
                 {
                     list.Add(pair.Key);
@@ -90,7 +91,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                 }
             }
 
-            foreach (UIElement element in list)
+            foreach (var element in list)
             {
                 glyphs.Remove(element);
             }
@@ -101,9 +102,9 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
             if (glyphs.Count > 0)
             {
                 var dictionary = new Dictionary<UIElement, GlyphData<TGlyphTag>>(glyphs.Count);
-                foreach (KeyValuePair<UIElement, GlyphData<TGlyphTag>> pair in glyphs)
+                foreach (var pair in glyphs)
                 {
-                    GlyphData<TGlyphTag> data = pair.Value;
+                    var data = pair.Value;
                     if (!data.VisualSpan.HasValue)
                     {
                         dictionary[pair.Key] = data;
@@ -119,7 +120,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                     }
 
                     dictionary[data.Glyph] = data;
-                    ITextViewLine startingLine = GetStartingLine(translatedLines, bufferSpan);
+                    var startingLine = GetStartingLine(translatedLines, bufferSpan);
                     if (startingLine != null)
                     {
                         data.SetTop(startingLine.TextTop - textView.ViewportTop);
@@ -137,26 +138,26 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                 int count = lines.Count;
                 while (num < count)
                 {
-                    int num3 = (num + count) / 2;
-                    ITextViewLine line2 = lines[num3];
-                    if (span.Start < line2.Start)
+                    int middle = (num + count) / 2;
+                    var middleLine = lines[middle];
+                    if (span.Start < middleLine.Start)
                     {
-                        count = num3;
+                        count = middle;
                     }
                     else
                     {
-                        if (span.Start >= line2.EndIncludingLineBreak)
+                        if (span.Start >= middleLine.EndIncludingLineBreak)
                         {
-                            num = num3 + 1;
+                            num = middle + 1;
                             continue;
                         }
 
-                        return line2;
+                        return middleLine;
                     }
                 }
 
-                ITextViewLine line = lines[lines.Count - 1];
-                if ((line.EndIncludingLineBreak == line.Snapshot.Length) && (span.Start == line.EndIncludingLineBreak))
+                var line = lines[lines.Count - 1];
+                if (line.EndIncludingLineBreak == line.Snapshot.Length && span.Start == line.EndIncludingLineBreak)
                 {
                     return line;
                 }
