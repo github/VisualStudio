@@ -242,9 +242,9 @@ namespace GitHub.InlineReviews.Tags
                         }
                     }
                 }
-            }
 
-            signalRebuild.OnNext(buffer.CurrentSnapshot);
+                signalRebuild.OnNext(buffer.CurrentSnapshot);
+            }
         }
 
         async Task Rebuild(ITextSnapshot snapshot)
