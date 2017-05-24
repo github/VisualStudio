@@ -70,11 +70,14 @@ public class PullRequestServiceTests : TestBaseClass
 
             var localRepo = Substitute.For<ILocalRepositoryModel>();
             var pr = Substitute.For<IPullRequestModel>();
+            pr.Number.Returns(4);
 
             await service.Checkout(localRepo, pr, "pr/123-foo1");
 
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "pr/123-foo1").Forget();
-            Assert.Equal(1, gitClient.ReceivedCalls().Count());
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.pr/123-foo1.ghfvs-pr", "4").Forget();
+
+            Assert.Equal(2, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
@@ -98,7 +101,9 @@ public class PullRequestServiceTests : TestBaseClass
 
             gitClient.Received().Fetch(Arg.Any<IRepository>(), "origin").Forget();
             gitClient.Received().Checkout(Arg.Any<IRepository>(), "local").Forget();
-            Assert.Equal(3, gitClient.ReceivedCalls().Count());
+            gitClient.Received().SetConfig(Arg.Any<IRepository>(), "branch.local.ghfvs-pr", "5").Forget();
+
+            Assert.Equal(4, gitClient.ReceivedCalls().Count());
         }
 
         [Fact]
