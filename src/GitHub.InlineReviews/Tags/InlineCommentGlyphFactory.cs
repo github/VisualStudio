@@ -5,9 +5,9 @@ using Microsoft.VisualStudio.Text.Formatting;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineCommentGlyphFactory : IGlyphFactory
+    class InlineCommentGlyphFactory : IGlyphFactory<InlineCommentTag>
     {
-        public UIElement GenerateGlyph(IWpfTextViewLine line, IGlyphTag tag)
+        public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
             var showTag = tag as ShowInlineCommentTag;

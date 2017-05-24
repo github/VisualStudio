@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GitHub.Factories;
-using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Peek;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Primitives;
@@ -21,32 +19,19 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextView textView;
         readonly IWpfTextViewMargin margin;
         readonly ITagAggregator<InlineCommentTag> tagAggregator;
-        readonly MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph> mouseEventRouter;
 
         public InlineCommentGlyphMouseProcessor(
             IApiClientFactory apiClientFactory,
             IPeekBroker peekBroker,
             ITextView textView,
             IWpfTextViewMargin margin,
-            ITagAggregator<InlineCommentTag> aggregator)
+            ITagAggregator<InlineCommentTag> tagAggregator)
         {
             this.apiClientFactory = apiClientFactory;
             this.peekBroker = peekBroker;
             this.textView = textView;
             this.margin = margin;
-            this.tagAggregator = aggregator;
-
-            mouseEventRouter = new MouseEnterAndLeaveEventRouter<AddInlineCommentGlyph>();
-        }
-
-        public override void PostprocessMouseMove(MouseEventArgs e)
-        {
-            mouseEventRouter.MouseMove(margin.VisualElement, e);
-        }
-
-        public override void PostprocessMouseLeave(MouseEventArgs e)
-        {
-            mouseEventRouter.MouseLeave(margin.VisualElement, e);
+            this.tagAggregator = tagAggregator;
         }
 
         public override void PreprocessMouseLeftButtonUp(MouseButtonEventArgs e)
