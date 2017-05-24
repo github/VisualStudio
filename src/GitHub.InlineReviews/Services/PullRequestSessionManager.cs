@@ -106,7 +106,14 @@ namespace GitHub.InlineReviews.Services
 
                 if (repository?.CloneUrl != null)
                 {
-                    var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+                    var hostAddress = HostAddress.Create(repository.CloneUrl);
+
+                    if (!hosts.IsLoggedInToAnyHost)
+                    {
+                        await hosts.LogInFromCache(hostAddress);
+                    }
+
+                    var modelService = hosts.LookupHost(hostAddress)?.ModelService;
 
                     if (modelService != null)
                     {
