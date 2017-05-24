@@ -4,24 +4,39 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:sample="clr-namespace:GitHub.InlineReviews.SampleData"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+    <d:DesignProperties.DataContext>
+        <x:Array Type="{x:Type sample:CommentThreadViewModelDesigner}">
+            <sample:CommentThreadViewModelDesigner>
+                <sample:CommentThreadViewModelDesigner.Comments>
+                    <sample:CommentViewModelDesigner>
+                        <sample:CommentViewModelDesigner.Body>
+                            I assume this doesn't do anything if our message isn't showing?
+                        </sample:CommentViewModelDesigner.Body>
+                    </sample:CommentViewModelDesigner>
+                    <sample:CommentViewModelDesigner>
+                        <sample:CommentViewModelDesigner.Body>
+                            Nope, does nothing! Also checked the logs.
+                        </sample:CommentViewModelDesigner.Body>
+                    </sample:CommentViewModelDesigner>
+                    <sample:CommentViewModelDesigner EditState="Placeholder">
+                        <sample:CommentViewModelDesigner.Body>
+                            Reply...
+                        </sample:CommentViewModelDesigner.Body>
+                    </sample:CommentViewModelDesigner>
+                </sample:CommentThreadViewModelDesigner.Comments>
+            </sample:CommentThreadViewModelDesigner>
+        </x:Array>
+    </d:DesignProperties.DataContext>
+    
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <ItemsControl ItemsSource="{Binding Comments}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <local:CommentView Margin="0 4"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
-            <!-- Reply TextBox etc here -->
-        </Grid>
+        <ItemsControl ItemsSource="{Binding Comments}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:CommentView Margin="0 4"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </ScrollViewer>
 </UserControl>
