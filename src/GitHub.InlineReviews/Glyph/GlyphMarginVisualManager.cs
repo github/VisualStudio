@@ -4,11 +4,13 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
 
-namespace Microsoft.VisualStudio.Text.Editor.Implementation
+namespace GitHub.InlineReviews.Glyph.Implementation
 {
     internal class GlyphMarginVisualManager<TGlyphTag> where TGlyphTag: ITag
     {

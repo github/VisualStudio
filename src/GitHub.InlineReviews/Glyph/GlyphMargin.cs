@@ -2,13 +2,15 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Text.Editor.Implementation;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
+using GitHub.InlineReviews.Glyph.Implementation;
 
-namespace Microsoft.VisualStudio.Text.Editor
+namespace GitHub.InlineReviews.Glyph
 {
     public sealed class GlyphMargin<TGlyphTag> : IWpfTextViewMargin, ITextViewMargin, IDisposable where TGlyphTag: ITag
     {

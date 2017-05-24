@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Windows;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
 using GitHub.InlineReviews.Tags;
+using GitHub.InlineReviews.Glyph;
 
 namespace GitHub.InlineReviews
 {

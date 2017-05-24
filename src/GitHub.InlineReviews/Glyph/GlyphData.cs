@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.VisualStudio.Text.Editor.Implementation
+namespace GitHub.InlineReviews.Glyph.Implementation
 {
     internal class GlyphData<TGlyphTag>
     {

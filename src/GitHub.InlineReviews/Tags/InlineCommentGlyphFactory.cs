@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
-using Microsoft.VisualStudio.Text.Editor;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Text.Formatting;
+using GitHub.InlineReviews.Glyph;
 
 namespace GitHub.InlineReviews.Tags
 {
