@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using ReactiveUI;
+using System.Threading;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -27,6 +28,7 @@ namespace GitHub.InlineReviews.Services
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
+        readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         ReactiveList<IPullRequestSessionFile> files;
 
         public PullRequestSession(
@@ -128,25 +130,34 @@ namespace GitHub.InlineReviews.Services
 
         async Task<IPullRequestSessionFile> GetFile(string relativePath, string contents)
         {
-            PullRequestSessionFile file;
+            await getFilesLock.WaitAsync();
 
-            relativePath = relativePath.Replace("\\", "/");
-
-            if (!fileIndex.TryGetValue(relativePath, out file))
+            try
             {
-                // TODO: Check for binary files.
-                if (FilePaths.Any(x => x == relativePath))
-                {
-                    file = await CreateFile(relativePath, contents);
-                    fileIndex.Add(relativePath, file);
-                }
-                else
-                {
-                    fileIndex.Add(relativePath, null);
-                }
-            }
+                PullRequestSessionFile file;
 
-            return file;
+                relativePath = relativePath.Replace("\\", "/");
+
+                if (!fileIndex.TryGetValue(relativePath, out file))
+                {
+                    // TODO: Check for binary files.
+                    if (FilePaths.Any(x => x == relativePath))
+                    {
+                        file = await CreateFile(relativePath, contents);
+                        fileIndex.Add(relativePath, file);
+                    }
+                    else
+                    {
+                        fileIndex.Add(relativePath, null);
+                    }
+                }
+
+                return file;
+            }
+            finally
+            {
+                getFilesLock.Release();
+            }
         }
 
         async Task<PullRequestSessionFile> CreateFile(string relativePath, string contents)
