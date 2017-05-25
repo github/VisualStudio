@@ -4,8 +4,10 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Glyph;
+using GitHub.Factories;
 
 namespace GitHub.InlineReviews
 {
@@ -21,27 +23,34 @@ namespace GitHub.InlineReviews
         const string MarginName = "InlineComment";
         const string MarginPropertiesName = "Indicator Margin"; // Same background color as Glyph margin 
 
-        IEditorFormatMapService editorFormatMapService;
-        IViewTagAggregatorFactoryService tagAggregatorFactory;
-        InlineCommentGlyphMouseProcessorProvider inlineCommentGlyphMouseProcessorProvider;
+        readonly IEditorFormatMapService editorFormatMapService;
+        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
+        readonly IApiClientFactory apiClientFactory;
+        readonly IPeekBroker peekBroker;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            InlineCommentGlyphMouseProcessorProvider inlineCommentGlyphMouseProcessorProvider)
+            IApiClientFactory apiClientFactory,
+            IPeekBroker peekBroker)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
-            this.inlineCommentGlyphMouseProcessorProvider = inlineCommentGlyphMouseProcessorProvider;
+            this.apiClientFactory = apiClientFactory;
+            this.peekBroker = peekBroker;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
             var glyphFactory = new InlineCommentGlyphFactory();
             var margin = CreateMargin(glyphFactory, wpfTextViewHost, parent);
-            var mouseProcessor = inlineCommentGlyphMouseProcessorProvider.GetAssociatedMouseProcessor(wpfTextViewHost, margin);
+
+            var textView = wpfTextViewHost.TextView;
+            var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
+            var mouseProcessor = new InlineCommentGlyphMouseProcessor(apiClientFactory, peekBroker, textView, margin, tagAggregator);
             margin.VisualElement.PreviewMouseLeftButtonUp += (s, e) => mouseProcessor.PreprocessMouseLeftButtonUp(e);
+
             return margin;
         }
 

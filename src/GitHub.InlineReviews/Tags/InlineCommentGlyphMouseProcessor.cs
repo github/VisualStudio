@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Tags
 {
-    class InlineCommentGlyphMouseProcessor : MouseProcessorBase
+    class InlineCommentGlyphMouseProcessor
     {
         readonly IApiClientFactory apiClientFactory;
         readonly IPeekBroker peekBroker;
@@ -34,7 +34,7 @@ namespace GitHub.InlineReviews.Tags
             this.tagAggregator = tagAggregator;
         }
 
-        public override void PreprocessMouseLeftButtonUp(MouseButtonEventArgs e)
+        public void PreprocessMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             var y = e.GetPosition(margin.VisualElement).Y + textView.ViewportTop;
             var line = textView.TextViewLines.GetTextViewLineContainingYCoordinate(y);
