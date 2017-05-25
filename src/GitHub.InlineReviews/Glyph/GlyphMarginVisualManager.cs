@@ -31,8 +31,8 @@ namespace GitHub.InlineReviews.Glyph.Implementation
             this.margin = margin;
             this.marginPropertiesName = marginPropertiesName;
             this.editorFormatMap = editorFormatMap;
-            this.editorFormatMap.FormatMappingChanged += new EventHandler<FormatItemsEventArgs>(this.OnFormatMappingChanged);
-            this.textView.Closed += new EventHandler(this.OnTextViewClosed);
+            this.editorFormatMap.FormatMappingChanged += OnFormatMappingChanged;
+            this.textView.Closed += new EventHandler(OnTextViewClosed);
             this.glyphFactory = glyphFactory;
 
             glyphs = new Dictionary<UIElement, GlyphData<TGlyphTag>>();
@@ -177,7 +177,7 @@ namespace GitHub.InlineReviews.Glyph.Implementation
 
         void OnTextViewClosed(object sender, EventArgs e)
         {
-            editorFormatMap.FormatMappingChanged -= new EventHandler<FormatItemsEventArgs>(OnFormatMappingChanged);
+            editorFormatMap.FormatMappingChanged -= OnFormatMappingChanged;
         }
 
         void UpdateBackgroundColor()
