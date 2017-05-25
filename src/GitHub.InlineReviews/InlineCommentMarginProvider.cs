@@ -43,13 +43,12 @@ namespace GitHub.InlineReviews
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
-            var glyphFactory = new InlineCommentGlyphFactory();
-            var margin = CreateMargin(glyphFactory, wpfTextViewHost, parent);
-
             var textView = wpfTextViewHost.TextView;
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
-            var mouseProcessor = new InlineCommentGlyphMouseProcessor(apiClientFactory, peekBroker, textView, margin, tagAggregator);
-            margin.VisualElement.PreviewMouseLeftButtonUp += (s, e) => mouseProcessor.PreprocessMouseLeftButtonUp(e);
+            var glyphFactory = new InlineCommentGlyphFactory(apiClientFactory, peekBroker, textView, tagAggregator);
+
+            var margin = CreateMargin(glyphFactory, wpfTextViewHost, parent);
+            margin.VisualElement.PreviewMouseLeftButtonUp += glyphFactory.PreprocessMouseLeftButtonUp;
 
             return margin;
         }
