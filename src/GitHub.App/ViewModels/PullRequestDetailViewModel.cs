@@ -481,9 +481,6 @@ namespace GitHub.ViewModels
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(repository, Model).ToList();
-
-                usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget();
-
                 if (localBranches.Count > 0)
                 {
                     return pullRequestsService.SwitchToBranch(repository, Model);
