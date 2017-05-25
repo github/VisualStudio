@@ -1,15 +1,18 @@
 ﻿using System;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Tags
 {
     class ShowInlineCommentTag : InlineCommentTag
     {
-        public ShowInlineCommentTag(IPullRequestSession session, IInlineCommentThreadModel thread)
-            : base(session)
+        public ShowInlineCommentTag(
+            IPullRequestSession session,
+            ITextView textView,
+            IInlineCommentThreadModel thread)
+            : base(session, textView, thread.LineNumber)
         {
             Guard.ArgumentNotNull(thread, nameof(thread));
 
@@ -17,7 +20,5 @@ namespace GitHub.InlineReviews.Tags
         }
 
         public IInlineCommentThreadModel Thread { get; }
-        public bool IsAddNewCommentTag => Thread.Comments.Count == 0;
-        ////public bool NeedsUpdate => Thread.Any(x => x.IsStale);
     }
 }

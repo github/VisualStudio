@@ -81,6 +81,8 @@
     <Compile Include="SampleData\CommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\DiffCommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\PullRequestCommentsViewModelDesigner.cs" />
+    <Compile Include="Services\IInlineCommentPeekService.cs" />
+    <Compile Include="Services\InlineCommentPeekService.cs" />
     <Compile Include="Services\PullRequestSession.cs" />
     <Compile Include="Services\PullRequestSessionManager.cs" />
     <Compile Include="InlineCommentMarginProvider.cs" />

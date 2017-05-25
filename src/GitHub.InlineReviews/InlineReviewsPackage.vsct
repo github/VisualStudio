@@ -48,6 +48,20 @@
           <ButtonText>Pull Request Comments</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidGitHubCommandSet" id="NextInlineCommentId" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_GOTO" />
+        <Strings>
+          <CommandName>GitHub.InlineReviews.NextInlineComment</CommandName>
+          <ButtonText>Next Comment</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidGitHubCommandSet" id="PreviousInlineCommentId" priority="0x0100" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_GOTO" />
+        <Strings>
+          <CommandName>GitHub.InlineReviews.PreviousInlineComment</CommandName>
+          <ButtonText>Previous Comment</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -68,6 +82,8 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidGitHubCommandSet" value="{C5F1193E-F300-41B3-B4C4-5A703DD3C1C6}">
       <IDSymbol name="PullRequestCommentsToolWindowCommandId" value="0x1000" />
+      <IDSymbol name="NextInlineCommentId" value="0x1001" />
+      <IDSymbol name="PreviousInlineCommentId" value="0x1002" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{775aa523-6c52-4c11-9c28-823c99d15613}" >

@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Glyph;
 using GitHub.Factories;
+using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews
 {
@@ -25,27 +26,24 @@ namespace GitHub.InlineReviews
 
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
-        readonly IApiClientFactory apiClientFactory;
-        readonly IPeekBroker peekBroker;
+        readonly IInlineCommentPeekService peekService;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IApiClientFactory apiClientFactory,
-            IPeekBroker peekBroker)
+            IInlineCommentPeekService peekService)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
-            this.apiClientFactory = apiClientFactory;
-            this.peekBroker = peekBroker;
+            this.peekService = peekService;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
             var textView = wpfTextViewHost.TextView;
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
-            var glyphFactory = new InlineCommentGlyphFactory(apiClientFactory, peekBroker, textView, tagAggregator);
+            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView, tagAggregator);
             return CreateMargin(glyphFactory, wpfTextViewHost, parent);
         }
 
