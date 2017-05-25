@@ -60,6 +60,12 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
+    <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
+    <Compile Include="Commands\NextInlineCommentCommand.cs" />
+    <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
