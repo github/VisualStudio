@@ -35,7 +35,6 @@ namespace GitHub.VisualStudio
 
         public AssemblyResolverPackage()
         {
-            Debug.WriteLine("GitHub assembly resolver is now active.");
             extensionDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             AppDomain.CurrentDomain.AssemblyResolve += LoadAssemblyFromExtensionDir;
         }
@@ -66,14 +65,11 @@ namespace GitHub.VisualStudio
                     // Resolve any version of our assemblies.
                     if (!ourAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase))
                     {
-                        Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Not resolving '{0}' to '{1}'.", e.Name, targetName.FullName));
                         return null;
                     }
 
-                    Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Resolving '{0}' to '{1}'.", e.Name, targetName.FullName));
                 }
 
-                Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Loading '{0}' from '{1}'.", targetName.FullName, filename));
                 return Assembly.LoadFrom(filename);
             }
             catch (Exception ex)
@@ -85,7 +81,6 @@ namespace GitHub.VisualStudio
                     Environment.NewLine,
                     ex,
                     Environment.NewLine);
-                Trace.WriteLine(log);
                 VsOutputLogger.Write(log);
             }
 
