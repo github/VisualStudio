@@ -288,10 +288,6 @@ namespace GitHub.ViewModels
         {
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
-            SourceBranchDisplayName = GetBranchDisplayName(pullRequest.Head?.Label);
-            TargetBranchDisplayName = GetBranchDisplayName(pullRequest.Base.Label);
-            IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, pullRequest);
-            Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : "*No description provided.*";
 
             IsFromFork = pullRequestsService.IsPullRequestFromFork(repository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
@@ -302,7 +298,6 @@ namespace GitHub.ViewModels
             ChangedFilesTree = CreateChangedFilesTree(pullRequest, changes).Children.ToList();
 
             var localBranches = await pullRequestsService.GetLocalBranches(repository, pullRequest).ToList();
-
             IsCheckedOut = localBranches.Contains(repository.CurrentBranch);
 
             if (IsCheckedOut)

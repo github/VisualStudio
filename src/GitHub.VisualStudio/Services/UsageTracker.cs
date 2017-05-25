@@ -202,13 +202,6 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
-        public async Task IncrementPullRequestCheckedOut()
-        {
-            var usage = await LoadUsage();
-            ++usage.Model.NumberOfPullRequestsCheckedOut;
-            SaveUsage(usage);
-        }
-
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
