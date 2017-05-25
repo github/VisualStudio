@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Media;
 using System.Windows.Controls;
 
 namespace GitHub.InlineReviews.Tags
@@ -8,6 +9,8 @@ namespace GitHub.InlineReviews.Tags
         public ShowInlineCommentGlyph()
         {
             InitializeComponent();
+
+            Background = Brushes.Transparent;
         }
     }
 }

@@ -46,11 +46,7 @@ namespace GitHub.InlineReviews
             var textView = wpfTextViewHost.TextView;
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
             var glyphFactory = new InlineCommentGlyphFactory(apiClientFactory, peekBroker, textView, tagAggregator);
-
-            var margin = CreateMargin(glyphFactory, wpfTextViewHost, parent);
-            margin.VisualElement.PreviewMouseLeftButtonUp += glyphFactory.PreprocessMouseLeftButtonUp;
-
-            return margin;
+            return CreateMargin(glyphFactory, wpfTextViewHost, parent);
         }
 
         IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory,

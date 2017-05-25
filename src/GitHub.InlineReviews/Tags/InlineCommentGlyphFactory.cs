@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
-using System.Windows.Input;
 using System.Collections.Generic;
 using GitHub.Factories;
 using GitHub.InlineReviews.Peek;
@@ -37,6 +35,23 @@ namespace GitHub.InlineReviews.Tags
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
         {
+            var glyph = CreateGlyph(tag);
+            glyph.MouseLeftButtonUp += (s, e) => OpenThreadView(line, tag);
+
+            return glyph;
+        }
+
+        public IEnumerable<Type> GetTagTypes()
+        {
+            return new[]
+            {
+                typeof(AddInlineCommentTag),
+                typeof(ShowInlineCommentTag)
+            };
+        }
+
+        static UIElement CreateGlyph(InlineCommentTag tag)
+        {
             var addTag = tag as AddInlineCommentTag;
             var showTag = tag as ShowInlineCommentTag;
 
@@ -52,34 +67,15 @@ namespace GitHub.InlineReviews.Tags
                 };
             }
 
-            return null;
+            throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
         }
 
-        public IEnumerable<Type> GetTagTypes()
+        void OpenThreadView(ITextViewLine line, InlineCommentTag tag)
         {
-            return new[] { typeof(ShowInlineCommentTag), typeof(AddInlineCommentTag) };
-        }
-
-        public void PreprocessMouseLeftButtonUp(object source, MouseButtonEventArgs e)
-        {
-            var visualElement = (FrameworkElement)source;
-
-            var y = e.GetPosition(visualElement).Y + textView.ViewportTop;
-            var line = textView.TextViewLines.GetTextViewLineContainingYCoordinate(y);
-
-            if (line != null)
-            {
-                var tag = tagAggregator.GetTags(line.ExtentAsMappingSpan).FirstOrDefault();
-
-                if (tag != null)
-                {
-                    var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-                    var viewModel = CreateViewModel(tag.Tag);
-                    var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, viewModel);
-                    peekBroker.TriggerPeekSession(options);
-                    e.Handled = true;
-                }
-            }
+            var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
+            var viewModel = CreateViewModel(tag);
+            var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, viewModel);
+            peekBroker.TriggerPeekSession(options);
         }
 
         InlineCommentThreadViewModel CreateViewModel(InlineCommentTag tag)

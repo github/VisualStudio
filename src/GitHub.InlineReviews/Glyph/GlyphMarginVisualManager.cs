@@ -46,7 +46,6 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                 if (!visuals.ContainsKey(type))
                 {
                     var element = new Canvas();
-                    element.Background = Brushes.Transparent;
                     element.ClipToBounds = true;
                     glyphMarginGrid.Children.Add(element);
                     visuals[type] = element;
