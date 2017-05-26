@@ -38,6 +38,21 @@ namespace GitHub.InlineReviews.Commands
             this.peekService = peekService;
         }
 
+        /// <inheritdoc/>
+        protected override bool IsEnabled
+        {
+            get
+            {
+                var textView = GetCurrentTextView();
+                if (textView == null) return false;
+
+                var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
+                var span = new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length);
+                var mappingSpan = textView.BufferGraph.CreateMappingSpan(span, SpanTrackingMode.EdgeExclusive);
+                return tagAggregator.GetTags(mappingSpan).Any();
+            }
+        }
+
         /// <summary>
         /// Gets the currently active text view from Visual Studio.
         /// </summary>

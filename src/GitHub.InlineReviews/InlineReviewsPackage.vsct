@@ -50,6 +50,8 @@
       </Button>
       <Button guid="guidGitHubCommandSet" id="NextInlineCommentId" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_GOTO" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>GitHub.InlineReviews.NextInlineComment</CommandName>
           <ButtonText>Next Comment</ButtonText>
@@ -57,6 +59,8 @@
       </Button>
       <Button guid="guidGitHubCommandSet" id="PreviousInlineCommentId" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_EDIT_GOTO" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>GitHub.InlineReviews.PreviousInlineComment</CommandName>
           <ButtonText>Previous Comment</ButtonText>

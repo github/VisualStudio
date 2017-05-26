@@ -36,12 +36,12 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets a value indicating whether the command is enabled.
         /// </summary>
-        protected virtual bool Enabled => true;
+        protected virtual bool IsEnabled => true;
 
         /// <summary>
         /// Gets a value indicating whether the command is visible.
         /// </summary>
-        protected virtual bool Visible => true;
+        protected virtual bool IsVisible => true;
 
         /// <summary>
         /// Gets the group and identifier for the command.
@@ -101,8 +101,8 @@ namespace GitHub.InlineReviews.Commands
 
         internal void BeforeQueryStatus(OleMenuCommand command)
         {
-            command.Enabled = Enabled;
-            command.Visible = Visible;
+            command.Enabled = IsEnabled;
+            command.Visible = IsVisible;
         }
 
         internal void Register(IServiceProvider package, OleMenuCommand command)
