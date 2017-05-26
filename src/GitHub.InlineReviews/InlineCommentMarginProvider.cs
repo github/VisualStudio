@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Windows.Controls;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Glyph;
-using GitHub.Factories;
 using GitHub.InlineReviews.Services;
+using GitHub.InlineReviews.Views;
 
 namespace GitHub.InlineReviews
 {
@@ -44,14 +44,15 @@ namespace GitHub.InlineReviews
             var textView = wpfTextViewHost.TextView;
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView, tagAggregator);
-            return CreateMargin(glyphFactory, wpfTextViewHost, parent);
+            Func<Grid> gridFactory = () => new GlyphMarginGrid();
+            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, parent);
         }
 
-        IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory,
+        IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
             IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, tagAggregator,
+            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator,
                 editorFormatMapService.GetEditorFormatMap(wpfTextViewHost.TextView),
                 MarginPropertiesName, MarginName, true, 17.0);
         }

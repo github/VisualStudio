@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.Glyph.Implementation
 
         Dictionary<UIElement, GlyphData<TGlyphTag>> glyphs;
 
-        public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory,
+        public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
             IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName, double marginWidth)
         {
             this.textView = textView;
@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.Glyph.Implementation
 
             glyphs = new Dictionary<UIElement, GlyphData<TGlyphTag>>();
             visuals = new Dictionary<Type, Canvas>();
-            glyphMarginGrid = new Grid();
+            glyphMarginGrid = gridFactory.Invoke();
             glyphMarginGrid.Width = marginWidth;
             UpdateBackgroundColor();
 
@@ -64,18 +64,37 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                 var startingLine = GetStartingLine(textViewLines, span) as IWpfTextViewLine;
                 if (startingLine != null)
                 {
-                    var element = glyphFactory.GenerateGlyph(startingLine, tag);
+                    var element = (FrameworkElement)glyphFactory.GenerateGlyph(startingLine, tag);
                     if (element != null)
                     {
-                        element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                        double length = (17.0 - element.DesiredSize.Width) / 2.0;
-                        Canvas.SetLeft(element, length);
+                        // center on margin
+                        //element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                        //double length = (17.0 - element.DesiredSize.Width) / 2.0;
+                        //Canvas.SetLeft(element, length);
+
+                        // size to margin
+                        element.Width = glyphMarginGrid.Width;
+                        element.Height = startingLine.Height;
+
                         var data = new GlyphData<TGlyphTag>(span, tag, element);
                         data.SetTop(startingLine.TextTop - textView.ViewportTop);
                         glyphs[element] = data;
                         visuals[glyphType].Children.Add(element);
                     }
                 }
+            }
+        }
+
+        static void SetMinimumWithAndHeight(FrameworkElement element, double width, double height)
+        {
+            if (element.Width < width)
+            {
+                element.Width = width;
+            }
+
+            if (element.Height < height)
+            {
+                element.Height = height;
             }
         }
 
@@ -182,26 +201,35 @@ namespace GitHub.InlineReviews.Glyph.Implementation
 
         void UpdateBackgroundColor()
         {
+            // set background color for children
             var properties = editorFormatMap.GetProperties(marginPropertiesName);
             if (properties.Contains("BackgroundColor"))
             {
-                glyphMarginGrid.Background = new SolidColorBrush((Color)properties["BackgroundColor"]);
-                glyphMarginGrid.Background.Freeze();
-            }
-            else if (properties.Contains("Background"))
-            {
-                glyphMarginGrid.Background = (Brush)properties["Background"];
-            }
-            else
-            {
-                glyphMarginGrid.Background = Brushes.Transparent;
+                var backgroundColor = (Color)properties["BackgroundColor"];
+                ImageThemingUtilities.SetImageBackgroundColor(glyphMarginGrid, backgroundColor);
             }
 
-            var background = glyphMarginGrid.Background as SolidColorBrush;
-            if (background != null)
-            {
-                ImageThemingUtilities.SetImageBackgroundColor(glyphMarginGrid, background.Color);
-            }
+            // set background color for margin
+            //var properties = editorFormatMap.GetProperties(marginPropertiesName);
+            //if (properties.Contains("BackgroundColor"))
+            //{
+            //    glyphMarginGrid.Background = new SolidColorBrush((Color)properties["BackgroundColor"]);
+            //    glyphMarginGrid.Background.Freeze();
+            //}
+            //else if (properties.Contains("Background"))
+            //{
+            //    glyphMarginGrid.Background = (Brush)properties["Background"];
+            //}
+            //else
+            //{
+            //    glyphMarginGrid.Background = Brushes.Transparent;
+            //}
+
+            //var background = glyphMarginGrid.Background as SolidColorBrush;
+            //if (background != null)
+            //{
+            //    ImageThemingUtilities.SetImageBackgroundColor(glyphMarginGrid, background.Color);
+            //}
         }
     }
 }
