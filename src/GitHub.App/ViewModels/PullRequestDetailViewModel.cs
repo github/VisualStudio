@@ -361,7 +361,6 @@ namespace GitHub.ViewModels
             }
 
             IsLoading = IsBusy = false;
-            IsBusy = false;
             usageTracker.IncrementPullRequestOpened().Forget();
 
             if (!isInCheckout)
