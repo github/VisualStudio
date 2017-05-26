@@ -78,7 +78,10 @@
       <Bitmap guid="guidImages" href="Resources\PullRequestCommentsToolWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
     </Bitmaps>
   </Commands>
-
+  <KeyBindings>
+    <KeyBinding guid="guidGitHubCommandSet" id="NextInlineCommentId" editor="guidVSStd97" key1="VK_OEM_6" mod1="Alt"/>
+    <KeyBinding guid="guidGitHubCommandSet" id="PreviousInlineCommentId" editor="guidVSStd97" key1="VK_OEM_4" mod1="Alt"/>
+  </KeyBindings>
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidInlineReviewsPackage" value="{248325be-4a2d-4111-b122-e7d59bf73a35}" />
