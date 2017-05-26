@@ -286,6 +286,7 @@ namespace GitHub.ViewModels
         /// <param name="files">The pull request's changed files.</param>
         public async Task Load(IPullRequestModel pullRequest)
         {
+            var firstLoad = (Model == null);
             Model = pullRequest;
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
@@ -361,7 +362,11 @@ namespace GitHub.ViewModels
             }
 
             IsLoading = IsBusy = false;
-            usageTracker.IncrementPullRequestOpened().Forget();
+
+            if (firstLoad)
+            {
+                usageTracker.IncrementPullRequestOpened().Forget();
+            }
 
             if (!isInCheckout)
             {
