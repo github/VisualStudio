@@ -9,6 +9,7 @@ using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Rothko;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -19,6 +20,7 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : IPullRequestSessionManager, IDisposable
     {
+        readonly IOperatingSystem os;
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
@@ -40,6 +42,7 @@ namespace GitHub.InlineReviews.Services
         /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
+            IOperatingSystem os,
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
@@ -47,6 +50,7 @@ namespace GitHub.InlineReviews.Services
             IRepositoryHosts hosts,
             ITeamExplorerServiceHolder teamExplorerService)
         {
+            Guard.ArgumentNotNull(os, nameof(os));
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(diffService, nameof(diffService));
@@ -54,6 +58,7 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
 
+            this.os = os;
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
@@ -87,6 +92,7 @@ namespace GitHub.InlineReviews.Services
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
 
                 return new PullRequestSession(
+                    os,
                     gitService,
                     gitClient,
                     diffService,
@@ -123,6 +129,7 @@ namespace GitHub.InlineReviews.Services
                         if (pullRequest != null)
                         {
                             session = new PullRequestSession(
+                                os,
                                 gitService,
                                 gitClient,
                                 diffService,

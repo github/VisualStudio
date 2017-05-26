@@ -10,6 +10,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Text;
 using ReactiveUI;
 using System.Threading;
+using Rothko;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -24,6 +25,7 @@ namespace GitHub.InlineReviews.Services
     public class PullRequestSession : IPullRequestSession
     {
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
+        readonly IOperatingSystem os;
         readonly IGitService gitService;
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
@@ -33,6 +35,7 @@ namespace GitHub.InlineReviews.Services
         bool? isCheckedOut;
 
         public PullRequestSession(
+            IOperatingSystem os,
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
@@ -41,12 +44,14 @@ namespace GitHub.InlineReviews.Services
             ILocalRepositoryModel repository,
             bool isCheckedOut)
         {
+            Guard.ArgumentNotNull(os, nameof(os));
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
             Guard.ArgumentNotNull(repository, nameof(repository));
 
+            this.os = os;
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
@@ -253,13 +258,13 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        static async Task<string> ReadAllTextAsync(string path)
+        async Task<string> ReadAllTextAsync(string path)
         {
-            if (File.Exists(path))
+            if (os.File.Exists(path))
             {
                 try
                 {
-                    using (var reader = File.OpenText(path))
+                    using (var reader = os.File.OpenText(path))
                     {
                         return await reader.ReadToEndAsync();
                     }
