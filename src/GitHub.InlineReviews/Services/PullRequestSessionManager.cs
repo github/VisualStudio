@@ -92,7 +92,8 @@ namespace GitHub.InlineReviews.Services
                     diffService,
                     await modelService.GetCurrentUser(),
                     pullRequest,
-                    repository);
+                    repository,
+                    false);
             }
         }
 
@@ -127,7 +128,8 @@ namespace GitHub.InlineReviews.Services
                                 diffService,
                                 await modelService.GetCurrentUser(),
                                 pullRequest,
-                                repository);
+                                repository,
+                                true);
                         }
                     }
                 }

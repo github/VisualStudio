@@ -29,6 +29,7 @@ namespace GitHub.ViewModels
     {
         readonly IModelService modelService;
         readonly IPullRequestService pullRequestsService;
+        readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
         IPullRequestModel model;
         string sourceBranchDisplayName;
@@ -51,16 +52,19 @@ namespace GitHub.ViewModels
         /// <param name="connectionRepositoryHostMap">The connection repository host map.</param>
         /// <param name="teservice">The team explorer service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
+        /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
             ITeamExplorerServiceHolder teservice,
             IPullRequestService pullRequestsService,
+            IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
             : this(teservice.ActiveRepo,
                    connectionRepositoryHostMap.CurrentRepositoryHost.ModelService,
                    pullRequestsService,
+                   sessionManager,
                    usageTracker)
         {
         }
@@ -71,16 +75,19 @@ namespace GitHub.ViewModels
         /// <param name="repositoryHost">The repository host.</param>
         /// <param name="teservice">The team explorer service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
+        /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="avatarProvider">The avatar provider.</param>
         public PullRequestDetailViewModel(
             ILocalRepositoryModel repository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
+            IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
         {
             this.Repository = repository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
+            this.sessionManager = sessionManager;
             this.usageTracker = usageTracker;
 
             Checkout = ReactiveCommand.CreateAsyncObservable(
@@ -134,6 +141,11 @@ namespace GitHub.ViewModels
         /// Gets the repository that the pull request relates to.
         /// </summary>
         public ILocalRepositoryModel Repository { get; }
+
+        /// <summary>
+        /// Gets the session for the pull request.
+        /// </summary>
+        public IPullRequestSession Session { get; private set; }
 
         /// <summary>
         /// Gets a string describing how to display the pull request's source branch.
@@ -301,6 +313,7 @@ namespace GitHub.ViewModels
         public async Task Load(IPullRequestModel pullRequest)
         {
             Model = pullRequest;
+            Session = await sessionManager.GetSession(pullRequest);
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
             IsFromFork = pullRequestsService.IsPullRequestFromFork(Repository, Model);

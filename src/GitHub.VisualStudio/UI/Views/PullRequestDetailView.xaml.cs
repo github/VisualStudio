@@ -124,8 +124,9 @@ namespace GitHub.VisualStudio.UI.Views
                 frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
                 var diffViewer = ((IVsDifferenceCodeWindow)docView).DifferenceViewer;
 
-                AddCompareBufferTag(diffViewer.LeftView.TextBuffer, fullPath, true);
-                AddCompareBufferTag(diffViewer.RightView.TextBuffer, fullPath, false);
+                var session = ViewModel.Session;
+                AddCompareBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
+                AddCompareBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
 
                 // Set Inline mode but allow user to change.
                 diffViewer.Options.SetOptionValue(DifferenceViewerOptions.ViewModeId, DifferenceViewMode.Inline);
@@ -141,11 +142,11 @@ namespace GitHub.VisualStudio.UI.Views
             }
         }
 
-        void AddCompareBufferTag(ITextBuffer buffer, string path, bool isLeftBuffer)
+        void AddCompareBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, bool isLeftBuffer)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
-                typeof(CompareBufferTag),
-                () => new CompareBufferTag(path, isLeftBuffer));
+                typeof(PullRequestBufferTag),
+                () => new PullRequestBufferTag(session, path, isLeftBuffer));
         }
 
         void ShowErrorInStatusBar(string message, Exception e)

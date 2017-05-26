@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -69,6 +70,11 @@ namespace GitHub.ViewModels
         /// Gets the underlying pull request model.
         /// </summary>
         IPullRequestModel Model { get; }
+
+        /// <summary>
+        /// Gets the session for the pull request.
+        /// </summary>
+        IPullRequestSession Session { get; }
 
         /// <summary>
         /// Gets the repository that the pull request relates to.

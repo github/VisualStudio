@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 using System.Collections;
+using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -153,12 +154,18 @@ namespace GitHub.InlineReviews.Tags
 
         void Initialize()
         {
-            var bufferTag = buffer.Properties.GetProperty<CompareBufferTag>(typeof(CompareBufferTag), null);
+            var bufferTag = buffer.Properties.GetProperty<PullRequestBufferTag>(typeof(PullRequestBufferTag), null);
+            IPullRequestSession session = null;
 
             if (bufferTag != null)
             {
-                fullPath = bufferTag.Path;
-                leftHandSide = bufferTag.IsLeftBuffer;
+                fullPath = bufferTag.RelativePath;
+                leftHandSide = bufferTag.IsLeftComparisonBuffer;
+                
+                if (!bufferTag.Session.IsCheckedOut)
+                {
+                    session = bufferTag.Session;
+                }
             }
             else
             {
@@ -166,7 +173,14 @@ namespace GitHub.InlineReviews.Tags
                 fullPath = document.FilePath;
             }
 
-            subscription = sessionManager.CurrentSession.Subscribe(SessionChanged);
+            if (session == null)
+            {
+                subscription = sessionManager.CurrentSession.Subscribe(SessionChanged);
+            }
+            else
+            {
+                SessionChanged(session);
+            }
 
             initialized = true;
         }

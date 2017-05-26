@@ -7,7 +7,7 @@ using ReactiveUI;
 namespace GitHub.Services
 {
     /// <summary>
-    /// A pull request session.
+    /// A pull request session used to display inline reviews.
     /// </summary>
     /// <remarks>
     /// A pull request session represents the real-time state of a pull request in the IDE.
@@ -16,6 +16,11 @@ namespace GitHub.Services
     /// </remarks>
     public interface IPullRequestSession
     {
+        /// <summary>
+        /// Gets a value indicating whether the pull request branch is the currently checked out branch.
+        /// </summary>
+        bool IsCheckedOut { get; }
+
         /// <summary>
         /// Gets the current user.
         /// </summary>

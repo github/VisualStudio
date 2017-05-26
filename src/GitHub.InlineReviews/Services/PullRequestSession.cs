@@ -14,7 +14,7 @@ using System.Threading;
 namespace GitHub.InlineReviews.Services
 {
     /// <summary>
-    /// A pull request session.
+    /// A pull request session used to display inline reviews.
     /// </summary>
     /// <remarks>
     /// A pull request session represents the real-time state of a pull request in the IDE.
@@ -30,6 +30,7 @@ namespace GitHub.InlineReviews.Services
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         ReactiveList<IPullRequestSessionFile> files;
+        bool? isCheckedOut;
 
         public PullRequestSession(
             IGitService gitService,
@@ -37,7 +38,8 @@ namespace GitHub.InlineReviews.Services
             IDiffService diffService,
             IAccount user,
             IPullRequestModel pullRequest,
-            ILocalRepositoryModel repository)
+            ILocalRepositoryModel repository,
+            bool isCheckedOut)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
@@ -48,10 +50,14 @@ namespace GitHub.InlineReviews.Services
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
+            IsCheckedOut = isCheckedOut;
             User = user;
             PullRequest = pullRequest;
             Repository = repository;
         }
+
+        /// <inheritdoc/>
+        public bool IsCheckedOut { get; }
 
         /// <inheritdoc/>
         public IAccount User { get; }
