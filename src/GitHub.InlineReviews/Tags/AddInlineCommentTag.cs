@@ -1,7 +1,6 @@
 ﻿using System;
 using GitHub.Extensions;
 using GitHub.Services;
-using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -9,12 +8,11 @@ namespace GitHub.InlineReviews.Tags
     {
         public AddInlineCommentTag(
             IPullRequestSession session,
-            ITextView textView,
             string commitSha,
             string filePath,
             int diffLine,
             int lineNumber)
-            : base(session, textView, lineNumber)
+            : base(session, lineNumber)
         {
             Guard.ArgumentNotNull(commitSha, nameof(commitSha));
 

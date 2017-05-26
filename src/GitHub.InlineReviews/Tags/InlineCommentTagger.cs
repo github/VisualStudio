@@ -112,7 +112,7 @@ namespace GitHub.InlineReviews.Tags
 
                             yield return new TagSpan<ShowInlineCommentTag>(
                                 new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineCommentTag(session, view, thread));
+                                new ShowInlineCommentTag(session, thread));
                         }
                     }
 
@@ -129,7 +129,7 @@ namespace GitHub.InlineReviews.Tags
                                     var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                     yield return new TagSpan<InlineCommentTag>(
                                         new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
-                                        new AddInlineCommentTag(session, view, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber));
+                                        new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber));
                                 }
                             }
                         }

@@ -49,7 +49,7 @@ namespace GitHub.InlineReviews.Commands
             {
                 var cursorPoint = textView.Caret.Position.BufferPosition.Position;
                 var next = tags.FirstOrDefault(x => x.Point > cursorPoint) ?? tags.First();
-                ShowPeekComments(next.Tag);
+                ShowPeekComments(textView, next.Tag);
             }
 
             return Task.CompletedTask;

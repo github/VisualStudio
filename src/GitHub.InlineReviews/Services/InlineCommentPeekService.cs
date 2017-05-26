@@ -37,11 +37,10 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public void Show(AddInlineCommentTag tag, bool moveCaret = false)
+        public void Show(ITextView textView, AddInlineCommentTag tag, bool moveCaret = false)
         {
             Guard.ArgumentNotNull(tag, nameof(tag));
 
-            var textView = tag.TextView;
             var line = textView.TextSnapshot.GetLineFromLineNumber(tag.LineNumber);
             var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
             var viewModel = new InlineCommentThreadViewModel(
@@ -61,11 +60,10 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public void Show(ShowInlineCommentTag tag, bool moveCaret = false)
+        public void Show(ITextView textView, ShowInlineCommentTag tag, bool moveCaret = false)
         {
             Guard.ArgumentNotNull(tag, nameof(tag));
 
-            var textView = tag.TextView;
             var line = textView.TextSnapshot.GetLineFromLineNumber(tag.LineNumber);
             var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
             var viewModel = new InlineCommentThreadViewModel(

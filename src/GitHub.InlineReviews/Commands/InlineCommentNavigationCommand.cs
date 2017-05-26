@@ -98,9 +98,9 @@ namespace GitHub.InlineReviews.Commands
         /// Shows the inline comments for the specified tag in a peek view.
         /// </summary>
         /// <param name="tag"></param>
-        protected void ShowPeekComments(ShowInlineCommentTag tag)
+        protected void ShowPeekComments(ITextView textView, ShowInlineCommentTag tag)
         {
-            peekService.Show(tag, true);
+            peekService.Show(textView, tag, true);
         }
 
         SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)

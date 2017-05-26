@@ -74,12 +74,12 @@ namespace GitHub.InlineReviews.Tags
 
             if (addTag != null)
             {
-                peekService.Show(addTag);
+                peekService.Show(textView, addTag);
                 return true;
             }
             else if (showTag != null)
             {
-                peekService.Show(showTag);
+                peekService.Show(textView, showTag);
                 return true;
             }
 

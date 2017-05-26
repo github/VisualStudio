@@ -9,18 +9,15 @@ namespace GitHub.InlineReviews.Tags
     {
         public InlineCommentTag(
             IPullRequestSession session,
-            ITextView textView,
             int lineNumber)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
             LineNumber = lineNumber;
             Session = session;
-            TextView = textView;
         }
 
         public int LineNumber { get; }
         public IPullRequestSession Session { get; }
-        public ITextView TextView { get; }
     }
 }
