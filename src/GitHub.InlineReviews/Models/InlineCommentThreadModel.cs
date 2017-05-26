@@ -46,7 +46,7 @@ namespace GitHub.InlineReviews.Models
         public IList<DiffLine> DiffMatch { get; }
 
         /// <inheritdoc/>
-        public DiffChangeType DiffLineType => DiffMatch.Last().Type;
+        public DiffChangeType DiffLineType => DiffMatch.First().Type;
 
         /// <inheritdoc/>
         public bool IsStale
