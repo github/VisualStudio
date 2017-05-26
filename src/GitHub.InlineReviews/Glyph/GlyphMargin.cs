@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Controls;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -26,6 +27,7 @@ namespace GitHub.InlineReviews.Glyph
         public GlyphMargin(
             IWpfTextViewHost wpfTextViewHost,
             IGlyphFactory<TGlyphTag> glyphFactory,
+            Func<Grid> gridFactory,
             ITagAggregator<TGlyphTag> tagAggregator,
             IEditorFormatMap editorFormatMap,
             string marginPropertiesName, string marginName, bool handleZoom = true, double marginWidth = 17.0)
@@ -35,7 +37,7 @@ namespace GitHub.InlineReviews.Glyph
             this.marginName = marginName;
             this.handleZoom = handleZoom;
 
-            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory,
+            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, gridFactory,
                 this, editorFormatMap, marginPropertiesName, marginWidth);
 
             marginVisual = visualManager.MarginVisual;

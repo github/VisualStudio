@@ -108,6 +108,9 @@
       <DependentUpon>DiffCommentThreadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DiffView.cs" />
+    <Compile Include="Views\GlyphMarginGrid.xaml.cs">
+      <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PullRequestCommentsPane.cs" />
     <Compile Include="Views\PullRequestCommentsView.xaml.cs">
       <DependentUpon>PullRequestCommentsView.xaml</DependentUpon>
@@ -360,6 +363,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\DiffCommentThreadView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GlyphMarginGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

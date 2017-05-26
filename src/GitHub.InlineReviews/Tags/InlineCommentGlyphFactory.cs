@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Collections.Generic;
-using GitHub.InlineReviews.Peek;
 using GitHub.InlineReviews.Glyph;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
@@ -47,7 +46,7 @@ namespace GitHub.InlineReviews.Tags
             };
         }
 
-        static UIElement CreateGlyph(InlineCommentTag tag)
+        static UserControl CreateGlyph(InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
             var showTag = tag as ShowInlineCommentTag;
