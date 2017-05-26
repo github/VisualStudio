@@ -61,7 +61,9 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\ExportCommandAttribute.cs" />
     <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\IExportCommandMetadata.cs" />
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
@@ -345,6 +347,7 @@
   <ItemGroup>
     <VSCTCompile Include="InlineReviewsPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
     </VSCTCompile>
     <Content Include="Resources\InlineReviewsPackage.ico" />
     <Content Include="Resources\PullRequestCommentsToolWindowCommand.png" />

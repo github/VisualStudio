@@ -12,11 +12,21 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace GitHub.InlineReviews.Commands
 {
+    /// <summary>
+    /// Base class for commands that navigate between inline comments.
+    /// </summary>
     abstract class InlineCommentNavigationCommand : Command
     {
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InlineCommentNavigationCommand"/> class.
+        /// </summary>
+        /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
+        /// <param name="peekService">The peek service.</param>
+        /// <param name="commandSet">The GUID of the group the command belongs to.</param>
+        /// <param name="commandId">The numeric identifier of the command.</param>
         protected InlineCommentNavigationCommand(
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
@@ -28,6 +38,10 @@ namespace GitHub.InlineReviews.Commands
             this.peekService = peekService;
         }
 
+        /// <summary>
+        /// Gets the currently active text view from Visual Studio.
+        /// </summary>
+        /// <returns>An <see cref="ITextView"/> or null if no active text view.</returns>
         protected ITextView GetCurrentTextView()
         {
             IVsTextView textView = null;
@@ -43,6 +57,11 @@ namespace GitHub.InlineReviews.Commands
             return viewHost?.TextView;
         }
 
+        /// <summary>
+        /// Gets the <see cref="ShowInlineCommentTag"/>s for the specified text view.
+        /// </summary>
+        /// <param name="textView">The text view.</param>
+        /// <returns>A collection of <see cref="ITagInfo"/> objects, ordered by line.</returns>
         protected IReadOnlyList<ITagInfo> GetTags(ITextView textView)
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
@@ -60,6 +79,10 @@ namespace GitHub.InlineReviews.Commands
                 .ToList();
         }
 
+        /// <summary>
+        /// Shows the inline comments for the specified tag in a peek view.
+        /// </summary>
+        /// <param name="tag"></param>
         protected void ShowPeekComments(ShowInlineCommentTag tag)
         {
             peekService.Show(tag, true);
