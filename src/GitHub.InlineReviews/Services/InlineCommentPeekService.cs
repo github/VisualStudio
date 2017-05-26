@@ -99,9 +99,12 @@ namespace GitHub.InlineReviews.Services
         {
             var outlining = outliningService.GetOutliningManager(textView);
 
-            foreach (var collapsed in outlining.GetCollapsedRegions(span))
+            if (outlining != null)
             {
-                outlining.Expand(collapsed);
+                foreach (var collapsed in outlining.GetCollapsedRegions(span))
+                {
+                    outlining.Expand(collapsed);
+                }
             }
         }
     }
