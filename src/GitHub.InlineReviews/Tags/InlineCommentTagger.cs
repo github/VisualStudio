@@ -130,7 +130,7 @@ namespace GitHub.InlineReviews.Tags
                                     var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
                                     yield return new TagSpan<InlineCommentTag>(
                                         new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
-                                        new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber));
+                                        new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type));
                                 }
                             }
                         }

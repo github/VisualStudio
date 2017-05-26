@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
 using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
+using Microsoft.VisualStudio.Text.Classification;
 using GitHub.InlineReviews.Services;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -15,15 +18,53 @@ namespace GitHub.InlineReviews.Tags
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
         readonly ITagAggregator<InlineCommentTag> tagAggregator;
+        readonly BrushesManager brushesManager;
 
         public InlineCommentGlyphFactory(
             IInlineCommentPeekService peekService,
             ITextView textView,
-            ITagAggregator<InlineCommentTag> tagAggregator)
+            ITagAggregator<InlineCommentTag> tagAggregator,
+            IEditorFormatMap editorFormatMap)
         {
             this.peekService = peekService;
             this.textView = textView;
             this.tagAggregator = tagAggregator;
+
+            brushesManager = new BrushesManager(editorFormatMap);
+        }
+
+        class BrushesManager
+        {
+            readonly Brush addBackground;
+            readonly Brush deleteBackground;
+            readonly Brush noneBackground;
+
+            internal BrushesManager(IEditorFormatMap editorFormatMap)
+            {
+                addBackground = TryGetValue<Brush>(editorFormatMap, "deltadiff.add.word", "Background");
+                deleteBackground = TryGetValue<Brush>(editorFormatMap, "deltadiff.remove.word", "Background");
+                noneBackground = TryGetValue<Brush>(editorFormatMap, "Indicator Margin", "Background");
+            }
+
+            T TryGetValue<T>(IEditorFormatMap editorFormatMap, string key, string name) where T : class
+            {
+                var properties = editorFormatMap.GetProperties(key);
+                return properties?[name] as T;
+            }
+
+            internal Brush GetBrush(DiffChangeType diffChangeType)
+            {
+                switch (diffChangeType)
+                {
+                    case DiffChangeType.Add:
+                        return addBackground;
+                    case DiffChangeType.Delete:
+                        return deleteBackground;
+                    case DiffChangeType.None:
+                    default:
+                        return noneBackground;
+                }
+            }
         }
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
@@ -34,6 +75,7 @@ namespace GitHub.InlineReviews.Tags
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
+            glyph.Background = brushesManager.GetBrush(tag.DiffChangeType);
             return glyph;
         }
 
