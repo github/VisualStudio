@@ -206,7 +206,7 @@ namespace GitHub.Services
                 {
                     var contentStream = new MemoryStream(Encoding.UTF8.GetBytes(contents));
                     var blob1 = commit[path]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
-                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream);
+                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
                     return repository.Diff.Compare(blob1, blob2);
                 }
 
