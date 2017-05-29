@@ -10,7 +10,7 @@ namespace GitHub.InlineReviews.Tags
         public ShowInlineCommentTag(
             IPullRequestSession session,
             IInlineCommentThreadModel thread)
-            : base(session, thread.LineNumber)
+            : base(session, thread.LineNumber, thread.DiffLineType)
         {
             Guard.ArgumentNotNull(thread, nameof(thread));
 

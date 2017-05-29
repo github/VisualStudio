@@ -1,6 +1,6 @@
 ﻿using GitHub.Extensions;
 using GitHub.Services;
-using Microsoft.VisualStudio.Text.Editor;
+using GitHub.Models;
 using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Tags
@@ -9,15 +9,18 @@ namespace GitHub.InlineReviews.Tags
     {
         public InlineCommentTag(
             IPullRequestSession session,
-            int lineNumber)
+            int lineNumber,
+            DiffChangeType diffChangeType)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
             LineNumber = lineNumber;
             Session = session;
+            DiffChangeType = diffChangeType;
         }
 
         public int LineNumber { get; }
         public IPullRequestSession Session { get; }
+        public DiffChangeType DiffChangeType { get; }
     }
 }

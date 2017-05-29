@@ -43,17 +43,18 @@ namespace GitHub.InlineReviews
         {
             var textView = wpfTextViewHost.TextView;
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
-            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView, tagAggregator);
+            var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
+            var glyphFactory = new InlineCommentGlyphFactory(peekService, textView, tagAggregator, editorFormatMap);
+
             Func<Grid> gridFactory = () => new GlyphMarginGrid();
-            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, parent);
+            return CreateMargin(glyphFactory, gridFactory, wpfTextViewHost, parent, editorFormatMap);
         }
 
         IWpfTextViewMargin CreateMargin<TGlyphTag>(IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
-            IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent) where TGlyphTag : ITag
+            IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent, IEditorFormatMap editorFormatMap) where TGlyphTag : ITag
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
-            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator,
-                editorFormatMapService.GetEditorFormatMap(wpfTextViewHost.TextView),
+            return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
                 MarginPropertiesName, MarginName, true, 17.0);
         }
     }

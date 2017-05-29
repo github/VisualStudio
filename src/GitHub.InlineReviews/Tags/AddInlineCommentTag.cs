@@ -1,6 +1,7 @@
 ﻿using System;
 using GitHub.Extensions;
 using GitHub.Services;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -11,8 +12,9 @@ namespace GitHub.InlineReviews.Tags
             string commitSha,
             string filePath,
             int diffLine,
-            int lineNumber)
-            : base(session, lineNumber)
+            int lineNumber,
+            DiffChangeType diffChangeType)
+            : base(session, lineNumber, diffChangeType)
         {
             Guard.ArgumentNotNull(commitSha, nameof(commitSha));
 
