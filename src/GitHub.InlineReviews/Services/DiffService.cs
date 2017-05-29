@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using GitHub.InlineReviews.Models;
 using GitHub.Models;
-using Microsoft.VisualStudio.Text.Differencing;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -16,69 +13,6 @@ namespace GitHub.InlineReviews.Services
     {
         static readonly Regex ChunkHeaderRegex = new Regex(@"^@@\s+\-(\d+),?\d+?\s+\+(\d+),?\d+?\s@@");
         static readonly char[] Newlines = new[] { '\r', '\n' };
-        readonly ITextDifferencingService vsDiff;
-
-        [ImportingConstructor]
-        public DiffService(ITextDifferencingSelectorService diffSelector)
-        {
-            this.vsDiff = diffSelector.DefaultTextDifferencingService;
-        }
-
-        public IEnumerable<DiffChunk> Diff(string left, string right, int contextLines = 3)
-        {
-            var diff = vsDiff.DiffStrings(left ?? string.Empty, right ?? string.Empty, new StringDifferenceOptions
-            {
-                DifferenceType = StringDifferenceTypes.Line,
-                IgnoreTrimWhiteSpace = true,
-            });
-
-            foreach (var difference in diff.Differences)
-            {
-                var chunk = new DiffChunk();
-
-                for (var i = contextLines; i > 0; --i)
-                {
-                    if (difference.Left.Start - i < 0 || difference.Right.Start - i < 0) break;
-
-                    chunk.Lines.Add(new DiffLine
-                    {
-                        OldLineNumber = (difference.Left.Start - i) + 1,
-                        NewLineNumber = (difference.Right.Start - i) + 1,
-                        Content = ' ' + diff.LeftSequence[difference.Left.Start - i].TrimEnd(Newlines),
-                    });
-                }
-
-                if (difference.DifferenceType == DifferenceType.Remove || difference.DifferenceType == DifferenceType.Change)
-                {
-                    for (var i = 0; i < difference.Left.Length; ++i)
-                    {
-                        chunk.Lines.Add(new DiffLine
-                        {
-                            Type = DiffChangeType.Delete,
-                            OldLineNumber = (difference.Left.Start + i) + 1,
-                            Content = '-' + diff.LeftSequence[difference.Left.Start + i].TrimEnd(Newlines),
-                        });
-                    }
-                }
-
-                if (difference.DifferenceType == DifferenceType.Add || difference.DifferenceType == DifferenceType.Change)
-                {
-                    for (var i = 0; i < difference.Right.Length; ++i)
-                    {
-                        chunk.Lines.Add(new DiffLine
-                        {
-                            Type = DiffChangeType.Add,
-                            NewLineNumber = (difference.Right.Start + i) + 1,
-                            Content = '+' + diff.RightSequence[difference.Right.Start + i].TrimEnd(Newlines),
-                        });
-                    }
-                }
-
-                chunk.OldLineNumber = chunk.Lines.FirstOrDefault(x => x.OldLineNumber != -1)?.OldLineNumber ?? -1;
-                chunk.NewLineNumber = chunk.Lines.FirstOrDefault(x => x.NewLineNumber != -1)?.NewLineNumber ?? -1;
-                yield return chunk;
-            }
-        }
 
         public IEnumerable<DiffChunk> ParseFragment(string diff)
         {

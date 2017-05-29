@@ -33,9 +33,6 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public string BaseCommit { get; internal set; }
-
-        /// <inheritdoc/>
         public string BaseSha { get; internal set; }
 
         /// <inheritdoc/>

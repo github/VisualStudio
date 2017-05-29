@@ -170,6 +170,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
 
             return Task.Factory.StartNew(() =>
             {
@@ -187,6 +188,29 @@ namespace GitHub.Services
                 {
                     return null;
                 }
+            });
+        }
+
+        public Task<ContentChanges> CompareWithString(IRepository repository, string sha, string path, string contents)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha, nameof(sha));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentNotEmptyString(contents, nameof(contents));
+
+            return Task.Factory.StartNew(() =>
+            {
+                var commit = repository.Lookup<Commit>(sha);
+
+                if (commit != null)
+                {
+                    var contentStream = new MemoryStream(Encoding.UTF8.GetBytes(contents));
+                    var blob1 = commit[path]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
+                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream);
+                    return repository.Diff.Compare(blob1, blob2);
+                }
+
+                return null;
             });
         }
 

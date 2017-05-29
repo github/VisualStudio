@@ -32,7 +32,6 @@ namespace GitHub.InlineReviews.Services
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         ReactiveList<IPullRequestSessionFile> files;
-        bool? isCheckedOut;
 
         public PullRequestSession(
             IOperatingSystem os,
@@ -108,15 +107,17 @@ namespace GitHub.InlineReviews.Services
         {
             relativePath = relativePath.Replace("\\", "/");
 
-            var updated = await Task.Run(() =>
+            var updated = await Task.Run(async () =>
             {
                 PullRequestSessionFile file;
 
                 if (fileIndex.TryGetValue(relativePath, out file))
                 {
+                    var repo = gitService.GetRepository(Repository.LocalPath);
                     var result = new Dictionary<IInlineCommentThreadModel, int>();
+                    var diff = await gitClient.CompareWithString(repo, file.BaseSha, relativePath, contents);
 
-                    file.Diff = diffService.Diff(file.BaseCommit, contents).ToList();
+                    file.Diff = diffService.ParseFragment(diff.Patch).ToList();
 
                     foreach (var thread in file.InlineCommentThreads)
                     {
@@ -175,12 +176,12 @@ namespace GitHub.InlineReviews.Services
         {
             var file = new PullRequestSessionFile();
             var repository = gitService.GetRepository(Repository.LocalPath);
+            var changes = await gitClient.CompareWithString(repository, PullRequest.Base.Sha, relativePath, contents);
 
             file.RelativePath = relativePath;
             file.BaseSha = PullRequest.Base.Sha;
-            file.BaseCommit = await gitClient.ExtractFile(repository, file.BaseSha, relativePath);
             file.CommitSha = await gitClient.IsModified(repository, relativePath, contents) ? null : repository.Head.Tip.Sha;
-            file.Diff = diffService.Diff(file.BaseCommit, contents).ToList();
+            file.Diff = diffService.ParseFragment(changes.Patch).ToList();
 
             var commentsByPosition = PullRequest.ReviewComments
                 .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
