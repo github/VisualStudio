@@ -58,12 +58,12 @@ namespace GitHub.Services
         /// Gets a file touched by the pull request.
         /// </summary>
         /// <param name="relativePath">The relative path to the file.</param>
-        /// <param name="snapshot">The current snapshot of the file in an editor.</param>
+        /// <param name="snapshot">The editor file contents.</param>
         /// <returns>
         /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
         /// the pull request.
         /// </returns>
-        Task<IPullRequestSessionFile> GetFile(string relativePath, ITextSnapshot snapshot);
+        Task<IPullRequestSessionFile> GetFile(string relativePath, byte[] contents);
 
         /// <summary>
         /// Updates the line numbers of the inline comments of a file.
@@ -71,6 +71,6 @@ namespace GitHub.Services
         /// <param name="relativePath">The relative path to the file.</param>
         /// <param name="contents">The new file contents.</param>
         /// <returns>A tack which completes when the operation has completed.</returns>
-        Task RecaluateLineNumbers(string relativePath, string contents);
+        Task RecaluateLineNumbers(string relativePath, byte[] contents);
     }
 }

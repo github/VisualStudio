@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using NullGuard;
-using System.Diagnostics;
 using NLog;
-using System.Security.Cryptography;
-using System.Text;
+using NullGuard;
 
 namespace GitHub.Services
 {
@@ -191,12 +188,11 @@ namespace GitHub.Services
             });
         }
 
-        public Task<ContentChanges> CompareWithString(IRepository repository, string sha, string path, string contents)
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, [AllowNull] byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
             Guard.ArgumentNotEmptyString(path, nameof(path));
-            Guard.ArgumentNotEmptyString(contents, nameof(contents));
 
             return Task.Factory.StartNew(() =>
             {
@@ -204,7 +200,7 @@ namespace GitHub.Services
 
                 if (commit != null)
                 {
-                    var contentStream = new MemoryStream(Encoding.UTF8.GetBytes(contents));
+                    var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
                     var blob1 = commit[path]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
                     var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
                     return repository.Diff.Compare(blob1, blob2);
@@ -304,14 +300,20 @@ namespace GitHub.Services
             });
         }
 
-        public Task<bool> IsModified(IRepository repository, string path, [AllowNull] string contents)
+        public Task<bool> IsModified(IRepository repository, string path, [AllowNull] byte[] contents)
         {
             return Task.Factory.StartNew(() =>
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
-                    var repoContents = (repository.Head[path].Target as Blob)?.GetContentText();
-                    return !contents.EqualsIgnoringLineEndings(repoContents);
+                    var blob1 = (Blob)repository.Head[path].Target;
+
+                    using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
+                    {
+                        var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
+                        var diff = repository.Diff.Compare(blob1, blob2);
+                        return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
+                    }
                 }
 
                 return true;

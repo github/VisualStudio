@@ -86,11 +86,11 @@ namespace GitHub.Services
         /// <param name="repository">The repository</param>
         /// <param name="sha">The SHA of the first commit.</param>
         /// <param name="path">The relative path to the file.</param>
-        /// <param name="contents">The string to compare with the file.</param>
+        /// <param name="contents">The contents to compare with the file.</param>
         /// <returns>
         /// A <see cref="Patch"/> object or null if the commit could not be found in the repository.
         /// </returns>
-        Task<ContentChanges> CompareWithString(IRepository repository, string sha, string path, string contents);
+        Task<ContentChanges> CompareWith(IRepository repository, string sha, string path, byte[] contents);
 
         /// Gets the value of a configuration key.
         /// </summary>
@@ -155,6 +155,6 @@ namespace GitHub.Services
         /// <param name="path">The relative path to the file.</param>
         /// <param name="contents">The file contents to test.</param>
         /// <returns></returns>
-        Task<bool> IsModified(IRepository repository, string path, string contents);
+        Task<bool> IsModified(IRepository repository, string path, byte[] contents);
     }
 }

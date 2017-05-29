@@ -32,6 +32,7 @@ namespace GitHub.InlineReviews.Tags
         readonly Dictionary<IInlineCommentThreadModel, ITrackingPoint> trackingPoints;
         readonly int? tabsToSpaces;
         bool initialized;
+        ITextDocument document;
         string fullPath;
         string relativePath;
         bool leftHandSide;
@@ -157,6 +158,8 @@ namespace GitHub.InlineReviews.Tags
             var bufferTag = buffer.Properties.GetProperty<PullRequestBufferTag>(typeof(PullRequestBufferTag), null);
             IPullRequestSession session = null;
 
+            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+
             if (bufferTag != null)
             {
                 fullPath = bufferTag.RelativePath;
@@ -169,7 +172,6 @@ namespace GitHub.InlineReviews.Tags
             }
             else
             {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
                 fullPath = document.FilePath;
             }
 
@@ -228,7 +230,7 @@ namespace GitHub.InlineReviews.Tags
             if (snapshot == null) return;
 
             var repository = gitService.GetRepository(session.Repository.LocalPath);
-            file = await session.GetFile(relativePath, snapshot);
+            file = await session.GetFile(relativePath, GetContents(snapshot));
 
             NotifyTagsChanged();
         }
@@ -261,11 +263,27 @@ namespace GitHub.InlineReviews.Tags
             }
         }
 
+        byte[] GetContents(ITextSnapshot snapshot)
+        {
+            var currentText = snapshot.GetText();
+
+            var content = document.Encoding.GetBytes(currentText);
+
+            var preamble = document.Encoding.GetPreamble();
+            if (preamble.Length == 0) return content;
+
+            var completeContent = new byte[preamble.Length + content.Length];
+            Buffer.BlockCopy(preamble, 0, completeContent, 0, preamble.Length);
+            Buffer.BlockCopy(content, 0, completeContent, preamble.Length, content.Length);
+
+            return completeContent;
+        }
+
         async Task Rebuild(ITextSnapshot snapshot)
         {
             if (buffer.CurrentSnapshot == snapshot)
             {
-                await session.RecaluateLineNumbers(relativePath, buffer.CurrentSnapshot.GetText());
+                await session.RecaluateLineNumbers(relativePath, GetContents(buffer.CurrentSnapshot));
 
                 foreach (var thread in file.InlineCommentThreads)
                 {

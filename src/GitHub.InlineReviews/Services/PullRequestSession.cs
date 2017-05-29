@@ -91,56 +91,12 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSessionFile> GetFile(string relativePath)
         {
-            var contents = await ReadAllTextAsync(GetFullPath(relativePath));
+            var contents = await ReadAsync(GetFullPath(relativePath));
             return await GetFile(relativePath, contents);
         }
 
         /// <inheritdoc/>
-        public Task<IPullRequestSessionFile> GetFile(string relativePath, ITextSnapshot snapshot)
-        {
-            var contents = snapshot.GetText();
-            return GetFile(relativePath, contents);
-        }
-
-        /// <inheritdoc/>
-        public async Task RecaluateLineNumbers(string relativePath, string contents)
-        {
-            relativePath = relativePath.Replace("\\", "/");
-
-            var updated = await Task.Run(async () =>
-            {
-                PullRequestSessionFile file;
-
-                if (fileIndex.TryGetValue(relativePath, out file))
-                {
-                    var repo = gitService.GetRepository(Repository.LocalPath);
-                    var result = new Dictionary<IInlineCommentThreadModel, int>();
-                    var diff = await gitClient.CompareWithString(repo, file.BaseSha, relativePath, contents);
-
-                    file.Diff = diffService.ParseFragment(diff.Patch).ToList();
-
-                    foreach (var thread in file.InlineCommentThreads)
-                    {
-                        result[thread] = GetUpdatedLineNumber(thread, file.Diff);
-                    }
-
-                    return result;
-                }
-
-                return null;
-            });
-
-            if (updated != null)
-            {
-                foreach (var i in updated)
-                {
-                    i.Key.LineNumber = i.Value;
-                    i.Key.IsStale = false;
-                }
-            }
-        }
-
-        async Task<IPullRequestSessionFile> GetFile(string relativePath, string contents)
+        public async Task<IPullRequestSessionFile> GetFile(string relativePath, byte[] contents)
         {
             await getFilesLock.WaitAsync();
 
@@ -172,11 +128,49 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        async Task<PullRequestSessionFile> CreateFile(string relativePath, string contents)
+        /// <inheritdoc/>
+        public async Task RecaluateLineNumbers(string relativePath, byte[] contents)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            var updated = await Task.Run(async () =>
+            {
+                PullRequestSessionFile file;
+
+                if (fileIndex.TryGetValue(relativePath, out file))
+                {
+                    var repo = gitService.GetRepository(Repository.LocalPath);
+                    var result = new Dictionary<IInlineCommentThreadModel, int>();
+                    var diff = await gitClient.CompareWith(repo, file.BaseSha, relativePath, contents);
+
+                    file.Diff = diffService.ParseFragment(diff.Patch).ToList();
+
+                    foreach (var thread in file.InlineCommentThreads)
+                    {
+                        result[thread] = GetUpdatedLineNumber(thread, file.Diff);
+                    }
+
+                    return result;
+                }
+
+                return null;
+            });
+
+            if (updated != null)
+            {
+                foreach (var i in updated)
+                {
+                    i.Key.LineNumber = i.Value;
+                    i.Key.IsStale = false;
+                }
+            }
+        }
+
+        async Task<PullRequestSessionFile> CreateFile(string relativePath, byte[] contents)
         {
             var file = new PullRequestSessionFile();
             var repository = gitService.GetRepository(Repository.LocalPath);
-            var changes = await gitClient.CompareWithString(repository, PullRequest.Base.Sha, relativePath, contents);
+            var changes = await gitClient.CompareWith(repository, PullRequest.Base.Sha, relativePath, contents);
 
             file.RelativePath = relativePath;
             file.BaseSha = PullRequest.Base.Sha;
@@ -211,7 +205,7 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var path in FilePaths)
             {
-                var contents = await ReadAllTextAsync(GetFullPath(path));
+                var contents = await ReadAsync(GetFullPath(path));
                 result.Add(await CreateFile(path, contents));
             }
 
@@ -259,15 +253,17 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        async Task<string> ReadAllTextAsync(string path)
+        async Task<byte[]> ReadAsync(string path)
         {
             if (os.File.Exists(path))
             {
                 try
                 {
-                    using (var reader = os.File.OpenText(path))
+                    using (var stream = os.File.OpenRead(path))
                     {
-                        return await reader.ReadToEndAsync();
+                        var result = new byte[stream.Length];
+                        await stream.ReadAsync(result, 0, result.Length);
+                        return result;
                     }
                 }
                 catch { }
