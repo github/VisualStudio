@@ -189,7 +189,7 @@ namespace GitHub.InlineReviews.Glyph
             get
             {
                 ThrowIfDisposed();
-                return textView.Options.IsGlyphMarginEnabled();
+                return true;
             }
         }
 

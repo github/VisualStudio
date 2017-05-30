@@ -18,7 +18,6 @@ namespace GitHub.InlineReviews
     [MarginContainer(PredefinedMarginNames.Left)]
     [ContentType("text")]
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
-    //[DeferCreation(OptionName = "TextViewHost/GlyphMargin")]
     internal sealed class InlineCommentMarginProvider : IWpfTextViewMarginProvider
     {
         const string MarginName = "InlineComment";

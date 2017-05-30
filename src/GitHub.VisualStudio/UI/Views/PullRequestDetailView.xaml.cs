@@ -131,10 +131,6 @@ namespace GitHub.VisualStudio.UI.Views
                 // Set Inline mode but allow user to change.
                 diffViewer.Options.SetOptionValue(DifferenceViewerOptions.ViewModeId, DifferenceViewMode.Inline);
                 diffViewer.Options.ClearOptionValue(DifferenceViewerOptions.ViewModeId);
-
-                diffViewer.LeftView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
-                diffViewer.RightView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
-                diffViewer.InlineView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, true);
             }
             catch (Exception e)
             {
