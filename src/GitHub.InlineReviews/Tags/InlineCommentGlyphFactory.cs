@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Collections.Generic;
 using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
 using GitHub.InlineReviews.Services;
@@ -17,18 +16,15 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
-        readonly ITagAggregator<InlineCommentTag> tagAggregator;
         readonly BrushesManager brushesManager;
 
         public InlineCommentGlyphFactory(
             IInlineCommentPeekService peekService,
             ITextView textView,
-            ITagAggregator<InlineCommentTag> tagAggregator,
             IEditorFormatMap editorFormatMap)
         {
             this.peekService = peekService;
             this.textView = textView;
-            this.tagAggregator = tagAggregator;
 
             brushesManager = new BrushesManager(editorFormatMap);
         }
