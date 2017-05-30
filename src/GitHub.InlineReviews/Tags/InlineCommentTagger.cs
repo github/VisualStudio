@@ -231,8 +231,10 @@ namespace GitHub.InlineReviews.Tags
 
             var repository = gitService.GetRepository(session.Repository.LocalPath);
             file = await session.GetFile(relativePath, GetContents(snapshot));
-
-            NotifyTagsChanged();
+            if(file != null)
+            {
+                NotifyTagsChanged();
+            }
         }
 
         void Buffer_Changed(object sender, TextContentChangedEventArgs e)
