@@ -24,8 +24,8 @@ namespace GitHub.InlineReviews.Glyph.Implementation
 
         Dictionary<UIElement, GlyphData<TGlyphTag>> glyphs;
 
-        public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory, Func<Grid> gridFactory,
-            IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName, double marginWidth)
+        public GlyphMarginVisualManager(IWpfTextView textView, IGlyphFactory<TGlyphTag> glyphFactory, Grid glyphMarginGrid,
+            IWpfTextViewMargin margin, IEditorFormatMap editorFormatMap, string marginPropertiesName)
         {
             this.textView = textView;
             this.margin = margin;
@@ -34,12 +34,11 @@ namespace GitHub.InlineReviews.Glyph.Implementation
             this.editorFormatMap.FormatMappingChanged += OnFormatMappingChanged;
             this.textView.Closed += new EventHandler(OnTextViewClosed);
             this.glyphFactory = glyphFactory;
+            this.glyphMarginGrid = glyphMarginGrid;
+            UpdateBackgroundColor();
 
             glyphs = new Dictionary<UIElement, GlyphData<TGlyphTag>>();
             visuals = new Dictionary<Type, Canvas>();
-            glyphMarginGrid = gridFactory.Invoke();
-            glyphMarginGrid.Width = marginWidth;
-            UpdateBackgroundColor();
 
             foreach (Type type in glyphFactory.GetTagTypes())
             {
@@ -82,19 +81,6 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                         visuals[glyphType].Children.Add(element);
                     }
                 }
-            }
-        }
-
-        static void SetMinimumWithAndHeight(FrameworkElement element, double width, double height)
-        {
-            if (element.Width < width)
-            {
-                element.Width = width;
-            }
-
-            if (element.Height < height)
-            {
-                element.Height = height;
             }
         }
 

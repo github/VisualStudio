@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Controls;
@@ -8,7 +9,6 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using GitHub.InlineReviews.Glyph.Implementation;
 
 namespace GitHub.InlineReviews.Glyph
@@ -17,7 +17,8 @@ namespace GitHub.InlineReviews.Glyph
     {
         bool handleZoom;
         bool isDisposed;
-        FrameworkElement marginVisual;
+        Grid marginVisual;
+        double marginWidth;
         bool refreshAllGlyphs;
         ITagAggregator<TGlyphTag> tagAggregator;
         IWpfTextView textView;
@@ -36,12 +37,14 @@ namespace GitHub.InlineReviews.Glyph
             this.tagAggregator = tagAggregator;
             this.marginName = marginName;
             this.handleZoom = handleZoom;
+            this.marginWidth = marginWidth;
 
-            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, gridFactory,
-                this, editorFormatMap, marginPropertiesName, marginWidth);
-
-            marginVisual = visualManager.MarginVisual;
+            marginVisual = gridFactory();
+            marginVisual.Width = marginWidth;
             marginVisual.IsVisibleChanged += OnIsVisibleChanged;
+
+            visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
+                this, editorFormatMap, marginPropertiesName);
         }
 
         public void Dispose()
@@ -67,6 +70,8 @@ namespace GitHub.InlineReviews.Glyph
 
         private void OnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs e)
         {
+            RefreshMarginVisibility();
+
             if (!textView.IsClosed)
             {
                 var list = new List<SnapshotSpan>();
@@ -101,6 +106,8 @@ namespace GitHub.InlineReviews.Glyph
 
         void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            RefreshMarginVisibility();
+
             if ((bool) e.NewValue)
             {
                 if (!textView.IsClosed)
@@ -174,6 +181,19 @@ namespace GitHub.InlineReviews.Glyph
                     visualManager.AddGlyph(span.Tag, spans[0]);
                 }
             }
+        }
+
+        void RefreshMarginVisibility()
+        {
+            marginVisual.Width = HasTags() ? marginWidth : 0;
+        }
+
+        bool HasTags()
+        {
+            var snapshot = textView.TextBuffer.CurrentSnapshot;
+            var span = new SnapshotSpan(snapshot, 0, snapshot.Length);
+            var tags = tagAggregator.GetTags(span);
+            return tags.FirstOrDefault() != null;
         }
 
         void ThrowIfDisposed()
