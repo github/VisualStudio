@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +61,152 @@ Line 4";
                 var thread = file.InlineCommentThreads.First();
 
                 Assert.Equal(2, thread.LineNumber);
+            }
+
+            [Fact]
+            public async Task MatchesReviewCommentOnOriginalLineGettingContentFromDisk()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                var pullRequest = CreatePullRequest(comment);
+                var repository = CreateRepository();
+                var gitService = CreateGitService(repository);
+                var gitClient = CreateGitClient(repository);
+                var diffService = new FakeDiffService();
+
+                diffService.AddFile(FilePath, baseContents);
+
+                var os = Substitute.For<IOperatingSystem>();
+                os.File.Exists(FilePath).Returns(true);
+                os.File.OpenRead(FilePath).Returns(new MemoryStream(Encoding.UTF8.GetBytes(headContents)));
+
+                var target = new PullRequestSession(
+                    os,
+                    gitService,
+                    gitClient,
+                    diffService,
+                    Substitute.For<IAccount>(),
+                    pullRequest,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    true);
+
+                var file = await target.GetFile(FilePath);
+                var thread = file.InlineCommentThreads.First();
+
+                Assert.Equal(2, thread.LineNumber);
+            }
+
+            [Fact]
+            public async Task MatchesReviewCommentOnDifferentLine()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"New Line 1
+New Line 2
+Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                var pullRequest = CreatePullRequest(comment);
+                var repository = CreateRepository();
+                var gitService = CreateGitService(repository);
+                var gitClient = CreateGitClient(repository);
+                var diffService = new FakeDiffService();
+
+                diffService.AddFile(FilePath, baseContents);
+
+                var target = new PullRequestSession(
+                    Substitute.For<IOperatingSystem>(),
+                    gitService,
+                    gitClient,
+                    diffService,
+                    Substitute.For<IAccount>(),
+                    pullRequest,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    true);
+
+                var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
+                var thread = file.InlineCommentThreads.First();
+
+                Assert.Equal(4, thread.LineNumber);
+            }
+
+            [Fact]
+            public async Task UpdatesReviewCommentWithEditorContents()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var diskContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+                var editorContents = @"New Line 1
+New Line 2
+Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                var pullRequest = CreatePullRequest(comment);
+                var repository = CreateRepository();
+                var gitService = CreateGitService(repository);
+                var gitClient = CreateGitClient(repository);
+                var diffService = new FakeDiffService();
+
+                diffService.AddFile(FilePath, baseContents);
+
+                var os = Substitute.For<IOperatingSystem>();
+                os.File.Exists(FilePath).Returns(true);
+                os.File.OpenRead(FilePath).Returns(new MemoryStream(Encoding.UTF8.GetBytes(diskContents)));
+
+                var target = new PullRequestSession(
+                    os,
+                    gitService,
+                    gitClient,
+                    diffService,
+                    Substitute.For<IAccount>(),
+                    pullRequest,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    true);
+
+                var file = await target.GetFile(FilePath);
+                var thread = file.InlineCommentThreads.First();
+
+                Assert.Equal(2, thread.LineNumber);
+
+                await target.RecaluateLineNumbers(FilePath, Encoding.UTF8.GetBytes(editorContents));
+
+                Assert.Equal(4, thread.LineNumber);
             }
 
             IPullRequestReviewCommentModel CreateComment(string diffHunk)

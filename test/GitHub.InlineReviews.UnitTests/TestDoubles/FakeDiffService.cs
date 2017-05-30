@@ -42,8 +42,9 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         public Task<IList<DiffChunk>> Diff(IRepository repo, string baseSha, string path, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
+            var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
             var blob1 = repository.Head.Tip[path]?.Target as Blob;
-            var blob2 = repository.ObjectDatabase.CreateBlob(new MemoryStream(contents), path);
+            var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
             var patch = repository.Diff.Compare(blob1, blob2).Patch;
             return Task.FromResult<IList<DiffChunk>>(inner.ParseFragment(patch).ToList());
         }
