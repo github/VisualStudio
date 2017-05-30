@@ -2,6 +2,8 @@
 using System.Linq;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.Properties;
+using GitHub.Services;
+using NSubstitute;
 using Xunit;
 
 namespace GitHub.InlineReviews.UnitTests.Services
@@ -13,7 +15,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Fact]
             public void ShouldParsePr960()
             {
-                var target = new DiffService();
+                var target = new DiffService(Substitute.For<IGitClient>());
                 var result = target.ParseFragment(Resources.pr_960_diff).ToList();
 
                 Assert.Equal(4, result.Count);

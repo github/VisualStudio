@@ -141,9 +141,8 @@ namespace GitHub.InlineReviews.Services
                 {
                     var repo = gitService.GetRepository(Repository.LocalPath);
                     var result = new Dictionary<IInlineCommentThreadModel, int>();
-                    var diff = await gitClient.CompareWith(repo, file.BaseSha, relativePath, contents);
 
-                    file.Diff = diffService.ParseFragment(diff.Patch).ToList();
+                    file.Diff = await diffService.Diff(repo, file.BaseSha, relativePath, contents);
 
                     foreach (var thread in file.InlineCommentThreads)
                     {
@@ -170,12 +169,11 @@ namespace GitHub.InlineReviews.Services
         {
             var file = new PullRequestSessionFile();
             var repository = gitService.GetRepository(Repository.LocalPath);
-            var changes = await gitClient.CompareWith(repository, PullRequest.Base.Sha, relativePath, contents);
 
             file.RelativePath = relativePath;
             file.BaseSha = PullRequest.Base.Sha;
             file.CommitSha = await gitClient.IsModified(repository, relativePath, contents) ? null : repository.Head.Tip.Sha;
-            file.Diff = diffService.ParseFragment(changes.Patch).ToList();
+            file.Diff = await diffService.Diff(repository, PullRequest.Base.Sha, relativePath, contents);
 
             var commentsByPosition = PullRequest.ReviewComments
                 .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)

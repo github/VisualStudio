@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.InlineReviews.Services;
+using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
@@ -14,64 +16,97 @@ namespace GitHub.InlineReviews.UnitTests.Services
     public class PullRequestSessionTests
     {
         const string RepoUrl = "https://foo.bar/owner/repo";
+        const string FilePath = "test.cs";
 
         public class TheGetFileMethod
         {
             [Fact]
-            public async Task ReviewCommentIsCreated()
+            public async Task MatchesReviewCommentOnOriginalLine()
             {
-                const string path = "test.cs";
-                var comment = Substitute.For<IPullRequestReviewCommentModel>();
-                comment.DiffHunk.Returns(@"@@ -11,21 +11,21 @@
- using GitHub.Extensions;
- using System.Threading.Tasks;
- using GitHub.Helpers;
-+using System.Threading;");
-                comment.Path.Returns(path);
-                comment.OriginalCommitId.Returns("ORIG");
-                comment.OriginalPosition.Returns(3);
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
 
-                var changedFile = Substitute.For<IPullRequestFileModel>();
-                changedFile.FileName.Returns("test.cs");
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
 
-                var pullRequest = Substitute.For<IPullRequestModel>();
-                pullRequest.Base.Returns(new GitReferenceModel("BASE", "master", "BASE", RepoUrl));
-                pullRequest.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD", RepoUrl));
-                pullRequest.ChangedFiles.Returns(new[] { changedFile });
-                pullRequest.ReviewComments.Returns(new[] { comment });
+                var pullRequest = CreatePullRequest(comment);
+                var repository = CreateRepository();
+                var gitService = CreateGitService(repository);
+                var gitClient = CreateGitClient(repository);
+                var diffService = new FakeDiffService();
 
-                var repository = Substitute.For<IRepository>();
-                var branch = Substitute.For<Branch>();
-                var commit = Substitute.For<Commit>();
-                branch.Tip.Returns(commit);
-                repository.Head.Returns(branch);
-
-                var gitService = Substitute.For<IGitService>();
-                gitService.GetRepository(Arg.Any<string>()).Returns(repository);
-
-                var changes = Substitute.For<ContentChanges>();
-                changes.Patch.Returns(Properties.Resources.pr_960_diff);
-
-                var gitClient = Substitute.For<IGitClient>();
-                gitClient.IsModified(repository, "test.cs", Arg.Any<byte[]>()).Returns(false);
-                gitClient.CompareWith(repository, "BASE", path, Arg.Any<byte[]>()).Returns(changes);
-
-                var os = Substitute.For<IOperatingSystem>();
+                diffService.AddFile(FilePath, baseContents);
 
                 var target = new PullRequestSession(
-                    os,
+                    Substitute.For<IOperatingSystem>(),
                     gitService,
                     gitClient,
-                    new DiffService(),
+                    diffService,
                     Substitute.For<IAccount>(),
                     pullRequest,
                     Substitute.For<ILocalRepositoryModel>(),
                     true);
 
-                var file = await target.GetFile(path);
+                var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
                 var thread = file.InlineCommentThreads.First();
 
-                Assert.Equal(13, thread.LineNumber);
+                Assert.Equal(2, thread.LineNumber);
+            }
+
+            IPullRequestReviewCommentModel CreateComment(string diffHunk)
+            {
+                var result = Substitute.For<IPullRequestReviewCommentModel>();
+                result.DiffHunk.Returns(diffHunk);
+                result.Path.Returns(FilePath);
+                result.OriginalCommitId.Returns("ORIG");
+                result.OriginalPosition.Returns(1);
+                return result;
+            }
+
+            IGitClient CreateGitClient(IRepository repository)
+            {
+                var result = Substitute.For<IGitClient>();
+                result.IsModified(repository, FilePath, Arg.Any<byte[]>()).Returns(false);
+                return result;
+            }
+
+            IGitService CreateGitService(IRepository repository)
+            {
+                var result = Substitute.For<IGitService>();
+                result.GetRepository(Arg.Any<string>()).Returns(repository);
+                return result;
+            }
+
+            IPullRequestModel CreatePullRequest(IPullRequestReviewCommentModel comment)
+            {
+                var changedFile = Substitute.For<IPullRequestFileModel>();
+                changedFile.FileName.Returns("test.cs");
+
+                var result = Substitute.For<IPullRequestModel>();
+                result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE", RepoUrl));
+                result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD", RepoUrl));
+                result.ChangedFiles.Returns(new[] { changedFile });
+                result.ReviewComments.Returns(new[] { comment });
+                return result;
+            }
+
+            IRepository CreateRepository()
+            {
+                var result = Substitute.For<IRepository>();
+                var branch = Substitute.For<Branch>();
+                var commit = Substitute.For<Commit>();
+                branch.Tip.Returns(commit);
+                result.Head.Returns(branch);
+                return result;
             }
         }
     }
