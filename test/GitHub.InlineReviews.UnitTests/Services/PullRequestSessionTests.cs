@@ -91,7 +91,7 @@ Line 4";
 
                 var os = Substitute.For<IOperatingSystem>();
                 os.File.Exists(FilePath).Returns(true);
-                os.File.OpenRead(FilePath).Returns(new MemoryStream(Encoding.UTF8.GetBytes(headContents)));
+                os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(headContents));
 
                 var target = new PullRequestSession(
                     os,
@@ -187,7 +187,7 @@ Line 4";
 
                 var os = Substitute.For<IOperatingSystem>();
                 os.File.Exists(FilePath).Returns(true);
-                os.File.OpenRead(FilePath).Returns(new MemoryStream(Encoding.UTF8.GetBytes(diskContents)));
+                os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(diskContents));
 
                 var target = new PullRequestSession(
                     os,

@@ -257,12 +257,7 @@ namespace GitHub.InlineReviews.Services
             {
                 try
                 {
-                    using (var stream = os.File.OpenRead(path))
-                    {
-                        var result = new byte[stream.Length];
-                        await stream.ReadAsync(result, 0, result.Length);
-                        return result;
-                    }
+                    return await os.File.ReadAllBytesAsync(path);
                 }
                 catch { }
             }
