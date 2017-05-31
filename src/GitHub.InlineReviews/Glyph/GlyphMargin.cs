@@ -43,12 +43,12 @@ namespace GitHub.InlineReviews.Glyph
 
             marginVisual = gridFactory();
             marginVisual.Width = marginWidth;
-            marginVisual.Visibility = Visibility.Collapsed;
 
             visualManager = new GlyphMarginVisualManager<TGlyphTag>(textView, glyphFactory, marginVisual,
                 this, editorFormatMap, marginPropertiesName);
 
-            Initialize();
+            // Do on Loaded to give diff view a chance to initialize.
+            marginVisual.Loaded += OnLoaded;
         }
 
         public void Dispose()
@@ -71,8 +71,10 @@ namespace GitHub.InlineReviews.Glyph
             return null;
         }
 
-        void Initialize()
+        void OnLoaded(object sender, RoutedEventArgs e)
         {
+            RefreshMarginVisibility();
+
             tagAggregator.BatchedTagsChanged += OnBatchedTagsChanged;
             textView.LayoutChanged += OnLayoutChanged;
             if (handleZoom)
