@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.InlineReviews.Services;
 using GitHub.Models;
@@ -36,7 +37,10 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         {
             var path = repository.Info.WorkingDirectory;
             repository.Dispose();
-            Directory.Delete(path);
+
+            // The .git folder has some files marked as readonly, meaning that a simple
+            // Directory.Delete doesn't work here.
+            DeleteDirectory(path);
         }
 
         public Task<IList<DiffChunk>> Diff(IRepository repo, string baseSha, string path, byte[] contents)
@@ -57,6 +61,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         static IRepository CreateRepository()
         {
             var tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempPath);
             Repository.Init(tempPath);
 
             var result = new Repository(tempPath);
@@ -67,6 +72,21 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             result.Commit("Initial commit", signature, signature);
 
             return result;
+        }
+
+        static void DeleteDirectory(string path)
+        {
+            foreach (var d in Directory.EnumerateDirectories(path))
+            {
+                DeleteDirectory(d);
+            }
+
+            foreach (var f in Directory.EnumerateFiles(path))
+            {
+                var fileInfo = new FileInfo(f);
+                fileInfo.Attributes = FileAttributes.Normal;
+                fileInfo.Delete();
+            }
         }
     }
 }

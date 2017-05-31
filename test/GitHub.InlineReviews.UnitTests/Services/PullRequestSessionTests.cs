@@ -43,24 +43,25 @@ Line 4";
                 var repository = CreateRepository();
                 var gitService = CreateGitService(repository);
                 var gitClient = CreateGitClient(repository);
-                var diffService = new FakeDiffService();
 
-                diffService.AddFile(FilePath, baseContents);
+                using (var diffService = new FakeDiffService())
+                {
+                    diffService.AddFile(FilePath, baseContents);
 
-                var target = new PullRequestSession(
-                    Substitute.For<IOperatingSystem>(),
-                    gitService,
-                    gitClient,
-                    diffService,
-                    Substitute.For<IAccount>(),
-                    pullRequest,
-                    Substitute.For<ILocalRepositoryModel>(),
-                    true);
+                    var target = new PullRequestSession(
+                        Substitute.For<IOperatingSystem>(),
+                        gitService,
+                        gitClient,
+                        diffService,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
 
-                var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
-                var thread = file.InlineCommentThreads.First();
-
-                Assert.Equal(2, thread.LineNumber);
+                    var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
+                    var thread = file.InlineCommentThreads.First();
+                    Assert.Equal(2, thread.LineNumber);
+                }
             }
 
             [Fact]
@@ -85,28 +86,29 @@ Line 4";
                 var repository = CreateRepository();
                 var gitService = CreateGitService(repository);
                 var gitClient = CreateGitClient(repository);
-                var diffService = new FakeDiffService();
+                using (var diffService = new FakeDiffService())
+                {
+                    diffService.AddFile(FilePath, baseContents);
 
-                diffService.AddFile(FilePath, baseContents);
+                    var os = Substitute.For<IOperatingSystem>();
+                    os.File.Exists(FilePath).Returns(true);
+                    os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(headContents));
 
-                var os = Substitute.For<IOperatingSystem>();
-                os.File.Exists(FilePath).Returns(true);
-                os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(headContents));
+                    var target = new PullRequestSession(
+                        os,
+                        gitService,
+                        gitClient,
+                        diffService,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
 
-                var target = new PullRequestSession(
-                    os,
-                    gitService,
-                    gitClient,
-                    diffService,
-                    Substitute.For<IAccount>(),
-                    pullRequest,
-                    Substitute.For<ILocalRepositoryModel>(),
-                    true);
+                    var file = await target.GetFile(FilePath);
+                    var thread = file.InlineCommentThreads.First();
 
-                var file = await target.GetFile(FilePath);
-                var thread = file.InlineCommentThreads.First();
-
-                Assert.Equal(2, thread.LineNumber);
+                    Assert.Equal(2, thread.LineNumber);
+                }
             }
 
             [Fact]
@@ -133,24 +135,26 @@ Line 4";
                 var repository = CreateRepository();
                 var gitService = CreateGitService(repository);
                 var gitClient = CreateGitClient(repository);
-                var diffService = new FakeDiffService();
 
-                diffService.AddFile(FilePath, baseContents);
+                using (var diffService = new FakeDiffService())
+                {
+                    diffService.AddFile(FilePath, baseContents);
 
-                var target = new PullRequestSession(
-                    Substitute.For<IOperatingSystem>(),
-                    gitService,
-                    gitClient,
-                    diffService,
-                    Substitute.For<IAccount>(),
-                    pullRequest,
-                    Substitute.For<ILocalRepositoryModel>(),
-                    true);
+                    var target = new PullRequestSession(
+                        Substitute.For<IOperatingSystem>(),
+                        gitService,
+                        gitClient,
+                        diffService,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
 
-                var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
-                var thread = file.InlineCommentThreads.First();
+                    var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
+                    var thread = file.InlineCommentThreads.First();
 
-                Assert.Equal(4, thread.LineNumber);
+                    Assert.Equal(4, thread.LineNumber);
+                }
             }
 
             [Fact]
@@ -181,32 +185,34 @@ Line 4";
                 var repository = CreateRepository();
                 var gitService = CreateGitService(repository);
                 var gitClient = CreateGitClient(repository);
-                var diffService = new FakeDiffService();
 
-                diffService.AddFile(FilePath, baseContents);
+                using (var diffService = new FakeDiffService())
+                {
+                    diffService.AddFile(FilePath, baseContents);
 
-                var os = Substitute.For<IOperatingSystem>();
-                os.File.Exists(FilePath).Returns(true);
-                os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(diskContents));
+                    var os = Substitute.For<IOperatingSystem>();
+                    os.File.Exists(FilePath).Returns(true);
+                    os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(diskContents));
 
-                var target = new PullRequestSession(
-                    os,
-                    gitService,
-                    gitClient,
-                    diffService,
-                    Substitute.For<IAccount>(),
-                    pullRequest,
-                    Substitute.For<ILocalRepositoryModel>(),
-                    true);
+                    var target = new PullRequestSession(
+                        os,
+                        gitService,
+                        gitClient,
+                        diffService,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
 
-                var file = await target.GetFile(FilePath);
-                var thread = file.InlineCommentThreads.First();
+                    var file = await target.GetFile(FilePath);
+                    var thread = file.InlineCommentThreads.First();
 
-                Assert.Equal(2, thread.LineNumber);
+                    Assert.Equal(2, thread.LineNumber);
 
-                await target.RecaluateLineNumbers(FilePath, Encoding.UTF8.GetBytes(editorContents));
+                    await target.RecaluateLineNumbers(FilePath, Encoding.UTF8.GetBytes(editorContents));
 
-                Assert.Equal(4, thread.LineNumber);
+                    Assert.Equal(4, thread.LineNumber);
+                }
             }
 
             IPullRequestReviewCommentModel CreateComment(string diffHunk)
