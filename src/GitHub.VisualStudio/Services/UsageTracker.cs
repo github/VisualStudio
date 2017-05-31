@@ -195,6 +195,13 @@ namespace GitHub.Services
             SaveUsage(usage);
         }
 
+        public async Task IncrementPullRequestOpened()
+        {
+            var usage = await LoadUsage();
+            ++usage.Model.NumberOfPullRequestsOpened;
+            SaveUsage(usage);
+        }
+
         async Task Initialize()
         {
             // The services needed by the usage tracker are loaded when they are first needed to
@@ -346,6 +353,9 @@ namespace GitHub.Services
             usage.NumberOfForkPullRequestsCheckedOut = 0;
             usage.NumberOfForkPullRequestPulls = 0;
             usage.NumberOfForkPullRequestPushes = 0;
+            usage.NumberOfGitHubPaneHelpClicks = 0;
+            usage.NumberOfWelcomeTrainingClicks = 0;
+            usage.NumberOfWelcomeDocsClicks = 0;
 
             if (weekly)
                 usage.NumberOfStartupsWeek = 0;
