@@ -127,10 +127,6 @@ namespace GitHub.VisualStudio.UI.Views
                 var session = ViewModel.Session;
                 AddCompareBufferTag(diffViewer.LeftView.TextBuffer, session, fullPath, true);
                 AddCompareBufferTag(diffViewer.RightView.TextBuffer, session, fullPath, false);
-
-                // Set Inline mode but allow user to change.
-                diffViewer.Options.SetOptionValue(DifferenceViewerOptions.ViewModeId, DifferenceViewMode.Inline);
-                diffViewer.Options.ClearOptionValue(DifferenceViewerOptions.ViewModeId);
             }
             catch (Exception e)
             {
