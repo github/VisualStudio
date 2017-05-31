@@ -75,6 +75,8 @@ namespace GitHub.InlineReviews.Tags
             this.buffer.Changed += Buffer_Changed;
         }
 
+        public bool ShowMargin => file != null;
+
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
         public void Dispose()

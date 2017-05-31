@@ -5,10 +5,12 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text;
 using GitHub.InlineReviews.Tags;
 using GitHub.InlineReviews.Glyph;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Views;
+using GitHub.Models;
 
 namespace GitHub.InlineReviews
 {
@@ -53,7 +55,26 @@ namespace GitHub.InlineReviews
         {
             var tagAggregator = tagAggregatorFactory.CreateTagAggregator<TGlyphTag>(wpfTextViewHost.TextView);
             return new GlyphMargin<TGlyphTag>(wpfTextViewHost, glyphFactory, gridFactory, tagAggregator, editorFormatMap,
-                MarginPropertiesName, MarginName, true, 17.0);
+                IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
+        }
+
+        static bool IsMarginVisible(ITextBuffer buffer)
+        {
+            if (buffer.Properties.ContainsProperty(typeof(PullRequestBufferTag)))
+            {
+                return true;
+            }
+
+            InlineCommentTagger inlineCommentTagger;
+            if (buffer.Properties.TryGetProperty(typeof(InlineCommentTagger), out inlineCommentTagger))
+            {
+                if (inlineCommentTagger.ShowMargin)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
