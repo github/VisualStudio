@@ -182,8 +182,10 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var position in commentsByPosition)
             {
-                var chunk = diffService.ParseFragment(position.First().DiffHunk);
-                var diffLines = chunk.Last().Lines.Reverse().Take(5).ToList();
+                var hunk = position.First().DiffHunk;
+                var chunks = diffService.ParseFragment(hunk);
+                var chunk = chunks.Last();
+                var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var thread = new InlineCommentThreadModel(
                     relativePath,
                     position.Key.Item1,
@@ -232,6 +234,11 @@ namespace GitHub.InlineReviews.Services
         static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
         {
             int j = 0;
+
+            if (target.Count == 0)
+            {
+                return null; // no lines to match
+            }
 
             foreach (var source in diff)
             {
