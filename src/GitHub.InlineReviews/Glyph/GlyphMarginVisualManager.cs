@@ -66,17 +66,22 @@ namespace GitHub.InlineReviews.Glyph.Implementation
                     var element = (FrameworkElement)glyphFactory.GenerateGlyph(startingLine, tag);
                     if (element != null)
                     {
+                        var data = new GlyphData<TGlyphTag>(span, tag, element);
+                        element.Width = glyphMarginGrid.Width;
+
+                        // draw where text is
+                        element.Height = startingLine.TextHeight + 1; // HACK: +1 to fill gaps
+                        data.SetTop(startingLine.TextTop - textView.ViewportTop);
+
+                        // draw where line is
+                        //element.Height = startingLine.Height;
+                        //data.SetTop(startingLine.Top - textView.ViewportTop);
+
                         // center on margin
                         //element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                         //double length = (17.0 - element.DesiredSize.Width) / 2.0;
                         //Canvas.SetLeft(element, length);
 
-                        // size to margin
-                        element.Width = glyphMarginGrid.Width;
-                        element.Height = startingLine.Height;
-
-                        var data = new GlyphData<TGlyphTag>(span, tag, element);
-                        data.SetTop(startingLine.TextTop - textView.ViewportTop);
                         glyphs[element] = data;
                         visuals[glyphType].Children.Add(element);
                     }
