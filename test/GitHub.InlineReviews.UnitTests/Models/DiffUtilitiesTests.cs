@@ -30,20 +30,20 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Fact]
-            public void Chunks_NegativeOneBased()
+            public void Chunks_ZeroBased()
             {
                 var header = "@@ -1,1 +1,1 @@\n 1";
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
-                Assert.Equal(-1, chunk.DiffLine);
+                Assert.Equal(0, chunk.DiffLine);
             }
 
             [Fact]
-            public void DiffLineNumberIsZeroBased()
+            public void FirstDiffLine_HasDiffLineNumber1()
             {
                 var expectLine = " FIRST";
-                var expectDiffLineNumber = 0;
+                var expectDiffLineNumber = 1;
                 var fragment = $"@@ -1,4 +1,4 @@\n{expectLine}";
 
                 var result = DiffUtilities.ParseFragment(fragment);
@@ -54,10 +54,10 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Fact]
-            public void IgnoreTextOnSameLineAsHeader()
+            public void TextOnSameLineAsHeader_IgnoreLine()
             {
                 var expectLine = " FIRST";
-                var expectDiffLineNumber = 0;
+                var expectDiffLineNumber = 1;
                 var fragment = $"@@ -10,7 +10,6 @@ TextOnSameLineAsHeader\n{expectLine}";
 
                 var result = DiffUtilities.ParseFragment(fragment);
