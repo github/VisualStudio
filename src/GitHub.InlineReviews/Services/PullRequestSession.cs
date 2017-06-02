@@ -219,7 +219,7 @@ namespace GitHub.InlineReviews.Services
 
         int GetUpdatedLineNumber(IInlineCommentThreadModel thread, IEnumerable<DiffChunk> diff)
         {
-            var line = Match(diff, thread.DiffMatch);
+            var line = DiffUtilities.Match(diff, thread.DiffMatch);
 
             if (line != null)
             {
@@ -229,33 +229,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             return -1;
-        }
-
-        static DiffLine Match(IEnumerable<DiffChunk> diff, IList<DiffLine> target)
-        {
-            int j = 0;
-
-            if (target.Count == 0)
-            {
-                return null; // no lines to match
-            }
-
-            foreach (var source in diff)
-            {
-                for (var i = source.Lines.Count - 1; i >= 0; --i)
-                {
-                    if (source.Lines[i].Content == target[j].Content)
-                    {
-                        if (++j == target.Count) return source.Lines[i + j - 1];
-                    }
-                    else
-                    {
-                        j = 0;
-                    }
-                }
-            }
-
-            return null;
         }
 
         async Task<byte[]> ReadAsync(string path)

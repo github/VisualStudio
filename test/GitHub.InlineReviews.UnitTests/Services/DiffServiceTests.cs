@@ -15,64 +15,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
         public class TheParseFragmentMethod
         {
             [Fact]
-            public void DiffLineNumberIsZeroBased()
-            {
-                var expectLine = " FIRST";
-                var expectDiffLineNumber = 0;
-                var fragment = $"@@ -1,4 +1,4 @@\n{expectLine}";
-                var target = new DiffService(Substitute.For<IGitClient>());
-
-                var result = target.ParseFragment(fragment);
-
-                var firstLine = result.First().Lines.First();
-                Assert.Equal(expectLine, firstLine.Content);
-                Assert.Equal(expectDiffLineNumber, firstLine.DiffLineNumber);
-            }
-
-            [Fact]
-            public void IgnoreTextOnSameLineAsHeader()
-            {
-                var expectLine = " FIRST";
-                var expectDiffLineNumber = 0;
-                var fragment = $"@@ -10,7 +10,6 @@ TextOnSameLineAsHeader\n{expectLine}";
-                var target = new DiffService(Substitute.For<IGitClient>());
-
-                var result = target.ParseFragment(fragment);
-
-                var firstLine = result.First().Lines.First();
-                Assert.Equal(expectLine, firstLine.Content);
-                Assert.Equal(expectDiffLineNumber, firstLine.DiffLineNumber);
-            }
-
-            [Theory]
-            [InlineData(" FIRST", DiffChangeType.None)]
-            [InlineData("+FIRST", DiffChangeType.Add)]
-            [InlineData("-FIRST", DiffChangeType.Delete)]
-            public void DiffChangeTypes(string line, DiffChangeType expectType)
-            {
-                var fragment = $"@@ -1,4 +1,4 @@\n{line}";
-                var target = new DiffService(Substitute.For<IGitClient>());
-
-                var result = target.ParseFragment(fragment);
-
-                var firstLine = result.First().Lines.First();
-                Assert.Equal(line, firstLine.Content);
-                Assert.Equal(expectType, firstLine.Type);
-            }
-
-            [Theory]
-            [InlineData("?FIRST", "Invalid diff line change char: '?'.")]
-            public void InvalidDiffLineChangeChar(string line, string expectMessage)
-            {
-                var fragment = $"@@ -1,4 +1,4 @@\n{line}";
-                var target = new DiffService(Substitute.For<IGitClient>());
-
-                var e = Assert.Throws<InvalidDataException>(() => target.ParseFragment(fragment).First());
-
-                Assert.Equal(expectMessage, e.Message);
-            }
-
-            [Fact]
             public void ShouldParsePr960()
             {
                 var target = new DiffService(Substitute.For<IGitClient>());
