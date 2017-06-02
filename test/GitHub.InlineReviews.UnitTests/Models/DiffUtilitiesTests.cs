@@ -30,13 +30,39 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Fact]
-            public void Chunks_ZeroBased()
+            public void FirstChunk_CheckDiffLineZeroBased()
             {
-                var header = "@@ -1,1 +1,1 @@\n 1";
+                var expectDiffLine = 0;
+                var header = "@@ -1,1 +1,1 @@";
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
 
-                Assert.Equal(0, chunk.DiffLine);
+                Assert.Equal(expectDiffLine, chunk.DiffLine);
+            }
+
+            [Theory]
+            [InlineData(1, 2)]
+            public void FirstChunk_CheckLineNumbers(int oldLineNumber, int newLineNumber)
+            {
+                var header = $"@@ -{oldLineNumber},1 +{newLineNumber},1 @@";
+
+                var chunk = DiffUtilities.ParseFragment(header).First();
+
+                Assert.Equal(oldLineNumber, chunk.OldLineNumber);
+                Assert.Equal(newLineNumber, chunk.NewLineNumber);
+            }
+
+            [Theory]
+            [InlineData(1, 2)]
+            public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber)
+            {
+                var header = $"@@ -{oldLineNumber},1 +{newLineNumber},1 @@\n 1";
+
+                var chunk = DiffUtilities.ParseFragment(header).First();
+                var line = chunk.Lines.First();
+
+                Assert.Equal(oldLineNumber, line.OldLineNumber);
+                Assert.Equal(newLineNumber, line.NewLineNumber);
             }
 
             [Fact]
@@ -68,10 +94,25 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Theory]
+            [InlineData(" FIRST", " FIRST")]
+            [InlineData("+FIRST", "+FIRST")]
+            [InlineData("-FIRST", "-FIRST")]
+            public void FirstLine_CheckContent(string line, string expectContent)
+            {
+                var fragment = $"@@ -1,4 +1,4 @@\n{line}";
+
+                var result = DiffUtilities.ParseFragment(fragment);
+
+                var firstLine = result.First().Lines.First();
+                Assert.Equal(line, firstLine.Content);
+                Assert.Equal(expectContent, firstLine.Content);
+            }
+
+            [Theory]
             [InlineData(" FIRST", DiffChangeType.None)]
             [InlineData("+FIRST", DiffChangeType.Add)]
             [InlineData("-FIRST", DiffChangeType.Delete)]
-            public void DiffChangeTypes(string line, DiffChangeType expectType)
+            public void FirstLine_CheckDiffChangeTypes(string line, DiffChangeType expectType)
             {
                 var fragment = $"@@ -1,4 +1,4 @@\n{line}";
 
