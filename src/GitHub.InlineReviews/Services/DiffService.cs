@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.Services
             {
                 string line;
                 DiffChunk chunk = null;
-                int diffLine = 1;
+                int diffLine = -1;
                 int oldLine = -1;
                 int newLine = -1;
 
