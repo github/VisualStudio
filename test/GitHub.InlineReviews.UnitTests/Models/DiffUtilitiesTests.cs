@@ -11,6 +11,35 @@ namespace GitHub.InlineReviews.UnitTests.Models
         public class TheParseFragmentMethod
         {
             [Fact]
+            public void EmptyDiff_NoDiffChunks()
+            {
+                var chunks = DiffUtilities.ParseFragment("");
+
+                Assert.Equal(0, chunks.Count());
+            }
+
+            [Fact]
+            public void HeaderOnly_NoLines()
+            {
+                var header = "@@ -1,0 +1,0 @@";
+
+                var chunks = DiffUtilities.ParseFragment(header);
+
+                var chunk = chunks.First();
+                Assert.Equal(0, chunk.Lines.Count());
+            }
+
+            [Fact]
+            public void Chunks_NegativeOneBased()
+            {
+                var header = "@@ -1,1 +1,1 @@\n 1";
+
+                var chunk = DiffUtilities.ParseFragment(header).First();
+
+                Assert.Equal(-1, chunk.DiffLine);
+            }
+
+            [Fact]
             public void DiffLineNumberIsZeroBased()
             {
                 var expectLine = " FIRST";
