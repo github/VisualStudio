@@ -30,6 +30,17 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Fact]
+            public void HeaderOnlyNoNewLineAtEnd_NoLines()
+            {
+                var header = "@@ -1,0 +1,0 @@\n\\ No newline at end of file\n";
+
+                var chunks = DiffUtilities.ParseFragment(header);
+
+                var chunk = chunks.First();
+                Assert.Equal(0, chunk.Lines.Count());
+            }
+
+            [Fact]
             public void FirstChunk_CheckDiffLineZeroBased()
             {
                 var expectDiffLine = 0;
@@ -53,59 +64,71 @@ namespace GitHub.InlineReviews.UnitTests.Models
             }
 
             [Theory]
-            [InlineData(1, 2)]
-            public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber)
+            [InlineData(1, 2, " 1", 1, 2)]
+            [InlineData(1, 2, "+1", -1, 2)]
+            [InlineData(1, 2, "-1", 1, -1)]
+            public void FirstLine_CheckLineNumbers(int oldLineNumber, int newLineNumber, string line, int expectOldLineNumber, int expectNewLineNumber)
             {
-                var header = $"@@ -{oldLineNumber},1 +{newLineNumber},1 @@\n 1";
+                var header = $"@@ -{oldLineNumber},1 +{newLineNumber},1 @@\n{line}";
 
                 var chunk = DiffUtilities.ParseFragment(header).First();
-                var line = chunk.Lines.First();
+                var diffLine = chunk.Lines.First();
 
-                Assert.Equal(oldLineNumber, line.OldLineNumber);
-                Assert.Equal(newLineNumber, line.NewLineNumber);
+                Assert.Equal(expectOldLineNumber, diffLine.OldLineNumber);
+                Assert.Equal(expectNewLineNumber, diffLine.NewLineNumber);
             }
 
-            [Fact]
-            public void FirstDiffLine_HasDiffLineNumber1()
+            [Theory]
+            [InlineData(" 1", 0, 1)]
+            [InlineData(" 1\n 2", 1, 2)]
+            [InlineData(" 1\n 2\n 3", 2, 3)]
+            public void SkipNLines_CheckDiffLineNumber(string lines, int skip, int expectDiffLineNumber)
             {
-                var expectLine = " FIRST";
-                var expectDiffLineNumber = 1;
-                var fragment = $"@@ -1,4 +1,4 @@\n{expectLine}";
+                var fragment = $"@@ -1,4 +1,4 @@\n{lines}";
 
                 var result = DiffUtilities.ParseFragment(fragment);
 
-                var firstLine = result.First().Lines.First();
-                Assert.Equal(expectLine, firstLine.Content);
+                var firstLine = result.First().Lines.Skip(skip).First();
                 Assert.Equal(expectDiffLineNumber, firstLine.DiffLineNumber);
             }
 
             [Fact]
             public void TextOnSameLineAsHeader_IgnoreLine()
             {
-                var expectLine = " FIRST";
-                var expectDiffLineNumber = 1;
-                var fragment = $"@@ -10,7 +10,6 @@ TextOnSameLineAsHeader\n{expectLine}";
+                var fragment = $"@@ -10,7 +10,6 @@ TextOnSameLineAsHeader";
 
                 var result = DiffUtilities.ParseFragment(fragment);
 
-                var firstLine = result.First().Lines.First();
-                Assert.Equal(expectLine, firstLine.Content);
-                Assert.Equal(expectDiffLineNumber, firstLine.DiffLineNumber);
+                Assert.Equal(0, result.First().Lines.Count());
             }
 
             [Theory]
-            [InlineData(" FIRST", " FIRST")]
-            [InlineData("+FIRST", "+FIRST")]
-            [InlineData("-FIRST", "-FIRST")]
-            public void FirstLine_CheckContent(string line, string expectContent)
+            [InlineData(" FIRST")]
+            [InlineData("+FIRST")]
+            [InlineData("-FIRST")]
+            public void FirstLine_CheckToString(string line)
+            {
+                var fragment = $"@@ -1,4 +1,4 @@\n{line}";
+                var result = DiffUtilities.ParseFragment(fragment);
+                var firstLine = result.First().Lines.First();
+
+                var str = firstLine.ToString();
+
+                Assert.Equal(line, str);
+            }
+
+            [Theory]
+            [InlineData(" FIRST")]
+            [InlineData("+FIRST")]
+            [InlineData("-FIRST")]
+            public void FirstLine_CheckContent(string line)
             {
                 var fragment = $"@@ -1,4 +1,4 @@\n{line}";
 
                 var result = DiffUtilities.ParseFragment(fragment);
-
                 var firstLine = result.First().Lines.First();
+
                 Assert.Equal(line, firstLine.Content);
-                Assert.Equal(expectContent, firstLine.Content);
             }
 
             [Theory]
@@ -119,7 +142,6 @@ namespace GitHub.InlineReviews.UnitTests.Models
                 var result = DiffUtilities.ParseFragment(fragment);
 
                 var firstLine = result.First().Lines.First();
-                Assert.Equal(line, firstLine.Content);
                 Assert.Equal(expectType, firstLine.Type);
             }
 
@@ -138,10 +160,30 @@ namespace GitHub.InlineReviews.UnitTests.Models
 
         public class TheMatchMethod
         {
+            [Theory]
+            [InlineData(" 1", " 1", 0)]
+            [InlineData(" 1\n 2", " 2", 1)]
+            [InlineData(" 1\n 1", " 1", 1)] // match the later line
+            [InlineData("+x", "-x", -1)]
+            [InlineData("", " x", -1)]
+            [InlineData(" x", "", -1)]
+            public void MatchLine(string lines1, string lines2, int skip /* -1 for no match */)
+            {
+                var header = "@@ -1,1 +1,1 @@";
+                var chunks1 = DiffUtilities.ParseFragment(header + "\n" + lines1).ToList();
+                var chunks2 = DiffUtilities.ParseFragment(header + "\n" + lines2).ToList();
+                var expectLine = (skip != -1) ? chunks1.First().Lines.Skip(skip).First() : null;
+                var targetLines = chunks2.First().Lines;
+
+                var line = DiffUtilities.Match(chunks1, targetLines);
+
+                Assert.Equal(expectLine, line);
+            }
+
             [Fact]
             public void MatchSameLine()
             {
-                var diff = "@@ -1,1 +1,0 @@\n-1";
+                var diff = "@@ -1,1 +1,1 @@\n 1";
                 var chunks1 = DiffUtilities.ParseFragment(diff).ToList();
                 var chunks2 = DiffUtilities.ParseFragment(diff).ToList();
                 var expectLine = chunks1.First().Lines.First();

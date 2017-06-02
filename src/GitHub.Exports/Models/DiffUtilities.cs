@@ -8,6 +8,7 @@ namespace GitHub.Models
 {
     public static class DiffUtilities
     {
+        const string NoNewLineAtEnd = "\\ No newline at end of file";
         static readonly Regex ChunkHeaderRegex = new Regex(@"^@@\s+\-(\d+),?\d+?\s+\+(\d+),?\d+?\s@@");
 
         public static IEnumerable<DiffChunk> ParseFragment(string diff)
@@ -38,7 +39,7 @@ namespace GitHub.Models
                             DiffLine = diffLine,
                         };
                     }
-                    else if (line == "\\ No newline at end of file")
+                    else if (line == NoNewLineAtEnd)
                     {
                         break;
                     }
