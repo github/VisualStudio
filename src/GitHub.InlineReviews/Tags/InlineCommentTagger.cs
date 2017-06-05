@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
@@ -16,7 +15,6 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 using System.Collections;
-using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -28,6 +26,7 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IInlineCommentPeekService peekService;
         readonly Subject<ITextSnapshot> signalRebuild;
         readonly Dictionary<IInlineCommentThreadModel, ITrackingPoint> trackingPoints;
         readonly int? tabsToSpaces;
@@ -47,13 +46,15 @@ namespace GitHub.InlineReviews.Tags
             IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            IInlineCommentPeekService peekService)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(peekService, nameof(peekService));
 
             this.gitService = gitService;
             this.gitClient = gitClient;
@@ -61,7 +62,9 @@ namespace GitHub.InlineReviews.Tags
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
-            this.trackingPoints = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
+            this.peekService = peekService;
+
+            trackingPoints = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
 
             if (view.Options.GetOptionValue("Tabs/ConvertTabsToSpaces", false))
             {
@@ -244,7 +247,13 @@ namespace GitHub.InlineReviews.Tags
 
             if (file == null) return;
 
-            sessionSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => NotifyTagsChanged());
+            sessionSubscription = file.WhenAnyValue(x => x.InlineCommentThreads)
+                .Subscribe(_ =>
+                {
+                    peekService.Hide(view);
+                    NotifyTagsChanged();
+                });
+
             NotifyTagsChanged();
         }
 

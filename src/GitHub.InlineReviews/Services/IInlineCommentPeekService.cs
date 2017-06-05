@@ -9,6 +9,12 @@ namespace GitHub.InlineReviews.Services
     interface IInlineCommentPeekService
     {
         /// <summary>
+        /// Hides the inline comment peek view for a text view.
+        /// </summary>
+        /// <param name="textView">The text view.</param>
+        void Hide(ITextView textView);
+
+        /// <summary>
         /// Shows the peek view for a <see cref="ShowInlineCommentTag"/>.
         /// </summary>
         /// <param name="textView">The text view.</param>

@@ -19,22 +19,26 @@ namespace GitHub.InlineReviews.Tags
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IInlineCommentPeekService peekService;
 
         [ImportingConstructor]
         public InlineCommentTaggerProvider(
             IGitService gitService,
             IGitClient gitClient,
             IDiffService diffService,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            IInlineCommentPeekService peekService)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(peekService, nameof(peekService));
 
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
             this.sessionManager = sessionManager;
+            this.peekService = peekService;
         }
 
         public ITagger<T> CreateTagger<T>(ITextView view, ITextBuffer buffer) where T : ITag
@@ -46,7 +50,8 @@ namespace GitHub.InlineReviews.Tags
                     diffService,
                     view,
                     buffer,
-                    sessionManager)) as ITagger<T>;
+                    sessionManager,
+                    peekService)) as ITagger<T>;
         }
     }
 }
