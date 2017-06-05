@@ -120,6 +120,11 @@ namespace GitHub.InlineReviews.Services
                         fileIndex.Add(relativePath, null);
                     }
                 }
+                else if (contentSource != null && file.ContentSource != contentSource)
+                {
+                    file.ContentSource = contentSource;
+                    await UpdateEditorContent(relativePath);
+                }
 
                 return file;
             }
@@ -236,7 +241,7 @@ namespace GitHub.InlineReviews.Services
 
         Task<byte[]> GetFileContent(IPullRequestSessionFile file)
         {
-            return file.ContentSource?.GetContent() ?? ReadAsync(file.RelativePath);
+            return file.ContentSource?.GetContent() ?? ReadAsync(Path.Combine(Repository.LocalPath, file.RelativePath));
         }
 
         string GetFullPath(string relativePath)
