@@ -73,13 +73,23 @@ namespace GitHub.InlineReviews.Commands
         }
 
         /// <summary>
+        /// Creates a tag aggregator for the specified text view.
+        /// </summary>
+        /// <param name="textView">The text view.</param>
+        /// <returns>The tag aggregator</returns>
+        protected ITagAggregator<InlineCommentTag> CreateTagAggregator(ITextView textView)
+        {
+            return tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ShowInlineCommentTag"/>s for the specified text view.
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <returns>A collection of <see cref="ITagInfo"/> objects, ordered by line.</returns>
         protected IReadOnlyList<ITagInfo> GetTags(ITextView textView)
         {
-            var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
+            var tagAggregator = CreateTagAggregator(textView);
             var span = new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length);
             var mappingSpan = textView.BufferGraph.CreateMappingSpan(span, SpanTrackingMode.EdgeExclusive);
 

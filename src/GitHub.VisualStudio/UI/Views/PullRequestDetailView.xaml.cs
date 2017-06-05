@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using GitHub.Exports;
 using GitHub.Extensions;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
@@ -21,15 +18,9 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Differencing;
-using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
-using GitHub.Models;
-using System.ComponentModel.Design;
-using Microsoft.VisualStudio.OLE.Interop;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -206,6 +197,25 @@ namespace GitHub.VisualStudio.UI.Views
                 GlobalCommands.ShowPullRequestCommentsId,
                 ref model,
                 null);
+        }
+
+        private async void ViewFileCommentsClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var file = (e.OriginalSource as Hyperlink)?.DataContext as IPullRequestFileNode;
+
+                if (file != null)
+                {
+                    await DoDiffFile(file);
+                    Services.Dte.Commands.Raise(
+                        GlobalCommands.CommandSetString,
+                        GlobalCommands.FirstInlineCommentId,
+                        null,
+                        null);
+                }
+            }
+            catch { }
         }
     }
 }

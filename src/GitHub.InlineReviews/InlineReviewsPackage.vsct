@@ -66,6 +66,14 @@
           <ButtonText>Previous Comment</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidGitHubCommandSet" id="FirstInlineCommentId" priority="0x0100" type="Button">
+        <!-- This command is not visible in the UI - it's used by the PR details pane to show the
+             first comment thread when the "# of comments" hyperlink is clicked. -->
+        <Strings>
+          <CommandName>GitHub.InlineReviews.FirstInlineComment</CommandName>
+          <ButtonText>First Comment</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -91,6 +99,7 @@
       <IDSymbol name="PullRequestCommentsToolWindowCommandId" value="0x1000" />
       <IDSymbol name="NextInlineCommentId" value="0x1001" />
       <IDSymbol name="PreviousInlineCommentId" value="0x1002" />
+      <IDSymbol name="FirstInlineCommentId" value="0x1003" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{775aa523-6c52-4c11-9c28-823c99d15613}" >

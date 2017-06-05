@@ -370,7 +370,7 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                                 <ui:OcticonImage Icon="comment_discussion" Height="10" Margin="-2 0"/>
-                                                <Hyperlink>
+                                                <Hyperlink Click="ViewFileCommentsClick">
                                                     <Run Text="{Binding CommentCount, Mode=OneWay}"/>
                                                 </Hyperlink>
                                             </TextBlock>

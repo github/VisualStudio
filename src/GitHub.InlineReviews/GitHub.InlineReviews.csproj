@@ -65,6 +65,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\IExportCommandMetadata.cs" />
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
+    <Compile Include="Commands\FirstInlineCommentCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
     <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
