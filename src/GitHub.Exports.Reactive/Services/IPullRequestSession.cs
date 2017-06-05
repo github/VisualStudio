@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GitHub.Models;
-using Microsoft.VisualStudio.Text;
 using ReactiveUI;
 
 namespace GitHub.Services
@@ -58,19 +57,28 @@ namespace GitHub.Services
         /// Gets a file touched by the pull request.
         /// </summary>
         /// <param name="relativePath">The relative path to the file.</param>
-        /// <param name="snapshot">The editor file contents.</param>
+        /// <param name="contentSource">The editor file content source.</param>
         /// <returns>
         /// A <see cref="IPullRequestSessionFile"/> object or null if the file was not touched by
         /// the pull request.
         /// </returns>
-        Task<IPullRequestSessionFile> GetFile(string relativePath, byte[] contents);
+        Task<IPullRequestSessionFile> GetFile(
+            string relativePath,
+            IEditorContentSource contentSource);
 
         /// <summary>
-        /// Updates the line numbers of the inline comments of a file.
+        /// Updates the pull request session with a new pull request model in response to a refresh
+        /// from the server.
+        /// </summary>
+        /// <param name="pullRequest">The new pull request model.</param>
+        /// <returns>A task which completes when the session has completed updating.</returns>
+        Task Update(IPullRequestModel pullRequest);
+
+        /// <summary>
+        /// Notifies the session that the contents of a file in the editor have changed.
         /// </summary>
         /// <param name="relativePath">The relative path to the file.</param>
-        /// <param name="contents">The new file contents.</param>
-        /// <returns>A tack which completes when the operation has completed.</returns>
-        Task RecaluateLineNumbers(string relativePath, byte[] contents);
+        /// <returns>A task which completes when the session has completed updating.</returns>
+        Task UpdateEditorContent(string relativePath);
     }
 }

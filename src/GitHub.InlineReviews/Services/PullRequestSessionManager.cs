@@ -85,6 +85,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (pullRequest.Number == session?.PullRequest.Number)
             {
+                await session.Update(pullRequest);
                 return session;
             }
             else
