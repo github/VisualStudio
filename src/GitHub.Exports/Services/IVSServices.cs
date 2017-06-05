@@ -10,6 +10,6 @@ namespace GitHub.Services
         void ActivityLogMessage(string message);
         void ActivityLogWarning(string message);
         void ActivityLogError(string message);
-        bool TryOpenRepository(string directory);
+        bool TryOpenRepository(string directory, bool logErrors = true);
     }
 }

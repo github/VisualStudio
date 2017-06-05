@@ -84,24 +84,24 @@ namespace GitHub.Services
         /// </remarks>
         /// <param name="repoPath">The path to the repository to open</param>
         /// <returns>True if a transient solution was successfully created in target directory (which should trigger opening of repository).</returns>
-        public bool TryOpenRepository(string repoPath)
+        public bool TryOpenRepository(string repoPath, bool logErrors = true)
         {
             var os = serviceProvider.TryGetService<IOperatingSystem>();
             if (os == null)
             {
-                log.Error("TryOpenRepository couldn't find IOperatingSystem service");
+                if (logErrors) log.Error("TryOpenRepository couldn't find IOperatingSystem service");
                 return false;
             }
 
             var dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
-                log.Error("TryOpenRepository couldn't find DTE service");
+                if (logErrors) log.Error("TryOpenRepository couldn't find DTE service");
                 return false;
             }
 
             var repoDir = os.Directory.GetDirectory(repoPath);
-            if(!repoDir.Exists)
+            if (!repoDir.Exists)
             {
                 return false;
             }
@@ -116,16 +116,16 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                log.Error(e, "Error opening repository");
+                if (logErrors) log.Error(e, "Error opening repository");
             }
             finally
             {
-                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName);
+                TryCleanupSolutionUserFiles(os, repoPath, TempSolutionName, logErrors);
             }
             return solutionCreated;
         }
 
-        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName)
+        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName, bool logErrors)
         {
             var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
             try
@@ -139,7 +139,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
+                if (logErrors) log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
             }
         }
 
@@ -162,7 +162,7 @@ namespace GitHub.Services
                 if (asm != null)
                     return asm.GetName().Version.ToString();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex, "Error getting the Visual Studio version");
             }

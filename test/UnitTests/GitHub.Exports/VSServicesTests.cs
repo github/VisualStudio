@@ -31,7 +31,7 @@ public class VSServicesTests
                 ci => { throw new COMException(); });
             var target = CreateVSServices(repoDir, dte: dte);
 
-            var success = target.TryOpenRepository("");
+            var success = target.TryOpenRepository(repoDir, logErrors: false);
 
             Assert.False(success);
         }
@@ -40,11 +40,7 @@ public class VSServicesTests
         public void RepoDirExistsFalse_ReturnFalse()
         {
             var repoDir = @"x:\repo";
-            var os = Substitute.For<IOperatingSystem>();
-            //var directoryInfo = Substitute.For<IDirectoryInfo>();
-            //directoryInfo.Exists.Returns(false);
-            //os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
-            var target = CreateVSServices(null, os: os);
+            var target = CreateVSServices(repoDir, repoDirExists: false);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -64,7 +60,7 @@ public class VSServicesTests
                 ci => { throw new IOException(); });
             var target = CreateVSServices(repoDir, os: os);
 
-            var success = target.TryOpenRepository(repoDir);
+            var success = target.TryOpenRepository(repoDir, logErrors: false);
 
             Assert.True(success);
         }
@@ -85,7 +81,7 @@ public class VSServicesTests
             directoryInfo.Received().Delete(true);
         }
 
-        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null)
+        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null, bool repoDirExists = true)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
@@ -93,7 +89,7 @@ public class VSServicesTests
             if (repoDir != null)
             {
                 var directoryInfo = Substitute.For<IDirectoryInfo>();
-                directoryInfo.Exists.Returns(true);
+                directoryInfo.Exists.Returns(repoDirExists);
                 os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
             }
 
