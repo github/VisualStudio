@@ -67,7 +67,7 @@ namespace GitHub.InlineReviews.Services
         public IAccount User { get; }
 
         /// <inheritdoc/>
-        public IPullRequestModel PullRequest { get; }
+        public IPullRequestModel PullRequest { get; private set; }
 
         /// <inheritdoc/>
         public ILocalRepositoryModel Repository { get; }
@@ -91,12 +91,13 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSessionFile> GetFile(string relativePath)
         {
-            var contents = await ReadAsync(GetFullPath(relativePath));
-            return await GetFile(relativePath, contents);
+            return await GetFile(relativePath, null);
         }
 
         /// <inheritdoc/>
-        public async Task<IPullRequestSessionFile> GetFile(string relativePath, byte[] contents)
+        public async Task<IPullRequestSessionFile> GetFile(
+            string relativePath,
+            IEditorContentSource contentSource)
         {
             await getFilesLock.WaitAsync();
 
@@ -111,7 +112,7 @@ namespace GitHub.InlineReviews.Services
                     // TODO: Check for binary files.
                     if (FilePaths.Any(x => x == relativePath))
                     {
-                        file = await CreateFile(relativePath, contents);
+                        file = await CreateFile(relativePath, contentSource);
                         fileIndex.Add(relativePath, file);
                     }
                     else
@@ -129,7 +130,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task RecaluateLineNumbers(string relativePath, byte[] contents)
+        public async Task UpdateEditorContent(string relativePath)
         {
             relativePath = relativePath.Replace("\\", "/");
 
@@ -141,8 +142,9 @@ namespace GitHub.InlineReviews.Services
                 {
                     var repo = gitService.GetRepository(Repository.LocalPath);
                     var result = new Dictionary<IInlineCommentThreadModel, int>();
+                    var content = await GetFileContent(file);
 
-                    file.Diff = await diffService.Diff(repo, file.BaseSha, relativePath, contents);
+                    file.Diff = await diffService.Diff(repo, file.BaseSha, relativePath, content);
 
                     foreach (var thread in file.InlineCommentThreads)
                     {
@@ -165,20 +167,31 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        async Task<PullRequestSessionFile> CreateFile(string relativePath, byte[] contents)
+        public async Task Update(IPullRequestModel pullRequest)
         {
-            var file = new PullRequestSessionFile();
-            var repository = gitService.GetRepository(Repository.LocalPath);
+            PullRequest = pullRequest;
 
-            file.RelativePath = relativePath;
+            foreach (var file in this.fileIndex.Values)
+            {
+                await UpdateFile(file);
+            }
+        }
+
+        async Task UpdateFile(PullRequestSessionFile file)
+        {
+            var repository = gitService.GetRepository(Repository.LocalPath);
+            var content = await GetFileContent(file);
+
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await gitClient.IsModified(repository, relativePath, contents) ? null : repository.Head.Tip.Sha;
-            file.Diff = await diffService.Diff(repository, PullRequest.Base.Sha, relativePath, contents);
+            file.CommitSha = await gitClient.IsModified(repository, file.RelativePath, content) ? 
+                null : repository.Head.Tip.Sha;
+            file.Diff = await diffService.Diff(repository, PullRequest.Base.Sha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
-                .Where(x => x.Path == relativePath && x.OriginalPosition.HasValue)
+                .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)
                 .OrderBy(x => x.Id)
                 .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
+            var threads = new List<IInlineCommentThreadModel>();
 
             foreach (var position in commentsByPosition)
             {
@@ -187,15 +200,25 @@ namespace GitHub.InlineReviews.Services
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var thread = new InlineCommentThreadModel(
-                    relativePath,
+                    file.RelativePath,
                     position.Key.Item1,
                     position.Key.Item2,
                     diffLines);
                 thread.Comments.AddRange(position);
                 thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
-                file.InlineCommentThreads.Add(thread);
+                threads.Add(thread);
             }
 
+            file.InlineCommentThreads = threads;
+        }
+
+        async Task<PullRequestSessionFile> CreateFile(
+            string relativePath,
+            IEditorContentSource contentSource)
+        {
+            var file = new PullRequestSessionFile(relativePath);
+            file.ContentSource = contentSource;
+            await UpdateFile(file);
             return file;
         }
 
@@ -205,11 +228,15 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var path in FilePaths)
             {
-                var contents = await ReadAsync(GetFullPath(path));
-                result.Add(await CreateFile(path, contents));
+                result.Add(await CreateFile(path, null));
             }
 
             return result;
+        }
+
+        Task<byte[]> GetFileContent(IPullRequestSessionFile file)
+        {
+            return file.ContentSource?.GetContent() ?? ReadAsync(file.RelativePath);
         }
 
         string GetFullPath(string relativePath)

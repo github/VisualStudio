@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ReactiveUI;
 
 namespace GitHub.Models
 {
@@ -31,8 +30,13 @@ namespace GitHub.Models
         IList<DiffChunk> Diff { get; }
 
         /// <summary>
+        /// Gets the source for the editor contents for the file.
+        /// </summary>
+        IEditorContentSource ContentSource { get; }
+
+        /// <summary>
         /// Gets the inline comments threads for the file.
         /// </summary>
-        IReactiveList<IInlineCommentThreadModel> InlineCommentThreads { get; }
+        IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads { get; }
     }
 }

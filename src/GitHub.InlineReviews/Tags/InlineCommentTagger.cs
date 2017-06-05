@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Models;
 using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
@@ -16,11 +15,10 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
 using System.Collections;
-using System.Reactive.Disposables;
 
 namespace GitHub.InlineReviews.Tags
 {
-    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
+    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IEditorContentSource, IDisposable
     {
         readonly IGitService gitService;
         readonly IGitClient gitClient;
@@ -28,6 +26,7 @@ namespace GitHub.InlineReviews.Tags
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IInlineCommentPeekService peekService;
         readonly Subject<ITextSnapshot> signalRebuild;
         readonly Dictionary<IInlineCommentThreadModel, ITrackingPoint> trackingPoints;
         readonly int? tabsToSpaces;
@@ -36,7 +35,8 @@ namespace GitHub.InlineReviews.Tags
         string fullPath;
         string relativePath;
         bool leftHandSide;
-        IDisposable subscription;
+        IDisposable managerSubscription;
+        IDisposable sessionSubscription;
         IPullRequestSession session;
         IPullRequestSessionFile file;
 
@@ -46,13 +46,15 @@ namespace GitHub.InlineReviews.Tags
             IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            IInlineCommentPeekService peekService)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(gitClient, nameof(gitClient));
             Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(peekService, nameof(peekService));
 
             this.gitService = gitService;
             this.gitClient = gitClient;
@@ -60,7 +62,9 @@ namespace GitHub.InlineReviews.Tags
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
-            this.trackingPoints = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
+            this.peekService = peekService;
+
+            trackingPoints = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
 
             if (view.Options.GetOptionValue("Tabs/ConvertTabsToSpaces", false))
             {
@@ -81,7 +85,8 @@ namespace GitHub.InlineReviews.Tags
 
         public void Dispose()
         {
-            subscription?.Dispose();
+            sessionSubscription?.Dispose();
+            managerSubscription?.Dispose();
         }
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -142,6 +147,11 @@ namespace GitHub.InlineReviews.Tags
             }
         }
 
+        Task<byte[]> IEditorContentSource.GetContent()
+        {
+            return Task.FromResult(GetContents(buffer.CurrentSnapshot));
+        }
+
         static string RootedPathToRelativePath(string path, string basePath)
         {
             if (Path.IsPathRooted(path))
@@ -179,7 +189,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (session == null)
             {
-                subscription = sessionManager.CurrentSession.Subscribe(SessionChanged);
+                managerSubscription = sessionManager.CurrentSession.Subscribe(SessionChanged);
             }
             else
             {
@@ -204,6 +214,7 @@ namespace GitHub.InlineReviews.Tags
 
         async void SessionChanged(IPullRequestSession session)
         {
+            sessionSubscription?.Dispose();
             this.session = session;
 
             if (file != null)
@@ -232,11 +243,18 @@ namespace GitHub.InlineReviews.Tags
             if (snapshot == null) return;
 
             var repository = gitService.GetRepository(session.Repository.LocalPath);
-            file = await session.GetFile(relativePath, GetContents(snapshot));
-            if(file != null)
-            {
-                NotifyTagsChanged();
-            }
+            file = await session.GetFile(relativePath, !leftHandSide ? this : null);
+
+            if (file == null) return;
+
+            sessionSubscription = file.WhenAnyValue(x => x.InlineCommentThreads)
+                .Subscribe(_ =>
+                {
+                    peekService.Hide(view);
+                    NotifyTagsChanged();
+                });
+
+            NotifyTagsChanged();
         }
 
         void Buffer_Changed(object sender, TextContentChangedEventArgs e)
@@ -287,7 +305,7 @@ namespace GitHub.InlineReviews.Tags
         {
             if (buffer.CurrentSnapshot == snapshot)
             {
-                await session.RecaluateLineNumbers(relativePath, GetContents(buffer.CurrentSnapshot));
+                await session.UpdateEditorContent(relativePath);
 
                 foreach (var thread in file.InlineCommentThreads)
                 {

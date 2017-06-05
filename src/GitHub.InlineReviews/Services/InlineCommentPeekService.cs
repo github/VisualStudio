@@ -37,6 +37,12 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public void Hide(ITextView textView)
+        {
+            peekBroker.DismissPeekSession(textView);
+        }
+
+        /// <inheritdoc/>
         public void Show(ITextView textView, AddInlineCommentTag tag, bool moveCaret = false)
         {
             Guard.ArgumentNotNull(tag, nameof(tag));

@@ -16,14 +16,21 @@ namespace GitHub.InlineReviews.Models
     class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
         IList<DiffChunk> diff;
-        string relativePath;
+        IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PullRequestSessionFile"/> class.
+        /// </summary>
+        /// <param name="relativePath">
+        /// The relative path to the file in the repository.
+        /// </param>
+        public PullRequestSessionFile(string relativePath)
+        {
+            RelativePath = relativePath;
+        }
 
         /// <inheritdoc/>
-        public string RelativePath
-        {
-            get { return relativePath; }
-            internal set { this.RaiseAndSetIfChanged(ref relativePath, value); }
-        }
+        public string RelativePath { get; }
 
         /// <inheritdoc/>
         public IList<DiffChunk> Diff
@@ -39,7 +46,13 @@ namespace GitHub.InlineReviews.Models
         public string CommitSha { get; internal set; }
 
         /// <inheritdoc/>
-        public IReactiveList<IInlineCommentThreadModel> InlineCommentThreads { get; }
-            = new ReactiveList<IInlineCommentThreadModel>();
+        public IEditorContentSource ContentSource { get; internal set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads
+        {
+            get { return inlineCommentThreads; }
+            internal set { this.RaiseAndSetIfChanged(ref inlineCommentThreads, value); }
+        }
     }
 }

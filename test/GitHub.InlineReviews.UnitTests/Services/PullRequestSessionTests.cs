@@ -58,7 +58,8 @@ Line 4";
                         Substitute.For<ILocalRepositoryModel>(),
                         true);
 
-                    var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
                     var thread = file.InlineCommentThreads.First();
                     Assert.Equal(2, thread.LineNumber);
                 }
@@ -150,7 +151,8 @@ Line 4";
                         Substitute.For<ILocalRepositoryModel>(),
                         true);
 
-                    var file = await target.GetFile(FilePath, Encoding.UTF8.GetBytes(headContents));
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
                     var thread = file.InlineCommentThreads.First();
 
                     Assert.Equal(4, thread.LineNumber);
@@ -204,20 +206,144 @@ Line 4";
                         Substitute.For<ILocalRepositoryModel>(),
                         true);
 
-                    var file = await target.GetFile(FilePath);
+                    var editor = new FakeEditorContentSource(diskContents);
+                    var file = await target.GetFile(FilePath, editor);
                     var thread = file.InlineCommentThreads.First();
 
                     Assert.Equal(2, thread.LineNumber);
+                    editor.SetContent(editorContents);
 
-                    await target.RecaluateLineNumbers(FilePath, Encoding.UTF8.GetBytes(editorContents));
+                    await target.UpdateEditorContent(FilePath);
 
                     Assert.Equal(4, thread.LineNumber);
                 }
             }
 
-            IPullRequestReviewCommentModel CreateComment(string diffHunk)
+            [Fact]
+            public async Task UpdatesReviewCommentWithNewBody()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var editorContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var originalComment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Original Comment");
+
+                var updatedComment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Updated Comment");
+
+                var pullRequest = CreatePullRequest(originalComment);
+                var repository = CreateRepository();
+                var gitService = CreateGitService(repository);
+                var gitClient = CreateGitClient(repository);
+
+                using (var diffService = new FakeDiffService())
+                {
+                    diffService.AddFile(FilePath, baseContents);
+
+                    var target = new PullRequestSession(
+                        Substitute.For<IOperatingSystem>(),
+                        gitService,
+                        gitClient,
+                        diffService,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
+
+                    var editor = new FakeEditorContentSource(editorContents);
+                    var file = await target.GetFile(FilePath, editor);
+
+                    var thread = file.InlineCommentThreads.Single();
+
+                    Assert.Equal("Original Comment", thread.Comments.Single().Body);
+                    Assert.Equal(2, thread.LineNumber);
+
+                    pullRequest = CreatePullRequest(updatedComment);
+                    await target.Update(pullRequest);
+                    thread = file.InlineCommentThreads.Single();
+
+                    Assert.Equal("Updated Comment", thread.Comments.Single().Body);
+                    Assert.Equal(2, thread.LineNumber);
+                }
+            }
+
+            [Fact]
+            public async Task AddsNewReviewCommentToThread()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var editorContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var comment1 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment1");
+
+                var comment2 = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "Comment2");
+
+                var pullRequest = CreatePullRequest(comment1);
+                var repository = CreateRepository();
+                var gitService = CreateGitService(repository);
+                var gitClient = CreateGitClient(repository);
+
+                using (var diffService = new FakeDiffService())
+                {
+                    diffService.AddFile(FilePath, baseContents);
+
+                    var target = new PullRequestSession(
+                        Substitute.For<IOperatingSystem>(),
+                        gitService,
+                        gitClient,
+                        diffService,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
+
+                    var editor = new FakeEditorContentSource(editorContents);
+                    var file = await target.GetFile(FilePath, editor);
+
+                    var thread = file.InlineCommentThreads.Single();
+
+                    Assert.Equal("Comment1", thread.Comments.Single().Body);
+                    Assert.Equal(2, thread.LineNumber);
+
+                    pullRequest = CreatePullRequest(comment1, comment2);
+                    await target.Update(pullRequest);
+                    thread = file.InlineCommentThreads.Single();
+
+                    Assert.Equal(2, thread.Comments.Count);
+                    Assert.Equal(new[] { "Comment1", "Comment2" }, thread.Comments.Select(x => x.Body).ToArray());
+                    Assert.Equal(2, thread.LineNumber);
+                }
+            }
+
+            IPullRequestReviewCommentModel CreateComment(string diffHunk, string body = "Comment")
             {
                 var result = Substitute.For<IPullRequestReviewCommentModel>();
+                result.Body.Returns(body);
                 result.DiffHunk.Returns(diffHunk);
                 result.Path.Returns(FilePath);
                 result.OriginalCommitId.Returns("ORIG");
@@ -239,7 +365,7 @@ Line 4";
                 return result;
             }
 
-            IPullRequestModel CreatePullRequest(IPullRequestReviewCommentModel comment)
+            IPullRequestModel CreatePullRequest(params IPullRequestReviewCommentModel[] comments)
             {
                 var changedFile = Substitute.For<IPullRequestFileModel>();
                 changedFile.FileName.Returns("test.cs");
@@ -248,7 +374,8 @@ Line 4";
                 result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE", RepoUrl));
                 result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD", RepoUrl));
                 result.ChangedFiles.Returns(new[] { changedFile });
-                result.ReviewComments.Returns(new[] { comment });
+                result.ReviewComments.Returns(comments);
+
                 return result;
             }
 
@@ -260,6 +387,23 @@ Line 4";
                 branch.Tip.Returns(commit);
                 result.Head.Returns(branch);
                 return result;
+            }
+
+            class FakeEditorContentSource : IEditorContentSource
+            {
+                byte[] content;
+
+                public FakeEditorContentSource(string content)
+                {
+                    SetContent(content);
+                }
+
+                public Task<byte[]> GetContent() => Task.FromResult(content);
+
+                public void SetContent(string content)
+                {
+                    this.content = Encoding.UTF8.GetBytes(content);
+                }
             }
         }
     }
