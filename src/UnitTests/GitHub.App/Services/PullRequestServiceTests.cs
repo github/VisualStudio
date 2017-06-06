@@ -26,8 +26,8 @@ public class PullRequestServiceTests : TestBaseClass
             var gitClient = MockGitClient();
             var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
-            var baseFile = "baseFile";
-            var headFile = "headFile";
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
@@ -42,13 +42,13 @@ public class PullRequestServiceTests : TestBaseClass
             pullRequest.Base.Returns(baseRef);
             pullRequest.Head.Returns(headRef);
 
-            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFile));
-            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(Task.FromResult(headFile));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFileContent));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(Task.FromResult(headFileContent));
 
             var files = await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
 
-            Assert.Equal(baseFile, files.Item1);
-            Assert.Equal(headFile, files.Item2);
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
         }
 
         [Fact]
@@ -59,7 +59,7 @@ public class PullRequestServiceTests : TestBaseClass
             var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
             var repoDir = "repoDir";
-            var baseFile = "baseFile";
+            var baseFileContent = "baseFileContent";
             var fileName = "fileName";
             var baseSha = "baseSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
@@ -73,11 +73,11 @@ public class PullRequestServiceTests : TestBaseClass
             var pullRequest = Substitute.For<IPullRequestModel>();
             pullRequest.Base.Returns(baseRef);
 
-            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFile));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFileContent));
 
             var files = await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
 
-            Assert.Equal(baseFile, files.Item1);
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(workingFile, files.Item2);
         }
 
@@ -88,8 +88,8 @@ public class PullRequestServiceTests : TestBaseClass
             var gitClient = MockGitClient();
             var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
-            var baseFile = "baseFile";
-            var headFile = "headFile";
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
@@ -104,14 +104,14 @@ public class PullRequestServiceTests : TestBaseClass
             pullRequest.Base.Returns(baseRef);
             pullRequest.Head.Returns(headRef);
 
-            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFile));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(Task.FromResult<string>(null));
-            modelService.GetFileContents(Arg.Any<IRepositoryModel>(), headSha, fileName, headFileSha).Returns(Observable.Return(headFile));
+            modelService.GetFileContents(Arg.Any<IRepositoryModel>(), headSha, fileName, headFileSha).Returns(Observable.Return(headFileContent));
 
             var files = await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
 
-            Assert.Equal(baseFile, files.Item1);
-            Assert.Equal(headFile, files.Item2);
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
         }
     }
 
