@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -16,6 +17,104 @@ using Xunit;
 
 public class PullRequestServiceTests : TestBaseClass
 {
+    public class TheExtractDiffFilesMethod
+    {
+        [Fact]
+        public async Task NotCheckedOut_ExtractFilesFromLocalRepo()
+        {
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitClient = MockGitClient();
+            var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
+            var baseFile = "baseFile";
+            var headFile = "headFile";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
+            var headFileSha = "???";
+            var checkedOut = false;
+
+            var repo = Substitute.For<ILocalRepositoryModel>();
+            var modelService = Substitute.For<IModelService>();
+            var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Base.Returns(baseRef);
+            pullRequest.Head.Returns(headRef);
+
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFile));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(Task.FromResult(headFile));
+
+            var files = await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
+
+            Assert.Equal(baseFile, files.Item1);
+            Assert.Equal(headFile, files.Item2);
+        }
+
+        [Fact]
+        public async Task CheckedOut_BaseFromWorkingFile()
+        {
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitClient = MockGitClient();
+            var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
+            var repoDir = "repoDir";
+            var baseFile = "baseFile";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var headFileSha = "headFileSha";
+            var checkedOut = true;
+            var workingFile = Path.Combine(repoDir, fileName);
+
+            var repo = Substitute.For<ILocalRepositoryModel>();
+            repo.LocalPath.Returns(repoDir);
+            var modelService = Substitute.For<IModelService>();
+            var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Base.Returns(baseRef);
+
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFile));
+
+            var files = await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
+
+            Assert.Equal(baseFile, files.Item1);
+            Assert.Equal(workingFile, files.Item2);
+        }
+
+        [Fact]
+        public async Task HeadBranchNotAvailable_GetFileFromModelService()
+        {
+            var serviceProvider = Substitutes.ServiceProvider;
+            var gitClient = MockGitClient();
+            var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+
+            var baseFile = "baseFile";
+            var headFile = "headFile";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
+            var headFileSha = "headFileSha";
+            var checkedOut = false;
+
+            var repo = Substitute.For<ILocalRepositoryModel>();
+            var modelService = Substitute.For<IModelService>();
+            var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Base.Returns(baseRef);
+            pullRequest.Head.Returns(headRef);
+
+            gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(Task.FromResult(baseFile));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(Task.FromResult<string>(null));
+            modelService.GetFileContents(Arg.Any<IRepositoryModel>(), headSha, fileName, headFileSha).Returns(Observable.Return(headFile));
+
+            var files = await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
+
+            Assert.Equal(baseFile, files.Item1);
+            Assert.Equal(headFile, files.Item2);
+        }
+    }
+
     [Fact]
     public void CreatePullRequestAllArgsMandatory()
     {
