@@ -50,12 +50,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             var blob1 = repository.Head.Tip[path]?.Target as Blob;
             var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
             var patch = repository.Diff.Compare(blob1, blob2).Patch;
-            return Task.FromResult<IList<DiffChunk>>(inner.ParseFragment(patch).ToList());
-        }
-
-        public IEnumerable<DiffChunk> ParseFragment(string diff)
-        {
-            return inner.ParseFragment(diff);
+            return Task.FromResult<IList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
         static IRepository CreateRepository()

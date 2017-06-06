@@ -20,11 +20,8 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class PullRequestSessionManager : IPullRequestSessionManager, IDisposable
     {
-        readonly IOperatingSystem os;
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
         readonly IPullRequestService service;
+        readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
         readonly BehaviorSubject<IPullRequestSession> currentSession = new BehaviorSubject<IPullRequestSession>(null);
@@ -42,27 +39,18 @@ namespace GitHub.InlineReviews.Services
         /// <param name="teamExplorerService">The team explorer service to use.</param>
         [ImportingConstructor]
         public PullRequestSessionManager(
-            IOperatingSystem os,
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
             IPullRequestService service,
+            IPullRequestSessionService sessionService,
             IRepositoryHosts hosts,
             ITeamExplorerServiceHolder teamExplorerService)
         {
-            Guard.ArgumentNotNull(os, nameof(os));
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
-            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(sessionService, nameof(sessionService));
             Guard.ArgumentNotNull(hosts, nameof(hosts));
             Guard.ArgumentNotNull(teamExplorerService, nameof(teamExplorerService));
 
-            this.os = os;
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
             this.service = service;
+            this.sessionService = sessionService;
             this.hosts = hosts;
             this.teamExplorerService = teamExplorerService;
             teamExplorerService.Subscribe(this, RepoChanged);
@@ -93,10 +81,7 @@ namespace GitHub.InlineReviews.Services
                 var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
 
                 return new PullRequestSession(
-                    os,
-                    gitService,
-                    gitClient,
-                    diffService,
+                    sessionService,
                     await modelService.GetCurrentUser(),
                     pullRequest,
                     repository,
@@ -130,10 +115,7 @@ namespace GitHub.InlineReviews.Services
                         if (pullRequest != null)
                         {
                             session = new PullRequestSession(
-                                os,
-                                gitService,
-                                gitClient,
-                                diffService,
+                                sessionService,
                                 await modelService.GetCurrentUser(),
                                 pullRequest,
                                 repository,

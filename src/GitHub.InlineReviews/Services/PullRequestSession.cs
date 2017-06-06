@@ -25,35 +25,24 @@ namespace GitHub.InlineReviews.Services
     public class PullRequestSession : IPullRequestSession
     {
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
-        readonly IOperatingSystem os;
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
+        readonly IPullRequestSessionService service;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
         ReactiveList<IPullRequestSessionFile> files;
 
         public PullRequestSession(
-            IOperatingSystem os,
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
+            IPullRequestSessionService service,
             IAccount user,
             IPullRequestModel pullRequest,
             ILocalRepositoryModel repository,
             bool isCheckedOut)
         {
-            Guard.ArgumentNotNull(os, nameof(os));
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
+            Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(user, nameof(user));
             Guard.ArgumentNotNull(pullRequest, nameof(pullRequest));
             Guard.ArgumentNotNull(repository, nameof(repository));
 
-            this.os = os;
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
+            this.service = service;
             IsCheckedOut = isCheckedOut;
             User = user;
             PullRequest = pullRequest;
@@ -145,11 +134,12 @@ namespace GitHub.InlineReviews.Services
 
                 if (fileIndex.TryGetValue(relativePath, out file))
                 {
-                    var repo = gitService.GetRepository(Repository.LocalPath);
                     var result = new Dictionary<IInlineCommentThreadModel, int>();
                     var content = await GetFileContent(file);
 
-                    file.Diff = await diffService.Diff(repo, file.BaseSha, relativePath, content);
+                    file.CommitSha = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
+                        service.GetTipSha(Repository) : null;
+                    file.Diff = await service.Diff(Repository, file.BaseSha, relativePath, content);
 
                     foreach (var thread in file.InlineCommentThreads)
                     {
@@ -184,13 +174,13 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
-            var repository = gitService.GetRepository(Repository.LocalPath);
             var content = await GetFileContent(file);
+            var unmodified = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content);
 
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await gitClient.IsModified(repository, file.RelativePath, content) ? 
-                null : repository.Head.Tip.Sha;
-            file.Diff = await diffService.Diff(repository, PullRequest.Base.Sha, file.RelativePath, content);
+            file.CommitSha = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
+                service.GetTipSha(Repository) : null;
+            file.Diff = await service.Diff(Repository, file.BaseSha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
                 .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)
@@ -201,7 +191,7 @@ namespace GitHub.InlineReviews.Services
             foreach (var position in commentsByPosition)
             {
                 var hunk = position.First().DiffHunk;
-                var chunks = diffService.ParseFragment(hunk);
+                var chunks = DiffUtilities.ParseFragment(hunk);
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var thread = new InlineCommentThreadModel(
@@ -241,7 +231,8 @@ namespace GitHub.InlineReviews.Services
 
         Task<byte[]> GetFileContent(IPullRequestSessionFile file)
         {
-            return file.ContentSource?.GetContent() ?? ReadAsync(Path.Combine(Repository.LocalPath, file.RelativePath));
+            return file.ContentSource?.GetContent() ??
+                service.ReadFileAsync(Path.Combine(Repository.LocalPath, file.RelativePath));
         }
 
         string GetFullPath(string relativePath)
@@ -261,20 +252,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             return -1;
-        }
-
-        async Task<byte[]> ReadAsync(string path)
-        {
-            if (os.File.Exists(path))
-            {
-                try
-                {
-                    return await os.File.ReadAllBytesAsync(path);
-                }
-                catch { }
-            }
-
-            return null;
         }
     }
 }

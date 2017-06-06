@@ -39,20 +39,15 @@ Line 4";
 -Line 3
 +Line 3 with comment");
 
-                var pullRequest = CreatePullRequest(comment);
-                var repository = CreateRepository();
-                var gitService = CreateGitService(repository);
-                var gitClient = CreateGitClient(repository);
-
                 using (var diffService = new FakeDiffService())
                 {
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
+
                     diffService.AddFile(FilePath, baseContents);
 
                     var target = new PullRequestSession(
-                        Substitute.For<IOperatingSystem>(),
-                        gitService,
-                        gitClient,
-                        diffService,
+                        service,
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
@@ -83,23 +78,16 @@ Line 4";
 -Line 3
 +Line 3 with comment");
 
-                var pullRequest = CreatePullRequest(comment);
-                var repository = CreateRepository();
-                var gitService = CreateGitService(repository);
-                var gitClient = CreateGitClient(repository);
                 using (var diffService = new FakeDiffService())
                 {
-                    diffService.AddFile(FilePath, baseContents);
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
 
-                    var os = Substitute.For<IOperatingSystem>();
-                    os.File.Exists(FilePath).Returns(true);
-                    os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(headContents));
+                    diffService.AddFile(FilePath, baseContents);
+                    service.ReadFileAsync(FilePath).Returns(Encoding.UTF8.GetBytes(headContents));
 
                     var target = new PullRequestSession(
-                        os,
-                        gitService,
-                        gitClient,
-                        diffService,
+                        service,
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
@@ -132,20 +120,16 @@ Line 4";
 -Line 3
 +Line 3 with comment");
 
-                var pullRequest = CreatePullRequest(comment);
-                var repository = CreateRepository();
-                var gitService = CreateGitService(repository);
-                var gitClient = CreateGitClient(repository);
 
                 using (var diffService = new FakeDiffService())
                 {
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
+
                     diffService.AddFile(FilePath, baseContents);
 
                     var target = new PullRequestSession(
-                        Substitute.For<IOperatingSystem>(),
-                        gitService,
-                        gitClient,
-                        diffService,
+                        service,
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
@@ -183,24 +167,15 @@ Line 4";
 -Line 3
 +Line 3 with comment");
 
-                var pullRequest = CreatePullRequest(comment);
-                var repository = CreateRepository();
-                var gitService = CreateGitService(repository);
-                var gitClient = CreateGitClient(repository);
-
                 using (var diffService = new FakeDiffService())
                 {
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
+
                     diffService.AddFile(FilePath, baseContents);
 
-                    var os = Substitute.For<IOperatingSystem>();
-                    os.File.Exists(FilePath).Returns(true);
-                    os.File.ReadAllBytesAsync(FilePath).Returns(Encoding.UTF8.GetBytes(diskContents));
-
                     var target = new PullRequestSession(
-                        os,
-                        gitService,
-                        gitClient,
-                        diffService,
+                        service,
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
@@ -243,20 +218,16 @@ Line 4";
 -Line 3
 +Line 3 with comment", "Updated Comment");
 
-                var pullRequest = CreatePullRequest(originalComment);
-                var repository = CreateRepository();
-                var gitService = CreateGitService(repository);
-                var gitClient = CreateGitClient(repository);
 
                 using (var diffService = new FakeDiffService())
                 {
+                    var pullRequest = CreatePullRequest(originalComment);
+                    var service = CreateService(diffService);
+
                     diffService.AddFile(FilePath, baseContents);
 
                     var target = new PullRequestSession(
-                        Substitute.For<IOperatingSystem>(),
-                        gitService,
-                        gitClient,
-                        diffService,
+                        service,
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
@@ -303,20 +274,16 @@ Line 4";
 -Line 3
 +Line 3 with comment", "Comment2");
 
-                var pullRequest = CreatePullRequest(comment1);
-                var repository = CreateRepository();
-                var gitService = CreateGitService(repository);
-                var gitClient = CreateGitClient(repository);
 
                 using (var diffService = new FakeDiffService())
                 {
+                    var pullRequest = CreatePullRequest(comment1);
+                    var service = CreateService(diffService);
+
                     diffService.AddFile(FilePath, baseContents);
 
                     var target = new PullRequestSession(
-                        Substitute.For<IOperatingSystem>(),
-                        gitService,
-                        gitClient,
-                        diffService,
+                        service,
                         Substitute.For<IAccount>(),
                         pullRequest,
                         Substitute.For<ILocalRepositoryModel>(),
@@ -340,6 +307,117 @@ Line 4";
                 }
             }
 
+            [Fact]
+            public async Task CommitShaIsSetIfUnmodified()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest();
+                    var service = CreateService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents);
+                    service.IsUnmodifiedAndPushed(Arg.Any<ILocalRepositoryModel>(), FilePath, Arg.Any<byte[]>()).Returns(true);
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
+
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
+                    Assert.Equal("BRANCH_TIP", file.CommitSha);
+                }
+            }
+
+            [Fact]
+            public async Task CommitShaIsNullIfModified()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest();
+                    var service = CreateService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents);
+                    service.IsUnmodifiedAndPushed(Arg.Any<ILocalRepositoryModel>(), FilePath, Arg.Any<byte[]>()).Returns(false);
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
+
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
+                    Assert.Null(file.CommitSha);
+                }
+            }
+
+            [Fact]
+            public async Task CommitShaIsNullWhenChangedToModified()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = Encoding.UTF8.GetBytes(@"Line 1
+Line 2
+Line 3 with comment
+Line 4");
+                var editorContents = Encoding.UTF8.GetBytes(@"Line 1
+Line 2
+Line 3 with comment
+Line 4 with comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest();
+                    var service = CreateService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents);
+                    service.IsUnmodifiedAndPushed(Arg.Any<ILocalRepositoryModel>(), FilePath, headContents).Returns(true);
+                    service.IsUnmodifiedAndPushed(Arg.Any<ILocalRepositoryModel>(), FilePath, editorContents).Returns(false);
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        true);
+
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
+
+                    Assert.Equal("BRANCH_TIP", file.CommitSha);
+
+                    editor.SetContent(editorContents);
+                    await target.UpdateEditorContent(FilePath);
+
+                    Assert.Null(file.CommitSha);
+                }
+            }
+
             IPullRequestReviewCommentModel CreateComment(string diffHunk, string body = "Comment")
             {
                 var result = Substitute.For<IPullRequestReviewCommentModel>();
@@ -351,17 +429,20 @@ Line 4";
                 return result;
             }
 
-            IGitClient CreateGitClient(IRepository repository)
+            IPullRequestSessionService CreateService(FakeDiffService diffService)
             {
-                var result = Substitute.For<IGitClient>();
-                result.IsModified(repository, FilePath, Arg.Any<byte[]>()).Returns(false);
-                return result;
-            }
-
-            IGitService CreateGitService(IRepository repository)
-            {
-                var result = Substitute.For<IGitService>();
-                result.GetRepository(Arg.Any<string>()).Returns(repository);
+                var result = Substitute.For<IPullRequestSessionService>();
+                result.Diff(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<byte[]>())
+                    .Returns(i => diffService.Diff(
+                        null,
+                        i.ArgAt<string>(1),
+                        i.ArgAt<string>(2),
+                        i.ArgAt<byte[]>(3)));
+                result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
                 return result;
             }
 
@@ -384,6 +465,7 @@ Line 4";
                 var result = Substitute.For<IRepository>();
                 var branch = Substitute.For<Branch>();
                 var commit = Substitute.For<Commit>();
+                commit.Sha.Returns("BRANCH_TIP");
                 branch.Tip.Returns(commit);
                 result.Head.Returns(branch);
                 return result;
@@ -398,11 +480,21 @@ Line 4";
                     SetContent(content);
                 }
 
+                public FakeEditorContentSource(byte[] content)
+                {
+                    SetContent(content);
+                }
+
                 public Task<byte[]> GetContent() => Task.FromResult(content);
 
                 public void SetContent(string content)
                 {
                     this.content = Encoding.UTF8.GetBytes(content);
+                }
+
+                public void SetContent(byte[] content)
+                {
+                    this.content = content;
                 }
             }
         }

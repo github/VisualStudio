@@ -28,12 +28,7 @@ namespace GitHub.InlineReviews.Services
             byte[] contents)
         {
             var changes = await gitClient.CompareWith(repo, sha, path, contents);
-            return ParseFragment(changes.Patch).ToList();
-        }
-
-        public IEnumerable<DiffChunk> ParseFragment(string diff)
-        {
-            return DiffUtilities.ParseFragment(diff);
+            return DiffUtilities.ParseFragment(changes.Patch).ToList();
         }
     }
 }
