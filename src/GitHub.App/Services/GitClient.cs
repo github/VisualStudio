@@ -297,9 +297,7 @@ namespace GitHub.Services
                 var commit = repository.Lookup<Commit>(commitSha);
                 if(commit == null)
                 {
-                    var message = $"ExtractFile couldn't find commit at '{commitSha}'.";
-                    log.Info(message);
-                    throw new Exception(message); // TODO: What kind of exception?
+                    throw new FileNotFoundException("Couldn't find commit at '" + commitSha + "'.");
                 }
 
                 var blob = commit[fileName]?.Target as Blob;
