@@ -379,17 +379,15 @@ namespace GitHub.Services
             string fileName,
             string fileSha)
         {
-            string contents;
             try
             {
-                contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+                var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+                return CreateTempFile(fileName, commitSha, contents);
             }
             catch (Exception)
             {
-                contents = await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+                return await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
             }
-
-            return CreateTempFile(fileName, commitSha, contents);
         }
 
         static string CreateTempFile(string fileName, string commitSha, string contents)
