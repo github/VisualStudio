@@ -295,7 +295,14 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
-                var blob = commit?[fileName]?.Target as Blob;
+                if(commit == null)
+                {
+                    var message = $"ExtractFile couldn't find commit at '{commitSha}'.";
+                    log.Info(message);
+                    throw new Exception(message); // TODO: What kind of exception?
+                }
+
+                var blob = commit[fileName]?.Target as Blob;
                 return blob?.GetContentText();
             });
         }
