@@ -128,8 +128,8 @@ namespace GitHub.VisualStudio.UI.Views
         void AddCompareBufferTag(ITextBuffer buffer, IPullRequestSession session, string path, bool isLeftBuffer)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
-                typeof(PullRequestBufferTag),
-                () => new PullRequestBufferTag(session, path, isLeftBuffer));
+                typeof(PullRequestTextBufferInfo),
+                () => new PullRequestTextBufferInfo(session, path, isLeftBuffer));
         }
 
         void ShowErrorInStatusBar(string message, Exception e)

@@ -152,40 +152,23 @@ namespace GitHub.InlineReviews.Tags
             return Task.FromResult(GetContents(buffer.CurrentSnapshot));
         }
 
-        static string RootedPathToRelativePath(string path, string basePath)
-        {
-            if (Path.IsPathRooted(path))
-            {
-                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
-                {
-                    return path.Substring(basePath.Length + 1);
-                }
-            }
-
-            return null;
-        }
-
         void Initialize()
         {
-            var bufferTag = buffer.Properties.GetProperty<PullRequestBufferTag>(typeof(PullRequestBufferTag), null);
+            var bufferInfo = sessionManager.GetTextBufferInfo(buffer);
             IPullRequestSession session = null;
 
-            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-
-            if (bufferTag != null)
+            if (bufferInfo != null)
             {
-                fullPath = bufferTag.RelativePath;
-                leftHandSide = bufferTag.IsLeftComparisonBuffer;
-                
-                if (!bufferTag.Session.IsCheckedOut)
+                fullPath = Path.Combine(bufferInfo.Session.Repository.LocalPath, bufferInfo.RelativePath);
+                leftHandSide = bufferInfo.IsLeftComparisonBuffer;
+
+                if (!bufferInfo.Session.IsCheckedOut)
                 {
-                    session = bufferTag.Session;
+                    session = bufferInfo.Session;
                 }
             }
-            else
-            {
-                fullPath = document.FilePath;
-            }
+
+            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
 
             if (session == null)
             {
@@ -225,7 +208,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (session == null) return;
 
-            relativePath = RootedPathToRelativePath(fullPath, session.Repository.LocalPath);
+            relativePath = session.GetRelativePath(fullPath);
 
             if (relativePath == null) return;
 

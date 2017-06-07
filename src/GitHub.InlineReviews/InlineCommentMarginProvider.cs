@@ -60,7 +60,7 @@ namespace GitHub.InlineReviews
 
         static bool IsMarginVisible(ITextBuffer buffer)
         {
-            if (buffer.Properties.ContainsProperty(typeof(PullRequestBufferTag)))
+            if (buffer.Properties.ContainsProperty(typeof(PullRequestTextBufferInfo)))
             {
                 return true;
             }

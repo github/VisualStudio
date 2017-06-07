@@ -104,7 +104,7 @@
     <Compile Include="Models\IInlineCommentThreadModel.cs" />
     <Compile Include="Models\IPullRequestSessionFile.cs" />
     <Compile Include="Models\IRepositoryHosts.cs" />
-    <Compile Include="Models\PullRequestBufferTag.cs" />
+    <Compile Include="Models\PullRequestTextBufferInfo.cs" />
     <Compile Include="Models\UserAndScopes.cs" />
     <Compile Include="Services\IModelService.cs" />
     <Compile Include="Services\IGistPublishService.cs" />

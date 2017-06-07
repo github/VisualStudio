@@ -124,6 +124,22 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public string GetRelativePath(string path)
+        {
+            if (Path.IsPathRooted(path))
+            {
+                var basePath = Repository.LocalPath;
+
+                if (path.StartsWith(basePath) && path.Length > basePath.Length + 1)
+                {
+                    return path.Substring(basePath.Length + 1);
+                }
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
         public async Task UpdateEditorContent(string relativePath)
         {
             relativePath = relativePath.Replace("\\", "/");

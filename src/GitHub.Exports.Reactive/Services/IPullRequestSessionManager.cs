@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 using GitHub.Models;
+using Microsoft.VisualStudio.Text;
 
 namespace GitHub.Services
 {
@@ -29,5 +30,21 @@ namespace GitHub.Services
         /// returned. If not, a new pull request session object will be created.
         /// </remarks>
         Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest);
+
+        /// <summary>
+        /// Gets information about the pull request that a Visual Studio text buffer is a part of.
+        /// </summary>
+        /// <param name="buffer">The text buffer.</param>
+        /// <returns>
+        /// A <see cref="PullRequestTextBufferInfo"/> or null if the pull request for the text
+        /// buffer could not be determined.
+        /// </returns>
+        /// <remarks>
+        /// Firstly the method looks for an existing <see cref="PullRequestTextBufferInfo"/> object
+        /// stored in the text buffer's properties, if that does not exist, it creates one based on
+        /// the current pull request session. If there is no current pull request session, returns
+        /// null.
+        /// </remarks>
+        PullRequestTextBufferInfo GetTextBufferInfo(ITextBuffer buffer);
     }
 }

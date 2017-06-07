@@ -67,6 +67,15 @@ namespace GitHub.Services
             IEditorContentSource contentSource);
 
         /// <summary>
+        /// Converts a path to a path relative to the current repository.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>
+        /// The relative path, or null if the specified path is not in the repository.
+        /// </returns>
+        string GetRelativePath(string path);
+
+        /// <summary>
         /// Updates the pull request session with a new pull request model in response to a refresh
         /// from the server.
         /// </summary>

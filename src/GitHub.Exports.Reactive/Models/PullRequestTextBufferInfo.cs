@@ -7,10 +7,10 @@ namespace GitHub.Models
     /// When attached as a property to a Visual Studio ITextBuffer, informs the inline comment
     /// tagger that the buffer represents a buffer opened from a pull request.
     /// </summary>
-    public class PullRequestBufferTag
+    public class PullRequestTextBufferInfo
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PullRequestBufferTag"/> class.
+        /// Initializes a new instance of the <see cref="PullRequestTextBufferInfo"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="relativePath">
@@ -19,7 +19,7 @@ namespace GitHub.Models
         /// <param name="isLeftComparisonBuffer">
         /// Whether the buffer represents the left-hand-side of a comparison.
         /// </param>
-        public PullRequestBufferTag(
+        public PullRequestTextBufferInfo(
             IPullRequestSession session,
             string relativePath,
             bool isLeftComparisonBuffer)
