@@ -13,19 +13,17 @@ namespace GitHub.Models
         /// Initializes a new instance of the <see cref="PullRequestTextBufferInfo"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
-        /// <param name="relativePath">
-        /// The relative path to the file in the repository.
-        /// </param>
+        /// <param name="filePath">The full path to the file.</param>
         /// <param name="isLeftComparisonBuffer">
         /// Whether the buffer represents the left-hand-side of a comparison.
         /// </param>
         public PullRequestTextBufferInfo(
             IPullRequestSession session,
-            string relativePath,
+            string filePath,
             bool isLeftComparisonBuffer)
         {
             Session = session;
-            RelativePath = relativePath;
+            FilePath = filePath;
             IsLeftComparisonBuffer = isLeftComparisonBuffer;
         }
 
@@ -35,9 +33,9 @@ namespace GitHub.Models
         public IPullRequestSession Session { get; }
 
         /// <summary>
-        /// Gets the relative path to the file in the repository.
+        /// Gets the full path to the file.
         /// </summary>
-        public string RelativePath { get; }
+        public string FilePath { get; }
 
         /// <summary>
         /// Gets a value indicating whether the buffer represents the left-hand-side of a comparison.

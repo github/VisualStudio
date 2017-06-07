@@ -24,7 +24,7 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         InlineCommentThreadViewModel thread;
-        string relativePath;
+        string fullPath;
         bool leftBuffer;
         int? lineNumber;
 
@@ -52,16 +52,20 @@ namespace GitHub.InlineReviews.ViewModels
 
         public async Task Initialize()
         {
-            var info = sessionManager.GetTextBufferInfo(peekSession.TextView.TextBuffer);
+            var buffer = peekSession.TextView.TextBuffer;
+            var info = sessionManager.GetTextBufferInfo(buffer);
 
             if (info != null)
             {
-                relativePath = info.RelativePath;
+                fullPath = info.FilePath;
                 leftBuffer = info.IsLeftComparisonBuffer;
                 await SessionChanged(info.Session);
             }
             else
             {
+                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+                fullPath = document.FilePath;
+
                 await SessionChanged(sessionManager.CurrentSession);
                 sessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
@@ -73,6 +77,7 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Thread = null;
 
+            var relativePath = session.GetRelativePath(fullPath);
             var file = await session.GetFile(relativePath);
             var buffer = peekSession.TextView.TextBuffer;
             lineNumber = peekSession.GetTriggerPoint(buffer.CurrentSnapshot)?.GetContainingLine().LineNumber;
@@ -108,16 +113,6 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 Thread = null;
                 return;
-            }
-
-            if (relativePath == null)
-            {
-                var buffer = peekSession.TextView.TextBuffer;
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-                relativePath = session.GetRelativePath(document.FilePath);
-
-                if (relativePath == null)
-                    return;
             }
 
             await LineNumberChanged();

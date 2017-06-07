@@ -164,7 +164,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (bufferInfo != null)
             {
-                fullPath = Path.Combine(bufferInfo.Session.Repository.LocalPath, bufferInfo.RelativePath);
+                fullPath = bufferInfo.FilePath;
                 leftHandSide = bufferInfo.IsLeftComparisonBuffer;
 
                 if (!bufferInfo.Session.IsCheckedOut)
