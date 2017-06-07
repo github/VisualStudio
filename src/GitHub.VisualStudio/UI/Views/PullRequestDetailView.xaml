@@ -273,14 +273,11 @@
                                    RawContent="{Binding Body}"
                                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-                <TextBlock Grid.Column="2" Grid.Row="2" Margin="0 6">
-                    <ui:OcticonImage Icon="comment_discussion" Margin="0 0 0 -3"/>
-                    <Hyperlink Click="ViewCommentsClick">
-                        <Run Text="{Binding CommentCount, Mode=OneWay}"/>
-                        <Run>Comments</Run>
-                    </Hyperlink>
-                </TextBlock>
-
+                <!-- View conversation on GitHub -->
+                <ui:GitHubActionLink Grid.Column="2" Grid.Row="2" Margin="0 6" Command="{Binding OpenOnGitHub}">
+                    View conversation on GitHub
+                </ui:GitHubActionLink>
+                
                 <!-- Files changed -->
                 <ui:SectionControl Name="changesSection" 
                                    Grid.Row="3"
