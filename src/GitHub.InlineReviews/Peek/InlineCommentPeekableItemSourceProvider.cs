@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using GitHub.Factories;
+using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
 namespace GitHub.InlineReviews.Peek
@@ -12,17 +13,21 @@ namespace GitHub.InlineReviews.Peek
     [Name("GitHub Inline Comments Peekable Item Source")]
     class InlineCommentPeekableItemSourceProvider : IPeekableItemSourceProvider
     {
-        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
+        readonly IApiClientFactory apiClientFactory;
+        readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
-        public InlineCommentPeekableItemSourceProvider(IViewTagAggregatorFactoryService tagAggregatorFactory)
+        public InlineCommentPeekableItemSourceProvider(
+            IApiClientFactory apiClientFactory,
+            IPullRequestSessionManager sessionManager)
         {
-            this.tagAggregatorFactory = tagAggregatorFactory;
+            this.apiClientFactory = apiClientFactory;
+            this.sessionManager = sessionManager;
         }
 
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
         {
-            return new InlineCommentPeekableItemSource(textBuffer, tagAggregatorFactory);
+            return new InlineCommentPeekableItemSource(apiClientFactory, sessionManager);
         }
     }
 }
