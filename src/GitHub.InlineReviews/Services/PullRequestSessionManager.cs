@@ -1,15 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
-using Rothko;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -18,15 +16,14 @@ namespace GitHub.InlineReviews.Services
     /// </summary>
     [Export(typeof(IPullRequestSessionManager))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestSessionManager : IPullRequestSessionManager, IDisposable
+    public class PullRequestSessionManager : ReactiveObject, IPullRequestSessionManager
     {
         readonly IPullRequestService service;
         readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
-        readonly BehaviorSubject<IPullRequestSession> currentSession = new BehaviorSubject<IPullRequestSession>(null);
+        IPullRequestSession currentSession;
         ILocalRepositoryModel repository;
-        PullRequestSession session;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionManager"/> class.
@@ -57,24 +54,19 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IObservable<IPullRequestSession> CurrentSession => currentSession;
-
-        /// <summary>
-        /// Disposes of the object and terminates all subscriptions.
-        /// </summary>
-        public void Dispose()
+        public IPullRequestSession CurrentSession
         {
-            currentSession.Dispose();
-            GC.SuppressFinalize(this);
+            get { return currentSession; }
+            private set { this.RaiseAndSetIfChanged(ref currentSession, value); }
         }
 
         /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
-            if (pullRequest.Number == session?.PullRequest.Number)
+            if (pullRequest.Number == CurrentSession?.PullRequest.Number)
             {
-                await session.Update(pullRequest);
-                return session;
+                await CurrentSession.Update(pullRequest);
+                return CurrentSession;
             }
             else
             {
@@ -124,8 +116,7 @@ namespace GitHub.InlineReviews.Services
                     }
                 }
 
-                this.session = session;
-                currentSession.OnNext(this.session);
+                CurrentSession = session;
             }
             catch
             {

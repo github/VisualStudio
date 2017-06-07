@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using GitHub.Models;
 
@@ -7,18 +8,16 @@ namespace GitHub.Services
     /// <summary>
     /// Manages pull request sessions.
     /// </summary>
-    public interface IPullRequestSessionManager
+    public interface IPullRequestSessionManager : INotifyPropertyChanged
     {
         /// <summary>
-        /// Gets an observable that tracks the current pull request session.
+        /// Gets the current pull request session.
         /// </summary>
-        /// <remarks>
-        /// When first subscribed, this observable will fire immediately with the current pull
-        /// request session or null if there is no current session. The current session is non-null
-        /// if the current branch represents a pull request and changes when the current branch
-        /// changes.
-        /// </remarks>
-        IObservable<IPullRequestSession> CurrentSession { get; }
+        /// <returns>
+        /// The current pull request session, or null if the currently checked out branch is not
+        /// a pull request branch.
+        /// </returns>
+        IPullRequestSession CurrentSession { get; }
 
         /// <summary>
         /// Gets a pull request session for a pull request that may not be checked out.

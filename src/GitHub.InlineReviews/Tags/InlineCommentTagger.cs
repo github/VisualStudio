@@ -189,7 +189,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (session == null)
             {
-                managerSubscription = sessionManager.CurrentSession.Subscribe(SessionChanged);
+                managerSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession).Subscribe(SessionChanged);
             }
             else
             {
