@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,11 +15,14 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI.Helpers;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -100,16 +102,21 @@ namespace GitHub.VisualStudio.UI.Views
                     options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
                 }
 
-                var frame = Services.DifferenceService.OpenComparisonWindow2(
-                    fileNames.Item1,
-                    fileNames.Item2,
-                    caption,
-                    tooltip,
-                    leftLabel,
-                    rightLabel,
-                    string.Empty,
-                    string.Empty,
-                    (uint)options);
+                IVsWindowFrame frame;
+                using (new NewDocumentStateScope(__VSNEWDOCUMENTSTATE.NDS_Provisional, VSConstants.NewDocumentStateReason.SolutionExplorer))
+                {
+                    // Diff window will open in provisional (right hand) tab until document is touched.
+                    frame = Services.DifferenceService.OpenComparisonWindow2(
+                        fileNames.Item1,
+                        fileNames.Item2,
+                        caption,
+                        tooltip,
+                        leftLabel,
+                        rightLabel,
+                        string.Empty,
+                        string.Empty,
+                        (uint)options);
+                }
 
                 object docView;
                 frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView);
