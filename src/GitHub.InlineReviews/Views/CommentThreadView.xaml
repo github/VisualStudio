@@ -31,6 +31,15 @@
     </d:DesignProperties.DataContext>
     
     <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer.Style>
+            <Style TargetType="ScrollViewer">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsUnmodifiedAndPushed}" Value="False">
+                        <Setter Property="IsEnabled" Value="False"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ScrollViewer.Style>
         <ItemsControl ItemsSource="{Binding Comments}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>

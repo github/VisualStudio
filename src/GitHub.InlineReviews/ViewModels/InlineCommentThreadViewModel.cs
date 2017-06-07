@@ -22,7 +22,10 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
-        /// <param name="commitSha">The SHA of the commit that the thread relates to.</param>
+        /// <param name="commitSha">
+        /// The SHA of the commit that the thread relates to. May be null if the thread
+        /// represents trying to add a comment to a line that hasn't yet been pushed.
+        /// </param>
         /// <param name="filePath">The path to the file that the thread relates to.</param>
         /// <param name="diffLine">The line in the diff that the thread relates to.</param>
         public InlineCommentThreadViewModel(
@@ -35,7 +38,6 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(apiClient, nameof(apiClient));
             Guard.ArgumentNotNull(session, nameof(session));
-            Guard.ArgumentNotNull(commitSha, nameof(commitSha));
             Guard.ArgumentNotNull(filePath, nameof(filePath));
 
             this.apiClient = apiClient;
