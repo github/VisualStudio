@@ -154,6 +154,11 @@ namespace GitHub.InlineReviews.Tags
 
         void Initialize()
         {
+            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+
+            if (document == null)
+                return;
+
             var bufferInfo = sessionManager.GetTextBufferInfo(buffer);
             IPullRequestSession session = null;
 
@@ -167,8 +172,10 @@ namespace GitHub.InlineReviews.Tags
                     session = bufferInfo.Session;
                 }
             }
-
-            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+            else
+            {
+                fullPath = document.FilePath;
+            }
 
             if (session == null)
             {

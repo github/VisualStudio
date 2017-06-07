@@ -85,22 +85,7 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public PullRequestTextBufferInfo GetTextBufferInfo(ITextBuffer buffer)
         {
-            var result = buffer.Properties.GetProperty<PullRequestTextBufferInfo>(typeof(PullRequestTextBufferInfo), null);
-
-            if (result == null && CurrentSession != null)
-            {
-                var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-
-                if (document != null)
-                {
-                    result = new PullRequestTextBufferInfo(
-                        CurrentSession,
-                        CurrentSession.GetRelativePath(document.FilePath),
-                        false);
-                }
-            }
-
-            return result;
+            return buffer.Properties.GetProperty<PullRequestTextBufferInfo>(typeof(PullRequestTextBufferInfo), null);
         }
 
         async void RepoChanged(ILocalRepositoryModel repository)

@@ -40,10 +40,8 @@ namespace GitHub.Services
         /// buffer could not be determined.
         /// </returns>
         /// <remarks>
-        /// Firstly the method looks for an existing <see cref="PullRequestTextBufferInfo"/> object
-        /// stored in the text buffer's properties, if that does not exist, it creates one based on
-        /// the current pull request session. If there is no current pull request session, returns
-        /// null.
+        /// This method looks for a <see cref="PullRequestTextBufferInfo"/> object stored in the text
+        /// buffer's properties.
         /// </remarks>
         PullRequestTextBufferInfo GetTextBufferInfo(ITextBuffer buffer);
     }
