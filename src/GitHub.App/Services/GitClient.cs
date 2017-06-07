@@ -295,7 +295,12 @@ namespace GitHub.Services
             return Task.Factory.StartNew(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
-                var blob = commit?[fileName]?.Target as Blob;
+                if(commit == null)
+                {
+                    throw new FileNotFoundException("Couldn't find commit at '" + commitSha + "'.");
+                }
+
+                var blob = commit[fileName]?.Target as Blob;
                 return blob?.GetContentText();
             });
         }

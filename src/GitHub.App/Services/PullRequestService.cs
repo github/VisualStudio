@@ -368,13 +368,7 @@ namespace GitHub.Services
         async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName)
         {
             var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
-            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
-            var tempFile = Path.Combine(tempDir, tempFileName);
-
-            Directory.CreateDirectory(tempDir);
-            File.WriteAllText(tempFile, contents, Encoding.UTF8);
-            return tempFile;
+            return CreateTempFile(fileName, commitSha, contents);
         }
 
         async Task<string> GetFileFromRepositoryOrApi(
@@ -385,10 +379,27 @@ namespace GitHub.Services
             string fileName,
             string fileSha)
         {
-            return await ExtractToTempFile(repo, commitSha, fileName) ??
-                   await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+            try
+            {
+                var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
+                return CreateTempFile(fileName, commitSha, contents);
+            }
+            catch (Exception)
+            {
+                return await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
+            }
         }
 
+        static string CreateTempFile(string fileName, string commitSha, string contents)
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
+            var tempFile = Path.Combine(tempDir, tempFileName);
+
+            Directory.CreateDirectory(tempDir);
+            File.WriteAllText(tempFile, contents, Encoding.UTF8);
+            return tempFile;
+        }
 
         IEnumerable<string> GetLocalBranchesInternal(
             ILocalRepositoryModel localRepository,
