@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -62,7 +63,10 @@ namespace GitHub.InlineReviews.ViewModels
             CancelEdit.Subscribe(DoCancelEdit);
 
             CommitEdit = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.Body, x => !string.IsNullOrEmpty(x)),
+                Observable.CombineLatest(
+                    this.WhenAnyValue(x => x.Body, x => !string.IsNullOrEmpty(x)),
+                    thread.PostComment.CanExecuteObservable,
+                    (hasBody, canPost) => hasBody && canPost),
                 DoCommitEdit);
         }
 
@@ -178,7 +182,7 @@ namespace GitHub.InlineReviews.ViewModels
             try
             {
                 ErrorMessage = null;
-                Id = (await Thread.PostComment(Body)).Id;
+                Id = (await Thread.PostComment.ExecuteAsyncTask(Body)).Id;
                 EditState = CommentEditState.None;
                 UpdatedAt = DateTimeOffset.Now;
             }

@@ -36,8 +36,6 @@ namespace GitHub.InlineReviews.ViewModels
                     session.User,
                     comment));
             }
-
-            Conversation.AddReplyPlaceholder();
         }
 
         public IRepositoryModel Repository { get; }
@@ -55,28 +53,16 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 foreach (var thread in file.InlineCommentThreads)
                 {
-                    var vm = new InlineCommentThreadViewModel(
+                    var threadViewModel = new InlineCommentThreadViewModel(
                         apiClient,
                         session,
-                        thread.Comments.First().CommitId,
-                        file.RelativePath,
-                        thread.LineNumber);
-
-                    foreach (var comment in thread.Comments)
-                    {
-                        vm.Comments.Add(new InlineCommentViewModel(
-                            vm,
-                            session.User,
-                            comment));
-                    }
-
-                    vm.AddReplyPlaceholder();
+                        thread.Comments);
 
                     FileComments.Add(new DiffCommentThreadViewModel(
                         ToString(thread.DiffMatch),
                         thread.LineNumber,
                         file.RelativePath,
-                        vm));
+                        threadViewModel));
                 }
             }
         }

@@ -16,6 +16,7 @@ namespace GitHub.InlineReviews.Models
     class PullRequestSessionFile : ReactiveObject, IPullRequestSessionFile
     {
         IList<DiffChunk> diff;
+        string commitSha;
         IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
 
         /// <summary>
@@ -43,7 +44,11 @@ namespace GitHub.InlineReviews.Models
         public string BaseSha { get; internal set; }
 
         /// <inheritdoc/>
-        public string CommitSha { get; internal set; }
+        public string CommitSha
+        {
+            get { return commitSha; }
+            internal set { this.RaiseAndSetIfChanged(ref commitSha, value); }
+        }
 
         /// <inheritdoc/>
         public IEditorContentSource ContentSource { get; internal set; }

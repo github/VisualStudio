@@ -27,8 +27,7 @@ namespace GitHub.InlineReviews.ViewModels
         IPullRequestSession session;
         IPullRequestSessionFile file;
         IDisposable fileSubscription;
-        bool needsPush;
-        InlineCommentThreadViewModel thread;
+        ICommentThreadViewModel thread;
         string fullPath;
         bool leftBuffer;
 
@@ -47,16 +46,10 @@ namespace GitHub.InlineReviews.ViewModels
             this.sessionManager = sessionManager;
         }
 
-        public bool NeedsPush
-        {
-            get { return needsPush; }
-            private set { this.RaiseAndSetIfChanged(ref needsPush, value); }
-        }
-
         /// <summary>
         /// Gets the thread of comments to display.
         /// </summary>
-        public InlineCommentThreadViewModel Thread
+        public ICommentThreadViewModel Thread
         {
             get { return thread; }
             private set { this.RaiseAndSetIfChanged(ref thread, value); }
@@ -99,46 +92,15 @@ namespace GitHub.InlineReviews.ViewModels
                 return;
 
             var thread = file.InlineCommentThreads.FirstOrDefault(x => x.LineNumber == lineNumber);
+            var apiClient = CreateApiClient(session.Repository);
 
             if (thread != null)
             {
-                Thread = new InlineCommentThreadViewModel(
-                    CreateApiClient(session.Repository),
-                    session,
-                    thread.OriginalCommitSha,
-                    file.RelativePath,
-                    thread.OriginalPosition);
-
-                foreach (var comment in thread.Comments)
-                {
-                    Thread.Comments.Add(new InlineCommentViewModel(Thread, session.User, comment));
-                }
-
-                Thread.AddReplyPlaceholder();
+                Thread = new InlineCommentThreadViewModel(apiClient, session, thread.Comments);
             }
             else
             {
-                var diffLine = file.Diff
-                    .SelectMany(x => x.Lines)
-                    .FirstOrDefault(x =>
-                    {
-                        if (!leftBuffer)
-                            return x.NewLineNumber == lineNumber.Value;
-                        else
-                            return x.OldLineNumber == lineNumber.Value;
-                    });
-
-                if (diffLine != null)
-                {
-                    Thread = new InlineCommentThreadViewModel(
-                        CreateApiClient(session.Repository),
-                        session,
-                        file.CommitSha,
-                        file.RelativePath,
-                        diffLine.DiffLineNumber);
-                    var placeholder = Thread.AddReplyPlaceholder();
-                    placeholder.BeginEdit.Execute(null);
-                }
+                Thread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber.Value);
             }
         }
 
@@ -154,13 +116,6 @@ namespace GitHub.InlineReviews.ViewModels
 
             var relativePath = session.GetRelativePath(fullPath);
             file = await session.GetFile(relativePath);
-
-            fileSubscription = Observable.CombineLatest(
-                file.WhenAnyValue(x => x.CommitSha),
-                this.WhenAnyValue(x => x.Thread.CommitSha))
-                .Select(x => x[0] == null && x[1] == null)
-                .Subscribe(x => NeedsPush = x);
-
             UpdateThread();
         }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -21,16 +21,8 @@ namespace GitHub.InlineReviews.ViewModels
         IAccount CurrentUser { get; }
 
         /// <summary>
-        /// Adds a reply placeholder to the end of the <see cref="Comments"/>.
-        /// </summary>
-        /// <returns></returns>
-        ICommentViewModel AddReplyPlaceholder();
-
-        /// <summary>
         /// Called by a comment in the thread to post itself as a new comment to the API.
         /// </summary>
-        /// <param name="body">The comment body.</param>
-        /// <returns>The comment model of the generated comment.</returns>
-        Task<ICommentModel> PostComment(string body);
+        ReactiveCommand<ICommentModel> PostComment { get; }
     }
 }

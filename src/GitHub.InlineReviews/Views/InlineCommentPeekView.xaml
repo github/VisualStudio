@@ -21,8 +21,17 @@
     <DockPanel>
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
-                Padding="8"
-                Visibility="{Binding NeedsPush, Converter={ui:BooleanToVisibilityConverter}}">
+                Padding="8">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Thread.NeedsPush}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
             <StackPanel Orientation="Horizontal">
                 <ui:OcticonImage Icon="alert" Margin="0 0 8 0"/>
                 <TextBlock>You must commit and push your changes to add a comment here.</TextBlock>

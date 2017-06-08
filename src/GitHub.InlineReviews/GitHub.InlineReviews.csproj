@@ -103,6 +103,7 @@
     <Compile Include="ViewModels\IDiffCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\IInlineCommentViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
+    <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />

@@ -115,6 +115,7 @@
     <Compile Include="Services\DiffServiceTests.cs" />
     <Compile Include="Services\PullRequestSessionTests.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModelTests.cs" />
+    <Compile Include="ViewModels\NewInlineCommentThreadViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

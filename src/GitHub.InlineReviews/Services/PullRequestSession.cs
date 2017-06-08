@@ -142,38 +142,22 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task UpdateEditorContent(string relativePath)
         {
+            PullRequestSessionFile file;
+
             relativePath = relativePath.Replace("\\", "/");
 
-            var updated = await Task.Run(async () =>
+            if (fileIndex.TryGetValue(relativePath, out file))
             {
-                PullRequestSessionFile file;
+                var content = await GetFileContent(file);
 
-                if (fileIndex.TryGetValue(relativePath, out file))
+                file.CommitSha = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
+                    service.GetTipSha(Repository) : null;
+                file.Diff = await service.Diff(Repository, file.BaseSha, relativePath, content);
+
+                foreach (var thread in file.InlineCommentThreads)
                 {
-                    var result = new Dictionary<IInlineCommentThreadModel, int>();
-                    var content = await GetFileContent(file);
-
-                    file.CommitSha = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
-                        service.GetTipSha(Repository) : null;
-                    file.Diff = await service.Diff(Repository, file.BaseSha, relativePath, content);
-
-                    foreach (var thread in file.InlineCommentThreads)
-                    {
-                        result[thread] = GetUpdatedLineNumber(thread, file.Diff);
-                    }
-
-                    return result;
-                }
-
-                return null;
-            });
-
-            if (updated != null)
-            {
-                foreach (var i in updated)
-                {
-                    i.Key.LineNumber = i.Value;
-                    i.Key.IsStale = false;
+                    thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
+                    thread.IsStale = false;
                 }
             }
         }

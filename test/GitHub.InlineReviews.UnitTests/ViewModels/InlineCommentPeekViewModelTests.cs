@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.InlineReviews.Services;
@@ -34,6 +33,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             await target.Initialize();
 
             // There should be an existing comment and a reply placeholder.
+            Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
             Assert.Equal(2, target.Thread.Comments.Count);
             Assert.Equal("Existing comment", target.Thread.Comments[0].Body);
             Assert.Equal(string.Empty, target.Thread.Comments[1].Body);
@@ -52,57 +52,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             await target.Initialize();
 
-            Assert.Equal(19, target.Thread.DiffLine);
+            Assert.IsType<NewInlineCommentThreadViewModel>(target.Thread);
             Assert.Equal(string.Empty, target.Thread.Comments[0].Body);
             Assert.Equal(CommentEditState.Editing, target.Thread.Comments[0].EditState);
-            Assert.False(target.NeedsPush);
-        }
-
-        [Fact]
-        public async Task ThreadIsNotCreatedForNewCommentWhenNoDiffLinePresent()
-        {
-            // There is no existing comment thread at line 11 and no diff entry.
-            var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
-                CreatePeekService(lineNumber: 11),
-                CreatePeekSession(),
-                CreateSessionManager());
-
-            await target.Initialize();
-
-            Assert.Null(target.Thread);
-        }
-
-        [Fact]
-        public async Task NeedsPushIsAlwaysFalseForExistingComments()
-        {
-            // There is an existing comment thread at line 10.
-            var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
-                CreatePeekService(lineNumber: 10),
-                CreatePeekSession(),
-                CreateSessionManager(commitSha: null));
-
-            await target.Initialize();
-
-            // There should be an existing comment and a reply placeholder.
-            Assert.False(target.NeedsPush);
-        }
-
-        [Fact]
-        public async Task NeedsPushIsTrueForNewCommentWhenFileCommitShaIsNull()
-        {
-            // There is an existing comment thread at line 10.
-            var target = new InlineCommentPeekViewModel(
-                Substitute.For<IApiClientFactory>(),
-                CreatePeekService(lineNumber: 9),
-                CreatePeekSession(),
-                CreateSessionManager(commitSha: null));
-
-            await target.Initialize();
-
-            // There should be an existing comment and a reply placeholder.
-            Assert.True(target.NeedsPush);
         }
 
         IInlineCommentPeekService CreatePeekService(int lineNumber)
