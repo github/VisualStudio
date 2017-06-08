@@ -7,7 +7,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// View model for an inline comment (aka Pull Request Review Comment).
     /// </summary>
-    class InlineCommentViewModel : CommentViewModel, IInlineCommentViewModel
+    public class InlineCommentViewModel : CommentViewModel, IInlineCommentViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.

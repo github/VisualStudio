@@ -9,7 +9,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// Base view model for a thread of comments.
     /// </summary>
-    abstract class CommentThreadViewModel : ICommentThreadViewModel, IDisposable
+    public abstract class CommentThreadViewModel : ICommentThreadViewModel, IDisposable
     {
         IDisposable placeholderSubscription;
 

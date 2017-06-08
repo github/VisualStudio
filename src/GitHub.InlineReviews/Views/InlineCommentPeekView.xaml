@@ -4,9 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+             d:DesignHeight="200" d:DesignWidth="500">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
+                Padding="8"
+                Visibility="{Binding NeedsPush, Converter={ui:BooleanToVisibilityConverter}}">
+            <StackPanel Orientation="Horizontal">
+                <ui:OcticonImage Icon="alert" Margin="0 0 8 0"/>
+                <TextBlock>You must commit and push your changes to add a comment here.</TextBlock>
+            </StackPanel>
+        </Border>
+        
         <local:CommentThreadView DataContext="{Binding Thread}"/>
-    </Grid>
+    </DockPanel>
 </UserControl>

@@ -37,6 +37,12 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public int? GetLineNumber(IPeekSession session)
+        {
+            return session.GetTriggerPoint(session.TextView.TextSnapshot)?.GetContainingLine().LineNumber;
+        }
+
+        /// <inheritdoc/>
         public void Hide(ITextView textView)
         {
             peekBroker.DismissPeekSession(textView);

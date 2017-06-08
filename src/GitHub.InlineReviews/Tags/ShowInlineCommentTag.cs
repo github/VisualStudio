@@ -8,7 +8,7 @@ namespace GitHub.InlineReviews.Tags
     /// <summary>
     /// A tag which marks a line where inline review comments are present.
     /// </summary>
-    class ShowInlineCommentTag : InlineCommentTag
+    public class ShowInlineCommentTag : InlineCommentTag
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ShowInlineCommentTag"/> class.

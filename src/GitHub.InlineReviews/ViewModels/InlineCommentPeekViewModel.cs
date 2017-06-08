@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
+using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
@@ -17,28 +18,39 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// Represents the contents of an inline comment peek view displayed in an editor.
     /// </summary>
-    class InlineCommentPeekViewModel : ReactiveObject
+    public class InlineCommentPeekViewModel : ReactiveObject
     {
         readonly IApiClientFactory apiClientFactory;
+        readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
+        IPullRequestSessionFile file;
+        IDisposable fileSubscription;
+        bool needsPush;
         InlineCommentThreadViewModel thread;
         string fullPath;
         bool leftBuffer;
-        int? lineNumber;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
         /// </summary>
         public InlineCommentPeekViewModel(
             IApiClientFactory apiClientFactory,
+            IInlineCommentPeekService peekService,
             IPeekSession peekSession,
             IPullRequestSessionManager sessionManager)
         {
             this.apiClientFactory = apiClientFactory;
+            this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
+        }
+
+        public bool NeedsPush
+        {
+            get { return needsPush; }
+            private set { this.RaiseAndSetIfChanged(ref needsPush, value); }
         }
 
         /// <summary>
@@ -73,36 +85,61 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task LineNumberChanged()
+        void UpdateThread()
         {
             Thread = null;
 
-            var relativePath = session.GetRelativePath(fullPath);
-            var file = await session.GetFile(relativePath);
-            var buffer = peekSession.TextView.TextBuffer;
-            lineNumber = peekSession.GetTriggerPoint(buffer.CurrentSnapshot)?.GetContainingLine().LineNumber;
+            if (file == null)
+                return;
 
-            if (file == null || lineNumber == null)
+            var buffer = peekSession.TextView.TextBuffer;
+            var lineNumber = peekService.GetLineNumber(peekSession);
+
+            if (lineNumber == null)
                 return;
 
             var thread = file.InlineCommentThreads.FirstOrDefault(x => x.LineNumber == lineNumber);
 
-            if (thread == null)
-                return;
-
-            Thread = new InlineCommentThreadViewModel(
-                CreateApiClient(session.Repository),
-                session,
-                thread.OriginalCommitSha,
-                relativePath,
-                thread.OriginalPosition);
-
-            foreach (var comment in thread.Comments)
+            if (thread != null)
             {
-                Thread.Comments.Add(new InlineCommentViewModel(Thread, session.User, comment));
-            }
+                Thread = new InlineCommentThreadViewModel(
+                    CreateApiClient(session.Repository),
+                    session,
+                    thread.OriginalCommitSha,
+                    file.RelativePath,
+                    thread.OriginalPosition);
 
-            Thread.AddReplyPlaceholder();
+                foreach (var comment in thread.Comments)
+                {
+                    Thread.Comments.Add(new InlineCommentViewModel(Thread, session.User, comment));
+                }
+
+                Thread.AddReplyPlaceholder();
+            }
+            else
+            {
+                var diffLine = file.Diff
+                    .SelectMany(x => x.Lines)
+                    .FirstOrDefault(x =>
+                    {
+                        if (!leftBuffer)
+                            return x.NewLineNumber == lineNumber.Value;
+                        else
+                            return x.OldLineNumber == lineNumber.Value;
+                    });
+
+                if (diffLine != null)
+                {
+                    Thread = new InlineCommentThreadViewModel(
+                        CreateApiClient(session.Repository),
+                        session,
+                        file.CommitSha,
+                        file.RelativePath,
+                        diffLine.DiffLineNumber);
+                    var placeholder = Thread.AddReplyPlaceholder();
+                    placeholder.BeginEdit.Execute(null);
+                }
+            }
         }
 
         async Task SessionChanged(IPullRequestSession session)
@@ -115,7 +152,16 @@ namespace GitHub.InlineReviews.ViewModels
                 return;
             }
 
-            await LineNumberChanged();
+            var relativePath = session.GetRelativePath(fullPath);
+            file = await session.GetFile(relativePath);
+
+            fileSubscription = Observable.CombineLatest(
+                file.WhenAnyValue(x => x.CommitSha),
+                this.WhenAnyValue(x => x.Thread.CommitSha))
+                .Select(x => x[0] == null && x[1] == null)
+                .Subscribe(x => NeedsPush = x);
+
+            UpdateThread();
         }
 
         IApiClient CreateApiClient(ILocalRepositoryModel repository)

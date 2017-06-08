@@ -13,9 +13,10 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// A thread of inline comments (aka Pull Request Review Comments).
     /// </summary>
-    class InlineCommentThreadViewModel : CommentThreadViewModel
+    public class InlineCommentThreadViewModel : CommentThreadViewModel
     {
         readonly IApiClient apiClient;
+        string commitSha;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.

@@ -11,7 +11,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// View model for an issue or pull request comment.
     /// </summary>
-    class CommentViewModel : ReactiveObject, ICommentViewModel
+    public class CommentViewModel : ReactiveObject, ICommentViewModel
     {
         string body;
         string errorMessage;
