@@ -1,10 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
 using NSubstitute;
+using Octokit;
 using Xunit;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
@@ -28,9 +31,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Fact]
         public void NeedsPushTracksFileCommitSha()
         {
-            var file = Substitute.For<IPullRequestSessionFile>();
-            file.CommitSha.Returns("COMMIT_SHA");
-
+            var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
@@ -54,8 +55,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Fact]
         public void PlaceholderCommitEnabledWhenCommentHasBodyAndPostCommentIsEnabled()
         {
-            var file = Substitute.For<IPullRequestSessionFile>();
-
+            var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
                 Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
@@ -72,6 +72,62 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             file.CommitSha.Returns("COMMIT_SHA");
             RaisePropertyChanged(file, nameof(file.CommitSha));
             Assert.True(target.Comments[0].CommitEdit.CanExecute(null));
+        }
+
+        [Fact]
+        public void AddsCommentToCorrectDiffLine()
+        {
+            var apiClient = CreateApiClient();
+            var session = CreateSession();
+            var file = CreateFile();
+            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10);
+
+            target.Comments[0].Body = "New Comment";
+            target.Comments[0].CommitEdit.Execute(null);
+
+            apiClient.Received(1).CreatePullRequestReviewComment(
+                "owner",
+                "repo",
+                47,
+                "New Comment",
+                "COMMIT_SHA",
+                "file.cs",
+                5);
+        }
+
+        IApiClient CreateApiClient()
+        {
+            var result = Substitute.For<IApiClient>();
+            result.CreatePullRequestReviewComment(null, null, 0, null, null, null, 0)
+                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
+            return result;
+        }
+
+        IPullRequestSessionFile CreateFile()
+        {
+            var result = Substitute.For<IPullRequestSessionFile>();
+            result.CommitSha.Returns("COMMIT_SHA");
+            result.Diff.Returns(new[]
+            {
+                new DiffChunk
+                {
+                    Lines =
+                    {
+                        new DiffLine { NewLineNumber = 11, DiffLineNumber = 5 }
+                    }
+                }
+            });
+            result.RelativePath.Returns("file.cs");
+            return result;
+        }
+
+        IPullRequestSession CreateSession()
+        {
+            var result = Substitute.For<IPullRequestSession>();
+            result.Repository.Owner.Returns("owner");
+            result.Repository.Name.Returns("repo");
+            result.PullRequest.Number.Returns(47);
+            return result;
         }
 
         void RaisePropertyChanged<T>(T o, string propertyName)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -22,12 +23,8 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
-        /// <param name="commitSha">
-        /// The SHA of the commit that the thread relates to. May be null if the thread
-        /// represents trying to add a comment to a line that hasn't yet been pushed.
-        /// </param>
-        /// <param name="filePath">The path to the file that the thread relates to.</param>
-        /// <param name="diffLine">The line in the diff that the thread relates to.</param>
+        /// <param name="file">The file being commented on.</param>
+        /// <param name="lineNumber">The 0-based line number in the file.</param>
         public NewInlineCommentThreadViewModel(
             IApiClient apiClient,
             IPullRequestSession session,
@@ -42,6 +39,7 @@ namespace GitHub.InlineReviews.ViewModels
             this.apiClient = apiClient;
             Session = session;
             File = file;
+            LineNumber = lineNumber;
 
             PostComment = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.NeedsPush, x => !x),
@@ -58,6 +56,11 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets the file that the comment will be left on.
         /// </summary>
         public IPullRequestSessionFile File { get; }
+
+        /// <summary>
+        /// Gets the 0-based line number in the file that the comment will be left on.
+        /// </summary>
+        public int LineNumber { get; }
 
         /// <summary>
         /// Gets the current pull request review session.
@@ -81,6 +84,15 @@ namespace GitHub.InlineReviews.ViewModels
         {
             Guard.ArgumentNotNull(parameter, nameof(parameter));
 
+            var diffPosition = File.Diff
+                .SelectMany(x => x.Lines)
+                .FirstOrDefault(x => x.NewLineNumber == LineNumber + 1);
+
+            if (diffPosition == null)
+            {
+                throw new InvalidOperationException("Unable to locate line in diff.");
+            }
+
             var body = (string)parameter;
             var result = await apiClient.CreatePullRequestReviewComment(
                 Session.Repository.Owner,
@@ -89,7 +101,7 @@ namespace GitHub.InlineReviews.ViewModels
                 body,
                 File.CommitSha,
                 File.RelativePath.Replace("\\", "/"),
-                -1);
+                diffPosition.DiffLineNumber);
 
             var model = new PullRequestReviewCommentModel
             {
