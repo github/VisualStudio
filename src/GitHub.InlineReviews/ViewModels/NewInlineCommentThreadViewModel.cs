@@ -131,7 +131,7 @@ namespace GitHub.InlineReviews.ViewModels
                 User = Session.User,
             };
 
-            ////Session.AddComment(model);
+            Session.AddComment(model);
             return model;
         }
     }

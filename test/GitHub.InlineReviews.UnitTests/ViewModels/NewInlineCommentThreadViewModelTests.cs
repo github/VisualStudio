@@ -131,6 +131,20 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 7);
         }
 
+        [Fact]
+        public void AddsPostedCommentToSession()
+        {
+            var apiClient = CreateApiClient();
+            var session = CreateSession();
+            var file = CreateFile();
+            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
+
+            target.Comments[0].Body = "New Comment";
+            target.Comments[0].CommitEdit.Execute(null);
+
+            session.Received(1).AddComment(Arg.Any<IPullRequestReviewCommentModel>());
+        }
+
         IApiClient CreateApiClient()
         {
             var result = Substitute.For<IApiClient>();

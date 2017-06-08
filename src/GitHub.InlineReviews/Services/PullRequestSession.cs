@@ -67,6 +67,15 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public async Task AddComment(IPullRequestReviewCommentModel comment)
+        {
+            PullRequest.ReviewComments = PullRequest.ReviewComments
+                .Concat(new[] { comment })
+                .ToList();
+            await Update(PullRequest);
+        }
+
+        /// <inheritdoc/>
         public async Task<IReactiveList<IPullRequestSessionFile>> GetAllFiles()
         {
             if (files == null)
@@ -99,15 +108,8 @@ namespace GitHub.InlineReviews.Services
                 if (!fileIndex.TryGetValue(relativePath, out file))
                 {
                     // TODO: Check for binary files.
-                    if (FilePaths.Any(x => x == relativePath))
-                    {
-                        file = await CreateFile(relativePath, contentSource);
-                        fileIndex.Add(relativePath, file);
-                    }
-                    else
-                    {
-                        fileIndex.Add(relativePath, null);
-                    }
+                    file = await CreateFile(relativePath, contentSource);
+                    fileIndex.Add(relativePath, file);
                 }
                 else if (contentSource != null && file.ContentSource != contentSource)
                 {

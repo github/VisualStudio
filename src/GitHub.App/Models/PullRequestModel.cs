@@ -161,7 +161,13 @@ namespace GitHub.Models
         public IAccount Author { get; set; }
         public IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
         public IReadOnlyCollection<ICommentModel> Comments { get; set; } = new ICommentModel[0];
-        public IReadOnlyCollection<IPullRequestReviewCommentModel> ReviewComments { get; set; } = new IPullRequestReviewCommentModel[0];
+
+        IReadOnlyCollection<IPullRequestReviewCommentModel> reviewComments = new IPullRequestReviewCommentModel[0];
+        public IReadOnlyCollection<IPullRequestReviewCommentModel> ReviewComments
+        {
+            get { return reviewComments; }
+            set { reviewComments = value; this.RaisePropertyChange(); }
+        }
 
         IAccount assignee;
         [AllowNull]
