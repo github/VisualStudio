@@ -1,10 +1,10 @@
 # First Launch
 - **Start page is displayed by default on first launch**
   - **Click on GitHub link on start page under Open > Checkout from**
-    - [ ] Team Explorer Window exposed
-    - [ ] Clone a GitHub Repository dialog visible
+    - [ ] Team Explorer Window exposed (only appears when clone dialog is closed)
+    - [x] Clone a GitHub Repository dialog visible
   - **If last solution was in a git repo hosted on GitHub**
-    - **Team Explorer Home page shows:**
+    - **Team Explorer Home page shows:** (VS 2017 doesn't seem to remember. Shows Connect page)
       - [ ] GitHub header, repo information
       - [ ] Pull Requests button
       - [ ] Pulse button
@@ -13,160 +13,163 @@
     - **If last solution was in a git repo not hosted on GitHub**
         - [ ] Team Explorer Home page does not show any github information
   - **Go to Team Explorer Connect page**
-    - [ ] GitHub invitation section in Hosted Service Providers area is visible with Connect... and Sign up links
-    - [ ] **Click on Connect**
-        - [ ] Connect to GitHub dialog appears
-        - [ ] GitHub option underlined
-        - [ ] Cursor on username field
-        - [ ] Login button disabled
-        - [ ] Link to sign up at the bottom
-    - [ ] **Fill out login information**
-        - [ ] **On successful login**
-              - [ ] Connect dialog disappears
-              - [ ] GitHub invitation section in Connect page disappears
-              - [ ] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
+    - [x] GitHub invitation section in Hosted Service Providers area is visible with Connect... and Sign up links
+    - [x] **Click on Connect**
+        - [x] Connect to GitHub dialog appears
+        - [x] GitHub option underlined
+        - [x] Cursor on username field
+        - [x] Login button disabled
+        - [x] Link to sign up at the bottom
+    - [x] **Fill out login information**
+        - [x] **On successful login**
+              - [x] Connect dialog disappears
+              - [x] GitHub invitation section in Connect page disappears
+              - [x] GitHub connection appears above Hosted Service Providers area with Clone, Create and Sign out action links. As long as it's above Local Git Repositories, it's good
 
 # In Team Explorer Connect page (logged in)
-  - [ ] **Click on Clone action link**
-      - [ ] Clone dialog appears
-      - [ ] List of user repositories is populated
-      - [ ] Path field contains default cloning path C:\Users\[user]\Source\Repos
-      - [ ] Cursor is in Search Repositories field
-      - [ ] Clone button is disabled
-      - [ ] Typing in the Search Repositories field filters the list
-      - [ ] Clicking on the browse action link opens a file explorer
-      - [ ] Selecting a directory in the file explorer changes the contents of the Path field to the new path
-      - [ ] Selecting a repository from the list enables the clone button
-      - [ ] ctrl-clicking a selection in the list removes the selection and disables the clone button
-      - [ ] Hovering over the clone button (when enabled) animates the button (reversing colors)
-  - [ ] **Select a repository and click Clone**
-      - [ ] Clone dialog disappears
-      - [ ] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
-      - [ ] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed.
-      - [ ] Repository shows up in the "Local Git Repositories" list
+  - [x] **Click on Clone action link**
+      - [x] Clone dialog appears
+      - [x] List of user repositories is populated
+      - [x] Path field contains default cloning path C:\Users\[user]\Source\Repos
+      - [x] Cursor is in Search Repositories field
+      - [x] Clone button is disabled
+      - [x] Typing in the Search Repositories field filters the list
+      - [x] Clicking on the browse action link opens a file explorer
+      - [x] Selecting a directory in the file explorer changes the contents of the Path field to the new path
+      - [x] Selecting a repository from the list enables the clone button
+      - [x] ctrl-clicking a selection in the list removes the selection and disables the clone button
+      - [x] Hovering over the clone button (when enabled) animates the button (reversing colors)
+  - [x] **Select a repository and click Clone**
+      - [x] Clone dialog disappears
+      - [x] Progress bar appears in the Team Explorer Connect page with cloning progress (depending on repo size)
+      - [x] Notification appears in Team Explorer Connect page: "The repository was cloned successfully. username/repo-name has been successfully created. Create a new project or solution." with proper links displayed.
+      - [ ] ~~Repository shows up in the "Local Git Repositories" list~~
+      - [x] Repository opens in Solution Explorer - Folder View
   - [ ] **Double-click the cloned repository in the "Local Git Repositories" list**
-      - [ ] Team Explorer view changes to Home page
-      - [ ] GitHub header and repo information is shown
+      - [x] Team Explorer view changes to Home page
+      - [x] GitHub header and repo information is shown
   - [ ] **Navigate back to Connect view, then click clone in "Local Git Repositories" list**
-      - [ ] Copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
-  - [ ] **Click on Create action link in GitHub section**
-    - [ ] Create dialog appears
-    - [ ] Cursor is on the Name field
-    - [ ] Create button is disabled
-    - [ ] Local path is set to default cloning path C:\Users\[user]\Source\Repos
-    - [ ] Git ignore is set to VisualStudio
-    - [ ] User is set to current logged user
-    - [ ] Tabbing through the fields follows visual placement of fields
-    - [ ] Filling the name field enables the Create button
-    - [ ] Hovering over the Create button animates it (reversing colors)
-    - [ ] Clicking on the browse action link opens a file explorer
-    - [ ] Selecting a directory in the file explorer changes the contents of the Path field to the new path
-  - [ ] **Fill out the name field and click Create**
-    - [ ] Dialog disappears
-    - [ ] Notification appears in Team Explorer Connect page: "The repository was created successfully"
-    - [ ] Repository shows up in the "Local Git Repositories" list
-  - [ ] **Double-click the created repository in the "Local Git Repositories" list**
-    - [ ] Team Explorer view changes to Home page
-    - [ ] GitHub header and repo information is shown
-- [ ] **Publishing a local repo**
-  - [ ] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
-  - [ ] **Set "Create new Git Repository" checkbox to checked**
-  - [ ] **Click OK button**
-  - [ ] Verify that Team Explorer home page does *not* have a GitHub section
-- [ ] **Click "Sync"**
-       - [ ] Synchronization page opens with "Publish to GitHub" section
-- [ ] **Click "Publish to GitHub" in the "Publish to GitHub" section**
-      - [ ] Contents of section change to a publish form with:
-        - [ ] Account type dropdown
-        - [ ] User dropdown
-        - [ ] Pre-filled name field with project name
-        - [ ] Description field
-        - [ ] Private checkbox
-        - [ ] Publish button
-- [ ] **Publish button is enabled and private checkbox is unchecked (and disabled if user cannot create private repos)**
-    - [ ] Click on "Publish"
-        - [ ] Form becomes disabled
-        - [ ] Progress bar appears above Synchronization title
-        - [ ] Team Explorer view changes to Home page
-        - [ ] Notification appears: "Repository published successfully"
-        - [ ] Publish a private repo and verify on .com that it's private
-- [ ] **Project section (Home button)***
-    - [ ] Click on "Home" icon
-        - [ ] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
-        - [ ] Verify Pulse button navigates to Pulse page on Github.com
-        - [ ] Verify Graphs button navigates to Graphs page on GitHub.com
-        - [ ] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
-        - [ ] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
-- [ ] **Creating Multiple Repositories**
-    - [ ] Go to Team Explorer Connect page (logged in)
-      - [ ] Create additional repository
-        - [ ] Publish new repository
-          - [ ] Verify remote information present in repository settings
-- [ ] **Validate Publish Repository Error**
-    - [ ] Remove remote settings from repository
-    - [ ] Go to Sync page and publish repository
-    - [ ] Go to Team Explorer Connect page (logged in)
-    - [ ] Click GitHub > Create
-    - [ ] Received error: "There is already a repository named [repo name] for the current account"
+      - [x] Copy/paste a repo from .com. Clone and verify the message displays, "The repository was cloned successfully."
+  - [x] **Click on Create action link in GitHub section**
+    - [x] Create dialog appears
+    - [x] Cursor is on the Name field
+    - [x] Create button is disabled
+    - [x] Local path is set to default cloning path C:\Users\[user]\Source\Repos
+    - [x] Git ignore is set to VisualStudio
+    - [x] User is set to current logged user
+    - [x] Tabbing through the fields follows visual placement of fields
+    - [x] Filling the name field enables the Create button
+    - [x] Hovering over the Create button animates it (reversing colors)
+    - [x] Clicking on the browse action link opens a file explorer
+    - [x] Selecting a directory in the file explorer changes the contents of the Path field to the new path
+  - [x] **Fill out the name field and click Create**
+    - [x] Dialog disappears
+    - [x] Notification appears in Team Explorer Connect page: "The repository was created successfully"
+    - [x] Repository shows up in the "Local Git Repositories" list
+  - [x] **Double-click the created repository in the "Local Git Repositories" list**
+    - [x] Team Explorer view changes to Home page
+    - [x] GitHub header and repo information is shown
+- [x] **Publishing a local repo**
+  - [x] **File - New - Project - Console Application (or any type of project, doesn't matter much)**
+  - [x] **Set "Create new Git Repository" checkbox to checked**
+  - [x] **Click OK button**
+  - [x] Verify that Team Explorer home page does *not* have a GitHub section
+- [x] **Click "Sync"**
+       - [x] Synchronization page opens with "Publish to GitHub" section
+- [x] **Click "Publish to GitHub" in the "Publish to GitHub" section**
+      - [x] Contents of section change to a publish form with:
+        - [x] Account type dropdown
+        - [x] User dropdown
+        - [x] Pre-filled name field with project name
+        - [x] Description field
+        - [x] Private checkbox (might we want note about why this is disabled for non-paying users?)
+        - [x] Publish button
+- [x] **Publish button is enabled and private checkbox is unchecked (and disabled if user cannot create private repos)**
+    - [x] Click on "Publish"
+        - [x] Form becomes disabled
+        - [x] Progress bar appears above Synchronization title
+        - [x] Team Explorer view changes to Home page
+        - [ ] Notification appears: "Repository published successfully" (... has been successfully *created*)
+        - [ ] Publish a private repo and verify on .com that it's private (N/A I'm using a regular account)
+- [x] **Project section (Home button)***
+    - [x] Click on "Home" icon
+        - [x] Verify Project has the following sections/buttons when signed into GitHub.com and the Repository is enabled: Pull Requests, Pulse, Graphs, Issues, Wikis
+        - [x] Verify Pulse button navigates to Pulse page on Github.com
+        - [x] Verify Graphs button navigates to Graphs page on GitHub.com
+        - [x] Verify Wikis button navigates to Wikis page on GitHub.com (when logged in and the repository is enabled)
+        - [x] Verify Issues button navigates to Issues page on GitHub.com (when logged in and the repository is enabled)
+- [x] **Creating Multiple Repositories**
+    - [x] Go to Team Explorer Connect page (logged in)
+    - [x] Create additional repository
+    - [x] Publish new repository (note, it doesn't change to new repository which seems surprising) 
+    - [x] Verify remote information present in repository settings
+- [x] **Validate Publish Repository Error**
+    - [x] Remove remote settings from repository
+    - [x] Go to Sync page and publish repository
+    - [x] Go to Team Explorer Connect page (logged in)
+    - [x] Click GitHub > Create
+    - [x] Enter name of original repository
+    - [x] Received error: "There is already a repository named [repo name] for the current account"
 # Connect page when logged in to TFS
-   - [ ] **Connect to a TFS project**
-    - [ ] Login to GitHub
-      - [ ] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Sign out links
-    - [ ] Log out of GitHub
-      - [ ] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Login links
-    - [ ]  Disconnect from TFS (right click on project and "Remove"
+   - [x] **Connect to a TFS project**
+    - [x] Login to GitHub
+      - [x] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Sign out links
+    - [x] Log out of GitHub
+      - [x] Team Explorer Connect page: GitHub section appears above TFS section with Clone | Create | Login links
+    - [ ]  Disconnect from TFS (right click on project and "Remove" (no more option to remove?)
       - [ ] Team Explorer Connect page: GitHub invitation section appears in Hosted Service Providers with Connect.. and Sign up links
 
 # In GitHub pane (logged into GitHub)
-- [ ] **Go to Team Explorer > Home > Pull Requests**
-      - [ ] List of pull requests is displayed.
-      - [ ] Pane title displays "GitHub | (current repository)"
-      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
-      - [ ] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
-      - [ ] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
-      - [ ] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
-      - [ ] Filter author selection displays recent pull request authors
-      - [ ] "Create New" Link button is displayed
-      - [ ] Clicking on a pull request number opens browser window to pull request on .com
-- [ ] **Click on a pull request title**
-      - [ ] A detailed description of the pull request is displayed.
-      - [ ] Pull request number matches the number in the list.
-      - [ ] Pull request title matches the title in the list.
-      - [ ] Source branch is displayed on the left
-      - [ ] Mousing over the source branch shows the entire branch name in a tool tip
-      - [ ] Target branch is displayed on the right
-      - [ ] Mousing over the target branch shows the entire branch name in a tool tip
-      - [ ] "View conversation on GitHub" link navigates to pull request on .com
-      - [ ] List of changed files displayed under pull request description
-      - [ ] Right clicking on a specific file displays options to open or compare file
-      - [ ] Double clicking on a file opens a diff view of the file or a single file (depends on current file option)
-      - [ ] Files in file diff view match diff on .com (pick any file)
-- [ ] **Make a change any file and save it**
-- [ ] **Go to any pull request details and mouseover**
-      - [ ] "Checkout to [branch name]" is plain text (not hyperlink) and mouseover displays tool tip
-- [ ] **Undo pending changes (Many option to do this. One way: Go to Team Explorer > Home > Changes > Right click on files > Undo Changes)**
-- [ ] **Click on "checkout to [branch name]"**
-      - [ ] Git context (lower right) displays source branch name of pull request
-      - [ ] "Checkout to [branch name]" text has changed to "Local branch up to date"
-- [ ] **Create a new branch (can alternatively make commits on an existing branch)**
-- [ ] **Switch Git context to new branch**
-- [ ] **Navigate to the Pull Request List (Pull request icon in navigation toolbar) and click on Create New button**
-      - [ ] Pane title displays "GitHub | (current repository)"
-      - [ ] Selected pane tab title (on the bottom) displays "GitHub"
-      - [ ] Create Pull Request button is disabled.
-      - [ ] Default/target branch name is displayed to the left of the arrow (<)
-      - [ ] Source branch is displayed to the right of the arrow
-      - [ ] Default/target branch is a dropdown of all branches
-      - [ ] Clicking on Cancel button navigates back to the pull request list
-      - [ ] Setting the target and source branch as the same branches disables the "Create Pull Request" button and displays an error message at the top of pane
-- [ ] **Fill out pull request Title**
-      - [ ] "Create Pull Request" button is enabled.
-- [ ] **Click on Create Pull Request**
-      - [ ] Pull request list is displayed with new pull request (that was just created) at the top of the list
-      - [ ] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
-      - [ ] Verify all non pushed commits prior to pull request creation have been pushed and exist on .com
-- [ ] **Click on back/right/pull request/refresh navigation items (any order)**
-      - [ ] Verify that navigation buttons show views are consistent with clicked navigation buttons
+- [x] **Go to Team Explorer > Home > Pull Requests**
+      - [x] List of pull requests is displayed.
+      - [ ] Pane title displays "GitHub | (current repository)" (title  just says `GitHub`)
+      - [x] Selected pane tab title (on the bottom) displays "GitHub"
+      - [x] Changing the open/close/all filter dropdown filters the pull request list, by selected option (confirm on .com)  
+      - [x] Changing the Assignee filter dropdown filters the pull request list to display only selected user assigned (confirm on .com)  
+      - [x] Changing the Author filter dropdown filters the pull request list to display pull requests the user created (confirm on .com)  
+      - [ ] Filter author selection displays recent pull request authors (recent?  there's a lot on the VisualStudio repo, plenty where list comes up empty)
+      - [x] "Create New" Link button is displayed
+      - [x] Clicking on a pull request number opens browser window to pull request on .com
+- [x] **Click on a pull request title**
+      - [x] A detailed description of the pull request is displayed.
+      - [x] Pull request number matches the number in the list.
+      - [x] Pull request title matches the title in the list.
+      - [x] Source branch is displayed on the left
+      - [x] Mousing over the source branch shows the entire branch name in a tool tip
+      - [x] Target branch is displayed on the right
+      - [x] Mousing over the target branch shows the entire branch name in a tool tip
+      - [x] "View conversation on GitHub" link navigates to pull request on .com
+      - [x] List of changed files displayed under pull request description
+      - [x] Right clicking on a specific file displays options to open or compare file
+      - [ ] Double clicking on a file opens a diff view of the file ~~or a single file (depends on current file option)~~ (this now always shows a diff)
+      - [x] Files in file diff view match diff on .com (pick any file)
+- [x] **Make a change any file and save it** (I was a bit confused about these steps)
+- [x] **Go to any (other?) pull request details and mouseover**
+      - [x] "Checkout to [branch name]" is plain text (not hyperlink) and mouseover displays (Cannot checkout?) tool tip
+- [x] **Undo pending changes (Many option to do this. One way: Go to Team Explorer > Home > Changes > Right click on files > Undo Changes)**
+      (should there be a click on refresh button step here?)
+- [x] **Click on "checkout to [branch name]"**
+      - [ ] Git context (lower right) displays source branch name of pull request (can't see this)
+      - [x] "Checkout to [branch name]" text has changed to "Local branch up to date"
+- [x] **Create a new branch (can alternatively make commits on an existing branch)**
+- [x] **Switch Git context to new branch**
+- [x] **Navigate to the Pull Request List (Pull request icon in navigation toolbar) and click on Create New button**
+      - [x] Pane title displays "GitHub | (current repository)"
+      - [x] Selected pane tab title (on the bottom) displays "GitHub"
+      - [x] Create Pull Request button is disabled.
+      - [x] Default/target branch name is displayed to the left of the arrow (<)
+      - [x] Source branch is displayed to the right of the arrow (it's a hyperlink, not sure why?)
+      - [x] Default/target branch is a dropdown of all branches
+      - [x] Clicking on Cancel button navigates back to the pull request list
+      - [ ] Setting the target and source branch as the same branches (can't change see source branch on list of target branches) disables the "Create Pull Request" button and displays an error message at the top of pane
+- [x] **Fill out pull request Title**
+      - [x] "Create Pull Request" button is enabled.
+- [x] **Click on Create Pull Request**
+      - [x] Pull request list is displayed with new pull request (that was just created) at the top of the list
+      - [x] "The Pull Request has been created at [target branch]" message is displayed at the top of the GitHub pane
+      - [x] Verify all non pushed commits prior to pull request creation have been pushed and exist on .com
+- [x] **Click on back/right/pull request/refresh navigation items (any order)**
+      - [x] Verify that navigation buttons show views are consistent with clicked navigation buttons
 
 # In VS text/code Editor (logged in to GitHub, open a file that is hosted on Github)
 - [ ] **Highlight code or text within solution, then right click.**
