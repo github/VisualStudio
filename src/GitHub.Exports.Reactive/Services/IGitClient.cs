@@ -156,5 +156,16 @@ namespace GitHub.Services
         /// <param name="contents">The file contents to test.</param>
         /// <returns></returns>
         Task<bool> IsModified(IRepository repository, string path, byte[] contents);
+
+        /// <summary>
+        /// Find the merge base SHA between two commits.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="sha1">The SHA of 1st commit.</param>
+        /// <param name="sha2">The SHA of 2nd commit.</param>
+        /// <returns>
+        /// The merge base SHA or null.
+        /// </returns>
+        string GetMergeBase(IRepository repo, string sha1, string sha2);
     }
 }

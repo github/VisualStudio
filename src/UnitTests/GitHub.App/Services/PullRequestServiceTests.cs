@@ -29,7 +29,48 @@ public class PullRequestServiceTests : TestBaseClass
             var headFileSha = null as string;
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, headFileSha, checkedOut);
+
+            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async Task MergeBaseAvailable_UseMergeBaseSha()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = "mergeBaseFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = "mergeBaseSha";
+            var headFileSha = null as string;
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                fileName, headFileSha, checkedOut);
+
+            Assert.Equal(mergeBaseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async Task MergeBaseNotAvailable_UseBaseSha()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = null as string;
+            var headFileSha = null as string;
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                fileName, headFileSha, checkedOut);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
@@ -46,7 +87,8 @@ public class PullRequestServiceTests : TestBaseClass
             var headFileSha = "headFileSha";
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, headFileSha, checkedOut);
 
             Assert.Equal(string.Empty, File.ReadAllText(files.Item1));
             Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
@@ -65,7 +107,8 @@ public class PullRequestServiceTests : TestBaseClass
             var headFileSha = "headFileSha";
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, headFileSha, checkedOut);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(string.Empty, File.ReadAllText(files.Item2));
@@ -79,13 +122,14 @@ public class PullRequestServiceTests : TestBaseClass
             var headFileContent = null as string;
             var fileName = "fileName";
             var baseSha = "baseSha";
-            var headSha = null as string;
+            var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
             var headFileSha = "headFileSha";
             var checkedOut = true;
             var workingFile = Path.Combine(repoDir, fileName);
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut, repoDir);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, headFileSha, checkedOut, repoDir);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(workingFile, files.Item2);
@@ -105,43 +149,38 @@ public class PullRequestServiceTests : TestBaseClass
             var headFileSha = "headFileSha";
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut, modelServiceHeadFile: headFile);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, headFileSha, checkedOut, modelServiceHeadFile: headFile);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(headFile, files.Item2);
         }
 
-        static async Task<Tuple<string, string>> ExtractDiffFiles(object baseFileContent, object headFileContent,
-            string fileName, string baseSha, string headSha, string headFileSha, bool checkedOut,
-            string repoDir = "repoDir", object modelServiceHeadFile = null)
+        static async Task<Tuple<string, string>> ExtractDiffFiles(
+            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
+            string fileName, string headFileSha, bool checkedOut, string repoDir = "repoDir", object modelServiceHeadFile = null)
         {
-            var repo = Substitute.For<ILocalRepositoryModel>();
-            repo.LocalPath.Returns(repoDir);
+            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+            repositoryModel.LocalPath.Returns(repoDir);
 
             var modelService = Substitute.For<IModelService>();
             var pullRequest = Substitute.For<IPullRequestModel>();
 
-            if (baseSha != null)
-            {
-                var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-                pullRequest.Base.Returns(baseRef);
-            }
-
-            if (headSha != null)
-            {
-                var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-                pullRequest.Head.Returns(headRef);
-            }
+            pullRequest.Base.Returns(new GitReferenceModel("ref", "label", baseSha, "uri"));
+            pullRequest.Head.Returns(new GitReferenceModel("ref", "label", headSha, "uri"));
 
             var serviceProvider = Substitutes.ServiceProvider;
             var gitClient = MockGitClient();
-            var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+            var gitService = serviceProvider.GetGitService();
+            var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
+            gitClient.GetMergeBase(Arg.Any<IRepository>(), baseSha, headSha).Returns(mergeBaseSha);
+            gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
             modelService.GetFileContents(Arg.Any<IRepositoryModel>(), headSha, fileName, headFileSha).Returns(GetFileObservable(modelServiceHeadFile));
 
-            return await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
+            return await service.ExtractDiffFiles(repositoryModel, modelService, pullRequest, fileName, headFileSha, checkedOut);
         }
 
         static IObservable<string> GetFileObservable(object fileOrException)
