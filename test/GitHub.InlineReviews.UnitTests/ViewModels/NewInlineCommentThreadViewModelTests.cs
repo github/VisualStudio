@@ -21,7 +21,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 Substitute.For<IPullRequestSessionFile>(),
-                10);
+                10,
+                false);
 
             Assert.Equal(1, target.Comments.Count);
             Assert.Equal(string.Empty, target.Comments[0].Body);
@@ -36,7 +37,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 file,
-                10);
+                10,
+                false);
 
             Assert.False(target.NeedsPush);
             Assert.True(target.PostComment.CanExecute(false));
@@ -60,7 +62,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IApiClient>(),
                 Substitute.For<IPullRequestSession>(),
                 file,
-                10);
+                10,
+                false);
 
             file.CommitSha.Returns((string)null);
             RaisePropertyChanged(file, nameof(file.CommitSha));
@@ -75,12 +78,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Fact]
-        public void AddsCommentToCorrectDiffLine()
+        public void AddsCommentToCorrectAddedLine()
         {
             var apiClient = CreateApiClient();
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10);
+            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
 
             target.Comments[0].Body = "New Comment";
             target.Comments[0].CommitEdit.Execute(null);
@@ -93,6 +96,39 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "COMMIT_SHA",
                 "file.cs",
                 5);
+        }
+
+        [Fact]
+        public void AddsCommentToCorrectDeletedLine()
+        {
+            var apiClient = CreateApiClient();
+            var session = CreateSession();
+            var file = CreateFile();
+
+            file.Diff.Returns(new[]
+            {
+                new DiffChunk
+                {
+                    Lines =
+                    {
+                        new DiffLine { OldLineNumber = 17, DiffLineNumber = 7 }
+                    }
+                }
+            });
+
+            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 16, true);
+
+            target.Comments[0].Body = "New Comment";
+            target.Comments[0].CommitEdit.Execute(null);
+
+            apiClient.Received(1).CreatePullRequestReviewComment(
+                "owner",
+                "repo",
+                47,
+                "New Comment",
+                "COMMIT_SHA",
+                "file.cs",
+                7);
         }
 
         IApiClient CreateApiClient()

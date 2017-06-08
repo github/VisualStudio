@@ -26,7 +26,6 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        IDisposable fileSubscription;
         ICommentThreadViewModel thread;
         string fullPath;
         bool leftBuffer;
@@ -100,7 +99,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             else
             {
-                Thread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber.Value);
+                Thread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber.Value, leftBuffer);
             }
         }
 

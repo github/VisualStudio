@@ -25,11 +25,15 @@ namespace GitHub.InlineReviews.ViewModels
         /// <param name="session">The current PR review session.</param>
         /// <param name="file">The file being commented on.</param>
         /// <param name="lineNumber">The 0-based line number in the file.</param>
+        /// <param name="leftComparisonBuffer">
+        /// True if the comment is being left on the left-hand-side of a diff; otherwise false.
+        /// </param>
         public NewInlineCommentThreadViewModel(
             IApiClient apiClient,
             IPullRequestSession session,
             IPullRequestSessionFile file,
-            int lineNumber)
+            int lineNumber,
+            bool leftComparisonBuffer)
             : base(session.User)
         {
             Guard.ArgumentNotNull(apiClient, nameof(apiClient));
@@ -40,6 +44,7 @@ namespace GitHub.InlineReviews.ViewModels
             Session = session;
             File = file;
             LineNumber = lineNumber;
+            LeftComparisonBuffer = leftComparisonBuffer;
 
             PostComment = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.NeedsPush, x => !x),
@@ -61,6 +66,11 @@ namespace GitHub.InlineReviews.ViewModels
         /// Gets the 0-based line number in the file that the comment will be left on.
         /// </summary>
         public int LineNumber { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether comment is being left on the left-hand-side of a diff.
+        /// </summary>
+        public bool LeftComparisonBuffer { get; }
 
         /// <summary>
         /// Gets the current pull request review session.
@@ -86,7 +96,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             var diffPosition = File.Diff
                 .SelectMany(x => x.Lines)
-                .FirstOrDefault(x => x.NewLineNumber == LineNumber + 1);
+                .FirstOrDefault(x =>
+                {
+                    var line = LeftComparisonBuffer ? x.OldLineNumber : x.NewLineNumber;
+                    return line == LineNumber + 1;
+                });
 
             if (diffPosition == null)
             {
