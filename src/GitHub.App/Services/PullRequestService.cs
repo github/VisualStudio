@@ -293,8 +293,15 @@ namespace GitHub.Services
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
                 await gitClient.Fetch(repo, remote.Name);
 
+                var mergeBase = gitClient.GetMergeBase(repo, pullRequest.Base.Sha, pullRequest.Head.Sha);
+                if(mergeBase == null)
+                {
+                    // HACK: If we can't find the merge base, fall back to using the base.
+                    mergeBase = pullRequest.Base.Sha;
+                }
+
                 // The left file is the target of the PR so this should already be fetched.
-                var left = await ExtractToTempFile(repo, pullRequest.Base.Sha, fileName);
+                var left = await ExtractToTempFile(repo, mergeBase, fileName);
 
                 // The right file - if it comes from a fork - may not be fetched so fall back to
                 // getting the file contents from the model service.

@@ -325,6 +325,19 @@ namespace GitHub.Services
             });
         }
 
+        public string GetMergeBase(IRepository repo, string a, string b)
+        {
+            var aCommit = repo.Lookup<Commit>(a);
+            var bCommit = repo.Lookup<Commit>(b);
+            if (aCommit == null || bCommit == null)
+            {
+                return null;
+            }
+
+            var baseCommit = repo.ObjectDatabase.FindMergeBase(aCommit, bCommit);
+            return baseCommit?.Sha;
+        }
+
         static bool IsCanonical(string s)
         {
             return s.StartsWith("refs/", StringComparison.Ordinal);
