@@ -57,7 +57,7 @@ public class PullRequestServiceTests : TestBaseClass
         }
 
         [Fact]
-        public async Task MergeBaseNotAvailable_UseBaseSha()
+        public async void MergeBaseNotAvailable_ThrowsFileNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = "headFileContent";
@@ -68,12 +68,19 @@ public class PullRequestServiceTests : TestBaseClass
             var mergeBaseSha = null as string;
             var headFileSha = null as string;
             var checkedOut = false;
+            var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
 
-            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                fileName, headFileSha, checkedOut);
+            FileNotFoundException ex = null;
+            try
+            {
+                // Can't use Assert.Throws because ExtractDiffFiles is async.
+                await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                                fileName, headFileSha, checkedOut);
+            }
+            catch(FileNotFoundException e) { ex = e; }
 
-            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
-            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+            Assert.NotNull(ex);
+            Assert.Equal(expectMessage, ex.Message);
         }
 
         [Fact]

@@ -291,13 +291,17 @@ namespace GitHub.Services
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name);
 
-                var mergeBase = gitClient.GetMergeBase(repo, pullRequest.Base.Sha, pullRequest.Head.Sha);
+                var pullBaseRef = pullRequest.Base.Ref;
+                var pullHeadRef = $"refs/pull/{pullRequest.Number}/head";
+                await gitClient.Fetch(repo, remote.Name, pullBaseRef, pullHeadRef);
+
+                var baseSha = pullRequest.Base.Sha;
+                var headSha = pullRequest.Head.Sha;
+                var mergeBase = gitClient.GetMergeBase(repo, baseSha, headSha);
                 if(mergeBase == null)
                 {
-                    // HACK: If we can't find the merge base, fall back to using the base.
-                    mergeBase = pullRequest.Base.Sha;
+                    throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
                 }
 
                 // The left file is the target of the PR so this should already be fetched.
@@ -307,11 +311,11 @@ namespace GitHub.Services
                 // getting the file contents from the model service.
                 var right = isPullRequestBranchCheckedOut ?
                     Path.Combine(repository.LocalPath, fileName) :
-                    await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
+                    await GetFileFromRepositoryOrApi(repository, repo, modelService, headSha, fileName, fileSha);
 
                 if (right == null)
                 {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Head.Sha}");
+                    throw new FileNotFoundException($"Could not retrieve {fileName}@{headSha}");
                 }
 
                 return Observable.Return(Tuple.Create(left, right));

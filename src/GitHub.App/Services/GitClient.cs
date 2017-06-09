@@ -14,6 +14,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IGitClient))]
     [PartCreationPolicy(CreationPolicy.Shared)]
+    [NullGuard(ValidationFlags.None)]
     public class GitClient : IGitClient
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
