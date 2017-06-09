@@ -78,7 +78,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Fact]
-        public void AddsCommentToCorrectAddedLine()
+        public void PostsCommentToCorrectAddedLine()
         {
             var apiClient = CreateApiClient();
             var session = CreateSession();

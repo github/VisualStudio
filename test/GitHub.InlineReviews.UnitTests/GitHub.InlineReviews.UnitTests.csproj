@@ -116,6 +116,7 @@
     <Compile Include="Services\PullRequestSessionTests.cs" />
     <Compile Include="TestDoubles\FakeEditorContentSource.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModelTests.cs" />
+    <Compile Include="ViewModels\InlineCommentThreadViewModelTests.cs" />
     <Compile Include="ViewModels\NewInlineCommentThreadViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>

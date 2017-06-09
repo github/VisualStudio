@@ -65,7 +65,7 @@ namespace GitHub.InlineReviews.ViewModels
             CommitEdit = ReactiveCommand.CreateAsyncTask(
                 Observable.CombineLatest(
                     this.WhenAnyValue(x => x.Body, x => !string.IsNullOrEmpty(x)),
-                    thread.PostComment.CanExecuteObservable,
+                    this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
                     (hasBody, canPost) => hasBody && canPost),
                 DoCommitEdit);
         }

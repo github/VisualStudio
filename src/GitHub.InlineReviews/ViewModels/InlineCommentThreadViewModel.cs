@@ -34,7 +34,9 @@ namespace GitHub.InlineReviews.ViewModels
 
             this.apiClient = apiClient;
             Session = session;
-            PostComment = ReactiveCommand.CreateAsyncTask(DoPostComment);
+            PostComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(true),
+                DoPostComment);
 
             foreach (var comment in comments)
             {
@@ -79,7 +81,7 @@ namespace GitHub.InlineReviews.ViewModels
                 User = Session.User,
             };
 
-            ////Session.AddComment(model);
+            await Session.AddComment(model);
             return model;
         }
     }
