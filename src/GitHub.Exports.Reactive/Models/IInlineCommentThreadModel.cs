@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.Text;
-using ReactiveUI;
 
 namespace GitHub.Models
 {
@@ -13,7 +11,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets or sets the comments in the thread.
         /// </summary>
-        IReactiveList<IPullRequestReviewCommentModel> Comments { get; }
+        IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
 
         /// <summary>
         /// Gets the last five lines of the thread's diff hunk, in reverse order.

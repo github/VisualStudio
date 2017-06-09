@@ -190,18 +190,19 @@ namespace GitHub.InlineReviews.Services
                 .GroupBy(x => Tuple.Create(x.OriginalCommitId, x.OriginalPosition.Value));
             var threads = new List<IInlineCommentThreadModel>();
 
-            foreach (var position in commentsByPosition)
+            foreach (var comments in commentsByPosition)
             {
-                var hunk = position.First().DiffHunk;
+                var hunk = comments.First().DiffHunk;
                 var chunks = DiffUtilities.ParseFragment(hunk);
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
                 var thread = new InlineCommentThreadModel(
                     file.RelativePath,
-                    position.Key.Item1,
-                    position.Key.Item2,
-                    diffLines);
-                thread.Comments.AddRange(position);
+                    comments.Key.Item1,
+                    comments.Key.Item2,
+                    diffLines,
+                    comments);
+
                 thread.LineNumber = GetUpdatedLineNumber(thread, file.Diff);
                 threads.Add(thread);
             }

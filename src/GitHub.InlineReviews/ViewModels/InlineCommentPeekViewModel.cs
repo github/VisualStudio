@@ -27,6 +27,7 @@ namespace GitHub.InlineReviews.ViewModels
         IPullRequestSession session;
         IPullRequestSessionFile file;
         ICommentThreadViewModel thread;
+        IDisposable threadSubscription;
         string fullPath;
         bool leftBuffer;
 
@@ -80,6 +81,7 @@ namespace GitHub.InlineReviews.ViewModels
         void UpdateThread()
         {
             Thread = null;
+            threadSubscription?.Dispose();
 
             if (file == null)
                 return;
@@ -99,7 +101,9 @@ namespace GitHub.InlineReviews.ViewModels
             }
             else
             {
-                Thread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber.Value, leftBuffer);
+                var newThread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber.Value, leftBuffer);
+                threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread());
+                Thread = newThread;
             }
         }
 
@@ -110,6 +114,7 @@ namespace GitHub.InlineReviews.ViewModels
             if (session == null)
             {
                 Thread = null;
+                threadSubscription?.Dispose();
                 return;
             }
 

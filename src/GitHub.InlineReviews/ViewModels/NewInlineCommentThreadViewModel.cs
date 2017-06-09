@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
@@ -16,6 +18,7 @@ namespace GitHub.InlineReviews.ViewModels
     public class NewInlineCommentThreadViewModel : CommentThreadViewModel
     {
         readonly IApiClient apiClient;
+        readonly Subject<Unit> finished = new Subject<Unit>();
         bool needsPush;
 
         /// <summary>
@@ -77,6 +80,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
+        /// <summary>
+        /// Gets an observable that is fired with a single value when a comment is sucessfully
+        /// posted and therefore this is no loner a new comment thread.
+        /// </summary>
+        public IObservable<Unit> Finished => finished;
+
         /// <inheritdoc/>
         public override ReactiveCommand<ICommentModel> PostComment { get; }
 
@@ -131,7 +140,9 @@ namespace GitHub.InlineReviews.ViewModels
                 User = Session.User,
             };
 
-            Session.AddComment(model);
+            await Session.AddComment(model);
+            finished.OnNext(Unit.Default);
+
             return model;
         }
     }

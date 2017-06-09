@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Factories;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
@@ -10,6 +14,7 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 using NSubstitute;
+using Octokit;
 using ReactiveUI;
 using Xunit;
 
@@ -57,6 +62,63 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.Equal(CommentEditState.Editing, target.Thread.Comments[0].EditState);
         }
 
+        [Fact]
+        public async Task SwitchesFromNewThreadToExistingThreadWhenCommentPosted()
+        {
+            var sessionManager = CreateSessionManager();
+            var target = new InlineCommentPeekViewModel(
+                CreateApiClientFactory(),
+                CreatePeekService(lineNumber: 8),
+                CreatePeekSession(),
+                sessionManager);
+
+            await target.Initialize();
+            Assert.IsType<NewInlineCommentThreadViewModel>(target.Thread);
+
+            target.Thread.Comments[0].Body = "New Comment";
+
+            sessionManager.CurrentSession
+                .When(x => x.AddComment(Arg.Any<IPullRequestReviewCommentModel>()))
+                .Do(async x =>
+                {
+                    // Simulate the thread being added to the session.
+                    var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+                    var newThread = CreateThread(8, "New Comment");
+                    file.InlineCommentThreads.Returns(new[] { newThread });
+                });
+
+            await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
+
+            Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
+        }
+
+        IApiClientFactory CreateApiClientFactory()
+        {
+            var apiClient = Substitute.For<IApiClient>();
+            apiClient.CreatePullRequestReviewComment(null, null, 0, null, null, null, 0)
+                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
+
+            var result = Substitute.For<IApiClientFactory>();
+            result.Create(null).ReturnsForAnyArgs(apiClient);
+            return result;
+        }
+
+        IPullRequestReviewCommentModel CreateComment(string body)
+        {
+            var comment = Substitute.For<IPullRequestReviewCommentModel>();
+            comment.Body.Returns(body);
+            return comment;
+        }
+
+        IInlineCommentThreadModel CreateThread(int lineNumber, params string[] comments)
+        {
+            var result = Substitute.For<IInlineCommentThreadModel>();
+            var commentList = comments.Select(x => CreateComment(x)).ToList();
+            result.Comments.Returns(commentList);
+            result.LineNumber.Returns(lineNumber);
+            return result;
+        }
+
         IInlineCommentPeekService CreatePeekService(int lineNumber)
         {
             var result = Substitute.For<IInlineCommentPeekService>();
@@ -80,13 +142,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
         IPullRequestSessionManager CreateSessionManager(string commitSha = "COMMIT")
         {
-            var comment = Substitute.For<IPullRequestReviewCommentModel>();
-            comment.Body.Returns("Existing comment");
-            comment.OriginalPosition.Returns(10);
-
-            var thread = Substitute.For<IInlineCommentThreadModel>();
-            thread.Comments.Returns(new ReactiveList<IPullRequestReviewCommentModel>(new[] { comment }));
-            thread.LineNumber.Returns(10);
+            var thread = CreateThread(10, "Existing comment");
 
             var diff = new DiffChunk
             {

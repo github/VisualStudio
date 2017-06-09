@@ -145,6 +145,24 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             session.Received(1).AddComment(Arg.Any<IPullRequestReviewCommentModel>());
         }
 
+        [Fact]
+        public void SignalsFinishedWhenCommentPosted()
+        {
+            var apiClient = CreateApiClient();
+            var session = CreateSession();
+            var file = CreateFile();
+            var target = new NewInlineCommentThreadViewModel(apiClient, session, file, 10, false);
+            var signalled = false;
+
+            target.Finished.Subscribe(_ => signalled = true);
+            Assert.False(signalled);
+
+            target.Comments[0].Body = "New Comment";
+            target.Comments[0].CommitEdit.Execute(null);
+
+            Assert.True(signalled);
+        }
+
         IApiClient CreateApiClient()
         {
             var result = Substitute.For<IApiClient>();
