@@ -405,7 +405,7 @@ namespace GitHub.ViewModels
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(Repository, modelService, model, path, file.Sha, IsCheckedOut).ToTask();
+            return pullRequestsService.ExtractDiffFiles(Repository, model, path, IsCheckedOut).ToTask();
         }
 
         /// <summary>

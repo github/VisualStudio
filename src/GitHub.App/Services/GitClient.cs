@@ -298,7 +298,7 @@ namespace GitHub.Services
                 var commit = repository.Lookup<Commit>(commitSha);
                 if(commit == null)
                 {
-                    throw new FileNotFoundException("Couldn't find commit at '" + commitSha + "'.");
+                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
                 }
 
                 var blob = commit[fileName]?.Target as Blob;
