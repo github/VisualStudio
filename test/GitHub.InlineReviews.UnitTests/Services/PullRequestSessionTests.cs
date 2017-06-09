@@ -417,6 +417,40 @@ Line 4 with comment");
                     Assert.Null(file.CommitSha);
                 }
             }
+
+            [Fact]
+            public async Task CommitShaIsReadFromPullRequestModelIfBranchNotCheckedOut()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest();
+                    var service = CreateService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents);
+                    service.IsUnmodifiedAndPushed(Arg.Any<ILocalRepositoryModel>(), FilePath, Arg.Any<byte[]>()).Returns(false);
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        isCheckedOut: false);
+
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
+                    Assert.Equal("HEAD_SHA", file.CommitSha);
+                }
+            }
+
         }
 
         public class TheAddCommentMethod
@@ -492,8 +526,8 @@ Line 4";
             changedFile.FileName.Returns("test.cs");
 
             var result = Substitute.For<IPullRequestModel>();
-            result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE", RepoUrl));
-            result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD", RepoUrl));
+            result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
+            result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
             result.ChangedFiles.Returns(new[] { changedFile });
             result.ReviewComments.Returns(comments);
 

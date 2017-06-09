@@ -152,8 +152,7 @@ namespace GitHub.InlineReviews.Services
             {
                 var content = await GetFileContent(file);
 
-                file.CommitSha = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
-                    service.GetTipSha(Repository) : null;
+                file.CommitSha = await CalculateCommitSha(file, content);
                 file.Diff = await service.Diff(Repository, file.BaseSha, relativePath, content);
 
                 foreach (var thread in file.InlineCommentThreads)
@@ -180,8 +179,7 @@ namespace GitHub.InlineReviews.Services
             var unmodified = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content);
 
             file.BaseSha = PullRequest.Base.Sha;
-            file.CommitSha = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
-                service.GetTipSha(Repository) : null;
+            file.CommitSha = await CalculateCommitSha(file, content);
             file.Diff = await service.Diff(Repository, file.BaseSha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
@@ -230,6 +228,19 @@ namespace GitHub.InlineReviews.Services
             }
 
             return result;
+        }
+
+        async Task<string> CalculateCommitSha(IPullRequestSessionFile file, byte[] content)
+        {
+            if (IsCheckedOut)
+            {
+                return await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content) ?
+                        service.GetTipSha(Repository) : null;
+            }
+            else
+            {
+                return PullRequest.Head.Sha;
+            }       
         }
 
         Task<byte[]> GetFileContent(IPullRequestSessionFile file)
