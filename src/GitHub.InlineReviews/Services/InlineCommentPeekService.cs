@@ -37,9 +37,9 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public int? GetLineNumber(IPeekSession session)
+        public int GetLineNumber(IPeekSession session, ITrackingPoint point)
         {
-            return session.GetTriggerPoint(session.TextView.TextSnapshot)?.GetContainingLine().LineNumber;
+            return point.GetPoint(session.TextView.TextSnapshot).GetContainingLine().LineNumber;
         }
 
         /// <inheritdoc/>

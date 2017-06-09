@@ -238,11 +238,7 @@ namespace GitHub.InlineReviews.Tags
             if (file == null) return;
 
             sessionSubscription = file.WhenAnyValue(x => x.InlineCommentThreads)
-                .Subscribe(_ =>
-                {
-                    peekService.Hide(view);
-                    NotifyTagsChanged();
-                });
+                .Subscribe(_ => NotifyTagsChanged());
 
             NotifyTagsChanged();
         }

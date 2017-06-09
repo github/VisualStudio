@@ -11,6 +11,7 @@ using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -18,7 +19,7 @@ namespace GitHub.InlineReviews.ViewModels
     /// <summary>
     /// Represents the contents of an inline comment peek view displayed in an editor.
     /// </summary>
-    public class InlineCommentPeekViewModel : ReactiveObject
+    public sealed class InlineCommentPeekViewModel : ReactiveObject, IDisposable
     {
         readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
@@ -26,8 +27,10 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IPullRequestSessionManager sessionManager;
         IPullRequestSession session;
         IPullRequestSessionFile file;
+        IDisposable fileSubscription;
         ICommentThreadViewModel thread;
         IDisposable threadSubscription;
+        ITrackingPoint triggerPoint;
         string fullPath;
         bool leftBuffer;
 
@@ -44,6 +47,9 @@ namespace GitHub.InlineReviews.ViewModels
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
+            triggerPoint = peekSession.GetTriggerPoint(peekSession.TextView.TextBuffer);
+
+            peekSession.Dismissed += (s, e) => Dispose();
         }
 
         /// <summary>
@@ -53,6 +59,12 @@ namespace GitHub.InlineReviews.ViewModels
         {
             get { return thread; }
             private set { this.RaiseAndSetIfChanged(ref thread, value); }
+        }
+
+        public void Dispose()
+        {
+            fileSubscription?.Dispose();
+            fileSubscription = null;
         }
 
         public async Task Initialize()
@@ -86,12 +98,7 @@ namespace GitHub.InlineReviews.ViewModels
             if (file == null)
                 return;
 
-            var buffer = peekSession.TextView.TextBuffer;
-            var lineNumber = peekService.GetLineNumber(peekSession);
-
-            if (lineNumber == null)
-                return;
-
+            var lineNumber = peekService.GetLineNumber(peekSession, triggerPoint);
             var thread = file.InlineCommentThreads.FirstOrDefault(x => x.LineNumber == lineNumber);
             var apiClient = CreateApiClient(session.Repository);
 
@@ -101,7 +108,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             else
             {
-                var newThread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber.Value, leftBuffer);
+                var newThread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber, leftBuffer);
                 threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread());
                 Thread = newThread;
             }
@@ -110,6 +117,7 @@ namespace GitHub.InlineReviews.ViewModels
         async Task SessionChanged(IPullRequestSession session)
         {
             this.session = session;
+            fileSubscription?.Dispose();
 
             if (session == null)
             {
@@ -120,7 +128,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             var relativePath = session.GetRelativePath(fullPath);
             file = await session.GetFile(relativePath);
-            UpdateThread();
+            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread());
         }
 
         IApiClient CreateApiClient(ILocalRepositoryModel repository)

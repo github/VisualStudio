@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -92,6 +93,33 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
         }
 
+        [Fact]
+        public async Task RefreshesWhenSessionInlineCommentThreadsChanges()
+        {
+            var sessionManager = CreateSessionManager();
+            var target = new InlineCommentPeekViewModel(
+                Substitute.For<IApiClientFactory>(),
+                CreatePeekService(lineNumber: 10),
+                CreatePeekSession(),
+                sessionManager);
+
+            await target.Initialize();
+
+            Assert.IsType<InlineCommentThreadViewModel>(target.Thread);
+            Assert.Equal(2, target.Thread.Comments.Count);
+
+            var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+            var newThreads = file.InlineCommentThreads.ToList();
+            var thread = file.InlineCommentThreads.Single();
+            var newComment = CreateComment("New Comment");
+            var newComments = thread.Comments.Concat(new[] { newComment }).ToList();
+            thread.Comments.Returns(newComments);
+            file.InlineCommentThreads.Returns(newThreads);
+            RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
+
+            Assert.Equal(3, target.Thread.Comments.Count);
+        }
+
         IApiClientFactory CreateApiClientFactory()
         {
             var apiClient = Substitute.For<IApiClient>();
@@ -122,7 +150,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         IInlineCommentPeekService CreatePeekService(int lineNumber)
         {
             var result = Substitute.For<IInlineCommentPeekService>();
-            result.GetLineNumber(Arg.Any<IPeekSession>()).Returns(lineNumber);
+            result.GetLineNumber(null, null).ReturnsForAnyArgs(lineNumber);
             return result;
         }
 
@@ -175,6 +203,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             result.CurrentSession.Returns(session);
 
             return result;
+        }
+
+        void RaisePropertyChanged<T>(T o, string propertyName)
+            where T : INotifyPropertyChanged
+        {
+            o.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(new PropertyChangedEventArgs(propertyName));
         }
     }
 }
