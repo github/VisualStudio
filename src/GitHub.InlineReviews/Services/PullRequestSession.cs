@@ -22,12 +22,13 @@ namespace GitHub.InlineReviews.Services
     /// It takes the pull request model and updates according to the current state of the
     /// repository on disk and in the editor.
     /// </remarks>
-    public class PullRequestSession : IPullRequestSession
+    public class PullRequestSession : ReactiveObject, IPullRequestSession
     {
         static readonly List<IPullRequestReviewCommentModel> Empty = new List<IPullRequestReviewCommentModel>();
         readonly IPullRequestSessionService service;
         readonly Dictionary<string, PullRequestSessionFile> fileIndex = new Dictionary<string, PullRequestSessionFile>();
         readonly SemaphoreSlim getFilesLock = new SemaphoreSlim(1);
+        bool isCheckedOut;
         ReactiveList<IPullRequestSessionFile> files;
 
         public PullRequestSession(
@@ -43,14 +44,18 @@ namespace GitHub.InlineReviews.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
 
             this.service = service;
-            IsCheckedOut = isCheckedOut;
+            this.isCheckedOut = isCheckedOut;
             User = user;
             PullRequest = pullRequest;
             Repository = repository;
         }
 
         /// <inheritdoc/>
-        public bool IsCheckedOut { get; }
+        public bool IsCheckedOut
+        {
+            get { return isCheckedOut; }
+            internal set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
+        }
 
         /// <inheritdoc/>
         public IAccount User { get; }
