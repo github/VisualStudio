@@ -156,5 +156,12 @@ namespace GitHub.Services
         /// <param name="contents">The file contents to test.</param>
         /// <returns></returns>
         Task<bool> IsModified(IRepository repository, string path, byte[] contents);
+
+        /// <summary>
+        /// Checks whether the current head is pushed to its remote tracking branch.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <returns></returns>
+        Task<bool> IsHeadPushed(IRepository repo);
     }
 }
