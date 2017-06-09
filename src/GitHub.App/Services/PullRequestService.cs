@@ -293,7 +293,7 @@ namespace GitHub.Services
                 var baseSha = pullRequest.Base.Sha;
                 var headSha = pullRequest.Head.Sha;
                 var baseRef = pullRequest.Base.Ref;
-                string mergeBase = await GetMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
+                string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
                 if (mergeBase == null)
                 {
                     throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
@@ -306,20 +306,6 @@ namespace GitHub.Services
 
                 return Observable.Return(Tuple.Create(left, right));
             });
-        }
-
-        async Task<string> GetMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber)
-        {
-            var mergeBase = gitClient.GetMergeBase(repo, baseSha, headSha);
-            if (mergeBase == null)
-            {
-                var pullHeadRef = $"refs/pull/{pullNumber}/head";
-                await gitClient.Fetch(repo, remoteName, baseRef, pullHeadRef);
-
-                mergeBase = gitClient.GetMergeBase(repo, baseSha, headSha);
-            }
-
-            return mergeBase;
         }
 
         public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)

@@ -162,14 +162,15 @@ public class PullRequestServiceTests : TestBaseClass
 
         static async Task<Tuple<string, string>> ExtractDiffFiles(
             string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
-            string fileName, bool checkedOut, string repoDir = "repoDir")
+            string fileName, bool checkedOut, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef")
         {
             var repositoryModel = Substitute.For<ILocalRepositoryModel>();
             repositoryModel.LocalPath.Returns(repoDir);
 
             var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Number.Returns(pullNumber);
 
-            pullRequest.Base.Returns(new GitReferenceModel("ref", "label", baseSha, "uri"));
+            pullRequest.Base.Returns(new GitReferenceModel(baseRef, "label", baseSha, "uri"));
             pullRequest.Head.Returns(new GitReferenceModel("ref", "label", headSha, "uri"));
 
             var serviceProvider = Substitutes.ServiceProvider;
@@ -177,7 +178,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitService = serviceProvider.GetGitService();
             var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
-            gitClient.GetMergeBase(Arg.Any<IRepository>(), baseSha, headSha).Returns(mergeBaseSha);
+            gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<string>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
             gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));

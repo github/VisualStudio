@@ -161,11 +161,14 @@ namespace GitHub.Services
         /// Find the merge base SHA between two commits.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="sha1">The SHA of 1st commit.</param>
-        /// <param name="sha2">The SHA of 2nd commit.</param>
+        /// <param name="remoteName">The name of the remote (e.g. 'origin').</param>
+        /// <param name="baseSha">The PR base SHA.</param>
+        /// <param name="headSha">The PR head SHA.</param>
+        /// <param name="baseRef">The PR base ref (e.g. 'master').</param>
+        /// <param name="pullNumber">The PR number.</param>
         /// <returns>
         /// The merge base SHA or null.
         /// </returns>
-        string GetMergeBase(IRepository repo, string sha1, string sha2);
+        Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber);
     }
 }

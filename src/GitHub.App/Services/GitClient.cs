@@ -326,7 +326,21 @@ namespace GitHub.Services
             });
         }
 
-        public string GetMergeBase(IRepository repo, string a, string b)
+        public async Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber)
+        {
+            var mergeBase = GetMergeBase(repo, baseSha, headSha);
+            if (mergeBase == null)
+            {
+                var pullHeadRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, remoteName, baseRef, pullHeadRef);
+
+                mergeBase = GetMergeBase(repo, baseSha, headSha);
+            }
+
+            return mergeBase;
+        }
+
+        static string GetMergeBase(IRepository repo, string a, string b)
         {
             var aCommit = repo.Lookup<Commit>(a);
             var bCommit = repo.Lookup<Commit>(b);
