@@ -323,7 +323,7 @@ namespace GitHub.ViewModels
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
             var changes = await pullRequestsService.GetTreeChanges(Repository, pullRequest);
-            ChangedFilesTree = CreateChangedFilesTree(pullRequest, changes).Children.ToList();
+            ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
 
             var localBranches = await pullRequestsService.GetLocalBranches(Repository, pullRequest).ToList();
 
@@ -424,7 +424,7 @@ namespace GitHub.ViewModels
             command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        IPullRequestDirectoryNode CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
+        async Task<IPullRequestDirectoryNode> CreateChangedFilesTree(IPullRequestModel pullRequest, TreeChanges changes)
         {
             var dirs = new Dictionary<string, PullRequestDirectoryNode>
             {
@@ -433,17 +433,17 @@ namespace GitHub.ViewModels
 
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
-                var fileCommentCount = pullRequest.ReviewComments
-                    .Where(x => x.Path == changedFile.FileName && x.OriginalPosition.HasValue)
-                    .Count();
-
                 var node = new PullRequestFileNode(
                     Repository.LocalPath,
                     changedFile.FileName,
                     changedFile.Sha,
                     changedFile.Status,
-                    GetStatusDisplay(changedFile, changes),
-                    fileCommentCount);
+                    GetStatusDisplay(changedFile, changes));
+
+                var file = await Session.GetFile(changedFile.FileName);
+                var fileCommentCount = file?.WhenAnyValue(x => x.InlineCommentThreads)
+                    .Subscribe(x => node.CommentCount = x.Count(y => y.LineNumber != -1));
+
                 var dir = GetDirectory(node.DirectoryPath, dirs);
                 dir.Files.Add(node);
             }
