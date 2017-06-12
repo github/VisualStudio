@@ -106,7 +106,25 @@ namespace GitHub.Api
             } while (auth == null);
 
             await loginCache.SaveLogin(userName, auth.Token, hostAddress).ConfigureAwait(false);
-            return await client.User.Current().ConfigureAwait(false);
+
+            var retry = 0;
+
+            while (true)
+            {
+                try
+                {
+                    return await client.User.Current().ConfigureAwait(false);
+                }
+                catch (AuthorizationException)
+                {
+                    if (retry++ == 3) throw;
+                }
+
+                // It seems that attempting to use a token immediately sometimes fails, retry a few
+                // times with a delay of of 1s to allow the token to propagate.
+                await Task.Delay(1000);
+                System.Diagnostics.Debug.WriteLine("Retrying login " + retry);
+            }
         }
 
         /// <inheritdoc/>
