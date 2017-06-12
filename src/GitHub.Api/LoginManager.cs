@@ -123,7 +123,6 @@ namespace GitHub.Api
                 // It seems that attempting to use a token immediately sometimes fails, retry a few
                 // times with a delay of of 1s to allow the token to propagate.
                 await Task.Delay(1000);
-                System.Diagnostics.Debug.WriteLine("Retrying login " + retry);
             }
         }
 
