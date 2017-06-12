@@ -77,7 +77,7 @@ namespace GitHub.InlineReviews.ViewModels
                 OriginalPosition = result.OriginalPosition,
                 Path = result.Path,
                 Position = result.Position,
-                UpdatedAt = result.UpdatedAt,
+                CreatedAt = result.CreatedAt,
                 User = Session.User,
             };
 

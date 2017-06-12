@@ -423,7 +423,7 @@ namespace GitHub.Services
                         Id = x.Id,
                         Body = x.Body,
                         User = Create(x.User),
-                        UpdatedAt = x.UpdatedAt.Value,
+                        CreatedAt = x.CreatedAt ?? DateTimeOffset.MinValue,
                     }).ToList(),
                 ReviewComments = prCacheItem.ReviewComments.Select(x =>
                     (IPullRequestReviewCommentModel)new PullRequestReviewCommentModel
@@ -437,7 +437,7 @@ namespace GitHub.Services
                         DiffHunk = x.DiffHunk,
                         User = Create(x.User),
                         Body = x.Body,
-                        UpdatedAt = x.UpdatedAt,
+                        CreatedAt = x.CreatedAt,
                     }).ToList(),
                 CommentCount = prCacheItem.CommentCount,
                 CommitCount = prCacheItem.CommitCount,
@@ -656,13 +656,13 @@ namespace GitHub.Services
                 Id = comment.Id;
                 User = new AccountCacheItem(comment.User);
                 Body = comment.Body;
-                UpdatedAt = comment.UpdatedAt;
+                CreatedAt = comment.CreatedAt;
             }
 
             public int Id { get; }
             public AccountCacheItem User { get; set; }
             public string Body { get; set; }
-            public DateTimeOffset? UpdatedAt { get; set; }
+            public DateTimeOffset? CreatedAt { get; set; }
         }
 
         [NullGuard(ValidationFlags.None)]
@@ -683,7 +683,7 @@ namespace GitHub.Services
                 DiffHunk = comment.DiffHunk;
                 User = new AccountCacheItem(comment.User);
                 Body = comment.Body;
-                UpdatedAt = comment.UpdatedAt;
+                CreatedAt = comment.CreatedAt;
             }
 
             public int Id { get; }
@@ -695,7 +695,7 @@ namespace GitHub.Services
             public string DiffHunk { get; set; }
             public AccountCacheItem User { get; set; }
             public string Body { get; set; }
-            public DateTimeOffset UpdatedAt { get; set; }
+            public DateTimeOffset CreatedAt { get; set; }
         }
 
         [NullGuard(ValidationFlags.None)]

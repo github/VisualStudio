@@ -15,6 +15,6 @@ namespace GitHub.Models
         public string DiffHunk { get; set; }
         public IAccount User { get; set; }
         public string Body { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

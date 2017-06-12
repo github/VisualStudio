@@ -80,7 +80,7 @@ namespace GitHub.InlineReviews.ViewModels
             ICommentThreadViewModel thread,
             IAccount currentUser,
             ICommentModel model)
-            : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.UpdatedAt)
+            : this(thread, currentUser, model.Id, model.Body, CommentEditState.None, model.User, model.CreatedAt)
         {
         }
 

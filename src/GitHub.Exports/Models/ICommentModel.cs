@@ -23,8 +23,8 @@ namespace GitHub.Models
         string Body { get; }
 
         /// <summary>
-        /// Gets the last updated time of the comment.
+        /// Gets the creation time of the comment.
         /// </summary>
-        DateTimeOffset UpdatedAt { get; }
+        DateTimeOffset CreatedAt { get; }
     }
 }
