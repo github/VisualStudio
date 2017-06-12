@@ -27,11 +27,13 @@ namespace GitHub.InlineReviews.Models
             string relativePath,
             string originalCommitSha,
             int originalPosition,
-            IList<DiffLine> diffMatch)
+            IList<DiffLine> diffMatch,
+            IEnumerable<IPullRequestReviewCommentModel> comments)
         {
             Guard.ArgumentNotNull(originalCommitSha, nameof(originalCommitSha));
             Guard.ArgumentNotNull(diffMatch, nameof(diffMatch));
 
+            Comments = comments.ToList();
             DiffMatch = diffMatch;
             OriginalCommitSha = originalCommitSha;
             OriginalPosition = originalPosition;
@@ -39,8 +41,7 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public IReactiveList<IPullRequestReviewCommentModel> Comments { get; }
-            = new ReactiveList<IPullRequestReviewCommentModel>();
+        public IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
 
         /// <inheritdoc/>
         public IList<DiffLine> DiffMatch { get; }

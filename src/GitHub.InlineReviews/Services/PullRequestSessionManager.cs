@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace GitHub.InlineReviews.Services
         readonly IPullRequestSessionService sessionService;
         readonly IRepositoryHosts hosts;
         readonly ITeamExplorerServiceHolder teamExplorerService;
+        readonly Dictionary<int, WeakReference<PullRequestSession>> sessions =
+            new Dictionary<int, WeakReference<PullRequestSession>>();
         IPullRequestSession currentSession;
         ILocalRepositoryModel repository;
 
@@ -64,22 +67,7 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
-            if (pullRequest.Number == CurrentSession?.PullRequest.Number)
-            {
-                await CurrentSession.Update(pullRequest);
-                return CurrentSession;
-            }
-            else
-            {
-                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
-
-                return new PullRequestSession(
-                    sessionService,
-                    await modelService.GetCurrentUser(),
-                    pullRequest,
-                    repository,
-                    false);
-            }
+            return await GetSessionInternal(pullRequest);
         }
 
         /// <inheritdoc/>
@@ -92,35 +80,37 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                PullRequestSession session = null;
+                await EnsureLoggedIn(repository);
 
-                this.repository = repository;
-
-                if (repository?.CloneUrl != null)
+                if (repository != this.repository)
                 {
-                    var hostAddress = HostAddress.Create(repository.CloneUrl);
+                    this.repository = repository;
+                    CurrentSession = null;
+                    sessions.Clear();
+                }
 
-                    if (!hosts.IsLoggedInToAnyHost)
-                    {
-                        await hosts.LogInFromCache(hostAddress);
-                    }
+                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+                var session = CurrentSession;
 
-                    var modelService = hosts.LookupHost(hostAddress)?.ModelService;
+                if (modelService != null)
+                {
+                    var number = await service.GetPullRequestForCurrentBranch(repository);
 
-                    if (modelService != null)
+                    if (number != (CurrentSession?.PullRequest.Number ?? 0))
                     {
                         var pullRequest = await GetPullRequestForTip(modelService, repository);
 
                         if (pullRequest != null)
                         {
-                            session = new PullRequestSession(
-                                sessionService,
-                                await modelService.GetCurrentUser(),
-                                pullRequest,
-                                repository,
-                                true);
+                            var newSession = await GetSessionInternal(pullRequest); ;
+                            if (newSession != null) newSession.IsCheckedOut = true;
+                            session = newSession;
                         }
                     }
+                }
+                else
+                {
+                    session = null;
                 }
 
                 CurrentSession = session;
@@ -133,10 +123,55 @@ namespace GitHub.InlineReviews.Services
 
         async Task<IPullRequestModel> GetPullRequestForTip(IModelService modelService, ILocalRepositoryModel repository)
         {
-            var number = await service.GetPullRequestForCurrentBranch(repository);
-            return number != 0 ?
-                await modelService.GetPullRequest(repository, number).ToTask() :
-                null;
+            if (modelService != null)
+            {
+                var number = await service.GetPullRequestForCurrentBranch(repository);
+                if (number != 0) return await modelService.GetPullRequest(repository, number).ToTask();
+            }
+
+            return null;
+        }
+
+        async Task<PullRequestSession> GetSessionInternal(IPullRequestModel pullRequest)
+        {
+            PullRequestSession session = null;
+            WeakReference<PullRequestSession> weakSession;
+
+            if (sessions.TryGetValue(pullRequest.Number, out weakSession))
+            {
+                weakSession.TryGetTarget(out session);
+            }
+
+            if (session == null)
+            {
+                var modelService = hosts.LookupHost(HostAddress.Create(repository.CloneUrl))?.ModelService;
+
+                if (modelService != null)
+                {
+                    session = new PullRequestSession(
+                        sessionService,
+                        await modelService.GetCurrentUser(),
+                        pullRequest,
+                        repository,
+                        false);
+                    sessions[pullRequest.Number] = new WeakReference<PullRequestSession>(session);
+                }
+            }
+            else
+            {
+                await session.Update(pullRequest);
+            }
+
+            return session;
+        }
+
+        async Task EnsureLoggedIn(ILocalRepositoryModel repository)
+        {
+            if (!hosts.IsLoggedInToAnyHost && repository != null)
+            {
+                var hostAddress = HostAddress.Create(repository.CloneUrl);
+                await hosts.LogInFromCache(hostAddress);
+            }
         }
     }
 }

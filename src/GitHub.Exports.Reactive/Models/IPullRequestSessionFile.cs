@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace GitHub.Models
 {
@@ -11,7 +12,7 @@ namespace GitHub.Models
     /// the IDE. It represents the state of a file from the pull request model updated to the 
     /// current state of the code on disk and in the editor.
     /// </remarks>
-    public interface IPullRequestSessionFile
+    public interface IPullRequestSessionFile : INotifyPropertyChanged
     {
         /// <summary>
         /// Gets the SHA of the current commit of the file, or null if the file has uncommitted

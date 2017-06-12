@@ -47,7 +47,9 @@ namespace GitHub.InlineReviews.Services
         public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
         {
             var repo = gitService.GetRepository(repository.LocalPath);
-            return !await gitClient.IsModified(repo, relativePath, contents);
+
+            return !await gitClient.IsModified(repo, relativePath, contents) &&
+                   await gitClient.IsHeadPushed(repo);
         }
 
         /// <inheritdoc/>

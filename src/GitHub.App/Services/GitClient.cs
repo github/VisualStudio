@@ -353,6 +353,14 @@ namespace GitHub.Services
             return baseCommit?.Sha;
         }
 
+        public Task<bool> IsHeadPushed(IRepository repo)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
+            });
+        }
+
         static bool IsCanonical(string s)
         {
             return s.StartsWith("refs/", StringComparison.Ordinal);

@@ -418,85 +418,148 @@ Line 4 with comment");
                 }
             }
 
-            IPullRequestReviewCommentModel CreateComment(string diffHunk, string body = "Comment")
+            [Fact]
+            public async Task CommitShaIsReadFromPullRequestModelIfBranchNotCheckedOut()
             {
-                var result = Substitute.For<IPullRequestReviewCommentModel>();
-                result.Body.Returns(body);
-                result.DiffHunk.Returns(diffHunk);
-                result.Path.Returns(FilePath);
-                result.OriginalCommitId.Returns("ORIG");
-                result.OriginalPosition.Returns(1);
-                return result;
-            }
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
 
-            IPullRequestSessionService CreateService(FakeDiffService diffService)
-            {
-                var result = Substitute.For<IPullRequestSessionService>();
-                result.Diff(
-                    Arg.Any<ILocalRepositoryModel>(),
-                    Arg.Any<string>(),
-                    Arg.Any<string>(),
-                    Arg.Any<byte[]>())
-                    .Returns(i => diffService.Diff(
-                        null,
-                        i.ArgAt<string>(1),
-                        i.ArgAt<string>(2),
-                        i.ArgAt<byte[]>(3)));
-                result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
-                return result;
-            }
-
-            IPullRequestModel CreatePullRequest(params IPullRequestReviewCommentModel[] comments)
-            {
-                var changedFile = Substitute.For<IPullRequestFileModel>();
-                changedFile.FileName.Returns("test.cs");
-
-                var result = Substitute.For<IPullRequestModel>();
-                result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE", RepoUrl));
-                result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD", RepoUrl));
-                result.ChangedFiles.Returns(new[] { changedFile });
-                result.ReviewComments.Returns(comments);
-
-                return result;
-            }
-
-            IRepository CreateRepository()
-            {
-                var result = Substitute.For<IRepository>();
-                var branch = Substitute.For<Branch>();
-                var commit = Substitute.For<Commit>();
-                commit.Sha.Returns("BRANCH_TIP");
-                branch.Tip.Returns(commit);
-                result.Head.Returns(branch);
-                return result;
-            }
-
-            class FakeEditorContentSource : IEditorContentSource
-            {
-                byte[] content;
-
-                public FakeEditorContentSource(string content)
+                using (var diffService = new FakeDiffService())
                 {
-                    SetContent(content);
-                }
+                    var pullRequest = CreatePullRequest();
+                    var service = CreateService(diffService);
 
-                public FakeEditorContentSource(byte[] content)
-                {
-                    SetContent(content);
-                }
+                    diffService.AddFile(FilePath, baseContents);
+                    service.IsUnmodifiedAndPushed(Arg.Any<ILocalRepositoryModel>(), FilePath, Arg.Any<byte[]>()).Returns(false);
 
-                public Task<byte[]> GetContent() => Task.FromResult(content);
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        isCheckedOut: false);
 
-                public void SetContent(string content)
-                {
-                    this.content = Encoding.UTF8.GetBytes(content);
-                }
-
-                public void SetContent(byte[] content)
-                {
-                    this.content = content;
+                    var editor = new FakeEditorContentSource(headContents);
+                    var file = await target.GetFile(FilePath, editor);
+                    Assert.Equal("HEAD_SHA", file.CommitSha);
                 }
             }
+
+        }
+
+        public class TheAddCommentMethod
+        {
+            [Fact]
+            public async Task UpdatesFileWithNewThread()
+            {
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment", "New Comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var target = await CreateTarget(diffService);
+                    var file = await target.GetFile(FilePath);
+
+                    Assert.Empty(file.InlineCommentThreads);
+
+                    await target.AddComment(comment);
+
+                    Assert.Equal(1, file.InlineCommentThreads.Count);
+                    Assert.Equal(2, file.InlineCommentThreads[0].LineNumber);
+                    Assert.Equal(1, file.InlineCommentThreads[0].Comments.Count);
+                    Assert.Equal("New Comment", file.InlineCommentThreads[0].Comments[0].Body);
+                }
+            }
+
+            async Task<PullRequestSession> CreateTarget(FakeDiffService diffService)
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var headContents = @"Line 1
+Line 2
+Line 3 with comment
+Line 4";
+
+                var pullRequest = CreatePullRequest();
+                var service = CreateService(diffService);
+
+                diffService.AddFile(FilePath, baseContents);
+
+                var target = new PullRequestSession(
+                    service,
+                    Substitute.For<IAccount>(),
+                    pullRequest,
+                    Substitute.For<ILocalRepositoryModel>(),
+                    true);
+
+                var editor = new FakeEditorContentSource(headContents);
+                var file = await target.GetFile(FilePath, editor);
+                return target;
+            }
+        }
+
+        static IPullRequestReviewCommentModel CreateComment(string diffHunk, string body = "Comment")
+        {
+            var result = Substitute.For<IPullRequestReviewCommentModel>();
+            result.Body.Returns(body);
+            result.DiffHunk.Returns(diffHunk);
+            result.Path.Returns(FilePath);
+            result.OriginalCommitId.Returns("ORIG");
+            result.OriginalPosition.Returns(1);
+            return result;
+        }
+
+        static IPullRequestModel CreatePullRequest(params IPullRequestReviewCommentModel[] comments)
+        {
+            var changedFile = Substitute.For<IPullRequestFileModel>();
+            changedFile.FileName.Returns("test.cs");
+
+            var result = Substitute.For<IPullRequestModel>();
+            result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
+            result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
+            result.ChangedFiles.Returns(new[] { changedFile });
+            result.ReviewComments.Returns(comments);
+
+            return result;
+        }
+
+        static IRepository CreateRepository()
+        {
+            var result = Substitute.For<IRepository>();
+            var branch = Substitute.For<Branch>();
+            var commit = Substitute.For<Commit>();
+            commit.Sha.Returns("BRANCH_TIP");
+            branch.Tip.Returns(commit);
+            result.Head.Returns(branch);
+            return result;
+        }
+
+        static IPullRequestSessionService CreateService(FakeDiffService diffService)
+        {
+            var result = Substitute.For<IPullRequestSessionService>();
+            result.Diff(
+                Arg.Any<ILocalRepositoryModel>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<byte[]>())
+                .Returns(i => diffService.Diff(
+                    null,
+                    i.ArgAt<string>(1),
+                    i.ArgAt<string>(2),
+                    i.ArgAt<byte[]>(3)));
+            result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
+            return result;
         }
     }
 }

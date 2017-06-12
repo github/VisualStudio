@@ -37,6 +37,12 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
+        public int GetLineNumber(IPeekSession session, ITrackingPoint point)
+        {
+            return point.GetPoint(session.TextView.TextSnapshot).GetContainingLine().LineNumber;
+        }
+
+        /// <inheritdoc/>
         public void Hide(ITextView textView)
         {
             peekBroker.DismissPeekSession(textView);
@@ -49,20 +55,11 @@ namespace GitHub.InlineReviews.Services
 
             var line = textView.TextSnapshot.GetLineFromLineNumber(tag.LineNumber);
             var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-            var viewModel = new InlineCommentThreadViewModel(
-                CreateApiClient(tag.Session.Repository),
-                tag.Session,
-                tag.CommitSha,
-                tag.FilePath,
-                tag.DiffLine);
-            var placeholder = viewModel.AddReplyPlaceholder();
-            placeholder.BeginEdit.Execute(null);
 
             ExpandCollapsedRegions(textView, line.Extent);
             if (moveCaret) textView.Caret.MoveTo(line.Start);
 
-            var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, viewModel);
-            peekBroker.TriggerPeekSession(options);
+            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
         }
 
         /// <inheritdoc/>
@@ -72,25 +69,11 @@ namespace GitHub.InlineReviews.Services
 
             var line = textView.TextSnapshot.GetLineFromLineNumber(tag.LineNumber);
             var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
-            var viewModel = new InlineCommentThreadViewModel(
-                CreateApiClient(tag.Session.Repository),
-                tag.Session,
-                tag.Thread.OriginalCommitSha,
-                tag.Thread.RelativePath,
-                tag.Thread.OriginalPosition);
-
-            foreach (var comment in tag.Thread.Comments)
-            {
-                viewModel.Comments.Add(new InlineCommentViewModel(viewModel, tag.Session.User, comment));
-            }
-
-            viewModel.AddReplyPlaceholder();
 
             ExpandCollapsedRegions(textView, line.Extent);
             if (moveCaret) textView.Caret.MoveTo(line.Start);
 
-            var options = new InlineCommentPeekSessionCreationOptions(textView, trackingPoint, viewModel);
-            peekBroker.TriggerPeekSession(options);
+            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
         }
 
         IApiClient CreateApiClient(ILocalRepositoryModel repository)

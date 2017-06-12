@@ -8,12 +8,12 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekResultPresentation : IPeekResultPresentation
     {
-        readonly InlineCommentThreadViewModel viewModel;
+        readonly InlineCommentPeekViewModel viewModel;
 
         public bool IsDirty => false;
         public bool IsReadOnly => true;
 
-        public InlineCommentPeekResultPresentation(InlineCommentThreadViewModel viewModel)
+        public InlineCommentPeekResultPresentation(InlineCommentPeekViewModel viewModel)
         {
             this.viewModel = viewModel;
         }
@@ -45,7 +45,7 @@ namespace GitHub.InlineReviews.Peek
 
         public UIElement Create(IPeekSession session, IPeekResultScrollState scrollState)
         {
-            var view = new CommentThreadView();
+            var view = new InlineCommentPeekView();
             view.DataContext = viewModel;
             return view;
         }

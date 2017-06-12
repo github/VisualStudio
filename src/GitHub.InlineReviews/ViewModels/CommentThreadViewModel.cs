@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
     /// <summary>
     /// Base view model for a thread of comments.
     /// </summary>
-    abstract class CommentThreadViewModel : ICommentThreadViewModel, IDisposable
+    public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel, IDisposable
     {
         IDisposable placeholderSubscription;
 
@@ -30,35 +30,16 @@ namespace GitHub.InlineReviews.ViewModels
         public ObservableCollection<ICommentViewModel> Comments { get; }
 
         /// <inheritdoc/>
+        public abstract ReactiveCommand<ICommentModel> PostComment { get; }
+
+        /// <inheritdoc/>
         public IAccount CurrentUser { get; }
-
-        /// <inheritdoc/>
-        public ICommentViewModel AddReplyPlaceholder()
-        {
-            var placeholder = CreateReplyPlaceholder();
-
-            placeholderSubscription = placeholder.CommitEdit.Subscribe(_ =>
-            {
-                placeholderSubscription.Dispose();
-                placeholderSubscription = null;
-                AddReplyPlaceholder();
-            });
-
-            Comments.Add(placeholder);
-
-            return placeholder;
-        }
-
-        /// <inheritdoc/>
-        public abstract Task<ICommentModel> PostComment(string body);
 
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        protected abstract ICommentViewModel CreateReplyPlaceholder();
 
         protected virtual void Dispose(bool disposing)
         {

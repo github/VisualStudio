@@ -1,32 +1,40 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using GitHub.Extensions;
+using GitHub.Factories;
+using GitHub.InlineReviews.Services;
+using GitHub.InlineReviews.ViewModels;
+using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Tagging;
-using GitHub.InlineReviews.Tags;
 
 namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekableItemSource : IPeekableItemSource
     {
-        readonly ITextBuffer textBuffer;
-        readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
+        readonly IApiClientFactory apiClientFactory;
+        readonly IInlineCommentPeekService peekService;
+        readonly IPullRequestSessionManager sessionManager;
 
         public InlineCommentPeekableItemSource(
-            ITextBuffer textBuffer,
-            IViewTagAggregatorFactoryService tagAggregatorFactory)
+            IApiClientFactory apiClientFactory,
+            IInlineCommentPeekService peekService,
+            IPullRequestSessionManager sessionManager)
         {
-            this.textBuffer = textBuffer;
-            this.tagAggregatorFactory = tagAggregatorFactory;
+            this.apiClientFactory = apiClientFactory;
+            this.peekService = peekService;
+            this.sessionManager = sessionManager;
         }
 
         public void AugmentPeekSession(IPeekSession session, IList<IPeekableItem> peekableItems)
         {
-            var options = session.CreationOptions as InlineCommentPeekSessionCreationOptions;
-
-            if (session.RelationshipName == InlineCommentPeekRelationship.Instance.Name && options != null)
+            if (session.RelationshipName == InlineCommentPeekRelationship.Instance.Name)
             {
-                peekableItems.Add(new InlineCommentPeekableItem(options.ViewModel));
+                var viewModel = new InlineCommentPeekViewModel(
+                    apiClientFactory,
+                    peekService,
+                    session,
+                    sessionManager);
+                viewModel.Initialize().Forget();
+                peekableItems.Add(new InlineCommentPeekableItem(viewModel));
             }
         }
 

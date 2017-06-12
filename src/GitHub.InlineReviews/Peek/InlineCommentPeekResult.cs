@@ -7,7 +7,7 @@ namespace GitHub.InlineReviews.Peek
 {
     class InlineCommentPeekResult : IPeekResult
     {
-        public InlineCommentPeekResult(InlineCommentThreadViewModel viewModel)
+        public InlineCommentPeekResult(InlineCommentPeekViewModel viewModel)
         {
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
 
@@ -15,7 +15,7 @@ namespace GitHub.InlineReviews.Peek
         }
 
         public bool CanNavigateTo => true;
-        public InlineCommentThreadViewModel ViewModel { get; }
+        public InlineCommentPeekViewModel ViewModel { get; }
 
         public IPeekResultDisplayInfo DisplayInfo { get; }
             = new PeekResultDisplayInfo("Review", null, "GitHub Review", "GitHub Review");

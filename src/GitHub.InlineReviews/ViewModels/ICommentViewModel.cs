@@ -5,14 +5,14 @@ using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
-    enum CommentEditState
+    public enum CommentEditState
     {
         None,
         Editing,
         Placeholder,
     }
 
-    interface ICommentViewModel
+    public interface ICommentViewModel
     {
         /// <summary>
         /// Gets the ID of the comment.

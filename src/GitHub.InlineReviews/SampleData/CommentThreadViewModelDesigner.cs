@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.SampleData;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.SampleData
 {
@@ -15,14 +15,6 @@ namespace GitHub.InlineReviews.SampleData
         public IAccount CurrentUser { get; set; }
             = new AccountDesigner { Login = "shana", IsUser = true };
 
-        public ICommentViewModel AddReplyPlaceholder()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ICommentModel> PostComment(string body)
-        {
-            throw new NotImplementedException();
-        }
+        public ReactiveCommand<ICommentModel> PostComment { get; }
     }
 }

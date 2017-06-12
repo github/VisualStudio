@@ -36,6 +36,12 @@ namespace GitHub.Services
         ILocalRepositoryModel Repository { get; }
 
         /// <summary>
+        /// Adds a new comment to the session.
+        /// </summary>
+        /// <param name="comment">The comment.</param>
+        Task AddComment(IPullRequestReviewCommentModel comment);
+
+        /// <summary>
         /// Gets all files touched by the pull request.
         /// </summary>
         /// <returns>

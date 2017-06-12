@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Threading.Tasks;
+using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using Octokit;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
     /// <summary>
     /// A thread of inline comments (aka Pull Request Review Comments).
     /// </summary>
-    class InlineCommentThreadViewModel : CommentThreadViewModel
+    public class InlineCommentThreadViewModel : CommentThreadViewModel
     {
         readonly IApiClient apiClient;
 
@@ -22,46 +23,28 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         /// <param name="apiClient">The API client to use to post/update comments.</param>
         /// <param name="session">The current PR review session.</param>
-        /// <param name="commitSha">
-        /// The SHA of the commit that the thread relates to. May be null if the thread
-        /// represents trying to add a comment to a line that hasn't yet been pushed.
-        /// </param>
-        /// <param name="filePath">The path to the file that the thread relates to.</param>
-        /// <param name="diffLine">The line in the diff that the thread relates to.</param>
         public InlineCommentThreadViewModel(
             IApiClient apiClient,
             IPullRequestSession session,
-            string commitSha,
-            string filePath,
-            int diffLine)
+            IEnumerable<IPullRequestReviewCommentModel> comments)
             : base(session.User)
         {
             Guard.ArgumentNotNull(apiClient, nameof(apiClient));
             Guard.ArgumentNotNull(session, nameof(session));
-            Guard.ArgumentNotNull(filePath, nameof(filePath));
 
             this.apiClient = apiClient;
             Session = session;
-            CommitSha = commitSha;
-            DiffLine = diffLine;
-            FilePath = filePath;
+            PostComment = ReactiveCommand.CreateAsyncTask(
+                Observable.Return(true),
+                DoPostComment);
+
+            foreach (var comment in comments)
+            {
+                Comments.Add(new CommentViewModel(this, CurrentUser, comment));
+            }
+
+            Comments.Add(CommentViewModel.CreatePlaceholder(this, CurrentUser));
         }
-
-        /// <summary>
-        /// Gets the SHA of the commit that the thread relates to.
-        /// </summary>
-        public string CommitSha { get; }
-
-        /// <summary>
-        /// Gets line in the diff between the PR base and <see cref="CommitSha"/> that the thread
-        /// relates to.
-        /// </summary>
-        public int DiffLine { get; }
-
-        /// <summary>
-        /// Gets the path to the file that the thread relates to.
-        /// </summary>
-        public string FilePath { get; }
 
         /// <summary>
         /// Gets the current pull request review session.
@@ -69,14 +52,20 @@ namespace GitHub.InlineReviews.ViewModels
         public IPullRequestSession Session { get; }
 
         /// <inheritdoc/>
-        public override async Task<ICommentModel> PostComment(string body)
-        {
-            Guard.ArgumentNotNull(body, nameof(body));
+        public override ReactiveCommand<ICommentModel> PostComment { get; }
 
-            var lastComment = Comments.Where(x => x.Id != 0).FirstOrDefault();
-            var result = lastComment != null ?
-                await PostReply(body, lastComment.Id) :
-                await PostNewComment(body);
+        async Task<ICommentModel> DoPostComment(object parameter)
+        {
+            Guard.ArgumentNotNull(parameter, nameof(parameter));
+
+            var body = (string)parameter;
+            var replyId = Comments[0].Id;
+            var result = await apiClient.CreatePullRequestReviewComment(
+                Session.Repository.Owner,
+                Session.Repository.Name,
+                Session.PullRequest.Number,
+                body,
+                replyId);
 
             var model = new PullRequestReviewCommentModel
             {
@@ -88,39 +77,12 @@ namespace GitHub.InlineReviews.ViewModels
                 OriginalPosition = result.OriginalPosition,
                 Path = result.Path,
                 Position = result.Position,
-                UpdatedAt = result.UpdatedAt,
+                CreatedAt = result.CreatedAt,
                 User = Session.User,
             };
 
-            ////Session.AddComment(model);
+            await Session.AddComment(model);
             return model;
-        }
-
-        protected override ICommentViewModel CreateReplyPlaceholder()
-        {
-            return CommentViewModel.CreatePlaceholder(this, CurrentUser);
-        }
-
-        Task<PullRequestReviewComment> PostNewComment(string body)
-        {
-            return apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
-                Session.PullRequest.Number,
-                body,
-                CommitSha,
-                FilePath.Replace("\\", "/"),
-                DiffLine).ToTask();
-        }
-
-        Task<PullRequestReviewComment> PostReply(string body, int replyTo)
-        {
-            return apiClient.CreatePullRequestReviewComment(
-                Session.Repository.Owner,
-                Session.Repository.Name,
-                Session.PullRequest.Number,
-                body,
-                replyTo).ToTask();
         }
     }
 }

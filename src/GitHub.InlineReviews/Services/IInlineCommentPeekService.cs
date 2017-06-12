@@ -1,4 +1,6 @@
 ﻿using GitHub.InlineReviews.Tags;
+using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace GitHub.InlineReviews.Services
@@ -6,8 +8,17 @@ namespace GitHub.InlineReviews.Services
     /// <summary>
     /// Shows inline comments in a peek view.
     /// </summary>
-    interface IInlineCommentPeekService
+    public interface IInlineCommentPeekService
     {
+        /// <summary>
+        /// Gets the line number for a peek session tracking point.
+        /// </summary>
+        /// <param name="session">The peek session.</param>
+        /// <returns>
+        /// The line number or null if the line number could not be determined.
+        /// </returns>
+        int GetLineNumber(IPeekSession session, ITrackingPoint point);
+
         /// <summary>
         /// Hides the inline comment peek view for a text view.
         /// </summary>

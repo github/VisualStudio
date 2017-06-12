@@ -6,7 +6,7 @@ namespace GitHub.Models
     {
         public string Body { get; set; }
         public int Id { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public IAccount User { get; set; }
     }
 }

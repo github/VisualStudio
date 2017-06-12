@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
 {
@@ -19,14 +20,7 @@ namespace GitHub.InlineReviews.ViewModels
         public IRepositoryModel Repository { get; }
         public int Number { get; }
 
-        public override Task<ICommentModel> PostComment(string body)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override ICommentViewModel CreateReplyPlaceholder()
-        {
-            return CommentViewModel.CreatePlaceholder(this, CurrentUser);
-        }
+        /// <inheritdoc/>
+        public override ReactiveCommand<ICommentModel> PostComment { get; }
     }
 }

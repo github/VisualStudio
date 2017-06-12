@@ -125,21 +125,18 @@ namespace GitHub.InlineReviews.Tags
                         }
                     }
 
-                    if (file.CommitSha != null)
+                    foreach (var chunk in file.Diff)
                     {
-                        foreach (var chunk in file.Diff)
+                        foreach (var line in chunk.Lines)
                         {
-                            foreach (var line in chunk.Lines)
-                            {
-                                var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
+                            var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
 
-                                if (lineNumber >= startLine && lineNumber <= endLine && !linesWithComments[lineNumber - startLine])
-                                {
-                                    var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
-                                    yield return new TagSpan<InlineCommentTag>(
-                                        new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
-                                        new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type));
-                                }
+                            if (lineNumber >= startLine && lineNumber <= endLine && !linesWithComments[lineNumber - startLine])
+                            {
+                                var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
+                                yield return new TagSpan<InlineCommentTag>(
+                                    new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
+                                    new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type));
                             }
                         }
                     }
@@ -164,7 +161,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (bufferInfo != null)
             {
-                fullPath = Path.Combine(bufferInfo.Session.Repository.LocalPath, bufferInfo.RelativePath);
+                fullPath = bufferInfo.FilePath;
                 leftHandSide = bufferInfo.IsLeftComparisonBuffer;
 
                 if (!bufferInfo.Session.IsCheckedOut)
@@ -238,11 +235,7 @@ namespace GitHub.InlineReviews.Tags
             if (file == null) return;
 
             sessionSubscription = file.WhenAnyValue(x => x.InlineCommentThreads)
-                .Subscribe(_ =>
-                {
-                    peekService.Hide(view);
-                    NotifyTagsChanged();
-                });
+                .Subscribe(_ => NotifyTagsChanged());
 
             NotifyTagsChanged();
         }

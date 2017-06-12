@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Tags
 {
-    abstract class InlineCommentTag : ITag
+    public abstract class InlineCommentTag : ITag
     {
         public InlineCommentTag(
             IPullRequestSession session,

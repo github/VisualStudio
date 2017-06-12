@@ -85,7 +85,6 @@
     <Compile Include="Peek\InlineCommentPeekResult.cs" />
     <Compile Include="Peek\InlineCommentPeekResultPresentation.cs" />
     <Compile Include="Peek\InlineCommentPeekResultPresenter.cs" />
-    <Compile Include="Peek\InlineCommentPeekSessionCreationOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleData\CommentThreadViewModelDesigner.cs" />
     <Compile Include="SampleData\DiffCommentThreadViewModelDesigner.cs" />
@@ -103,6 +102,8 @@
     <Compile Include="ViewModels\CommentThreadViewModel.cs" />
     <Compile Include="ViewModels\IDiffCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\IInlineCommentViewModel.cs" />
+    <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
+    <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentViewModel.cs" />
     <Compile Include="ViewModels\IPullRequestCommentsViewModel.cs" />
     <Compile Include="ViewModels\IssueCommentThreadViewModel.cs" />
@@ -113,6 +114,9 @@
     <Compile Include="Views\DiffView.cs" />
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InlineCommentPeekView.xaml.cs">
+      <DependentUpon>InlineCommentPeekView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PullRequestCommentsPane.cs" />
     <Compile Include="Views\PullRequestCommentsView.xaml.cs">
@@ -374,6 +378,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GlyphMarginGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InlineCommentPeekView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
