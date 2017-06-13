@@ -26,13 +26,50 @@ public class PullRequestServiceTests : TestBaseClass
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
-            var headFileSha = null as string;
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async Task MergeBaseAvailable_UseMergeBaseSha()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = "mergeBaseFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = "mergeBaseSha";
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                fileName, checkedOut);
+
+            Assert.Equal(mergeBaseFileContent, File.ReadAllText(files.Item1));
+            Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
+        }
+
+        [Fact]
+        public async void MergeBaseNotAvailable_ThrowsFileNotFoundException()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var mergeBaseFileContent = null as string;
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var mergeBaseSha = null as string;
+            var checkedOut = false;
+            var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
+
+            var ex = await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                                fileName, checkedOut));
+            Assert.Equal(expectMessage, ex.Message);
         }
 
         [Fact]
@@ -43,10 +80,10 @@ public class PullRequestServiceTests : TestBaseClass
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
-            var headFileSha = "headFileSha";
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
 
             Assert.Equal(string.Empty, File.ReadAllText(files.Item1));
             Assert.Equal(headFileContent, File.ReadAllText(files.Item2));
@@ -62,10 +99,10 @@ public class PullRequestServiceTests : TestBaseClass
             var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
             var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-            var headFileSha = "headFileSha";
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(string.Empty, File.ReadAllText(files.Item2));
@@ -79,69 +116,58 @@ public class PullRequestServiceTests : TestBaseClass
             var headFileContent = null as string;
             var fileName = "fileName";
             var baseSha = "baseSha";
-            var headSha = null as string;
+            var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-            var headFileSha = "headFileSha";
             var checkedOut = true;
             var workingFile = Path.Combine(repoDir, fileName);
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut, repoDir);
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut, repoDir);
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(workingFile, files.Item2);
         }
 
         [Fact]
-        public async Task HeadBranchNotAvailable_GetFileFromModelService()
+        public async Task HeadBranchNotAvailable_ThrowsFileNotFoundException()
         {
             var baseFileContent = "baseFileContent";
             var headFileContent = new FileNotFoundException();
-            var headFile = "headFile";
             var fileName = "fileName";
             var baseSha = "baseSha";
             var headSha = "headSha";
             var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
             var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-            var headFileSha = "headFileSha";
             var checkedOut = false;
 
-            var files = await ExtractDiffFiles(baseFileContent, headFileContent, fileName, baseSha, headSha, headFileSha, checkedOut, modelServiceHeadFile: headFile);
-
-            Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
-            Assert.Equal(headFile, files.Item2);
+            await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, checkedOut));
         }
 
-        static async Task<Tuple<string, string>> ExtractDiffFiles(object baseFileContent, object headFileContent,
-            string fileName, string baseSha, string headSha, string headFileSha, bool checkedOut,
-            string repoDir = "repoDir", object modelServiceHeadFile = null)
+        static async Task<Tuple<string, string>> ExtractDiffFiles(
+            string baseSha, object baseFileContent, string headSha, object headFileContent, string mergeBaseSha, object mergeBaseFileContent,
+            string fileName, bool checkedOut, string repoDir = "repoDir", int pullNumber = 666, string baseRef = "baseRef")
         {
-            var repo = Substitute.For<ILocalRepositoryModel>();
-            repo.LocalPath.Returns(repoDir);
+            var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+            repositoryModel.LocalPath.Returns(repoDir);
 
-            var modelService = Substitute.For<IModelService>();
             var pullRequest = Substitute.For<IPullRequestModel>();
+            pullRequest.Number.Returns(pullNumber);
 
-            if (baseSha != null)
-            {
-                var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
-                pullRequest.Base.Returns(baseRef);
-            }
-
-            if (headSha != null)
-            {
-                var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
-                pullRequest.Head.Returns(headRef);
-            }
+            pullRequest.Base.Returns(new GitReferenceModel(baseRef, "label", baseSha, "uri"));
+            pullRequest.Head.Returns(new GitReferenceModel("ref", "label", headSha, "uri"));
 
             var serviceProvider = Substitutes.ServiceProvider;
             var gitClient = MockGitClient();
-            var service = new PullRequestService(gitClient, serviceProvider.GetGitService(), serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+            var gitService = serviceProvider.GetGitService();
+            var service = new PullRequestService(gitClient, gitService, serviceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
 
+            gitClient.GetPullRequestMergeBase(Arg.Any<IRepository>(), Arg.Any<string>(), baseSha, headSha, baseRef, pullNumber).ReturnsForAnyArgs(Task.FromResult(mergeBaseSha));
+            gitClient.ExtractFile(Arg.Any<IRepository>(), mergeBaseSha, fileName).Returns(GetFileTask(mergeBaseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), baseSha, fileName).Returns(GetFileTask(baseFileContent));
             gitClient.ExtractFile(Arg.Any<IRepository>(), headSha, fileName).Returns(GetFileTask(headFileContent));
-            modelService.GetFileContents(Arg.Any<IRepositoryModel>(), headSha, fileName, headFileSha).Returns(GetFileObservable(modelServiceHeadFile));
 
-            return await service.ExtractDiffFiles(repo, modelService, pullRequest, fileName, headFileSha, checkedOut);
+            return await service.ExtractDiffFiles(repositoryModel, pullRequest, fileName, checkedOut);
         }
 
         static IObservable<string> GetFileObservable(object fileOrException)

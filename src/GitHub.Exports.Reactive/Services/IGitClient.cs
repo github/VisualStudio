@@ -158,6 +158,19 @@ namespace GitHub.Services
         Task<bool> IsModified(IRepository repository, string path, byte[] contents);
 
         /// <summary>
+        /// Find the merge base SHA between two commits.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="remoteName">The name of the remote (e.g. 'origin').</param>
+        /// <param name="baseSha">The PR base SHA.</param>
+        /// <param name="headSha">The PR head SHA.</param>
+        /// <param name="baseRef">The PR base ref (e.g. 'master').</param>
+        /// <param name="pullNumber">The PR number.</param>
+        /// <returns>
+        /// The merge base SHA or null.
+        /// </returns>
+        Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber);
+
         /// Checks whether the current head is pushed to its remote tracking branch.
         /// </summary>
         /// <param name="repository">The repository.</param>

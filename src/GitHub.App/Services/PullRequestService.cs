@@ -281,31 +281,28 @@ namespace GitHub.Services
 
         public IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
-            IModelService modelService,
             IPullRequestModel pullRequest,
             string fileName,
-            string fileSha,
             bool isPullRequestBranchCheckedOut)
         {
             return Observable.Defer(async () =>
             {
                 var repo = gitService.GetRepository(repository.LocalPath);
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name);
 
-                // The left file is the target of the PR so this should already be fetched.
-                var left = await ExtractToTempFile(repo, pullRequest.Base.Sha, fileName);
-
-                // The right file - if it comes from a fork - may not be fetched so fall back to
-                // getting the file contents from the model service.
-                var right = isPullRequestBranchCheckedOut ?
-                    Path.Combine(repository.LocalPath, fileName) :
-                    await GetFileFromRepositoryOrApi(repository, repo, modelService, pullRequest.Head.Sha, fileName, fileSha);
-
-                if (right == null)
+                var baseSha = pullRequest.Base.Sha;
+                var headSha = pullRequest.Head.Sha;
+                var baseRef = pullRequest.Base.Ref;
+                string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullRequest.Number);
+                if (mergeBase == null)
                 {
-                    throw new FileNotFoundException($"Could not retrieve {fileName}@{pullRequest.Head.Sha}");
+                    throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
                 }
+
+                // We've found the merge base so these should already be fetched.
+                var left = await ExtractToTempFile(repo, mergeBase, fileName);
+                var right = isPullRequestBranchCheckedOut ?
+                    Path.Combine(repository.LocalPath, fileName) : await ExtractToTempFile(repo, headSha, fileName);
 
                 return Observable.Return(Tuple.Create(left, right));
             });
@@ -369,25 +366,6 @@ namespace GitHub.Services
         {
             var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
             return CreateTempFile(fileName, commitSha, contents);
-        }
-
-        async Task<string> GetFileFromRepositoryOrApi(
-            ILocalRepositoryModel repository,
-            IRepository repo,
-            IModelService modelService,
-            string commitSha,
-            string fileName,
-            string fileSha)
-        {
-            try
-            {
-                var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
-                return CreateTempFile(fileName, commitSha, contents);
-            }
-            catch (Exception)
-            {
-                return await modelService.GetFileContents(repository, commitSha, fileName, fileSha);
-            }
         }
 
         static string CreateTempFile(string fileName, string commitSha, string contents)

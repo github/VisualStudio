@@ -125,10 +125,8 @@ namespace GitHub.Services
         /// <returns>The paths of the left and right files for the diff.</returns>
         IObservable<Tuple<string, string>> ExtractDiffFiles(
             ILocalRepositoryModel repository,
-            IModelService modelService,
             IPullRequestModel pullRequest,
             string fileName,
-            string fileSha,
             bool isPullRequestBranchCheckedOut);
 
         /// <summary>
