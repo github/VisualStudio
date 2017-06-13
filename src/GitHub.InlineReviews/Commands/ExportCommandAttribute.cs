@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 namespace GitHub.InlineReviews.Commands
 {
     /// <summary>
-    /// Exports a <see cref="Command"/>.
+    /// Exports a <see cref="VsCommand"/>.
     /// </summary>
     /// <remarks>
-    /// To implement a new command, inherit from the <see cref="Command"/> or <see cref="Command{TParam}"/>
+    /// To implement a new command, inherit from the <see cref="VsCommand"/> or <see cref="Command{TParam}"/>
     /// class and add an <see cref="ExportCommandAttribute"/> to the class with the type of the package that
     /// the command is registered by.
     /// </remarks>
@@ -16,7 +16,7 @@ namespace GitHub.InlineReviews.Commands
     class ExportCommandAttribute : ExportAttribute
     {
         public ExportCommandAttribute(Type packageType)
-            : base(typeof(ICommand))
+            : base(typeof(IPackageResource))
         {
             PackageType = packageType;
         }

@@ -15,7 +15,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Base class for commands that navigate between inline comments.
     /// </summary>
-    abstract class InlineCommentNavigationCommand : Command
+    abstract class InlineCommentNavigationCommand : VsCommand
     {
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.Commands
         }
 
         /// <inheritdoc/>
-        protected override bool IsEnabled
+        public override bool IsEnabled
         {
             get
             {

@@ -60,15 +60,19 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\IVsCommandBase.cs" />
+    <Compile Include="Commands\IVsCommand.cs" />
+    <Compile Include="Commands\PackageResources.cs" />
+    <Compile Include="Commands\VsCommand.cs" />
     <Compile Include="Commands\ExportCommandAttribute.cs" />
-    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\IPackageResource.cs" />
     <Compile Include="Commands\IExportCommandMetadata.cs" />
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\FirstInlineCommentCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
     <Compile Include="Commands\ShowPullRequestCommentsCommand.cs" />
+    <Compile Include="Commands\VsCommandBase.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />

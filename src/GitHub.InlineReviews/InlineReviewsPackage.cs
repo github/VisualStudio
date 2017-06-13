@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews
         protected override void Initialize()
         {
             base.Initialize();
-            Command.RegisterPackageCommands(this);
+            PackageResources.Register(this);
         }
     }
 }

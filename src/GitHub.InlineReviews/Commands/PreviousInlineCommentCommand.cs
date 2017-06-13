@@ -40,7 +40,7 @@ namespace GitHub.InlineReviews.Commands
         /// Executes the command.
         /// </summary>
         /// <returns>A task that tracks the execution of the command.</returns>
-        protected override Task Execute()
+        public override Task Execute()
         {
             var textView = GetCurrentTextView();
             var tags = GetTags(textView);

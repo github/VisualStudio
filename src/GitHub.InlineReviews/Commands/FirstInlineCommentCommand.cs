@@ -43,13 +43,13 @@ namespace GitHub.InlineReviews.Commands
         {
         }
 
-        protected override bool IsEnabled => true;
+        public override bool IsEnabled => true;
 
         /// <summary>
         /// Executes the command.
         /// </summary>
         /// <returns>A task that tracks the execution of the command.</returns>
-        protected override Task Execute()
+        public override Task Execute()
         {
             if (!TryShow())
             {

@@ -14,7 +14,7 @@ namespace GitHub.InlineReviews.Commands
     /// Shows the pull request comments view for a specified pull request.
     /// </summary>
     [ExportCommand(typeof(InlineReviewsPackage))]
-    class ShowPullRequestCommentsCommand : Command<IPullRequestModel>
+    class ShowPullRequestCommentsCommand : VsCommand<IPullRequestModel>
     {
         public static readonly Guid CommandSet = GlobalCommands.CommandSetGuid;
         public const int CommandId = GlobalCommands.ShowPullRequestCommentsId;
@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Commands
         /// </summary>
         /// <param name="pullRequest">The pull request.</param>
         /// <returns>A task that tracks the execution of the command.</returns>
-        protected override async Task Execute(IPullRequestModel pullRequest)
+        public override async Task Execute(IPullRequestModel pullRequest)
         {
             if (pullRequest == null) return;
 
