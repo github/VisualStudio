@@ -67,16 +67,8 @@ public class PullRequestServiceTests : TestBaseClass
             var checkedOut = false;
             var expectMessage = $"Couldn't find merge base between {baseSha} and {headSha}.";
 
-            FileNotFoundException ex = null;
-            try
-            {
-                // Can't use Assert.Throws because ExtractDiffFiles is async.
-                await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
-                                fileName, checkedOut);
-            }
-            catch(FileNotFoundException e) { ex = e; }
-
-            Assert.NotNull(ex);
+            var ex = await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, mergeBaseSha, mergeBaseFileContent,
+                                fileName, checkedOut));
             Assert.Equal(expectMessage, ex.Message);
         }
 
@@ -148,16 +140,8 @@ public class PullRequestServiceTests : TestBaseClass
             var headRef = new GitReferenceModel("ref", "label", headSha, "uri");
             var checkedOut = false;
 
-            FileNotFoundException ex = null;
-            try
-            {
-                // Can't use Assert.Throws because ExtractDiffFiles is async.
-                await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
-                    fileName, checkedOut);
-            }
-            catch (FileNotFoundException e) { ex = e; }
-
-            Assert.NotNull(ex);
+            await Assert.ThrowsAsync<FileNotFoundException>(() => ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, checkedOut));
         }
 
         static async Task<Tuple<string, string>> ExtractDiffFiles(
