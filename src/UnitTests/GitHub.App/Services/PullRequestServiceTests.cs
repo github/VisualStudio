@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -126,6 +127,32 @@ public class PullRequestServiceTests : TestBaseClass
 
             Assert.Equal(baseFileContent, File.ReadAllText(files.Item1));
             Assert.Equal(workingFile, files.Item2);
+        }
+
+        // https://github.com/github/VisualStudio/issues/1010
+        [Theory]
+        [InlineData("utf-8")]        // Unicode (UTF-8)
+        [InlineData("Windows-1252")] // Western European (Windows)        
+        public async Task CheckedOut_DifferentEncodings(string encodingName)
+        {
+            var encoding = Encoding.GetEncoding(encodingName);
+            var repoDir = Path.GetTempPath();
+            var baseFileContent = "baseFileContent";
+            var headFileContent = null as string;
+            var fileName = "fileName.txt";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var baseRef = new GitReferenceModel("ref", "label", baseSha, "uri");
+            var checkedOut = true;
+            var workingFile = Path.Combine(repoDir, fileName);
+            var workingFileContent = baseFileContent;
+            File.WriteAllText(workingFile, workingFileContent, encoding);
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent,
+                baseSha, baseFileContent, fileName, checkedOut, repoDir);
+
+            Assert.Equal(File.ReadAllText(files.Item1), File.ReadAllText(files.Item2));
+            Assert.Equal(File.ReadAllBytes(files.Item1), File.ReadAllBytes(files.Item2));
         }
 
         [Fact]
