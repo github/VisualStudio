@@ -11,7 +11,8 @@ namespace GitHub.InlineReviews.Commands
     /// Navigates to and opens the the previous inline comment thread in the currently active text view.
     /// </summary>
     [ExportCommand(typeof(InlineReviewsPackage))]
-    class PreviousInlineCommentCommand : InlineCommentNavigationCommand
+    [Export(typeof(IPreviousInlineCommentCommand))]
+    class PreviousInlineCommentCommand : InlineCommentNavigationCommand, IPreviousInlineCommentCommand
     {
         /// <summary>
         /// Gets the GUID of the group the command belongs to.
@@ -40,16 +41,16 @@ namespace GitHub.InlineReviews.Commands
         /// Executes the command.
         /// </summary>
         /// <returns>A task that tracks the execution of the command.</returns>
-        public override Task Execute()
+        public override Task Execute(InlineCommentNavigationParams parameter)
         {
             var textView = GetCurrentTextView();
             var tags = GetTags(textView);
 
             if (tags.Count > 0)
             {
-                var cursorPoint = textView.Caret.Position.BufferPosition.Position;
+                var cursorPoint = GetCursorPoint(textView, parameter);
                 var next = tags.LastOrDefault(x => x.Point < cursorPoint) ?? tags.Last();
-                ShowPeekComments(textView, next.Tag);
+                ShowPeekComments(parameter, textView, next.Tag);
             }
 
             return Task.CompletedTask;

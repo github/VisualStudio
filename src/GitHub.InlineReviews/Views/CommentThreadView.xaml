@@ -29,14 +29,12 @@
             </sample:CommentThreadViewModelDesigner>
         </x:Array>
     </d:DesignProperties.DataContext>
-    
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <ItemsControl ItemsSource="{Binding Comments}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <local:CommentView Margin="0 4"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+
+    <ItemsControl ItemsSource="{Binding Comments}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <local:CommentView Margin="0 4"/>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>

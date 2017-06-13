@@ -15,7 +15,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Base class for commands that navigate between inline comments.
     /// </summary>
-    abstract class InlineCommentNavigationCommand : VsCommand
+    abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
     {
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
@@ -51,6 +51,37 @@ namespace GitHub.InlineReviews.Commands
                 var mappingSpan = textView.BufferGraph.CreateMappingSpan(span, SpanTrackingMode.EdgeExclusive);
                 return tagAggregator.GetTags(mappingSpan).Any();
             }
+        }
+
+        /// <summary>
+        /// Gets the text buffer position for the line specified in the parameters or from the
+        /// cursor point if no line is specified or <paramref name="parameter"/> is null.
+        /// </summary>
+        /// <param name="parameter">The parameters.</param>
+        /// <param name="textView">The text view.</param>
+        /// <returns></returns>
+        protected int GetCursorPoint(ITextView textView, InlineCommentNavigationParams parameter)
+        {
+            if (parameter?.FromLine != null)
+            {
+                return parameter.FromLine > -1 ? GetCursorPoint(textView, parameter.FromLine.Value) : -1;
+            }
+            else
+            {
+                return textView.Caret.Position.BufferPosition.Position;
+            }
+        }
+
+        /// <summary>
+        /// Gets the text buffer position for the specified line.
+        /// </summary>
+        /// <param name="parameter">The parameters.</param>
+        /// <param name="lineNumber">The 0-based line number.</param>
+        /// <returns></returns>
+        protected int GetCursorPoint(ITextView textView, int lineNumber)
+        {
+            lineNumber = Math.Max(0, Math.Min(lineNumber, textView.TextSnapshot.LineCount - 1));
+            return textView.TextSnapshot.GetLineFromLineNumber(lineNumber).Start.Position;
         }
 
         /// <summary>
@@ -108,9 +139,18 @@ namespace GitHub.InlineReviews.Commands
         /// Shows the inline comments for the specified tag in a peek view.
         /// </summary>
         /// <param name="tag"></param>
-        protected void ShowPeekComments(ITextView textView, ShowInlineCommentTag tag)
+        protected void ShowPeekComments(
+            InlineCommentNavigationParams parameter,
+            ITextView textView,
+            ShowInlineCommentTag tag)
         {
-            peekService.Show(textView, tag, true);
+            peekService.Show(textView, tag);
+
+            if (parameter?.MoveCursor != false)
+            {
+                var point = new SnapshotPoint(textView.TextSnapshot, GetCursorPoint(textView, tag.LineNumber));
+                textView.Caret.MoveTo(point);
+            }
         }
 
         SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)

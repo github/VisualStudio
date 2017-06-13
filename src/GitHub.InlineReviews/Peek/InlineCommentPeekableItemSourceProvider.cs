@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Factories;
+using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -17,21 +18,32 @@ namespace GitHub.InlineReviews.Peek
         readonly IApiClientFactory apiClientFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly INextInlineCommentCommand nextCommentCommand;
+        readonly IPreviousInlineCommentCommand previousCommentCommand;
 
         [ImportingConstructor]
         public InlineCommentPeekableItemSourceProvider(
             IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            INextInlineCommentCommand nextCommentCommand,
+            IPreviousInlineCommentCommand previousCommentCommand)
         {
             this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
+            this.nextCommentCommand = nextCommentCommand;
+            this.previousCommentCommand = previousCommentCommand;
         }
 
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
         {
-            return new InlineCommentPeekableItemSource(apiClientFactory, peekService, sessionManager);
+            return new InlineCommentPeekableItemSource(
+                apiClientFactory,
+                peekService,
+                sessionManager,
+                nextCommentCommand,
+                previousCommentCommand);
         }
     }
 }

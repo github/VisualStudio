@@ -49,7 +49,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public void Show(ITextView textView, AddInlineCommentTag tag, bool moveCaret = false)
+        public void Show(ITextView textView, AddInlineCommentTag tag)
         {
             Guard.ArgumentNotNull(tag, nameof(tag));
 
@@ -57,13 +57,12 @@ namespace GitHub.InlineReviews.Services
             var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
 
             ExpandCollapsedRegions(textView, line.Extent);
-            if (moveCaret) textView.Caret.MoveTo(line.Start);
 
             peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
         }
 
         /// <inheritdoc/>
-        public void Show(ITextView textView, ShowInlineCommentTag tag, bool moveCaret = false)
+        public void Show(ITextView textView, ShowInlineCommentTag tag)
         {
             Guard.ArgumentNotNull(tag, nameof(tag));
 
@@ -71,7 +70,6 @@ namespace GitHub.InlineReviews.Services
             var trackingPoint = textView.TextSnapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
 
             ExpandCollapsedRegions(textView, line.Extent);
-            if (moveCaret) textView.Caret.MoveTo(line.Start);
 
             peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
         }

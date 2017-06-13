@@ -6,7 +6,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Represents a Visual Studio command that does not accept a parameter.
     /// </summary>
-    interface IVsCommand : IVsCommandBase
+    public interface IVsCommand : IVsCommandBase
     {
         /// <summary>
         /// Executes the command.
@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Represents a Visual Studio command that accepts a parameter.
     /// </summary>
-    interface IVsCommand<TParam> : IVsCommandBase
+    public interface IVsCommand<TParam> : IVsCommandBase
     {
         /// <summary>
         /// Executes the command.

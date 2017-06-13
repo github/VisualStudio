@@ -5,7 +5,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Represents a resource to be registered on package initialization.
     /// </summary>
-    interface IPackageResource
+    public interface IPackageResource
     {
         /// <summary>
         /// Registers the resource with a package.

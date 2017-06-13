@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
+using GitHub.InlineReviews.Commands;
 
 namespace GitHub.VisualStudio.UI.Views
 {
@@ -214,11 +215,21 @@ namespace GitHub.VisualStudio.UI.Views
 
                 if (file != null)
                 {
+                    var param = (object)new InlineCommentNavigationParams
+                    {
+                        FromLine = -1,
+                    };
+
                     await DoDiffFile(file);
+
+                    // HACK: We need to wait here for the diff view to set itself up and move its cursor
+                    // to the first changed line. There must be a better way of doing this.
+                    await Task.Delay(1500);
+
                     Services.Dte.Commands.Raise(
                         GlobalCommands.CommandSetString,
-                        GlobalCommands.FirstInlineCommentId,
-                        null,
+                        GlobalCommands.NextInlineCommentId,
+                        ref param,
                         null);
                 }
             }

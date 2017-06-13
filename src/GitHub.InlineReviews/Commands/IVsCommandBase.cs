@@ -6,7 +6,7 @@ namespace GitHub.InlineReviews.Commands
     /// <summary>
     /// Represents a Visual Studio command.
     /// </summary>
-    interface IVsCommandBase : IPackageResource, ICommand
+    public interface IVsCommandBase : IPackageResource, ICommand
     {
         /// <summary>
         /// Gets a value indicating whether the command is enabled.

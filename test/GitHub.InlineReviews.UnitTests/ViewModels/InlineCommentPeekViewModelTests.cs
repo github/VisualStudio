@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Factories;
+using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
@@ -34,7 +35,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
-                CreateSessionManager());
+                CreateSessionManager(),
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
 
             await target.Initialize();
 
@@ -54,7 +57,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 9),
                 CreatePeekSession(),
-                CreateSessionManager());
+                CreateSessionManager(),
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
 
             await target.Initialize();
 
@@ -71,7 +76,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreateApiClientFactory(),
                 CreatePeekService(lineNumber: 8),
                 CreatePeekSession(),
-                sessionManager);
+                sessionManager,
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
 
             await target.Initialize();
             Assert.IsType<NewInlineCommentThreadViewModel>(target.Thread);
@@ -101,7 +108,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 Substitute.For<IApiClientFactory>(),
                 CreatePeekService(lineNumber: 10),
                 CreatePeekSession(),
-                sessionManager);
+                sessionManager,
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
 
             await target.Initialize();
 

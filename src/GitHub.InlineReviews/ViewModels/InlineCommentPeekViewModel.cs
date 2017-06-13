@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
+using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -41,8 +42,17 @@ namespace GitHub.InlineReviews.ViewModels
             IApiClientFactory apiClientFactory,
             IInlineCommentPeekService peekService,
             IPeekSession peekSession,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            INextInlineCommentCommand nextCommentCommand,
+            IPreviousInlineCommentCommand previousCommentCommand)
         {
+            Guard.ArgumentNotNull(apiClientFactory, nameof(apiClientFactory));
+            Guard.ArgumentNotNull(peekService, nameof(peekService));
+            Guard.ArgumentNotNull(peekSession, nameof(peekSession));
+            Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
+            Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
+
             this.apiClientFactory = apiClientFactory;
             this.peekService = peekService;
             this.peekSession = peekSession;
@@ -50,6 +60,18 @@ namespace GitHub.InlineReviews.ViewModels
             triggerPoint = peekSession.GetTriggerPoint(peekSession.TextView.TextBuffer);
 
             peekSession.Dismissed += (s, e) => Dispose();
+
+            NextComment = ReactiveCommand.CreateAsyncTask(_ =>
+                nextCommentCommand.Execute(new InlineCommentNavigationParams
+                {
+                    FromLine = GetLineNumber(),
+                }));
+
+            PreviousComment = ReactiveCommand.CreateAsyncTask(_ =>
+                previousCommentCommand.Execute(new InlineCommentNavigationParams
+                {
+                    FromLine = GetLineNumber(),
+                }));
         }
 
         /// <summary>
@@ -60,6 +82,16 @@ namespace GitHub.InlineReviews.ViewModels
             get { return thread; }
             private set { this.RaiseAndSetIfChanged(ref thread, value); }
         }
+
+        /// <summary>
+        /// Gets a command which moves to the next inline comment in the file.
+        /// </summary>
+        public ReactiveCommand<Unit> NextComment { get; }
+
+        /// <summary>
+        /// Gets a command which moves to the previous inline comment in the file.
+        /// </summary>
+        public ReactiveCommand<Unit> PreviousComment { get; }
 
         public void Dispose()
         {
@@ -90,6 +122,8 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
+        int GetLineNumber() => peekService.GetLineNumber(peekSession, triggerPoint);
+
         void UpdateThread()
         {
             Thread = null;
@@ -98,7 +132,7 @@ namespace GitHub.InlineReviews.ViewModels
             if (file == null)
                 return;
 
-            var lineNumber = peekService.GetLineNumber(peekSession, triggerPoint);
+            var lineNumber = GetLineNumber();
             var thread = file.InlineCommentThreads.FirstOrDefault(x => x.LineNumber == lineNumber);
             var apiClient = CreateApiClient(session.Repository);
 
