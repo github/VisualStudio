@@ -299,13 +299,51 @@ namespace GitHub.Services
                     throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
                 }
 
-                // We've found the merge base so these should already be fetched.
-                var left = await ExtractToTempFile(repo, mergeBase, fileName);
-                var right = isPullRequestBranchCheckedOut ?
-                    Path.Combine(repository.LocalPath, fileName) : await ExtractToTempFile(repo, headSha, fileName);
+                string left;
+                string right;
+                if (isPullRequestBranchCheckedOut)
+                {
+                    right = Path.Combine(repository.LocalPath, fileName);
+                    left = await ExtractToTempFile(repo, mergeBase, fileName, GetEncoding(right));
+                }
+                else
+                {
+                    left = await ExtractToTempFile(repo, mergeBase, fileName, Encoding.Default);
+                    right = await ExtractToTempFile(repo, headSha, fileName, Encoding.Default);
+                }
 
                 return Observable.Return(Tuple.Create(left, right));
             });
+        }
+
+        static Encoding GetEncoding(string file)
+        {
+            if (File.Exists(file))
+            {
+                var encoding = Encoding.UTF8;
+                if (IsEncoding(file, encoding))
+                {
+                    return encoding;
+                }
+            }
+
+            return Encoding.Default;
+        }
+
+        static bool IsEncoding(string file, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(file))
+            {
+                foreach (var b in encoding.GetPreamble())
+                {
+                    if(b != stream.ReadByte())
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
@@ -362,20 +400,20 @@ namespace GitHub.Services
             return uniqueName;
         }
 
-        async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName)
+        async Task<string> ExtractToTempFile(IRepository repo, string commitSha, string fileName, Encoding encoding)
         {
             var contents = await gitClient.ExtractFile(repo, commitSha, fileName) ?? string.Empty;
-            return CreateTempFile(fileName, commitSha, contents);
+            return CreateTempFile(fileName, commitSha, contents, encoding);
         }
 
-        static string CreateTempFile(string fileName, string commitSha, string contents)
+        static string CreateTempFile(string fileName, string commitSha, string contents, Encoding encoding)
         {
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}@{commitSha}{Path.GetExtension(fileName)}";
             var tempFile = Path.Combine(tempDir, tempFileName);
 
             Directory.CreateDirectory(tempDir);
-            File.WriteAllText(tempFile, contents, Encoding.UTF8);
+            File.WriteAllText(tempFile, contents, encoding);
             return tempFile;
         }
 
