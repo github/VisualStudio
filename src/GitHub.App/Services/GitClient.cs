@@ -14,6 +14,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IGitClient))]
     [PartCreationPolicy(CreationPolicy.Shared)]
+    [NullGuard(ValidationFlags.None)]
     public class GitClient : IGitClient
     {
         static readonly Logger log = LogManager.GetCurrentClassLogger();
@@ -297,7 +298,7 @@ namespace GitHub.Services
                 var commit = repository.Lookup<Commit>(commitSha);
                 if(commit == null)
                 {
-                    throw new FileNotFoundException("Couldn't find commit at '" + commitSha + "'.");
+                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
                 }
 
                 var blob = commit[fileName]?.Target as Blob;
@@ -323,6 +324,33 @@ namespace GitHub.Services
 
                 return true;
             });
+        }
+
+        public async Task<string> GetPullRequestMergeBase(IRepository repo, string remoteName, string baseSha, string headSha, string baseRef, int pullNumber)
+        {
+            var mergeBase = GetMergeBase(repo, baseSha, headSha);
+            if (mergeBase == null)
+            {
+                var pullHeadRef = $"refs/pull/{pullNumber}/head";
+                await Fetch(repo, remoteName, baseRef, pullHeadRef);
+
+                mergeBase = GetMergeBase(repo, baseSha, headSha);
+            }
+
+            return mergeBase;
+        }
+
+        static string GetMergeBase(IRepository repo, string a, string b)
+        {
+            var aCommit = repo.Lookup<Commit>(a);
+            var bCommit = repo.Lookup<Commit>(b);
+            if (aCommit == null || bCommit == null)
+            {
+                return null;
+            }
+
+            var baseCommit = repo.ObjectDatabase.FindMergeBase(aCommit, bCommit);
+            return baseCommit?.Sha;
         }
 
         public Task<bool> IsHeadPushed(IRepository repo)
