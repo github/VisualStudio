@@ -9,6 +9,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.Services
@@ -81,7 +82,22 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public PullRequestTextBufferInfo GetTextBufferInfo(ITextBuffer buffer)
         {
-            return buffer.Properties.GetProperty<PullRequestTextBufferInfo>(typeof(PullRequestTextBufferInfo), null);
+            var projectionBuffer = buffer as IProjectionBuffer;
+
+            if (projectionBuffer == null)
+            {
+                return buffer.Properties.GetProperty<PullRequestTextBufferInfo>(typeof(PullRequestTextBufferInfo), null);
+            }
+            else
+            {
+                foreach (var sourceBuffer in projectionBuffer.SourceBuffers)
+                {
+                    var sourceBufferInfo = GetTextBufferInfo(sourceBuffer);
+                    if (sourceBufferInfo != null) return sourceBufferInfo;
+                }
+            }
+
+            return null;
         }
 
         async Task RepoChanged(ILocalRepositoryModel repository)

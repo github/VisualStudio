@@ -11,6 +11,7 @@ using GitHub.InlineReviews.Glyph;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Views;
 using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews
 {
@@ -28,16 +29,19 @@ namespace GitHub.InlineReviews
         readonly IEditorFormatMapService editorFormatMapService;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
+        readonly IPullRequestSessionManager sessionManager;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
-            IInlineCommentPeekService peekService)
+            IInlineCommentPeekService peekService,
+            IPullRequestSessionManager sessionManager)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
+            this.sessionManager = sessionManager;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
@@ -58,9 +62,9 @@ namespace GitHub.InlineReviews
                 IsMarginVisible, MarginPropertiesName, MarginName, true, 17.0);
         }
 
-        static bool IsMarginVisible(ITextBuffer buffer)
+        bool IsMarginVisible(ITextBuffer buffer)
         {
-            if (buffer.Properties.ContainsProperty(typeof(PullRequestTextBufferInfo)))
+            if (sessionManager.GetTextBufferInfo(buffer) != null)
             {
                 return true;
             }
