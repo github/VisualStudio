@@ -176,6 +176,31 @@ namespace GitHub.InlineReviews.UnitTests.Services
             Assert.Null(result);
         }
 
+        [Fact]
+        public async Task GetSessionUpdatesCurrentSessionIfCurrentBranchIsPullRequestButWasNotMarked()
+        {
+            var service = CreatePullRequestService();
+
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<int>());
+
+            var target = new PullRequestSessionManager(
+                service,
+                Substitute.For<IPullRequestSessionService>(),
+                CreateRepositoryHosts(),
+                new FakeTeamExplorerServiceHolder(CreateRepositoryModel()));
+             
+            Assert.Null(target.CurrentSession);
+
+            var model = CreatePullRequestModel(CurrentBranchPullRequestNumber);
+
+            service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<ILocalRepositoryModel>(), model).Returns(Observable.Return(true));
+            service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(CurrentBranchPullRequestNumber));
+
+            var session = await target.GetSession(model);
+
+            Assert.Same(session, target.CurrentSession);
+        }
+
         IPullRequestModel CreatePullRequestModel(int number)
         {
             var result = Substitute.For<IPullRequestModel>();

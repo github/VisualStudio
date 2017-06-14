@@ -54,7 +54,7 @@ namespace GitHub.InlineReviews.Services
             this.sessionService = sessionService;
             this.hosts = hosts;
             this.teamExplorerService = teamExplorerService;
-            teamExplorerService.Subscribe(this, RepoChanged);
+            teamExplorerService.Subscribe(this, x => RepoChanged(x).Forget());
         }
 
         /// <inheritdoc/>
@@ -67,6 +67,14 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest)
         {
+            if (await service.EnsureLocalBranchesAreMarkedAsPullRequests(repository, pullRequest))
+            {
+                // The branch for the PR was not previously marked with the PR number in the git
+                // config so we didn't pick up that the current branch is a PR branch. That has
+                // now been corrected, so call RepoChanged to make sure everything is up-to-date.
+                await RepoChanged(repository);
+            }
+
             return await GetSessionInternal(pullRequest);
         }
 
@@ -76,7 +84,7 @@ namespace GitHub.InlineReviews.Services
             return buffer.Properties.GetProperty<PullRequestTextBufferInfo>(typeof(PullRequestTextBufferInfo), null);
         }
 
-        async void RepoChanged(ILocalRepositoryModel repository)
+        async Task RepoChanged(ILocalRepositoryModel repository)
         {
             try
             {
@@ -94,7 +102,7 @@ namespace GitHub.InlineReviews.Services
 
                 if (modelService != null)
                 {
-                    var number = await service.GetPullRequestForCurrentBranch(repository);
+                    var number = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
 
                     if (number != (CurrentSession?.PullRequest.Number ?? 0))
                     {
