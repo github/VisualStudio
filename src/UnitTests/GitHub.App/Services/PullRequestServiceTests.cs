@@ -155,6 +155,41 @@ public class PullRequestServiceTests : TestBaseClass
             Assert.Equal(File.ReadAllBytes(files.Item1), File.ReadAllBytes(files.Item2));
         }
 
+        // Files need to be explicitly marked as UTF-8 otherwise Visual Studio will take them to be Windows-1252.
+        // Fixes https://github.com/github/VisualStudio/pull/1004#issuecomment-308358520
+        [Fact]
+        public async Task NotCheckedOut_FilesHaveUTF8Encoding()
+        {
+            var baseFileContent = "baseFileContent";
+            var headFileContent = "headFileContent";
+            var fileName = "fileName";
+            var baseSha = "baseSha";
+            var headSha = "headSha";
+            var checkedOut = false;
+
+            var files = await ExtractDiffFiles(baseSha, baseFileContent, headSha, headFileContent, baseSha, baseFileContent,
+                fileName, checkedOut);
+
+            Assert.True(HasPreamble(files.Item1, Encoding.UTF8));
+            Assert.True(HasPreamble(files.Item2, Encoding.UTF8));
+        }
+
+        static bool HasPreamble(string file, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(file))
+            {
+                foreach (var b in encoding.GetPreamble())
+                {
+                    if (b != stream.ReadByte())
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         [Fact]
         public async Task HeadBranchNotAvailable_ThrowsFileNotFoundException()
         {

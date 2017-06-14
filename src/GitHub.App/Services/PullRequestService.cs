@@ -326,8 +326,8 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    left = await ExtractToTempFile(repo, mergeBase, fileName, Encoding.Default);
-                    right = await ExtractToTempFile(repo, headSha, fileName, Encoding.Default);
+                    left = await ExtractToTempFile(repo, mergeBase, fileName, Encoding.UTF8);
+                    right = await ExtractToTempFile(repo, headSha, fileName, Encoding.UTF8);
                 }
 
                 return Observable.Return(Tuple.Create(left, right));
@@ -339,7 +339,7 @@ namespace GitHub.Services
             if (File.Exists(file))
             {
                 var encoding = Encoding.UTF8;
-                if (IsEncoding(file, encoding))
+                if (HasPreamble(file, encoding))
                 {
                     return encoding;
                 }
@@ -348,7 +348,7 @@ namespace GitHub.Services
             return Encoding.Default;
         }
 
-        static bool IsEncoding(string file, Encoding encoding)
+        static bool HasPreamble(string file, Encoding encoding)
         {
             using (var stream = File.OpenRead(file))
             {
