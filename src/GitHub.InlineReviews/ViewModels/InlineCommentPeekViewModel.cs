@@ -124,8 +124,10 @@ namespace GitHub.InlineReviews.ViewModels
 
         int GetLineNumber() => peekService.GetLineNumber(peekSession, triggerPoint);
 
-        void UpdateThread()
+        async Task UpdateThread()
         {
+            var placeholderBody = GetPlaceholderBody();
+
             Thread = null;
             threadSubscription?.Dispose();
 
@@ -143,8 +145,19 @@ namespace GitHub.InlineReviews.ViewModels
             else
             {
                 var newThread = new NewInlineCommentThreadViewModel(apiClient, session, file, lineNumber, leftBuffer);
-                threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread());
+                threadSubscription = newThread.Finished.Subscribe(_ => UpdateThread().Forget());
                 Thread = newThread;
+            }
+
+            if (!string.IsNullOrWhiteSpace(placeholderBody))
+            {
+                var placeholder = Thread.Comments.LastOrDefault();
+
+                if (placeholder?.EditState == CommentEditState.Placeholder)
+                {
+                    await placeholder.BeginEdit.ExecuteAsync(null);
+                    placeholder.Body = placeholderBody;
+                }
             }
         }
 
@@ -162,13 +175,19 @@ namespace GitHub.InlineReviews.ViewModels
 
             var relativePath = session.GetRelativePath(fullPath);
             file = await session.GetFile(relativePath);
-            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread());
+            fileSubscription = file.WhenAnyValue(x => x.InlineCommentThreads).Subscribe(_ => UpdateThread().Forget());
         }
 
         IApiClient CreateApiClient(ILocalRepositoryModel repository)
         {
             var hostAddress = HostAddress.Create(repository.CloneUrl.Host);
             return apiClientFactory.Create(hostAddress);
+        }
+
+        string GetPlaceholderBody()
+        {
+            var lastComment = Thread?.Comments.LastOrDefault();
+            return lastComment?.EditState == CommentEditState.Editing ? lastComment.Body : null;
         }
     }
 }

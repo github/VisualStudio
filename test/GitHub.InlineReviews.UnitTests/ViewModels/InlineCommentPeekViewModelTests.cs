@@ -118,6 +118,42 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.Equal(2, target.Thread.Comments.Count);
 
             var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+            AddCommentToExistingThread(file);
+
+            Assert.Equal(3, target.Thread.Comments.Count);
+        }
+
+        [Fact]
+        public async Task RetainsCommentBeingEditedWhenSessionRefreshed()
+        {
+            var sessionManager = CreateSessionManager();
+            var target = new InlineCommentPeekViewModel(
+                Substitute.For<IApiClientFactory>(),
+                CreatePeekService(lineNumber: 10),
+                CreatePeekSession(),
+                sessionManager,
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
+
+            await target.Initialize();
+
+            Assert.Equal(2, target.Thread.Comments.Count);
+
+            var placeholder = target.Thread.Comments.Last();
+            placeholder.BeginEdit.Execute(null);
+            placeholder.Body = "Comment being edited";
+
+            var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+            AddCommentToExistingThread(file);
+
+            placeholder = target.Thread.Comments.Last();
+            Assert.Equal(3, target.Thread.Comments.Count);
+            Assert.Equal(CommentEditState.Editing, placeholder.EditState);
+            Assert.Equal("Comment being edited", placeholder.Body);
+        }
+
+        void AddCommentToExistingThread(IPullRequestSessionFile file)
+        {
             var newThreads = file.InlineCommentThreads.ToList();
             var thread = file.InlineCommentThreads.Single();
             var newComment = CreateComment("New Comment");
@@ -125,8 +161,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             thread.Comments.Returns(newComments);
             file.InlineCommentThreads.Returns(newThreads);
             RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
-
-            Assert.Equal(3, target.Thread.Comments.Count);
         }
 
         IApiClientFactory CreateApiClientFactory()
