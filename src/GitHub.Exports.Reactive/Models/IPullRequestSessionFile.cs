@@ -26,7 +26,7 @@ namespace GitHub.Models
         string RelativePath { get; }
 
         /// <summary>
-        /// Gets the diff between the PR base and the current state of the file.
+        /// Gets the diff between the PR merge base and the current state of the file.
         /// </summary>
         IList<DiffChunk> Diff { get; }
 

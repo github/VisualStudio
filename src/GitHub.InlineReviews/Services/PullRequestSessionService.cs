@@ -80,5 +80,24 @@ namespace GitHub.InlineReviews.Services
 
             return null;
         }
+
+        /// <inheritdoc/>
+        public async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        {
+            var repo = gitService.GetRepository(repository.LocalPath);
+            var remote = await gitClient.GetHttpRemote(repo, "origin");
+
+            var baseSha = pullRequest.Base.Sha;
+            var baseRef = pullRequest.Base.Ref;
+            var headSha = pullRequest.Head.Sha;
+            var pullNumber = pullRequest.Number;
+            string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullNumber);
+            if (mergeBase == null)
+            {
+                throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
+            }
+
+            return mergeBase;
+        }
     }
 }

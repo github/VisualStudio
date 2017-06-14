@@ -156,7 +156,8 @@ namespace GitHub.InlineReviews.Services
                 var content = await GetFileContent(file);
 
                 file.CommitSha = await CalculateCommitSha(file, content);
-                file.Diff = await service.Diff(Repository, file.BaseSha, relativePath, content);
+                var mergeBaseSha = await service.GetPullRequestMergeBase(Repository, PullRequest);
+                file.Diff = await service.Diff(Repository, mergeBaseSha, relativePath, content);
 
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -183,7 +184,8 @@ namespace GitHub.InlineReviews.Services
 
             file.BaseSha = PullRequest.Base.Sha;
             file.CommitSha = await CalculateCommitSha(file, content);
-            file.Diff = await service.Diff(Repository, file.BaseSha, file.RelativePath, content);
+            var mergeBaseSha = await service.GetPullRequestMergeBase(Repository, PullRequest);
+            file.Diff = await service.Diff(Repository, mergeBaseSha, file.RelativePath, content);
 
             var commentsByPosition = PullRequest.ReviewComments
                 .Where(x => x.Path == file.RelativePath && x.OriginalPosition.HasValue)

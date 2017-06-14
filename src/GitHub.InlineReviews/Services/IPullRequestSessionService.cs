@@ -68,5 +68,15 @@ namespace GitHub.InlineReviews.Services
         /// A task returning the contents of the file, or null if the file was not found.
         /// </returns>
         Task<byte[]> ReadFileAsync(string path);
+
+        /// <summary>
+        /// Find the merge base for a pull request.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="pullRequest">The pull request.</param>
+        /// <returns>
+        /// The merge base SHA for the PR.
+        /// </returns>
+        Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
     }
 }
