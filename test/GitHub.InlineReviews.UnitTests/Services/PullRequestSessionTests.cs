@@ -1,21 +1,19 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.UnitTests.TestDoubles;
 using GitHub.Models;
-using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
-using Rothko;
 using Xunit;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
     public class PullRequestSessionTests
     {
+        const int PullRequestNumber = 5;
         const string RepoUrl = "https://foo.bar/owner/repo";
         const string FilePath = "test.cs";
 
@@ -222,7 +220,7 @@ Line 4");
 
                     // Because the PR branch isn't checked out, the file contents should be read
                     // from git and not the editor or disk.
-                    service.ExtractFileFromGit(Arg.Any<ILocalRepositoryModel>(), "HEAD_SHA", FilePath)
+                    service.ExtractFileFromGit(Arg.Any<ILocalRepositoryModel>(), PullRequestNumber, "HEAD_SHA", FilePath)
                         .Returns(Task.FromResult(gitContents));
 
                     var target = new PullRequestSession(
@@ -572,6 +570,7 @@ Line 4";
             changedFile.FileName.Returns("test.cs");
 
             var result = Substitute.For<IPullRequestModel>();
+            result.Number.Returns(PullRequestNumber);
             result.Base.Returns(new GitReferenceModel("BASE", "master", "BASE_SHA", RepoUrl));
             result.Head.Returns(new GitReferenceModel("HEAD", "pr", "HEAD_SHA", RepoUrl));
             result.ChangedFiles.Returns(new[] { changedFile });

@@ -50,6 +50,7 @@ namespace GitHub.InlineReviews.Services
         /// </returns>
         Task<byte[]> ExtractFileFromGit(
             ILocalRepositoryModel repository,
+            int pullRequestNumber,
             string sha,
             string relativePath);
 

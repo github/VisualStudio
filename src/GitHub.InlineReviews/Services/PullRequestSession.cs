@@ -252,7 +252,11 @@ namespace GitHub.InlineReviews.Services
         {
             if (!IsCheckedOut)
             {
-                return service.ExtractFileFromGit(Repository, PullRequest.Head.Sha, file.RelativePath);
+                return service.ExtractFileFromGit(
+                    Repository,
+                    PullRequest.Number,
+                    PullRequest.Head.Sha,
+                    file.RelativePath);
             }
             else if (file.ContentSource != null)
             {
