@@ -40,6 +40,20 @@ namespace GitHub.InlineReviews.Services
             byte[] contents);
 
         /// <summary>
+        /// Extracts a file at a specified commit from the repository.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="relativePath">The path to the file, relative to the repository.</param>
+        /// <returns>
+        /// The contents of the file, or null if the file was not found at the specified commit.
+        /// </returns>
+        Task<byte[]> ExtractFileFromGit(
+            ILocalRepositoryModel repository,
+            string sha,
+            string relativePath);
+
+        /// <summary>
         /// Gets the SHA of the tip of the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>

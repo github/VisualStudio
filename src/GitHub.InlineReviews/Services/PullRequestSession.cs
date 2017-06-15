@@ -7,10 +7,8 @@ using GitHub.Extensions;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
 using GitHub.Services;
-using Microsoft.VisualStudio.Text;
 using ReactiveUI;
 using System.Threading;
-using Rothko;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -250,8 +248,18 @@ namespace GitHub.InlineReviews.Services
 
         Task<byte[]> GetFileContent(IPullRequestSessionFile file)
         {
-            return file.ContentSource?.GetContent() ??
-                service.ReadFileAsync(Path.Combine(Repository.LocalPath, file.RelativePath));
+            if (!IsCheckedOut)
+            {
+                return service.ExtractFileFromGit(Repository, PullRequest.Head.Sha, file.RelativePath);
+            }
+            else if (file.ContentSource != null)
+            {
+                return file.ContentSource?.GetContent();
+            }
+            else
+            {
+                return service.ReadFileAsync(Path.Combine(Repository.LocalPath, file.RelativePath));
+            }
         }
 
         string GetFullPath(string relativePath)

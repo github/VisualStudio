@@ -148,6 +148,17 @@ namespace GitHub.Services
         Task<string> ExtractFile(IRepository repository, string commitSha, string fileName);
 
         /// <summary>
+        /// Extracts a file at a specified commit from the repository as binary data.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="fileName">The path to the file, relative to the repository.</param>
+        /// <returns>
+        /// The contents of the file, or null if the file was not found at the specified commit.
+        /// </returns>
+        Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName);
+
+        /// <summary>
         /// Checks whether the latest commit of a file in the repository has the specified file
         /// contents.
         /// </summary>

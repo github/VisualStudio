@@ -52,6 +52,15 @@ namespace GitHub.InlineReviews.Services
                    await gitClient.IsHeadPushed(repo);
         }
 
+        public Task<byte[]> ExtractFileFromGit(
+            ILocalRepositoryModel repository,
+            string sha,
+            string relativePath)
+        {
+            var repo = gitService.GetRepository(repository.LocalPath);
+            return gitClient.ExtractFileBinary(repo, sha, relativePath);
+        }
+
         /// <inheritdoc/>
         public async Task<byte[]> ReadFileAsync(string path)
         {

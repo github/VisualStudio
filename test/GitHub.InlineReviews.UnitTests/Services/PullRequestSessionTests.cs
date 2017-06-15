@@ -195,6 +195,52 @@ Line 4";
             }
 
             [Fact]
+            public async Task UpdatesReviewCommentWithContentsFromGitWhenBranchNotCheckedOut()
+            {
+                var baseContents = @"Line 1
+Line 2
+Line 3
+Line 4";
+                var gitContents = Encoding.UTF8.GetBytes(@"Line 1
+Line 2
+Line 3 with comment
+Line 4");
+                var editorContents = @"Editor content";
+
+                var comment = CreateComment(@"@@ -1,4 +1,4 @@
+ Line 1
+ Line 2
+-Line 3
++Line 3 with comment");
+
+                using (var diffService = new FakeDiffService())
+                {
+                    var pullRequest = CreatePullRequest(comment);
+                    var service = CreateService(diffService);
+
+                    diffService.AddFile(FilePath, baseContents);
+
+                    // Because the PR branch isn't checked out, the file contents should be read
+                    // from git and not the editor or disk.
+                    service.ExtractFileFromGit(Arg.Any<ILocalRepositoryModel>(), "HEAD_SHA", FilePath)
+                        .Returns(Task.FromResult(gitContents));
+
+                    var target = new PullRequestSession(
+                        service,
+                        Substitute.For<IAccount>(),
+                        pullRequest,
+                        Substitute.For<ILocalRepositoryModel>(),
+                        isCheckedOut: false);
+
+                    var editor = new FakeEditorContentSource(editorContents);
+                    var file = await target.GetFile(FilePath, editor);
+                    var thread = file.InlineCommentThreads.First();
+
+                    Assert.Equal(2, thread.LineNumber);
+                }
+            }
+
+            [Fact]
             public async Task UpdatesReviewCommentWithNewBody()
             {
                 var baseContents = @"Line 1

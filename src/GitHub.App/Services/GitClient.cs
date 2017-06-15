@@ -306,6 +306,34 @@ namespace GitHub.Services
             });
         }
 
+        [return: AllowNull]
+        public Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var commit = repository.Lookup<Commit>(commitSha);
+                if (commit == null)
+                {
+                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
+                }
+
+                var blob = commit[fileName]?.Target as Blob;
+
+                if (blob != null)
+                {
+                    using (var m = new MemoryStream())
+                    {
+                        var content = blob.GetContentStream();
+                        content.CopyTo(m);
+                        return m.ToArray();
+                    }
+                }
+
+                return null;
+            });
+        }
+
+
         public Task<bool> IsModified(IRepository repository, string path, [AllowNull] byte[] contents)
         {
             return Task.Factory.StartNew(() =>
