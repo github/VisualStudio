@@ -180,7 +180,6 @@ namespace GitHub.InlineReviews.Services
         async Task UpdateFile(PullRequestSessionFile file)
         {
             var content = await GetFileContent(file);
-            var unmodified = await service.IsUnmodifiedAndPushed(Repository, file.RelativePath, content);
 
             file.BaseSha = PullRequest.Base.Sha;
             file.CommitSha = await CalculateCommitSha(file, content);
