@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using System.Linq;
 using GitHub.Extensions;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace GitHub.Services
 {
@@ -53,9 +55,19 @@ namespace GitHub.Services
         /// <returns>An instance of <see cref="IRepositoryModel"/> or null</returns>
         public IRepository GetRepository(string path)
         {
+            IRepository repository;
+            if (repositoryCache.TryGetValue(path, out repository))
+            {
+                return repository;
+            }
+
             var repoPath = Repository.Discover(path);
-            return repoPath == null ? null : new Repository(repoPath);
+            repository = repoPath == null ? null : new Repository(repoPath);
+            repositoryCache[path] = repository;
+            return repository;
         }
+
+        IDictionary<string, IRepository> repositoryCache = new Dictionary<string, IRepository>();
 
         /// <summary>
         /// Returns a <see cref="UriString"/> representing the uri of a remote
