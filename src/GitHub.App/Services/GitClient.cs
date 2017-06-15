@@ -38,7 +38,8 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
                 repository.Network.Pull(signature, pullOptions);
@@ -51,7 +52,8 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
@@ -67,7 +69,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 try
                 {
@@ -89,7 +92,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 try
                 {
@@ -111,7 +115,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 repository.Checkout(branchName);
             });
@@ -122,7 +127,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 repository.CreateBranch(branchName);
             });
@@ -138,7 +144,8 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var options = new CompareOptions
                 {
@@ -170,7 +177,8 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
             Guard.ArgumentNotEmptyString(path, nameof(path));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var commit1 = repository.Lookup<Commit>(sha1);
                 var commit2 = repository.Lookup<Commit>(sha2);
@@ -195,7 +203,8 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
             Guard.ArgumentNotEmptyString(path, nameof(path));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var commit = repository.Lookup<Commit>(sha);
 
@@ -216,7 +225,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(key, nameof(key));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var result = repository.Config.Get<T>(key);
                 return result != null ? result.Value : default(T);
@@ -229,7 +239,8 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotEmptyString(value, nameof(value));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 repository.Config.Set(key, value);
             });
@@ -240,7 +251,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 repository.Config.Set("remote." + remoteName + ".url", url.ToString());
                 repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
@@ -253,7 +265,8 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
                 var remoteBranch = repository.Branches[remoteBranchName];
@@ -271,7 +284,8 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotEmptyString(key, nameof(key));
 
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 repository.Config.Unset(key);
             });
@@ -279,7 +293,8 @@ namespace GitHub.Services
 
         public Task<Remote> GetHttpRemote(IRepository repo, string remote)
         {
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var uri = GitService.GitServiceHelper.GetRemoteUri(repo, remote);
                 var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
@@ -293,7 +308,8 @@ namespace GitHub.Services
         [return: AllowNull]
         public Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
         {
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
                 if(commit == null)
@@ -309,7 +325,8 @@ namespace GitHub.Services
         [return: AllowNull]
         public Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName)
         {
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
                 if (commit == null)
@@ -336,11 +353,17 @@ namespace GitHub.Services
 
         public Task<bool> IsModified(IRepository repository, string path, [AllowNull] byte[] contents)
         {
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
-                    var blob1 = (Blob)repository.Head[path].Target;
+                    var blob1 = repository.Head[path].Target as Blob;
+                    if(blob1 == null)
+                    {
+                        // HACK: Return `false` if it's a submodule or other non-blob.
+                        return false;
+                    }
 
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
@@ -383,7 +406,8 @@ namespace GitHub.Services
 
         public Task<bool> IsHeadPushed(IRepository repo)
         {
-            return Task.Factory.StartNew(() =>
+            //return Task.Factory.StartNew(() =>
+            return Task_Factory_RunNow(() =>
             {
                 return repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha;
             });
@@ -392,6 +416,17 @@ namespace GitHub.Services
         static bool IsCanonical(string s)
         {
             return s.StartsWith("refs/", StringComparison.Ordinal);
+        }
+
+        static Task Task_Factory_RunNow(Action method)
+        {
+            method();
+            return Task.CompletedTask;
+        }
+
+        static Task<T> Task_Factory_RunNow<T>(Func<T> method)
+        {
+            return Task.FromResult(method());
         }
     }
 }
