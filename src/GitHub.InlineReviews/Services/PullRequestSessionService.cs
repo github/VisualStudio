@@ -18,6 +18,8 @@ namespace GitHub.InlineReviews.Services
         readonly IGitClient gitClient;
         readonly IDiffService diffService;
 
+        readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
+
         [ImportingConstructor]
         public PullRequestSessionService(
             IGitService gitService,
@@ -27,6 +29,8 @@ namespace GitHub.InlineReviews.Services
             this.gitService = gitService;
             this.gitClient = gitClient;
             this.diffService = diffService;
+
+            mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
         }
 
         /// <inheritdoc/>
@@ -84,19 +88,28 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
         {
+            var baseSha = pullRequest.Base.Sha;
+            var headSha = pullRequest.Head.Sha;
+            var key = new Tuple<string, string>(baseSha, headSha);
+
+            string mergeBase;
+            if(mergeBaseCache.TryGetValue(key, out mergeBase))
+            {
+                return mergeBase;
+            }
+
             var repo = gitService.GetRepository(repository.LocalPath);
             var remote = await gitClient.GetHttpRemote(repo, "origin");
 
-            var baseSha = pullRequest.Base.Sha;
             var baseRef = pullRequest.Base.Ref;
-            var headSha = pullRequest.Head.Sha;
             var pullNumber = pullRequest.Number;
-            string mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullNumber);
+            mergeBase = await gitClient.GetPullRequestMergeBase(repo, remote.Name, baseSha, headSha, baseRef, pullNumber);
             if (mergeBase == null)
             {
                 throw new FileNotFoundException($"Couldn't find merge base between {baseSha} and {headSha}.");
             }
 
+            mergeBaseCache[key] = mergeBase;
             return mergeBase;
         }
     }
