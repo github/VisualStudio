@@ -193,7 +193,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         IInlineCommentPeekService CreatePeekService(int lineNumber)
         {
             var result = Substitute.For<IInlineCommentPeekService>();
-            result.GetLineNumber(null, null).ReturnsForAnyArgs(lineNumber);
+            result.GetLineNumber(null, null).ReturnsForAnyArgs(Tuple.Create(lineNumber, false));
             return result;
         }
 
