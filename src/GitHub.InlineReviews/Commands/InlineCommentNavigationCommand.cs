@@ -151,8 +151,7 @@ namespace GitHub.InlineReviews.Commands
                         break;
                 }
             }
-
-            if (docView is IVsCodeWindow)
+            else if (docView is IVsCodeWindow)
             {
                 IVsTextView textView;
                 if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
@@ -216,20 +215,28 @@ namespace GitHub.InlineReviews.Commands
             ShowInlineCommentTag tag,
             IEnumerable<ITextView> allTextViews)
         {
-            peekService.Show(textView, tag);
+            var point = peekService.Show(textView, tag);
 
             if (parameter?.MoveCursor != false)
             {
-                var point = new SnapshotPoint(textView.TextSnapshot, GetCursorPoint(textView, tag.LineNumber));
-                (textView as FrameworkElement)?.Focus();
-                textView.Caret.MoveTo(point);
+                var caretPoint = textView.BufferGraph.MapUpToSnapshot(
+                    point.GetPoint(point.TextBuffer.CurrentSnapshot),
+                    PointTrackingMode.Negative,
+                    PositionAffinity.Successor,
+                    textView.TextSnapshot);
 
-                foreach (var other in allTextViews)
+                if (caretPoint.HasValue)
                 {
-                    if (other != textView)
-                    {
-                        peekService.Hide(other);
-                    }
+                    (textView as FrameworkElement)?.Focus();
+                    textView.Caret.MoveTo(caretPoint.Value);
+                }
+            }
+
+            foreach (var other in allTextViews)
+            {
+                if (other != textView)
+                {
+                    peekService.Hide(other);
                 }
             }
         }

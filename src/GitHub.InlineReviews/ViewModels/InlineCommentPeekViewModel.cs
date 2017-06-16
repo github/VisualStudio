@@ -64,13 +64,13 @@ namespace GitHub.InlineReviews.ViewModels
             NextComment = ReactiveCommand.CreateAsyncTask(_ =>
                 nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
-                    FromLine = GetLineNumber(),
+                    FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
 
             PreviousComment = ReactiveCommand.CreateAsyncTask(_ =>
                 previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
-                    FromLine = GetLineNumber(),
+                    FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }));
         }
 
@@ -122,8 +122,6 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        int GetLineNumber() => peekService.GetLineNumber(peekSession, triggerPoint);
-
         async Task UpdateThread()
         {
             var placeholderBody = GetPlaceholderBody();
@@ -134,8 +132,12 @@ namespace GitHub.InlineReviews.ViewModels
             if (file == null)
                 return;
 
-            var lineNumber = GetLineNumber();
-            var thread = file.InlineCommentThreads.FirstOrDefault(x => x.LineNumber == lineNumber);
+            var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
+            var lineNumber = lineAndLeftBuffer.Item1;
+            var leftBuffer = lineAndLeftBuffer.Item2;
+            var thread = file.InlineCommentThreads.FirstOrDefault(x => 
+                x.LineNumber == lineNumber &&
+                (!leftBuffer || x.DiffLineType == DiffChangeType.Delete));
             var apiClient = CreateApiClient(session.Repository);
 
             if (thread != null)

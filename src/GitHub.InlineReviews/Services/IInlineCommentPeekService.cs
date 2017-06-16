@@ -1,4 +1,5 @@
-﻿using GitHub.InlineReviews.Tags;
+﻿using System;
+using GitHub.InlineReviews.Tags;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -15,9 +16,10 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="session">The peek session.</param>
         /// <returns>
-        /// The line number or null if the line number could not be determined.
+        /// A tuple containing the line number and whether the line number represents a line in the
+        /// left hand side of a diff view.
         /// </returns>
-        int GetLineNumber(IPeekSession session, ITrackingPoint point);
+        Tuple<int, bool> GetLineNumber(IPeekSession session, ITrackingPoint point);
 
         /// <summary>
         /// Hides the inline comment peek view for a text view.
@@ -30,13 +32,13 @@ namespace GitHub.InlineReviews.Services
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <param name="tag">The tag.</param>
-        void Show(ITextView textView, ShowInlineCommentTag tag);
+        ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag);
 
         /// <summary>
         /// Shows the peek view for an <see cref="AddInlineCommentTag"/>.
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <param name="tag">The tag.</param>
-        void Show(ITextView textView, AddInlineCommentTag tag);
+        ITrackingPoint Show(ITextView textView, AddInlineCommentTag tag);
     }
 }
