@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using GitHub.Extensions;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -43,13 +48,8 @@ namespace GitHub.InlineReviews.Commands
         {
             get
             {
-                var textView = GetCurrentTextView();
-                if (textView == null) return false;
-
-                var tagAggregator = tagAggregatorFactory.CreateTagAggregator<InlineCommentTag>(textView);
-                var span = new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length);
-                var mappingSpan = textView.BufferGraph.CreateMappingSpan(span, SpanTrackingMode.EdgeExclusive);
-                return tagAggregator.GetTags(mappingSpan).Any();
+                var tags = GetTags(GetCurrentTextViews());
+                return tags.Any();
             }
         }
 
@@ -85,22 +85,86 @@ namespace GitHub.InlineReviews.Commands
         }
 
         /// <summary>
-        /// Gets the currently active text view from Visual Studio.
+        /// Gets the currently active text view(s) from Visual Studio.
         /// </summary>
-        /// <returns>An <see cref="ITextView"/> or null if no active text view.</returns>
-        protected ITextView GetCurrentTextView()
+        /// <returns>
+        /// Zero, one or two active <see cref="ITextView"/> objects.
+        /// </returns>
+        /// <remarks>
+        /// This method will return a single text view for a normal code window, or a pair of text
+        /// views if the currently active text view is a difference view in side by side mode, with
+        /// the first item being the side that currently has focus. If there is no active text view,
+        /// an empty collection will be returned.
+        /// </remarks>
+        protected IEnumerable<ITextView> GetCurrentTextViews()
         {
-            IVsTextView textView = null;
-            var textManager = (IVsTextManager)Package.GetServiceSafe(typeof(VsTextManagerClass));
-            textManager.GetActiveView(0, null, out textView);
-            var userData = textView as IVsUserData;
-            if (userData == null) return null;
-            IWpfTextViewHost viewHost;
-            object holder;
-            Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
-            userData.GetData(ref guidViewHost, out holder);
-            viewHost = (IWpfTextViewHost)holder;
-            return viewHost?.TextView;
+            var serviceProvider = Package;
+            var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
+            if (monitorSelection == null)
+            {
+                yield break;
+            }
+
+            object curDocument;
+            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
+            {
+                yield break;
+            }
+
+            IVsWindowFrame frame = curDocument as IVsWindowFrame;
+            if (frame == null)
+            {
+                yield break;
+            }
+
+            object docView = null;
+            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
+                yield break;
+            }
+
+            if (docView is IVsDifferenceCodeWindow)
+            {
+                var diffWindow = (IVsDifferenceCodeWindow)docView;
+                
+                switch (diffWindow.DifferenceViewer.ViewMode)
+                {
+                    case DifferenceViewMode.Inline:
+                        yield return diffWindow.DifferenceViewer.InlineView;
+                        break;
+                    case DifferenceViewMode.SideBySide:
+                        switch (diffWindow.DifferenceViewer.ActiveViewType)
+                        {
+                            case DifferenceViewType.LeftView:
+                                yield return diffWindow.DifferenceViewer.LeftView;
+                                yield return diffWindow.DifferenceViewer.RightView;
+                                break;
+                            case DifferenceViewType.RightView:
+                                yield return diffWindow.DifferenceViewer.RightView;
+                                yield return diffWindow.DifferenceViewer.LeftView;
+                                break;
+                        }
+                        yield return diffWindow.DifferenceViewer.LeftView;
+                        break;
+                    case DifferenceViewMode.RightViewOnly:
+                        yield return diffWindow.DifferenceViewer.RightView;
+                        break;
+                }
+            }
+
+            if (docView is IVsCodeWindow)
+            {
+                IVsTextView textView;
+                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
+                {
+                    yield break;
+                }
+
+                var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+                var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
+                var wpfTextView = adapterFactory.GetWpfTextView(textView);
+                yield return wpfTextView;
+            }
         }
 
         /// <summary>
@@ -116,23 +180,30 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the <see cref="ShowInlineCommentTag"/>s for the specified text view.
         /// </summary>
-        /// <param name="textView">The text view.</param>
+        /// <param name="textViews">The active text views.</param>
         /// <returns>A collection of <see cref="ITagInfo"/> objects, ordered by line.</returns>
-        protected IReadOnlyList<ITagInfo> GetTags(ITextView textView)
+        protected IReadOnlyList<ITagInfo> GetTags(IEnumerable<ITextView> textViews)
         {
-            var tagAggregator = CreateTagAggregator(textView);
-            var span = new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length);
-            var mappingSpan = textView.BufferGraph.CreateMappingSpan(span, SpanTrackingMode.EdgeExclusive);
+            var result = new List<ITagInfo>();
 
-            return tagAggregator.GetTags(mappingSpan)
-                .Select(x => new TagInfo
-                {
-                    Point = Map(x.Span.Start, textView.TextSnapshot),
-                    Tag = x.Tag as ShowInlineCommentTag,
-                })
-                .Where(x => x.Tag != null && x.Point.HasValue)
-                .OrderBy(x => x.Point)
-                .ToList();
+            foreach (var textView in textViews)
+            {
+                var tagAggregator = CreateTagAggregator(textView);
+                var span = new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length);
+                var mappingSpan = textView.BufferGraph.CreateMappingSpan(span, SpanTrackingMode.EdgeExclusive);
+                var tags = tagAggregator.GetTags(mappingSpan)
+                    .Select(x => new TagInfo
+                    {
+                        TextView = textView,
+                        Point = Map(x.Span.Start, textView.TextSnapshot),
+                        Tag = x.Tag as ShowInlineCommentTag,
+                    })
+                    .Where(x => x.Tag != null && x.Point.HasValue);
+                result.AddRange(tags);
+            }
+
+            result.Sort(TagInfoComparer.Instance);
+            return result;
         }
 
         /// <summary>
@@ -142,14 +213,24 @@ namespace GitHub.InlineReviews.Commands
         protected void ShowPeekComments(
             InlineCommentNavigationParams parameter,
             ITextView textView,
-            ShowInlineCommentTag tag)
+            ShowInlineCommentTag tag,
+            IEnumerable<ITextView> allTextViews)
         {
             peekService.Show(textView, tag);
 
             if (parameter?.MoveCursor != false)
             {
                 var point = new SnapshotPoint(textView.TextSnapshot, GetCursorPoint(textView, tag.LineNumber));
+                (textView as FrameworkElement)?.Focus();
                 textView.Caret.MoveTo(point);
+
+                foreach (var other in allTextViews)
+                {
+                    if (other != textView)
+                    {
+                        peekService.Hide(other);
+                    }
+                }
             }
         }
 
@@ -160,16 +241,24 @@ namespace GitHub.InlineReviews.Commands
 
         protected interface ITagInfo
         {
+            ITextView TextView { get; }
             ShowInlineCommentTag Tag { get; }
             SnapshotPoint Point { get; }
         }
 
-        private class TagInfo : ITagInfo
+        class TagInfo : ITagInfo
         {
+            public ITextView TextView { get; set; }
             public ShowInlineCommentTag Tag { get; set; }
             public SnapshotPoint? Point { get; set; }
 
             SnapshotPoint ITagInfo.Point => Point.Value;
+        }
+
+        class TagInfoComparer : IComparer<ITagInfo>
+        {
+            public static readonly TagInfoComparer Instance = new TagInfoComparer();
+            public int Compare(ITagInfo x, ITagInfo y) => x.Point.Position - y.Point.Position;
         }
     }
 }

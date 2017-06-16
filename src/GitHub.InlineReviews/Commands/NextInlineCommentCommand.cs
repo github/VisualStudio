@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.InlineReviews.Services;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 
 namespace GitHub.InlineReviews.Commands
@@ -43,14 +44,14 @@ namespace GitHub.InlineReviews.Commands
         /// <returns>A task that tracks the execution of the command.</returns>
         public override Task Execute(InlineCommentNavigationParams parameter)
         {
-            var textView = GetCurrentTextView();
-            var tags = GetTags(textView);
+            var textViews = GetCurrentTextViews().ToList();
+            var tags = GetTags(textViews);
 
             if (tags.Count > 0)
             {
-                var cursorPoint = GetCursorPoint(textView, parameter);
+                var cursorPoint = GetCursorPoint(textViews[0], parameter);
                 var next = tags.FirstOrDefault(x => x.Point > cursorPoint) ?? tags.First();
-                ShowPeekComments(parameter, textView, next.Tag);
+                ShowPeekComments(parameter, next.TextView, next.Tag, textViews);
             }
 
             return Task.CompletedTask;
