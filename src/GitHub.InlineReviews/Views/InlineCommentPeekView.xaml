@@ -47,6 +47,7 @@
                     HorizontalAlignment="Left" >
                 <Button Margin="2 0" Padding="2" Command="{Binding PreviousComment}">Previous</Button>
                 <Button Margin="2 0" Padding="2" Command="{Binding NextComment}">Next</Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             </StackPanel>
         </Border>
 
