@@ -38,15 +38,20 @@
             </StackPanel>
         </Border>
 
-        <StackPanel DockPanel.Dock="Top"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top">
-            <Button Margin="2 0" Padding="4" Command="{Binding PreviousComment}">Previous</Button>
-            <Button Margin="2 0" Padding="4" Command="{Binding NextComment}">Next</Button>
-        </StackPanel>
+        <Border DockPanel.Dock="Top"
+                Padding="4"
+                BorderThickness="0 0 0 1"
+                Background="#FFEEEEF2"
+                BorderBrush="#FFD1D5DA">
+            <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Left" >
+                <Button Margin="2 0" Padding="2" Command="{Binding PreviousComment}">Previous</Button>
+                <Button Margin="2 0" Padding="2" Command="{Binding NextComment}">Next</Button>
+            </StackPanel>
+        </Border>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      Background="#FFF5F5F5">
             <Grid>
                 <local:CommentThreadView DataContext="{Binding Thread}"/>
             </Grid>
