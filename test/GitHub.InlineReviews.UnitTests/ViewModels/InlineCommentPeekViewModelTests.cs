@@ -152,6 +152,39 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.Equal("Comment being edited", placeholder.Body);
         }
 
+        [Fact]
+        public async Task DoesntRetainSubmittedCommentInPlaceholderAfterPost()
+        {
+            var sessionManager = CreateSessionManager();
+            var target = new InlineCommentPeekViewModel(
+                CreateApiClientFactory(),
+                CreatePeekService(lineNumber: 10),
+                CreatePeekSession(),
+                sessionManager,
+                Substitute.For<INextInlineCommentCommand>(),
+                Substitute.For<IPreviousInlineCommentCommand>());
+
+            await target.Initialize();
+
+            Assert.Equal(2, target.Thread.Comments.Count);
+
+            sessionManager.CurrentSession.AddComment(null)
+                .ReturnsForAnyArgs(async x =>
+                {
+                    var file = await sessionManager.CurrentSession.GetFile(RelativePath);
+                    AddCommentToExistingThread(file);
+                });
+
+            var placeholder = target.Thread.Comments.Last();
+            placeholder.BeginEdit.Execute(null);
+            placeholder.Body = "Comment being edited";
+            placeholder.CommitEdit.Execute(null);
+
+            placeholder = target.Thread.Comments.Last();
+            Assert.Equal(CommentEditState.Placeholder, placeholder.EditState);
+            Assert.Equal(string.Empty, placeholder.Body);
+        }
+
         void AddCommentToExistingThread(IPullRequestSessionFile file)
         {
             var newThreads = file.InlineCommentThreads.ToList();
@@ -166,6 +199,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         IApiClientFactory CreateApiClientFactory()
         {
             var apiClient = Substitute.For<IApiClient>();
+            apiClient.CreatePullRequestReviewComment(null, null, 0, null, 0)
+                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
             apiClient.CreatePullRequestReviewComment(null, null, 0, null, null, null, 0)
                 .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
 

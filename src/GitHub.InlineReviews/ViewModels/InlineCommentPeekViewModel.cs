@@ -124,7 +124,7 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task UpdateThread()
         {
-            var placeholderBody = GetPlaceholderBody();
+            var placeholderBody = await GetPlaceholderBodyToPreserve();
 
             Thread = null;
             threadSubscription?.Dispose();
@@ -186,10 +186,17 @@ namespace GitHub.InlineReviews.ViewModels
             return apiClientFactory.Create(hostAddress);
         }
 
-        string GetPlaceholderBody()
+        async Task<string> GetPlaceholderBodyToPreserve()
         {
             var lastComment = Thread?.Comments.LastOrDefault();
-            return lastComment?.EditState == CommentEditState.Editing ? lastComment.Body : null;
+
+            if (lastComment?.EditState == CommentEditState.Editing)
+            {
+                var executing = await lastComment.CommitEdit.IsExecuting.FirstAsync();
+                if (!executing) return lastComment.Body;
+            }
+
+            return null;
         }
     }
 }
