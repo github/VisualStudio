@@ -55,7 +55,6 @@
             x:Name="hostTabControl"
             Margin="30,0"
             Style="{StaticResource LightModalViewTabControl}"
-            SelectionChanged="hostTabControl_SelectionChanged"
             FocusManager.IsFocusScope="True"
             FocusVisualStyle="{x:Null}"
             helpers:AccessKeysManagerScoping.IsEnabled="True"

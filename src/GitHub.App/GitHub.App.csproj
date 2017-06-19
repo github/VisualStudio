@@ -19,7 +19,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration.cs')">Internal</BuildType>
+    <BuildType Condition="Exists('..\..\script\src\ApiClientConfiguration_User.cs')">Internal</BuildType>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -175,10 +175,6 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\script\src\ApiClientConfiguration.cs" Condition="$(Buildtype) == 'Internal'">
-      <Link>Api\ApiClientConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="Api\ApiClientConfiguration.cs" Condition="$(Buildtype) != 'Internal'" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AkavacheSqliteLinkerOverride.cs" />
@@ -283,6 +279,10 @@
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
       <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
       <Name>CredentialManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
+      <Project>{B389ADAF-62CC-486E-85B4-2D8B078DF763}</Project>
+      <Name>GitHub.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>

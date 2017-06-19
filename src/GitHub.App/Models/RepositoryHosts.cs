@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -10,9 +9,9 @@ using System.Reactive.Subjects;
 using Akavache;
 using GitHub.Authentication;
 using GitHub.Caches;
-using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Primitives;
+using GitHub.Services;
 using NullGuard;
 using ReactiveUI;
 
@@ -81,11 +80,11 @@ namespace GitHub.Models
             disposables.Add(
                 connectionManager.Connections.CreateDerivedCollection(x => x)
                 .ItemsRemoved
-                .Select(x =>
+                .SelectMany(async x =>
                 {
                     var host = LookupHost(x.HostAddress);
                     if (host.Address != x.HostAddress)
-                        host = RepositoryHostFactory.Create(x.HostAddress);
+                        host = await RepositoryHostFactory.Create(x.HostAddress);
                     return host;
                 })
                 .Select(h => LogOut(h))
@@ -128,36 +127,42 @@ namespace GitHub.Models
             string password)
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
-            var host = RepositoryHostFactory.Create(address);
-            return host.LogIn(usernameOrEmail, password)
-                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
-                .Do(result =>
-                {
-                    bool successful = result.IsSuccess();
-                    log.Info(CultureInfo.InvariantCulture, "Log in to {3} host '{0}' with username '{1}' {2}",
-                        address.ApiUri,
-                        usernameOrEmail,
-                        successful ? "SUCCEEDED" : "FAILED",
-                        isDotCom ? "GitHub.com" : address.WebUri.Host
-                    );
-                    if (successful)
+
+            return Observable.Defer(async () =>
+            {
+                var host = await RepositoryHostFactory.Create(address);
+
+                return host.LogIn(usernameOrEmail, password)
+                    .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Do(result =>
                     {
-                        // Make sure that GitHubHost/EnterpriseHost are set when the connections
-                        // changed event is raised and likewise that the connection is added when
-                        // the property changed notification is sent.
-                        if (isDotCom)
-                            githubHost = host;
-                        else
-                            enterpriseHost = host;
+                        bool successful = result.IsSuccess();
+                        log.Info(CultureInfo.InvariantCulture, "Log in to {3} host '{0}' with username '{1}' {2}",
+                            address.ApiUri,
+                            usernameOrEmail,
+                            successful ? "SUCCEEDED" : "FAILED",
+                            isDotCom ? "GitHub.com" : address.WebUri.Host
+                        );
+                        if (successful)
+                        {
+                            // Make sure that GitHubHost/EnterpriseHost are set when the connections
+                            // changed event is raised and likewise that the connection is added when
+                            // the property changed notification is sent.
+                            if (isDotCom)
+                                githubHost = host;
+                            else
+                                enterpriseHost = host;
 
-                        connectionManager.AddConnection(address, usernameOrEmail);
+                            connectionManager.AddConnection(address, usernameOrEmail);
 
-                        if (isDotCom)
-                            this.RaisePropertyChanged(nameof(GitHubHost));
-                        else
-                            this.RaisePropertyChanged(nameof(EnterpriseHost));
-                    }
-                });
+                            if (isDotCom)
+                                this.RaisePropertyChanged(nameof(GitHubHost));
+                            else
+                                this.RaisePropertyChanged(nameof(EnterpriseHost));
+                        }
+                    });
+            });
         }
 
         /// <summary>
@@ -169,20 +174,25 @@ namespace GitHub.Models
         public IObservable<AuthenticationResult> LogInFromCache(HostAddress address)
         {
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
-            var host = RepositoryHostFactory.Create(address);
-            return host.LogInFromCache()
-                .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
-                .Do(result =>
-                {
-                    bool successful = result.IsSuccess();
-                    if (successful)
+
+            return Observable.Defer(async () =>
+            {
+                var host = await RepositoryHostFactory.Create(address);
+                return host.LogInFromCache()
+                    .Catch<AuthenticationResult, Exception>(Observable.Throw<AuthenticationResult>)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Do(result =>
                     {
-                        if (isDotCom)
-                            GitHubHost = host;
-                        else
-                            EnterpriseHost = host;
-                    }
-                });
+                        bool successful = result.IsSuccess();
+                        if (successful)
+                        {
+                            if (isDotCom)
+                                GitHubHost = host;
+                            else
+                                EnterpriseHost = host;
+                        }
+                    });
+            });
         }
 
         public IObservable<Unit> LogOut(IRepositoryHost host)
@@ -190,6 +200,7 @@ namespace GitHub.Models
             var address = host.Address;
             var isDotCom = HostAddress.GitHubDotComHostAddress == address;
             return host.LogOut()
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Do(result =>
                 {
                     // reset the logged out host property to null
