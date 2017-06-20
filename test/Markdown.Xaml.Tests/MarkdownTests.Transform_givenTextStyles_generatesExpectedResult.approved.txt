@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <Paragraph>
+    <Italic>This text will be italic</Italic> <Italic>This will also be italic</Italic></Paragraph>
+  <Paragraph>
+    <Bold>This text will be bold</Bold> <Bold>This will also be bold</Bold></Paragraph>
+</FlowDocument>

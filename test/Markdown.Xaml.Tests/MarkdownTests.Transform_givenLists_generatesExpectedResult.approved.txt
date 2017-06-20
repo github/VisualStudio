@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <Paragraph>First we have a simple numeric list</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>Alpha</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Beta</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Gamma</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Delta</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Then we have a simple unordered list</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Han</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Leia</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Luke</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Obiwan</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Unordered</Paragraph>
+  <Paragraph>Asterisks tight:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>asterisk 1</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>asterisk 2</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>asterisk 3</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Asterisks loose:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>asterisk 1</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>asterisk 2</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>asterisk 3</Paragraph>
+    </ListItem>
+  </List>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph>Pluses tight:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Plus 1</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Plus 2</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Plus 3</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Pluses loose:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Plus 1</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Plus 2</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Plus 3</Paragraph>
+    </ListItem>
+  </List>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph>Minuses tight:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Minus 1</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Minus 2</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Minus 3</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Minuses loose:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Minus 1</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Minus 2</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Minus 3</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Ordered</Paragraph>
+  <Paragraph>Tight:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>First</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Second</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Third</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>and:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>One</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Two</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Three</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Loose using tabs:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>First</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Second</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Third</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>and using spaces:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>One</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Two</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Three</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Multiple paragraphs:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>Item 1, graf one.</Paragraph>
+      <Paragraph xml:space="preserve"> Item 2. graf two. The quick brown fox jumped over the lazy dog's back.</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Item 2.</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Item 3.</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Nested</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Tab * Tab * Tab</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Here's another:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>First</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Second: * Fee * Fie * Foe</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Third</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Same thing but with paragraphs:</Paragraph>
+  <List MarkerStyle="Decimal">
+    <ListItem>
+      <Paragraph>First</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Second: * Fee * Fie * Foe</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Third</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>This was an error in Markdown 1.0.1:</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>this</Paragraph>
+      <Paragraph xml:space="preserve"> * sub</Paragraph>
+      <Paragraph xml:space="preserve"> that</Paragraph>
+    </ListItem>
+  </List>
+</FlowDocument>

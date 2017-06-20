@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <Paragraph>A remote <Image Source="http://placehold.it/350x150" Tag="image" Width="1" Margin="0,0,0,0" />.</Paragraph>
+  <Paragraph>Images side by side <Image Source="http://placehold.it/100x150/0000FF" Tag="imageleft" Width="1" Margin="0,0,0,0" /><Image Source="http://placehold.it/100x150/00FFFF" Tag="imageright" Width="1" Margin="0,0,0,0" /></Paragraph>
+  <Paragraph>A local image <Image Source="sampleimage.jpg" Tag="image" Width="128" Margin="0,0,0,0" />.</Paragraph>
+</FlowDocument>
