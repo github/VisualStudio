@@ -5,6 +5,9 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Markup;
 using System.Xml;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace Markdown.Xaml.Tests
 {
@@ -67,6 +70,16 @@ namespace Markdown.Xaml.Tests
         {
             var text = LoadText("Images.md");
             var markdown = new GitHub.UI.Markdown();
+            var result = markdown.Transform(text);
+            Approvals.Verify(AsXaml(result));
+        }
+
+        [Test]
+        [RequiresSTA]
+        public void Transform_givenCode_generatesExpectedResult()
+        {
+            var text = LoadText("Code.md");
+            var markdown = new GitHub.UI.Markdown { CodeStyle = new Style { TargetType = typeof(Run) } };
             var result = markdown.Transform(text);
             Approvals.Verify(AsXaml(result));
         }
