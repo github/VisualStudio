@@ -113,6 +113,16 @@ namespace GitHub.UI
         public static readonly DependencyProperty CodeStyleProperty =
             DependencyProperty.Register("CodeStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
 
+        public Style CodeBlockStyle
+        {
+            get { return (Style)GetValue(CodeBlockStyleProperty); }
+            set { SetValue(CodeBlockStyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CodeBlockStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CodeBlockStyleProperty =
+            DependencyProperty.Register("CodeBlockStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
         public Style LinkStyle
         {
             get { return (Style)GetValue(LinkStyleProperty); }
@@ -185,8 +195,9 @@ namespace GitHub.UI
 
             return DoHeaders(text,
                 s1 => DoHorizontalRules(s1,
-                    s2 => DoLists(s2,
-                    sn => FormParagraphs(sn))));
+                s2 => DoLists(s2,
+                s3 => DoCodeBlocks(s3, 
+                sn => FormParagraphs(sn)))));
 
             //text = DoCodeBlocks(text);
             //text = DoBlockQuotes(text);
@@ -740,6 +751,43 @@ namespace GitHub.UI
                 // recursion for sub-lists
                 return Create<ListItem, Block>(RunBlockGamut(item));
             }
+        }
+
+        static Regex codeBlock = new Regex(@"
+                    ^           # Beginning of line
+                    ```         # Three ` backticks
+                    \s*?        # Whitespace
+                    ([\S]+)?    # $1 = language
+                    \n          # Newline
+                    ([\s\S]+?)  # $2 = The code block
+                    \n          # Newline
+                    ```", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Turn Markdown ``` code blocks into a PRE tags
+        /// </summary>
+        IEnumerable<Block> DoCodeBlocks(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        {
+            Guard.ArgumentNotNull(text, nameof(text));
+
+            return Evaluate(text, codeBlock, CodeBlockEvaluator, defaultHandler);
+        }
+
+        Block CodeBlockEvaluator(Match match)
+        {
+            Guard.ArgumentNotNull(match, nameof(match));
+
+            var inline = new Run();
+            inline.Text = match.Groups[2].Value;
+
+            var result = new Paragraph(inline);
+
+            if (CodeBlockStyle != null)
+            {
+                result.Style = CodeBlockStyle;
+            }
+
+            return result;
         }
 
         static Regex codeSpan = new Regex(@"

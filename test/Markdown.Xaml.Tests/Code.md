@@ -1,34 +1,21 @@
-﻿# Code 1
+﻿# Inline Code 1
 ` Type.Method(); Type.Method("a string");`
 
-# Code 2
-Some text around a ` Type.Method()` code block.
+# Inline Code 2
+Some text around ` Type.Method()` inline code.
 
-# Block 1
+# Code Block
 ```  
-Type.Method();
+Type.Block1();
 
-Type.Method("a string");
+Type.Block1("a string");
 ```
 
-# Block 2
-```  
-Type.Method();
+# Code Block with language
+```csharp
+Type.Block2();
 
-Type.Method("a string");
+Type.Block2("a string");
 
-Type.Method("a string");
+Type.Block2("a string");
 ```
-
-# Block 3
-```  
-Type.Method();
-Type.Method("a string");
-```
-
-# Block 4
-``` 
-Type.Method("a string");
-Type.Method();
-```
-

@@ -100,6 +100,16 @@ namespace GitHub.UI
             Markdown.CodeStyleProperty.AddOwner(typeof(MarkdownViewer),
                 new FrameworkPropertyMetadata(UpdateLinkedProperties));
 
+        public Style CodeBlockStyle
+        {
+            get { return (Style)GetValue(CodeBlockStyleProperty); }
+            set { SetValue(CodeBlockStyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty CodeBlockStyleProperty =
+            Markdown.CodeBlockStyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
         public Style LinkStyle
         {
             get { return (Style)GetValue(LinkStyleProperty); }

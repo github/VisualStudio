@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <Paragraph>Inline Code 1</Paragraph>
+  <Paragraph>
+    <Run>
+      <Run.Style>
+        <Style TargetType="Run">
+          <Style.Resources>
+            <ResourceDictionary />
+          </Style.Resources>
+        </Style>
+      </Run.Style>Type.Method(); Type.Method("a string");</Run>
+  </Paragraph>
+  <Paragraph>Inline Code 2</Paragraph>
+  <Paragraph>Some text around <Run><Run.Style><Style TargetType="Run"><Style.Resources><ResourceDictionary /></Style.Resources></Style></Run.Style>Type.Method()</Run> inline code.</Paragraph>
+  <Paragraph>Code Block</Paragraph>
+  <Paragraph xml:space="preserve"><Paragraph.Style><Style TargetType="Paragraph"><Style.Resources><ResourceDictionary /></Style.Resources></Style></Paragraph.Style>Type.Block1();
+
+Type.Block1("a string");</Paragraph>
+  <Paragraph />
+  <Paragraph>Code Block with language</Paragraph>
+  <Paragraph xml:space="preserve"><Paragraph.Style><Style TargetType="Paragraph"><Style.Resources><ResourceDictionary /></Style.Resources></Style></Paragraph.Style>Type.Block2();
+
+Type.Block2("a string");
+
+Type.Block2("a string");</Paragraph>
+  <Paragraph />
+</FlowDocument>

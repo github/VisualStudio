@@ -79,7 +79,11 @@ namespace Markdown.Xaml.Tests
         public void Transform_givenCode_generatesExpectedResult()
         {
             var text = LoadText("Code.md");
-            var markdown = new GitHub.UI.Markdown { CodeStyle = new Style { TargetType = typeof(Run) } };
+            var markdown = new GitHub.UI.Markdown
+            {
+                CodeStyle = new Style { TargetType = typeof(Run) },
+                CodeBlockStyle = new Style { TargetType = typeof(Paragraph) }
+            };
             var result = markdown.Transform(text);
             Approvals.Verify(AsXaml(result));
         }
