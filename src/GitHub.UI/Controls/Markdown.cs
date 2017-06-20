@@ -154,7 +154,7 @@ namespace GitHub.UI
 
         public Markdown()
         {
-            //HyperlinkCommand = NavigationCommands.GoToPage;
+            HyperlinkCommand = NavigationCommands.GoToPage;
         }
 
         public FlowDocument Transform(string text)
