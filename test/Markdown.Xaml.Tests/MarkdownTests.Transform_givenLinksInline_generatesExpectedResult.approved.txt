@@ -23,4 +23,5 @@
     <Hyperlink Command="GoToPage" CommandParameter="/foo(bar)">With parens in the URL</Hyperlink>
   </Paragraph>
   <Paragraph>(With outer parens and <Hyperlink Command="GoToPage" CommandParameter="/foo(bar)">parens in url</Hyperlink>)</Paragraph>
+  <Paragraph>A paragraph with a URL autolink <Hyperlink Command="GoToPage" CommandParameter="http://en.wikipedia.org/wiki/WIMP_(computing)">http://en.wikipedia.org/wiki/WIMP_(computing)</Hyperlink></Paragraph>
 </FlowDocument>

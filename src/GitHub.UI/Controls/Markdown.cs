@@ -374,13 +374,15 @@ namespace GitHub.UI
                 )", GetNestedBracketsPattern(), GetNestedParensPattern()),
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+        static Regex anchorAuto = new Regex(@"([A-Za-z][A-Za-z0-9.+-]{1,31}:[^<>\x00-\x20]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         /// <summary>
         /// Turn Markdown images into images
         /// </summary>
         /// <remarks>
         /// ![image alt](url) 
         /// </remarks>
-        IEnumerable<Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        IEnumerable <Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
             Guard.ArgumentNotNull(text, nameof(text));
 
@@ -452,8 +454,8 @@ namespace GitHub.UI
         {
             Guard.ArgumentNotNull(text, nameof(text));
 
-            // Next, inline-style links: [link text](url "optional title") or [link text](url "optional title")
-            return Evaluate(text, anchorInline, AnchorInlineEvaluator, defaultHandler);
+            return Evaluate(text, anchorInline, AnchorInlineEvaluator, 
+                x => Evaluate(x, anchorAuto, AnchorAutoEvaluator, defaultHandler));
         }
 
         Inline AnchorInlineEvaluator(Match match)
@@ -465,6 +467,26 @@ namespace GitHub.UI
             string title = match.Groups[6].Value;
 
             var result = Create<Hyperlink, Inline>(RunSpanGamut(linkText));
+            result.Command = HyperlinkCommand;
+            result.CommandParameter = url;
+            if (LinkStyle != null)
+            {
+                result.Style = LinkStyle;
+            }
+
+            return result;
+        }
+
+        Inline AnchorAutoEvaluator(Match match)
+        {
+            Guard.ArgumentNotNull(match, nameof(match));
+
+            string url = match.Groups[1].Value;
+
+            var run = new Run();
+            run.Text = url;
+
+            var result = new Hyperlink(run);
             result.Command = HyperlinkCommand;
             result.CommandParameter = url;
             if (LinkStyle != null)

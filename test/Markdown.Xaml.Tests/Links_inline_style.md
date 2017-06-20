@@ -18,7 +18,8 @@ Just a [URL](/url/).
 
 (With outer parens and [parens in url](/foo(bar)))
 
-
 [With parens in the URL](/foo(bar) "and a title")
 
 (With outer parens and [parens in url](/foo(bar) "and a title"))
+
+A paragraph with a URL autolink http://en.wikipedia.org/wiki/WIMP_(computing)
