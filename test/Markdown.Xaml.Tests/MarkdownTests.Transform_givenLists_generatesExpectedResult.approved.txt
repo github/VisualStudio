@@ -209,4 +209,25 @@
       <Paragraph xml:space="preserve"> that</Paragraph>
     </ListItem>
   </List>
+  <Paragraph>List with CheckBoxes</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>
+        <CheckBox IsChecked="False" IsEnabled="False" />Unchecked item</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>
+        <CheckBox IsChecked="True" IsEnabled="False" />Checked item</Paragraph>
+      <List MarkerStyle="Disc">
+        <ListItem>
+          <Paragraph>
+            <CheckBox IsChecked="False" IsEnabled="False" />Nested unchecked item</Paragraph>
+        </ListItem>
+        <ListItem>
+          <Paragraph>
+            <CheckBox IsChecked="True" IsEnabled="False" />Nested checked item</Paragraph>
+        </ListItem>
+      </List>
+    </ListItem>
+  </List>
 </FlowDocument>

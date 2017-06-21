@@ -16,6 +16,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Linq;
 
 namespace GitHub.UI
 {
@@ -738,10 +739,11 @@ namespace GitHub.UI
                 list = Regex.Replace(list, @"\n{2,}\z", "\n");
 
                 string pattern = string.Format(
-                  @"(\n)?                      # leading line = $1
+                  @"(\n)?                  # leading line = $1
                 (^[ ]*)                    # leading whitespace = $2
                 ({0}) [ ]+                 # list marker = $3
-                ((?s:.+?)                  # list item text = $4
+                (\[[ x]\]\s)?              # checkbox = $4
+                ((?s:.+?)                  # list item text = $5
                 (\n{{1,2}}))      
                 (?= \n* (\z | \2 ({0}) [ ]+))", marker);
 
@@ -762,16 +764,43 @@ namespace GitHub.UI
         {
             Guard.ArgumentNotNull(match, nameof(match));
 
-            string item = match.Groups[4].Value;
+            string check = match.Groups[4].Value.Trim();
+            string item = match.Groups[5].Value;
             string leadingLine = match.Groups[1].Value;
 
             if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
                 // we could correct any bad indentation here..
-                return Create<ListItem, Block>(RunBlockGamut(item));
+                return Create<ListItem, Block>(BuildListItem(check, item));
             else
             {
                 // recursion for sub-lists
-                return Create<ListItem, Block>(RunBlockGamut(item));
+                return Create<ListItem, Block>(BuildListItem(check, item));
+            }
+        }
+
+        IEnumerable<Block> BuildListItem(string check, string item)
+        {
+            CheckBox checkBox = null;
+
+            if (!string.IsNullOrWhiteSpace(check))
+            {
+                checkBox = new CheckBox
+                {
+                    IsEnabled = false,
+                    IsChecked = check == "[x]",
+                };
+            }
+
+            foreach (var block in RunBlockGamut(item))
+            {
+                if (checkBox != null)
+                {
+                    var paragraph = block as Paragraph;
+                    paragraph.Inlines.InsertBefore(paragraph.Inlines.FirstInline, new InlineUIContainer(checkBox));
+                    checkBox = null;
+                }
+
+                yield return block;
             }
         }
 

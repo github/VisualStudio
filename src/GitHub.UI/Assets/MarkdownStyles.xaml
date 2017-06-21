@@ -6,6 +6,11 @@
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="PagePadding" Value="0"/>
+        <Style.Resources>
+            <Style TargetType="CheckBox">
+                <Setter Property="Margin" Value="0 0 4 -3"/>
+            </Style>
+        </Style.Resources>
     </Style>
 
     <Style x:Key="MarkdownH1Style" TargetType="Paragraph">

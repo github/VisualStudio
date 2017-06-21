@@ -144,3 +144,10 @@ This was an error in Markdown 1.0.1:
 	*	sub
 
 	that
+
+List with CheckBoxes
+
+- [ ] Unchecked item
+- [x] Checked item
+  - [ ] Nested unchecked item
+  - [x] Nested checked item
