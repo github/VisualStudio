@@ -31,4 +31,14 @@
     <Setter Property="FontWeight" Value="Light" />
     <Setter Property="TextDecorations" Value="Underline" />
   </Style>
+  <Style TargetType="{x:Type Table}" x:Key="{x:Static markdig:Styles.TableStyleKey}">
+    <Setter Property="BorderBrush" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
+    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+    <Setter Property="CellSpacing" Value="0"/>
+  </Style>
+  <Style TargetType="{x:Type TableCell}" x:Key="{x:Static markdig:Styles.TableCellStyleKey}">
+    <Setter Property="BorderBrush" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
+    <Setter Property="BorderThickness" Value="1,1,0,0"/>
+    <Setter Property="Padding" Value="4"/>
+  </Style>
 </ResourceDictionary>
