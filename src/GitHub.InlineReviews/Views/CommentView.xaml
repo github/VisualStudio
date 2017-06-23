@@ -121,8 +121,8 @@
 
             <controls:AccountAvatar Grid.RowSpan="2"
                                 Margin="4 2"
-                                Width="32" 
-                                Height="32" 
+                                Width="28" 
+                                Height="28" 
                                 VerticalAlignment="Top"
                                 Account="{Binding User}"/>
 
