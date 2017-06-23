@@ -120,7 +120,7 @@
             </Grid.RowDefinitions>
 
             <controls:AccountAvatar Grid.RowSpan="2"
-                                Margin="4 2"
+                                Margin="4"
                                 Width="28" 
                                 Height="28" 
                                 VerticalAlignment="Top"
@@ -137,6 +137,7 @@
                               GotFocus="ReplyPlaceholder_GotFocus">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
+                        <Setter Property="Height" Value="28"/>
                         <Setter Property="PromptText" Value="Reply..."/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding EditState}" Value="Editing">
