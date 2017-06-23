@@ -130,7 +130,7 @@
                               Grid.Column="1"
                               AcceptsReturn="True"
                               AcceptsTab="True"
-                              Margin="0"
+                              Margin="4 0"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
