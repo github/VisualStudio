@@ -184,6 +184,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Assets\Markdown.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Assets\TextBlocks.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -252,6 +255,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\markdig-wpf\src\Markdig.Wpf\Markdig.Wpf.csproj">
+      <Project>{01e40fb5-b4e9-489d-98d5-4771ddc2d1d7}</Project>
+      <Name>Markdig.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
