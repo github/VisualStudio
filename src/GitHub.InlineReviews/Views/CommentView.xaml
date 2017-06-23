@@ -49,6 +49,7 @@
         <Grid>
             <Grid.Style>
                 <Style TargetType="FrameworkElement">
+                    <Setter Property="Margin" Value="0 0 0 -40" />
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding EditState}" Value="None">
