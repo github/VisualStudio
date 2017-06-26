@@ -77,9 +77,7 @@ namespace GitHub.ViewModels
             Authors = trackingAuthors.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAuthor));
             Assignees = trackingAssignees.CreateListenerCollection(EmptyUser, this.WhenAnyValue(x => x.SelectedAssignee));
 
-            PullRequests = new TrackingCollection<IPullRequestModel>();
-            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
-            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            CreatePullRequests();
 
             this.WhenAny(x => x.SelectedState, x => x.Value)
                 .Where(x => PullRequests != null)
@@ -95,7 +93,7 @@ namespace GitHub.ViewModels
 
             this.WhenAnyValue(x => x.ShowPullRequestsForFork)
                 .Skip(1)
-                .Subscribe(_ => Load().Forget());
+                .Subscribe(_ => ResetAndLoad());
 
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
             OpenPullRequest = ReactiveCommand.Create();
@@ -289,6 +287,20 @@ namespace GitHub.ViewModels
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        void CreatePullRequests()
+        {
+            PullRequests = new TrackingCollection<IPullRequestModel>();
+            pullRequests.Comparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+            pullRequests.NewerComparer = OrderedComparer<IPullRequestModel>.OrderByDescending(x => x.UpdatedAt).Compare;
+        }
+
+        void ResetAndLoad()
+        {
+            CreatePullRequests();
+            UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
+            Load().Forget();
         }
 
         void SaveSettings()
