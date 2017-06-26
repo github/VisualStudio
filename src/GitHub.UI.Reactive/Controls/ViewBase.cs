@@ -42,6 +42,13 @@ namespace GitHub.UI
                 typeof(ViewBase),
                 new FrameworkPropertyMetadata());
 
+        static readonly DependencyProperty ShowBusyStateProperty =
+            DependencyProperty.Register(
+                nameof(ShowBusyState),
+                typeof(bool),
+                typeof(ViewBase),
+                new FrameworkPropertyMetadata(true));
+
         public static readonly DependencyProperty HasBusyStateProperty = HasBusyStatePropertyKey.DependencyProperty;
         public static readonly DependencyProperty IsBusyProperty = IsBusyPropertyKey.DependencyProperty;
         public static readonly DependencyProperty IsLoadingProperty = IsLoadingPropertyKey.DependencyProperty;
@@ -81,6 +88,15 @@ namespace GitHub.UI
         {
             get { return (bool)GetValue(IsLoadingProperty); }
             protected set { SetValue(IsLoadingPropertyKey, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display the view model's busy state.
+        /// </summary>
+        public bool ShowBusyState
+        {
+            get { return (bool)GetValue(ShowBusyStateProperty); }
+            set { SetValue(ShowBusyStateProperty, value); }
         }
 
         internal ViewBase()
