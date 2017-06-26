@@ -90,7 +90,7 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
                 var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
-                var fullPath = System.IO.Path.Combine(ViewModel.Repository.LocalPath, relativePath);
+                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
                 var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
                 var rightLabel = $"{relativePath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";

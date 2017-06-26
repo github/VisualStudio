@@ -189,7 +189,7 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number)
+        public IObservable<IPullRequestModel> GetPullRequest(IRepositoryModel repo, int number)
         {
             return Observable.Defer(() =>
             {

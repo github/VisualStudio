@@ -73,7 +73,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public IPullRequestModel Model { get; }
         public IPullRequestSession Session { get; }
-        public ILocalRepositoryModel Repository { get; }
+        public ILocalRepositoryModel LocalRepository { get; }
         public string SourceBranchDisplayName { get; set; }
         public string TargetBranchDisplayName { get; set; }
         public int CommentCount { get; set; }

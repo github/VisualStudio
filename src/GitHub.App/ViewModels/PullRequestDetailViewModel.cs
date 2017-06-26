@@ -31,6 +31,7 @@ namespace GitHub.ViewModels
         readonly IPullRequestService pullRequestsService;
         readonly IPullRequestSessionManager sessionManager;
         readonly IUsageTracker usageTracker;
+        IRemoteRepositoryModel remoteRepository;
         IPullRequestModel model;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
@@ -53,7 +54,7 @@ namespace GitHub.ViewModels
         /// <param name="teservice">The team explorer service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
-        /// <param name="avatarProvider">The avatar provider.</param>
+        /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         PullRequestDetailViewModel(
             IConnectionRepositoryHostMap connectionRepositoryHostMap,
@@ -72,19 +73,19 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
-        /// <param name="repositoryHost">The repository host.</param>
-        /// <param name="teservice">The team explorer service.</param>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="modelService">The model service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
-        /// <param name="avatarProvider">The avatar provider.</param>
+        /// <param name="usageTracker">The usage tracker.</param>
         public PullRequestDetailViewModel(
-            ILocalRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
             IModelService modelService,
             IPullRequestService pullRequestsService,
             IPullRequestSessionManager sessionManager,
             IUsageTracker usageTracker)
         {
-            this.Repository = repository;
+            this.LocalRepository = localRepository;
             this.modelService = modelService;
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -140,7 +141,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the repository that the pull request relates to.
         /// </summary>
-        public ILocalRepositoryModel Repository { get; }
+        public ILocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets the session for the pull request.
@@ -291,15 +292,23 @@ namespace GitHub.ViewModels
         /// <param name="data"></param>
         public override void Initialize([AllowNull] ViewWithData data)
         {
-            var prNumber = data?.Data != null ? (int)data.Data : Model.Number;
+            int number;
 
-            if (Model == null)
+            if (data != null)
+            {
+                var arg = (PullRequestDetailArgument)data.Data;
+                number = arg.Number;
+                remoteRepository = arg.Repository;
                 IsLoading = true;
+            }
             else
+            {
+                number = Model.Number;
                 IsBusy = true;
+            }
 
             OperationError = null;
-            modelService.GetPullRequest(Repository, prNumber)
+            modelService.GetPullRequest(remoteRepository, number)
                 .TakeLast(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Load(x).Forget());
@@ -317,22 +326,22 @@ namespace GitHub.ViewModels
             Session = await sessionManager.GetSession(pullRequest);
             Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
-            IsFromFork = pullRequestsService.IsPullRequestFromFork(Repository, Model);
+            IsFromFork = pullRequestsService.IsPullRequestFromFork(LocalRepository, Model);
             SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
             TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base.Label);
             CommentCount = pullRequest.Comments.Count +  pullRequest.ReviewComments.Count;
             Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
 
-            var changes = await pullRequestsService.GetTreeChanges(Repository, pullRequest);
+            var changes = await pullRequestsService.GetTreeChanges(LocalRepository, pullRequest);
             ChangedFilesTree = (await CreateChangedFilesTree(pullRequest, changes)).Children.ToList();
 
-            var localBranches = await pullRequestsService.GetLocalBranches(Repository, pullRequest).ToList();
+            var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
-            IsCheckedOut = localBranches.Contains(Repository.CurrentBranch);
+            IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
 
             if (IsCheckedOut)
             {
-                var divergence = await pullRequestsService.CalculateHistoryDivergence(Repository, Model.Number);
+                var divergence = await pullRequestsService.CalculateHistoryDivergence(LocalRepository, Model.Number);
                 var pullEnabled = divergence.BehindBy > 0;
                 var pushEnabled = divergence.AheadBy > 0 && !pullEnabled;
                 string pullToolTip;
@@ -373,8 +382,8 @@ namespace GitHub.ViewModels
             {
                 var caption = localBranches.Count > 0 ?
                     string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(Repository, Model.Number, Model.Title));
-                var clean = await pullRequestsService.IsWorkingDirectoryClean(Repository);
+                    string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
+                var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                 string disabled = null;
 
                 if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
@@ -399,7 +408,7 @@ namespace GitHub.ViewModels
 
             if (!isInCheckout)
             {
-                pullRequestsService.RemoveUnusedRemotes(Repository).Subscribe(_ => { });
+                pullRequestsService.RemoveUnusedRemotes(LocalRepository).Subscribe(_ => { });
             }
         }
 
@@ -411,7 +420,7 @@ namespace GitHub.ViewModels
         public Task<Tuple<string, string>> ExtractDiffFiles(IPullRequestFileNode file)
         {
             var path = Path.Combine(file.DirectoryPath, file.FileName);
-            return pullRequestsService.ExtractDiffFiles(Repository, model, path, IsCheckedOut).ToTask();
+            return pullRequestsService.ExtractDiffFiles(LocalRepository, model, path, IsCheckedOut).ToTask();
         }
 
         /// <summary>
@@ -421,7 +430,7 @@ namespace GitHub.ViewModels
         /// <returns>The full path to the file in the working directory.</returns>
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
-            return Path.Combine(Repository.LocalPath, file.DirectoryPath, file.FileName);
+            return Path.Combine(LocalRepository.LocalPath, file.DirectoryPath, file.FileName);
         }
 
         void SubscribeOperationError(ReactiveCommand<Unit> command)
@@ -440,7 +449,7 @@ namespace GitHub.ViewModels
             foreach (var changedFile in pullRequest.ChangedFiles)
             {
                 var node = new PullRequestFileNode(
-                    Repository.LocalPath,
+                    LocalRepository.LocalPath,
                     changedFile.FileName,
                     changedFile.Sha,
                     changedFile.Status,
@@ -518,30 +527,30 @@ namespace GitHub.ViewModels
         {
             return Observable.Defer(async () =>
             {
-                var localBranches = await pullRequestsService.GetLocalBranches(Repository, Model).ToList();
+                var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, Model).ToList();
 
                 if (localBranches.Count > 0)
                 {
-                    return pullRequestsService.SwitchToBranch(Repository, Model);
+                    return pullRequestsService.SwitchToBranch(LocalRepository, Model);
                 }
                 else
                 {
                     return pullRequestsService
-                        .GetDefaultLocalBranchName(Repository, Model.Number, Model.Title)
-                        .SelectMany(x => pullRequestsService.Checkout(Repository, Model, x));
+                        .GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title)
+                        .SelectMany(x => pullRequestsService.Checkout(LocalRepository, Model, x));
                 }
             }).Do(_ => usageTracker.IncrementPullRequestCheckOutCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPull(object unused)
         {
-            return pullRequestsService.Pull(Repository)
+            return pullRequestsService.Pull(LocalRepository)
                 .Do(_ => usageTracker.IncrementPullRequestPullCount(IsFromFork).Forget());
         }
 
         IObservable<Unit> DoPush(object unused)
         {
-            return pullRequestsService.Push(Repository)
+            return pullRequestsService.Push(LocalRepository)
                 .Do(_ => usageTracker.IncrementPullRequestPushCount(IsFromFork).Forget());
         }
 

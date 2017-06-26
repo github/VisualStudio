@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -28,7 +29,7 @@ namespace GitHub.ViewModels
         static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         readonly IRepositoryHost repositoryHost;
-        readonly ILocalRepositoryModel repository;
+        readonly ILocalRepositoryModel localRepository;
         readonly TrackingCollection<IAccount> trackingAuthors;
         readonly TrackingCollection<IAccount> trackingAssignees;
         readonly IPackageSettings settings;
@@ -52,7 +53,7 @@ namespace GitHub.ViewModels
         {
             constructing = true;
             this.repositoryHost = repositoryHost;
-            this.repository = repository;
+            this.localRepository = repository;
             this.settings = settings;
 
             Title = Resources.PullRequestsNavigationItemText;
@@ -110,6 +111,20 @@ namespace GitHub.ViewModels
             Load().Forget();
         }
 
+        IRemoteRepositoryModel Repository
+        {
+            get
+            {
+                if (remoteRepository != null)
+                {
+                    return !remoteRepository.IsFork || showForkPullRequests ?
+                        remoteRepository : remoteRepository.Parent;
+                }
+
+                return null;
+            }
+        }
+
         async Task Load()
         {
             IsBusy = true;
@@ -117,15 +132,12 @@ namespace GitHub.ViewModels
             if (remoteRepository == null)
             {
                 remoteRepository = await repositoryHost.ModelService.GetRepository(
-                    repository.Owner,
-                    repository.Name);
+                    localRepository.Owner,
+                    localRepository.Name);
                 RepositoryIsFork = remoteRepository.IsFork;
             }
 
-            var repo = !remoteRepository.IsFork || showForkPullRequests ?
-                remoteRepository : remoteRepository.Parent;
-
-            PullRequests = repositoryHost.ModelService.GetPullRequests(repo, pullRequests);
+            PullRequests = repositoryHost.ModelService.GetPullRequests(Repository, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -316,7 +328,14 @@ namespace GitHub.ViewModels
 
         void DoOpenPullRequest(object pullRequest)
         {
-            var d = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = pullRequest };
+            var d = new ViewWithData(UIControllerFlow.PullRequestDetail)
+            {
+                Data = new PullRequestDetailArgument
+                {
+                    Repository = Repository,
+                    Number = (int)pullRequest,
+                }
+            };
             navigate.OnNext(d);
         }
 

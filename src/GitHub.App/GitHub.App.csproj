@@ -134,6 +134,7 @@
   <ItemGroup>
     <Compile Include="Models\IssueCommentModel.cs" />
     <Compile Include="Models\PullRequestReviewCommentModel.cs" />
+    <Compile Include="Models\PullRequestDetailArgument.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <None Include="..\..\script\Key.snk" Condition="$(Buildtype) == 'Internal'">
       <Link>Key.snk</Link>
