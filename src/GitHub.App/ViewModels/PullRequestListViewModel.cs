@@ -5,10 +5,12 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using GitHub.App;
 using GitHub.Collections;
 using GitHub.Exports;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
@@ -32,6 +34,7 @@ namespace GitHub.ViewModels
         readonly IPackageSettings settings;
         readonly PullRequestListUIState listSettings;
         readonly bool constructing;
+        IRemoteRepositoryModel remoteRepository;
 
         [ImportingConstructor]
         PullRequestListViewModel(
@@ -90,6 +93,10 @@ namespace GitHub.ViewModels
                 .Where(x => PullRequests != null && x != EmptyUser)
                 .Subscribe(a => UpdateFilter(SelectedState, SelectedAssignee, a));
 
+            this.WhenAnyValue(x => x.ShowPullRequestsForFork)
+                .Skip(1)
+                .Subscribe(_ => Load().Forget());
+
             SelectedState = States.FirstOrDefault(x => x.Name == listSettings.SelectedState) ?? States[0];
             OpenPullRequest = ReactiveCommand.Create();
             OpenPullRequest.Subscribe(DoOpenPullRequest);
@@ -102,10 +109,25 @@ namespace GitHub.ViewModels
         public override void Initialize([AllowNull] ViewWithData data)
         {
             base.Initialize(data);
+            Load().Forget();
+        }
 
+        async Task Load()
+        {
             IsBusy = true;
 
-            PullRequests = repositoryHost.ModelService.GetPullRequests(repository, pullRequests);
+            if (remoteRepository == null)
+            {
+                remoteRepository = await repositoryHost.ModelService.GetRepository(
+                    repository.Owner,
+                    repository.Name);
+                RepositoryIsFork = remoteRepository.IsFork;
+            }
+
+            var repo = !remoteRepository.IsFork || showForkPullRequests ?
+                remoteRepository : remoteRepository.Parent;
+
+            PullRequests = repositoryHost.ModelService.GetPullRequests(repo, pullRequests);
             pullRequests.Subscribe(pr =>
             {
                 trackingAssignees.AddItem(pr.Assignee);
@@ -136,7 +158,7 @@ namespace GitHub.ViewModels
                     {
                         SelectedAssignee = Assignees.FirstOrDefault(x => x.Login == listSettings.SelectedAssignee);
                     }
- 
+
                     IsBusy = false;
                     UpdateFilter(SelectedState, SelectedAssignee, SelectedAuthor);
                 });
@@ -222,6 +244,20 @@ namespace GitHub.ViewModels
             [return: AllowNull]
             get { return selectedAssignee; }
             set { this.RaiseAndSetIfChanged(ref selectedAssignee, value); }
+        }
+
+        bool repositoryIsFork;
+        public bool RepositoryIsFork
+        {
+            get { return repositoryIsFork; }
+            set { this.RaiseAndSetIfChanged(ref repositoryIsFork, value); }
+        }
+
+        bool showForkPullRequests;
+        public bool ShowPullRequestsForFork
+        {
+            get { return showForkPullRequests; }
+            set { this.RaiseAndSetIfChanged(ref showForkPullRequests, value); }
         }
 
         IAccount emptyUser = new Account("[None]", false, false, 0, 0, Observable.Empty<BitmapSource>());

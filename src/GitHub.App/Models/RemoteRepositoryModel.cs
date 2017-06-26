@@ -21,7 +21,7 @@ namespace GitHub.Models
         /// <param name="isPrivate">Whether the repository is private.</param>
         /// <param name="isFork">Whether the repository is a fork.</param>
         /// <param name="ownerAccount">The repository owner account.</param>
-        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount)
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount, [AllowNull] IRemoteRepositoryModel parent)
             : base(name, cloneUrl)
         {
             Id = id;
@@ -31,6 +31,7 @@ namespace GitHub.Models
             // this is an assumption, we'd have to load the repo information from octokit to know for sure
             // probably not worth it for this ctor
             DefaultBranch = new BranchModel("master", this);
+            Parent = parent;
         }
 
         /// <summary>

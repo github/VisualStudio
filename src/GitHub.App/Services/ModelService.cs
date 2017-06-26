@@ -154,7 +154,7 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(ILocalRepositoryModel repo,
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
@@ -215,6 +215,19 @@ namespace GitHub.Services
                         TimeSpan.FromDays(7))
                     .Select(Create);
             });
+        }
+
+        public IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo)
+        {
+            var keyobs = GetUserFromCache()
+                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
+
+            return Observable.Defer(() => keyobs
+                .SelectMany(key =>
+                    hostCache.GetAndFetchLatest(
+                        key,
+                        () => apiClient.GetRepository(owner, repo).Select(RepositoryCacheItem.Create))
+                    .Select(Create)));
         }
 
         public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
@@ -391,7 +404,8 @@ namespace GitHub.Services
                 new UriString(item.CloneUrl),
                 item.Private,
                 item.Fork,
-                Create(item.Owner))
+                Create(item.Owner),
+                item.Parent != null ? Create(item.Parent) : null)
             {
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
@@ -505,6 +519,7 @@ namespace GitHub.Services
                 CreatedAt = apiRepository.CreatedAt;
                 UpdatedAt = apiRepository.UpdatedAt;
                 Timestamp = apiRepository.UpdatedAt;
+                Parent = apiRepository.Parent != null ? new RepositoryCacheItem(apiRepository.Parent) : null;
             }
 
             public long Id { get; set; }
@@ -521,6 +536,13 @@ namespace GitHub.Services
             public bool Fork { get; set; }
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
+
+            [AllowNull]
+            public RepositoryCacheItem Parent
+            {
+                [return: AllowNull]
+                get; set;
+            }
         }
 
         [NullGuard(ValidationFlags.None)]

@@ -37,6 +37,8 @@ namespace GitHub.ViewModels
         IAccount SelectedAuthor { get; set; }
         ObservableCollection<IAccount> Assignees { get; }
         IAccount SelectedAssignee { get; set; }
+        bool RepositoryIsFork { get; set; }
+        bool ShowPullRequestsForFork { get; set; }
         ReactiveCommand<object> OpenPullRequest { get; }
         ReactiveCommand<object> CreatePullRequest { get; }
     }

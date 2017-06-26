@@ -132,6 +132,12 @@
                          ItemsSource="{Binding Source={StaticResource AuthorCollectionViewSource}}"
                          SelectedItem="{Binding SelectedAuthor}"
                          AutomationProperties.AutomationId="{x:Static automation:AutomationIDs.PullRequestListAuthorFilterComboBox}" />          
+        <Separator Style="{StaticResource VerticalSeparator}" />
+          
+        <CheckBox IsChecked="{Binding ShowPullRequestsForFork}"
+                  Visibility="{Binding RepositoryIsFork, Converter={ui:BooleanToVisibilityConverter}}">
+            Fork
+        </CheckBox>
       </WrapPanel>
 
       <ui:GitHubActionLink Grid.Column="1"
