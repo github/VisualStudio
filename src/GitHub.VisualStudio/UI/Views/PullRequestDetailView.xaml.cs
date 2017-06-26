@@ -35,6 +35,10 @@ namespace GitHub.VisualStudio.UI.Views
         {
             InitializeComponent();
 
+            CommandBindings.Add(new CommandBinding(
+                NavigationCommands.GoToPage,
+                NavigateToUrl));
+
             bodyMarkdown.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
             changesSection.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
 
@@ -55,6 +59,16 @@ namespace GitHub.VisualStudio.UI.Views
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {
             base.OnVisualParentChanged(oldParent);
+        }
+
+        void NavigateToUrl(object sender, ExecutedRoutedEventArgs e)
+        {
+            var url = e.Parameter as string;
+
+            if (url != null)
+            {
+                VisualStudioBrowser.OpenUrl(new Uri(url));
+            }
         }
 
         void DoOpenOnGitHub()

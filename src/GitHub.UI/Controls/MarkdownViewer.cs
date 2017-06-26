@@ -46,9 +46,68 @@ namespace GitHub.UI
             set { SetValue(DocumentStyleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DocumentStyleProperty =
             Markdown.DocumentStyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style Heading1Style
+        {
+            get { return (Style)GetValue(Heading1StyleProperty); }
+            set { SetValue(Heading1StyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty Heading1StyleProperty =
+            Markdown.Heading1StyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style Heading2Style
+        {
+            get { return (Style)GetValue(Heading2StyleProperty); }
+            set { SetValue(Heading2StyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty Heading2StyleProperty =
+            Markdown.Heading2StyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style Heading3Style
+        {
+            get { return (Style)GetValue(Heading3StyleProperty); }
+            set { SetValue(Heading3StyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty Heading3StyleProperty =
+            Markdown.Heading3StyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style Heading4Style
+        {
+            get { return (Style)GetValue(Heading4StyleProperty); }
+            set { SetValue(Heading4StyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty Heading4StyleProperty =
+            Markdown.Heading4StyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style CodeStyle
+        {
+            get { return (Style)GetValue(CodeStyleProperty); }
+            set { SetValue(CodeStyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty CodeStyleProperty =
+            Markdown.CodeStyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style CodeBlockStyle
+        {
+            get { return (Style)GetValue(CodeBlockStyleProperty); }
+            set { SetValue(CodeBlockStyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty CodeBlockStyleProperty =
+            Markdown.CodeBlockStyleProperty.AddOwner(typeof(MarkdownViewer),
                 new FrameworkPropertyMetadata(UpdateLinkedProperties));
 
         public Style LinkStyle
@@ -57,9 +116,28 @@ namespace GitHub.UI
             set { SetValue(LinkStyleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for LinkStyle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LinkStyleProperty =
             Markdown.LinkStyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style ImageStyle
+        {
+            get { return (Style)GetValue(ImageStyleProperty); }
+            set { SetValue(ImageStyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty ImageStyleProperty =
+            Markdown.ImageStyleProperty.AddOwner(typeof(MarkdownViewer),
+                new FrameworkPropertyMetadata(UpdateLinkedProperties));
+
+        public Style SeparatorStyle
+        {
+            get { return (Style)GetValue(SeparatorStyleProperty); }
+            set { SetValue(SeparatorStyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty SeparatorStyleProperty =
+            Markdown.SeparatorStyleProperty.AddOwner(typeof(MarkdownViewer),
                 new FrameworkPropertyMetadata(UpdateLinkedProperties));
 
         public MarkdownViewer()

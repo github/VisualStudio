@@ -16,6 +16,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Linq;
 
 namespace GitHub.UI
 {
@@ -113,6 +114,16 @@ namespace GitHub.UI
         public static readonly DependencyProperty CodeStyleProperty =
             DependencyProperty.Register("CodeStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
 
+        public Style CodeBlockStyle
+        {
+            get { return (Style)GetValue(CodeBlockStyleProperty); }
+            set { SetValue(CodeBlockStyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CodeBlockStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CodeBlockStyleProperty =
+            DependencyProperty.Register("CodeBlockStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
         public Style LinkStyle
         {
             get { return (Style)GetValue(LinkStyleProperty); }
@@ -154,7 +165,7 @@ namespace GitHub.UI
 
         public Markdown()
         {
-            //HyperlinkCommand = NavigationCommands.GoToPage;
+            HyperlinkCommand = NavigationCommands.GoToPage;
         }
 
         public FlowDocument Transform(string text)
@@ -185,8 +196,9 @@ namespace GitHub.UI
 
             return DoHeaders(text,
                 s1 => DoHorizontalRules(s1,
-                    s2 => DoLists(s2,
-                    sn => FormParagraphs(sn))));
+                s2 => DoLists(s2,
+                s3 => DoCodeBlocks(s3, 
+                sn => FormParagraphs(sn)))));
 
             //text = DoCodeBlocks(text);
             //text = DoBlockQuotes(text);
@@ -363,13 +375,15 @@ namespace GitHub.UI
                 )", GetNestedBracketsPattern(), GetNestedParensPattern()),
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+        static Regex anchorAuto = new Regex(@"([A-Za-z][A-Za-z0-9.+-]{1,31}:[^<>\x00-\x20]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         /// <summary>
         /// Turn Markdown images into images
         /// </summary>
         /// <remarks>
         /// ![image alt](url) 
         /// </remarks>
-        IEnumerable<Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        IEnumerable <Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
             Guard.ArgumentNotNull(text, nameof(text));
 
@@ -441,8 +455,8 @@ namespace GitHub.UI
         {
             Guard.ArgumentNotNull(text, nameof(text));
 
-            // Next, inline-style links: [link text](url "optional title") or [link text](url "optional title")
-            return Evaluate(text, anchorInline, AnchorInlineEvaluator, defaultHandler);
+            return Evaluate(text, anchorInline, AnchorInlineEvaluator, 
+                x => Evaluate(x, anchorAuto, AnchorAutoEvaluator, defaultHandler));
         }
 
         Inline AnchorInlineEvaluator(Match match)
@@ -454,6 +468,26 @@ namespace GitHub.UI
             string title = match.Groups[6].Value;
 
             var result = Create<Hyperlink, Inline>(RunSpanGamut(linkText));
+            result.Command = HyperlinkCommand;
+            result.CommandParameter = url;
+            if (LinkStyle != null)
+            {
+                result.Style = LinkStyle;
+            }
+
+            return result;
+        }
+
+        Inline AnchorAutoEvaluator(Match match)
+        {
+            Guard.ArgumentNotNull(match, nameof(match));
+
+            string url = match.Groups[1].Value;
+
+            var run = new Run();
+            run.Text = url;
+
+            var result = new Hyperlink(run);
             result.Command = HyperlinkCommand;
             result.CommandParameter = url;
             if (LinkStyle != null)
@@ -705,10 +739,11 @@ namespace GitHub.UI
                 list = Regex.Replace(list, @"\n{2,}\z", "\n");
 
                 string pattern = string.Format(
-                  @"(\n)?                      # leading line = $1
+                  @"(\n)?                  # leading line = $1
                 (^[ ]*)                    # leading whitespace = $2
                 ({0}) [ ]+                 # list marker = $3
-                ((?s:.+?)                  # list item text = $4
+                (\[[ x]\]\s)?              # checkbox = $4
+                ((?s:.+?)                  # list item text = $5
                 (\n{{1,2}}))      
                 (?= \n* (\z | \2 ({0}) [ ]+))", marker);
 
@@ -729,17 +764,81 @@ namespace GitHub.UI
         {
             Guard.ArgumentNotNull(match, nameof(match));
 
-            string item = match.Groups[4].Value;
+            string check = match.Groups[4].Value.Trim();
+            string item = match.Groups[5].Value;
             string leadingLine = match.Groups[1].Value;
 
             if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
                 // we could correct any bad indentation here..
-                return Create<ListItem, Block>(RunBlockGamut(item));
+                return Create<ListItem, Block>(BuildListItem(check, item));
             else
             {
                 // recursion for sub-lists
-                return Create<ListItem, Block>(RunBlockGamut(item));
+                return Create<ListItem, Block>(BuildListItem(check, item));
             }
+        }
+
+        IEnumerable<Block> BuildListItem(string check, string item)
+        {
+            CheckBox checkBox = null;
+
+            if (!string.IsNullOrWhiteSpace(check))
+            {
+                checkBox = new CheckBox
+                {
+                    IsEnabled = false,
+                    IsChecked = check == "[x]",
+                };
+            }
+
+            foreach (var block in RunBlockGamut(item))
+            {
+                if (checkBox != null)
+                {
+                    var paragraph = block as Paragraph;
+                    paragraph.Inlines.InsertBefore(paragraph.Inlines.FirstInline, new InlineUIContainer(checkBox));
+                    checkBox = null;
+                }
+
+                yield return block;
+            }
+        }
+
+        static Regex codeBlock = new Regex(@"
+                    ^           # Beginning of line
+                    ```         # Three ` backticks
+                    \s*?        # Whitespace
+                    ([\S]+)?    # $1 = language
+                    \n          # Newline
+                    ([\s\S]+?)  # $2 = The code block
+                    \n          # Newline
+                    ```", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Turn Markdown ``` code blocks into a PRE tags
+        /// </summary>
+        IEnumerable<Block> DoCodeBlocks(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        {
+            Guard.ArgumentNotNull(text, nameof(text));
+
+            return Evaluate(text, codeBlock, CodeBlockEvaluator, defaultHandler);
+        }
+
+        Block CodeBlockEvaluator(Match match)
+        {
+            Guard.ArgumentNotNull(match, nameof(match));
+
+            var inline = new Run();
+            inline.Text = match.Groups[2].Value;
+
+            var result = new Paragraph(inline);
+
+            if (CodeBlockStyle != null)
+            {
+                result.Style = CodeBlockStyle;
+            }
+
+            return result;
         }
 
         static Regex codeSpan = new Regex(@"

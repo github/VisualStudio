@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  <Paragraph>Dashes:</Paragraph>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> ---</Paragraph>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> - - -</Paragraph>
+  <Paragraph>Asterisks:</Paragraph>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph> <Italic>*</Italic></Paragraph>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> * * *</Paragraph>
+  <Paragraph>Underscores:</Paragraph>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph> <Italic>_</Italic></Paragraph>
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Line X2="1" StrokeThickness="1" />
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> _ _ _</Paragraph>
+</FlowDocument>
